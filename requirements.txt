@@ -5,7 +5,6 @@ Jinja2==2.8
 lxml==3.7.0
 MarkupSafe==0.23
 numericalunits==1.15
-pygpx==0.3.1
 https://github.com/fxdgear/pygpx/archive/master.zip
 python-dateutil==2.6.0
 requests==2.12.4
