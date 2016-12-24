@@ -1,3 +1,4 @@
+from flask import flash
 from pygpx import GPX
 import numericalunits as nu
 import requests
@@ -38,7 +39,10 @@ class weather_calculator:
 
         base_speed = self.paceToSpeed[pace]
         # month day year hour:minute (24-hour)
-        start_datetime = datetime.strptime(starting_time,'%Y-%m-%dT%H:%M')
+        try:
+            start_datetime = datetime.strptime(starting_time,'%Y-%m-%dT%H:%M')
+        except:
+            flash('Invalid starting time','error')
         tracks = gpx.tracks
         for track in tracks:
             for trkseg in track.trksegs:

@@ -2,6 +2,17 @@
   <head>
     <title>Submit a form</title>
    <link rel="stylesheet" type="text/css" href="/static/style.css">
+      <style>
+        button {
+            color: #900;
+            font-weight: bold;
+            font-size: 150%;
+        }
+        input.action {
+            color: #909;
+            width: 14em;  height: 3em;
+        }
+      </style>
   </head>
   <body>
     <div id="container">
@@ -27,8 +38,10 @@
              <option value="E">E</option>
          </select><br />
           <label for="route">Route file:</label>
-          <input type="file" name="route" accept=".gpx" required><br />
-          <input type="submit" value="Find forecast">
+          <input type="file" name="route" size="25" accept=".gpx" required><br />
+          <!--<input type="file" name="route" class="action" style="width: 20em;  height: 3em" accept=".gpx" required><br />-->
+          <input type="submit" id="forecast" class="action" value="Find forecast">
+          <!--<input type="submit" id="forecast" style="width: 15em;  height: 3em" value="Find forecast">-->
         </form>
       </div>
     </div>

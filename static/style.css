@@ -1,3 +1,15 @@
 .pagetitle {
     color: #810080;
 }
+#forecast {
+    width: 20em;  height: 2em;
+}
+input.action {
+    color: #908;
+    width: 15em;  height: 3em;
+}
+button {
+  color: #900;
+  font-weight: bold;
+  font-size: 150%;
+  }
