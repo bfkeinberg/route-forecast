@@ -1,4 +1,6 @@
 import logging
+import os
+
 from flask import Flask, render_template, request, redirect, url_for
 import tempfile
 
@@ -35,9 +37,11 @@ def submitted_form():
         forecast = wcalc.calc_weather(float(interval), pace, starting_time=starting_time, route=local_file.name)
         bounds = wcalc.get_bounds()
         min_lat, min_lon, max_lat, max_lon = bounds
+    # key = os.environ("MAPS_KEY")
+    key = "AIzaSyAYuBONqQrBidMOwcM22dDUl28iqv22zKM"
     return render_template(
         'submitted_form.html',
-        forecast=forecast, min_lat=min_lat, max_lat=max_lat, min_lon=min_lon, max_lon=max_lon, points=wcalc.get_points())
+        forecast=forecast, min_lat=min_lat, max_lat=max_lat, min_lon=min_lon, max_lon=max_lon, points=wcalc.get_points(),key=key)
 
 # run the app.
 if __name__ == "__main__":
