@@ -1,0 +1,100 @@
+<html>
+ <head>
+   <title>Submitted form</title>
+   <link rel="stylesheet" type="text/css" href="/static/style.css">
+    <style>
+        #map {
+        height: 400px;
+        width: 100%;
+        }
+        table, th, td {
+            border: 1px solid black;
+        }
+        th, td {
+            padding: 5px;
+        }
+        th {
+            text-align: left;
+        }
+    </style>
+ </head>
+ <body>
+   <div id="container">
+     <div class="pagetitle">
+       <h1>Route forecast</h1>
+     </div>
+     <div id="main">
+        <table style="width:100%">
+            <tr>
+                <th>Time</th>
+                <th>Summary</th>
+                <th>Temperature</th>
+                <th>Chance of rain</th>
+                <th>Cloud cover</th>
+                <th>Wind speed</th>
+            </tr>
+         {% for short_time,summary,float_temp,chance_rain,cloud_cover,wind_speed,lat,lon,temp,time in forecast %}
+            <tr>
+                <td>{{ short_time }}</td>
+                <td>{{ summary }}</td>
+                <td>{{ float_temp }}</td>
+                <td>{{ chance_rain }}</td>
+                <td>{{ cloud_cover }}</td>
+                <td>{{ wind_speed }}</td>
+            </tr>
+         {% endfor %}
+        </table>
+       <input type="button" onclick="location.href='form';" value="Forecast another" />
+     </div>
+       <div class="map title">
+           <h1>Forecast map</h1>
+       </div>
+       <div id="map"></div>
+    </div>
+    <script>
+        function addMarker(latitude, longitude, map, value, title) {
+          // Add the marker at the specified location
+          var marker = new google.maps.Marker({
+            position: {lat:latitude,lng:longitude},
+            label: value,
+            map: map,
+            title: title
+          });
+        };
+        var routePoints = [
+            {% for point in points %}
+            {lat: {{ point.lat }}, lng: {{ point.lon }} },
+            {% endfor %}
+        ];
+        function drawRoute(points,map) {
+            var routeLine = new google.maps.Polyline({
+                path: points,
+                geodesic: true,
+                strokeColor: '#FF0000',
+                strokeOpacity: 1.0,
+                strokeWeight: 2
+                });
+
+            routeLine.setMap(map);
+        }
+        function initMap() {
+            var mapDiv = document.getElementById('map');
+            var map = new google.maps.Map(mapDiv, {
+                mapTypeId: google.maps.MapTypeId.ROADMAP
+            });
+
+            var southWest = { lat:{{ min_lat }}, lng:{{ min_lon }} };
+            var northEast = { lat:{{ max_lat }}, lng:{{ max_lon }} };
+            var bounds = new google.maps.LatLngBounds(southWest,northEast);
+            map.fitBounds(bounds);
+            {% for short_time,summary,float_temp,chance_rain,cloud_cover,wind_speed,lat,lon,temp,time in forecast %}
+            addMarker({{ lat }}, {{ lon }}, map,'{{ temp }}', '{{ time }}');
+            {% endfor %}
+            drawRoute(routePoints,map)
+        };
+    </script>
+    <script async defer
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAYuBONqQrBidMOwcM22dDUl28iqv22zKM&callback=initMap">
+    </script>
+ </body>
+</html>
