@@ -24,6 +24,7 @@
        <h1>Route forecast</h1>
      </div>
      <div id="main">
+       <input type="button" onclick="location.href='form';" value="Forecast another" /><br/>
         <table style="width:100%">
             <tr>
                 <th>Time</th>
@@ -44,7 +45,6 @@
             </tr>
          {% endfor %}
         </table>
-       <input type="button" onclick="location.href='form';" value="Forecast another" />
      </div>
        <div class="map title">
            <h1>Forecast map</h1>
@@ -94,7 +94,7 @@
         };
     </script>
     <script async defer
-        src="https://maps.googleapis.com/maps/api/js?key={{ key }}&callback=initMap">
+        src="https://maps.googleapis.com/maps/api/js?key={{ maps_key }}&callback=initMap">
     </script>
  </body>
 </html>

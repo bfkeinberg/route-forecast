@@ -1,13 +1,21 @@
 import logging
 import os
+import tempfile
 
 from flask import Flask, render_template, request, redirect, url_for
-import tempfile
 
 from routeWeather import weather_calculator
 
 application = Flask(__name__)
-application.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
+application.config['MAX_CONTENT_LENGTH'] = 20 * 1024 * 1024
+
+# @application.template_filter()
+# def env(value, key):
+#     return os.getenv(key, value)
+
+@application.context_processor
+def inject_maps_keys():
+    return dict(maps_key=os.getenv('MAPS_KEY','NONE'))
 
 @application.route('/')
 def hello():
@@ -37,10 +45,9 @@ def submitted_form():
         forecast = wcalc.calc_weather(float(interval), pace, starting_time=starting_time, route=local_file.name)
         bounds = wcalc.get_bounds()
         min_lat, min_lon, max_lat, max_lon = bounds
-    key = os.environ["MAPS_KEY"]
     return render_template(
         'submitted_form.html',
-        forecast=forecast, min_lat=min_lat, max_lat=max_lat, min_lon=min_lon, max_lon=max_lon, points=wcalc.get_points(),key=key)
+        forecast=forecast, min_lat=min_lat, max_lat=max_lat, min_lon=min_lon, max_lon=max_lon, points=wcalc.get_points())
 
 # run the app.
 if __name__ == "__main__":
