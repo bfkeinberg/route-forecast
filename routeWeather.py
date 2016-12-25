@@ -104,8 +104,8 @@ class weather_calculator:
             now = datetime.fromtimestamp(currentForecast['time'])
             return (now.strftime("%H:%M"),currentForecast['summary'],str(currentForecast['temperature'])+'F',
                     str((currentForecast['precipProbability'] * 100)) + '%' if 'precipProbability' in currentForecast else '<unavailable>',
-                    str(currentForecast['cloudCover'] * 100) + '%',
-                    str(currentForecast['windSpeed']) + ' mph',
+                    str(currentForecast['cloudCover'] * 100) + '%' if 'cloudCover' in currentForecast else '<unavailable>',
+                    str(currentForecast['windSpeed']) + ' mph' if 'windSpeed' in currentForecast else '<unavailable>',
                     lat, lon, int(round(currentForecast['temperature'])), now.strftime("%c")
                     )
 
