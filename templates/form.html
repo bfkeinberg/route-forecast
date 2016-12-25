@@ -2,8 +2,35 @@
   <head>
     <title>Find weather forecast for route</title>
    <link rel="stylesheet" type="text/css" href="static/style.css">
+        <link rel="stylesheet" href="https://unpkg.com/flatpickr/dist/flatpickr.min.css">
+        <link rel="stylesheet" href="https://unpkg.com/flatpickr/dist/themes/confetti.css">
+        <script src="https://unpkg.com/flatpickr"></script>
+        <script>
+            function setupDate() {
+                var now = new Date();
+                var later = new Date();
+                var daysToAdd = 14;
+                later.setDate(now.getDate() + daysToAdd);
+                document.getElementById('starting_time').flatpickr({
+                enableTime: true,
+                altInput: true,
+	            altFormat: "F j, Y h:i K",
+	            altInputClass: "dateDisplay",
+	            minDate: now,
+	            maxDate: later,
+	            defaultDate: now,
+	            dateFormat: "Y-m-d\TH:i"
+                 });
+            }
+        </script>
+      <style>
+        .dateDisplay {
+            width: 16em;
+            font-size: 105%;
+        }
+      </style>
   </head>
-  <body>
+  <body onload="setupDate()">
     <div id="container">
       <div class="pagetitle">
         <h1>Get weather for route</h1>
@@ -13,7 +40,7 @@
           <label for="interval">Interval in hours:</label>
           <input type="number" min=0.5 max=2 step=0.5 name="interval" required><br />
           <label for="starting_time">Starting time:</label>
-          <input type="datetime-local" name="starting_time" required><br />
+          <input type="text" name="starting_time" id='starting_time' placeholder="Select Date.." required><br/>
           <label for="pace">Pace:</label>
           <select name="pace" required>
              <option value="A">A</option>
@@ -27,7 +54,7 @@
              <option value="E">E</option>
          </select><br />
           <label for="route">Route file:</label>
-          <input type="file" name="route" accept=".gpx" required><br />
+          <input type="file" name="route" accept=".gpx" required><br /><br/>
           <input type="submit" id="forecast" value="Find forecast">
         </form>
       </div>
