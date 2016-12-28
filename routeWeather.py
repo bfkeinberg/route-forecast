@@ -1,9 +1,10 @@
-from flask import flash
-from pygpx import GPX
-import numericalunits as nu
-import requests
 from datetime import datetime
 from datetime import timedelta
+
+import gpxpy.gpx
+import numericalunits as nu
+import requests
+
 nu.reset_units()
 nu.set_derived_units_and_constants()
 
@@ -16,6 +17,10 @@ class weather_calculator:
         self.min_longitude = 180
         self.max_latitude = -90
         self.max_longitude = -180
+        self.error = False
+
+    def isError(self):
+        return self.error
 
     def get_bounds(self):
         return self.min_latitude,self.min_longitude,self.max_latitude,self.max_longitude
@@ -24,15 +29,18 @@ class weather_calculator:
         return self.pointsInRoute
 
     def calc_weather(self, forecast_interval_hours, pace, starting_time, route):
-        try:
-            gpx = GPX(route)
-        except:
-            return ["Invalid route file", 0, 0]
+        with open(route, 'r') as gpx_file:
+            try:
+                gpx = gpxpy.parse(gpx_file)
+            except:
+                self.error = True
+                return "Unknown GPX parsing error"
         elevation_change = 0
         delta_elevation_gain = 0
         accum_distance = 0
         segment_distance = 0
         old_trkpnt = None
+        prev_elevation = None
         elapsed_time = None
         forecast = []
         self.pointsInRoute = []
@@ -42,24 +50,25 @@ class weather_calculator:
         try:
             start_datetime = datetime.strptime(starting_time,'%Y-%m-%dT%H:%M')
         except:
-            flash('Invalid starting time','error')
+            self.error = True
+            return 'Invalid starting time'
         tracks = gpx.tracks
         for track in tracks:
-            for trkseg in track.trksegs:
-                for trkpnt in trkseg.trkpts:
+            for trkseg in track.segments:
+                for trkpnt in trkseg.points:
                     self.pointsInRoute.append(trkpnt)
-                    self.min_latitude = min(self.min_latitude, trkpnt.lat)
-                    self.max_latitude = max(self.max_latitude, trkpnt.lat)
-                    self.min_longitude = min(self.min_longitude, trkpnt.lon)
-                    self.max_longitude = max(self.max_longitude, trkpnt.lon)
+                    self.min_latitude = min(self.min_latitude, trkpnt.latitude)
+                    self.max_latitude = max(self.max_latitude, trkpnt.latitude)
+                    self.min_longitude = min(self.min_longitude, trkpnt.longitude)
+                    self.max_longitude = max(self.max_longitude, trkpnt.longitude)
                     if old_trkpnt != None:
-                        distance_from_last = trkpnt.distance(old_trkpnt)
+                        distance_from_last = trkpnt.distance_3d(old_trkpnt)
                         accum_distance += distance_from_last
                         segment_distance += distance_from_last
 
-                        if trkpnt.elevation > old_trkpnt.elevation:
-                            elevation_change += trkpnt.elevation - old_trkpnt.elevation
-                            delta_elevation_gain += trkpnt.elevation - old_trkpnt.elevation
+                        if trkpnt.elevation != None and prev_elevation != None and trkpnt.elevation > prev_elevation:
+                            elevation_change += trkpnt.elevation - prev_elevation
+                            delta_elevation_gain += trkpnt.elevation - prev_elevation
 
                         # calc elapsed time?
                         elapsed_time = self.calc_elapsed_time(delta_elevation_gain,segment_distance,base_speed)
@@ -71,8 +80,9 @@ class weather_calculator:
                         forecast.append(self.findWeatherAtPoint(elevation_change, accum_distance, trkpnt, base_speed, start_datetime))
                         delta_elevation_gain = 0
                     old_trkpnt = trkpnt
-        lastPoint = gpx.end()
-        forecast.append(self.findWeatherAtPoint(gpx.elevation_gain(), gpx.distance(), lastPoint, base_speed, start_datetime))
+                    if trkpnt.elevation != None:
+                        prev_elevation = trkpnt.elevation
+        forecast.append(self.findWeatherAtPoint(elevation_change, accum_distance, trkpnt, base_speed, start_datetime))
         return forecast
 
     def calc_elapsed_time(self,elevationChange,distance,base_speed):
@@ -92,7 +102,7 @@ class weather_calculator:
         timeToCover = distance_in_miles / pace # hours
         elapsedTimeDelta = timedelta(hours=timeToCover)
         timeAtPoint = startDatetime + elapsedTimeDelta
-        return self.callWeatherService(where.lat,where.lon,int(timeAtPoint.strftime("%s")))
+        return self.callWeatherService(where.latitude,where.longitude,int(timeAtPoint.strftime("%s")))
 
     def callWeatherService(self,lat,lon,time):
         key ="9f1075d7f3960b4ec949f0dddae04cfc"
@@ -110,9 +120,16 @@ class weather_calculator:
                     )
 
 if __name__ == "__main__":
+    gpx_file = open('/Users/bfeinberg/Downloads/Uvas_Gold_200k.gpx', 'r')
+    gpx = gpxpy.parse(gpx_file)
+    for track in gpx.tracks:
+        for segment in track.segments:
+            for point in segment.points:
+                print 'Point at ({0},{1}) -> {2}'.format(point.latitude, point.longitude, point.elevation)
     # 1 hour, D-pace, starting at 06:00PM
-    wcalc = weather_calculator()
+    # wcalc = weather_calculator()
     # print wcalc.calc_weather(forecast_interval_hours=1,pace='D',starting_time='2016-12-27T18:00',route="/users/bfeinberg/Downloads/pygpx-master/readme.rst")
-    print wcalc.calc_weather(forecast_interval_hours=1,pace='D',starting_time='2016-12-27T18:00',route="/users/bfeinberg/Downloads/Uvas_Gold_200k.gpx")
+    # print wcalc.calc_weather(forecast_interval_hours=1,pace='D',starting_time='2016-12-29T12:00',route="/Users/bfeinberg/Downloads/Sausalito_-_Freestone.gpx")
+    # print wcalc.calc_weather(forecast_interval_hours=1,pace='D',starting_time='2016-12-29T12:00',route="/Users/bfeinberg/Downloads/Uvas_Gold_200k.gpx")
 
 

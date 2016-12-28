@@ -1,6 +1,17 @@
 <html>
   <head>
     <title>Find weather forecast for route</title>
+    {% with errors = get_flashed_messages(category_filter=["error"]) %}
+    {% if errors %}
+    <div class="alert-message block-message error">
+      <ul>
+        {%- for msg in errors %}
+          <li style="color:#FF0000"><strong>Error: </strong>{{ msg }}</li>
+        {% endfor -%}
+      </ul>
+    </div>
+    {% endif %}
+    {% endwith %}
    <link rel="stylesheet" type="text/css" href="static/style.css">
         <link rel="stylesheet" href="https://unpkg.com/flatpickr/dist/flatpickr.min.css">
         <link rel="stylesheet" href="https://unpkg.com/flatpickr/dist/themes/confetti.css">
@@ -26,7 +37,6 @@
       <style>
         .dateDisplay {
             width: 16em;
-            font-size: 105%;
         }
       </style>
   </head>
@@ -52,9 +62,14 @@
              <option value="D+">D+</option>
              <option value="E-">E-</option>
              <option value="E">E</option>
-         </select><br />
+         </select><a href="https://westernwheelersbicycleclub.wildapricot.org/page-1374754" target="_blank">Pace explanation</a>
+            <label for="enable_ride_with_gps">Enable RideWithGps</label>
+            <input type="button" name="Enable RideWithGps" id="enable_ride_with_gps">
+            <br />
           <label for="route">Route file:</label>
-          <input type="file" name="route" accept=".gpx" required><br /><br/>
+          <input type="file" name="route" accept=".gpx">
+            <label for="ridewithgps">RideWithGps route number</label>
+            <input type="number" id="ridewithgps" name="ridewithgps" disabled pattern="[0-9]*"><br /><br/>
           <input type="submit" id="forecast" value="Find forecast">
         </form>
       </div>

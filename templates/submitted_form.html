@@ -24,7 +24,7 @@
        <h1>Route forecast</h1>
      </div>
      <div id="main">
-       <input type="button" onclick="location.href='form';" value="Forecast another" /><br/>
+       <p><input type="button" onclick="location.href='form';" value="Forecast another" /></p>
         <table style="width:100%">
             <tr>
                 <th>Time</th>
@@ -63,7 +63,7 @@
         };
         var routePoints = [
             {% for point in points %}
-            {lat: {{ point.lat }}, lng: {{ point.lon }} },
+            {lat: {{ point.latitude }}, lng: {{ point.longitude }} },
             {% endfor %}
         ];
         function drawRoute(points,map) {
