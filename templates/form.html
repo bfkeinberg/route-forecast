@@ -58,7 +58,7 @@
              <option value="C">C</option>
              <option value="C+">C+</option>
              <option value="D-">D-</option>
-             <option value="D">D</option>
+             <option value="D" selected>D</option>
              <option value="D+">D+</option>
              <option value="E-">E-</option>
              <option value="E">E</option>
@@ -68,8 +68,8 @@
             <br />
           <label for="route">Route file:</label>
           <input type="file" name="route" accept=".gpx">
-            <label for="ridewithgps">RideWithGps route number</label>
-            <input type="number" id="ridewithgps" name="ridewithgps"  pattern="[0-9]*" {{ disabled }}><br/><br/>
+            <label for="ridewithgps" {{ disabled|safe }}>RideWithGps route number</label>
+            <input type="number" id="ridewithgps" name="ridewithgps"  pattern="[0-9]*" {{ disabled|safe }}><br/><br/>
           <input type="submit" id="forecast" class="bigger" value="Find forecast">
         </form>
       </div>

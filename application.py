@@ -37,7 +37,7 @@ def server_error(e):
 
 @application.route('/form')
 def form():
-    return render_template('form.html', disabled='disabled')
+    return render_template('form.html', disabled='disabled style=' + "'color:#888;'")
 
 def dl_from_rwgps(route_number):
     gpx_url = "https://ridewithgps.com/routes/{}.gpx?sub_format=track".format(route_number)
@@ -58,12 +58,12 @@ def handle_login():
                            params={'email': username, 'password': password, 'apikey': rwgps_api_key})
     if login_result.status_code == 401:
         flash('Invalid rwgps login', 'error')
-        return render_template('form.html', disabled='disabled')
+        return render_template('form.html', disabled='disabled style=' + "'color:#888;'")
     login_result.raise_for_status()
     userinfo = login_result.json()
     if userinfo["user"] is None:
         flash('Invalid rwgps login', 'error')
-        render_template('form.html', disabled='disabled')
+        render_template('form.html', disabled='disabled style=' + "'color:#888;'")
     member_id = userinfo["user"]["id"]
     logged_into_rwgps = True
     return render_template('form.html', disabled='')
