@@ -1,4 +1,4 @@
-<html>
+<html xmlns="http://www.w3.org/1999/html">
   <head>
     <title>Find weather forecast for route</title>
     {% with errors = get_flashed_messages(category_filter=["error"]) %}
@@ -12,33 +12,33 @@
     </div>
     {% endif %}
     {% endwith %}
-   <link rel="stylesheet" type="text/css" href="static/style.css">
-        <link rel="stylesheet" href="https://unpkg.com/flatpickr/dist/flatpickr.min.css">
-        <link rel="stylesheet" href="https://unpkg.com/flatpickr/dist/themes/confetti.css">
-        <script src="https://unpkg.com/flatpickr"></script>
-        <script>
-            function setupDate() {
-                var now = new Date();
-                var later = new Date();
-                var daysToAdd = 14;
-                later.setDate(now.getDate() + daysToAdd);
-                document.getElementById('starting_time').flatpickr({
-                enableTime: true,
-                altInput: true,
-	            altFormat: "F j, Y h:i K",
-	            altInputClass: "dateDisplay",
-	            minDate: now,
-	            maxDate: later,
-	            defaultDate: now,
-	            dateFormat: "Y-m-d\TH:i"
-                 });
-            }
-        </script>
-      <style>
-        .dateDisplay {
-            width: 16em;
+    <link rel="stylesheet" type="text/css" href="static/style.css">
+    <link rel="stylesheet" href="https://unpkg.com/flatpickr/dist/flatpickr.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/flatpickr/dist/themes/confetti.css">
+    <script src="https://unpkg.com/flatpickr"></script>
+    <script>
+        function setupDate() {
+            var now = new Date();
+            var later = new Date();
+            var daysToAdd = 14;
+            later.setDate(now.getDate() + daysToAdd);
+            document.getElementById('starting_time').flatpickr({
+            enableTime: true,
+            altInput: true,
+            altFormat: "F j, Y h:i K",
+            altInputClass: "dateDisplay",
+            minDate: now,
+            maxDate: later,
+            defaultDate: now,
+            dateFormat: "Y-m-d\TH:i"
+             });
         }
-      </style>
+    </script>
+    <style>
+    .dateDisplay {
+        width: 16em;
+    }
+    </style>
   </head>
   <body onload="setupDate()">
     <div id="container">
@@ -64,13 +64,13 @@
              <option value="E">E</option>
          </select><a href="https://westernwheelersbicycleclub.wildapricot.org/page-1374754" target="_blank">Pace explanation</a>
             <label for="enable_ride_with_gps">Enable RideWithGps</label>
-            <input type="button" name="Enable RideWithGps" id="enable_ride_with_gps">
+            <button onclick="window.location.href='/rwgps_login'">Enable RideWithGps</button>
             <br />
           <label for="route">Route file:</label>
           <input type="file" name="route" accept=".gpx">
             <label for="ridewithgps">RideWithGps route number</label>
-            <input type="number" id="ridewithgps" name="ridewithgps" disabled pattern="[0-9]*"><br /><br/>
-          <input type="submit" id="forecast" value="Find forecast">
+            <input type="number" id="ridewithgps" name="ridewithgps"  pattern="[0-9]*" {{ disabled }}><br/><br/>
+          <input type="submit" id="forecast" class="bigger" value="Find forecast">
         </form>
       </div>
     </div>

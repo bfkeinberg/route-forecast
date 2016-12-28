@@ -7,6 +7,7 @@ import tempfile
 import requests
 from flask import Flask, render_template, request, redirect, url_for
 from flask import flash
+from flask_bower import Bower
 
 from routeWeather import weather_calculator
 
@@ -15,10 +16,14 @@ application.config['MAX_CONTENT_LENGTH'] = 20 * 1024 * 1024
 secret_key = ''.join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(4))
 application.secret_key = secret_key
 logged_into_rwgps = False
+Bower(application)
+session = requests.Session()
 
 @application.context_processor
-def inject_maps_keys():
-    return dict(maps_key=os.getenv('MAPS_KEY','NONE'))
+def inject_api_keys():
+    return dict(maps_key=os.getenv('MAPS_KEY','NONE'),
+                darksky_api_key=os.getenv('DARKSKY_API_KEY','NONE'),
+                rwgps_api_key=os.getenv('RWGPS_API_KEY','NONE'))
 
 @application.route('/')
 def hello():
@@ -32,12 +37,36 @@ def server_error(e):
 
 @application.route('/form')
 def form():
-    return render_template('form.html')
+    return render_template('form.html', disabled='disabled')
 
 def dl_from_rwgps(route_number):
     gpx_url = "https://ridewithgps.com/routes/{}.gpx?sub_format=track".format(route_number)
-    dl_req = requests.get(gpx_url)
+    dl_req = session.get(gpx_url)
     return dl_req.content
+
+@application.route("/rwgps_login", methods=['GET'])
+def log_in_to_rwgps():
+    return render_template('login_form.html', service='Ride with GPS')
+
+@application.route('/handle_login', methods=['POST'])
+def handle_login():
+    username = request.form['username']
+    password = request.form['password']
+    rwgps_api_key = os.environ.get("RWGPS_API_KEY")
+
+    login_result = session.get("https://ridewithgps.com/users/current.json",
+                           params={'email': username, 'password': password, 'apikey': rwgps_api_key})
+    if login_result.status_code == 401:
+        flash('Invalid rwgps login', 'error')
+        return render_template('form.html', disabled='disabled')
+    login_result.raise_for_status()
+    userinfo = login_result.json()
+    if userinfo["user"] is None:
+        flash('Invalid rwgps login', 'error')
+        render_template('form.html', disabled='disabled')
+    member_id = userinfo["user"]["id"]
+    logged_into_rwgps = True
+    return render_template('form.html', disabled='')
 
 @application.route('/submitted', methods=['POST'])
 def submitted_form():
@@ -49,14 +78,11 @@ def submitted_form():
     if len(route.filename) > 0:
         contents = route.read()
     elif request.form['ridewithgps'] != "":
-        if logged_into_rwgps==False:
-            session = requests.Session()
-            login_result = session.get('https://ridewithgps.com/#login_form')
         route_number = request.form['ridewithgps']
         gpx_url = "https://ridewithgps.com/trips/{}.gpx?sub_format=track".format(route_number)
         dl_req = session.get(gpx_url)
         if dl_req.status_code == 200:
-            contents = dl_from_rwgps(route_number)
+            contents = dl_req.content #dl_from_rwgps(route_number)
         else:
             flash(dl_req.reason, 'error')
             return redirect(url_for('form'))

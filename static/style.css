@@ -2,7 +2,13 @@ h1 {
     color: navy;
     margin-left: 20px;
 }
-input[type=submit], input[type=button] {
+input[type=submit] {
+  color: #908;
+  font-weight: bold;
+  font-size: 200%;
+  width:10em;
+}
+.bigger {
   color: #908;
   font-weight: bold;
   font-size: 200%;

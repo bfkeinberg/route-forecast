@@ -1,3 +1,4 @@
+import os
 from datetime import datetime
 from datetime import timedelta
 
@@ -105,7 +106,7 @@ class weather_calculator:
         return self.callWeatherService(where.latitude,where.longitude,int(timeAtPoint.strftime("%s")))
 
     def callWeatherService(self,lat,lon,time):
-        key ="9f1075d7f3960b4ec949f0dddae04cfc"
+        key = os.getenv('DARKSKY_API_KEY')
         url = "https://api.darksky.net/forecast/{}/{},{},{}?exclude=hourly,daily,flags".format(key,lat,lon,time)
         headers = {"Accept-Encoding": "gzip"}
         response = requests.get(url=url, headers=headers)
