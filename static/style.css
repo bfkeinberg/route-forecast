@@ -2,15 +2,16 @@ h1 {
     color: navy;
     margin-left: 20px;
 }
-input[type=submit] {
-  color: #908;
-  font-weight: bold;
-  font-size: 200%;
-  width:10em;
-}
 .bigger {
   color: #908;
   font-weight: bold;
   font-size: 200%;
   width:10em;
 }
+#content input[disabled] {
+    color: #DCDAD1;
+    padding: 2px;
+    margin: 0 0 0 0;
+    background-image: none;
+}
+
