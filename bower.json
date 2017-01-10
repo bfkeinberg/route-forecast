@@ -1,0 +1,23 @@
+{
+  "name": "route_weather",
+  "description": "Forecast weather along a route described by a gpx file.",
+  "main": "application.py",
+  "authors": [
+    "Brian Feinberg"
+  ],
+  "license": "ISC",
+  "keywords": [
+    "GPS",
+    "weather"
+  ],
+  "homepage": "https://github.com/bfkeinberg/route-forecast",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {}
+}

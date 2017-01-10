@@ -7,6 +7,14 @@ import math
 import datetime
 from dateutil.parser import parse
 
+GPX_1_1 = "{http://www.topografix.com/GPX/1/1}"
+GPX_1_0 = "{http://www.topografix.com/GPX/1/0}"
+
+def gpx_prefix(version):
+    if version == "1.1":
+        return GPX_1_1
+    else:
+        return GPX_1_0
 
 def deg2rad(deg):
     """Convert degrees to radians"""
@@ -25,16 +33,16 @@ class GPXTrackPt:
         self.time = None
         self.hr = None
         for child in node:
-            if child.tag == "{http://www.topografix.com/GPX/1/1}time":
+            if child.tag == "{}time".format(gpx_prefix(version)):
                 self.time = parse(child.text)
-            elif child.tag == "{http://www.topografix.com/GPX/1/1}ele":
-                self.elevation = float(child.text)
-            elif child.tag == "{http://www.topografix.com/GPX/1/1}extensions":
+            elif child.tag == "{}ele".format(gpx_prefix(version)):
+                self.elevation = float(child.text) if child.text != None else None
+            elif child.tag == "{}extensions".format(gpx_prefix(version)):
                 for child1 in child:
-                	if child1.tag == "{http://www.garmin.com/xmlschemas/TrackPointExtension/v1}TrackPointExtension":
-                		for child2 in child1:
-                			if child2.tag == "{http://www.garmin.com/xmlschemas/TrackPointExtension/v1}hr":
-                				self.hr = int(child2.text)
+                    if child1.tag == "{http://www.garmin.com/xmlschemas/TrackPointExtension/v1}TrackPointExtension":
+                        for child2 in child1:
+                            if child2.tag == "{http://www.garmin.com/xmlschemas/TrackPointExtension/v1}hr":
+                                self.hr = int(child2.text)
             else:
                 raise ValueError("Can't handle node: '%s'" % child.tag)
 
@@ -73,7 +81,7 @@ class GPXTrackSeg:
         self.elevation_gain = 0.0
         self.elevation_loss = 0.0
         for child in node:
-            if child.tag == "{http://www.topografix.com/GPX/1/1}trkpt":
+            if child.tag == "{}trkpt".format(gpx_prefix(version)):
                 self.trkpts.append(GPXTrackPt(child, self.version))
             else:
                 raise ValueError("Can't handle node <%s>" % node.nodeName)
@@ -86,10 +94,13 @@ class GPXTrackSeg:
             last_pt = self.trkpts[0]
             last_elevation = last_pt.elevation
             for pt in self.trkpts[1:]:
-                if pt.elevation > last_elevation:
-                    gain += pt.elevation - last_elevation
-                else:
-                    loss += last_elevation - pt.elevation
+                if pt.elevation == None:
+                    continue
+                if last_elevation != None:
+                    if pt.elevation > last_elevation:
+                        gain += pt.elevation - last_elevation
+                    else:
+                        loss += last_elevation - pt.elevation
                 last_elevation = pt.elevation
             self.elevation_gain = gain
             self.elevation_loss = loss
@@ -120,14 +131,14 @@ class GPXTrack:
         self.version = version
         self.trksegs = []
         for child in node:
-            if child.tag == "{http://www.topografix.com/GPX/1/1}name":
+            if child.tag == ("%sname" % gpx_prefix(version)):
                 self.name = child.text
-            elif child.tag == "{http://www.topografix.com/GPX/1/1}trkseg":
+            elif child.tag == ("%strkseg" % gpx_prefix(version)):
                 if len(child) > 0:
                     self.trksegs.append(GPXTrackSeg(child, self.version))
-            elif child.tag == "{http://www.topografix.com/GPX/1/1}number":
+            elif child.tag == ("%snumber" % gpx_prefix(version)):
                 self.name = child.text
-            elif child.tag == "{http://www.topografix.com/GPX/1/1}desc":
+            elif child.tag == ("%sdesc" % gpx_prefix(version)):
                 self.desc = child.text
 
     def elevation_gain(self):
@@ -185,6 +196,13 @@ class GPXTrack:
         return self.end().time
 
 
+class ParseError(Exception):
+    def __init__(self, value):
+        self.value = value
+
+    def __str__(self):
+        return repr(self.value)
+
 class GPX:
     """This class allows the manipulation of a GPX document."""
 
@@ -193,29 +211,31 @@ class GPX:
         Create a GPX object based on the given file descriptor.
         """
         PATH = os.path.dirname(__file__)
-        SCHEMA = os.path.join(PATH, "schema", "gpx-1_1.xsd")
+        SCHEMA_1_1 = os.path.join(PATH, "schema", "gpx-1_1.xsd")
+        SCHEMA_1_0 = os.path.join(PATH, "schema", "gpx-1_0.xsd")
         self.creator = None
         self.time = None
         self.tracks = []
         self.version = ""
         self.metadata = None
-        gpx_schema_doc = etree.parse(SCHEMA)
-        gpx_schema = etree.XMLSchema(gpx_schema_doc)
         self.gpx_doc = etree.parse(fd)
         self.root = self.gpx_doc.getroot()
 
-        # Test if this is a GPX file or not and if it's version 1.1
-        if self.root.tag != "{http://www.topografix.com/GPX/1/1}gpx":
+        # Test if this is a GPX file or not and if it's version 1.1 or version 1.0
+        if self.root.tag != "{}gpx".format(GPX_1_1) and self.root.tag != "{}gpx".format(GPX_1_0):
             raise ValueError("Not a gpx file: '%s'" % fd)
-        elif self.root.get("version") != "1.1":
-            raise ValueError("Verion %s is not supported. Must use GPX v1.1" % self.root.get("version"))
+        elif self.root.get("version") != "1.1" and self.root.get("version") != "1.0":
+            raise ValueError("Version %s is not supported. Must use GPX v1.1 or v1.0" % self.root.get("version"))
         else:
             self.version = self.root.get("version")
+
+        gpx_schema_doc = etree.parse(SCHEMA_1_1 if self.version=="1.1" else SCHEMA_1_0)
+        gpx_schema = etree.XMLSchema(gpx_schema_doc)
         # attempt to validate the xml file against the schema
         try:
             gpx_schema.validate(self.gpx_doc)
         except:
-            raise Exception("GPX does not validate: '%s'" % fd)
+            raise ParseError("GPX does not validate: '%s'" % fd)
 
         # initalize the GPX document for parsing.
         self._init_version()
@@ -226,11 +246,11 @@ class GPX:
         """
         self.creator = self.root.get("creator")
         for child in self.root:
-            if child.tag == "{http://www.topografix.com/GPX/1/1}time":
-                self.time = child[0]
-            elif child.tag == "{http://www.topografix.com/GPX/1/1}trk":
+            if child.tag == "{}time".format(gpx_prefix(self.version)):
+                self.time = child[0] if self.version=="1.1" else child.text
+            elif child.tag == "{}trk".format(gpx_prefix(self.version)):
                 self.tracks.append(GPXTrack(child, self.version))
-            elif child.tag == "{http://www.topografix.com/GPX/1/1}metadata":
+            elif child.tag == "{}metadata".format(gpx_prefix(self.version)):
                 self.metadata = child
 
     def elevation_gain(self):

@@ -1,0 +1,33 @@
+<html xmlns="http://www.w3.org/1999/html">
+  <head>
+    <meta charset="UTF-8">
+    <title>Find weather forecast for route</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% with errors = get_flashed_messages(category_filter=["error"]) %}
+    {% if errors %}
+    <div class="alert-message block-message error">
+      <ul>
+        {%- for msg in errors %}
+          <li style="color:#FF0000"><strong>Error: </strong>{{ msg }}</li>
+        {% endfor -%}
+      </ul>
+    </div>
+    {% endif %}
+    {% endwith %}
+    <link rel="stylesheet" type="text/css" href="static/style.css">
+    <style>
+    .rwgpsLogin {
+        background: url(https://ridewithgps.com/images/logo_trans_black.png?1);
+        height:40px;
+        width:179px;
+    }
+    </style>
+  </head>
+  <body>
+    <div id="container">
+            <div id="content"></div>
+    </div>
+    <!--<script id='routeui' action="{{ url_for('submitted_form') }}" src="{{ url_for('static', filename='scripts/js/d.js') }}"></script>-->
+    <script id='routeui' action="{{ url_for('submitted_form') }}" src="{{ url_for('static', filename='scripts/js/main.js') }}"></script>
+  </body>
+</html>

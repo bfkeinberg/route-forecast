@@ -1,4 +1,4 @@
-<html>
+<html xmlns="http://www.w3.org/1999/html">
  <head>
    <title>Submitted form</title>
    <link rel="stylesheet" type="text/css" href="static/style.css">
@@ -15,6 +15,10 @@
         }
         th {
             text-align: left;
+        }
+        .darkSkyLogo {
+            background: url(https://darksky.net/dev/img/attribution/poweredby.png);
+            height:3rem;
         }
     </style>
  </head>
@@ -45,6 +49,7 @@
             </tr>
          {% endfor %}
         </table>
+        <a href="https://darksky.net/poweredby/"><img src="https://darksky.net/dev/img/attribution/poweredby.png" style="height: 3rem;"/></a>
      </div>
        <div class="map title">
            <h1>Forecast map</h1>
@@ -66,17 +71,17 @@
             {lat: {{ point.latitude }}, lng: {{ point.longitude }} },
             {% endfor %}
         ];
-        function drawRoute(points,map) {
-            var routeLine = new google.maps.Polyline({
-                path: points,
-                geodesic: true,
-                strokeColor: '#FF0000',
-                strokeOpacity: 1.0,
-                strokeWeight: 2
-                });
+            function drawRoute(points,map) {
+                var routeLine = new google.maps.Polyline({
+                    path: points,
+                    geodesic: true,
+                    strokeColor: '#FF0000',
+                    strokeOpacity: 1.0,
+                    strokeWeight: 2
+                    });
 
-            routeLine.setMap(map);
-        }
+                routeLine.setMap(map);
+            }
         function initMap() {
             var mapDiv = document.getElementById('map');
             var map = new google.maps.Map(mapDiv, {

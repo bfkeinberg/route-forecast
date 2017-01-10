@@ -2,13 +2,7 @@ h1 {
     color: navy;
     margin-left: 20px;
 }
-.bigger {
-  color: #908;
-  font-weight: bold;
-  font-size: 200%;
-  width:10em;
-}
-#content input[disabled] {
+#content input_1[disabled] {
     color: #DCDAD1;
     padding: 2px;
     margin: 0 0 0 0;

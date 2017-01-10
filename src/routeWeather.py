@@ -19,6 +19,7 @@ class weather_calculator:
         self.max_latitude = -90
         self.max_longitude = -180
         self.error = False
+        self.name = None;
 
     def isError(self):
         return self.error
@@ -29,13 +30,20 @@ class weather_calculator:
     def get_points(self):
         return self.pointsInRoute
 
-    def calc_weather(self, forecast_interval_hours, pace, starting_time, route):
+    def get_name(self):
+        return self.name
+
+    def get_controls(self):
+        return self.controls
+
+    def calc_weather(self, forecast_interval_hours, pace, starting_time, route, controls):
+        self.controls = controls
         with open(route, 'r') as gpx_file:
             try:
                 gpx = gpxpy.parse(gpx_file)
-            except:
+            except Exception as e:
                 self.error = True
-                return "Unknown GPX parsing error"
+                return "Unknown GPX parsing error" + e
         elevation_change = 0
         delta_elevation_gain = 0
         accum_distance = 0
@@ -43,8 +51,10 @@ class weather_calculator:
         old_trkpnt = None
         prev_elevation = None
         elapsed_time = None
+        accum_time = 0
         forecast = []
         self.pointsInRoute = []
+        self.next_control = 0
 
         base_speed = self.paceToSpeed[pace]
         # month day year hour:minute (24-hour)
@@ -55,9 +65,10 @@ class weather_calculator:
             return 'Invalid starting time'
         tracks = gpx.tracks
         for track in tracks:
+            self.name = track.name;
             for trkseg in track.segments:
                 for trkpnt in trkseg.points:
-                    self.pointsInRoute.append(trkpnt)
+                    self.pointsInRoute.append({'latitude':trkpnt.latitude,'longitude':trkpnt.longitude})
                     self.min_latitude = min(self.min_latitude, trkpnt.latitude)
                     self.max_latitude = max(self.max_latitude, trkpnt.latitude)
                     self.min_longitude = min(self.min_longitude, trkpnt.longitude)
@@ -73,8 +84,16 @@ class weather_calculator:
 
                         # calc elapsed time?
                         elapsed_time = self.calc_elapsed_time(delta_elevation_gain,segment_distance,base_speed)
+                        accum_time = self.calc_elapsed_time(elevation_change,accum_distance,base_speed)
                     # distance_in_km = int(segment_distance/1000)
                     # if distance_in_km >= desired_length:
+
+                    # add time due to stopping at controls
+                    added_time = self.check_and_update_controls(accum_distance,start_datetime,accum_time,controls)
+                    if elapsed_time != None:
+                        elapsed_time += added_time
+                    elif added_time > 0:
+                        elapsed_time = added_time
                     if elapsed_time != None and elapsed_time >= forecast_interval_hours:
                         segment_distance = 0
                         elapsed_time = 0
@@ -85,6 +104,19 @@ class weather_calculator:
                         prev_elevation = trkpnt.elevation
         forecast.append(self.findWeatherAtPoint(elevation_change, accum_distance, trkpnt, base_speed, start_datetime))
         return forecast
+
+    def check_and_update_controls(self,distance,start,time,controls):
+        if len(controls) <= self.next_control:
+            return 0
+        distance_in_miles = (distance * nu.m) / nu.mile
+        if distance_in_miles < int(controls[self.next_control]['distance']):
+            return 0
+        delayInMinutes = int(controls[self.next_control]['duration'])
+        addedDelay = timedelta(seconds=(delayInMinutes*60 + time*3600))
+        arrivalTime = start + addedDelay
+        controls[self.next_control]['arrival'] = arrivalTime.strftime('%a, %b %d %-I:%M%p')
+        self.next_control = self.next_control + 1
+        return float(delayInMinutes)/60      # convert from minutes to hours
 
     def calc_elapsed_time(self,elevationChange,distance,base_speed):
         elevation_in_feet = (elevationChange * nu.m) / nu.foot
