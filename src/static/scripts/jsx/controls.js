@@ -69,11 +69,11 @@ class ControlPoints extends React.Component {
 
     render () {
         const title = this.props.name == '' ?
-            ( <h3>Control point list</h3> ) :
+            ( <h3 style={{textAlign:"center"}}>Control point list</h3> ) :
             ( <h3>Control point list for {this.props.name}</h3> );
         return (
                 <div className="controlPoints">
-                        <h2>Checkpoint times</h2>
+                        <h2 style={{textAlign:"center"}}>Checkpoint times</h2>
                     <ButtonToolbar>
                         <ButtonGroup>
                             <Button onClick={this.addControl}><Glyphicon glyph="plus-sign"></Glyphicon>Add control point</Button>

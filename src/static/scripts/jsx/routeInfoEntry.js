@@ -1,7 +1,7 @@
 import LoginDialog from './loginDialog';
 import { DateTimePicker } from '@blueprintjs/datetime';
 import { Position, Popover } from '@blueprintjs/core';
-import { FormControl,FormGroup,Form,Glyphicon,Alert,ControlLabel,Button,HelpBlock,Tooltip,OverlayTrigger,Well,InputGroup} from 'react-bootstrap';
+import { Panel,FormControl,FormGroup,Form,Glyphicon,Alert,ControlLabel,Button,HelpBlock,Tooltip,OverlayTrigger,Well,InputGroup} from 'react-bootstrap';
 import moment from 'moment';
 import React, { Component } from 'react';
 import Flatpickr from 'react-flatpickr'
@@ -145,7 +145,7 @@ class RouteInfoForm extends React.Component {
             </FormGroup>
         );*/
         return (
-            <Well bsSize="small">
+            <Panel header="Forecast and time estimate">
                 <Form inline id="forecast_form">
 {/*
                     <Popover content={popupCalendar} position={Position.BOTTOM} useSmartPositioning={true}
@@ -230,7 +230,7 @@ class RouteInfoForm extends React.Component {
                     {this.showErrorDetails(this.state.errorDetails)}
                 </Form>
                 <LoginDialog loginCb={this.loginResult}/>
-            </Well>
+            </Panel>
         );
     }
 }

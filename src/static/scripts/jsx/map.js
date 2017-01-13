@@ -84,7 +84,7 @@ class RouteForecastMap extends React.Component {
             );
         }
         else {
-            return (<h2>Forecast map</h2>);
+            return (<h2 style={{textAlign:"center"}}>Forecast map</h2>);
         }
     }
 

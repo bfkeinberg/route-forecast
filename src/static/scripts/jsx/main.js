@@ -1,6 +1,5 @@
 global.jQuery = require('jquery');
 import React, { Component } from 'react';
-import {Grid,Row,Col,PageHeader} from 'react-bootstrap';
 import ControlPointList from './controls';
 import ReactDOM from 'react-dom';
 import RouteInfoForm from './routeInfoEntry';
@@ -36,8 +35,7 @@ class RouteWeatherUI extends React.Component {
     render() {
         return (
         <div>
-            <PageHeader>Get weather for route</PageHeader>
-            <SplitPane defaultSize={250} minSize={150} split="horizontal">
+            <SplitPane defaultSize={310} minSize={150} split="horizontal">
                 <SplitPane defaultSize={550} minSize={150} split="vertical" pane2Style={{'overflow':'scroll'}}>
                     <RouteInfoForm action={this.state.action}
                                    updateForecast={this.updateForecast}
