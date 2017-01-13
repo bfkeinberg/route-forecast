@@ -84,7 +84,7 @@ class RouteForecastMap extends React.Component {
             );
         }
         else {
-            return (<h1>Forecast map</h1>);
+            return (<h2>Forecast map</h2>);
         }
     }
 

@@ -36,9 +36,9 @@ class RouteWeatherUI extends React.Component {
     render() {
         return (
         <div>
-            {/*<PageHeader>Get weather for route</PageHeader>*/}
-            <SplitPane defaultSize={500} minSize={150} split="horizontal">
-                <SplitPane defaultSize={550} minSize={150} split="vertical">
+            <PageHeader>Get weather for route</PageHeader>
+            <SplitPane defaultSize={250} minSize={150} split="horizontal">
+                <SplitPane defaultSize={550} minSize={150} split="vertical" pane2Style={{'overflow':'scroll'}}>
                     <RouteInfoForm action={this.state.action}
                                    updateForecast={this.updateForecast}
                                    controlPoints={this.state.controlPoints}/>
@@ -46,7 +46,7 @@ class RouteWeatherUI extends React.Component {
                                       updateControls={this.updateControls}
                                       name={this.state.routeName}/>
                 </SplitPane>
-                <SplitPane defaultSize={400} minSize={150} split="horizontal">
+                <SplitPane defaultSize={500} minSize={150} split="vertical" paneStyle={{'overflow':'scroll'}}>
                     <ForecastTable forecast={this.state.forecast}/>
                     <RouteForecastMap maps_api_key={this.state.maps_key} forecast={this.state.forecast}/>
                 </SplitPane>
@@ -55,7 +55,6 @@ class RouteWeatherUI extends React.Component {
       );
     }
 }
-
 
 ReactDOM.render(
   <RouteWeatherUI />,

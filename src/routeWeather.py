@@ -9,6 +9,13 @@ import requests
 nu.reset_units()
 nu.set_derived_units_and_constants()
 
+class WeatherError(Exception):
+    def __init__(self,value):
+        self.value = value
+
+    def __str__(self):
+        return repr(self.value)
+
 class weather_calculator:
 
     paceToSpeed = {'A':10, 'B':12, 'C':14, 'C+':15, 'D-':15, 'D':16, 'D+':17, 'E-':17, 'E':18}
@@ -55,6 +62,8 @@ class weather_calculator:
         forecast = []
         self.pointsInRoute = []
         self.next_control = 0
+        idling_time = 0
+        segment_delay_time = 0
 
         base_speed = self.paceToSpeed[pace]
         # month day year hour:minute (24-hour)
@@ -89,14 +98,15 @@ class weather_calculator:
                     # if distance_in_km >= desired_length:
 
                     # add time due to stopping at controls
-                    added_time = self.check_and_update_controls(accum_distance,start_datetime,accum_time,controls)
-                    if elapsed_time != None:
-                        elapsed_time += added_time
-                    elif added_time > 0:
-                        elapsed_time = added_time
-                    if elapsed_time != None and elapsed_time >= forecast_interval_hours:
+                    added_time = self.check_and_update_controls(accum_distance,start_datetime,
+                                                                  (accum_time+idling_time),
+                                                                  controls,elevation_change)
+                    idling_time += added_time
+                    segment_delay_time += added_time
+                    if elapsed_time != None and (elapsed_time + segment_delay_time) >= forecast_interval_hours:
                         segment_distance = 0
                         elapsed_time = 0
+                        segment_delay_time = 0
                         forecast.append(self.findWeatherAtPoint(elevation_change, accum_distance, trkpnt, base_speed, start_datetime))
                         delta_elevation_gain = 0
                     old_trkpnt = trkpnt
@@ -105,14 +115,14 @@ class weather_calculator:
         forecast.append(self.findWeatherAtPoint(elevation_change, accum_distance, trkpnt, base_speed, start_datetime))
         return forecast
 
-    def check_and_update_controls(self,distance,start,time,controls):
+    def check_and_update_controls(self,distance,start,time,controls,elevation):
         if len(controls) <= self.next_control:
             return 0
         distance_in_miles = (distance * nu.m) / nu.mile
         if distance_in_miles < int(controls[self.next_control]['distance']):
             return 0
         delayInMinutes = int(controls[self.next_control]['duration'])
-        addedDelay = timedelta(seconds=(delayInMinutes*60 + time*3600))
+        addedDelay = timedelta(seconds=(time*3600))
         arrivalTime = start + addedDelay
         controls[self.next_control]['arrival'] = arrivalTime.strftime('%a, %b %d %-I:%M%p')
         self.next_control = self.next_control + 1
@@ -121,7 +131,7 @@ class weather_calculator:
     def calc_elapsed_time(self,elevationChange,distance,base_speed):
         elevation_in_feet = (elevationChange * nu.m) / nu.foot
         distance_in_miles = (distance * nu.m)/nu.mile
-        if distance_in_miles == 0:
+        if distance_in_miles < 1:
             return 0
         hilliness = int(min((elevation_in_feet / distance_in_miles) / 25,5))
         pace = base_speed - hilliness
@@ -151,6 +161,9 @@ class weather_calculator:
                     str(currentForecast['windSpeed']) + ' mph' if 'windSpeed' in currentForecast else '<unavailable>',
                     lat, lon, int(round(currentForecast['temperature'])), now.strftime("%c")
                     )
+        else:
+            response.raise_for_status()
+        return None
 
 if __name__ == "__main__":
     gpx_file = open('/Users/bfeinberg/Downloads/Uvas_Gold_200k.gpx', 'r')

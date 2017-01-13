@@ -110,6 +110,8 @@ def submitted_form():
         wcalc = weather_calculator()
         try:
             forecast = wcalc.calc_weather(float(interval), pace, starting_time=starting_time, route=local_file.name, controls=controls)
+        except requests.HTTPError as excpt:
+            return jsonify({'status': excpt.message}), 500
         except Exception as excpt:
             return jsonify({'status':excpt.message}),500
         if wcalc.isError():

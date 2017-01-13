@@ -1,7 +1,7 @@
 import LoginDialog from './loginDialog';
 import { DateTimePicker } from '@blueprintjs/datetime';
 import { Position, Popover } from '@blueprintjs/core';
-import { FormControl,FormGroup,Form,Glyphicon,Alert,ControlLabel,Button,HelpBlock,Tooltip,OverlayTrigger,Well} from 'react-bootstrap';
+import { FormControl,FormGroup,Form,Glyphicon,Alert,ControlLabel,Button,HelpBlock,Tooltip,OverlayTrigger,Well,InputGroup} from 'react-bootstrap';
 import moment from 'moment';
 import React, { Component } from 'react';
 import Flatpickr from 'react-flatpickr'
@@ -133,7 +133,7 @@ class RouteInfoForm extends React.Component {
         let timeProps = {showArrowButtons:true};
         let dateProps = {minDate:now,maxDate:later,canClearSelection:false};
         let buttonStyle = this.disableSubmit() ? {pointerEvents : 'none'} : {};
-        let popupCalendar = (
+/*        let popupCalendar = (
             <FormGroup controlId="starting_time">
                 <ControlLabel>Starting time</ControlLabel>
                 <DateTimePicker name="starting_time" value={this.state.start}
@@ -143,10 +143,10 @@ class RouteInfoForm extends React.Component {
                                 placeholder="Select Date.."/>
 
             </FormGroup>
-        );
+        );*/
         return (
             <Well bsSize="small">
-                <Form id="forecast_form">
+                <Form inline id="forecast_form">
 {/*
                     <Popover content={popupCalendar} position={Position.BOTTOM} useSmartPositioning={true}
                              popoverClassName="pt-popover-content-sizing">
@@ -165,9 +165,11 @@ class RouteInfoForm extends React.Component {
                         </FormGroup>
 */}
                     <FormGroup controlId="starting_time">
-                        <ControlLabel>Starting time</ControlLabel>
                         <OverlayTrigger placement='bottom' overlay={time_tooltip}>
-                            <Flatpickr options={{enableTime: true,
+                            <ControlLabel>Starting time</ControlLabel>
+                        </OverlayTrigger>
+                        <span className="pt-icon-standard pt-icon-calendar"></span>
+                        <Flatpickr options={{enableTime: true,
                                                 altInput: true, altFormat: 'F j, Y h:i K',
                                                 altInputClass: 'dateDisplay',
                                                 minDate: now,
@@ -175,16 +177,7 @@ class RouteInfoForm extends React.Component {
                                                 defaultDate: this.state.start,
                                                 dateFormat: 'Y-m-d\TH:i'
                                 }}/>
-                        </OverlayTrigger>
                     </FormGroup>
-{/*
-                        <FormGroup controlId="starting_time_display">
-                            <OverlayTrigger placement='bottom' overlay={time_tooltip}>
-                            <FormControl type="text" readOnly style={{'width':'65%'}}
-                                         value={moment(this.state.start).format('dddd, MMMM Do, YYYY h:mmA ')}/>
-                            </OverlayTrigger>
-                        </FormGroup>
-*/}
                     <FormGroup bsSize='small' controlId="interval">
                         <ControlLabel>Interval in hours</ControlLabel>
                         <OverlayTrigger placement='bottom' overlay={interval_tooltip}>
