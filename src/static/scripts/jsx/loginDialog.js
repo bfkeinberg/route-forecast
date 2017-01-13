@@ -1,13 +1,5 @@
-const FormGroup = require('react-bootstrap').FormGroup,
-    FormControl = require('react-bootstrap').FormControl,
-    ControlLabel = require('react-bootstrap').ControlLabel,
-    Button = require('react-bootstrap').Button,
-    Modal = require('react-bootstrap').Modal,
-    HelpBlock = require('react-bootstrap').HelpBlock,
-    Tooltip = require('react-bootstrap').Tooltip,
-    OverlayTrigger = require('react-bootstrap').OverlayTrigger,
-    React = require('react');
-
+import React, { Component } from 'react';
+import {FormControl,FormGroup,Button,Modal,Tooltip,OverlayTrigger,ControlLabel} from 'react-bootstrap';
 
 class LoginDialog extends React.Component {
     constructor(props) {
@@ -100,3 +92,4 @@ class LoginDialog extends React.Component {
 }
 
 module.exports=LoginDialog;
+export default LoginDialog;

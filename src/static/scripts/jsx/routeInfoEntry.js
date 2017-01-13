@@ -1,19 +1,12 @@
-const FormGroup = require('react-bootstrap').FormGroup,
-FormControl = require('react-bootstrap').FormControl,
-Form = require('react-bootstrap').Form;//,
-ControlLabel = require('react-bootstrap').ControlLabel,
-Button = require('react-bootstrap').Button,
-HelpBlock = require('react-bootstrap').HelpBlock,
-Tooltip = require('react-bootstrap').Tooltip,
-OverlayTrigger = require('react-bootstrap').OverlayTrigger,
-React = require('react'),
-moment = require("moment"),
-Glyphicon = require('react-bootstrap').Glyphicon,
-Alert = require('react-bootstrap').Alert,
-LoginDialog = require('./loginDialog'),
-DateTimePicker = require("@blueprintjs/datetime").DateTimePicker,
-Position = require("@blueprintjs/core").Position,
-Popover = require("@blueprintjs/core").Popover;
+import LoginDialog from './loginDialog';
+import { DateTimePicker } from '@blueprintjs/datetime';
+import { Position, Popover } from '@blueprintjs/core';
+import { FormControl,FormGroup,Form,Glyphicon,Alert,ControlLabel,Button,HelpBlock,Tooltip,OverlayTrigger,Well} from 'react-bootstrap';
+import moment from 'moment';
+import React, { Component } from 'react';
+import Flatpickr from 'react-flatpickr'
+
+let fpcss = require('!style!css!flatpickr/dist/themes/confetti.css');
 
 const paceToSpeed = {'A':10, 'B':12, 'C':14, 'C+':15, 'D-':15, 'D':16, 'D+':17, 'E-':17, 'E':18};
 
@@ -26,11 +19,11 @@ const interval_tooltip = (
 );
 
 const rwgps_disabled_tooltip = (
-    <Tooltip id="pace_tooltip" placement="bottom" positionLeft="0">Must log into rideWithGps to enable</Tooltip>
+    <Tooltip id="pace_tooltip" placement="bottom">Must log into rideWithGps to enable</Tooltip>
 );
 
 const rwgps_enabled_tooltip = (
-    <Tooltip id="pace_tooltip" positionLeft="0">The number for a route on ridewithgps</Tooltip>
+    <Tooltip id="pace_tooltip">The number for a route on ridewithgps</Tooltip>
 );
 
 const forecast_disabled_tooltip = (
@@ -152,12 +145,14 @@ class RouteInfoForm extends React.Component {
             </FormGroup>
         );
         return (
-            <div>
+            <Well bsSize="small">
                 <Form id="forecast_form">
+{/*
                     <Popover content={popupCalendar} position={Position.BOTTOM} useSmartPositioning={true}
                              popoverClassName="pt-popover-content-sizing">
                         <Button><Glyphicon glyph="calendar"></Glyphicon>Starting time</Button>
                     </Popover>
+*/}
 {/*
                         <FormGroup controlId="starting_time">
                             <ControlLabel>Starting time</ControlLabel>
@@ -169,22 +164,37 @@ class RouteInfoForm extends React.Component {
 
                         </FormGroup>
 */}
-                    <OverlayTrigger placement='bottom' overlay={time_tooltip}>
+                    <FormGroup controlId="starting_time">
+                        <ControlLabel>Starting time</ControlLabel>
+                        <OverlayTrigger placement='bottom' overlay={time_tooltip}>
+                            <Flatpickr options={{enableTime: true,
+                                                altInput: true, altFormat: 'F j, Y h:i K',
+                                                altInputClass: 'dateDisplay',
+                                                minDate: now,
+                                                maxDate: later,
+                                                defaultDate: this.state.start,
+                                                dateFormat: 'Y-m-d\TH:i'
+                                }}/>
+                        </OverlayTrigger>
+                    </FormGroup>
+{/*
                         <FormGroup controlId="starting_time_display">
-                            <FormControl type="text" readOnly style={{'width':'60%'}}
+                            <OverlayTrigger placement='bottom' overlay={time_tooltip}>
+                            <FormControl type="text" readOnly style={{'width':'65%'}}
                                          value={moment(this.state.start).format('dddd, MMMM Do, YYYY h:mmA ')}/>
+                            </OverlayTrigger>
                         </FormGroup>
-                    </OverlayTrigger>
-                    <OverlayTrigger placement='bottom' overlay={interval_tooltip}>
-                        <FormGroup bsSize='small' controlId="interval">
-                            <ControlLabel>Interval in hours</ControlLabel>
-                            <FormControl type="number" min={0.5} max={2} step={0.5} name="interval" style={{'width':'4em'}}
-                                         value={this.state.interval} onChange={this.intervalChanged}/><br />
-                         </FormGroup>
-                    </OverlayTrigger>
-                    <OverlayTrigger placement="bottom" overlay={pace_tooltip}>
-                        <FormGroup controlId="pace">
-                            <ControlLabel>Pace</ControlLabel>
+*/}
+                    <FormGroup bsSize='small' controlId="interval">
+                        <ControlLabel>Interval in hours</ControlLabel>
+                        <OverlayTrigger placement='bottom' overlay={interval_tooltip}>
+                            <FormControl type="number" min={0.5} max={2} step={0.5} name="interval" style={{'width':'5em'}}
+                                         value={this.state.interval} onChange={this.intervalChanged}/>
+                        </OverlayTrigger>
+                     </FormGroup>
+                    <FormGroup controlId="pace">
+                        <ControlLabel>Pace</ControlLabel>
+                        <OverlayTrigger placement="bottom" overlay={pace_tooltip}>
                             <FormControl componentClass="select" value={this.state.pace} name="pace" style={{'width':'3em'}}
                                          onChange={event => this.setState({start:this.state.start,pace:event.target.value})}
                                          required>
@@ -198,8 +208,8 @@ class RouteInfoForm extends React.Component {
                                 <option value="E-">E-</option>
                                 <option value="E">E</option>
                             </FormControl>
-                        </FormGroup>
-                    </OverlayTrigger>
+                        </OverlayTrigger>
+                    </FormGroup>
                     <a href="https://westernwheelersbicycleclub.wildapricot.org/page-1374754" target="_blank">Pace explanation</a>
                     <HelpBlock>Upload a .gpx file describing your route</HelpBlock>
                     <FormGroup controlId="route">
@@ -207,15 +217,15 @@ class RouteInfoForm extends React.Component {
                         <FormControl type="file" name='route' accept=".gpx"
                                      onChange={event => this.setState({routeFileSet : event.target.value != ''})}/>
                     </FormGroup>
-                    <OverlayTrigger placement="bottom" overlay={this.state.rwgps_enabled?rwgps_enabled_tooltip:rwgps_disabled_tooltip}>
-                        <FormGroup controlId="ridewithgps">
+                    <FormGroup controlId="ridewithgps">
                         <ControlLabel>RideWithGps route number</ControlLabel>
-                        <FormControl type="number" pattern="[0-9]*"
-                                     onChange={event => this.setState({rwgpsRoute : event.target.value!=''})}
-                                     style={{'width':'4em'}}
-                                     disabled={!this.state.rwgps_enabled}/>
-                        </FormGroup>
-                    </OverlayTrigger>
+                        <OverlayTrigger placement="bottom" overlay={this.state.rwgps_enabled?rwgps_enabled_tooltip:rwgps_disabled_tooltip}>
+                            <FormControl type="number" pattern="[0-9]*"
+                                         onChange={event => this.setState({rwgpsRoute : event.target.value!=''})}
+                                         style={{'width':'4em'}}
+                                         disabled={!this.state.rwgps_enabled}/>
+                        </OverlayTrigger>
+                    </FormGroup>
                     <OverlayTrigger placement='bottom' overlay={forecast_tooltip}>
                         <div style={{'display':'inline-block'}} cursor='not-allowed'>
                             <Button bsStyle="primary" onClick={this.requestForecast}
@@ -227,9 +237,10 @@ class RouteInfoForm extends React.Component {
                     {this.showErrorDetails(this.state.errorDetails)}
                 </Form>
                 <LoginDialog loginCb={this.loginResult}/>
-            </div>
+            </Well>
         );
     }
 }
 
 module.exports=RouteInfoForm;
+export default RouteInfoForm;

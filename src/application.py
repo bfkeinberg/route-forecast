@@ -116,7 +116,7 @@ def submitted_form():
             return jsonify({'status': forecast}), 400
         bounds = wcalc.get_bounds()
         min_lat, min_lon, max_lat, max_lon = bounds
-    return jsonify({'forecast':forecast,min_lat:min_lat,max_lat:max_lat, min_lon: min_lon, max_lon: max_lon,
+    return jsonify({'forecast':forecast,'min_lat':min_lat,'max_lat':max_lat, 'min_lon': min_lon, 'max_lon': max_lon,
                     'points': wcalc.get_points(), 'name':wcalc.get_name(),'controls':wcalc.get_controls()})
 
 # run the app.
@@ -124,4 +124,4 @@ if __name__ == "__main__":
     # Setting debug to True enables debug output. This line should be
     # removed before deploying a production app.
     # application.debug = True
-    application.run()
+    application.run(threaded=True)

@@ -1,12 +1,5 @@
-let Button = require('react-bootstrap').Button,
-ButtonGroup = require('react-bootstrap').ButtonGroup,
-ButtonToolbar = require('react-bootstrap').ButtonToolbar,
-Glyphicon = require('react-bootstrap').Glyphicon,
-Table = require('react-bootstrap').Table,
-Panel = require('react-bootstrap').Panel,
-React = require('react'),
-ReactDOM = require('react-dom');
-
+import {Button,ButtonGroup,ButtonToolbar,Glyphicon,Table,Panel} from 'react-bootstrap';
+import React, { Component } from 'react';
 class ControlPoint extends React.Component {
 
     constructor(props) {
@@ -79,32 +72,33 @@ class ControlPoints extends React.Component {
             ( <h3>Control point list</h3> ) :
             ( <h3>Control point list for {this.props.name}</h3> );
         return (
-            <div className="controlPoints">
-                <h2>Checkpoint times</h2>
-                <ButtonToolbar>
-                    <ButtonGroup>
-                        <Button onClick={this.addControl}><Glyphicon glyph="plus-sign"></Glyphicon>Add control point</Button>
-                    </ButtonGroup>
-                </ButtonToolbar>
-                <Panel header={title} bsStyle="info">
-                    <Table striped condensed hover fill>
-                        <thead>
-                        <tr>
-                            <th  style={{'fontSize':'80%'}}>Name</th>
-                            <th  style={{'fontSize':'80%'}}>Distance</th>
-                            <th  style={{'fontSize':'80%'}}>Expected time spent</th>
-                            <th  style={{'fontSize':'80%'}}>Est. arrival time</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                            {this.props.controlPoints.map((row, key) =>
-                                <ControlPoint key={key} index={key} onChange={this.updateRow} removeRow={this.removeRow} fields={row}/>)}
-                        </tbody>
-                    </Table>
-                </Panel>
-            </div>
+                <div className="controlPoints">
+                        <h2>Checkpoint times</h2>
+                    <ButtonToolbar>
+                        <ButtonGroup>
+                            <Button onClick={this.addControl}><Glyphicon glyph="plus-sign"></Glyphicon>Add control point</Button>
+                        </ButtonGroup>
+                    </ButtonToolbar>
+                    <Panel header={title} bsStyle="info">
+                        <Table striped condensed hover fill>
+                            <thead>
+                            <tr>
+                                <th  style={{'fontSize':'80%'}}>Name</th>
+                                <th  style={{'fontSize':'80%'}}>Distance</th>
+                                <th  style={{'fontSize':'80%'}}>Expected time spent</th>
+                                <th  style={{'fontSize':'80%'}}>Est. arrival time</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                                {this.props.controlPoints.map((row, key) =>
+                                    <ControlPoint key={key} index={key} onChange={this.updateRow} removeRow={this.removeRow} fields={row}/>)}
+                            </tbody>
+                        </Table>
+                    </Panel>
+                </div>
         );
     }
 }
 
 module.exports=ControlPoints;
+export default ControlPoint;
