@@ -1,0 +1,11 @@
+h1 {
+    color: navy;
+    margin-left: 20px;
+}
+#content input_1[disabled] {
+    color: #DCDAD1;
+    padding: 2px;
+    margin: 0 0 0 0;
+    background-image: none;
+}
+
