@@ -5,3 +5,4 @@
 !.elasticbeanstalk/*.global.yml
 *.pyc
 .idea
+node_modules/
