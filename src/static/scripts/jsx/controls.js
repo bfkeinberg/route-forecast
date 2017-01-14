@@ -1,6 +1,7 @@
 import {Button,ButtonGroup,ButtonToolbar,Glyphicon,Table,Panel} from 'react-bootstrap';
+import {Checkbox} from 'react-bootstrap';
 import React, { Component } from 'react';
-import { Checkbox } from '@blueprintjs/core';
+// import { Checkbox } from '@blueprintjs/core';
 
 class ControlPoint extends React.Component {
 
@@ -83,36 +84,46 @@ class ControlPoints extends React.Component {
             ( <h3 style={{textAlign:"center"}}>Control point list</h3> ) :
             ( <h3 style={{textAlign:"center"}}>Control point list for <i>{this.props.name}</i></h3> );
         const rusa_banked_header = (<th  style={{'fontSize':'80%'}}>Banked time</th>);
-
         return (
-                <div className="controlPoints">
-                        <h2 style={{textAlign:"center"}}>Checkpoint times</h2>
-                    <ButtonToolbar>
-                        <ButtonGroup>
-                            <Button onClick={this.addControl}><Glyphicon glyph="plus-sign"></Glyphicon>Add control point</Button>
-                        </ButtonGroup>
-                        <Checkbox checked={this.state.displayBankedTime} onChange={this.toggleDisplayBanked}
-                                  label="Display banked time" className="pt-inline"/>
-                    </ButtonToolbar>
-                    <Panel header={title} bsStyle="info">
-                        <Table striped condensed hover fill>
-                            <thead>
-                            <tr>
-                                <th  style={{'fontSize':'80%'}}>Name</th>
-                                <th  style={{'fontSize':'80%'}}>Distance</th>
-                                <th  style={{'fontSize':'80%'}}>Expected time spent</th>
-                                <th  style={{'fontSize':'80%'}}>Est. arrival time</th>
-                                {this.state.displayBankedTime?rusa_banked_header:null}
-                            </tr>
-                            </thead>
-                            <tbody>
-                                {this.props.controlPoints.map((row, key) =>
-                                    <ControlPoint key={key} index={key} onChange={this.updateRow} removeRow={this.removeRow}
-                                                  displayBanked={this.state.displayBankedTime} fields={row}/>)}
-                            </tbody>
-                        </Table>
-                    </Panel>
-                </div>
+
+            <div className="controlPoints">
+                {/*<h2 style={{textAlign:"center"}}>Checkpoint times</h2>*/}
+                <ButtonToolbar>
+                <ButtonGroup>
+                    <Button onClick={this.addControl}><Glyphicon glyph="plus-sign"></Glyphicon>Add control point</Button>
+                     <Checkbox checked={this.state.displayBankedTime} inline
+                     inputRef={ref => { this.input = ref; }}
+                       onChange={this.toggleDisplayBanked}
+                     onClick={this.toggleDisplayBanked}
+                     style={{padding:'7px 25px 0px','textAlign':'center',
+                     margin:'8x 0px 0px 29px',width:'190px'}}>Display banked time</Checkbox>
+{/*
+                    <Checkbox checked={this.state.displayBankedTime} onChange={this.toggleDisplayBanked}
+                              label="Display banked time"
+                              style={{padding:'10px 25px 0px','text-align':'center',
+                                  margin:'10px 0px 0px 170px',width:'200px'}} />
+*/}
+                </ButtonGroup>
+                </ButtonToolbar>
+                <Panel header={title} bsStyle="info">
+                    <Table striped condensed hover fill>
+                        <thead>
+                        <tr>
+                            <th  style={{'fontSize':'80%'}}>Name</th>
+                            <th  style={{'fontSize':'80%'}}>Distance</th>
+                            <th  style={{'fontSize':'80%'}}>Expected time spent</th>
+                            <th  style={{'fontSize':'80%'}}>Est. arrival time</th>
+                            {this.state.displayBankedTime?rusa_banked_header:null}
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {this.props.controlPoints.map((row, key) =>
+                            <ControlPoint key={key} index={key} onChange={this.updateRow} removeRow={this.removeRow}
+                                          displayBanked={this.state.displayBankedTime} fields={row}/>)}
+                        </tbody>
+                    </Table>
+                </Panel>
+            </div>
         );
     }
 }

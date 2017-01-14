@@ -132,7 +132,7 @@ class RouteInfoForm extends React.Component {
         later.setDate(now.getDate() + daysToAdd);
         let timeProps = {showArrowButtons:true};
         let dateProps = {minDate:now,maxDate:later,canClearSelection:false};
-        let buttonStyle = this.disableSubmit() ? {pointerEvents : 'none'} : {};
+        let buttonStyle = this.disableSubmit() ? {pointerEvents : 'none',padding:'14px'} : {padding:'14px'};
 /*        let popupCalendar = (
             <FormGroup controlId="starting_time">
                 <ControlLabel>Starting time</ControlLabel>
@@ -144,8 +144,9 @@ class RouteInfoForm extends React.Component {
 
             </FormGroup>
         );*/
+        const header = (<div style={{textAlign:"center",'fontSize':'99%'}}>Forecast and time estimate</div>);
         return (
-            <Panel header="Forecast and time estimate">
+            <Panel header={header}>
                 <Form inline id="forecast_form">
 {/*
                     <Popover content={popupCalendar} position={Position.BOTTOM} useSmartPositioning={true}
@@ -166,7 +167,7 @@ class RouteInfoForm extends React.Component {
 */}
                     <FormGroup controlId="starting_time">
                         <OverlayTrigger placement='bottom' overlay={time_tooltip}>
-                            <ControlLabel>Starting time</ControlLabel>
+                            <ControlLabel style={{padding:'10px'}}>Starting time</ControlLabel>
                         </OverlayTrigger>
                         <span className="pt-icon-standard pt-icon-calendar"></span>
                         <Flatpickr options={{enableTime: true,
@@ -179,16 +180,17 @@ class RouteInfoForm extends React.Component {
                                 }}/>
                     </FormGroup>
                     <FormGroup bsSize='small' controlId="interval">
-                        <ControlLabel>Interval in hours</ControlLabel>
+                        <ControlLabel style={{padding:'10px'}}>Interval in hours</ControlLabel>
                         <OverlayTrigger placement='bottom' overlay={interval_tooltip}>
                             <FormControl type="number" min={0.5} max={2} step={0.5} name="interval" style={{'width':'5em'}}
                                          value={this.state.interval} onChange={this.intervalChanged}/>
                         </OverlayTrigger>
                      </FormGroup>
                     <FormGroup controlId="pace">
-                        <ControlLabel>Pace</ControlLabel>
+                        <ControlLabel style={{padding:'10px'}}>Pace</ControlLabel>
                         <OverlayTrigger placement="bottom" overlay={pace_tooltip}>
-                            <FormControl componentClass="select" value={this.state.pace} name="pace" style={{'width':'3em'}}
+                            <FormControl componentClass="select" value={this.state.pace} name="pace"
+                                         style={{'width':'3em',padding:'10px'}}
                                          onChange={event => this.setState({start:this.state.start,pace:event.target.value})}
                                          required>
                                 <option value="A">A</option>
@@ -203,24 +205,24 @@ class RouteInfoForm extends React.Component {
                             </FormControl>
                         </OverlayTrigger>
                     </FormGroup>
-                    <a href="https://westernwheelersbicycleclub.wildapricot.org/page-1374754" target="_blank">Pace explanation</a>
+                    <a style={{padding:'10px'}} href="https://westernwheelersbicycleclub.wildapricot.org/page-1374754" target="_blank">Pace explanation</a>
                     <HelpBlock>Upload a .gpx file describing your route</HelpBlock>
-                    <FormGroup controlId="route">
-                        <ControlLabel>Route file:</ControlLabel>
+                    <FormGroup bsSize='small' controlId="route">
+                        <ControlLabel>Route file</ControlLabel>
                         <FormControl type="file" name='route' accept=".gpx"
                                      onChange={event => this.setState({routeFileSet : event.target.value != ''})}/>
                     </FormGroup>
                     <FormGroup controlId="ridewithgps">
-                        <ControlLabel>RideWithGps route number</ControlLabel>
+                        <ControlLabel style={{padding:'10px'}}>RideWithGps route number</ControlLabel>
                         <OverlayTrigger placement="bottom" overlay={this.state.rwgps_enabled?rwgps_enabled_tooltip:rwgps_disabled_tooltip}>
                             <FormControl type="number" pattern="[0-9]*"
                                          onChange={event => this.setState({rwgpsRoute : event.target.value!=''})}
-                                         style={{'width':'4em'}}
+                                         style={{'width':'4em',padding:'12px'}}
                                          disabled={!this.state.rwgps_enabled}/>
                         </OverlayTrigger>
                     </FormGroup>
                     <OverlayTrigger placement='bottom' overlay={forecast_tooltip}>
-                        <div style={{'display':'inline-block'}} cursor='not-allowed'>
+                        <div style={{'display':'inline-block',padding:'0px 14px'}} cursor='not-allowed'>
                             <Button bsStyle="primary" onClick={this.requestForecast}
                                     style={buttonStyle}
                                     disabled={this.disableSubmit() || this.state.pending} bsSize="large">
