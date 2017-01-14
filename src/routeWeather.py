@@ -74,7 +74,7 @@ class weather_calculator:
             return 'Invalid starting time'
         tracks = gpx.tracks
         for track in tracks:
-            self.name = track.name;
+            self.name = track.name
             for trkseg in track.segments:
                 for trkpnt in trkseg.points:
                     self.pointsInRoute.append({'latitude':trkpnt.latitude,'longitude':trkpnt.longitude})
@@ -82,7 +82,7 @@ class weather_calculator:
                     self.max_latitude = max(self.max_latitude, trkpnt.latitude)
                     self.min_longitude = min(self.min_longitude, trkpnt.longitude)
                     self.max_longitude = max(self.max_longitude, trkpnt.longitude)
-                    if old_trkpnt != None:
+                    if old_trkpnt != None and trkpnt != None:
                         distance_from_last = trkpnt.distance_3d(old_trkpnt)
                         accum_distance += distance_from_last
                         segment_distance += distance_from_last
