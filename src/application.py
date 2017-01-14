@@ -7,7 +7,7 @@ import tempfile
 
 import requests
 from flask import Flask, render_template, request, redirect, url_for, jsonify
-from flask import flash
+# from flask import flash
 from flask_bower import Bower
 
 from routeWeather import weather_calculator

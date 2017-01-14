@@ -70,7 +70,7 @@ class ControlPoints extends React.Component {
     render () {
         const title = this.props.name == '' ?
             ( <h3 style={{textAlign:"center"}}>Control point list</h3> ) :
-            ( <h3>Control point list for {this.props.name}</h3> );
+            ( <h3 style={{textAlign:"center"}}>Control point list for <i>{this.props.name}</i></h3> );
         return (
                 <div className="controlPoints">
                         <h2 style={{textAlign:"center"}}>Checkpoint times</h2>

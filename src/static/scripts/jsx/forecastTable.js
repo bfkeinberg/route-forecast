@@ -34,8 +34,7 @@ class ForecastTable extends React.Component {
                     <a href="https://darksky.net/poweredby/">
                         <img src="https://darksky.net/dev/img/attribution/poweredby.png" alt="Powered by DarkSky" width="80" height="40"/>
                     </a>
-                    <table className="pt-table .pt-condensed .pt-bordered .pt-striped .pt-interactive">
-                    {/*<Table striped condensed hover bordered>*/}
+                    <Table striped condensed hover bordered>
                         <thead>
                         <tr>
                             <th style={{'fontSize':'80%'}}>Time</th>
@@ -47,8 +46,7 @@ class ForecastTable extends React.Component {
                         </tr>
                         </thead>
                         {ForecastTable.expandTable(this.props.forecast)}
-                    </table>
-                    {/*</Table>*/}
+                    </Table>
                 </div>
         );
     }

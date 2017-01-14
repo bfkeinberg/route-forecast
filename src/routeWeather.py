@@ -155,10 +155,10 @@ class weather_calculator:
         if response.status_code==200:
             currentForecast = response.json()['currently']
             now = datetime.fromtimestamp(currentForecast['time'])
-            return (now.strftime("%H:%M"),currentForecast['summary'],str(currentForecast['temperature'])+'F',
+            return (now.strftime("%H:%M"),currentForecast['summary'],str(int(round(currentForecast['temperature'])))+'F',
                     str((currentForecast['precipProbability'] * 100)) + '%' if 'precipProbability' in currentForecast else '<unavailable>',
                     str(currentForecast['cloudCover'] * 100) + '%' if 'cloudCover' in currentForecast else '<unavailable>',
-                    str(currentForecast['windSpeed']) + ' mph' if 'windSpeed' in currentForecast else '<unavailable>',
+                    str(int(round(currentForecast['windSpeed']))) + ' mph' if 'windSpeed' in currentForecast else '<unavailable>',
                     lat, lon, int(round(currentForecast['temperature'])), now.strftime("%c")
                     )
         else:
