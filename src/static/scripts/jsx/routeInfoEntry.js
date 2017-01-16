@@ -68,7 +68,7 @@ class RouteInfoForm extends React.Component {
         this.state.xmlhttp.open("POST", this.props.action);
         let startMoment = moment(this.state.start);
         formdata.append('starting_time',startMoment.format('X'));
-        formdata.append('timezone',new Date().getTimezoneOffset());
+        formdata.append('timezone',-new Date().getTimezoneOffset());
         if (this.props.controlPoints.length > 0) {
             let js = JSON.stringify(this.props.controlPoints);
             formdata.set("controls",js);

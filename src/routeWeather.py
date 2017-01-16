@@ -91,7 +91,7 @@ class WeatherCalculator:
                 for trkpnt in trkseg.points:
                     if (first_forecast):
                         forecast.append(self.find_weather_at_point(elevation_change, accum_distance, trkpnt, base_speed,
-                                                               start_datetime))
+                                                               start_datetime, tzinfo))
                         first_forecast = False
                     self.pointsInRoute.append({'latitude': trkpnt.latitude, 'longitude': trkpnt.longitude})
                     self.min_latitude = min(self.min_latitude, trkpnt.latitude)
@@ -124,13 +124,15 @@ class WeatherCalculator:
                         segment_distance = 0
                         elapsed_time = 0
                         segment_delay_time = 0
-                        forecast.append(self.find_weather_at_point(elevation_change, accum_distance, trkpnt, base_speed, start_datetime))
+                        forecast.append(self.find_weather_at_point(elevation_change, accum_distance, trkpnt,
+                                                                   base_speed, start_datetime, tzinfo))
                         delta_elevation_gain = 0
                     old_trkpnt = trkpnt
                     if trkpnt.elevation is not None:
                         prev_elevation = trkpnt.elevation
         if trkpnt is not None:
-            forecast.append(self.find_weather_at_point(elevation_change, accum_distance, trkpnt, base_speed, start_datetime))
+            forecast.append(self.find_weather_at_point(elevation_change, accum_distance, trkpnt,
+                                                       base_speed, start_datetime, tzinfo))
         return forecast
 
     def check_and_update_controls(self, distance, start, time, controls):
@@ -170,7 +172,7 @@ class WeatherCalculator:
         pace = base_speed - hilliness
         return distance_in_miles / pace     # hours
 
-    def find_weather_at_point(self, elevation_change, distance, where, base_speed, start_datetime):
+    def find_weather_at_point(self, elevation_change, distance, where, base_speed, start_datetime, tzinfo):
         elevation_in_feet = (elevation_change * nu.m) / nu.foot
         distance_in_miles = (distance * nu.m)/nu.mile
         if distance_in_miles > 0:
@@ -182,18 +184,18 @@ class WeatherCalculator:
         elapsed_time_delta = timedelta(hours=time_to_cover)
         time_at_point = start_datetime + elapsed_time_delta
         forecast_time = time_at_point.strftime('%Y-%m-%dT%H:%M:00%z')
-        return self.call_weather_service(where.latitude, where.longitude, forecast_time)
+        return self.call_weather_service(where.latitude, where.longitude, forecast_time, tzinfo)
 
-    def call_weather_service(self, lat, lon, time):
+    def call_weather_service(self, lat, lon, time, tzinfo):
         key = os.getenv('DARKSKY_API_KEY')
         url = "https://api.darksky.net/forecast/{}/{},{},{}?exclude=hourly,daily,flags".format(key, lat, lon, time)
         headers = {"Accept-Encoding": "gzip"}
         response = requests.get(url=url, headers=headers)
         if response.status_code == 200:
             current_forecast = response.json()['currently']
-            now = datetime.fromtimestamp(current_forecast['time'])
+            now = datetime.fromtimestamp(current_forecast['time'], tzinfo)
             self.logger.info(now,lat,lon,current_forecast)
-            return (now.strftime("%H:%M"), current_forecast['summary'],
+            return (now.strftime("%-I:%M%p"), current_forecast['summary'],
                     str(int(round(current_forecast['temperature'])))+'F',
                     str((current_forecast['precipProbability'] * 100)) + '%'
                     if 'precipProbability' in current_forecast else '<unavailable>',
