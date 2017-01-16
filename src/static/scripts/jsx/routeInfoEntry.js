@@ -3,6 +3,7 @@ import { DateTimePicker } from '@blueprintjs/datetime';
 import { Position, Popover } from '@blueprintjs/core';
 import { Panel,FormControl,FormGroup,Form,Glyphicon,Alert,ControlLabel,Button,HelpBlock,Tooltip,OverlayTrigger,Well,InputGroup} from 'react-bootstrap';
 import moment from 'moment';
+// import momentz from 'moment-timezone';
 import React, { Component } from 'react';
 import Flatpickr from 'react-flatpickr'
 
@@ -25,11 +26,6 @@ const rwgps_disabled_tooltip = (
 const rwgps_enabled_tooltip = (
     <Tooltip id="pace_tooltip">The number for a route on ridewithgps</Tooltip>
 );
-
-const forecast_disabled_tooltip = (
-        <Tooltip id="forecast_tooltip">Must either upload a gpx file or provide an rwgps route id</Tooltip> );
-
-const forecast_enabled_tooltip = (<Tooltip id="'forecast_en">Request a ride forecast</Tooltip>)
 
 const startHour = 7;
 
@@ -70,7 +66,9 @@ class RouteInfoForm extends React.Component {
         let requestForm = document.getElementById("forecast_form");
         let formdata = new FormData(requestForm);
         this.state.xmlhttp.open("POST", this.props.action);
-        formdata.append('starting_time',moment(this.state.start).format('YYYY-MM-DDTHH:mm'));
+        let startMoment = moment(this.state.start);
+        formdata.append('starting_time',startMoment.format('X'));
+        formdata.append('timezone',new Date().getTimezoneOffset());
         if (this.props.controlPoints.length > 0) {
             let js = JSON.stringify(this.props.controlPoints);
             formdata.set("controls",js);
@@ -130,8 +128,10 @@ class RouteInfoForm extends React.Component {
         let later = new Date();
         const daysToAdd = 14;
         later.setDate(now.getDate() + daysToAdd);
+/*
         let timeProps = {showArrowButtons:true};
         let dateProps = {minDate:now,maxDate:later,canClearSelection:false};
+*/
         let buttonStyle = this.disableSubmit() ? {pointerEvents : 'none',padding:'14px'} : {padding:'14px'};
 /*        let popupCalendar = (
             <FormGroup controlId="starting_time">

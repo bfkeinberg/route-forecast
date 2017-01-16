@@ -24,7 +24,8 @@ module.exports = {
             { test: /\.css$/, loader: "style-loader!css-loader" },
             { test: /\.(png|woff2?)$/, loader: "url-loader?limit=100000" },
             { test: /\.jpg$/, loader: "file-loader" },
-            { test: /\.(ttf|eot|svg)$/, loader: "file-loader" }
+            { test: /\.(ttf|eot|svg)$/, loader: "file-loader" },
+            { test: /\.json$/, loader: "json-loader"}
         ]
     },
     output: {

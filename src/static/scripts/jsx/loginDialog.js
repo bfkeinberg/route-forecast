@@ -82,9 +82,9 @@ class LoginDialog extends React.Component {
                         </form>
                     </Modal.Body>
                 </Modal>
-                Log into RideWithGps
+                <span style={{padding:'10px'}}>Log into RideWithGps</span>
                 <OverlayTrigger overlay={rwgps_login_tooltip}>
-                    <Button onClick={this.open} bsClass="rwgpsLogin">Login</Button>
+                    <Button style={{padding:'10px'}} onClick={this.open} bsClass="rwgpsLogin">Login</Button>
                 </OverlayTrigger>
             </div>
         );

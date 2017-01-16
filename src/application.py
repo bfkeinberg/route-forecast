@@ -90,10 +90,11 @@ def handle_login():
 
 @application.route('/submitted', methods=['POST'])
 def submitted_form():
-    if not request.form.viewkeys() >= {'interval', 'pace', 'starting_time'}:
+    if not request.form.viewkeys() >= {'interval', 'pace', 'starting_time','timezone'}:
         return jsonify({'status': 'Missing keys'}), 400
     interval = request.form['interval']
     starting_time = request.form['starting_time']
+    timezone = request.form['timezone']
     pace = request.form['pace']
     if 'controls' in request.form:
         controls = json.loads(request.form['controls'])
@@ -118,7 +119,7 @@ def submitted_form():
         local_file.flush()
         wcalc = WeatherCalculator()
         try:
-            forecast = wcalc.calc_weather(float(interval), pace, starting_time=starting_time, route=local_file.name, controls=controls)
+            forecast = wcalc.calc_weather(float(interval), pace, starting_time=starting_time, tz=timezone, route=local_file.name, controls=controls)
         except requests.HTTPError as excpt:
             return jsonify({'status': excpt.message}), 500
         except Exception as excpt:

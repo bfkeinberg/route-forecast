@@ -1,10 +1,12 @@
 import os
-from datetime import datetime
-from datetime import timedelta
+from datetime import *
+from dateutil.tz import *
 
 import gpxpy.gpx
 import numericalunits as nu
 import requests
+
+import logging
 
 nu.reset_units()
 nu.set_derived_units_and_constants()
@@ -32,6 +34,7 @@ class WeatherCalculator:
         self.controls = None
         self.next_control = None
         self.pointsInRoute = None
+        self.logger = logging.getLogger('WeatherCalculator')
 
     def is_error(self):
         return self.error
@@ -48,7 +51,7 @@ class WeatherCalculator:
     def get_controls(self):
         return self.controls
 
-    def calc_weather(self, forecast_interval_hours, pace, starting_time, route, controls):
+    def calc_weather(self, forecast_interval_hours, pace, starting_time, tz, route, controls):
         self.controls = controls
         with open(route, 'r') as local_gpx_file:
             try:
@@ -73,16 +76,23 @@ class WeatherCalculator:
         base_speed = self.paceToSpeed[pace]
         # month day year hour:minute (24-hour)
         try:
-            start_datetime = datetime.strptime(starting_time, '%Y-%m-%dT%H:%M')
+            offset = long(tz) * 60
+            tzinfo = tzoffset('local', offset)
+            start_datetime = datetime.fromtimestamp(long(starting_time),tzinfo)
         except Exception as excpt:
             self.error = True
             return 'Invalid starting time' + excpt.message
         trkpnt = None
+        first_forecast = True
         tracks = gpx_obj.tracks
         for track_obj in tracks:
             self.name = track_obj.name
             for trkseg in track_obj.segments:
                 for trkpnt in trkseg.points:
+                    if (first_forecast):
+                        forecast.append(self.find_weather_at_point(elevation_change, accum_distance, trkpnt, base_speed,
+                                                               start_datetime))
+                        first_forecast = False
                     self.pointsInRoute.append({'latitude': trkpnt.latitude, 'longitude': trkpnt.longitude})
                     self.min_latitude = min(self.min_latitude, trkpnt.latitude)
                     self.max_latitude = max(self.max_latitude, trkpnt.latitude)
@@ -163,12 +173,16 @@ class WeatherCalculator:
     def find_weather_at_point(self, elevation_change, distance, where, base_speed, start_datetime):
         elevation_in_feet = (elevation_change * nu.m) / nu.foot
         distance_in_miles = (distance * nu.m)/nu.mile
-        hilliness = int(min((elevation_in_feet / distance_in_miles) / 25, 5))
+        if distance_in_miles > 0:
+            hilliness = int(min((elevation_in_feet / distance_in_miles) / 25, 5))
+        else:
+            hilliness = 0
         pace = base_speed - hilliness
         time_to_cover = distance_in_miles / pace       # hours
         elapsed_time_delta = timedelta(hours=time_to_cover)
         time_at_point = start_datetime + elapsed_time_delta
-        return self.call_weather_service(where.latitude, where.longitude, int(time_at_point.strftime("%s")))
+        forecast_time = time_at_point.strftime('%Y-%m-%dT%H:%M:00%z')
+        return self.call_weather_service(where.latitude, where.longitude, forecast_time)
 
     def call_weather_service(self, lat, lon, time):
         key = os.getenv('DARKSKY_API_KEY')
@@ -178,6 +192,7 @@ class WeatherCalculator:
         if response.status_code == 200:
             current_forecast = response.json()['currently']
             now = datetime.fromtimestamp(current_forecast['time'])
+            self.logger.info(now,lat,lon,current_forecast)
             return (now.strftime("%H:%M"), current_forecast['summary'],
                     str(int(round(current_forecast['temperature'])))+'F',
                     str((current_forecast['precipProbability'] * 100)) + '%'
