@@ -7,10 +7,10 @@ import RouteForecastMap from './map';
 import ForecastTable from './forecastTable';
 import SplitPane from 'react-split-pane';
 
-let css = require('!style!css!bootstrap/dist/css/bootstrap.min.css'),
-    css1 = require('!style!css!normalize.css/normalize.css'),
-    css2 = require('!style!css!@blueprintjs/core/dist/blueprint.css'),
-    css3 = require('!style!css!@blueprintjs/datetime/dist/blueprint-datetime.css');
+require('!style!css!bootstrap/dist/css/bootstrap.min.css');
+require('!style!css!normalize.css/normalize.css');
+require('!style!css!@blueprintjs/core/dist/blueprint.css');
+require('!style!css!@blueprintjs/datetime/dist/blueprint-datetime.css');
 
 class RouteWeatherUI extends React.Component {
 
@@ -35,7 +35,7 @@ class RouteWeatherUI extends React.Component {
     render() {
         return (
         <div>
-            <SplitPane defaultSize={320} minSize={150} split="horizontal">
+            <SplitPane defaultSize={320} minSize={150} maxSize={530} split="horizontal">
                 <SplitPane defaultSize={550} minSize={150} split="vertical" pane2Style={{'overflow':'scroll'}}>
                     <RouteInfoForm action={this.state.action}
                                    updateForecast={this.updateForecast}

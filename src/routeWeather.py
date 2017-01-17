@@ -1,6 +1,6 @@
 import os
 from datetime import *
-from dateutil.tz import *
+import dateutil.tz
 
 import gpxpy.gpx
 import numericalunits as nu
@@ -77,8 +77,8 @@ class WeatherCalculator:
         # month day year hour:minute (24-hour)
         try:
             offset = long(tz) * 60
-            tzinfo = tzoffset('local', offset)
-            start_datetime = datetime.fromtimestamp(long(starting_time),tzinfo)
+            req_tzinfo = dateutil.tz.tzoffset('local', offset)
+            start_datetime = datetime.fromtimestamp(long(starting_time), req_tzinfo)
         except Exception as excpt:
             self.error = True
             return 'Invalid starting time' + excpt.message
@@ -89,9 +89,9 @@ class WeatherCalculator:
             self.name = track_obj.name
             for trkseg in track_obj.segments:
                 for trkpnt in trkseg.points:
-                    if (first_forecast):
+                    if first_forecast:
                         forecast.append(self.find_weather_at_point(elevation_change, accum_distance, trkpnt, base_speed,
-                                                               start_datetime, tzinfo))
+                                                                   start_datetime, req_tzinfo))
                         first_forecast = False
                     self.pointsInRoute.append({'latitude': trkpnt.latitude, 'longitude': trkpnt.longitude})
                     self.min_latitude = min(self.min_latitude, trkpnt.latitude)
@@ -125,27 +125,28 @@ class WeatherCalculator:
                         elapsed_time = 0
                         segment_delay_time = 0
                         forecast.append(self.find_weather_at_point(elevation_change, accum_distance, trkpnt,
-                                                                   base_speed, start_datetime, tzinfo))
+                                                                   base_speed, start_datetime, req_tzinfo))
                         delta_elevation_gain = 0
                     old_trkpnt = trkpnt
                     if trkpnt.elevation is not None:
                         prev_elevation = trkpnt.elevation
         if trkpnt is not None:
             forecast.append(self.find_weather_at_point(elevation_change, accum_distance, trkpnt,
-                                                       base_speed, start_datetime, tzinfo))
+                                                       base_speed, start_datetime, req_tzinfo))
         return forecast
 
-    def check_and_update_controls(self, distance, start, time, controls):
+    def check_and_update_controls(self, distance, start, elapsed_time, controls):
         if len(controls) <= self.next_control:
             return 0
         distance_in_miles = (distance * nu.m) / nu.mile
         if distance_in_miles < int(controls[self.next_control]['distance']):
             return 0
         delay_in_minutes = int(controls[self.next_control]['duration'])
-        added_delay = timedelta(seconds=(time*3600))
+        added_delay = timedelta(seconds=(elapsed_time * 3600))
         arrival_time = start + added_delay
         controls[self.next_control]['arrival'] = arrival_time.strftime('%a, %b %d %-I:%M%p')
-        controls[self.next_control]['banked'] = str(int(round(self.rusa_time(accum_distance=distance, accum_time=time)))) + 'min'
+        controls[self.next_control]['banked'] = \
+            str(int(round(self.rusa_time(accum_distance=distance, accum_time=elapsed_time)))) + 'min'
         self.next_control += 1
         return float(delay_in_minutes)/60      # convert from minutes to hours
 
@@ -172,7 +173,7 @@ class WeatherCalculator:
         pace = base_speed - hilliness
         return distance_in_miles / pace     # hours
 
-    def find_weather_at_point(self, elevation_change, distance, where, base_speed, start_datetime, tzinfo):
+    def find_weather_at_point(self, elevation_change, distance, where, base_speed, start_datetime, zone):
         elevation_in_feet = (elevation_change * nu.m) / nu.foot
         distance_in_miles = (distance * nu.m)/nu.mile
         if distance_in_miles > 0:
@@ -184,17 +185,17 @@ class WeatherCalculator:
         elapsed_time_delta = timedelta(hours=time_to_cover)
         time_at_point = start_datetime + elapsed_time_delta
         forecast_time = time_at_point.strftime('%Y-%m-%dT%H:%M:00%z')
-        return self.call_weather_service(where.latitude, where.longitude, forecast_time, tzinfo)
+        return self.call_weather_service(where.latitude, where.longitude, forecast_time, zone)
 
-    def call_weather_service(self, lat, lon, time, tzinfo):
+    def call_weather_service(self, lat, lon, current_time, zone):
         key = os.getenv('DARKSKY_API_KEY')
-        url = "https://api.darksky.net/forecast/{}/{},{},{}?exclude=hourly,daily,flags".format(key, lat, lon, time)
+        url = "https://api.darksky.net/forecast/{}/{},{},{}?exclude=hourly,daily,flags".format(key, lat, lon, current_time)
         headers = {"Accept-Encoding": "gzip"}
         response = requests.get(url=url, headers=headers)
         if response.status_code == 200:
             current_forecast = response.json()['currently']
-            now = datetime.fromtimestamp(current_forecast['time'], tzinfo)
-            self.logger.info(now,lat,lon,current_forecast)
+            now = datetime.fromtimestamp(current_forecast['time'], zone)
+            self.logger.info(now, lat, lon, current_forecast)
             return (now.strftime("%-I:%M%p"), current_forecast['summary'],
                     str(int(round(current_forecast['temperature'])))+'F',
                     str((current_forecast['precipProbability'] * 100)) + '%'
@@ -208,16 +209,3 @@ class WeatherCalculator:
         else:
             response.raise_for_status()
         return None
-
-if __name__ == "__main__":
-    gpx_file = open('/Users/bfeinberg/Downloads/Uvas_Gold_200k.gpx', 'r')
-    gpx = gpxpy.parse(gpx_file)
-    for track in gpx.tracks:
-        for segment in track.segments:
-            for point in segment.points:
-                print 'Point at ({0},{1}) -> {2}'.format(point.latitude, point.longitude, point.elevation)
-    # 1 hour, D-pace, starting at 06:00PM
-    # wcalc = WeatherCalculator()
-    # print wcalc.calc_weather(forecast_interval_hours=1,pace='D',starting_time='2016-12-27T18:00',route="/users/bfeinberg/Downloads/pygpx-master/readme.rst")
-    # print wcalc.calc_weather(forecast_interval_hours=1,pace='D',starting_time='2016-12-29T12:00',route="/Users/bfeinberg/Downloads/Sausalito_-_Freestone.gpx")
-    # print wcalc.calc_weather(forecast_interval_hours=1,pace='D',starting_time='2016-12-29T12:00',route="/Users/bfeinberg/Downloads/Uvas_Gold_200k.gpx")

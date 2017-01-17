@@ -6,8 +6,9 @@ import moment from 'moment';
 // import momentz from 'moment-timezone';
 import React, { Component } from 'react';
 import Flatpickr from 'react-flatpickr'
+import ParseGpx from './gpxParser';
 
-let fpcss = require('!style!css!flatpickr/dist/themes/confetti.css');
+require('!style!css!flatpickr/dist/themes/confetti.css');
 
 const paceToSpeed = {'A':10, 'B':12, 'C':14, 'C+':15, 'D-':15, 'D':16, 'D+':17, 'E-':17, 'E':18};
 
@@ -38,14 +39,15 @@ class RouteInfoForm extends React.Component {
         this.requestForecast = this.requestForecast.bind(this);
         this.disableSubmit = this.disableSubmit.bind(this);
         this.handleDateChange = this.handleDateChange.bind(this);
+        this.updateRouteFile = this.updateRouteFile.bind(this);
         this.intervalChanged = this.intervalChanged.bind(this);
-        this.state = {start:this.findNextStartTime(), pace:'D', interval:1, rwgps_enabled:false,
+        this.state = {start:RouteInfoForm.findNextStartTime(), pace:'D', interval:1, rwgps_enabled:false,
             xmlhttp : null, routeFileSet:false,rwgpsRoute:false,errorDetails:null,
-            pending:false};
+            pending:false, parser:new ParseGpx()};
     }
 
 
-    findNextStartTime() {
+    static findNextStartTime() {
         let now = new Date();
         if (now.getHours() > startHour) {
             now.setDate(now.getDate() + 1);
@@ -59,12 +61,22 @@ class RouteInfoForm extends React.Component {
         this.setState({rwgps_enabled : true});
     }
 
+    updateRouteFile(event) {
+        this.setState({routeFileSet : event.target.value != ''});
+        let fileControl = event.target;
+        let gpxFiles = fileControl.files;
+        if (gpxFiles.length > 0) {
+            this.state.parser.parseRoute(gpxFiles[0]);
+        }
+    }
+
     requestForecast(event) {
         this.state.xmlhttp = new XMLHttpRequest();
         this.state.xmlhttp.onreadystatechange = this.forecastCb;
         this.state.xmlhttp.responseType = 'json';
         let requestForm = document.getElementById("forecast_form");
         let formdata = new FormData(requestForm);
+
         this.state.xmlhttp.open("POST", this.props.action);
         let startMoment = moment(this.state.start);
         formdata.append('starting_time',startMoment.format('X'));
@@ -73,6 +85,9 @@ class RouteInfoForm extends React.Component {
             let js = JSON.stringify(this.props.controlPoints);
             formdata.set("controls",js);
         }
+        this.state.parser.walkRoute(startMoment,formdata.get('timezone'),
+            formdata.get('pace'),formdata.get('interval'),this.props.controlPoints);
+        return;
         this.state.xmlhttp.send(formdata);
         this.setState({pending:true});
     }
@@ -109,7 +124,7 @@ class RouteInfoForm extends React.Component {
         this.setState({start:time});
     }
 
-    showErrorDetails(errorState) {
+    static showErrorDetails(errorState) {
         if (errorState != null) {
             return (
                 <Alert bsStyle="danger">{errorState}</Alert>
@@ -119,7 +134,7 @@ class RouteInfoForm extends React.Component {
 
     render() {
         let pace_mph = paceToSpeed[this.state.pace];
-        let pace_text = "Represents elevation-adjusted pace - current is ".concat(pace_mph);
+        let pace_text = "Represents climb-adjusted pace - current is ".concat(pace_mph);
         let pace_tooltip = ( <Tooltip id="pace_tooltip">{pace_text}</Tooltip> );
         let forecast_tooltip = this.disableSubmit() ? (
             <Tooltip id="forecast_tooltip">Must either upload a gpx file or provide an rwgps route id</Tooltip> ):
@@ -210,7 +225,7 @@ class RouteInfoForm extends React.Component {
                     <FormGroup bsSize='small' controlId="route">
                         <ControlLabel>Route file</ControlLabel>
                         <FormControl type="file" name='route' accept=".gpx"
-                                     onChange={event => this.setState({routeFileSet : event.target.value != ''})}/>
+                                     onChange={this.updateRouteFile}/>
                     </FormGroup>
                     <FormGroup controlId="ridewithgps">
                         <ControlLabel style={{padding:'10px'}}>RideWithGps route number</ControlLabel>
@@ -229,7 +244,7 @@ class RouteInfoForm extends React.Component {
                                 {this.state.pending?'Updating...':'Find forecast'}</Button>
                         </div>
                     </OverlayTrigger>
-                    {this.showErrorDetails(this.state.errorDetails)}
+                    {RouteInfoForm.showErrorDetails(this.state.errorDetails)}
                 </Form>
                 <LoginDialog loginCb={this.loginResult}/>
             </Panel>

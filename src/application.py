@@ -90,7 +90,7 @@ def handle_login():
 
 @application.route('/submitted', methods=['POST'])
 def submitted_form():
-    if not request.form.viewkeys() >= {'interval', 'pace', 'starting_time','timezone'}:
+    if not request.form.viewkeys() >= {'interval', 'pace', 'starting_time', 'timezone'}:
         return jsonify({'status': 'Missing keys'}), 400
     interval = request.form['interval']
     starting_time = request.form['starting_time']
@@ -119,7 +119,8 @@ def submitted_form():
         local_file.flush()
         wcalc = WeatherCalculator()
         try:
-            forecast = wcalc.calc_weather(float(interval), pace, starting_time=starting_time, tz=timezone, route=local_file.name, controls=controls)
+            forecast = wcalc.calc_weather(float(interval), pace, starting_time=starting_time, tz=timezone,
+                                          route=local_file.name, controls=controls)
         except requests.HTTPError as excpt:
             return jsonify({'status': excpt.message}), 500
         except Exception as excpt:
@@ -128,8 +129,9 @@ def submitted_form():
             return jsonify({'status': forecast}), 400
         bounds = wcalc.get_bounds()
         min_lat, min_lon, max_lat, max_lon = bounds
-    return jsonify({'forecast': forecast, 'min_lat': min_lat, 'max_lat': max_lat, 'min_lon': min_lon, 'max_lon': max_lon,
-                    'points': wcalc.get_points(), 'name': wcalc.get_name(), 'controls': wcalc.get_controls()})
+    return jsonify({'forecast': forecast, 'min_lat': min_lat, 'max_lat': max_lat, 'min_lon': min_lon,
+                    'max_lon': max_lon, 'points': wcalc.get_points(), 'name': wcalc.get_name(),
+                    'controls': wcalc.get_controls()})
 
 # run the app.
 if __name__ == "__main__":
