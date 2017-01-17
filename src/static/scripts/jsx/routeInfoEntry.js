@@ -43,7 +43,7 @@ class RouteInfoForm extends React.Component {
         this.intervalChanged = this.intervalChanged.bind(this);
         this.state = {start:RouteInfoForm.findNextStartTime(), pace:'D', interval:1, rwgps_enabled:false,
             xmlhttp : null, routeFileSet:false,rwgpsRoute:false,errorDetails:null,
-            pending:false, parser:new ParseGpx()};
+            pending:false, parser:new ParseGpx(this.props.updateForecast)};
     }
 
 
@@ -85,8 +85,8 @@ class RouteInfoForm extends React.Component {
             let js = JSON.stringify(this.props.controlPoints);
             formdata.set("controls",js);
         }
-        this.state.parser.walkRoute(startMoment,formdata.get('timezone'),
-            formdata.get('pace'),formdata.get('interval'),this.props.controlPoints);
+        let forecastResults = this.state.parser.walkRoute(startMoment,formdata.get('timezone'),
+            formdata.get('pace'),parseFloat(formdata.get('interval')),this.props.controlPoints);
         return;
         this.state.xmlhttp.send(formdata);
         this.setState({pending:true});

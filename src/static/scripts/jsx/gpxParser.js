@@ -35,6 +35,7 @@ class AnalyzeRoute {
         }
     }
 
+    // returns distance traveled in _miles_, and climb in meters
     findDeltas(previousPoint, currentPoint) {
         this.pointsInRoute.push({'latitude': currentPoint.lat, 'longitude': currentPoint.lon});
         // calculate distance and elevation from last
@@ -55,16 +56,19 @@ class AnalyzeRoute {
         let bounds = {min_latitude:90, min_longitude:180, max_latitude:-90, max_longitude:-180};
         let first = true;
         let previousPoint = null;
-        let accumulatedDistance = 0;
-        let accumulatedClimb = 0;
+        let accumulatedDistanceKm = 0;
+        let accumulatedClimbMeters = 0;
         let accumulatedTime = 0;
-        let segmentDistance = 0;
-        let segmentClimb = 0;
+        let segmentDistanceKm = 0;
+        let segmentClimbMeters = 0;
         let segmentTime = 0;
         let idlingTime = 0;
         let segmentIdlingTime = 0;
+        let trackName = null;
         for (let track of this.gpxResult.tracks) {
-            this.trackName = track.name;
+            if (trackName == null) {
+                trackName = track.name;
+            }
             for (let segment of track.segments) {
                 for (let point of segment) {
                     bounds = this.setMinMaxCoords(point,bounds);
@@ -74,13 +78,13 @@ class AnalyzeRoute {
                     }
                     if (previousPoint != null) {
                         let deltas = this.findDeltas(previousPoint,point);
-                        segmentDistance += deltas['distance'];
+                        segmentDistanceKm += deltas['distance'];
                         // accumulate elevation gain
-                        segmentClimb += deltas['climb'];
+                        segmentClimbMeters += deltas['climb'];
                         // then find elapsed time given pace
-                        segmentTime = this.calculateElapsedTime(segmentClimb, segmentDistance, baseSpeed);
+                        segmentTime = this.calculateElapsedTime(segmentClimbMeters, segmentDistanceKm, baseSpeed);
                     }
-                    let addedTime = this.checkAndUpdateControls(accumulatedDistance+segmentDistance, startTime,
+                    let addedTime = this.checkAndUpdateControls(accumulatedDistanceKm+segmentDistanceKm, startTime,
                         (accumulatedTime + idlingTime), controls);
                     idlingTime += addedTime;
                     segmentIdlingTime += addedTime;
@@ -88,9 +92,9 @@ class AnalyzeRoute {
                     if ((segmentTime + segmentIdlingTime) >= interval) {
                         forecastRequests.push(this.addToForecast(point,startTime,
                             (accumulatedTime+segmentTime+segmentIdlingTime)));
-                        accumulatedDistance += segmentDistance; segmentDistance = 0;
+                        accumulatedDistanceKm += segmentDistanceKm; segmentDistanceKm = 0;
                         accumulatedTime += segmentTime; segmentTime = 0;
-                        accumulatedClimb += segmentClimb; segmentClimb = 0;
+                        accumulatedClimbMeters += segmentClimbMeters; segmentClimbMeters = 0;
                         segmentIdlingTime = 0;
                     }
                     previousPoint = point;
@@ -101,15 +105,18 @@ class AnalyzeRoute {
             forecastRequests.push(this.addToForecast(previousPoint,startTime,
                 (accumulatedTime+segmentTime+segmentIdlingTime)));
         }
-        console.log('Elapsed time was',segmentTime,'total distance',segmentDistance,'total climb',accumulatedClimb);
+        console.log('Elapsed time was',segmentTime+accumulatedTime,
+            'total distance',segmentDistanceKm+accumulatedDistanceKm,'total climb',accumulatedClimbMeters+segmentClimbMeters);
+        return {forecast:forecastRequests,points:this.pointsInRoute,name:trackName,controls:controls,bounds:bounds};
     }
 
-     rusa_time(self, accumulatedDistance, accumulatedTime) {
-         if (accumulatedDistance == 0) {
+     rusa_time(accumulatedDistanceInKm, elapsedTimeInHours) {
+         if (accumulatedDistanceInKm == 0) {
              return 0
          }
 
-         let elapsedMinutes = accumulatedTime * 60;
+         let accumulatedDistance=accumulatedDistanceInKm*1000;
+         let elapsedMinutes = elapsedTimeInHours * 60;
          if (accumulatedDistance <= 600000) {
              var closetimeMinutes = accumulatedDistance * .004;         // 1 / 250;
          }
@@ -122,31 +129,30 @@ class AnalyzeRoute {
          return (closetimeMinutes - elapsedMinutes);
     }
 
-    checkAndUpdateControls(distanceInMeters, startTime, elapsedTime, controls) {
+    checkAndUpdateControls(distanceInKm, startTime, elapsedTimeInHours, controls) {
         if (controls.length <= this.nextControl) {
             return 0;
         }
-        let distanceInMiles = (distanceInMeters * 0.00062137);
+        let distanceInMiles = distanceInKm*0.62137;
         if (distanceInMiles < controls[this.nextControl]['distance']) {
             return 0
         }
         let delayInMinutes = controls[this.next_control]['duration'];
-        let addedDelayInSeconds = elapsedTime*3600;
-        let arrivalTime = startTime.add(addedDelayInSeconds,'seconds');
+        let arrivalTime = startTime.add(elapsedTimeInHours,'hours');
         controls[this.nextControl]['arrival'] = arrivalTime.format('ddd, MMM DD h:mma');
-        controls[this.nextControl]['banked'] = str(int(round(self.rusa_time(accum_distance=distance, accum_time=elapsed_time)))) + 'min';
+        controls[this.nextControl]['banked'] = Math.round(self.rusa_time(accumulatedDistanceInKm, elapsedTimeInHours)) + 'min';
         this.nextControl++;
         return delayInMinutes/60;      // convert from minutes to hours
     }
 
     // in hours
-    calculateElapsedTime(climbInMeters,distanceInMeters,baseSpeed) {
+    calculateElapsedTime(climbInMeters,distanceInKm,baseSpeed) {
         let climbInFeet = (climbInMeters * 3.2808);
-        let distanceInMiles = (distanceInMeters * 0.00062137);
+        let distanceInMiles = distanceInKm*0.62137;
         if (distanceInMiles < 1) {
             return 0;
         }
-        let hilliness = int(Math.min((climbInFeet / distanceInMiles) / 25, 5))
+        let hilliness = Math.floor(Math.min((climbInFeet / distanceInMiles) / 25, 5));
         return distanceInMiles / (baseSpeed - hilliness);     // hours
     }
 
