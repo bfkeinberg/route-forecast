@@ -35,6 +35,7 @@ class WeatherCalculator:
         self.next_control = None
         self.pointsInRoute = None
         self.logger = logging.getLogger('WeatherCalculator')
+        logging.basicConfig(level=logging.INFO)
 
     def is_error(self):
         return self.error
@@ -195,7 +196,7 @@ class WeatherCalculator:
         if response.status_code == 200:
             current_forecast = response.json()['currently']
             now = datetime.fromtimestamp(current_forecast['time'], zone)
-            self.logger.info(now, lat, lon, current_forecast)
+            self.logger.info('%s %f,%f %s', now, lat, lon, current_forecast)
             return (now.strftime("%-I:%M%p"), current_forecast['summary'],
                     str(int(round(current_forecast['temperature'])))+'F',
                     str((current_forecast['precipProbability'] * 100)) + '%'

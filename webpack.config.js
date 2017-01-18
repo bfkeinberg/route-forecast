@@ -31,7 +31,7 @@ module.exports = {
     },
     output: {
         path: BUILD_DIR,
-        filename: "main.js",
+        filename: "bundle.js",
     },
     resolve: {
         extensions: ['', '.js', '.jsx', '.ts', '.tsx'],

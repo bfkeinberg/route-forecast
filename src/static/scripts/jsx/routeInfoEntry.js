@@ -43,7 +43,7 @@ class RouteInfoForm extends React.Component {
         this.intervalChanged = this.intervalChanged.bind(this);
         this.state = {start:RouteInfoForm.findNextStartTime(), pace:'D', interval:1, rwgps_enabled:false,
             xmlhttp : null, routeFileSet:false,rwgpsRoute:false,errorDetails:null,
-            pending:false, parser:new ParseGpx(this.props.updateForecast)};
+            pending:false, parser:new ParseGpx()};
     }
 
 
@@ -53,6 +53,7 @@ class RouteInfoForm extends React.Component {
             now.setDate(now.getDate() + 1);
             now.setHours(startHour);
             now.setMinutes(0);
+            now.setSeconds(0);
         }
         return now;
     }
@@ -74,20 +75,15 @@ class RouteInfoForm extends React.Component {
         this.state.xmlhttp = new XMLHttpRequest();
         this.state.xmlhttp.onreadystatechange = this.forecastCb;
         this.state.xmlhttp.responseType = 'json';
-        let requestForm = document.getElementById("forecast_form");
-        let formdata = new FormData(requestForm);
+        let formdata = new FormData();
 
         this.state.xmlhttp.open("POST", this.props.action);
-        let startMoment = moment(this.state.start);
-        formdata.append('starting_time',startMoment.format('X'));
+        let forecastResults = this.state.parser.walkRoute(moment(this.state.start),-new Date().getTimezoneOffset(),
+            this.state.pace, parseFloat(this.state.interval),this.props.controlPoints);
+        this.props.updateRouteInfo({bounds:forecastResults['bounds'],points:forecastResults['points'],
+                name:forecastResults['name']}, forecastResults['controls']);
+        formdata.append('locations',JSON.stringify(forecastResults['forecast']));
         formdata.append('timezone',-new Date().getTimezoneOffset());
-        if (this.props.controlPoints.length > 0) {
-            let js = JSON.stringify(this.props.controlPoints);
-            formdata.set("controls",js);
-        }
-        let forecastResults = this.state.parser.walkRoute(startMoment,formdata.get('timezone'),
-            formdata.get('pace'),parseFloat(formdata.get('interval')),this.props.controlPoints);
-        return;
         this.state.xmlhttp.send(formdata);
         this.setState({pending:true});
     }
@@ -127,7 +123,7 @@ class RouteInfoForm extends React.Component {
     static showErrorDetails(errorState) {
         if (errorState != null) {
             return (
-                <Alert bsStyle="danger">{errorState}</Alert>
+                <Alert style={{padding:'10px'}} bsStyle="danger">{errorState}</Alert>
             );
         }
     }

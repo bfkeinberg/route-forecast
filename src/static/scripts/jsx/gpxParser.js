@@ -105,8 +105,6 @@ class AnalyzeRoute {
             forecastRequests.push(this.addToForecast(previousPoint,startTime,
                 (accumulatedTime+segmentTime+segmentIdlingTime)));
         }
-        console.log('Elapsed time was',segmentTime+accumulatedTime,
-            'total distance',segmentDistanceKm+accumulatedDistanceKm,'total climb',accumulatedClimbMeters+segmentClimbMeters);
         return {forecast:forecastRequests,points:this.pointsInRoute,name:trackName,controls:controls,bounds:bounds};
     }
 
@@ -137,7 +135,7 @@ class AnalyzeRoute {
         if (distanceInMiles < controls[this.nextControl]['distance']) {
             return 0
         }
-        let delayInMinutes = controls[this.next_control]['duration'];
+        let delayInMinutes = controls[this.nextControl]['duration'];
         let arrivalTime = startTime.add(elapsedTimeInHours,'hours');
         controls[this.nextControl]['arrival'] = arrivalTime.format('ddd, MMM DD h:mma');
         controls[this.nextControl]['banked'] = Math.round(self.rusa_time(accumulatedDistanceInKm, elapsedTimeInHours)) + 'min';
@@ -166,7 +164,7 @@ class AnalyzeRoute {
 
     addToForecast(trackPoint,currentTime,elapsedTimeInHours) {
         return {lat:trackPoint.lat,lon:trackPoint.lon,
-            time:currentTime.add(elapsedTimeInHours,'hours').format('YYYY-MM-DDTHH:mm:00ZZ')};
+            time:moment(currentTime).add(elapsedTimeInHours,'hours').format('YYYY-MM-DDTHH:mm:00ZZ')};
     }
 
     parseRoute(gpxFile) {

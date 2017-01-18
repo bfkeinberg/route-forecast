@@ -4,6 +4,7 @@ import os
 import random
 import string
 import tempfile
+import dateutil.tz
 
 import requests
 from flask import Flask, render_template, request, redirect, url_for, jsonify
@@ -47,7 +48,7 @@ def hello():
 def server_error(e):
     # Log the error and stacktrace.
     logging.exception('An error occurred during a request.')
-    return 'An internal error occurred.' + e, 500
+    return 'An internal error occurred.' + e.message    , 500
 
 
 @application.route('/form')
@@ -132,6 +133,23 @@ def submitted_form():
     return jsonify({'forecast': forecast, 'min_lat': min_lat, 'max_lat': max_lat, 'min_lon': min_lon,
                     'max_lon': max_lon, 'points': wcalc.get_points(), 'name': wcalc.get_name(),
                                 'controls': wcalc.get_controls()})
+
+@application.route('/forecast',methods=['POST'])
+def forecast():
+    if not request.form.viewkeys() >= {'locations', 'timezone'}:
+        return jsonify({'status':'Missing keys'}), 400
+    forecast_points = json.loads(request.form['locations'])
+    if len(forecast_points) > 40:
+        return jsonify({'status':'Invalid request'}),400
+    wcalc = WeatherCalculator()
+    zone = request.form['timezone']
+    offset = long(zone) * 60
+    req_tzinfo = dateutil.tz.tzoffset('local', offset)
+
+    results = []
+    for point in forecast_points:
+        results.append(wcalc.call_weather_service(point['lat'],point['lon'],point['time'],req_tzinfo))
+    return jsonify({'forecast':results})
 
 # run the app.
 if __name__ == "__main__":

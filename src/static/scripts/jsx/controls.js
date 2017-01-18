@@ -88,7 +88,7 @@ class ControlPoints extends React.Component {
 
             <div className="controlPoints">
                 {/*<h2 style={{textAlign:"center"}}>Checkpoint times</h2>*/}
-                <ButtonToolbar>
+                <ButtonToolbar style={{padding:'12px'}}>
                 <ButtonGroup>
                     <Button onClick={this.addControl}><Glyphicon glyph="plus-sign"></Glyphicon>Add control point</Button>
                      <Checkbox checked={this.state.displayBankedTime} inline
