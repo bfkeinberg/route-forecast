@@ -3,10 +3,9 @@ import { DateTimePicker } from '@blueprintjs/datetime';
 import { Position, Popover } from '@blueprintjs/core';
 import { Panel,FormControl,FormGroup,Form,Glyphicon,Alert,ControlLabel,Button,HelpBlock,Tooltip,OverlayTrigger,Well,InputGroup} from 'react-bootstrap';
 import moment from 'moment';
-// import momentz from 'moment-timezone';
 import React, { Component } from 'react';
 import Flatpickr from 'react-flatpickr'
-import ParseGpx from './gpxParser';
+import AnalyzeRoute from './gpxParser';
 
 require('!style!css!flatpickr/dist/themes/confetti.css');
 
@@ -41,9 +40,10 @@ class RouteInfoForm extends React.Component {
         this.handleDateChange = this.handleDateChange.bind(this);
         this.updateRouteFile = this.updateRouteFile.bind(this);
         this.intervalChanged = this.intervalChanged.bind(this);
-        this.state = {start:RouteInfoForm.findNextStartTime(), pace:'D', interval:1, rwgps_enabled:false,
-            xmlhttp : null, routeFileSet:false,rwgpsRoute:false,errorDetails:null,
-            pending:false, parser:new ParseGpx()};
+        this.handleRwgpsRoute = this.handleRwgpsRoute.bind(this);
+        this.state = {start:RouteInfoForm.findNextStartTime(), pace:'D', interval:1, rwgps_enabled:true,
+            xmlhttp : null, routeFileSet:false,rwgpsRoute:null, errorDetails:null,
+            pending:false, parser:new AnalyzeRoute(this.props.rwgpsKey)};
     }
 
 
@@ -126,6 +126,13 @@ class RouteInfoForm extends React.Component {
                 <Alert style={{padding:'10px'}} bsStyle="danger">{errorState}</Alert>
             );
         }
+    }
+
+    handleRwgpsRoute(event) {
+        if (event.target.value!='') {
+            this.setState({rwgpsRoute : event.target.value});
+        }
+        this.state.parser.loadRwgpsRoute(event.target.value);
     }
 
     render() {
@@ -227,7 +234,7 @@ class RouteInfoForm extends React.Component {
                         <ControlLabel style={{padding:'10px'}}>RideWithGps route number</ControlLabel>
                         <OverlayTrigger placement="bottom" overlay={this.state.rwgps_enabled?rwgps_enabled_tooltip:rwgps_disabled_tooltip}>
                             <FormControl type="number" pattern="[0-9]*"
-                                         onChange={event => this.setState({rwgpsRoute : event.target.value!=''})}
+                                         onBlur={this.handleRwgpsRoute}
                                          style={{'width':'4em',padding:'12px'}}
                                          disabled={!this.state.rwgps_enabled}/>
                         </OverlayTrigger>

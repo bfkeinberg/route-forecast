@@ -2,6 +2,7 @@ let gpxParse = require("gpx-parse-browser");
 import moment from 'moment';
 
 const paceToSpeed = {'A': 10, 'B': 12, 'C': 14, 'C+': 15, 'D-': 15, 'D': 16, 'D+': 17, 'E-': 17, 'E': 18};
+const rwgps_api_url = ('https://ridewithgps.com/api');
 
 class AnalyzeRoute {
     constructor(options) {
@@ -11,11 +12,14 @@ class AnalyzeRoute {
         this.walkRoute = this.walkRoute.bind(this);
         this.setMinMaxCoords = this.setMinMaxCoords.bind(this);
         this.checkAndUpdateControls = this.checkAndUpdateControls.bind(this);
+        this.rwgpsRouteCallback = this.rwgpsRouteCallback.bind(this);
         this.reader.onload = this.fileDataRead;
         this.reader.onerror = function(event) {
             console.error("File could not be read! Code " + event.target.error.code);
         };
         this.reader.onprogress = this.inProcess;
+        this.rwgpsRouteData = null;
+        this.rwgpsKey = options;
     }
 
     fileDataRead(event) {
@@ -46,6 +50,29 @@ class AnalyzeRoute {
         } else {
             return {distance:distanceFromLast,climb:0};
         }
+    }
+
+    loadRwgpsRoute(routeNumber) {
+        let xmlhttp = new XMLHttpRequest();
+        xmlhttp.onload = this.rwgpsRouteCallback;
+        xmlhttp.onerror = this.rwgpsErrorCallback;
+        xmlhttp.responseType = 'json';
+        xmlhttp.withCredentials = true;
+        let routeUrl = rwgps_api_url + '/route/' + routeNumber + '.json?apikey=' + this.rwgpsKey;
+        xmlhttp.open("GET", routeUrl);
+        xmlhttp.send(null);
+    }
+
+    rwgpsErrorCallback(event) {
+        console.log(event);
+    }
+
+    rwgpsRouteCallback(event) {
+        this.rwgpsRouteData = event.target.response;
+    }
+
+    analyzeRwgpsRoute() {
+
     }
 
     walkRoute(startTime,timezone,pace,interval,controls) {
