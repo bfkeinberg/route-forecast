@@ -12,6 +12,11 @@ class AnalyzeRoute {
         this.setMinMaxCoords = this.setMinMaxCoords.bind(this);
         this.checkAndUpdateControls = this.checkAndUpdateControls.bind(this);
         this.routeIsLoaded = this.routeIsLoaded.bind(this);
+        this.loadRwgpsRoute = this.loadRwgpsRoute.bind(this);
+        this.analyzeRwgpsRoute = this.analyzeRwgpsRoute.bind(this);
+        this.analyzeGpxRoute = this.analyzeGpxRoute.bind(this);
+        this.rwgpsRouteCallback = this.rwgpsRouteCallback.bind(this);
+        this.rwgpsErrorCallback = this.rwgpsErrorCallback.bind(this);
         this.reader.onload = this.fileDataRead;
         this.reader.onerror = function(event) {
             console.error("File could not be read! Code " + event.target.error.code);
@@ -19,6 +24,8 @@ class AnalyzeRoute {
         this.reader.onprogress = this.inProcess;
         this.rwgpsRouteData = null;
         this.gpxResult = null;
+        this.isTrip = false;
+        this.setErrorStateCallback = options;
     }
 
     routeIsLoaded() {
@@ -55,11 +62,97 @@ class AnalyzeRoute {
         }
     }
 
-    analyzeRwgpsRoute() {
+    rwgpsRouteCallback(event) {
+        if (event.target.status == 200) {
+            this.rwgpsRouteData = event.target.response;
+            this.gpxResult = null;
+            this.setErrorStateCallback(null);
+        } else {
+            this.setErrorStateCallback(event.target.statusText);
+        }
+    }
 
+    rwgpsErrorCallback(event) {
+        this.setErrorStateCallback(event.target.statusText);
+    }
+
+    loadRwgpsRoute(route,isTrip) {
+        let xmlhttp = new XMLHttpRequest();
+        xmlhttp.onload = this.rwgpsRouteCallback;
+        xmlhttp.onerror = this.rwgpsErrorCallback;
+        xmlhttp.responseType = 'json';
+        xmlhttp.open("GET", '/rwgps_route?route=' + route + '&trip=' + isTrip);
+        this.isTrip = isTrip;
+        xmlhttp.send();
+    }
+
+    analyzeRwgpsRoute(startTime,timezone,pace,interval,controls) {
+        this.nextControl = 0;
+        this.pointsInRoute = [];
+        let forecastRequests = [];
+        let baseSpeed = paceToSpeed[pace];
+        let bounds = {min_latitude:90, min_longitude:180, max_latitude:-90, max_longitude:-180};
+        let first = true;
+        let previousPoint = null;
+        let accumulatedDistanceKm = 0;
+        let accumulatedClimbMeters = 0;
+        let accumulatedTime = 0;
+        let segmentDistanceKm = 0;
+        let segmentClimbMeters = 0;
+        let segmentTime = 0;
+        let idlingTime = 0;
+        let segmentIdlingTime = 0;
+        let rideType = this.isTrip ? 'trip' : 'route';
+        let trackName = this.rwgpsRouteData[rideType]['name'];
+
+        let points = this.rwgpsRouteData[rideType]['track_points'];
+        for (let trackPoint of points) {
+            let point = {'lat':trackPoint['y'],'lon':trackPoint['x'],'elevation':trackPoint['e']};
+            bounds = this.setMinMaxCoords(point,bounds);
+            if (first) {
+                forecastRequests.push(this.addToForecast(point,startTime,accumulatedTime));
+                first = false;
+            }
+            if (previousPoint != null) {
+                let deltas = this.findDeltas(previousPoint,point);
+                segmentDistanceKm += deltas['distance'];
+                // accumulate elevation gain
+                segmentClimbMeters += deltas['climb'];
+                // then find elapsed time given pace
+                segmentTime = this.calculateElapsedTime(segmentClimbMeters, segmentDistanceKm, baseSpeed);
+            }
+            let addedTime = this.checkAndUpdateControls(accumulatedDistanceKm+segmentDistanceKm, startTime,
+                (accumulatedTime + idlingTime), controls);
+            idlingTime += addedTime;
+            segmentIdlingTime += addedTime;
+            // see if it's time for forecast
+            if ((segmentTime + segmentIdlingTime) >= interval) {
+                forecastRequests.push(this.addToForecast(point,startTime,
+                    (accumulatedTime+segmentTime+segmentIdlingTime)));
+                accumulatedDistanceKm += segmentDistanceKm; segmentDistanceKm = 0;
+                accumulatedTime += segmentTime; segmentTime = 0;
+                accumulatedClimbMeters += segmentClimbMeters; segmentClimbMeters = 0;
+                segmentIdlingTime = 0;
+            }
+            previousPoint = point;
+        }
+        if (previousPoint != null && segmentTime != 0) {
+            forecastRequests.push(this.addToForecast(previousPoint,startTime,
+                (accumulatedTime+segmentTime+segmentIdlingTime)));
+        }
+        return {forecast:forecastRequests,points:this.pointsInRoute,name:trackName,controls:controls,bounds:bounds};
     }
 
     walkRoute(startTime,timezone,pace,interval,controls) {
+        if (this.gpxResult != null) {
+            return this.analyzeGpxRoute(startTime,timezone,pace,interval,controls);
+        } else if (this.rwgpsRouteData != null) {
+            return this.analyzeRwgpsRoute(startTime,timezone,pace,interval,controls);
+        }
+        return null;
+    }
+
+    analyzeGpxRoute(startTime,timezone,pace,interval,controls) {
         this.nextControl = 0;
         this.pointsInRoute = [];
         let forecastRequests = [];
@@ -119,7 +212,7 @@ class AnalyzeRoute {
         return {forecast:forecastRequests,points:this.pointsInRoute,name:trackName,controls:controls,bounds:bounds};
     }
 
-     rusa_time(accumulatedDistanceInKm, elapsedTimeInHours) {
+    rusa_time(accumulatedDistanceInKm, elapsedTimeInHours) {
          if (accumulatedDistanceInKm == 0) {
              return 0
          }

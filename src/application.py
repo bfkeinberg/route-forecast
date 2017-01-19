@@ -69,13 +69,18 @@ def log_in_to_rwgps():
 
 @application.route('/rwgps_route', methods=['GET'])
 def get_rwgps_route():
-    if not request.form.viewkeys() >= {'route'}:
+    route = request.args.get('route')
+    if route is None:
         return jsonify({'status':'Missing keys'}), 400
-    route = request.form['route']
+    isTrip = request.args.get('trip')
+    if isTrip is None or isTrip != 'true':
+        routeType = 'routes'
+    else:
+        routeType = 'trips'
     rwgps_api_key = os.environ.get("RWGPS_API_KEY")
     if rwgps_api_key is None:
         return jsonify({'status': 'Missing rwgps API key'}), 500
-    route_info_result = session.get("https://ridewithgps.com/routes/{0}.json".format(route),
+    route_info_result = session.get("https://ridewithgps.com/{1}/{0}.json".format(route,routeType),
                                params={'apikey': rwgps_api_key})
     if route_info_result.status_code == 401:
         return jsonify({'status': 'Failed rwgps route lookup'}), route_info_result.status_code

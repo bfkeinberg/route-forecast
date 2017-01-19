@@ -1,7 +1,7 @@
-import LoginDialog from './loginDialog';
 import { DateTimePicker } from '@blueprintjs/datetime';
 import { Position, Popover, Spinner } from '@blueprintjs/core';
 import { Panel,FormControl,FormGroup,Form,Glyphicon,Alert,ControlLabel,Button,HelpBlock,Tooltip,OverlayTrigger,Well,InputGroup} from 'react-bootstrap';
+import { Checkbox } from 'react-bootstrap';
 import moment from 'moment';
 import React, { Component } from 'react';
 import Flatpickr from 'react-flatpickr'
@@ -27,6 +27,11 @@ const rwgps_enabled_tooltip = (
     <Tooltip id="pace_tooltip">The number for a route on ridewithgps</Tooltip>
 );
 
+const rwgps_trip_tooltip = (
+    <Tooltip id="trip_tooltip">Ride with GPS has both 'trips' and 'routes'.
+        Routes are created with the planner, trips are recorded rides.</Tooltip>
+);
+
 const startHour = 7;
 
 class RouteInfoForm extends React.Component {
@@ -42,12 +47,12 @@ class RouteInfoForm extends React.Component {
         this.intervalChanged = this.intervalChanged.bind(this);
         this.handleRwgpsRoute = this.handleRwgpsRoute.bind(this);
         this.handlePaceChange = this.handlePaceChange.bind(this);
-        this.state = {start:RouteInfoForm.findNextStartTime(), pace:'D', interval:1, rwgps_enabled:false,
+        this.setErrorState = this.setErrorState.bind(this);
+        this.state = {start:RouteInfoForm.findNextStartTime(), pace:'D', interval:1, rwgps_enabled:true,
             xmlhttp : null, routeFileSet:false,rwgpsRoute:null, errorDetails:null,
-            pending:false, parser:new AnalyzeRoute(),
-            paramsChanged:false};
+            pending:false, parser:new AnalyzeRoute(this.setErrorState),
+            paramsChanged:false, rwgpsRouteIsTrip:false};
     }
-
 
     static findNextStartTime() {
         let now = new Date();
@@ -117,6 +122,10 @@ class RouteInfoForm extends React.Component {
         }
     }
 
+    setErrorState(errorDetails) {
+        this.setState({errorDetails:errorDetails});
+    }
+
     disableSubmit() {
         return !this.state.rwgpsRoute && !this.state.routeFileSet;
     }
@@ -150,7 +159,9 @@ class RouteInfoForm extends React.Component {
     handleRwgpsRoute(event) {
         if (event.target.value!='') {
             this.setState({rwgpsRoute : event.target.value});
-            this.state.parser.loadRwgpsRoute(event.target.value);
+            this.state.parser.loadRwgpsRoute(event.target.value,this.state.rwgpsRouteIsTrip);
+            // clear file input to avoid confusion
+            document.getElementById('route').value = null;
         }
     }
 
@@ -250,8 +261,7 @@ class RouteInfoForm extends React.Component {
                     <HelpBlock>Upload a .gpx file describing your route</HelpBlock>
                     <FormGroup bsSize='small' controlId="route">
                         <ControlLabel>Route file</ControlLabel>
-                        <FormControl type="file" name='route' accept=".gpx"
-                                     onChange={this.updateRouteFile}/>
+                        <FormControl type="file" name='route' accept=".gpx" id='route' onChange={this.updateRouteFile}/>
                     </FormGroup>
                     <FormGroup controlId="ridewithgps">
                         <ControlLabel style={{padding:'10px'}}>RideWithGps route number</ControlLabel>
@@ -273,7 +283,6 @@ class RouteInfoForm extends React.Component {
                     {RouteInfoForm.showErrorDetails(this.state.errorDetails)}
                     {/*{RouteInfoForm.showProgressSpinner(this.state.pending)}*/}
                 </Form>
-                <LoginDialog loginCb={this.loginResult}/>
             </Panel>
         );
     }
