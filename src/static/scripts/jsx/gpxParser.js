@@ -2,7 +2,6 @@ let gpxParse = require("gpx-parse-browser");
 import moment from 'moment';
 
 const paceToSpeed = {'A': 10, 'B': 12, 'C': 14, 'C+': 15, 'D-': 15, 'D': 16, 'D+': 17, 'E-': 17, 'E': 18};
-const rwgps_url = ('https://ridewithgps.com');
 
 class AnalyzeRoute {
     constructor(options) {
@@ -12,7 +11,6 @@ class AnalyzeRoute {
         this.walkRoute = this.walkRoute.bind(this);
         this.setMinMaxCoords = this.setMinMaxCoords.bind(this);
         this.checkAndUpdateControls = this.checkAndUpdateControls.bind(this);
-        this.rwgpsRouteCallback = this.rwgpsRouteCallback.bind(this);
         this.routeIsLoaded = this.routeIsLoaded.bind(this);
         this.reader.onload = this.fileDataRead;
         this.reader.onerror = function(event) {
@@ -20,7 +18,6 @@ class AnalyzeRoute {
         };
         this.reader.onprogress = this.inProcess;
         this.rwgpsRouteData = null;
-        this.rwgpsKey = options;
         this.gpxResult = null;
     }
 
@@ -56,26 +53,6 @@ class AnalyzeRoute {
         } else {
             return {distance:distanceFromLast,climb:0};
         }
-    }
-
-    loadRwgpsRoute(routeNumber) {
-        let xmlhttp = new XMLHttpRequest();
-        xmlhttp.onload = this.rwgpsRouteCallback;
-        xmlhttp.onerror = this.rwgpsErrorCallback;
-        xmlhttp.onloadend = event => console.log(event,'load end');
-        xmlhttp.responseType = 'json';
-        xmlhttp.withCredentials = true;
-        let routeUrl = rwgps_url + '/route/' + routeNumber + '.json?apikey=' + this.rwgpsKey;
-        xmlhttp.open("GET", routeUrl);
-        xmlhttp.send(null);
-    }
-
-    rwgpsErrorCallback(event) {
-        console.log(event);
-    }
-
-    rwgpsRouteCallback(event) {
-        this.rwgpsRouteData = event.target.response;
     }
 
     analyzeRwgpsRoute() {
@@ -172,7 +149,7 @@ class AnalyzeRoute {
         let delayInMinutes = controls[this.nextControl]['duration'];
         let arrivalTime = moment(startTime).add(elapsedTimeInHours,'hours');
         controls[this.nextControl]['arrival'] = arrivalTime.format('ddd, MMM DD h:mma');
-        controls[this.nextControl]['banked'] = Math.round(this.rusa_time(distanceInKm, elapsedTimeInHours)) + 'min';
+        controls[this.nextControl]['banked'] = Math.round(this.rusa_time(distanceInKm, elapsedTimeInHours));
         this.nextControl++;
         return delayInMinutes/60;      // convert from minutes to hours
     }

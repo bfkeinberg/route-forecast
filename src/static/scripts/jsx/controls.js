@@ -11,14 +11,14 @@ class ControlPoint extends React.Component {
     render() {
         const banked_time = (<td>
             <InputGroup>
-            <input style={{'fontSize':'90%','width':'99%','padding':'2px 4px 1px'}}
+            <input style={{'fontSize':'90%','width':'100%','padding':'2px 4px 1px'}}
             value={this.props.fields['banked']} readOnly tabIndex='-1' type="text"/>
                 <InputGroup.Addon>min</InputGroup.Addon>
             </InputGroup>
         </td>);
         return (
             <tr>
-                <td><input style={{'fontSize':'90%','width':'99%','padding':'2px 4px 1px'}}
+                <td><input style={{'fontSize':'90%','width':'100%','padding':'2px 4px 1px'}}
                             type='text' value={this.props.fields['name']}
                               onChange={event => this.props.onChange(this.props.index,{
                                name: event.target.value,
@@ -26,7 +26,7 @@ class ControlPoint extends React.Component {
                                duration: this.props.fields['duration'],
                                arrival: this.props.fields['arrival']
                            })}/></td>
-                <td><input  style={{'fontSize':'90%','width':'98%','padding':'2px 4px 1px'}}
+                <td><input  style={{'fontSize':'90%','width':'100%','padding':'2px 4px 1px'}}
                             value={this.props.fields['distance']}
                              onChange={event => this.props.onChange(this.props.index,{name: this.props.fields['name'],
                                 distance: event.target.value,
@@ -36,7 +36,7 @@ class ControlPoint extends React.Component {
                            type="number"/></td>
                 <td>
                     <InputGroup>
-                    <input style={{'fontSize':'90%','width':'98%','padding':'2px 5px 1px'}}
+                    <input style={{'fontSize':'90%','width':'100%','padding':'2px 5px 1px'}}
                             value={this.props.fields['duration']}
                               onChange={event => this.props.onChange(this.props.index,{name: this.props.fields['name'],
                                distance: this.props.fields['distance'],
@@ -47,7 +47,7 @@ class ControlPoint extends React.Component {
                         <InputGroup.Addon>min</InputGroup.Addon>
                     </InputGroup>
                 </td>
-                <td><input style={{'fontSize':'90%','width':'98%','padding':'2px 4px 1px 0px'}}
+                <td><input style={{'fontSize':'90%','width':'100%','padding':'2px 4px 1px 0px'}}
                             value={this.props.fields['arrival']} readOnly tabIndex='-1' type="text"/></td>
                 {this.props.displayBanked?banked_time:null}
                 <td><Button onClick={() => this.props.removeRow(this.props.index)} tabIndex="-1"><Glyphicon glyph="minus-sign"></Glyphicon></Button></td>
@@ -116,9 +116,9 @@ class ControlPoints extends React.Component {
                         <thead>
                         <tr>
                             <th style={{'fontSize':'80%','width':'22%'}}>Name</th>
-                            <th style={{'fontSize':'80%','width':'11%'}}>Distance</th>
-                            <th style={{'fontSize':'80%','width':'20%'}}>Expected time spent</th>
-                            <th style={{'fontSize':'80%','width':'19%'}}>Est. arrival time</th>
+                            <th style={{'fontSize':'80%','width':'10%'}}>Distance</th>
+                            <th style={{'fontSize':'80%','width':'18%'}}>Expected time spent</th>
+                            <th style={{'fontSize':'80%','width':'23%'}}>Est. arrival time</th>
                             {this.state.displayBankedTime?rusa_banked_header:null}
                         </tr>
                         </thead>

@@ -67,6 +67,21 @@ def log_in_to_rwgps():
     return render_template('login_form.html', service='Ride with GPS')
 
 
+@application.route('/rwgps_route', methods=['GET'])
+def get_rwgps_route():
+    if not request.form.viewkeys() >= {'route'}:
+        return jsonify({'status':'Missing keys'}), 400
+    route = request.form['route']
+    rwgps_api_key = os.environ.get("RWGPS_API_KEY")
+    if rwgps_api_key is None:
+        return jsonify({'status': 'Missing rwgps API key'}), 500
+    route_info_result = session.get("https://ridewithgps.com/routes/{0}.json".format(route),
+                               params={'apikey': rwgps_api_key})
+    if route_info_result.status_code == 401:
+        return jsonify({'status': 'Failed rwgps route lookup'}), route_info_result.status_code
+    route_info_result.raise_for_status()
+    return jsonify(route_info_result.json())
+
 @application.route('/handle_login', methods=['POST'])
 def handle_login():
     if 'username' not in request.form or 'password' not in request.form:

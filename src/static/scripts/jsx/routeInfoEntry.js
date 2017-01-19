@@ -44,7 +44,7 @@ class RouteInfoForm extends React.Component {
         this.handlePaceChange = this.handlePaceChange.bind(this);
         this.state = {start:RouteInfoForm.findNextStartTime(), pace:'D', interval:1, rwgps_enabled:false,
             xmlhttp : null, routeFileSet:false,rwgpsRoute:null, errorDetails:null,
-            pending:false, parser:new AnalyzeRoute(this.props.rwgpsKey),
+            pending:false, parser:new AnalyzeRoute(),
             paramsChanged:false};
     }
 

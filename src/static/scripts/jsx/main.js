@@ -22,7 +22,7 @@ class RouteWeatherUI extends React.Component {
         let script = document.getElementById( "routeui" );
 
         this.state = {controlPoints: [], routeInfo:{bounds:{},points:[], name:''}, forecast:[], action:script.getAttribute('action'),
-            maps_key:script.getAttribute('maps_api_key'), rwgps_key:script.getAttribute('rwgps_api_key')};
+            maps_key:script.getAttribute('maps_api_key')};
     }
 
     updateControls(controlPoints) {
