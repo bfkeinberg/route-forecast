@@ -1,6 +1,6 @@
 import LoginDialog from './loginDialog';
 import { DateTimePicker } from '@blueprintjs/datetime';
-import { Position, Popover } from '@blueprintjs/core';
+import { Position, Popover, Spinner } from '@blueprintjs/core';
 import { Panel,FormControl,FormGroup,Form,Glyphicon,Alert,ControlLabel,Button,HelpBlock,Tooltip,OverlayTrigger,Well,InputGroup} from 'react-bootstrap';
 import moment from 'moment';
 import React, { Component } from 'react';
@@ -41,9 +41,11 @@ class RouteInfoForm extends React.Component {
         this.updateRouteFile = this.updateRouteFile.bind(this);
         this.intervalChanged = this.intervalChanged.bind(this);
         this.handleRwgpsRoute = this.handleRwgpsRoute.bind(this);
-        this.state = {start:RouteInfoForm.findNextStartTime(), pace:'D', interval:1, rwgps_enabled:true,
+        this.handlePaceChange = this.handlePaceChange.bind(this);
+        this.state = {start:RouteInfoForm.findNextStartTime(), pace:'D', interval:1, rwgps_enabled:false,
             xmlhttp : null, routeFileSet:false,rwgpsRoute:null, errorDetails:null,
-            pending:false, parser:new AnalyzeRoute(this.props.rwgpsKey)};
+            pending:false, parser:new AnalyzeRoute(this.props.rwgpsKey),
+            paramsChanged:false};
     }
 
 
@@ -56,6 +58,15 @@ class RouteInfoForm extends React.Component {
             now.setSeconds(0);
         }
         return now;
+    }
+
+    componentDidUpdate() {
+        if (this.state.paramsChanged) {
+            this.setState({paramsChanged:false});
+            if (this.state.parser.routeIsLoaded()) {
+                this.requestForecast(event);
+            }
+        }
     }
 
     loginResult(result) {
@@ -78,11 +89,11 @@ class RouteInfoForm extends React.Component {
         let formdata = new FormData();
 
         this.state.xmlhttp.open("POST", this.props.action);
-        let forecastResults = this.state.parser.walkRoute(moment(this.state.start),-new Date().getTimezoneOffset(),
+        let routeInfo = this.state.parser.walkRoute(moment(this.state.start),-new Date().getTimezoneOffset(),
             this.state.pace, parseFloat(this.state.interval),this.props.controlPoints);
-        this.props.updateRouteInfo({bounds:forecastResults['bounds'],points:forecastResults['points'],
-                name:forecastResults['name']}, forecastResults['controls']);
-        formdata.append('locations',JSON.stringify(forecastResults['forecast']));
+        this.props.updateRouteInfo({bounds:routeInfo['bounds'],points:routeInfo['points'],
+                name:routeInfo['name']}, routeInfo['controls']);
+        formdata.append('locations',JSON.stringify(routeInfo['forecast']));
         formdata.append('timezone',-new Date().getTimezoneOffset());
         this.state.xmlhttp.send(formdata);
         this.setState({pending:true});
@@ -112,12 +123,12 @@ class RouteInfoForm extends React.Component {
 
     intervalChanged(event) {
         if (event.target.value != '') {
-            this.setState({interval:event.target.value});
+            this.setState({interval:event.target.value,paramsChanged:true});
         }
     }
 
     handleDateChange(time) {
-        this.setState({start:time});
+        this.setState({start:time,paramsChanged:true});
     }
 
     static showErrorDetails(errorState) {
@@ -128,11 +139,23 @@ class RouteInfoForm extends React.Component {
         }
     }
 
+    static showProgressSpinner(running) {
+        if (running) {
+            return (
+                <Spinner/>
+            );
+        }
+    }
+
     handleRwgpsRoute(event) {
         if (event.target.value!='') {
             this.setState({rwgpsRoute : event.target.value});
+            this.state.parser.loadRwgpsRoute(event.target.value);
         }
-        this.state.parser.loadRwgpsRoute(event.target.value);
+    }
+
+    handlePaceChange(event) {
+        this.setState({pace:event.target.value,paramsChanged:true});
     }
 
     render() {
@@ -209,7 +232,7 @@ class RouteInfoForm extends React.Component {
                         <OverlayTrigger placement="bottom" overlay={pace_tooltip}>
                             <FormControl componentClass="select" value={this.state.pace} name="pace"
                                          style={{'width':'3em',padding:'10px'}}
-                                         onChange={event => this.setState({start:this.state.start,pace:event.target.value})}
+                                         onChange={this.handlePaceChange}
                                          required>
                                 <option value="A">A</option>
                                 <option value="B">B</option>
@@ -235,7 +258,7 @@ class RouteInfoForm extends React.Component {
                         <OverlayTrigger placement="bottom" overlay={this.state.rwgps_enabled?rwgps_enabled_tooltip:rwgps_disabled_tooltip}>
                             <FormControl type="number" pattern="[0-9]*"
                                          onBlur={this.handleRwgpsRoute}
-                                         style={{'width':'4em',padding:'12px'}}
+                                         style={{'width':'8em',padding:'12px'}}
                                          disabled={!this.state.rwgps_enabled}/>
                         </OverlayTrigger>
                     </FormGroup>
@@ -248,6 +271,7 @@ class RouteInfoForm extends React.Component {
                         </div>
                     </OverlayTrigger>
                     {RouteInfoForm.showErrorDetails(this.state.errorDetails)}
+                    {/*{RouteInfoForm.showProgressSpinner(this.state.pending)}*/}
                 </Form>
                 <LoginDialog loginCb={this.loginResult}/>
             </Panel>

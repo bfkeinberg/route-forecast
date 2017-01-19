@@ -2,7 +2,7 @@ let gpxParse = require("gpx-parse-browser");
 import moment from 'moment';
 
 const paceToSpeed = {'A': 10, 'B': 12, 'C': 14, 'C+': 15, 'D-': 15, 'D': 16, 'D+': 17, 'E-': 17, 'E': 18};
-const rwgps_api_url = ('https://ridewithgps.com/api');
+const rwgps_url = ('https://ridewithgps.com');
 
 class AnalyzeRoute {
     constructor(options) {
@@ -13,6 +13,7 @@ class AnalyzeRoute {
         this.setMinMaxCoords = this.setMinMaxCoords.bind(this);
         this.checkAndUpdateControls = this.checkAndUpdateControls.bind(this);
         this.rwgpsRouteCallback = this.rwgpsRouteCallback.bind(this);
+        this.routeIsLoaded = this.routeIsLoaded.bind(this);
         this.reader.onload = this.fileDataRead;
         this.reader.onerror = function(event) {
             console.error("File could not be read! Code " + event.target.error.code);
@@ -20,6 +21,11 @@ class AnalyzeRoute {
         this.reader.onprogress = this.inProcess;
         this.rwgpsRouteData = null;
         this.rwgpsKey = options;
+        this.gpxResult = null;
+    }
+
+    routeIsLoaded() {
+        return this.gpxResult != null || this.rwgpsRouteData != null;
     }
 
     fileDataRead(event) {
@@ -56,9 +62,10 @@ class AnalyzeRoute {
         let xmlhttp = new XMLHttpRequest();
         xmlhttp.onload = this.rwgpsRouteCallback;
         xmlhttp.onerror = this.rwgpsErrorCallback;
+        xmlhttp.onloadend = event => console.log(event,'load end');
         xmlhttp.responseType = 'json';
         xmlhttp.withCredentials = true;
-        let routeUrl = rwgps_api_url + '/route/' + routeNumber + '.json?apikey=' + this.rwgpsKey;
+        let routeUrl = rwgps_url + '/route/' + routeNumber + '.json?apikey=' + this.rwgpsKey;
         xmlhttp.open("GET", routeUrl);
         xmlhttp.send(null);
     }
@@ -128,7 +135,7 @@ class AnalyzeRoute {
                 }
             }
         }
-        if (previousPoint != null) {
+        if (previousPoint != null && segmentTime != 0) {
             forecastRequests.push(this.addToForecast(previousPoint,startTime,
                 (accumulatedTime+segmentTime+segmentIdlingTime)));
         }
@@ -163,9 +170,9 @@ class AnalyzeRoute {
             return 0
         }
         let delayInMinutes = controls[this.nextControl]['duration'];
-        let arrivalTime = startTime.add(elapsedTimeInHours,'hours');
+        let arrivalTime = moment(startTime).add(elapsedTimeInHours,'hours');
         controls[this.nextControl]['arrival'] = arrivalTime.format('ddd, MMM DD h:mma');
-        controls[this.nextControl]['banked'] = Math.round(self.rusa_time(accumulatedDistanceInKm, elapsedTimeInHours)) + 'min';
+        controls[this.nextControl]['banked'] = Math.round(this.rusa_time(distanceInKm, elapsedTimeInHours)) + 'min';
         this.nextControl++;
         return delayInMinutes/60;      // convert from minutes to hours
     }
