@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import loadGoogleMapsAPI from 'load-google-maps-api';
 
-class RouteForecastMap extends React.Component {
+class RouteForecastMap extends Component {
 
     constructor(props) {
         super(props);
@@ -32,14 +32,12 @@ class RouteForecastMap extends React.Component {
         routeLine.setMap(map);
     }
 
-    static addMarkers(values,map) {
-        if (values['forecast'] != null) {
-            return (
-                values['forecast'].map((point, index, data) =>
-                    RouteForecastMap.addMarker(point[6], point[7], map, point[8], point[9])
-                )
-            );
-        }
+    static addMarkers(forecast,map) {
+        return (
+            forecast.map((point, index, data) =>
+                RouteForecastMap.addMarker(point[6], point[7], map, point[8], point[9])
+            )
+        );
     }
 
     /*
@@ -51,7 +49,7 @@ class RouteForecastMap extends React.Component {
         return {lat:point.latitude, lng:point.longitude};
     }
 
-    initMap(min_lat,min_lon,max_lat,max_lon,values) {
+    initMap(forecast, routeInfo) {
         let mapDiv = document.getElementById('map');
         if (mapDiv == null) {
             return;
@@ -65,33 +63,28 @@ class RouteForecastMap extends React.Component {
         if (map == null) {
             return;
         }
-        var southWest = { lat:min_lat, lng:min_lon };
-        var northEast = { lat:max_lat, lng:max_lon };
-        var bounds = new google.maps.LatLngBounds(southWest,northEast);
-        map.fitBounds(bounds);
-        RouteForecastMap.addMarkers(values,map);
-        let routePoints = values['points'].map(this.makePoint);
+        let southWest = { lat:routeInfo['bounds']['min_latitude'], lng:routeInfo['bounds']['min_longitude'] };
+        let northEast = { lat:routeInfo['bounds']['max_latitude'], lng:routeInfo['bounds']['max_longitude'] };
+        let mapBounds = new google.maps.LatLngBounds(southWest,northEast);
+        map.fitBounds(mapBounds);
+        RouteForecastMap.addMarkers(forecast,map);
+        let routePoints = routeInfo['points'].map(this.makePoint);
         this.drawRoute(routePoints,map)
     };
 
-    drawTheMap(gmaps,values) {
-        if (values['forecast'] != null) {
-            this.initMap(values['min_lat'],
-                values['min_lon'],
-                values['max_lat'],
-                values['max_lon'],
-                values
-            );
+    drawTheMap(gmaps,forecast,routeInfo) {
+        if (forecast.length > 0) {
+            this.initMap(forecast, routeInfo);
         }
         else {
-            return (<h2 style={{textAlign:"center"}}>Forecast map</h2>);
+            return (<h2 style={{padding:'18px', textAlign:"center"}}>Forecast map</h2>);
         }
     }
 
     render() {
         return (
             <div id="map" style={{'height': '400px'}}>
-                {this.drawTheMap(this.state.googleMapsApi, this.props.forecast)}
+                {this.drawTheMap(this.state.googleMapsApi, this.props.forecast, this.props.routeInfo)}
             </div>
         );
     }

@@ -9,10 +9,10 @@ class ForecastTable extends React.Component {
     }
 
     static expandTable(forecast) {
-        if (forecast['forecast']!= null && forecast['forecast'][0].length > 5) {
+        if (forecast.length > 0 && forecast[0].length > 5) {
             return (
                 <tbody>
-                {forecast['forecast'].map((point, index, data) =>
+                {forecast.map((point, index, data) =>
                     <tr key={point[0]}>
                         <td>{point[0]}</td>
                         <td>{point[1]}</td>
@@ -30,7 +30,6 @@ class ForecastTable extends React.Component {
     render() {
         return (
                 <div>
-                {/*<Well bsSize="large">*/}
                     <a href="https://darksky.net/poweredby/">
                         <img src="https://darksky.net/dev/img/attribution/poweredby.png" alt="Powered by DarkSky" width="80" height="40"/>
                     </a>
