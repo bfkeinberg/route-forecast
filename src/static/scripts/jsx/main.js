@@ -40,7 +40,7 @@ class RouteWeatherUI extends React.Component {
     render() {
         return (
         <div>
-            <SplitPane defaultSize={320} minSize={150} maxSize={530} split="horizontal">
+            <SplitPane defaultSize={295} minSize={150} maxSize={530} split="horizontal">
                 <SplitPane defaultSize={550} minSize={150} split="vertical" pane2Style={{'overflow':'scroll'}}>
                     <RouteInfoForm action={this.state.action}
                                    updateRouteInfo={this.updateRouteInfo}

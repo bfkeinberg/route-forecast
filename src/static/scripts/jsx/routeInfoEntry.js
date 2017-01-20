@@ -19,10 +19,6 @@ const interval_tooltip = (
     <Tooltip id="interval_tooltip">How often to generate weather forecast</Tooltip>
 );
 
-const rwgps_disabled_tooltip = (
-    <Tooltip id="pace_tooltip" placement="bottom">Must log into rideWithGps to enable</Tooltip>
-);
-
 const rwgps_enabled_tooltip = (
     <Tooltip id="pace_tooltip">The number for a route on ridewithgps</Tooltip>
 );
@@ -38,7 +34,6 @@ class RouteInfoForm extends React.Component {
 
     constructor(props) {
         super(props);
-        this.loginResult = this.loginResult.bind(this);
         this.forecastCb = this.forecastCb.bind(this);
         this.requestForecast = this.requestForecast.bind(this);
         this.disableSubmit = this.disableSubmit.bind(this);
@@ -48,7 +43,7 @@ class RouteInfoForm extends React.Component {
         this.handleRwgpsRoute = this.handleRwgpsRoute.bind(this);
         this.handlePaceChange = this.handlePaceChange.bind(this);
         this.setErrorState = this.setErrorState.bind(this);
-        this.state = {start:RouteInfoForm.findNextStartTime(), pace:'D', interval:1, rwgps_enabled:true,
+        this.state = {start:RouteInfoForm.findNextStartTime(), pace:'D', interval:1,
             xmlhttp : null, routeFileSet:false,rwgpsRoute:null, errorDetails:null,
             pending:false, parser:new AnalyzeRoute(this.setErrorState),
             paramsChanged:false, rwgpsRouteIsTrip:false};
@@ -72,10 +67,6 @@ class RouteInfoForm extends React.Component {
                 this.requestForecast(event);
             }
         }
-    }
-
-    loginResult(result) {
-        this.setState({rwgps_enabled : true});
     }
 
     updateRouteFile(event) {
@@ -265,13 +256,21 @@ class RouteInfoForm extends React.Component {
                     </FormGroup>
                     <FormGroup controlId="ridewithgps">
                         <ControlLabel style={{padding:'10px'}}>RideWithGps route number</ControlLabel>
-                        <OverlayTrigger placement="bottom" overlay={this.state.rwgps_enabled?rwgps_enabled_tooltip:rwgps_disabled_tooltip}>
+                        <OverlayTrigger placement="bottom" overlay={rwgps_enabled_tooltip}>
                             <FormControl type="number" pattern="[0-9]*"
                                          onBlur={this.handleRwgpsRoute}
-                                         style={{'width':'8em',padding:'12px'}}
-                                         disabled={!this.state.rwgps_enabled}/>
+                                         style={{'width':'8em',padding:'12px'}}/>
                         </OverlayTrigger>
                     </FormGroup>
+{/*
+                    <FormGroup controlId="rwgpsType">
+                        <ControlLabel style={{padding:'10px'}}>RideWithGps trip</ControlLabel>
+                        <OverlayTrigger overlay={rwgps_trip_tooltip}>
+                            <Checkbox onClick={event => this.setState({rwgpsRouteIsTrip:!this.state.rwgpsRouteIsTrip})}
+                                      checked={this.state.rwgpsRouteIsTrip}>Rwgps number is a trip</Checkbox>
+                        </OverlayTrigger>
+                    </FormGroup>
+*/}
                     <OverlayTrigger placement='bottom' overlay={forecast_tooltip}>
                         <div style={{'display':'inline-block',padding:'0px 14px'}} cursor='not-allowed'>
                             <Button bsStyle="primary" onClick={this.requestForecast}
