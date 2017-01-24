@@ -20,7 +20,7 @@ const interval_tooltip = (
 );
 
 const rwgps_enabled_tooltip = (
-    <Tooltip id="pace_tooltip">The number for a route on ridewithgps</Tooltip>
+    <Tooltip id="rwgps_tooltip">The number for a route on ridewithgps</Tooltip>
 );
 
 const rwgps_trip_tooltip = (
@@ -43,10 +43,12 @@ class RouteInfoForm extends React.Component {
         this.handleRwgpsRoute = this.handleRwgpsRoute.bind(this);
         this.handlePaceChange = this.handlePaceChange.bind(this);
         this.setErrorState = this.setErrorState.bind(this);
+        this.decideValidationStateFor = this.decideValidationStateFor.bind(this);
+        this.setRwgpsRoute = this.setRwgpsRoute.bind(this);
         this.state = {start:RouteInfoForm.findNextStartTime(), pace:'D', interval:1,
-            xmlhttp : null, routeFileSet:false,rwgpsRoute:null, errorDetails:null,
+            xmlhttp : null, routeFileSet:false,rwgpsRoute:'', errorDetails:null,
             pending:false, parser:new AnalyzeRoute(this.setErrorState),
-            paramsChanged:false, rwgpsRouteIsTrip:false};
+            paramsChanged:false, rwgpsRouteIsTrip:false, errorSource:null,succeeded:null};
     }
 
     static findNextStartTime() {
@@ -75,6 +77,7 @@ class RouteInfoForm extends React.Component {
         let gpxFiles = fileControl.files;
         if (gpxFiles.length > 0) {
             this.state.parser.parseRoute(gpxFiles[0]);
+            this.setState({rwgpsRoute:''});
         }
     }
 
@@ -99,26 +102,35 @@ class RouteInfoForm extends React.Component {
         if (this.state.xmlhttp.readyState == 4) {
             this.setState({pending:false});
             if (event.target.status==200) {
-                this.setState({errorDetails:null});
+                this.setState({errorDetails:null,succeeded:true});
                 this.props.updateForecast(event.target.response);
             }
             else {
                 if (event.target.response != null) {
-                    this.setState({errorDetails:event.target.response['status']});
+                    this.setState({errorDetails:event.target.response['status'],
+                        errorCause:this.state.routeFileSet?'gpx':'rwgps', succeeded: false });
                 }
                 else if (event.target.statusText != null) {
-                    this.setState({errorDetails:event.target.statusText});
+                    this.setState({errorDetails:event.target.statusText,
+                        errorCause:this.state.routeFileSet?'gpx':'rwgps',succeeded:false});
                 }
             }
         }
     }
 
-    setErrorState(errorDetails) {
-        this.setState({errorDetails:errorDetails});
+    setErrorState(errorDetails,errorSource) {
+        this.setState({errorDetails:errorDetails,errorSource:errorSource});
+        if (errorDetails != null) {
+            if (errorSource=='rwgps') {
+                this.setState({rwgpsRoute:'',succeeded:false});
+            } else {
+                this.setState({routeFileSet:false,succeeded:false})
+            }
+        }
     }
 
     disableSubmit() {
-        return !this.state.rwgpsRoute && !this.state.routeFileSet;
+        return this.state.rwgpsRoute=='' && !this.state.routeFileSet;
     }
 
     intervalChanged(event) {
@@ -149,15 +161,46 @@ class RouteInfoForm extends React.Component {
 
     handleRwgpsRoute(event) {
         if (event.target.value!='') {
-            this.setState({rwgpsRoute : event.target.value});
             this.state.parser.loadRwgpsRoute(event.target.value,this.state.rwgpsRouteIsTrip);
             // clear file input to avoid confusion
             document.getElementById('route').value = null;
+            this.setState({'routeFileSet':false});
+        } else if (this.state.errorSource=='rwgps') {
+            this.setState({'errorSource':null});
         }
+    }
+
+    setRwgpsRoute(event) {
+        this.setState({rwgpsRoute : event.target.value});
+    }
+
+    isNumberKey(evt) {
+        var charCode = (evt.which) ? evt.which : event.keyCode;
+        if ((charCode < 48 || charCode > 57))
+            return false;
+
+        return charCode;
     }
 
     handlePaceChange(event) {
         this.setState({pace:event.target.value,paramsChanged:true});
+    }
+
+    decideValidationStateFor(type) {
+        if (type==this.state.errorSource) {
+            return 'error';
+        }
+        else {
+            if (this.state.succeeded) {
+                if (this.state.routeFileSet && type=='gpx') {
+                    return 'success';
+                }
+                if (this.state.rwgpsRoute && type=='rwgps') {
+                    return 'success';
+                }
+            }
+            return null;
+        }
     }
 
     render() {
@@ -250,19 +293,27 @@ class RouteInfoForm extends React.Component {
                     </FormGroup>
                     <a style={{padding:'10px'}} href="https://westernwheelersbicycleclub.wildapricot.org/page-1374754" target="_blank">Pace explanation</a>
                     <HelpBlock>Upload a .gpx file describing your route</HelpBlock>
-                    <FormGroup bsSize='small' controlId="route">
+                    <FormGroup bsSize='small'
+                               validationState={this.decideValidationStateFor('gpx',this.state.errorSource,this.state.succeeded)}
+                               controlId="route">
                         <ControlLabel>Route file</ControlLabel>
                         <FormControl type="file" name='route' accept=".gpx" id='route' onChange={this.updateRouteFile}/>
                     </FormGroup>
-                    <FormGroup controlId="ridewithgps">
+                    <FormGroup
+                               validationState={this.decideValidationStateFor('rwgps',this.state.errorSource,this.state.succeeded)}
+                               controlId="ridewithgps">
                         <ControlLabel style={{padding:'10px'}}>RideWithGps route number</ControlLabel>
                         <OverlayTrigger placement="bottom" overlay={rwgps_enabled_tooltip}>
-                            <FormControl type="number" pattern="[0-9]*"
+                            <FormControl type="number"
                                          onBlur={this.handleRwgpsRoute}
-                                         style={{'width':'8em',padding:'12px'}}/>
+                                         onKeyPress={this.isNumberKey}
+                                         onChange={this.setRwgpsRoute}
+                                         pattern="[0-9]*"
+                                         style={{'width':'8em',height:'3em', padding:'12px'}}/>
                         </OverlayTrigger>
                     </FormGroup>
 {/*
+ value={this.state.rwgpsRoute}
                     <FormGroup controlId="rwgpsType">
                         <ControlLabel style={{padding:'10px'}}>RideWithGps trip</ControlLabel>
                         <OverlayTrigger overlay={rwgps_trip_tooltip}>

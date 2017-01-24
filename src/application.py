@@ -48,7 +48,7 @@ def hello():
 def server_error(e):
     # Log the error and stacktrace.
     logging.exception('An error occurred during a request.')
-    return 'An internal error occurred.' + e.message    , 500
+    return 'An internal error occurred.' + e.message, e.response.status_code
 
 
 @application.route('/form')
@@ -82,9 +82,8 @@ def get_rwgps_route():
         return jsonify({'status': 'Missing rwgps API key'}), 500
     route_info_result = session.get("https://ridewithgps.com/{1}/{0}.json".format(route,routeType),
                                params={'apikey': rwgps_api_key})
-    if route_info_result.status_code == 401:
-        return jsonify({'status': 'Failed rwgps route lookup'}), route_info_result.status_code
-    route_info_result.raise_for_status()
+    if route_info_result.status_code != 200:
+        return jsonify({'status': route_info_result.text}), route_info_result.status_code
     return jsonify(route_info_result.json())
 
 @application.route('/handle_login', methods=['POST'])

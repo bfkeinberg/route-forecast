@@ -43,7 +43,7 @@ class AnalyzeRoute {
     handleParsedGpx(error,data)
     {
         if (error != null) {
-            console.log(error);
+            setErrorStateCallback(event.target.statusText,'gpx');
         } else {
             this.gpxResult = data;
         }
@@ -66,14 +66,19 @@ class AnalyzeRoute {
         if (event.target.status == 200) {
             this.rwgpsRouteData = event.target.response;
             this.gpxResult = null;
-            this.setErrorStateCallback(null);
+            this.setErrorStateCallback(null,null);
         } else {
-            this.setErrorStateCallback(event.target.statusText);
+            if (event.target.response != null) {
+                this.setErrorStateCallback(event.target.response['status'],'rwgps');
+            }
+            else {
+                this.setErrorStateCallback(event.target.statusText,'rwgps');
+            }
         }
     }
 
     rwgpsErrorCallback(event) {
-        this.setErrorStateCallback(event.target.statusText);
+        this.setErrorStateCallback(event.target.statusText,'rwgps');
     }
 
     loadRwgpsRoute(route,isTrip) {
