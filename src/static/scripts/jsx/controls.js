@@ -36,7 +36,7 @@ class ControlPoint extends React.Component {
                            type="number"/></td>
                 <td>
                     <InputGroup>
-                    <input style={{'fontSize':'90%','width':'100%','padding':'2px 5px 1px'}}
+                    <input style={{'fontSize':'90%','width':'100%','padding':'2px 4px 1px'}}
                             value={this.props.fields['duration']}
                               onChange={event => this.props.onChange(this.props.index,{name: this.props.fields['name'],
                                distance: this.props.fields['distance'],
@@ -118,7 +118,7 @@ class ControlPoints extends React.Component {
                             <th style={{'fontSize':'80%','width':'22%'}}>Name</th>
                             <th style={{'fontSize':'80%','width':'10%'}}>Distance</th>
                             <th style={{'fontSize':'80%','width':'18%'}}>Expected time spent</th>
-                            <th style={{'fontSize':'80%','width':'23%'}}>Est. arrival time</th>
+                            <th style={{'fontSize':'80%','width':'24%'}}>Est. arrival time</th>
                             {this.state.displayBankedTime?rusa_banked_header:null}
                         </tr>
                         </thead>

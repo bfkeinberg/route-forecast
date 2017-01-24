@@ -45,6 +45,7 @@ class RouteInfoForm extends React.Component {
         this.setErrorState = this.setErrorState.bind(this);
         this.decideValidationStateFor = this.decideValidationStateFor.bind(this);
         this.setRwgpsRoute = this.setRwgpsRoute.bind(this);
+        this.setDateAndTime = this.setDateAndTime.bind(this);
         this.state = {start:RouteInfoForm.findNextStartTime(), pace:'D', interval:1,
             xmlhttp : null, routeFileSet:false,rwgpsRoute:'', errorDetails:null,
             pending:false, parser:new AnalyzeRoute(this.setErrorState),
@@ -203,6 +204,10 @@ class RouteInfoForm extends React.Component {
         }
     }
 
+    setDateAndTime(dates, datestr, instance) {
+        this.setState({start:new Date(dates[0]),paramsChanged:true});
+    }
+
     render() {
         let pace_mph = paceToSpeed[this.state.pace];
         let pace_text = "Represents climb-adjusted pace - current is ".concat(pace_mph);
@@ -256,7 +261,7 @@ class RouteInfoForm extends React.Component {
                             <ControlLabel style={{padding:'10px'}}>Starting time</ControlLabel>
                         </OverlayTrigger>
                         <span className="pt-icon-standard pt-icon-calendar"></span>
-                        <Flatpickr options={{enableTime: true,
+                        <Flatpickr onChange={this.setDateAndTime} options={{enableTime: true,
                                                 altInput: true, altFormat: 'F j, Y h:i K',
                                                 altInputClass: 'dateDisplay',
                                                 minDate: now,
@@ -309,11 +314,12 @@ class RouteInfoForm extends React.Component {
                                          onKeyPress={this.isNumberKey}
                                          onChange={this.setRwgpsRoute}
                                          pattern="[0-9]*"
+                                         value={this.state.rwgpsRoute}
                                          style={{'width':'8em',height:'3em', padding:'12px'}}/>
                         </OverlayTrigger>
                     </FormGroup>
 {/*
- value={this.state.rwgpsRoute}
+
                     <FormGroup controlId="rwgpsType">
                         <ControlLabel style={{padding:'10px'}}>RideWithGps trip</ControlLabel>
                         <OverlayTrigger overlay={rwgps_trip_tooltip}>
