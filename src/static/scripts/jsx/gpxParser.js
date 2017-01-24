@@ -88,6 +88,7 @@ class AnalyzeRoute {
         xmlhttp.responseType = 'json';
         xmlhttp.open("GET", '/rwgps_route?route=' + route + '&trip=' + isTrip);
         this.isTrip = isTrip;
+        this.rwgpsRouteData = null;
         xmlhttp.send();
     }
 

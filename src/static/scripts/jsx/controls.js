@@ -116,9 +116,9 @@ class ControlPoints extends React.Component {
                         <thead>
                         <tr>
                             <th style={{'fontSize':'80%','width':'22%'}}>Name</th>
-                            <th style={{'fontSize':'80%','width':'10%'}}>Distance</th>
+                            <th style={{'fontSize':'80%','width':'11%'}}>Distance</th>
                             <th style={{'fontSize':'80%','width':'18%'}}>Expected time spent</th>
-                            <th style={{'fontSize':'80%','width':'24%'}}>Est. arrival time</th>
+                            <th style={{'fontSize':'80%','width':'26%'}}>Est. arrival time</th>
                             {this.state.displayBankedTime?rusa_banked_header:null}
                         </tr>
                         </thead>
