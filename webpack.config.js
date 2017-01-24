@@ -39,7 +39,7 @@ module.exports = {
     },
     externals: {
         jquery: 'jQuery',
-        react: 'React',
+        // react: 'React',
         "react-dom": "ReactDOM"
     }
 }

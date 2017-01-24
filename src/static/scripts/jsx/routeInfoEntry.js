@@ -49,7 +49,8 @@ class RouteInfoForm extends React.Component {
         this.state = {start:RouteInfoForm.findNextStartTime(), pace:'D', interval:1,
             xmlhttp : null, routeFileSet:false,rwgpsRoute:'', errorDetails:null,
             pending:false, parser:new AnalyzeRoute(this.setErrorState),
-            paramsChanged:false, rwgpsRouteIsTrip:false, errorSource:null,succeeded:null};
+            paramsChanged:this.props.controlsUpdated,
+            rwgpsRouteIsTrip:false, errorSource:null,succeeded:null};
     }
 
     static findNextStartTime() {
@@ -61,6 +62,10 @@ class RouteInfoForm extends React.Component {
             now.setSeconds(0);
         }
         return now;
+    }
+
+    componentWillReceiveProps() {
+        this.setState({paramsChanged:this.props.controlsUpdated});
     }
 
     componentDidUpdate() {
@@ -104,6 +109,10 @@ class RouteInfoForm extends React.Component {
             this.setState({pending:false});
             if (event.target.status==200) {
                 this.setState({errorDetails:null,succeeded:true});
+                if (event.target.response == null) {
+                    console.log('missing response');
+                    return;
+                }
                 this.props.updateForecast(event.target.response);
             }
             else {
@@ -131,7 +140,8 @@ class RouteInfoForm extends React.Component {
     }
 
     disableSubmit() {
-        return this.state.rwgpsRoute=='' && !this.state.routeFileSet;
+        return !this.state.parser.routeIsLoaded();
+        // return this.state.rwgpsRoute=='' && !this.state.routeFileSet;
     }
 
     intervalChanged(event) {
@@ -281,9 +291,8 @@ class RouteInfoForm extends React.Component {
                         <ControlLabel style={{padding:'10px'}}>Pace</ControlLabel>
                         <OverlayTrigger placement="bottom" overlay={pace_tooltip}>
                             <FormControl componentClass="select" value={this.state.pace} name="pace"
-                                         style={{'width':'3em',padding:'10px'}}
-                                         onChange={this.handlePaceChange}
-                                         required>
+                                         style={{'width':'5em','height':'2.8em',paddingRight:'8px'}}
+                                         onChange={this.handlePaceChange}>
                                 <option value="A">A</option>
                                 <option value="B">B</option>
                                 <option value="C">C</option>
@@ -318,7 +327,7 @@ class RouteInfoForm extends React.Component {
                                          style={{'width':'8em',height:'3em', padding:'12px'}}/>
                         </OverlayTrigger>
                     </FormGroup>
-{/*
+{/* if we want to allow selecting rwgps trips also
 
                     <FormGroup controlId="rwgpsType">
                         <ControlLabel style={{padding:'10px'}}>RideWithGps trip</ControlLabel>

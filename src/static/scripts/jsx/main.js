@@ -22,15 +22,15 @@ class RouteWeatherUI extends React.Component {
         let script = document.getElementById( "routeui" );
 
         this.state = {controlPoints: [], routeInfo:{bounds:{},points:[], name:''}, forecast:[], action:script.getAttribute('action'),
-            maps_key:script.getAttribute('maps_api_key')};
+            maps_key:script.getAttribute('maps_api_key'),controlsUpdated:false};
     }
 
     updateControls(controlPoints) {
-        this.setState({controlPoints: controlPoints})
+        this.setState({controlPoints: controlPoints,controlsUpdated:true})
     }
 
     updateRouteInfo(routeInfo,controlPoints) {
-        this.setState({routeInfo:routeInfo,comtrolPoints:controlPoints});
+        this.setState({routeInfo:routeInfo,controlPoints:controlPoints,controlsUpdated:false});
     }
 
     updateForecast(forecast) {
@@ -43,10 +43,12 @@ class RouteWeatherUI extends React.Component {
             <SplitPane defaultSize={300} minSize={150} maxSize={530} split="horizontal">
                 <SplitPane defaultSize={550} minSize={150} split="vertical" pane2Style={{'overflow':'scroll'}}>
                     <RouteInfoForm action={this.state.action}
-                                   updateRouteInfo={this.updateRouteInfo}
-                                   updateForecast={this.updateForecast}
-                                   rwgpsKey={this.state.rwgps_key}
-                                   controlPoints={this.state.controlPoints}/>
+                                    updateRouteInfo={this.updateRouteInfo}
+                                    updateForecast={this.updateForecast}
+                                    rwgpsKey={this.state.rwgps_key}
+                                    controlPoints={this.state.controlPoints}
+                                    controlsUpdated={this.state.controlsUpdated}
+                    />
                     <ControlPointList controlPoints={this.state.controlPoints}
                                       updateControls={this.updateControls}
                                       name={this.state.routeInfo['name']}/>
