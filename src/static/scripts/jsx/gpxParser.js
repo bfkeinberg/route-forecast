@@ -128,13 +128,13 @@ class AnalyzeRoute {
                 segmentTime = this.calculateElapsedTime(segmentClimbMeters, segmentDistanceKm, baseSpeed);
             }
             let addedTime = this.checkAndUpdateControls(accumulatedDistanceKm+segmentDistanceKm, startTime,
-                (accumulatedTime + idlingTime), controls);
+                (accumulatedTime + segmentTime + idlingTime), controls);
             idlingTime += addedTime;
             segmentIdlingTime += addedTime;
             // see if it's time for forecast
             if ((segmentTime + segmentIdlingTime) >= interval) {
                 forecastRequests.push(this.addToForecast(point,startTime,
-                    (accumulatedTime+segmentTime+segmentIdlingTime)));
+                    (accumulatedTime+segmentTime+idlingTime)));
                 accumulatedDistanceKm += segmentDistanceKm; segmentDistanceKm = 0;
                 accumulatedTime += segmentTime; segmentTime = 0;
                 accumulatedClimbMeters += segmentClimbMeters; segmentClimbMeters = 0;
