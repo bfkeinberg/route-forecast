@@ -50,7 +50,7 @@ class RouteInfoForm extends React.Component {
             xmlhttp : null, routeFileSet:false,rwgpsRoute:'', errorDetails:null,
             pending:false, parser:new AnalyzeRoute(this.setErrorState),
             paramsChanged:this.props.controlsUpdated,
-            rwgpsRouteIsTrip:false, errorSource:null,succeeded:null};
+            rwgpsRouteIsTrip:false, errorSource:null,succeeded:null,routeUpdating:false};
     }
 
     static findNextStartTime() {
@@ -65,6 +65,7 @@ class RouteInfoForm extends React.Component {
     }
 
     componentWillReceiveProps() {
+        console.log('got next props',this.props.controlsUpdated);
         this.setState({paramsChanged:this.props.controlsUpdated});
     }
 
@@ -78,7 +79,7 @@ class RouteInfoForm extends React.Component {
     }
 
     updateRouteFile(event) {
-        this.setState({routeFileSet : event.target.value != ''});
+        this.setState({routeFileSet : event.target.value != '',routeUpdating:true});
         let fileControl = event.target;
         let gpxFiles = fileControl.files;
         if (gpxFiles.length > 0) {
@@ -129,7 +130,7 @@ class RouteInfoForm extends React.Component {
     }
 
     setErrorState(errorDetails,errorSource) {
-        this.setState({errorDetails:errorDetails,errorSource:errorSource});
+        this.setState({errorDetails:errorDetails,errorSource:errorSource,routeUpdating:false});
         if (errorDetails != null) {
             if (errorSource=='rwgps') {
                 this.setState({rwgpsRoute:'',succeeded:false});
@@ -175,7 +176,7 @@ class RouteInfoForm extends React.Component {
             this.state.parser.loadRwgpsRoute(event.target.value,this.state.rwgpsRouteIsTrip);
             // clear file input to avoid confusion
             document.getElementById('route').value = null;
-            this.setState({'routeFileSet':false});
+            this.setState({'routeFileSet':false,'routeUpdating':true});
         } else if (this.state.errorSource=='rwgps') {
             this.setState({'errorSource':null});
         }
@@ -346,7 +347,7 @@ class RouteInfoForm extends React.Component {
                         </div>
                     </OverlayTrigger>
                     {RouteInfoForm.showErrorDetails(this.state.errorDetails)}
-                    {/*{RouteInfoForm.showProgressSpinner(this.state.pending)}*/}
+                    {RouteInfoForm.showProgressSpinner(this.state.routeUpdating)}
                 </Form>
             </Panel>
         );

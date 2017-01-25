@@ -46,6 +46,7 @@ class AnalyzeRoute {
             setErrorStateCallback(event.target.statusText,'gpx');
         } else {
             this.gpxResult = data;
+            setErrorStateCallback(null,'gpx');
         }
     }
 

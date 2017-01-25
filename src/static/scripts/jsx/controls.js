@@ -38,8 +38,7 @@ class ControlPoint extends React.Component {
                     <InputGroup>
                     <input style={{'fontSize':'90%','width':'100%','padding':'2px 4px 1px'}}
                             value={this.props.fields['duration']}
-                              onBlur={console.log('onblur')}
-                              onChange={event => this.props.onChange(this.props.index,{name: this.props.fields['name'],
+                           onBlur={event => this.props.onChange(this.props.index,{name: this.props.fields['name'],
                                distance: this.props.fields['distance'],
                                duration: event.target.value,
                                arrival: this.props.fields['arrival']
