@@ -5,6 +5,7 @@ import random
 import string
 import tempfile
 import dateutil.tz
+from datetime import *
 
 import requests
 from flask import Flask, render_template, request, redirect, url_for, jsonify
@@ -20,7 +21,8 @@ application.secret_key = secret_key
 logged_into_rwgps = False
 Bower(application)
 session = requests.Session()
-
+application.weather_request_count = 0
+application.last_request_day = datetime.now().date()
 
 @application.after_request
 def add_header(r):
@@ -160,6 +162,14 @@ def forecast():
     forecast_points = json.loads(request.form['locations'])
     if len(forecast_points) > 40:
         return jsonify({'status':'Invalid request'}),400
+    today = datetime.now().date()
+    if (today != application.last_request_day):
+        application.last_request_day = today
+        application.weather_request_count = len(forecast_points)
+    elif len(forecast_points) + application.weather_request_count > 600:
+        return jsonify({'status': 'Daily count exceeded'}), 400
+    else:
+        application.weather_request_count += len(forecast_points)
     wcalc = WeatherCalculator()
     zone = request.form['timezone']
     offset = long(zone) * 60
