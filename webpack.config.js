@@ -38,8 +38,8 @@ module.exports = {
         modulesDirectories: ["web_modules", "node_modules",'node_modules/gpx-parse/dist']
     },
     externals: {
-        jquery: 'jQuery',
+        jquery: 'jQuery'
         // react: 'React',
-        "react-dom": "ReactDOM"
+        // "react-dom": "ReactDOM"
     }
 }

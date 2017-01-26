@@ -46,11 +46,11 @@ class RouteInfoForm extends React.Component {
         this.decideValidationStateFor = this.decideValidationStateFor.bind(this);
         this.setRwgpsRoute = this.setRwgpsRoute.bind(this);
         this.setDateAndTime = this.setDateAndTime.bind(this);
+        this.controlPoints = [];
         this.state = {start:RouteInfoForm.findNextStartTime(), pace:'D', interval:1,
             xmlhttp : null, routeFileSet:false,rwgpsRoute:'', errorDetails:null,
             pending:false, parser:new AnalyzeRoute(this.setErrorState),
-            paramsChanged:this.props.controlsUpdated,
-            rwgpsRouteIsTrip:false, errorSource:null,succeeded:null,routeUpdating:false};
+            paramsChanged:false, rwgpsRouteIsTrip:false, errorSource:null,succeeded:null,routeUpdating:false};
     }
 
     static findNextStartTime() {
@@ -64,16 +64,37 @@ class RouteInfoForm extends React.Component {
         return now;
     }
 
-    componentWillReceiveProps() {
-        console.log('got next props',this.props.controlsUpdated);
-        this.setState({paramsChanged:this.props.controlsUpdated});
+    copyControls(controlPoints) {
+        return controlPoints.map(point => {return {distance:point['distance'],duration:point['duration']}});
     }
 
-    componentDidUpdate() {
+    compareControls(lastControlPoints,newControlPoints) {
+        if (lastControlPoints.length != newControlPoints.length) {
+            return false;
+        }
+        for (let index = 0; index < lastControlPoints.length; ++index) {
+            if (lastControlPoints[index]['distance'] != newControlPoints[index]['distance']) {
+                return false;
+            }
+            if (lastControlPoints[index]['duration'] != newControlPoints[index]['duration']) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    componentWillReceiveProps(nextProps) {
+        let controlsEqual = this.compareControls(this.controlPoints,nextProps.controlPoints);
+        if (!controlsEqual && this.state.parser.routeIsLoaded()) {
+            this.requestForecast(null);
+        }
+    }
+
+    componentDidUpdate(prevProps, prevState) {
         if (this.state.paramsChanged) {
             this.setState({paramsChanged:false});
             if (this.state.parser.routeIsLoaded()) {
-                this.requestForecast(event);
+                this.requestForecast(null);
             }
         }
     }
@@ -93,7 +114,7 @@ class RouteInfoForm extends React.Component {
         this.state.xmlhttp.onreadystatechange = this.forecastCb;
         this.state.xmlhttp.responseType = 'json';
         let formdata = new FormData();
-
+        this.controlPoints = this.copyControls(this.props.controlPoints);
         this.state.xmlhttp.open("POST", this.props.action);
         let routeInfo = this.state.parser.walkRoute(moment(this.state.start),-new Date().getTimezoneOffset(),
             this.state.pace, parseFloat(this.state.interval),this.props.controlPoints);
@@ -130,13 +151,15 @@ class RouteInfoForm extends React.Component {
     }
 
     setErrorState(errorDetails,errorSource) {
-        this.setState({errorDetails:errorDetails,errorSource:errorSource,routeUpdating:false});
         if (errorDetails != null) {
+            this.setState({errorDetails:errorDetails,errorSource:errorSource,routeUpdating:false});
             if (errorSource=='rwgps') {
                 this.setState({rwgpsRoute:'',succeeded:false});
             } else {
                 this.setState({routeFileSet:false,succeeded:false})
             }
+        } else {
+            this.setState({errorDetails:errorDetails,errorSource:null,routeUpdating:false,succeeded:true});
         }
     }
 

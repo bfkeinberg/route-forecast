@@ -22,15 +22,15 @@ class RouteWeatherUI extends React.Component {
         let script = document.getElementById( "routeui" );
 
         this.state = {controlPoints: [], routeInfo:{bounds:{},points:[], name:''}, forecast:[], action:script.getAttribute('action'),
-            maps_key:script.getAttribute('maps_api_key'),controlsUpdated:false};
+            maps_key:script.getAttribute('maps_api_key')};
     }
 
     updateControls(controlPoints) {
-        this.setState({controlPoints: controlPoints,controlsUpdated:true})
+        this.setState({controlPoints: controlPoints})
     }
 
     updateRouteInfo(routeInfo,controlPoints) {
-        this.setState({routeInfo:routeInfo,controlPoints:controlPoints,controlsUpdated:false});
+        this.setState({routeInfo:routeInfo,controlPoints:controlPoints});
     }
 
     updateForecast(forecast) {
@@ -45,9 +45,7 @@ class RouteWeatherUI extends React.Component {
                     <RouteInfoForm action={this.state.action}
                                     updateRouteInfo={this.updateRouteInfo}
                                     updateForecast={this.updateForecast}
-                                    rwgpsKey={this.state.rwgps_key}
                                     controlPoints={this.state.controlPoints}
-                                    controlsUpdated={this.state.controlsUpdated}
                     />
                     <ControlPointList controlPoints={this.state.controlPoints}
                                       updateControls={this.updateControls}

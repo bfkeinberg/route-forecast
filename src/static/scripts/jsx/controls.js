@@ -6,6 +6,11 @@ class ControlPoint extends React.Component {
 
     constructor(props) {
         super(props);
+        this.state = {fields:props.fields};
+    }
+
+    componentWillReceiveProps(newProps) {
+        this.setState({fields:newProps.fields});
     }
 
     render() {
@@ -22,27 +27,38 @@ class ControlPoint extends React.Component {
                             type='text' value={this.props.fields['name']}
                               onChange={event => this.props.onChange(this.props.index,{
                                name: event.target.value,
-                               distance: this.props.fields['distance'],
-                               duration: this.props.fields['duration'],
+                               distance: this.state.fields['distance'],
+                               duration: this.state.fields['duration'],
                                arrival: this.props.fields['arrival']
                            })}/></td>
                 <td><input  style={{'fontSize':'90%','width':'100%','padding':'2px 4px 1px'}}
-                            value={this.props.fields['distance']}
-                             onChange={event => this.props.onChange(this.props.index,{name: this.props.fields['name'],
-                                distance: event.target.value,
-                                duration: this.props.fields['duration'],
-                                arrival: this.props.fields['arrival']
-                           })} onFocus={event => event.target.select()}
+                            value={this.state.fields['distance']}
+                            onChange={(event) => this.setState({
+                                fields:
+                                    {
+                                        name:this.props.fields['name'],
+                                        distance: event.target.value,
+                                        duration: this.state.fields['duration'],
+                                        arrival: this.props.fields['arrival']
+                                    }
+                            })}
+                             onBlur={event => this.props.onChange(this.props.index,this.state.fields)}
+                            onFocus={event => event.target.select()}
                            type="number"/></td>
                 <td>
                     <InputGroup>
                     <input style={{'fontSize':'90%','width':'100%','padding':'2px 4px 1px'}}
-                            value={this.props.fields['duration']}
-                           onBlur={event => this.props.onChange(this.props.index,{name: this.props.fields['name'],
-                               distance: this.props.fields['distance'],
-                               duration: event.target.value,
-                               arrival: this.props.fields['arrival']
-                           })} onFocus={event => event.target.select()}
+                            value={this.state.fields['duration']}
+                            onChange={(event) => this.setState({
+                                fields:
+                                    {
+                                        name:this.props.fields['name'],
+                                        distance:this.state.fields['distance'],
+                                        duration:event.target.value,
+                                        arrival:this.props.fields['arrival']
+                                    }
+                            })}
+                           onBlur={event => this.props.onChange(this.props.index,this.state.fields)} onFocus={event => event.target.select()}
                            type="number"/>
                         <InputGroup.Addon>min</InputGroup.Addon>
                     </InputGroup>
@@ -65,7 +81,7 @@ class ControlPoints extends React.Component {
         this.removeRow = this.removeRow.bind(this);
         this.toggleDisplayBanked = this.toggleDisplayBanked.bind(this);
         this.state = {
-            displayBankedTime : false
+            displayBankedTime : false, controlsChanged:false
         }
     }
 
@@ -74,29 +90,48 @@ class ControlPoints extends React.Component {
         let key = controlPoints.length;
         controlPoints.push({name:'',distance:0,duration:0,arrival:"00:00"});
         this.props.updateControls(controlPoints);
+        this.setState({controlsChanged:true});
     }
 
     removeRow(key) {
         let controlPoints = this.props.controlPoints;
         controlPoints.splice(key,1);
         this.props.updateControls(controlPoints);
+        this.setState({controlsChanged:true});
     }
 
     updateRow(key,value) {
         let controlPoints = this.props.controlPoints;
         controlPoints[key] = value;
+        controlPoints.sort((a,b) => a['distance']-b['distance']);
         this.props.updateControls(controlPoints);
+        this.setState({controlsChanged:true});
     }
 
     toggleDisplayBanked(event) {
         this.setState({displayBankedTime:!this.state.displayBankedTime});
     }
 
+    shouldComponentUpdate(newProps,newState) {
+        if (newState.controlsChanged || newState.displayBankedTime != this.state.displayBankedTime) {
+            return true;
+        }
+        return false;
+    }
+
+    componentDidUpdate() {
+        this.setState({controlsChanged:false});
+    }
+
+    componentWillReceiveProps(newProps) {
+        this.setState({controlsChanged:true});
+    }
+
     render () {
         const title = this.props.name == '' ?
             ( <h3 style={{textAlign:"center"}}>Control point list</h3> ) :
             ( <h3 style={{textAlign:"center"}}>Control point list for <i>{this.props.name}</i></h3> );
-        const rusa_banked_header = (<th style={{'fontSize':'80%','width':'16%'}}>Banked time</th>);
+        const rusa_banked_header = (<th style={{'fontSize':'80%','width':'17%'}}>Banked time</th>);
         return (
 
             <div className="controlPoints">
@@ -118,7 +153,7 @@ class ControlPoints extends React.Component {
                             <th style={{'fontSize':'80%','width':'22%'}}>Name</th>
                             <th style={{'fontSize':'80%','width':'11%'}}>Distance</th>
                             <th style={{'fontSize':'80%','width':'18%'}}>Expected time spent</th>
-                            <th style={{'fontSize':'80%','width':'26%'}}>Est. arrival time</th>
+                            <th style={{'fontSize':'80%','width':'28%'}}>Est. arrival time</th>
                             {this.state.displayBankedTime?rusa_banked_header:null}
                         </tr>
                         </thead>

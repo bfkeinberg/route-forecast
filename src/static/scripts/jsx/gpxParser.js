@@ -43,10 +43,10 @@ class AnalyzeRoute {
     handleParsedGpx(error,data)
     {
         if (error != null) {
-            setErrorStateCallback(event.target.statusText,'gpx');
+            this.setErrorStateCallback(event.target.statusText,'gpx');
         } else {
             this.gpxResult = data;
-            setErrorStateCallback(null,'gpx');
+            this.setErrorStateCallback(null,'gpx');
         }
     }
 
@@ -93,7 +93,7 @@ class AnalyzeRoute {
         xmlhttp.send();
     }
 
-    analyzeRwgpsRoute(startTime,timezone,pace,interval,controls) {
+    analyzeRwgpsRoute(startTime,timezone,pace,intervalInHours,controls) {
         this.nextControl = 0;
         this.pointsInRoute = [];
         let forecastRequests = [];
@@ -104,14 +104,11 @@ class AnalyzeRoute {
         let accumulatedDistanceKm = 0;
         let accumulatedClimbMeters = 0;
         let accumulatedTime = 0;
-        let segmentDistanceKm = 0;
-        let segmentClimbMeters = 0;
-        let segmentTime = 0;
         let idlingTime = 0;
-        let segmentIdlingTime = 0;
         let rideType = this.isTrip ? 'trip' : 'route';
         let trackName = this.rwgpsRouteData[rideType]['name'];
 
+        let lastTime = 0;
         let points = this.rwgpsRouteData[rideType]['track_points'];
         for (let trackPoint of points) {
             let point = {'lat':trackPoint['y'],'lon':trackPoint['x'],'elevation':trackPoint['e']};
@@ -122,30 +119,23 @@ class AnalyzeRoute {
             }
             if (previousPoint != null) {
                 let deltas = this.findDeltas(previousPoint,point);
-                segmentDistanceKm += deltas['distance'];
+                accumulatedDistanceKm += deltas['distance'];
                 // accumulate elevation gain
-                segmentClimbMeters += deltas['climb'];
+                accumulatedClimbMeters += deltas['climb'];
                 // then find elapsed time given pace
-                segmentTime = this.calculateElapsedTime(segmentClimbMeters, segmentDistanceKm, baseSpeed);
+                accumulatedTime = this.calculateElapsedTime(accumulatedClimbMeters, accumulatedDistanceKm, baseSpeed);
             }
-            let addedTime = this.checkAndUpdateControls(accumulatedDistanceKm+segmentDistanceKm, startTime,
-                (accumulatedTime + segmentTime + idlingTime), controls);
+            let addedTime = this.checkAndUpdateControls(accumulatedDistanceKm, startTime, (accumulatedTime + idlingTime), controls);
             idlingTime += addedTime;
-            segmentIdlingTime += addedTime;
             // see if it's time for forecast
-            if ((segmentTime + segmentIdlingTime) >= interval) {
-                forecastRequests.push(this.addToForecast(point,startTime,
-                    (accumulatedTime+segmentTime+idlingTime)));
-                accumulatedDistanceKm += segmentDistanceKm; segmentDistanceKm = 0;
-                accumulatedTime += segmentTime; segmentTime = 0;
-                accumulatedClimbMeters += segmentClimbMeters; segmentClimbMeters = 0;
-                segmentIdlingTime = 0;
+            if (((accumulatedTime + idlingTime) - lastTime) >= intervalInHours) {
+                forecastRequests.push(this.addToForecast(point,startTime, (accumulatedTime + idlingTime)));
+                lastTime = accumulatedTime;
             }
             previousPoint = point;
         }
-        if (previousPoint != null && segmentTime != 0) {
-            forecastRequests.push(this.addToForecast(previousPoint,startTime,
-                (accumulatedTime+segmentTime+segmentIdlingTime)));
+        if (previousPoint != null && accumulatedTime != 0) {
+            forecastRequests.push(this.addToForecast(previousPoint,startTime, (accumulatedTime+idlingTime)));
         }
         return {forecast:forecastRequests,points:this.pointsInRoute,name:trackName,controls:controls,bounds:bounds};
     }
@@ -159,7 +149,7 @@ class AnalyzeRoute {
         return null;
     }
 
-    analyzeGpxRoute(startTime,timezone,pace,interval,controls) {
+    analyzeGpxRoute(startTime, timezone, pace, intervalInHours, controls) {
         this.nextControl = 0;
         this.pointsInRoute = [];
         let forecastRequests = [];
@@ -170,12 +160,9 @@ class AnalyzeRoute {
         let accumulatedDistanceKm = 0;
         let accumulatedClimbMeters = 0;
         let accumulatedTime = 0;
-        let segmentDistanceKm = 0;
-        let segmentClimbMeters = 0;
-        let segmentTime = 0;
         let idlingTime = 0;
-        let segmentIdlingTime = 0;
         let trackName = null;
+        let lastTime = 0;
         for (let track of this.gpxResult.tracks) {
             if (trackName == null) {
                 trackName = track.name;
@@ -189,32 +176,25 @@ class AnalyzeRoute {
                     }
                     if (previousPoint != null) {
                         let deltas = this.findDeltas(previousPoint,point);
-                        segmentDistanceKm += deltas['distance'];
+                        accumulatedDistanceKm += deltas['distance'];
                         // accumulate elevation gain
-                        segmentClimbMeters += deltas['climb'];
+                        accumulatedClimbMeters += deltas['climb'];
                         // then find elapsed time given pace
-                        segmentTime = this.calculateElapsedTime(segmentClimbMeters, segmentDistanceKm, baseSpeed);
+                        accumulatedTime = this.calculateElapsedTime(accumulatedClimbMeters, accumulatedDistanceKm, baseSpeed);
                     }
-                    let addedTime = this.checkAndUpdateControls(accumulatedDistanceKm+segmentDistanceKm, startTime,
-                        (accumulatedTime + idlingTime), controls);
+                    let addedTime = this.checkAndUpdateControls(accumulatedDistanceKm, startTime, (accumulatedTime + idlingTime), controls);
                     idlingTime += addedTime;
-                    segmentIdlingTime += addedTime;
                     // see if it's time for forecast
-                    if ((segmentTime + segmentIdlingTime) >= interval) {
-                        forecastRequests.push(this.addToForecast(point,startTime,
-                            (accumulatedTime+segmentTime+segmentIdlingTime)));
-                        accumulatedDistanceKm += segmentDistanceKm; segmentDistanceKm = 0;
-                        accumulatedTime += segmentTime; segmentTime = 0;
-                        accumulatedClimbMeters += segmentClimbMeters; segmentClimbMeters = 0;
-                        segmentIdlingTime = 0;
+                    if (((accumulatedTime + idlingTime) - lastTime) >= intervalInHours) {
+                        forecastRequests.push(this.addToForecast(point,startTime, (accumulatedTime + idlingTime)));
+                        lastTime = accumulatedTime;
                     }
                     previousPoint = point;
                 }
             }
         }
-        if (previousPoint != null && segmentTime != 0) {
-            forecastRequests.push(this.addToForecast(previousPoint,startTime,
-                (accumulatedTime+segmentTime+segmentIdlingTime)));
+        if (previousPoint != null && accumulatedTime != 0) {
+            forecastRequests.push(this.addToForecast(previousPoint,startTime, (accumulatedTime+idlingTime)));
         }
         return {forecast:forecastRequests,points:this.pointsInRoute,name:trackName,controls:controls,bounds:bounds};
     }
