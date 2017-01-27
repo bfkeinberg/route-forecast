@@ -308,12 +308,13 @@ class RouteInfoForm extends React.Component {
                         </OverlayTrigger>
                     </FormGroup>
                     <a style={{padding:'10px'}} href="https://westernwheelersbicycleclub.wildapricot.org/page-1374754" target="_blank">Pace explanation</a>
-                    <HelpBlock>Upload a .gpx file describing your route</HelpBlock>
+                    <HelpBlock bsClass='help-block hidden-xs hidden-sm'>Upload a .gpx file describing your route</HelpBlock>
                     <FormGroup bsSize='small'
+                               bsClass='formGroup hidden-xs hidden-sm'
                                validationState={this.decideValidationStateFor('gpx',this.state.errorSource,this.state.succeeded)}
                                controlId="route">
                         <ControlLabel>Route file</ControlLabel>
-                        <FormControl bsClass='formGroup .hidden-xs .hidden-sm' type="file" name='route' accept=".gpx" id='route' onChange={this.updateRouteFile}/>
+                        <FormControl type="file" name='route' accept=".gpx" id='route' onChange={this.updateRouteFile}/>
                     </FormGroup>
                     <FormGroup
                                validationState={this.decideValidationStateFor('rwgps',this.state.errorSource,this.state.succeeded)}
