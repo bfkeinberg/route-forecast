@@ -188,16 +188,18 @@ class WeatherCalculator:
         forecast_time = time_at_point.strftime('%Y-%m-%dT%H:%M:00%z')
         return self.call_weather_service(where.latitude, where.longitude, forecast_time, zone)
 
-    def call_weather_service(self, lat, lon, current_time, zone):
+    def call_weather_service(self, lat, lon, current_time, distance, zone):
         key = os.getenv('DARKSKY_API_KEY')
         url = "https://api.darksky.net/forecast/{}/{},{},{}?exclude=hourly,daily,flags".format(key, lat, lon, current_time)
         headers = {"Accept-Encoding": "gzip"}
         response = requests.get(url=url, headers=headers)
+        # if True: #response.status_code == 200:
         if response.status_code == 200:
+            # current_forecast = {u'ozone': 310.21, u'temperature': 53.32, u'icon': u'partly-cloudy-day', u'dewPoint': 45.71, u'humidity': 0.75, u'visibility': 10, u'summary': u'Partly Cloudy', u'apparentTemperature': 53.32, u'pressure': 1027.3, u'windSpeed': 4.65, u'cloudCover': 0.37, u'time': 1485391860, u'windBearing': 290, u'precipIntensity': 0, u'precipProbability': 0}
             current_forecast = response.json()['currently']
             now = datetime.fromtimestamp(current_forecast['time'], zone)
             self.logger.info('%s %f,%f %s', now, lat, lon, current_forecast)
-            return (now.strftime("%-I:%M%p"), current_forecast['summary'],
+            return (now.strftime("%-I:%M%p"), distance, current_forecast['summary'],
                     str(int(round(current_forecast['temperature'])))+'F',
                     str((current_forecast['precipProbability'] * 100)) + '%'
                     if 'precipProbability' in current_forecast else '<unavailable>',

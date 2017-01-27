@@ -1,5 +1,5 @@
 import {Button,ButtonGroup,ButtonToolbar,Glyphicon,Table,Panel,InputGroup} from 'react-bootstrap';
-import {Checkbox} from 'react-bootstrap';
+import {Checkbox,FormGroup,ControlLabel,FormControl} from 'react-bootstrap';
 import React, { Component } from 'react';
 
 class ControlPoint extends React.Component {
@@ -24,22 +24,30 @@ class ControlPoint extends React.Component {
         return (
             <tr>
                 <td><input style={{'fontSize':'90%','width':'100%','padding':'2px 4px 1px'}}
-                            type='text' value={this.props.fields['name']}
-                              onChange={event => this.props.onChange(this.props.index,{
-                               name: event.target.value,
-                               distance: this.state.fields['distance'],
-                               duration: this.state.fields['duration'],
-                               arrival: this.props.fields['arrival']
-                           })}/></td>
+                            type='text' value={this.state.fields['name']}
+                              onChange={event => this.setState({
+                                  fields:
+                                      {
+                                          name: event.target.value,
+                                          distance: this.state.fields['distance'],
+                                          duration: this.state.fields['duration'],
+                                          arrival: this.props.fields['arrival'],
+                                          banked: this.props.fields['banked']
+                                      }
+                           })}
+                           onBlur={event => this.props.onChange(this.props.index,this.state.fields)}
+                           onFocus={event => event.target.select()}
+                /></td>
                 <td><input  style={{'fontSize':'90%','width':'100%','padding':'2px 4px 1px'}}
                             value={this.state.fields['distance']}
                             onChange={(event) => this.setState({
                                 fields:
                                     {
-                                        name:this.props.fields['name'],
+                                        name:this.state.fields['name'],
                                         distance: event.target.value,
                                         duration: this.state.fields['duration'],
-                                        arrival: this.props.fields['arrival']
+                                        arrival: this.props.fields['arrival'],
+                                        banked: this.props.fields['banked']
                                     }
                             })}
                              onBlur={event => this.props.onChange(this.props.index,this.state.fields)}
@@ -52,10 +60,11 @@ class ControlPoint extends React.Component {
                             onChange={(event) => this.setState({
                                 fields:
                                     {
-                                        name:this.props.fields['name'],
+                                        name:this.state.fields['name'],
                                         distance:this.state.fields['distance'],
                                         duration:event.target.value,
-                                        arrival:this.props.fields['arrival']
+                                        arrival:this.props.fields['arrival'],
+                                        banked:this.props.fields['banked']
                                     }
                             })}
                            onBlur={event => this.props.onChange(this.props.index,this.state.fields)} onFocus={event => event.target.select()}
@@ -103,7 +112,6 @@ class ControlPoints extends React.Component {
     updateRow(key,value) {
         let controlPoints = this.props.controlPoints;
         controlPoints[key] = value;
-        controlPoints.sort((a,b) => a['distance']-b['distance']);
         this.props.updateControls(controlPoints);
         this.setState({controlsChanged:true});
     }
@@ -113,7 +121,8 @@ class ControlPoints extends React.Component {
     }
 
     shouldComponentUpdate(newProps,newState) {
-        if (newState.controlsChanged || newState.displayBankedTime != this.state.displayBankedTime) {
+        if (newState.controlsChanged || newState.displayBankedTime != this.state.displayBankedTime ||
+            this.props.controlPoints != newProps.controlPoints) {
             return true;
         }
         return false;
@@ -133,17 +142,18 @@ class ControlPoints extends React.Component {
             ( <h3 style={{textAlign:"center"}}>Control point list for <i>{this.props.name}</i></h3> );
         const rusa_banked_header = (<th style={{'fontSize':'80%','width':'17%'}}>Banked time</th>);
         return (
-
             <div className="controlPoints">
-                <ButtonToolbar style={{padding:'12px'}}>
-                <ButtonGroup>
-                    <Button onClick={this.addControl}><Glyphicon glyph="plus-sign"></Glyphicon>Add control point</Button>
+                <ButtonToolbar style={{paddingTop:'11px',paddingLeft:'4px'}}>
+                <ButtonGroup style={{display:'flex'}}>
+                    <Button onClick={this.addControl} style={{float:'left',height:'34px'}}><Glyphicon glyph="plus-sign"></Glyphicon>Add control point</Button>
                      <Checkbox checked={this.state.displayBankedTime} inline
-                     inputRef={ref => { this.input = ref; }}
                        onChange={this.toggleDisplayBanked}
                      onClick={this.toggleDisplayBanked}
-                     style={{padding:'7px 25px 0px','textAlign':'center',
-                     margin:'8x 0px 0px 29px',width:'190px'}}>Display banked time</Checkbox>
+                     style={{padding:'7px 0px 0px 28px','textAlign':'center',float:'right', display:'flex',width: '170px',height:'28px'}}>Display banked time</Checkbox>
+                    <FormGroup controlId="finishTime" style={{display:'flex'}}>
+                        <ControlLabel style={{width:'8em',display:'flex',float:'right',marginTop:'7px',paddingLeft:'8px'}}>Finish time</ControlLabel>
+                        <FormControl type="text" style={{width:'10em',float:'right',marginTop:'2px',marginBotton:'0px',paddingLeft:'4px',paddingTop:'2px',height:'28px'}} value={this.props.finishTime}/>
+                    </FormGroup>
                 </ButtonGroup>
                 </ButtonToolbar>
                 <Panel header={title} bsStyle="info">

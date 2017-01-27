@@ -21,7 +21,7 @@ class RouteWeatherUI extends React.Component {
         this.updateForecast = this.updateForecast.bind(this);
         let script = document.getElementById( "routeui" );
 
-        this.state = {controlPoints: [], routeInfo:{bounds:{},points:[], name:''}, forecast:[], action:script.getAttribute('action'),
+        this.state = {controlPoints: [], routeInfo:{bounds:{},points:[], name:'',finishTime:''}, forecast:[], action:script.getAttribute('action'),
             maps_key:script.getAttribute('maps_api_key')};
     }
 
@@ -49,6 +49,7 @@ class RouteWeatherUI extends React.Component {
                     />
                     <ControlPointList controlPoints={this.state.controlPoints}
                                       updateControls={this.updateControls}
+                                      finishTime={this.state.routeInfo['finishTime']}
                                       name={this.state.routeInfo['name']}/>
                 </SplitPane>
                 <SplitPane defaultSize={500} minSize={150} split="vertical" paneStyle={{'overflow':'scroll'}}>

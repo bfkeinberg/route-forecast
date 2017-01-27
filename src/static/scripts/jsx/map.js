@@ -36,7 +36,7 @@ class RouteForecastMap extends Component {
     static addMarkers(forecast,map) {
         return (
             forecast.map((point, index, data) =>
-                RouteForecastMap.addMarker(point[6], point[7], map, point[8], point[9])
+                RouteForecastMap.addMarker(point[7], point[8], map, point[9], point[10])
             )
         );
     }

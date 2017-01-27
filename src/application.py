@@ -6,6 +6,7 @@ import string
 import tempfile
 import dateutil.tz
 from datetime import *
+import urllib2
 
 import requests
 from flask import Flask, render_template, request, redirect, url_for, jsonify
@@ -50,7 +51,11 @@ def hello():
 def server_error(e):
     # Log the error and stacktrace.
     logging.exception('An error occurred during a request.')
-    return 'An internal error occurred.' + e.message, e.response.status_code
+    print type(e)
+    if type(e) != urllib2.HTTPError:
+        return 'An internal error occurred.' + e.message
+    else:
+        return 'An internal error occurred.' + e.message, e.response.status_code
 
 
 @application.route('/form')
@@ -166,7 +171,7 @@ def forecast():
     if (today != application.last_request_day):
         application.last_request_day = today
         application.weather_request_count = len(forecast_points)
-    elif len(forecast_points) + application.weather_request_count > 600:
+    elif len(forecast_points) + application.weather_request_count > 700:
         return jsonify({'status': 'Daily count exceeded'}), 400
     else:
         application.weather_request_count += len(forecast_points)
@@ -177,7 +182,7 @@ def forecast():
 
     results = []
     for point in forecast_points:
-        results.append(wcalc.call_weather_service(point['lat'],point['lon'],point['time'],req_tzinfo))
+        results.append(wcalc.call_weather_service(point['lat'],point['lon'],point['time'],point['distance'],req_tzinfo))
     return jsonify({'forecast':results})
 
 # run the app.

@@ -46,7 +46,9 @@ class RouteInfoForm extends React.Component {
         this.decideValidationStateFor = this.decideValidationStateFor.bind(this);
         this.setRwgpsRoute = this.setRwgpsRoute.bind(this);
         this.setDateAndTime = this.setDateAndTime.bind(this);
+        this.calculateTimeAndDistance = this.calculateTimeAndDistance.bind(this);
         this.controlPoints = [];
+        this.forecastRequest = null;
         this.state = {start:RouteInfoForm.findNextStartTime(), pace:'D', interval:1,
             xmlhttp : null, routeFileSet:false,rwgpsRoute:'', errorDetails:null,
             pending:false, parser:new AnalyzeRoute(this.setErrorState),
@@ -86,7 +88,7 @@ class RouteInfoForm extends React.Component {
     componentWillReceiveProps(nextProps) {
         let controlsEqual = this.compareControls(this.controlPoints,nextProps.controlPoints);
         if (!controlsEqual && this.state.parser.routeIsLoaded()) {
-            this.requestForecast(null);
+            this.calculateTimeAndDistance(null);
         }
     }
 
@@ -94,7 +96,7 @@ class RouteInfoForm extends React.Component {
         if (this.state.paramsChanged) {
             this.setState({paramsChanged:false});
             if (this.state.parser.routeIsLoaded()) {
-                this.requestForecast(null);
+                this.calculateTimeAndDistance(null);
             }
         }
     }
@@ -109,18 +111,25 @@ class RouteInfoForm extends React.Component {
         }
     }
 
+    calculateTimeAndDistance() {
+        this.controlPoints = this.copyControls(this.props.controlPoints);
+        let routeInfo = this.state.parser.walkRoute(moment(this.state.start),-new Date().getTimezoneOffset(),
+            this.state.pace, parseFloat(this.state.interval),this.props.controlPoints);
+        this.props.updateRouteInfo({bounds:routeInfo['bounds'],points:routeInfo['points'],
+            name:routeInfo['name'],finishTime:routeInfo['finishTime']}, routeInfo['controls']);
+        this.forecastRequest = routeInfo['forecast'];
+    }
+
     requestForecast(event) {
+        if (this.forecastRequest == null) {
+            this.calculateTimeAndDistance();
+        }
         this.state.xmlhttp = new XMLHttpRequest();
         this.state.xmlhttp.onreadystatechange = this.forecastCb;
         this.state.xmlhttp.responseType = 'json';
         let formdata = new FormData();
-        this.controlPoints = this.copyControls(this.props.controlPoints);
         this.state.xmlhttp.open("POST", this.props.action);
-        let routeInfo = this.state.parser.walkRoute(moment(this.state.start),-new Date().getTimezoneOffset(),
-            this.state.pace, parseFloat(this.state.interval),this.props.controlPoints);
-        this.props.updateRouteInfo({bounds:routeInfo['bounds'],points:routeInfo['points'],
-                name:routeInfo['name']}, routeInfo['controls']);
-        formdata.append('locations',JSON.stringify(routeInfo['forecast']));
+        formdata.append('locations',JSON.stringify(this.forecastRequest));
         formdata.append('timezone',-new Date().getTimezoneOffset());
         this.state.xmlhttp.send(formdata);
         this.setState({pending:true});

@@ -13,6 +13,7 @@ class ForecastTable extends React.Component {
             return (
                 <tbody>
                 {forecast.map((point, index, data) =>
+                    /*<tr key={Math.random().toString(36).slice(2)}>*/
                     <tr key={point[0]}>
                         <td>{point[0]}</td>
                         <td>{point[1]}</td>
@@ -20,6 +21,7 @@ class ForecastTable extends React.Component {
                         <td>{point[3]}</td>
                         <td>{point[4]}</td>
                         <td>{point[5]}</td>
+                        <td>{point[6]}</td>
                     </tr>
                 )}
                 </tbody>
@@ -37,6 +39,7 @@ class ForecastTable extends React.Component {
                         <thead>
                         <tr>
                             <th style={{'fontSize':'80%'}}>Time</th>
+                            <th style={{'fontSize':'80%'}}>Mile</th>
                             <th style={{'fontSize':'80%'}}>Summary</th>
                             <th style={{'fontSize':'80%'}}>Temperature</th>
                             <th style={{'fontSize':'80%'}}>Chance of rain</th>

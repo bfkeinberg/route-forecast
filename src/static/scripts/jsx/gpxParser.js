@@ -114,7 +114,7 @@ class AnalyzeRoute {
             let point = {'lat':trackPoint['y'],'lon':trackPoint['x'],'elevation':trackPoint['e']};
             bounds = this.setMinMaxCoords(point,bounds);
             if (first) {
-                forecastRequests.push(this.addToForecast(point,startTime,accumulatedTime));
+                forecastRequests.push(this.addToForecast(point, startTime, accumulatedTime,accumulatedDistanceKm*0.62137));
                 first = false;
             }
             if (previousPoint != null) {
@@ -129,18 +129,24 @@ class AnalyzeRoute {
             idlingTime += addedTime;
             // see if it's time for forecast
             if (((accumulatedTime + idlingTime) - lastTime) >= intervalInHours) {
-                forecastRequests.push(this.addToForecast(point,startTime, (accumulatedTime + idlingTime)));
-                lastTime = accumulatedTime;
+                forecastRequests.push(this.addToForecast(point, startTime, (accumulatedTime + idlingTime),accumulatedDistanceKm*0.62137));
+                lastTime = accumulatedTime + idlingTime;
             }
             previousPoint = point;
         }
         if (previousPoint != null && accumulatedTime != 0) {
-            forecastRequests.push(this.addToForecast(previousPoint,startTime, (accumulatedTime+idlingTime)));
+            forecastRequests.push(this.addToForecast(previousPoint, startTime, (accumulatedTime + accumulatedTime),accumulatedDistanceKm*0.62137));
         }
-        return {forecast:forecastRequests,points:this.pointsInRoute,name:trackName,controls:controls,bounds:bounds};
+        return {forecast:forecastRequests,points:this.pointsInRoute,name:trackName,controls:controls,bounds:bounds,
+            finishTime:this.formatFinishTime(startTime,accumulatedTime,idlingTime)};
+    }
+
+    formatFinishTime(startTime,accumulatedTime,restTime) {
+        return moment(startTime).add(accumulatedTime+restTime,'hours').format('ddd, MMM DD h:mma');
     }
 
     walkRoute(startTime,timezone,pace,interval,controls) {
+        controls.sort((a,b) => a['distance']-b['distance']);
         if (this.gpxResult != null) {
             return this.analyzeGpxRoute(startTime,timezone,pace,interval,controls);
         } else if (this.rwgpsRouteData != null) {
@@ -171,7 +177,7 @@ class AnalyzeRoute {
                 for (let point of segment) {
                     bounds = this.setMinMaxCoords(point,bounds);
                     if (first) {
-                        forecastRequests.push(this.addToForecast(point,startTime,accumulatedTime));
+                        forecastRequests.push(this.addToForecast(point, startTime, accumulatedTime,accumulatedDistanceKm*0.62137));
                         first = false;
                     }
                     if (previousPoint != null) {
@@ -186,17 +192,18 @@ class AnalyzeRoute {
                     idlingTime += addedTime;
                     // see if it's time for forecast
                     if (((accumulatedTime + idlingTime) - lastTime) >= intervalInHours) {
-                        forecastRequests.push(this.addToForecast(point,startTime, (accumulatedTime + idlingTime)));
-                        lastTime = accumulatedTime;
+                        forecastRequests.push(this.addToForecast(point, startTime, (accumulatedTime + idlingTime),accumulatedDistanceKm*0.62137));
+                        lastTime = accumulatedTime + idlingTime;
                     }
                     previousPoint = point;
                 }
             }
         }
         if (previousPoint != null && accumulatedTime != 0) {
-            forecastRequests.push(this.addToForecast(previousPoint,startTime, (accumulatedTime+idlingTime)));
+            forecastRequests.push(this.addToForecast(previousPoint, startTime, (accumulatedTime + idlingTime),accumulatedDistanceKm*0.62137));
         }
-        return {forecast:forecastRequests,points:this.pointsInRoute,name:trackName,controls:controls,bounds:bounds};
+        return {forecast:forecastRequests,points:this.pointsInRoute,name:trackName,controls:controls,bounds:bounds,
+            finishTime:this.formatFinishTime(startTime,accumulatedTime,idlingTime)};
     }
 
     rusa_time(accumulatedDistanceInKm, elapsedTimeInHours) {
@@ -253,8 +260,8 @@ class AnalyzeRoute {
         return bounds;
     }
 
-    addToForecast(trackPoint,currentTime,elapsedTimeInHours) {
-        return {lat:trackPoint.lat,lon:trackPoint.lon,
+    addToForecast(trackPoint, currentTime, elapsedTimeInHours, distance) {
+        return {lat:trackPoint.lat,lon:trackPoint.lon,distance:Math.round(distance),
             time:moment(currentTime).add(elapsedTimeInHours,'hours').format('YYYY-MM-DDTHH:mm:00ZZ')};
     }
 
