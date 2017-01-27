@@ -135,7 +135,7 @@ class AnalyzeRoute {
             previousPoint = point;
         }
         if (previousPoint != null && accumulatedTime != 0) {
-            forecastRequests.push(this.addToForecast(previousPoint, startTime, (accumulatedTime + accumulatedTime),accumulatedDistanceKm*0.62137));
+            forecastRequests.push(this.addToForecast(previousPoint, startTime, (accumulatedTime + idlingTime),accumulatedDistanceKm*0.62137));
         }
         return {forecast:forecastRequests,points:this.pointsInRoute,name:trackName,controls:controls,bounds:bounds,
             finishTime:this.formatFinishTime(startTime,accumulatedTime,idlingTime)};

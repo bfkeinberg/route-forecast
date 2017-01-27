@@ -62,7 +62,7 @@ class RouteForecastMap extends Component {
 
     render() {
         return (
-            <div id="map" ref='mapDiv' style={{'height':'400px'}}>
+            <div id="map" ref='mapDiv' style={{'height':'100%'}}>
                 <h2 style={{padding:'18px', textAlign:"center"}}>Forecast map</h2>
             </div>
         );

@@ -262,43 +262,12 @@ class RouteInfoForm extends React.Component {
         let later = new Date();
         const daysToAdd = 14;
         later.setDate(now.getDate() + daysToAdd);
-/*
-        let timeProps = {showArrowButtons:true};
-        let dateProps = {minDate:now,maxDate:later,canClearSelection:false};
-*/
         let buttonStyle = this.disableSubmit() ? {pointerEvents : 'none',padding:'14px'} : {padding:'14px'};
-/*        let popupCalendar = (
-            <FormGroup controlId="starting_time">
-                <ControlLabel>Starting time</ControlLabel>
-                <DateTimePicker name="starting_time" value={this.state.start}
-                                onChange={this.handleDateChange}
-                                datePickerProps={dateProps}
-                                timePickerProps={timeProps}
-                                placeholder="Select Date.."/>
 
-            </FormGroup>
-        );*/
         const header = (<div style={{textAlign:"center",'fontSize':'99%'}}>Forecast and time estimate</div>);
         return (
             <Panel header={header}>
                 <Form inline id="forecast_form">
-{/*
-                    <Popover content={popupCalendar} position={Position.BOTTOM} useSmartPositioning={true}
-                             popoverClassName="pt-popover-content-sizing">
-                        <Button><Glyphicon glyph="calendar"></Glyphicon>Starting time</Button>
-                    </Popover>
-*/}
-{/*
-                        <FormGroup controlId="starting_time">
-                            <ControlLabel>Starting time</ControlLabel>
-                            <DateTimePicker name="starting_time" value={this.state.start}
-                                            onChange={this.handleDateChange}
-                                            datePickerProps={dateProps}
-                                            timePickerProps={timeProps}
-                                            placeholder="Select Date.."/>
-
-                        </FormGroup>
-*/}
                     <FormGroup controlId="starting_time">
                         <OverlayTrigger placement='bottom' overlay={time_tooltip}>
                             <ControlLabel style={{padding:'10px'}}>Starting time</ControlLabel>
@@ -344,14 +313,14 @@ class RouteInfoForm extends React.Component {
                                validationState={this.decideValidationStateFor('gpx',this.state.errorSource,this.state.succeeded)}
                                controlId="route">
                         <ControlLabel>Route file</ControlLabel>
-                        <FormControl type="file" name='route' accept=".gpx" id='route' onChange={this.updateRouteFile}/>
+                        <FormControl bsClass='formGroup .hidden-xs .hidden-sm' type="file" name='route' accept=".gpx" id='route' onChange={this.updateRouteFile}/>
                     </FormGroup>
                     <FormGroup
                                validationState={this.decideValidationStateFor('rwgps',this.state.errorSource,this.state.succeeded)}
                                controlId="ridewithgps">
                         <ControlLabel style={{padding:'10px'}}>RideWithGps route number</ControlLabel>
                         <OverlayTrigger placement="bottom" overlay={rwgps_enabled_tooltip}>
-                            <FormControl type="number"
+                            <FormControl type="text"
                                          onBlur={this.handleRwgpsRoute}
                                          onKeyPress={this.isNumberKey}
                                          onChange={this.setRwgpsRoute}

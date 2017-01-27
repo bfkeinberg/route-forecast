@@ -1,6 +1,7 @@
 import {Button,ButtonGroup,ButtonToolbar,Glyphicon,Table,Panel,InputGroup} from 'react-bootstrap';
 import {Checkbox,FormGroup,ControlLabel,FormControl} from 'react-bootstrap';
 import React, { Component } from 'react';
+import ReactDOM from 'react-dom';
 
 class ControlPoint extends React.Component {
 
@@ -11,6 +12,10 @@ class ControlPoint extends React.Component {
 
     componentWillReceiveProps(newProps) {
         this.setState({fields:newProps.fields});
+    }
+
+    componentDidMount() {
+        ReactDOM.findDOMNode(this.refs.nameField).focus();
     }
 
     render() {
@@ -25,7 +30,8 @@ class ControlPoint extends React.Component {
             <tr>
                 <td><input style={{'fontSize':'90%','width':'100%','padding':'2px 4px 1px'}}
                             type='text' value={this.state.fields['name']}
-                              onChange={event => this.setState({
+                                ref="nameField"
+                                onChange={event => this.setState({
                                   fields:
                                       {
                                           name: event.target.value,
@@ -152,7 +158,7 @@ class ControlPoints extends React.Component {
                      style={{padding:'7px 0px 0px 28px','textAlign':'center',float:'right', display:'flex',width: '170px',height:'28px'}}>Display banked time</Checkbox>
                     <FormGroup controlId="finishTime" style={{display:'flex'}}>
                         <ControlLabel style={{width:'8em',display:'flex',float:'right',marginTop:'7px',paddingLeft:'8px'}}>Finish time</ControlLabel>
-                        <FormControl type="text" style={{width:'10em',float:'right',marginTop:'2px',marginBotton:'0px',paddingLeft:'4px',paddingTop:'2px',height:'28px'}} value={this.props.finishTime}/>
+                        <FormControl type="text" style={{width:'12em',float:'right',marginTop:'2px',marginBotton:'0px',paddingLeft:'4px',paddingTop:'2px',height:'28px'}} value={this.props.finishTime}/>
                     </FormGroup>
                 </ButtonGroup>
                 </ButtonToolbar>
