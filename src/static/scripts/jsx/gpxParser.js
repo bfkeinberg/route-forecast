@@ -144,7 +144,7 @@ class AnalyzeRoute {
     }
 
     fillLastControlPoint(finishTime,controls,nextControl) {
-        while (nextControl > controls.length)   {
+        while (nextControl < controls.length)   {
             controls[nextControl]['arrival'] = finishTime;
             ++nextControl;
         }
