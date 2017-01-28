@@ -137,8 +137,17 @@ class AnalyzeRoute {
         if (previousPoint != null && accumulatedTime != 0) {
             forecastRequests.push(this.addToForecast(previousPoint, startTime, (accumulatedTime + idlingTime),accumulatedDistanceKm*0.62137));
         }
+        let finishTime = this.formatFinishTime(startTime,accumulatedTime,idlingTime);
+        this.fillLastControlPoint(finishTime,controls,this.nextControl);
         return {forecast:forecastRequests,points:this.pointsInRoute,name:trackName,controls:controls,bounds:bounds,
-            finishTime:this.formatFinishTime(startTime,accumulatedTime,idlingTime)};
+            finishTime: finishTime};
+    }
+
+    fillLastControlPoint(finishTime,controls,nextControl) {
+        while (nextControl > controls.length)   {
+            controls[nextControl]['arrival'] = finishTime;
+            ++nextControl;
+        }
     }
 
     formatFinishTime(startTime,accumulatedTime,restTime) {
@@ -202,8 +211,10 @@ class AnalyzeRoute {
         if (previousPoint != null && accumulatedTime != 0) {
             forecastRequests.push(this.addToForecast(previousPoint, startTime, (accumulatedTime + idlingTime),accumulatedDistanceKm*0.62137));
         }
+        let finishTime = this.formatFinishTime(startTime,accumulatedTime,idlingTime);
+        this.fillLastControlPoint(finishTime,controls,this.nextControl);
         return {forecast:forecastRequests,points:this.pointsInRoute,name:trackName,controls:controls,bounds:bounds,
-            finishTime:this.formatFinishTime(startTime,accumulatedTime,idlingTime)};
+            finishTime:finishTime};
     }
 
     rusa_time(accumulatedDistanceInKm, elapsedTimeInHours) {

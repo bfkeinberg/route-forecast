@@ -54,7 +54,7 @@ class RouteWeatherUI extends React.Component {
                 </SplitPane>
                 <SplitPane defaultSize={500} minSize={150} split="vertical" paneStyle={{'overflow':'scroll'}}>
                     <ForecastTable forecast={this.state.forecast}/>
-                    <RouteForecastMap maps_api_key={this.state.maps_key}
+                    <RouteForecastMap class='hidden-sm hidden-xs' maps_api_key={this.state.maps_key}
                                       forecast={this.state.forecast} routeInfo={this.state.routeInfo}/>
                 </SplitPane>
             </SplitPane>
