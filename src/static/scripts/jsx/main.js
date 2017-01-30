@@ -6,7 +6,7 @@ import RouteInfoForm from './routeInfoEntry';
 import RouteForecastMap from './map';
 import ForecastTable from './forecastTable';
 import SplitPane from 'react-split-pane';
-
+let MediaQuery = require('react-responsive');
 require('!style!css!bootstrap/dist/css/bootstrap.min.css');
 require('!style!css!normalize.css/normalize.css');
 require('!style!css!@blueprintjs/core/dist/blueprint.css');
@@ -40,24 +40,30 @@ class RouteWeatherUI extends React.Component {
     render() {
         return (
         <div>
-            <SplitPane defaultSize={300} minSize={150} maxSize={530} split="horizontal">
-                <SplitPane defaultSize={550} minSize={150} split="vertical" pane2Style={{'overflow':'scroll'}}>
-                    <RouteInfoForm action={this.state.action}
-                                    updateRouteInfo={this.updateRouteInfo}
-                                    updateForecast={this.updateForecast}
-                                    controlPoints={this.state.controlPoints}
-                    />
-                    <ControlPointList controlPoints={this.state.controlPoints}
-                                      updateControls={this.updateControls}
-                                      finishTime={this.state.routeInfo['finishTime']}
-                                      name={this.state.routeInfo['name']}/>
-                </SplitPane>
-                <SplitPane defaultSize={500} minSize={150} split="vertical" paneStyle={{'overflow':'scroll'}}>
-                    <ForecastTable forecast={this.state.forecast}/>
-                    <RouteForecastMap class='hidden-sm hidden-xs' maps_api_key={this.state.maps_key}
-                                      forecast={this.state.forecast} routeInfo={this.state.routeInfo}/>
-                </SplitPane>
-            </SplitPane>
+            <MediaQuery minDeviceWidth={1000}>
+                {(matches) => {
+                    return (
+                        <SplitPane defaultSize={matches?294:500} minSize={150} maxSize={matches?530:600} split="horizontal">
+                            <SplitPane defaultSize={matches?550:75} minSize={matches?150:0} split={matches?"vertical":"horizontal"} pane2Style={{'overflow':'scroll'}}>
+                                <RouteInfoForm action={this.state.action}
+                                                updateRouteInfo={this.updateRouteInfo}
+                                                updateForecast={this.updateForecast}
+                                                controlPoints={this.state.controlPoints}
+                                />
+                                <ControlPointList controlPoints={this.state.controlPoints}
+                                                  updateControls={this.updateControls}
+                                                  finishTime={this.state.routeInfo['finishTime']}
+                                                  name={this.state.routeInfo['name']}/>
+                            </SplitPane>
+                            {matches?
+                                <SplitPane defaultSize={500} minSize={150} split="vertical" paneStyle={{'overflow':'scroll'}}>
+                                    <ForecastTable forecast={this.state.forecast}/>
+                                    <RouteForecastMap maps_api_key={this.state.maps_key}
+                                                      forecast={this.state.forecast} routeInfo={this.state.routeInfo}/>
+                                </SplitPane>:
+                                <ForecastTable forecast={this.state.forecast}/>}
+                        </SplitPane>)}}
+            </MediaQuery>
         </div>
       );
     }
