@@ -270,7 +270,9 @@ class RouteInfoForm extends React.Component {
         return (
             <MediaQuery maxDeviceWidth={992}>
                 {(matches) => {
-                    return (<Panel collapsible={matches} expanded={this.state.showForm} header={header}>
+                    return (
+                        <div>
+                        <Panel collapsible={matches} expanded={this.state.showForm} header={header}>
                         <Form inline id="forecast_form">
                             <FormGroup controlId="starting_time">
                                 <OverlayTrigger placement='bottom' overlay={time_tooltip}>
@@ -286,7 +288,7 @@ class RouteInfoForm extends React.Component {
                                     dateFormat: 'Y-m-d\TH:i'
                                 }}/>
                             </FormGroup>
-                            <FormGroup bsSize='small' controlId="interval">
+                            <FormGroup bsSize='small' controlId="interval" style={{'width':matches?'30px':'auto'}}>
                                 <ControlLabel style={{padding:'10px'}}>Interval in hours</ControlLabel>
                                 <OverlayTrigger placement='bottom' overlay={interval_tooltip}>
                                     <FormControl type="number" min={0.5} max={2} step={0.5} name="interval" style={{'width':'5em'}}
@@ -355,7 +357,10 @@ class RouteInfoForm extends React.Component {
                             {RouteInfoForm.showErrorDetails(this.state.errorDetails)}
                             {RouteInfoForm.showProgressSpinner(this.state.routeUpdating)}
                         </Form>
-                    </Panel>)
+                    </Panel>
+                    {matches && !this.state.showForm?<Button bsStyle="primary" onClick={event => this.setState({showForm:true})}>Show input</Button>:null}
+                    </div>
+                    )
                 }}
             </MediaQuery>
         );

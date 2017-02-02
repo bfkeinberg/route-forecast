@@ -28,6 +28,7 @@
     "react-bootstrap": "^0.30.7",
     "react-dom": "^15.4.2",
     "react-flatpickr": "^3.0.0",
+    "react-grid-layout": "^0.13.9",
     "react-responsive": "^1.2.6",
     "react-split-pane": "^0.1.57",
     "react-splitter-layout": "^0.2.0",
