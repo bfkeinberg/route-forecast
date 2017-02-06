@@ -53,8 +53,7 @@ class RouteInfoForm extends React.Component {
         this.state = {start:RouteInfoForm.findNextStartTime(), pace:'D', interval:1,
             xmlhttp : null, routeFileSet:false,rwgpsRoute:'', errorDetails:null,
             pending:false, parser:new AnalyzeRoute(this.setErrorState),
-            paramsChanged:false, rwgpsRouteIsTrip:false, errorSource:null,succeeded:null,routeUpdating:false,
-            showForm:true};
+            paramsChanged:false, rwgpsRouteIsTrip:false, errorSource:null,succeeded:null,routeUpdating:false};
     }
 
     static findNextStartTime() {
@@ -264,105 +263,99 @@ class RouteInfoForm extends React.Component {
         let later = new Date();
         const daysToAdd = 14;
         later.setDate(now.getDate() + daysToAdd);
-        let buttonStyle = this.disableSubmit() ? {pointerEvents : 'none',padding:'14px'} : {padding:'14px'};
+        let buttonStyle = this.disableSubmit() ? {pointerEvents : 'none',padding:'14px',display:'inline-flex'} : {padding:'14px'};
 
         const header = (<div style={{textAlign:"center",'fontSize':'99%'}}>Forecast and time estimate</div>);
         return (
-            <MediaQuery maxDeviceWidth={992}>
-                {(matches) => {
-                    return (
-                        <div>
-                        <Panel collapsible={matches} expanded={this.state.showForm} header={header}>
-                        <Form inline id="forecast_form">
-                            <FormGroup controlId="starting_time">
-                                <OverlayTrigger placement='bottom' overlay={time_tooltip}>
-                                    <ControlLabel style={{padding:'10px'}}>Starting time</ControlLabel>
-                                </OverlayTrigger>
-                                <span className="pt-icon-standard pt-icon-calendar"></span>
-                                <Flatpickr onChange={this.setDateAndTime} options={{enableTime: true,
-                                    altInput: true, altFormat: 'F j, Y h:i K',
-                                    altInputClass: 'dateDisplay',
-                                    minDate: now,
-                                    maxDate: later,
-                                    defaultDate: this.state.start,
-                                    dateFormat: 'Y-m-d\TH:i'
-                                }}/>
-                            </FormGroup>
-                            <FormGroup bsSize='small' controlId="interval" style={{'width':matches?'30px':'auto'}}>
-                                <ControlLabel style={{padding:'10px'}}>Interval in hours</ControlLabel>
-                                <OverlayTrigger placement='bottom' overlay={interval_tooltip}>
-                                    <FormControl type="number" min={0.5} max={2} step={0.5} name="interval" style={{'width':'5em'}}
-                                                 value={this.state.interval} onChange={this.intervalChanged}/>
-                                </OverlayTrigger>
-                            </FormGroup>
-                            <FormGroup controlId="pace">
-                                <ControlLabel style={{padding:'10px'}}>Pace</ControlLabel>
-                                <OverlayTrigger placement="bottom" overlay={pace_tooltip}>
-                                    <FormControl componentClass="select" value={this.state.pace} name="pace"
-                                                 style={{'width':'5em','height':'2.8em',paddingRight:'8px'}}
-                                                 onChange={this.handlePaceChange}>
-                                        <option value="A">A</option>
-                                        <option value="B">B</option>
-                                        <option value="C">C</option>
-                                        <option value="C+">C+</option>
-                                        <option value="D-">D-</option>
-                                        <option value="D">D</option>
-                                        <option value="D+">D+</option>
-                                        <option value="E-">E-</option>
-                                        <option value="E">E</option>
-                                    </FormControl>
-                                </OverlayTrigger>
-                            </FormGroup>
-                            <a style={{padding:'10px'}} href="https://westernwheelersbicycleclub.wildapricot.org/page-1374754" target="_blank">Pace explanation</a>
-                            <HelpBlock bsClass='help-block hidden-xs hidden-sm'>Upload a .gpx file describing your route</HelpBlock>
-                            <FormGroup bsSize='small'
-                                       bsClass='formGroup hidden-xs hidden-sm'
-                                       validationState={this.decideValidationStateFor('gpx',this.state.errorSource,this.state.succeeded)}
-                                       controlId="route">
-                                <ControlLabel>Route file</ControlLabel>
-                                <FormControl type="file" name='route' accept=".gpx" id='route' onChange={this.updateRouteFile}/>
-                            </FormGroup>
-                            <FormGroup
-                                validationState={this.decideValidationStateFor('rwgps',this.state.errorSource,this.state.succeeded)}
-                                controlId="ridewithgps">
-                                <ControlLabel style={{padding:'10px'}}>RideWithGps route number</ControlLabel>
-                                <OverlayTrigger placement="bottom" overlay={rwgps_enabled_tooltip}>
-                                    <FormControl type="text"
-                                                 onBlur={this.handleRwgpsRoute}
-                                                 onKeyPress={this.isNumberKey}
-                                                 onChange={this.setRwgpsRoute}
-                                                 pattern="[0-9]*"
-                                                 value={this.state.rwgpsRoute}
-                                                 style={{'width':'8em',height:'3em', padding:'12px'}}/>
-                                </OverlayTrigger>
-                            </FormGroup>
-                            {/* if we want to allow selecting rwgps trips also
+                <div style={{display:'flex',flexFlow:'row wrap',justifyContent:'space-between',alignItems:'center',alignContent:'space-between'}}>
+                <Panel style={{marginBottom:'0'}} header={header}>
+                <Form inline id="forecast_form">
+                    <FormGroup style={{flex:'1',display:'inline-flex',alignItems:'center'}} controlId="starting_time">
+                        <OverlayTrigger placement='bottom' overlay={time_tooltip}>
+                            <ControlLabel>Starting time</ControlLabel>
+                        </OverlayTrigger>
+                        <span style={{display:'inline-flex'}} className="pt-icon-standard pt-icon-calendar"></span>
+                        <Flatpickr onChange={this.setDateAndTime} options={{enableTime: true,
+                            altInput: true, altFormat: 'F j, Y h:i K',
+                            altInputClass: 'dateDisplay',
+                            minDate: now,
+                            maxDate: later,
+                            defaultDate: this.state.start,
+                            dateFormat: 'Y-m-d\TH:i'
+                        }}/>
+                    </FormGroup>
+                    <FormGroup bsSize='small' controlId="interval" style={{flex:'1',display:'inline-flex',alignItems:'center'}}>
+                        <ControlLabel>Interval in hours</ControlLabel>
+                        <OverlayTrigger placement='bottom' overlay={interval_tooltip}>
+                            <FormControl type="number" min={0.5} max={2} step={0.5} name="interval" style={{'width':'5em'}}
+                                         value={this.state.interval} onChange={this.intervalChanged}/>
+                        </OverlayTrigger>
+                    </FormGroup>
+                    <FormGroup style={{flex:'1',display:'inline-flex',alignItems:'center'}} controlId="pace">
+                        <ControlLabel>Pace</ControlLabel>
+                        <OverlayTrigger placement="bottom" overlay={pace_tooltip}>
+                            <FormControl componentClass="select" value={this.state.pace} name="pace"
+                                         style={{'width':'5em','height':'2.8em',paddingRight:'8px'}}
+                                         onChange={this.handlePaceChange}>
+                                <option value="A">A</option>
+                                <option value="B">B</option>
+                                <option value="C">C</option>
+                                <option value="C+">C+</option>
+                                <option value="D-">D-</option>
+                                <option value="D">D</option>
+                                <option value="D+">D+</option>
+                                <option value="E-">E-</option>
+                                <option value="E">E</option>
+                            </FormControl>
+                        </OverlayTrigger>
+                    </FormGroup>
+                    <a style={{padding:'8px',display:'inline-flex',alignItems:'center'}} href="https://westernwheelersbicycleclub.wildapricot.org/page-1374754" target="_blank">Pace explanation</a>
+                    <HelpBlock style={{flex:'1',display:'inline-flex'}} bsClass='help-block hidden-xs hidden-sm'>Upload a .gpx file describing your route</HelpBlock>
+                    <FormGroup bsSize='small'
+                               bsClass='formGroup hidden-xs hidden-sm'
+                               validationState={this.decideValidationStateFor('gpx',this.state.errorSource,this.state.succeeded)}
+                               style={{display:'inline-flex',alignItems:'center'}}
+                               controlId="route">
+                        <ControlLabel>Route file</ControlLabel>
+                        <FormControl type="file" name='route' accept=".gpx" id='route' onChange={this.updateRouteFile}/>
+                    </FormGroup>
+                    <FormGroup
+                        validationState={this.decideValidationStateFor('rwgps',this.state.errorSource,this.state.succeeded)}
+                        controlId="ridewithgps" style={{flex:'1',display:'inline-flex',alignItems:'center'}}>
+                        <ControlLabel>RideWithGps route number</ControlLabel>
+                        <OverlayTrigger placement="bottom" overlay={rwgps_enabled_tooltip}>
+                            <FormControl type="text"
+                                         onBlur={this.handleRwgpsRoute}
+                                         onKeyPress={this.isNumberKey}
+                                         onChange={this.setRwgpsRoute}
+                                         pattern="[0-9]*"
+                                         value={this.state.rwgpsRoute}
+                                         style={{'width':'8em',height:'3em', padding:'12px',flex:'1',display:'inline-flex',alignItems:'center'}}/>
+                        </OverlayTrigger>
+                    </FormGroup>
+                    {/* if we want to allow selecting rwgps trips also
 
-                             <FormGroup controlId="rwgpsType">
-                             <ControlLabel style={{padding:'10px'}}>RideWithGps trip</ControlLabel>
-                             <OverlayTrigger overlay={rwgps_trip_tooltip}>
-                             <Checkbox onClick={event => this.setState({rwgpsRouteIsTrip:!this.state.rwgpsRouteIsTrip})}
-                             checked={this.state.rwgpsRouteIsTrip}>Rwgps number is a trip</Checkbox>
-                             </OverlayTrigger>
-                             </FormGroup>
-                             */}
-                            <OverlayTrigger placement='bottom' overlay={forecast_tooltip}>
-                                <div style={{'display':'inline-block',padding:'0px 14px'}} cursor='not-allowed'>
-                                    <Button bsStyle="primary" onClick={this.requestForecast}
-                                            style={buttonStyle}
-                                            disabled={this.disableSubmit() || this.state.pending} bsSize="large">
-                                        {this.state.pending?'Updating...':'Find forecast'}</Button>
-                                </div>
-                            </OverlayTrigger>
-                            {RouteInfoForm.showErrorDetails(this.state.errorDetails)}
-                            {RouteInfoForm.showProgressSpinner(this.state.routeUpdating)}
-                        </Form>
-                    </Panel>
-                    {matches && !this.state.showForm?<Button bsStyle="primary" onClick={event => this.setState({showForm:true})}>Show input</Button>:null}
-                    </div>
-                    )
-                }}
-            </MediaQuery>
+                     <FormGroup controlId="rwgpsType">
+                     <ControlLabel style={{padding:'10px'}}>RideWithGps trip</ControlLabel>
+                     <OverlayTrigger overlay={rwgps_trip_tooltip}>
+                     <Checkbox onClick={event => this.setState({rwgpsRouteIsTrip:!this.state.rwgpsRouteIsTrip})}
+                     checked={this.state.rwgpsRouteIsTrip}>Rwgps number is a trip</Checkbox>
+                     </OverlayTrigger>
+                     </FormGroup>
+                     */}
+                    <OverlayTrigger placement='bottom' overlay={forecast_tooltip}>
+                        <div style={{'display':'inline-flex',padding:'0px 14px'}} cursor='not-allowed'>
+                            <Button bsStyle="primary" onClick={this.requestForecast}
+                                    style={buttonStyle}
+                                    disabled={this.disableSubmit() || this.state.pending} bsSize="large">
+                                {this.state.pending?'Updating...':'Find forecast'}</Button>
+                        </div>
+                    </OverlayTrigger>
+                    {RouteInfoForm.showErrorDetails(this.state.errorDetails)}
+                    {RouteInfoForm.showProgressSpinner(this.state.routeUpdating)}
+                </Form>
+            </Panel>
+            </div>
         );
     }
 }

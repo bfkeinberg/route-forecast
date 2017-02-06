@@ -2,6 +2,7 @@ import {Button,ButtonGroup,ButtonToolbar,Glyphicon,Table,Panel,InputGroup} from 
 import {Checkbox,FormGroup,ControlLabel,FormControl} from 'react-bootstrap';
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
+let MediaQuery = require('react-responsive');
 
 class ControlPoint extends React.Component {
 
@@ -23,7 +24,9 @@ class ControlPoint extends React.Component {
             <InputGroup>
             <input style={{'fontSize':'90%','width':'100%','padding':'2px 4px 1px'}}
             value={this.props.fields['banked']} readOnly tabIndex='-1' type="text"/>
-                <InputGroup.Addon>min</InputGroup.Addon>
+                <MediaQuery minDeviceWidth={1000}>
+                    <InputGroup.Addon>min</InputGroup.Addon>
+                </MediaQuery>
             </InputGroup>
         </td>);
         return (
@@ -75,7 +78,9 @@ class ControlPoint extends React.Component {
                             })}
                            onBlur={event => this.props.onChange(this.props.index,this.state.fields)} onFocus={event => event.target.select()}
                            type="number"/>
-                        <InputGroup.Addon>min</InputGroup.Addon>
+                        <MediaQuery minDeviceWidth={1000}>
+                            <InputGroup.Addon>min</InputGroup.Addon>
+                        </MediaQuery>
                     </InputGroup>
                 </td>
                 <td><input style={{'fontSize':'90%','width':'100%','padding':'2px 4px 1px 0px'}}
