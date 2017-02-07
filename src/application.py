@@ -182,7 +182,8 @@ def forecast():
 
     results = []
     for point in forecast_points:
-        results.append(wcalc.call_weather_service(point['lat'],point['lon'],point['time'],point['distance'],req_tzinfo))
+        results.append(wcalc.call_weather_service(point['lat'],point['lon'],point['time'],point['distance'],req_tzinfo,
+                                                  point['bearing']))
     return jsonify({'forecast':results})
 
 # run the app.

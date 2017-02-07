@@ -86,7 +86,7 @@ class ControlPoint extends React.Component {
                 <td><input style={{'fontSize':'90%','width':'100%','padding':'2px 4px 1px 0px'}}
                             value={this.props.fields['arrival']} readOnly tabIndex='-1' type="text"/></td>
                 {this.props.displayBanked?banked_time:null}
-                <td><Button onClick={() => this.props.removeRow(this.props.index)} tabIndex="-1"><Glyphicon glyph="minus-sign"></Glyphicon></Button></td>
+                <td><Button onClick={() => this.props.removeRow(this.props.index)} style={{width:'90%'}} tabIndex="-1"><Glyphicon glyph="minus-sign"></Glyphicon></Button></td>
             </tr>
         );
     }
@@ -155,13 +155,13 @@ class ControlPoints extends React.Component {
         return (
             <div className="controlPoints">
                 <ButtonToolbar style={{paddingTop:'11px',paddingLeft:'4px'}}>
-                <ButtonGroup style={{display:'flex'}}>
-                    <Button onClick={this.addControl} style={{float:'left',height:'34px'}}><Glyphicon glyph="plus-sign"></Glyphicon>Add control point</Button>
+                <ButtonGroup style={{display:'flex',flexFlow:'row wrap'}}>
+                    <Button onClick={this.addControl} style={{display:'inline-flex',height:'34px'}}><Glyphicon glyph="plus-sign"></Glyphicon>Add control point</Button>
                      <Checkbox checked={this.state.displayBankedTime} inline
                        onChange={this.toggleDisplayBanked}
                      onClick={this.toggleDisplayBanked}
-                     style={{padding:'7px 0px 0px 28px','textAlign':'center',float:'right', display:'flex',width: '170px',height:'28px'}}>Display banked time</Checkbox>
-                    <FormGroup controlId="finishTime" style={{display:'flex'}}>
+                     style={{padding:'7px 0px 0px 28px','textAlign':'center',float:'right', display:'inline-flex',width: '170px',height:'28px'}}>Display banked time</Checkbox>
+                    <FormGroup controlId="finishTime" style={{display:'inline-flex'}}>
                         <ControlLabel style={{width:'8em',display:'flex',float:'right',marginTop:'7px',paddingLeft:'8px'}}>Finish time</ControlLabel>
                         <FormControl type="text" style={{width:'12em',float:'right',marginTop:'2px',marginBotton:'0px',paddingLeft:'4px',paddingTop:'2px',height:'28px'}} value={this.props.finishTime}/>
                     </FormGroup>

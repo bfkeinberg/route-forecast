@@ -9,6 +9,7 @@ class ForecastTable extends React.Component {
     }
 
     static expandTable(forecast) {
+        const redText = ({color:'red'});
         if (forecast.length > 0 && forecast[0].length > 5) {
             return (
                 <tbody>
@@ -21,7 +22,7 @@ class ForecastTable extends React.Component {
                         <td>{point[3]}</td>
                         <td>{point[4]}</td>
                         <td>{point[5]}</td>
-                        <td>{point[6]}</td>
+                        <td style={point[11]>90?redText:null}>{point[6]}</td>
                     </tr>
                 )}
                 </tbody>

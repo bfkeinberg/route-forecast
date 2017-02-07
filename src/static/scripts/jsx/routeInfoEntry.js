@@ -267,7 +267,7 @@ class RouteInfoForm extends React.Component {
 
         const header = (<div style={{textAlign:"center",'fontSize':'99%'}}>Forecast and time estimate</div>);
         return (
-                <div style={{display:'flex',flexFlow:'row wrap',justifyContent:'space-between',alignItems:'center',alignContent:'space-between'}}>
+                <div style={{display:'flex',flexFlow:'row wrap',justifyContent:'space-between',alignItems:'center',alignContent:'space-between',margin:'10px'}}>
                 <Panel style={{marginBottom:'0'}} header={header}>
                 <Form inline id="forecast_form">
                     <FormGroup style={{flex:'1',display:'inline-flex',alignItems:'center'}} controlId="starting_time">
@@ -284,14 +284,14 @@ class RouteInfoForm extends React.Component {
                             dateFormat: 'Y-m-d\TH:i'
                         }}/>
                     </FormGroup>
-                    <FormGroup bsSize='small' controlId="interval" style={{flex:'1',display:'inline-flex',alignItems:'center'}}>
+                    <FormGroup bsSize='small' controlId="interval" style={{flex:'1',display:'inline-flex',marginTop:'5px',marginBottom:'5px'}}>
                         <ControlLabel>Interval in hours</ControlLabel>
                         <OverlayTrigger placement='bottom' overlay={interval_tooltip}>
                             <FormControl type="number" min={0.5} max={2} step={0.5} name="interval" style={{'width':'5em'}}
                                          value={this.state.interval} onChange={this.intervalChanged}/>
                         </OverlayTrigger>
                     </FormGroup>
-                    <FormGroup style={{flex:'1',display:'inline-flex',alignItems:'center'}} controlId="pace">
+                    <FormGroup style={{flex:'1',display:'inline-flex',marginTop:'5px',marginBottom:'5px'}} controlId="pace">
                         <ControlLabel>Pace</ControlLabel>
                         <OverlayTrigger placement="bottom" overlay={pace_tooltip}>
                             <FormControl componentClass="select" value={this.state.pace} name="pace"
@@ -309,19 +309,19 @@ class RouteInfoForm extends React.Component {
                             </FormControl>
                         </OverlayTrigger>
                     </FormGroup>
-                    <a style={{padding:'8px',display:'inline-flex',alignItems:'center'}} href="https://westernwheelersbicycleclub.wildapricot.org/page-1374754" target="_blank">Pace explanation</a>
+                    <a style={{padding:'8px',display:'inline-flex',marginTop:'5px',marginBottom:'5px'}} href="https://westernwheelersbicycleclub.wildapricot.org/page-1374754" target="_blank">Pace explanation</a>
                     <HelpBlock style={{flex:'1',display:'inline-flex'}} bsClass='help-block hidden-xs hidden-sm'>Upload a .gpx file describing your route</HelpBlock>
                     <FormGroup bsSize='small'
                                bsClass='formGroup hidden-xs hidden-sm'
                                validationState={this.decideValidationStateFor('gpx',this.state.errorSource,this.state.succeeded)}
-                               style={{display:'inline-flex',alignItems:'center'}}
+                               style={{display:'inline-flex',marginTop:'5px',marginBottom:'5px'}}
                                controlId="route">
                         <ControlLabel>Route file</ControlLabel>
                         <FormControl type="file" name='route' accept=".gpx" id='route' onChange={this.updateRouteFile}/>
                     </FormGroup>
                     <FormGroup
                         validationState={this.decideValidationStateFor('rwgps',this.state.errorSource,this.state.succeeded)}
-                        controlId="ridewithgps" style={{flex:'1',display:'inline-flex',alignItems:'center'}}>
+                        controlId="ridewithgps" style={{flex:'1',display:'inline-flex',marginTop:'5px',marginBottom:'5px'}}>
                         <ControlLabel>RideWithGps route number</ControlLabel>
                         <OverlayTrigger placement="bottom" overlay={rwgps_enabled_tooltip}>
                             <FormControl type="text"

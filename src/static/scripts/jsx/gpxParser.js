@@ -101,6 +101,7 @@ class AnalyzeRoute {
         let bounds = {min_latitude:90, min_longitude:180, max_latitude:-90, max_longitude:-180};
         let first = true;
         let previousPoint = null;
+        let forecastPoint = null;
         let accumulatedDistanceKm = 0;
         let accumulatedClimbMeters = 0;
         let accumulatedTime = 0;
@@ -114,7 +115,7 @@ class AnalyzeRoute {
             let point = {'lat':trackPoint['y'],'lon':trackPoint['x'],'elevation':trackPoint['e']};
             bounds = this.setMinMaxCoords(point,bounds);
             if (first) {
-                forecastRequests.push(this.addToForecast(point, startTime, accumulatedTime,accumulatedDistanceKm*0.62137));
+                forecastRequests.push(this.addToForecast(point, forecastPoint, startTime, accumulatedTime,accumulatedDistanceKm*0.62137));
                 first = false;
             }
             if (previousPoint != null) {
@@ -129,18 +130,30 @@ class AnalyzeRoute {
             idlingTime += addedTime;
             // see if it's time for forecast
             if (((accumulatedTime + idlingTime) - lastTime) >= intervalInHours) {
-                forecastRequests.push(this.addToForecast(point, startTime, (accumulatedTime + idlingTime),accumulatedDistanceKm*0.62137));
+                forecastRequests.push(this.addToForecast(point, forecastPoint, startTime, (accumulatedTime + idlingTime),accumulatedDistanceKm*0.62137));
                 lastTime = accumulatedTime + idlingTime;
+                forecastPoint = point;
             }
             previousPoint = point;
         }
         if (previousPoint != null && accumulatedTime != 0) {
-            forecastRequests.push(this.addToForecast(previousPoint, startTime, (accumulatedTime + idlingTime),accumulatedDistanceKm*0.62137));
+            forecastRequests.push(this.addToForecast(previousPoint, forecastPoint, startTime, (accumulatedTime + idlingTime),accumulatedDistanceKm*0.62137));
         }
         let finishTime = this.formatFinishTime(startTime,accumulatedTime,idlingTime);
         this.fillLastControlPoint(finishTime,controls,this.nextControl);
         return {forecast:forecastRequests,points:this.pointsInRoute,name:trackName,controls:controls,bounds:bounds,
             finishTime: finishTime};
+    }
+
+    getRelativeBearing(point1,point2) {
+        const degreesToRadians = Math.PI / 180;
+        let φ1 = point1.lat * degreesToRadians;
+        let φ2 = point2.lat * degreesToRadians;
+        let λ1 = point1.lon * degreesToRadians;
+        let λ2 = point2.lon * degreesToRadians;
+        let x = Math.cos(φ1)*Math.sin(φ2) - Math.sin(φ1)*Math.cos(φ2)*Math.cos(λ2-λ1);
+        let y = Math.sin(λ2-λ1) * Math.cos(φ2);
+        return Math.atan2(y, x) / degreesToRadians;
     }
 
     fillLastControlPoint(finishTime,controls,nextControl) {
@@ -172,6 +185,7 @@ class AnalyzeRoute {
         let bounds = {min_latitude:90, min_longitude:180, max_latitude:-90, max_longitude:-180};
         let first = true;
         let previousPoint = null;
+        let forecastPoint = null;
         let accumulatedDistanceKm = 0;
         let accumulatedClimbMeters = 0;
         let accumulatedTime = 0;
@@ -186,7 +200,7 @@ class AnalyzeRoute {
                 for (let point of segment) {
                     bounds = this.setMinMaxCoords(point,bounds);
                     if (first) {
-                        forecastRequests.push(this.addToForecast(point, startTime, accumulatedTime,accumulatedDistanceKm*0.62137));
+                        forecastRequests.push(this.addToForecast(point, forecastPoint, startTime, accumulatedTime,accumulatedDistanceKm*0.62137));
                         first = false;
                     }
                     if (previousPoint != null) {
@@ -201,15 +215,16 @@ class AnalyzeRoute {
                     idlingTime += addedTime;
                     // see if it's time for forecast
                     if (((accumulatedTime + idlingTime) - lastTime) >= intervalInHours) {
-                        forecastRequests.push(this.addToForecast(point, startTime, (accumulatedTime + idlingTime),accumulatedDistanceKm*0.62137));
+                        forecastRequests.push(this.addToForecast(point, forecastPoint, startTime, (accumulatedTime + idlingTime),accumulatedDistanceKm*0.62137));
                         lastTime = accumulatedTime + idlingTime;
+                        forecastPoint = point;
                     }
                     previousPoint = point;
                 }
             }
         }
         if (previousPoint != null && accumulatedTime != 0) {
-            forecastRequests.push(this.addToForecast(previousPoint, startTime, (accumulatedTime + idlingTime),accumulatedDistanceKm*0.62137));
+            forecastRequests.push(this.addToForecast(previousPoint, forecastPoint, startTime, (accumulatedTime + idlingTime),accumulatedDistanceKm*0.62137));
         }
         let finishTime = this.formatFinishTime(startTime,accumulatedTime,idlingTime);
         this.fillLastControlPoint(finishTime,controls,this.nextControl);
@@ -271,9 +286,13 @@ class AnalyzeRoute {
         return bounds;
     }
 
-    addToForecast(trackPoint, currentTime, elapsedTimeInHours, distance) {
+    addToForecast(trackPoint, earlierTrackPoint, currentTime, elapsedTimeInHours, distance) {
+        let bearing = null;
+        if (earlierTrackPoint != null) {
+            bearing = this.getRelativeBearing(earlierTrackPoint,trackPoint);
+        }
         return {lat:trackPoint.lat,lon:trackPoint.lon,distance:Math.round(distance),
-            time:moment(currentTime).add(elapsedTimeInHours,'hours').format('YYYY-MM-DDTHH:mm:00ZZ')};
+            time:moment(currentTime).add(elapsedTimeInHours,'hours').format('YYYY-MM-DDTHH:mm:00ZZ'),bearing:bearing};
     }
 
     parseRoute(gpxFile) {
