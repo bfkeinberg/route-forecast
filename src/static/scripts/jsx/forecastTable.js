@@ -10,6 +10,8 @@ class ForecastTable extends React.Component {
 
     static expandTable(forecast) {
         const redText = ({color:'red'});
+        const orange = ({color:'darkOrange'});
+        const skyBlue = ({color:'deepSkyBlue'});
         if (forecast.length > 0 && forecast[0].length > 5) {
             return (
                 <tbody>
@@ -22,7 +24,7 @@ class ForecastTable extends React.Component {
                         <td>{point[3]}</td>
                         <td>{point[4]}</td>
                         <td>{point[5]}</td>
-                        <td style={point[11]>90?redText:null}>{point[6]}</td>
+                        <td style={point[11]<90?(Math.cos((Math.PI / 180)*point[11])*parseInt(point[6])>10?redText:orange):skyBlue}>{point[6]}</td>
                     </tr>
                 )}
                 </tbody>
