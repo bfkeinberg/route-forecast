@@ -167,8 +167,8 @@ class ControlPoints extends React.Component {
                     </FormGroup>
                 </ButtonGroup>
                 </ButtonToolbar>
-                <Panel header={title} bsStyle="info">
-                    <Table condensed bordered striped hover fill>
+                <Panel header={title} bsStyle="info" style={{margin:'5px'}}>
+                    <Table responsive condensed bordered striped hover fill>
                         <thead>
                         <tr>
                             <th style={{'fontSize':'80%','width':'22%'}}>Name</th>
