@@ -149,8 +149,10 @@ class RouteInfoForm extends React.Component {
     }
 
     setQueryString(state) {
-        let query = {start:this.state.start,pace:this.state.pace,interval:this.state.interval,rwgpsRoute:this.state.rwgpsRoute};
-        history.pushState(null, 'nothing', location.origin + '?' + queryString.stringify(query));
+        if (state.rwgpsRoute != '') {
+            let query = {start:state.start,pace:state.pace,interval:state.interval,rwgpsRoute:state.rwgpsRoute};
+            history.pushState(null, 'nothing', location.origin + '?' + queryString.stringify(query));
+        }
     }
 
     forecastCb(event) {
