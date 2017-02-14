@@ -55,7 +55,8 @@ class RouteInfoForm extends React.Component {
             xmlhttp : null, routeFileSet:false,
             rwgpsRoute:props.rwgpsRoute==null?'':props.rwgpsRoute, errorDetails:null,
             pending:false, parser:new AnalyzeRoute(this.setErrorState),
-            paramsChanged:false, rwgpsRouteIsTrip:false, errorSource:null,succeeded:null,routeUpdating:false};
+            paramsChanged:false, rwgpsRouteIsTrip:false, errorSource:null, succeeded:null, routeUpdating:false,
+            fetchAfterLoad : false};
     }
 
     static findNextStartTime(start) {
@@ -75,7 +76,8 @@ class RouteInfoForm extends React.Component {
     componentDidMount() {
         if (this.state.rwgpsRoute != '') {
             this.state.parser.loadRwgpsRoute(this.state.rwgpsRoute,this.state.rwgpsRouteIsTrip);
-            this.setState({'routeUpdating':true});
+            this.setState({routeUpdating:true});
+            this.setState({fetchAfterLoad:true});
         }
     }
 
@@ -153,6 +155,9 @@ class RouteInfoForm extends React.Component {
             let query = {start:state.start,pace:state.pace,interval:state.interval,rwgpsRoute:state.rwgpsRoute};
             history.pushState(null, 'nothing', location.origin + '?' + queryString.stringify(query));
         }
+        else {
+            history.pushState(null, 'nothing', location.origin);
+        }
     }
 
     forecastCb(event) {
@@ -189,7 +194,11 @@ class RouteInfoForm extends React.Component {
                 this.setState({routeFileSet:false,succeeded:false})
             }
         } else {
-            this.setState({errorDetails:errorDetails,errorSource:null,routeUpdating:false,succeeded:true});
+            if (this.state.fetchAfterLoad) {
+                this.requestForecast();
+            }
+            this.setState({errorDetails:errorDetails,errorSource:null,routeUpdating:false,succeeded:true,fetchAfterLoad:false});
+
         }
     }
 
