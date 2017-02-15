@@ -12,6 +12,7 @@ require('!style!css!bootstrap/dist/css/bootstrap.min.css');
 require('!style!css!normalize.css/normalize.css');
 require('!style!css!@blueprintjs/core/dist/blueprint.css');
 require('!style!css!@blueprintjs/datetime/dist/blueprint-datetime.css');
+const queryString = require('query-string');
 
 class RouteWeatherUI extends React.Component {
 
@@ -39,6 +40,7 @@ class RouteWeatherUI extends React.Component {
     }
 
     render() {
+        let queryParams = queryString.parse(location.search);
         const inputForm = (
             <RouteInfoForm action={this.state.action}
                            updateRouteInfo={this.updateRouteInfo}
@@ -46,6 +48,10 @@ class RouteWeatherUI extends React.Component {
                            controlPoints={this.state.controlPoints}
                            formVisible={this.state.formVisible}
                            updateFormVisibility={this.updateFormVisibility}
+                           start={queryParams.start}
+                           pace={queryParams.pace}
+                           interval={queryParams.interval}
+                           rwgpsRoute={queryParams.rwgpsRoute}
             />
         );
         const formButton = (

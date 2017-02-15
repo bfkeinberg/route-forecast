@@ -44,7 +44,7 @@ def inject_api_keys():
 
 @application.route('/')
 def hello():
-    return redirect(url_for('form'))
+    return render_template('form.html')
 
 
 @application.errorhandler(500)

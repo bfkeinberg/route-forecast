@@ -6,7 +6,7 @@ import moment from 'moment';
 import React, { Component } from 'react';
 import Flatpickr from 'react-flatpickr'
 import AnalyzeRoute from './gpxParser';
-let MediaQuery = require('react-responsive');
+const queryString = require('query-string');
 
 require('!style!css!flatpickr/dist/themes/confetti.css');
 
@@ -50,13 +50,19 @@ class RouteInfoForm extends React.Component {
         this.calculateTimeAndDistance = this.calculateTimeAndDistance.bind(this);
         this.controlPoints = [];
         this.forecastRequest = null;
-        this.state = {start:RouteInfoForm.findNextStartTime(), pace:'D', interval:1,
-            xmlhttp : null, routeFileSet:false,rwgpsRoute:'', errorDetails:null,
+        this.state = {start:RouteInfoForm.findNextStartTime(props.start),
+            pace:props.pace==null?'D':props.pace, interval:props.interval==null?1:props.interval,
+            xmlhttp : null, routeFileSet:false,
+            rwgpsRoute:props.rwgpsRoute==null?'':props.rwgpsRoute, errorDetails:null,
             pending:false, parser:new AnalyzeRoute(this.setErrorState),
-            paramsChanged:false, rwgpsRouteIsTrip:false, errorSource:null,succeeded:null,routeUpdating:false};
+            paramsChanged:false, rwgpsRouteIsTrip:false, errorSource:null, succeeded:null, routeUpdating:false,
+            fetchAfterLoad : false};
     }
 
-    static findNextStartTime() {
+    static findNextStartTime(start) {
+        if (start != null) {
+            return new Date(start);
+        }
         let now = new Date();
         if (now.getHours() > startHour) {
             now.setDate(now.getDate() + 1);
@@ -65,6 +71,14 @@ class RouteInfoForm extends React.Component {
             now.setSeconds(0);
         }
         return now;
+    }
+
+    componentDidMount() {
+        if (this.state.rwgpsRoute != '') {
+            this.state.parser.loadRwgpsRoute(this.state.rwgpsRoute,this.state.rwgpsRouteIsTrip);
+            this.setState({routeUpdating:true});
+            this.setState({fetchAfterLoad:true});
+        }
     }
 
     copyControls(controlPoints) {
@@ -103,12 +117,13 @@ class RouteInfoForm extends React.Component {
     }
 
     updateRouteFile(event) {
-        this.setState({routeFileSet : event.target.value != '',routeUpdating:true});
+        this.setState({routeFileSet : event.target.value != '',routeUpdating:true, fetchAfterLoad:false});
         let fileControl = event.target;
         let gpxFiles = fileControl.files;
         if (gpxFiles.length > 0) {
             this.state.parser.parseRoute(gpxFiles[0]);
             this.setState({rwgpsRoute:''});
+            history.pushState(null, 'nothing', location.origin);
         }
     }
 
@@ -136,11 +151,22 @@ class RouteInfoForm extends React.Component {
         this.setState({pending:true,showForm:false});
     }
 
+    setQueryString(state) {
+        if (state.rwgpsRoute != '') {
+            let query = {start:state.start,pace:state.pace,interval:state.interval,rwgpsRoute:state.rwgpsRoute};
+            history.pushState(null, 'nothing', location.origin + '?' + queryString.stringify(query));
+        }
+        else {
+            history.pushState(null, 'nothing', location.origin);
+        }
+    }
+
     forecastCb(event) {
         if (this.state.xmlhttp.readyState == 4) {
             this.setState({pending:false});
             if (event.target.status==200) {
                 this.setState({errorDetails:null,succeeded:true});
+                this.setQueryString(this.state);
                 if (event.target.response == null) {
                     console.log('missing response');
                     return;
@@ -169,14 +195,17 @@ class RouteInfoForm extends React.Component {
                 this.setState({routeFileSet:false,succeeded:false})
             }
         } else {
-            this.setState({errorDetails:errorDetails,errorSource:null,routeUpdating:false,succeeded:true});
+            if (this.state.fetchAfterLoad) {
+                this.requestForecast();
+            }
+            this.setState({errorDetails:errorDetails,errorSource:null,routeUpdating:false,succeeded:true,fetchAfterLoad:false});
+
         }
     }
 
     disableSubmit() {
         return !this.state.parser.routeIsLoaded();
-        // return this.state.rwgpsRoute=='' && !this.state.routeFileSet;
-    }
+     }
 
     intervalChanged(event) {
         if (event.target.value != '') {
