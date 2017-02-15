@@ -117,12 +117,13 @@ class RouteInfoForm extends React.Component {
     }
 
     updateRouteFile(event) {
-        this.setState({routeFileSet : event.target.value != '',routeUpdating:true});
+        this.setState({routeFileSet : event.target.value != '',routeUpdating:true, fetchAfterLoad:false});
         let fileControl = event.target;
         let gpxFiles = fileControl.files;
         if (gpxFiles.length > 0) {
             this.state.parser.parseRoute(gpxFiles[0]);
             this.setState({rwgpsRoute:''});
+            history.pushState(null, 'nothing', location.origin);
         }
     }
 
