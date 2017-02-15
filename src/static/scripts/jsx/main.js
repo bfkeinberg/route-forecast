@@ -13,6 +13,7 @@ require('!style!css!normalize.css/normalize.css');
 require('!style!css!@blueprintjs/core/dist/blueprint.css');
 require('!style!css!@blueprintjs/datetime/dist/blueprint-datetime.css');
 const queryString = require('query-string');
+import cookie from 'react-cookie';
 
 class RouteWeatherUI extends React.Component {
 
@@ -29,10 +30,22 @@ class RouteWeatherUI extends React.Component {
 
     updateControls(controlPoints) {
         this.setState({controlPoints: controlPoints})
+        if (this.state.routeInfo.name != '') {
+            cookie.save(this.state.routeInfo.name,JSON.stringify(controlPoints));
+        }
     }
 
     updateRouteInfo(routeInfo,controlPoints) {
-        this.setState({routeInfo:routeInfo,controlPoints:controlPoints});
+        if (this.state.routeInfo.name != routeInfo.name) {
+            let savedControlPoints = cookie.load(routeInfo.name);
+            if (savedControlPoints != null && savedControlPoints.length > 0) {
+                controlPoints = savedControlPoints;
+            }
+        }
+        if (routeInfo.name != '') {
+            cookie.save(routeInfo.name,JSON.stringify(controlPoints));
+        }
+        this.setState({'routeInfo':routeInfo,'controlPoints':controlPoints});
     }
 
     updateForecast(forecast) {

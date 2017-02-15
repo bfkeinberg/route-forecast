@@ -103,7 +103,7 @@ class RouteInfoForm extends React.Component {
     componentWillReceiveProps(nextProps) {
         let controlsEqual = this.compareControls(this.controlPoints,nextProps.controlPoints);
         if (!controlsEqual && this.state.parser.routeIsLoaded()) {
-            this.calculateTimeAndDistance(null);
+            this.calculateTimeAndDistance(nextProps);
         }
     }
 
@@ -111,26 +111,26 @@ class RouteInfoForm extends React.Component {
         if (this.state.paramsChanged) {
             this.setState({paramsChanged:false});
             if (this.state.parser.routeIsLoaded()) {
-                this.calculateTimeAndDistance(null);
+                this.calculateTimeAndDistance(this.props);
             }
         }
     }
 
     updateRouteFile(event) {
-        this.setState({routeFileSet : event.target.value != '',routeUpdating:true, fetchAfterLoad:false});
         let fileControl = event.target;
         let gpxFiles = fileControl.files;
+        this.setState({routeFileSet : event.target.value != '', fetchAfterLoad:false});
         if (gpxFiles.length > 0) {
             this.state.parser.parseRoute(gpxFiles[0]);
-            this.setState({rwgpsRoute:''});
+            this.setState({rwgpsRoute:'',routeUpdating:true});
             history.pushState(null, 'nothing', location.origin);
         }
     }
 
-    calculateTimeAndDistance() {
+    calculateTimeAndDistance(props) {
         this.controlPoints = this.copyControls(this.props.controlPoints);
         let routeInfo = this.state.parser.walkRoute(moment(this.state.start),-new Date().getTimezoneOffset(),
-            this.state.pace, parseFloat(this.state.interval),this.props.controlPoints);
+            this.state.pace, parseFloat(this.state.interval),props.controlPoints);
         this.props.updateRouteInfo({bounds:routeInfo['bounds'],points:routeInfo['points'],
             name:routeInfo['name'],finishTime:routeInfo['finishTime']}, routeInfo['controls']);
         this.forecastRequest = routeInfo['forecast'];
@@ -138,7 +138,7 @@ class RouteInfoForm extends React.Component {
 
     requestForecast(event) {
         if (this.forecastRequest == null) {
-            this.calculateTimeAndDistance();
+            this.calculateTimeAndDistance(this.props);
         }
         this.state.xmlhttp = new XMLHttpRequest();
         this.state.xmlhttp.onreadystatechange = this.forecastCb;
@@ -197,6 +197,9 @@ class RouteInfoForm extends React.Component {
         } else {
             if (this.state.fetchAfterLoad) {
                 this.requestForecast();
+            }
+            else {
+                this.calculateTimeAndDistance(this.props);
             }
             this.setState({errorDetails:errorDetails,errorSource:null,routeUpdating:false,succeeded:true,fetchAfterLoad:false});
 
