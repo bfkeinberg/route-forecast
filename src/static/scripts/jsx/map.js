@@ -8,12 +8,13 @@ class RouteForecastMap extends Component {
         super(props);
         this.initMap = this.initMap.bind(this);
         this.map = null;
+        this.markers = [];
         this.state = {googleMapsApi:null, googleMapsPromise: loadGoogleMapsAPI({key:this.props.maps_api_key})};
     }
 
     static addMarker(latitude, longitude, map, value, title) {
     // Add the marker at the specified location
-        let marker = new google.maps.Marker({
+        return new google.maps.Marker({
             position: {lat:latitude,lng:longitude},
             label: value.toString(),
             map: map,
@@ -33,7 +34,12 @@ class RouteForecastMap extends Component {
         routeLine.setMap(map);
     }
 
-    static addMarkers(forecast,map) {
+    static clearMarkers(markers) {
+        markers.forEach(marker => marker.setMap(null));
+        markers.length = 0;
+    }
+
+    static addMarkers(forecast, map, markers) {
         return (
             forecast.map((point, index, data) =>
                 RouteForecastMap.addMarker(point[7], point[8], map, point[9], point[10])
@@ -49,7 +55,8 @@ class RouteForecastMap extends Component {
         let northEast = { lat:routeInfo['bounds']['max_latitude'], lng:routeInfo['bounds']['max_longitude'] };
         let mapBounds = new google.maps.LatLngBounds(southWest,northEast);
         this.map.fitBounds(mapBounds);
-        RouteForecastMap.addMarkers(forecast,this.map);
+        RouteForecastMap.clearMarkers(this.markers);
+        this.markers = RouteForecastMap.addMarkers(forecast, this.map, this.markers);
         let routePoints = routeInfo['points'].map((point) => {return {lat:point.latitude, lng: point.longitude}});
         this.drawRoute(routePoints,this.map)
     };
