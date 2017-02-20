@@ -9,6 +9,7 @@ class RouteForecastMap extends Component {
         this.initMap = this.initMap.bind(this);
         this.map = null;
         this.markers = [];
+        this.routePath = null;
         this.state = {googleMapsApi:null, googleMapsPromise: loadGoogleMapsAPI({key:this.props.maps_api_key})};
     }
 
@@ -32,6 +33,7 @@ class RouteForecastMap extends Component {
         });
 
         routeLine.setMap(map);
+        return routeLine;
     }
 
     static clearMarkers(markers) {
@@ -58,7 +60,11 @@ class RouteForecastMap extends Component {
         RouteForecastMap.clearMarkers(this.markers);
         this.markers = RouteForecastMap.addMarkers(forecast, this.map, this.markers);
         let routePoints = routeInfo['points'].map((point) => {return {lat:point.latitude, lng: point.longitude}});
-        this.drawRoute(routePoints,this.map)
+        if (this.routePath != null) {
+            this.routePath.setMap(null);
+            this.routePath = null;
+        }
+        this.routePath = this.drawRoute(routePoints,this.map);
     };
 
     drawTheMap(gmaps,forecast,routeInfo) {
