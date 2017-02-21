@@ -137,6 +137,10 @@ class RouteInfoForm extends React.Component {
     }
 
     requestForecast(event) {
+        if (!this.state.parser.routeIsLoaded()) {
+            this.setState({fetchAfterLoad:true});
+            return;
+        }
         if (this.forecastRequest == null) {
             this.calculateTimeAndDistance(this.props);
         }
@@ -207,7 +211,7 @@ class RouteInfoForm extends React.Component {
     }
 
     disableSubmit() {
-        return !this.state.parser.routeIsLoaded();
+        return (this.state.rwgpsRoute == '' && !this.state.routeFileSet);
      }
 
     intervalChanged(event) {

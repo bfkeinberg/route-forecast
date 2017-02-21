@@ -60,6 +60,7 @@ class RouteForecastMap extends Component {
         RouteForecastMap.clearMarkers(this.markers);
         this.markers = RouteForecastMap.addMarkers(forecast, this.map, this.markers);
         let routePoints = routeInfo['points'].map((point) => {return {lat:point.latitude, lng: point.longitude}});
+        // clear out old route path line if any
         if (this.routePath != null) {
             this.routePath.setMap(null);
             this.routePath = null;
