@@ -17,6 +17,7 @@ class AnalyzeRoute {
         this.analyzeGpxRoute = this.analyzeGpxRoute.bind(this);
         this.rwgpsRouteCallback = this.rwgpsRouteCallback.bind(this);
         this.rwgpsErrorCallback = this.rwgpsErrorCallback.bind(this);
+        this.clear = this.clear.bind(this);
         this.reader.onload = this.fileDataRead;
         this.reader.onerror = function(event) {
             console.error("File could not be read! Code " + event.target.error.code);
@@ -26,6 +27,11 @@ class AnalyzeRoute {
         this.gpxResult = null;
         this.isTrip = false;
         this.setErrorStateCallback = options;
+    }
+
+    clear() {
+        this.rwgpsRouteData = null;
+        this.gpxResult = null;
     }
 
     routeIsLoaded() {

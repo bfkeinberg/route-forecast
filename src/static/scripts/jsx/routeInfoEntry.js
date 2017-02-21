@@ -253,6 +253,7 @@ class RouteInfoForm extends React.Component {
 
     setRwgpsRoute(event) {
         this.setState({rwgpsRoute : event.target.value});
+        this.state.parser.clear();
     }
 
     isNumberKey(evt) {
