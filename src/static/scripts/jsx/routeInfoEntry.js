@@ -168,6 +168,7 @@ class RouteInfoForm extends React.Component {
     forecastCb(event) {
         if (this.state.xmlhttp.readyState == 4) {
             this.setState({pending:false});
+            this.forecastRequest = null;
             if (event.target.status==200) {
                 this.setState({errorDetails:null,succeeded:true});
                 this.setQueryString(this.state);
