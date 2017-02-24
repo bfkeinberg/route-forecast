@@ -30,6 +30,8 @@ const rwgps_trip_tooltip = (
 );
 
 const startHour = 7;
+const defaultPace = 'D';
+const defaultIntervalInHours = 1;
 
 class RouteInfoForm extends React.Component {
 
@@ -51,7 +53,7 @@ class RouteInfoForm extends React.Component {
         this.controlPoints = [];
         this.forecastRequest = null;
         this.state = {start:RouteInfoForm.findNextStartTime(props.start),
-            pace:props.pace==null?'D':props.pace, interval:props.interval==null?1:props.interval,
+            pace:props.pace==null?defaultPace:props.pace, interval:props.interval==null?defaultIntervalInHours:props.interval,
             xmlhttp : null, routeFileSet:false,
             rwgpsRoute:props.rwgpsRoute==null?'':props.rwgpsRoute, errorDetails:null,
             pending:false, parser:new AnalyzeRoute(this.setErrorState),
@@ -102,6 +104,10 @@ class RouteInfoForm extends React.Component {
 
     componentWillReceiveProps(nextProps) {
         let controlsEqual = this.compareControls(this.controlPoints,nextProps.controlPoints);
+        this.setState({interval:this.props.interval==null?defaultIntervalInHours:this.props.interval,
+            interval:this.props.interval==null?defaultIntervalInHours:this.props.interval,
+            pace:this.props.pace==null?defaultPace:this.props.pace,
+            rwgpsRoute:this.props.rwgpsRoute==null?'':this.props.rwgpsRoute})
         if (!controlsEqual && this.state.parser.routeIsLoaded()) {
             this.calculateTimeAndDistance(nextProps);
         }
