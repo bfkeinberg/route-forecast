@@ -13,12 +13,20 @@ class RouteForecastMap extends Component {
         this.state = {googleMapsApi:null, googleMapsPromise: loadGoogleMapsAPI({key:this.props.maps_api_key})};
     }
 
-    static addMarker(latitude, longitude, map, value, title) {
+    static addMarker(latitude, longitude, map, value, title, isRainy) {
     // Add the marker at the specified location
+        let markerIcon = {
+                url: "http://cdn.mysitemyway.com/etc-mysitemyway/icons/legacy-previews/icons/blue-chrome-rain-icons-natural-wonders/050175-blue-chrome-rain-icon-natural-wonders-rain-cloud1.png",
+                size: new google.maps.Size(320, 320),
+                scaledSize: new google.maps.Size(45, 50),
+                labelOrigin: new google.maps.Point(22,18),
+                anchor: new google.maps.Point(0, 0)
+        };
         return new google.maps.Marker({
             position: {lat:latitude,lng:longitude},
             label: value.toString(),
             map: map,
+            icon: isRainy?markerIcon:null,
             title: title
         });
     }
@@ -44,7 +52,7 @@ class RouteForecastMap extends Component {
     static addMarkers(forecast, map, markers) {
         return (
             forecast.map((point, index, data) =>
-                RouteForecastMap.addMarker(point[7], point[8], map, point[9], point[10])
+                RouteForecastMap.addMarker(point[7], point[8], map, point[9], point[10], point[12])
             )
         );
     }

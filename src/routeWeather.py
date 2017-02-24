@@ -24,7 +24,7 @@ class WeatherCalculator:
 
     paceToSpeed = {'A': 10, 'B': 12, 'C': 14, 'C+': 15, 'D-': 15, 'D': 16, 'D+': 17, 'E-': 17, 'E': 18}
 
-    def __init__(self):
+    def __init__(self,session):
         self.min_latitude = 90
         self.min_longitude = 180
         self.max_latitude = -90
@@ -35,6 +35,7 @@ class WeatherCalculator:
         self.next_control = None
         self.pointsInRoute = None
         self.logger = logging.getLogger('WeatherCalculator')
+        self.session = session
         logging.basicConfig(level=logging.INFO)
 
     def is_error(self):
@@ -203,7 +204,7 @@ class WeatherCalculator:
         key = os.getenv('DARKSKY_API_KEY')
         url = "https://api.darksky.net/forecast/{}/{},{},{}?exclude=hourly,daily,flags".format(key, lat, lon, current_time)
         headers = {"Accept-Encoding": "gzip"}
-        response = requests.get(url=url, headers=headers)
+        response = self.session.get(url=url, headers=headers)
         # if True: #response.status_code == 200:
         if response.status_code == 200:
             # current_forecast = {u'ozone': 310.21, u'temperature': 53.32, u'icon': u'partly-cloudy-day', u'dewPoint': 45.71, u'humidity': 0.75, u'visibility': 10, u'summary': u'Partly Cloudy', u'apparentTemperature': 53.32, u'pressure': 1027.3, u'windSpeed': 4.65, u'cloudCover': 0.37, u'time': 1485391860, u'windBearing': 290, u'precipIntensity': 0, u'precipProbability': 0}
@@ -211,6 +212,7 @@ class WeatherCalculator:
             now = datetime.fromtimestamp(current_forecast['time'], zone)
             has_wind = 'windSpeed' in current_forecast
             relative_bearing = self.get_bearing_difference(bearing, current_forecast['windBearing']) if has_wind and bearing != None else None
+            rainy = 'icon' in current_forecast and current_forecast['icon'] == 'rain'
             self.logger.info('%s %f,%f %s', now, lat, lon, current_forecast)
             return (now.strftime("%-I:%M%p"), distance, current_forecast['summary'],
                     str(int(round(current_forecast['temperature'])))+'F',
@@ -220,8 +222,8 @@ class WeatherCalculator:
                     if 'cloudCover' in current_forecast else '<unavailable>',
                     str(int(round(current_forecast['windSpeed']))) + ' mph'
                     if has_wind else '<unavailable>',
-                    lat, lon, int(round(current_forecast['temperature'])), now.strftime("%c"),
-                    relative_bearing
+                    lat, lon, int(round(current_forecast['temperature'])), now.strftime("%a %b %-d %-I:%M%p %Y"),
+                    relative_bearing, rainy
                     )
         else:
             response.raise_for_status()

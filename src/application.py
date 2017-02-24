@@ -144,7 +144,7 @@ def submitted_form():
     with tempfile.NamedTemporaryFile(mode='w+') as local_file:
         local_file.write(contents)
         local_file.flush()
-        wcalc = WeatherCalculator()
+        wcalc = WeatherCalculator(session)
         try:
             forecast = wcalc.calc_weather(float(interval), pace, starting_time=starting_time, tz=timezone,
                                           route=local_file.name, controls=controls)
@@ -175,7 +175,7 @@ def forecast():
         return jsonify({'status': 'Daily count exceeded'}), 400
     else:
         application.weather_request_count += len(forecast_points)
-    wcalc = WeatherCalculator()
+    wcalc = WeatherCalculator(session)
     zone = request.form['timezone']
     offset = long(zone) * 60
     req_tzinfo = dateutil.tz.tzoffset('local', offset)
