@@ -50,6 +50,7 @@ class RouteInfoForm extends React.Component {
         this.setRwgpsRoute = this.setRwgpsRoute.bind(this);
         this.setDateAndTime = this.setDateAndTime.bind(this);
         this.calculateTimeAndDistance = this.calculateTimeAndDistance.bind(this);
+        this.makeFullQueryString = this.makeFullQueryString.bind(this);
         this.controlPoints = [];
         this.forecastRequest = null;
         this.state = {start:RouteInfoForm.findNextStartTime(props.start),
@@ -104,10 +105,6 @@ class RouteInfoForm extends React.Component {
 
     componentWillReceiveProps(nextProps) {
         let controlsEqual = this.compareControls(this.controlPoints,nextProps.controlPoints);
-        this.setState({interval:this.props.interval==null?defaultIntervalInHours:this.props.interval,
-            interval:this.props.interval==null?defaultIntervalInHours:this.props.interval,
-            pace:this.props.pace==null?defaultPace:this.props.pace,
-            rwgpsRoute:this.props.rwgpsRoute==null?'':this.props.rwgpsRoute})
         if (!controlsEqual && this.state.parser.routeIsLoaded()) {
             this.calculateTimeAndDistance(nextProps);
         }
@@ -120,6 +117,21 @@ class RouteInfoForm extends React.Component {
                 this.calculateTimeAndDistance(this.props);
             }
         }
+    }
+
+    urlShortenCallback(event) {
+        // prompt to copy short url to clipboard
+        window.prompt('Shortened URL',event.currentTarget.response['id']);
+        return event.currentTarget.response;
+    }
+
+    shortenUrl(url) {
+        let xmlhttp = new XMLHttpRequest();
+        xmlhttp.responseType = 'json';
+        xmlhttp.addEventListener('load',this.urlShortenCallback);
+        xmlhttp.open('POST','https://www.googleapis.com/urlshortener/v1/url?key='+'AIzaSyAYuBONqQrBidMOwcM22dDUl28iqv22zKM',true);
+        xmlhttp.setRequestHeader('Content-Type','application/json; charset=utf-8"');
+        xmlhttp.send(JSON.stringify({'longUrl':url}));
     }
 
     updateRouteFile(event) {
@@ -159,6 +171,11 @@ class RouteInfoForm extends React.Component {
         formdata.append('timezone',-new Date().getTimezoneOffset());
         this.state.xmlhttp.send(formdata);
         this.setState({pending:true,showForm:false});
+    }
+
+    makeFullQueryString(event) {
+        let query = {start:this.state.start,pace:this.state.pace,interval:this.state.interval,rwgpsRoute:this.state.rwgpsRoute,controlPoints:JSON.stringify(this.props.controlPoints)};
+        this.shortenUrl(location.origin + '?' + queryString.stringify(query));
     }
 
     setQueryString(state) {
@@ -304,6 +321,8 @@ class RouteInfoForm extends React.Component {
             <Tooltip id="forecast_tooltip">Must either upload a gpx file or provide an rwgps route id</Tooltip> ):
             (<Tooltip id="'forecast_tooltip">Request a ride forecast</Tooltip>);
         const now = new Date();
+        // allow us to continue to show the start time if the route was forecast for a time before the present
+        let firstDate = now > this.state.start ? this.state.start : now;
         let later = new Date();
         const daysToAdd = 14;
         later.setDate(now.getDate() + daysToAdd);
@@ -322,7 +341,7 @@ class RouteInfoForm extends React.Component {
                         <Flatpickr onChange={this.setDateAndTime} options={{enableTime: true,
                             altInput: true, altFormat: 'F j, Y h:i K',
                             altInputClass: 'dateDisplay',
-                            minDate: now,
+                            minDate: firstDate,
                             maxDate: later,
                             defaultDate: this.state.start,
                             dateFormat: 'Y-m-d\TH:i'
@@ -363,6 +382,7 @@ class RouteInfoForm extends React.Component {
                         <ControlLabel>Route file</ControlLabel>
                         <FormControl type="file" name='route' accept=".gpx" id='route' onChange={this.updateRouteFile}/>
                     </FormGroup>
+                    {/*<Button style={{marginBottom:'5px',display:'inline-flex'}} onClick={this.makeFullQueryString}>Get URL</Button>*/}
                     <FormGroup
                         validationState={this.decideValidationStateFor('rwgps',this.state.errorSource,this.state.succeeded)}
                         controlId="ridewithgps" style={{flex:'1',display:'inline-flex',marginTop:'5px',marginBottom:'5px'}}>
