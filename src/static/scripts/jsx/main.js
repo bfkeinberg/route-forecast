@@ -23,8 +23,9 @@ class RouteWeatherUI extends React.Component {
         this.updateRouteInfo = this.updateRouteInfo.bind(this);
         this.updateForecast = this.updateForecast.bind(this);
         let script = document.getElementById( "routeui" );
-
-        this.state = {controlPoints: [], routeInfo:{bounds:{},points:[], name:'',finishTime:''}, forecast:[], action:script.getAttribute('action'),
+        let queryParams = queryString.parse(location.search);
+        this.state = {controlPoints: queryParams.controlPoints==null?[]:JSON.parse(queryParams.controlPoints),
+            routeInfo:{bounds:{},points:[], name:'',finishTime:''}, forecast:[], action:script.getAttribute('action'),
             maps_key:script.getAttribute('maps_api_key'),formVisible:true};
     }
 
