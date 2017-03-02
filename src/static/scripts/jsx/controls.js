@@ -47,21 +47,6 @@ class ControlPoint extends React.Component {
                            onBlur={event => this.props.onChange(this.props.index,this.state.fields)}
                            onFocus={event => event.target.select()}
                 /></td>
-                <td><input  style={{'fontSize':'90%','width':'100%','padding':'2px 4px 1px'}}
-                            value={this.state.fields['distance']}
-                            onChange={(event) => this.setState({
-                                fields:
-                                    {
-                                        name:this.state.fields['name'],
-                                        distance: event.target.value,
-                                        duration: this.state.fields['duration'],
-                                        arrival: this.props.fields['arrival'],
-                                        banked: this.props.fields['banked']
-                                    }
-                            })}
-                             onBlur={event => this.props.onChange(this.props.index,this.state.fields)}
-                            onFocus={event => event.target.select()}
-                           type="number"/></td>
                 <td>
                     <InputGroup>
                     <input style={{'fontSize':'90%','width':'100%','padding':'2px 4px 1px'}}
@@ -82,6 +67,22 @@ class ControlPoint extends React.Component {
                             <InputGroup.Addon>min</InputGroup.Addon>
                         </MediaQuery>
                     </InputGroup>
+                </td>
+                <td><input  style={{'fontSize':'90%','width':'100%','padding':'2px 4px 1px'}}
+                            value={this.state.fields['distance']}
+                            onChange={(event) => this.setState({
+                                fields:
+                                    {
+                                        name:this.state.fields['name'],
+                                        distance: event.target.value,
+                                        duration: this.state.fields['duration'],
+                                        arrival: this.props.fields['arrival'],
+                                        banked: this.props.fields['banked']
+                                    }
+                            })}
+                            onBlur={event => this.props.onChange(this.props.index,this.state.fields)}
+                            onFocus={event => event.target.select()}
+                            type="number"/>
                 </td>
                 <td><input style={{'fontSize':'90%','width':'100%','padding':'2px 4px 1px 0px'}}
                             value={this.props.fields['arrival']} readOnly tabIndex='-1' type="text"/></td>
@@ -172,8 +173,8 @@ class ControlPoints extends React.Component {
                         <thead>
                         <tr>
                             <th style={{'fontSize':'80%','width':'22%'}}>Name</th>
-                            <th style={{'fontSize':'80%','width':'11%'}}>Distance</th>
                             <th style={{'fontSize':'80%','width':'18%'}}>Expected time spent</th>
+                            <th style={{'fontSize':'80%','width':'11%'}}>Distance</th>
                             <th style={{'fontSize':'80%','width':'28%'}}>Est. arrival time</th>
                             {this.state.displayBankedTime?rusa_banked_header:null}
                         </tr>
