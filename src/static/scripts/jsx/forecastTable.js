@@ -35,7 +35,7 @@ class ForecastTable extends React.Component {
     render() {
         return (
                 <div>
-                    <a href="https://darksky.net/poweredby/">
+                    <a tabIndex='-1' href="https://darksky.net/poweredby/">
                         <img src="https://darksky.net/dev/img/attribution/poweredby.png" alt="Powered by DarkSky" width="80" height="40"/>
                     </a>
                     <Table striped condensed hover bordered>

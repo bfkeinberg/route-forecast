@@ -19,6 +19,16 @@ class ControlPoint extends React.Component {
         ReactDOM.findDOMNode(this.refs.nameField).focus();
     }
 
+    computeTabIndex(index,offset) {
+        if (index*3 < 10) {
+            index += 4;
+        }
+        if (index*3 > 94) {
+            index -= 28;
+        }
+        return (index*3)+offset;
+    }
+
     render() {
         const banked_time = (<td>
             <InputGroup>
@@ -31,7 +41,8 @@ class ControlPoint extends React.Component {
         </td>);
         return (
             <tr>
-                <td><input style={{'fontSize':'90%','width':'100%','padding':'2px 4px 1px'}}
+                <td><input tabIndex={this.computeTabIndex(this.props.index,0)}
+                           style={{'fontSize':'90%','width':'100%','padding':'2px 4px 1px'}}
                             type='text' value={this.state.fields['name']}
                                 ref="nameField"
                                 onChange={event => this.setState({
@@ -49,7 +60,8 @@ class ControlPoint extends React.Component {
                 /></td>
                 <td>
                     <InputGroup>
-                    <input style={{'fontSize':'90%','width':'100%','padding':'2px 4px 1px'}}
+                    <input tabIndex={this.computeTabIndex(this.props.index,1)}
+                           style={{'fontSize':'90%','width':'100%','padding':'2px 4px 1px'}}
                             value={this.state.fields['duration']}
                             onChange={(event) => this.setState({
                                 fields:
@@ -68,7 +80,8 @@ class ControlPoint extends React.Component {
                         </MediaQuery>
                     </InputGroup>
                 </td>
-                <td><input  style={{'fontSize':'90%','width':'100%','padding':'2px 4px 1px'}}
+                <td><input tabIndex={this.computeTabIndex(this.props.index,2)}
+                           style={{'fontSize':'90%','width':'100%','padding':'2px 4px 1px'}}
                             value={this.state.fields['distance']}
                             onChange={(event) => this.setState({
                                 fields:
@@ -157,14 +170,14 @@ class ControlPoints extends React.Component {
             <div className="controlPoints">
                 <ButtonToolbar style={{paddingTop:'11px',paddingLeft:'4px'}}>
                 <ButtonGroup style={{display:'flex',flexFlow:'row wrap'}}>
-                    <Button onClick={this.addControl} style={{display:'inline-flex',height:'34px'}}><Glyphicon glyph="plus-sign"></Glyphicon>Add control point</Button>
+                    <Button onClick={this.addControl} id='addButton' style={{display:'inline-flex',height:'34px'}}><Glyphicon glyph="plus-sign"></Glyphicon>Add control point</Button>
                      <Checkbox checked={this.state.displayBankedTime} inline
                        onChange={this.toggleDisplayBanked}
                      onClick={this.toggleDisplayBanked}
                      style={{padding:'7px 0px 0px 28px','textAlign':'center',float:'right', display:'inline-flex',width: '170px',height:'28px'}}>Display banked time</Checkbox>
                     <FormGroup controlId="finishTime" style={{display:'inline-flex'}}>
                         <ControlLabel style={{width:'8em',display:'flex',float:'right',marginTop:'7px',paddingLeft:'8px'}}>Finish time</ControlLabel>
-                        <FormControl type="text" style={{width:'12em',float:'right',marginTop:'2px',marginBotton:'0px',paddingLeft:'4px',paddingTop:'2px',height:'28px'}} value={this.props.finishTime}/>
+                        <FormControl tabIndex='-1' type="text" style={{width:'12em',float:'right',marginTop:'2px',marginBotton:'0px',paddingLeft:'4px',paddingTop:'2px',height:'28px'}} value={this.props.finishTime}/>
                     </FormGroup>
                 </ButtonGroup>
                 </ButtonToolbar>
@@ -185,6 +198,7 @@ class ControlPoints extends React.Component {
                                           displayBanked={this.state.displayBankedTime} fields={row}/>)}
                         </tbody>
                     </Table>
+                    <div tabIndex="98" onFocus={event => {document.getElementById('addButton').focus()}}></div>
                 </Panel>
             </div>
         );

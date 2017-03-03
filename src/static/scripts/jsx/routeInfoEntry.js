@@ -312,6 +312,10 @@ class RouteInfoForm extends React.Component {
     }
 
     setDateAndTime(dates, datestr, instance) {
+        if (datestr=='') {
+            instance.setDate(this.state.start);
+            return;
+        }
         this.setState({start:new Date(dates[0]),paramsChanged:true});
     }
 
@@ -335,12 +339,14 @@ class RouteInfoForm extends React.Component {
                 <div style={{display:'flex',flexFlow:'row wrap',justifyContent:'space-between',alignItems:'center',alignContent:'space-between',margin:'10px'}}>
                 <Panel style={{marginBottom:'0'}} header={header}>
                 <Form inline id="forecast_form">
-                    <FormGroup style={{flex:'1',display:'inline-flex',alignItems:'center'}} controlId="starting_time">
+                    <FormGroup tabIndex="1"
+                        style={{flex:'1',display:'inline-flex',alignItems:'center'}} controlId="starting_time">
                         <OverlayTrigger placement='bottom' overlay={time_tooltip}>
                             <ControlLabel>Starting time</ControlLabel>
                         </OverlayTrigger>
                         <span style={{display:'inline-flex'}} className="pt-icon-standard pt-icon-calendar"></span>
-                        <Flatpickr onChange={this.setDateAndTime} options={{enableTime: true,
+                        <Flatpickr onChange={this.setDateAndTime}
+                                   options={{enableTime: true,
                             altInput: true, altFormat: 'F j, Y h:i K',
                             altInputClass: 'dateDisplay',
                             minDate: firstDate,
@@ -352,14 +358,14 @@ class RouteInfoForm extends React.Component {
                     <FormGroup bsSize='small' controlId="interval" style={{flex:'1',display:'inline-flex',marginTop:'5px',marginBottom:'5px'}}>
                         <ControlLabel>Interval in hours</ControlLabel>
                         <OverlayTrigger placement='bottom' overlay={interval_tooltip}>
-                            <FormControl type="number" min={0.5} max={2} step={0.5} name="interval" style={{'width':'5em'}}
+                            <FormControl tabIndex='2' type="number" min={0.5} max={2} step={0.5} name="interval" style={{'width':'5em'}}
                                          value={this.state.interval} onChange={this.intervalChanged}/>
                         </OverlayTrigger>
                     </FormGroup>
                     <FormGroup style={{flex:'1',display:'inline-flex',marginTop:'5px',marginBottom:'5px'}} controlId="pace">
                         <ControlLabel>Pace</ControlLabel>
                         <OverlayTrigger placement="bottom" overlay={pace_tooltip}>
-                            <FormControl componentClass="select" value={this.state.pace} name="pace"
+                            <FormControl tabIndex='3' componentClass="select" value={this.state.pace} name="pace"
                                          style={{'width':'5em','height':'2.8em',paddingRight:'8px'}}
                                          onChange={this.handlePaceChange}>
                                 <option value="A">A</option>
@@ -382,7 +388,7 @@ class RouteInfoForm extends React.Component {
                                style={{display:'inline-flex',marginTop:'5px',marginBottom:'5px'}}
                                controlId="route">
                         <ControlLabel>Route file</ControlLabel>
-                        <FormControl type="file" name='route' accept=".gpx" id='route' onChange={this.updateRouteFile}/>
+                        <FormControl tabIndex='4' type="file" name='route' accept=".gpx" id='route' onChange={this.updateRouteFile}/>
                     </FormGroup>
                     {/*<Button style={{marginBottom:'5px',display:'inline-flex'}} onClick={this.makeFullQueryString}>Get URL</Button>*/}
                     <FormGroup
@@ -390,7 +396,7 @@ class RouteInfoForm extends React.Component {
                         controlId="ridewithgps" style={{flex:'1',display:'inline-flex',marginTop:'5px',marginBottom:'5px'}}>
                         <ControlLabel>RideWithGps route number</ControlLabel>
                         <OverlayTrigger placement="bottom" overlay={rwgps_enabled_tooltip}>
-                            <FormControl type="text"
+                            <FormControl tabIndex='5' type="text"
                                          onBlur={this.handleRwgpsRoute}
                                          onKeyPress={this.isNumberKey}
                                          onChange={this.setRwgpsRoute}
@@ -411,7 +417,7 @@ class RouteInfoForm extends React.Component {
                      */}
                     <OverlayTrigger placement='bottom' overlay={forecast_tooltip}>
                         <div style={{'display':'inline-flex',padding:'0px 14px'}} cursor='not-allowed'>
-                            <Button bsStyle="primary" onClick={this.requestForecast}
+                            <Button tabIndex='6' bsStyle="primary" onClick={this.requestForecast}
                                     style={buttonStyle}
                                     disabled={this.disableSubmit() || this.state.pending} bsSize="large">
                                 {this.state.pending?'Updating...':'Find forecast'}</Button>
