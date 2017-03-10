@@ -53,7 +53,10 @@ def server_error(e):
     logging.exception('An error occurred during a request.')
     print type(e)
     if type(e) != urllib2.HTTPError:
-        return 'An internal error occurred.' + e.message
+        if type(e.message) == str:
+            return 'An internal error occurred.' + e.message
+        else:
+            return e.message
     else:
         return 'An internal error occurred.' + e.message, e.response.status_code
 

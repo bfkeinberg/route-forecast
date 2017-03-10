@@ -8,11 +8,11 @@ class ControlPoint extends React.Component {
 
     constructor(props) {
         super(props);
-        this.state = {fields:props.fields};
+        this.state = {fields:props.fields,index:props.index};
     }
 
     componentWillReceiveProps(newProps) {
-        this.setState({fields:newProps.fields});
+        this.setState({fields:newProps.fields,index:newProps.index});
     }
 
     componentDidMount() {
@@ -55,7 +55,7 @@ class ControlPoint extends React.Component {
                                           banked: this.props.fields['banked']
                                       }
                            })}
-                           onBlur={event => this.props.onChange(this.props.index,this.state.fields)}
+                           onBlur={event => this.props.onChange(this.state.index,this.state.fields)}
                            onFocus={event => event.target.select()}
                 /></td>
                 <td>
@@ -73,7 +73,7 @@ class ControlPoint extends React.Component {
                                         banked:this.props.fields['banked']
                                     }
                             })}
-                           onBlur={event => this.props.onChange(this.props.index,this.state.fields)} onFocus={event => event.target.select()}
+                           onBlur={event => this.props.onChange(this.state.index,this.state.fields)} onFocus={event => event.target.select()}
                            type="number"/>
                         <MediaQuery minDeviceWidth={1000}>
                             <InputGroup.Addon>min</InputGroup.Addon>
@@ -93,7 +93,7 @@ class ControlPoint extends React.Component {
                                         banked: this.props.fields['banked']
                                     }
                             })}
-                            onBlur={event => this.props.onChange(this.props.index,this.state.fields)}
+                            onBlur={event => this.props.onChange(this.state.index,this.state.fields)}
                             onFocus={event => event.target.select()}
                             type="number"/>
                 </td>

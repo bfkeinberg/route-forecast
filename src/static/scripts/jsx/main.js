@@ -5,6 +5,7 @@ import ReactDOM from 'react-dom';
 import RouteInfoForm from './routeInfoEntry';
 import RouteForecastMap from './map';
 import ForecastTable from './forecastTable';
+import moment from 'moment';
 import SplitPane from 'react-split-pane';
 import { Button } from 'react-bootstrap';
 let MediaQuery = require('react-responsive');
@@ -22,6 +23,7 @@ class RouteWeatherUI extends React.Component {
         this.updateControls = this.updateControls.bind(this);
         this.updateRouteInfo = this.updateRouteInfo.bind(this);
         this.updateForecast = this.updateForecast.bind(this);
+        this.updateFinishTime = this.updateFinishTime.bind(this);
         let script = document.getElementById( "routeui" );
         let queryParams = queryString.parse(location.search);
         this.state = {controlPoints: queryParams.controlPoints==null?[]:JSON.parse(queryParams.controlPoints),
@@ -49,6 +51,13 @@ class RouteWeatherUI extends React.Component {
         this.setState({'routeInfo':routeInfo,'controlPoints':controlPoints});
     }
 
+    updateFinishTime(weatherCorrectionMinutes) {
+        let routeInfoCopy = this.state.routeInfo;
+        routeInfoCopy.finishTime =
+            moment(routeInfoCopy.finishTime,'ddd, MMM DD h:mma').add(weatherCorrectionMinutes,'minutes').format('ddd, MMM DD h:mma');
+        this.setState({'routeInfo':routeInfoCopy});
+    }
+
     updateForecast(forecast) {
         this.setState({forecast:forecast['forecast'],formVisible:false});
     }
@@ -59,9 +68,11 @@ class RouteWeatherUI extends React.Component {
             <RouteInfoForm action={this.state.action}
                            updateRouteInfo={this.updateRouteInfo}
                            updateForecast={this.updateForecast}
+                           updateControls={this.updateControls}
                            controlPoints={this.state.controlPoints}
                            formVisible={this.state.formVisible}
                            updateFormVisibility={this.updateFormVisibility}
+                           updateFinishTime={this.updateFinishTime}
                            start={queryParams.start}
                            pace={queryParams.pace}
                            interval={queryParams.interval}

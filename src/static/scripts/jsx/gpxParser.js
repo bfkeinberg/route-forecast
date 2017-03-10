@@ -18,6 +18,7 @@ class AnalyzeRoute {
         this.rwgpsRouteCallback = this.rwgpsRouteCallback.bind(this);
         this.rwgpsErrorCallback = this.rwgpsErrorCallback.bind(this);
         this.clear = this.clear.bind(this);
+        this.adjustForWind = this.adjustForWind.bind(this);
         this.reader.onload = this.fileDataRead;
         this.reader.onerror = function(event) {
             console.error("File could not be read! Code " + event.target.error.code);
@@ -27,11 +28,13 @@ class AnalyzeRoute {
         this.gpxResult = null;
         this.isTrip = false;
         this.setErrorStateCallback = options;
+        this.points = [];
     }
 
     clear() {
         this.rwgpsRouteData = null;
         this.gpxResult = null;
+        this.points = [];
     }
 
     routeIsLoaded() {
@@ -119,6 +122,7 @@ class AnalyzeRoute {
         let points = this.rwgpsRouteData[rideType]['track_points'];
         for (let trackPoint of points) {
             let point = {'lat':trackPoint['y'],'lon':trackPoint['x'],'elevation':trackPoint['e']};
+            this.points.push(point);
             bounds = this.setMinMaxCoords(point,bounds);
             if (first) {
                 forecastRequests.push(this.addToForecast(point, forecastPoint, startTime, accumulatedTime,accumulatedDistanceKm*0.62137));
@@ -204,6 +208,7 @@ class AnalyzeRoute {
             }
             for (let segment of track.segments) {
                 for (let point of segment) {
+                    this.points.push(point);
                     bounds = this.setMinMaxCoords(point,bounds);
                     if (first) {
                         forecastRequests.push(this.addToForecast(point, forecastPoint, startTime, accumulatedTime,accumulatedDistanceKm*0.62137));
@@ -303,6 +308,102 @@ class AnalyzeRoute {
 
     parseRoute(gpxFile) {
         this.reader.readAsText(gpxFile);
+    }
+
+    getBearingBetween(trackBearing,windBearing) {
+        if ((trackBearing - windBearing) < 0) {
+            var relative_bearing1 = trackBearing - windBearing + 360;
+        }
+        else {
+            var relative_bearing1 = trackBearing - windBearing;
+        }
+        if ((windBearing - trackBearing) < 0) {
+            var relative_bearing2 = windBearing - trackBearing + 360;
+        }
+        else {
+            var relative_bearing2 = windBearing - trackBearing;
+        }
+        return Math.min(relative_bearing1,relative_bearing2);
+    }
+
+    windToTimeInMinutes(baseSpeed,distance,hilliness,windSpeed) {
+        let initialSpeed = baseSpeed - hilliness;
+        switch (hilliness) {
+            case 0:
+                var adjustedWindSpeed = windSpeed * 0.5;
+            case 1:
+                var adjustedWindSpeed = windSpeed * 0.45;
+            case 2:
+                var adjustedWindSpeed = windSpeed * 0.4;
+            case 3:
+                var adjustedWindSpeed = windSpeed * 0.35;
+            case 4:
+                var adjustedWindSpeed = windSpeed * 0.3;
+            default: var adjustedWindSpeed = windSpeed*0.25;
+        }
+        var effectiveSpeed = initialSpeed - adjustedWindSpeed;
+        // will be negative for a tailwind
+        return (distance*60)/effectiveSpeed-(distance*60)/initialSpeed;
+    }
+
+    adjustForWind(forecastInfo,pace,controls,start) {
+        if (forecastInfo.length==0) {
+            return 0;
+        }
+        let baseSpeed = paceToSpeed[pace];
+        let forecast = forecastInfo.forecast.slice().reverse();
+        let currentForecast = forecast.pop();
+        let currentControl = 0;
+        let previousPoint = null;
+        let totalMinutesLost = 0;
+        let totalDistanceInMiles = 0;
+
+        for (let currentPoint of this.points) {
+            if (previousPoint != null) {
+                let distanceInMiles = gpxParse.utils.calculateDistance(previousPoint.lat, previousPoint.lon,
+                    currentPoint.lat,currentPoint.lon);
+                totalDistanceInMiles += distanceInMiles;
+                if (currentPoint.elevation > previousPoint.elevation) {
+                    var climbInMeters = currentPoint.elevation - previousPoint.elevation;
+                }
+                else {
+                    var climbInMeters = 0;
+                }
+                let climbInFeet = (climbInMeters * 3.2808);
+                if (distanceInMiles != 0) {
+                    var hilliness = Math.floor(Math.min((climbInFeet / distanceInMiles) / 25, 5));
+                }
+                else {
+                    continue;
+                }
+                // get current forecast
+                if (forecast.length > 0 && totalDistanceInMiles>forecast[forecast.length-1][1]) {
+                    currentForecast = forecast.pop();
+                }
+                // get bearing between the two points
+                let trackBearing = this.getRelativeBearing(previousPoint,currentPoint);
+                let relativeBearing = this.getBearingBetween(trackBearing,currentForecast[13]);
+                // adjust speed
+                let effectiveWindSpeed = Math.cos((Math.PI / 180)*relativeBearing)*parseInt(currentForecast[6]);
+                let minutesChange = this.windToTimeInMinutes(baseSpeed,distanceInMiles,hilliness,effectiveWindSpeed);
+                totalMinutesLost += minutesChange;
+
+                if (controls.length > currentControl) {
+                    if (totalDistanceInMiles >= controls[currentControl]['distance']) {
+                        let previousArrivalTime = moment(controls[currentControl]['arrival'],'ddd, MMM DD h:mma');
+                        let arrivalTime = previousArrivalTime.add(totalMinutesLost,'minutes');
+                        controls[currentControl]['arrival'] = arrivalTime.format('ddd, MMM DD h:mma');
+                        let elapsedTimeMs = arrivalTime.toDate()-start;
+                        let elapsedDuration = moment.duration(elapsedTimeMs,'ms');
+                        controls[currentControl]['banked'] = Math.round(this.rusa_time(distanceInMiles/0.62137, elapsedDuration.asHours()));
+                        currentControl++;
+                    }
+                }
+
+            }
+            previousPoint = currentPoint;
+        }
+        return totalMinutesLost;
     }
 }
 
