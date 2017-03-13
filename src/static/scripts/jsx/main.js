@@ -28,7 +28,7 @@ class RouteWeatherUI extends React.Component {
         let queryParams = queryString.parse(location.search);
         this.state = {controlPoints: queryParams.controlPoints==null?[]:JSON.parse(queryParams.controlPoints),
             routeInfo:{bounds:{},points:[], name:'',finishTime:''}, forecast:[], action:script.getAttribute('action'),
-            maps_key:script.getAttribute('maps_api_key'),formVisible:true};
+            maps_key:script.getAttribute('maps_api_key'),formVisible:true, weatherCorrectionMinutes:null};
     }
 
     updateControls(controlPoints) {
@@ -55,7 +55,7 @@ class RouteWeatherUI extends React.Component {
         let routeInfoCopy = this.state.routeInfo;
         routeInfoCopy.finishTime =
             moment(routeInfoCopy.finishTime,'ddd, MMM DD h:mma').add(weatherCorrectionMinutes,'minutes').format('ddd, MMM DD h:mma');
-        this.setState({'routeInfo':routeInfoCopy});
+        this.setState({'routeInfo':routeInfoCopy,weatherCorrectionMinutes:weatherCorrectionMinutes});
     }
 
     updateForecast(forecast) {
@@ -94,7 +94,7 @@ class RouteWeatherUI extends React.Component {
                                           name={this.state.routeInfo['name']}/>
                     </SplitPane>
                         <SplitPane defaultSize={500} minSize={150} split="vertical" paneStyle={{'overflow':'scroll'}}>
-                            <ForecastTable forecast={this.state.forecast}/>
+                            <ForecastTable forecast={this.state.forecast} weatherCorrectionMinutes={this.state.weatherCorrectionMinutes}/>
                             <RouteForecastMap maps_api_key={this.state.maps_key}
                                               forecast={this.state.forecast} routeInfo={this.state.routeInfo}/>
                         </SplitPane>
@@ -109,7 +109,7 @@ class RouteWeatherUI extends React.Component {
                                           finishTime={this.state.routeInfo['finishTime']}
                                           name={this.state.routeInfo['name']}/>
                     </SplitPane>
-                    <ForecastTable forecast={this.state.forecast}/>
+                    <ForecastTable forecast={this.state.forecast} weatherCorrectionMinutes={this.state.weatherCorrectionMinutes}/>
                 </SplitPane>
             </MediaQuery>
         </div>

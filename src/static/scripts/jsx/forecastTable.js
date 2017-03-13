@@ -33,11 +33,22 @@ class ForecastTable extends React.Component {
     }
 
     render() {
+        if (this.props.weatherCorrectionMinutes != null) {
+            if (this.props.weatherCorrectionMinutes >= 0) {
+                var weatherCorrections = Math.round(this.props.weatherCorrectionMinutes) + " minutes lost to wind";
+            }
+            else {
+                var weatherCorrections = Math.round(this.props.weatherCorrectionMinutes) + " minutes gained from wind";
+            }
+        }
+        else {
+            var weatherCorrections = null;
+        }
         return (
                 <div>
                     <a tabIndex='-1' href="https://darksky.net/poweredby/">
                         <img src="https://darksky.net/dev/img/attribution/poweredby.png" alt="Powered by DarkSky" width="80" height="40"/>
-                    </a>
+                    </a>{weatherCorrections}
                     <Table striped condensed hover bordered>
                         <thead>
                         <tr>
