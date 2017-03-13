@@ -51,6 +51,7 @@ class RouteInfoForm extends React.Component {
         this.setDateAndTime = this.setDateAndTime.bind(this);
         this.calculateTimeAndDistance = this.calculateTimeAndDistance.bind(this);
         this.makeFullQueryString = this.makeFullQueryString.bind(this);
+        this.urlShortenCallback = this.urlShortenCallback.bind(this);
         this.controlPoints = [];
         this.forecastRequest = null;
         this.state = {start:RouteInfoForm.findNextStartTime(props.start),
@@ -59,7 +60,7 @@ class RouteInfoForm extends React.Component {
             rwgpsRoute:props.rwgpsRoute==null?'':props.rwgpsRoute, errorDetails:null,
             pending:false, parser:new AnalyzeRoute(this.setErrorState),
             paramsChanged:false, rwgpsRouteIsTrip:false, errorSource:null, succeeded:null, routeUpdating:false,
-            fetchAfterLoad : false};
+            fetchAfterLoad : false, shortUrl:''};
     }
 
     static findNextStartTime(start) {
@@ -123,8 +124,8 @@ class RouteInfoForm extends React.Component {
 
     urlShortenCallback(event) {
         // prompt to copy short url to clipboard
-        window.prompt('Shortened URL',event.currentTarget.response['id']);
-        return event.currentTarget.response;
+        // window.prompt('Shortened URL',event.currentTarget.response['id']);
+        this.setState({shortUrl:event.currentTarget.response['id']});
     }
 
     shortenUrl(url) {
@@ -184,9 +185,11 @@ class RouteInfoForm extends React.Component {
         if (state.rwgpsRoute != '') {
             let query = {start:state.start,pace:state.pace,interval:state.interval,rwgpsRoute:state.rwgpsRoute,controlPoints:JSON.stringify(controlPoints)};
             history.pushState(null, 'nothing', location.origin + '?' + queryString.stringify(query));
+            this.shortenUrl(location.origin + '?' + queryString.stringify(query));
         }
         else {
             history.pushState(null, 'nothing', location.origin);
+            this.setState({shortUrl:''});
         }
     }
 
@@ -327,6 +330,7 @@ class RouteInfoForm extends React.Component {
         let pace_mph = paceToSpeed[this.state.pace];
         let pace_text = "Represents climb-adjusted pace - current is ".concat(pace_mph);
         let pace_tooltip = ( <Tooltip id="pace_tooltip">{pace_text}</Tooltip> );
+        let file_upload_tooltip = ( <Tooltip id="upload_tooltip">Upload a .gpx file describing your route</Tooltip> );
         let forecast_tooltip = this.disableSubmit() ? (
             <Tooltip id="forecast_tooltip">Must either upload a gpx file or provide an rwgps route id</Tooltip> ):
             (<Tooltip id="'forecast_tooltip">Request a ride forecast</Tooltip>);
@@ -385,14 +389,18 @@ class RouteInfoForm extends React.Component {
                         </OverlayTrigger>
                     </FormGroup>
                     <a style={{padding:'8px',display:'inline-flex',marginTop:'5px',marginBottom:'5px'}} href="https://westernwheelersbicycleclub.wildapricot.org/page-1374754" target="_blank">Pace explanation</a>
-                    <HelpBlock style={{flex:'1',display:'inline-flex'}} bsClass='help-block hidden-xs hidden-sm'>Upload a .gpx file describing your route</HelpBlock>
+                    {/*<HelpBlock style={{flex:'1',display:'inline-flex'}} bsClass='help-block hidden-xs hidden-sm'>Upload a .gpx file describing your route</HelpBlock>*/}
+                    <FormControl readOnly type="text" style={{display:this.state.shortUrl==''?'none':'inline-flex'}}
+                                 value={this.state.shortUrl} onFocus={event => {event.target.select();document.execCommand('copy')}}/>
                     <FormGroup bsSize='small'
                                bsClass='formGroup hidden-xs hidden-sm'
                                validationState={this.decideValidationStateFor('gpx',this.state.errorSource,this.state.succeeded)}
                                style={{display:'inline-flex',marginTop:'5px',marginBottom:'5px'}}
                                controlId="route">
                         <ControlLabel>Route file</ControlLabel>
-                        <FormControl tabIndex='4' type="file" name='route' accept=".gpx" id='route' onChange={this.updateRouteFile}/>
+                        <OverlayTrigger placement='bottom' overlay={file_upload_tooltip}>
+                            <FormControl tabIndex='4' type="file" name='route' accept=".gpx" id='route' onChange={this.updateRouteFile}/>
+                        </OverlayTrigger>
                     </FormGroup>
                     {/*<Button style={{marginBottom:'5px',display:'inline-flex'}} onClick={this.makeFullQueryString}>Get URL</Button>*/}
                     <FormGroup
