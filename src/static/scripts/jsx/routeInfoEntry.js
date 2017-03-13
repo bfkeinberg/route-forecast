@@ -389,8 +389,10 @@ class RouteInfoForm extends React.Component {
                     </FormGroup>
                     <a style={{padding:'8px',display:'inline-flex',marginTop:'5px',marginBottom:'5px'}} href="https://westernwheelersbicycleclub.wildapricot.org/page-1374754" target="_blank">Pace explanation</a>
                     {/*<HelpBlock style={{flex:'1',display:'inline-flex'}} bsClass='help-block hidden-xs hidden-sm'>Upload a .gpx file describing your route</HelpBlock>*/}
-                    <FormControl readOnly type="text" style={{display:this.state.shortUrl==''?'none':'inline-flex'}}
-                                 value={this.state.shortUrl} onFocus={event => {event.target.select();document.execCommand('copy')}}/>
+                    <FormGroup bsSize="small">
+                        <FormControl readOnly type="text" style={{display:this.state.shortUrl==''?'none':'inline-flex'}}
+                                     value={this.state.shortUrl} onFocus={event => {event.target.select();document.execCommand('copy')}}/>
+                    </FormGroup>
                     <FormGroup bsSize='small'
                                bsClass='formGroup hidden-xs hidden-sm'
                                validationState={this.decideValidationStateFor('gpx',this.state.errorSource,this.state.succeeded)}
@@ -401,7 +403,6 @@ class RouteInfoForm extends React.Component {
                             <FormControl tabIndex='4' type="file" name='route' accept=".gpx" id='route' onChange={this.updateRouteFile}/>
                         </OverlayTrigger>
                     </FormGroup>
-                    {/*<Button style={{marginBottom:'5px',display:'inline-flex'}} onClick={this.makeFullQueryString}>Get URL</Button>*/}
                     <FormGroup
                         validationState={this.decideValidationStateFor('rwgps',this.state.errorSource,this.state.succeeded)}
                         controlId="ridewithgps" style={{flex:'1',display:'inline-flex',marginTop:'5px',marginBottom:'5px'}}>
