@@ -208,7 +208,6 @@ class RouteInfoForm extends React.Component {
                 let weatherCorrectionMinutes = this.state.parser.adjustForWind(event.target.response,this.state.pace,this.props.controlPoints,this.state.start);
                 this.props.updateFinishTime(weatherCorrectionMinutes);
                 this.props.updateControls(this.props.controlPoints);
-                console.log("Losing " + weatherCorrectionMinutes + ' minutes to wind');
             }
             else {
                 if (event.target.response != null) {
