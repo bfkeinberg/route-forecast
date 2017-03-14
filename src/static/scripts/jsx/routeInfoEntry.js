@@ -90,6 +90,7 @@ class RouteInfoForm extends React.Component {
     }
 
     compareControls(lastControlPoints,newControlPoints) {
+        // prevent recalc
         if (lastControlPoints.length != newControlPoints.length &&
                 // prevent updating list before distance has been entered for a new control point
             newControlPoints[newControlPoints.length-1]['distance']!=0) {

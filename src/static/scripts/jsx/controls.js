@@ -27,6 +27,26 @@ class ControlPoint extends React.Component {
         return baseIndex+offset;
     }
 
+    forceFocusDuration() {
+        if (this.state.fields.duration=='') {
+            let durationField = ReactDOM.findDOMNode(this.refs.durationField);
+            durationField.focus();
+        } else {
+            this.props.onChange(this.state.index,this.state.fields);
+        }
+    }
+
+    focusAndInitialize(event) {
+        if (this.state.fields.duration=='') {
+            this.setState({fields:{name:this.state.fields['name'],
+                distance:this.state.fields['distance'],
+                duration:'0',
+                arrival:this.props.fields['arrival'],
+                banked:this.props.fields['banked']}});
+        }
+        event.target.select();
+    }
+
     render() {
         const banked_time = (<td>
             <InputGroup>
@@ -56,29 +76,7 @@ class ControlPoint extends React.Component {
                            onBlur={event => this.props.onChange(this.state.index,this.state.fields)}
                            onFocus={event => event.target.select()}
                 /></td>
-                <td>
-                    <InputGroup>
-                    <input tabIndex={this.computeTabIndex(this.props.index,1)}
-                           style={{'fontSize':'90%','width':'100%','padding':'2px 4px 1px'}}
-                            value={this.state.fields['duration']}
-                            onChange={(event) => this.setState({
-                                fields:
-                                    {
-                                        name:this.state.fields['name'],
-                                        distance:this.state.fields['distance'],
-                                        duration:event.target.value,
-                                        arrival:this.props.fields['arrival'],
-                                        banked:this.props.fields['banked']
-                                    }
-                            })}
-                           onBlur={event => this.props.onChange(this.state.index,this.state.fields)} onFocus={event => event.target.select()}
-                           type="number"/>
-                        <MediaQuery minDeviceWidth={1000}>
-                            <InputGroup.Addon>min</InputGroup.Addon>
-                        </MediaQuery>
-                    </InputGroup>
-                </td>
-                <td><input tabIndex={this.computeTabIndex(this.props.index,2)}
+                <td><input tabIndex={this.computeTabIndex(this.props.index,1)}
                            style={{'fontSize':'90%','width':'100%','padding':'2px 4px 1px'}}
                             value={this.state.fields['distance']}
                             onChange={(event) => this.setState({
@@ -91,9 +89,33 @@ class ControlPoint extends React.Component {
                                         banked: this.props.fields['banked']
                                     }
                             })}
-                            onBlur={event => this.props.onChange(this.state.index,this.state.fields)}
+                            onBlur={event => this.forceFocusDuration.call(this)}
                             onFocus={event => event.target.select()}
                             type="number"/>
+                </td>
+                <td>
+                    <InputGroup>
+                        <input tabIndex={this.computeTabIndex(this.props.index,2)}
+                               style={{'fontSize':'90%','width':'100%','padding':'2px 4px 1px'}}
+                               value={this.state.fields['duration']}
+                               ref="durationField"
+                               onChange={(event) => this.setState({
+                                   fields:
+                                       {
+                                           name:this.state.fields['name'],
+                                           distance:this.state.fields['distance'],
+                                           duration:event.target.value,
+                                           arrival:this.props.fields['arrival'],
+                                           banked:this.props.fields['banked']
+                                       }
+                               })}
+                               onBlur={event => this.props.onChange(this.state.index,this.state.fields)}
+                               onFocus={event => this.focusAndInitialize.call(this,event)}
+                               type="number"/>
+                        <MediaQuery minDeviceWidth={1000}>
+                            <InputGroup.Addon>min</InputGroup.Addon>
+                        </MediaQuery>
+                    </InputGroup>
                 </td>
                 <td><input style={{'fontSize':'90%','width':'100%','padding':'2px 4px 1px 0px'}}
                             value={this.props.fields['arrival']} readOnly tabIndex='-1' type="text"/></td>
@@ -120,7 +142,7 @@ class ControlPoints extends React.Component {
     addControl( ) {
         let controlPoints = this.props.controlPoints;
         let key = controlPoints.length;
-        controlPoints.push({name:'',distance:0,duration:0,arrival:"00:00"});
+        controlPoints.push({name:'',distance:0,duration:'',arrival:"00:00"});
         this.props.updateControls(controlPoints);
         this.setState({controlsChanged:true});
     }
@@ -187,8 +209,8 @@ class ControlPoints extends React.Component {
                         <thead>
                         <tr>
                             <th style={{'fontSize':'80%','width':'22%'}}>Name</th>
-                            <th style={{'fontSize':'80%','width':'18%'}}>Expected time spent</th>
                             <th style={{'fontSize':'80%','width':'11%'}}>Distance</th>
+                            <th style={{'fontSize':'80%','width':'18%'}}>Expected time spent</th>
                             <th style={{'fontSize':'80%','width':'28%'}}>Est. arrival time</th>
                             {this.state.displayBankedTime?rusa_banked_header:null}
                         </tr>
