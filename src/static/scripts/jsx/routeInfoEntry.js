@@ -124,8 +124,6 @@ class RouteInfoForm extends React.Component {
     }
 
     urlShortenCallback(event) {
-        // prompt to copy short url to clipboard
-        // window.prompt('Shortened URL',event.currentTarget.response['id']);
         this.setState({shortUrl:event.currentTarget.response['id']});
     }
 
@@ -390,10 +388,6 @@ class RouteInfoForm extends React.Component {
                     </FormGroup>
                     <a style={{padding:'8px',display:'inline-flex',marginTop:'5px',marginBottom:'5px'}} href="https://westernwheelersbicycleclub.wildapricot.org/page-1374754" target="_blank">Pace explanation</a>
                     {/*<HelpBlock style={{flex:'1',display:'inline-flex'}} bsClass='help-block hidden-xs hidden-sm'>Upload a .gpx file describing your route</HelpBlock>*/}
-                    <FormGroup bsSize="small">
-                        <FormControl readOnly type="text" style={{display:this.state.shortUrl==''?'none':'inline-flex'}}
-                                     value={this.state.shortUrl} onFocus={event => {event.target.select();document.execCommand('copy')}}/>
-                    </FormGroup>
                     <FormGroup bsSize='small'
                                bsClass='formGroup hidden-xs hidden-sm'
                                validationState={this.decideValidationStateFor('gpx',this.state.errorSource,this.state.succeeded)}
@@ -440,6 +434,10 @@ class RouteInfoForm extends React.Component {
                     {RouteInfoForm.showProgressSpinner(this.state.routeUpdating)}
                 </Form>
             </Panel>
+                    <FormGroup bsSize="small">
+                        <FormControl readOnly type="text" style={{marginTop:'10px',marginLeft:'135px',width:'15em',display:this.state.shortUrl==''?'none':'inline-flex'}}
+                                     value={this.state.shortUrl} onFocus={event => {event.target.select();document.execCommand('copy')}}/>
+                    </FormGroup>
             </div>
         );
     }
