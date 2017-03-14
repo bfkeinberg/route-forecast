@@ -20,13 +20,11 @@ class ControlPoint extends React.Component {
     }
 
     computeTabIndex(index,offset) {
-        if (index*3 < 10) {
-            index += 4;
+        let baseIndex = index*3 + 12;
+        if (baseIndex > 94) {
+            baseIndex -= 82;
         }
-        if (index*3 > 94) {
-            index -= 28;
-        }
-        return (index*3)+offset;
+        return baseIndex+offset;
     }
 
     render() {
@@ -171,9 +169,9 @@ class ControlPoints extends React.Component {
                 <ButtonToolbar style={{paddingTop:'11px',paddingLeft:'4px'}}>
                 {/*<ButtonGroup style={{display:'flex',flexFlow:'row wrap'}}>*/}
                 <ButtonGroup>
-                    <Button onClick={this.addControl} id='addButton'><Glyphicon glyph="plus-sign"></Glyphicon>Add control point</Button>
+                    <Button tabIndex='10' onClick={this.addControl} id='addButton'><Glyphicon glyph="plus-sign"></Glyphicon>Add control point</Button>
                     {/*<Button onClick={this.addControl} id='addButton' style={{display:'inline-flex',width:'165px',height:'34px'}}><Glyphicon glyph="plus-sign"></Glyphicon>Add control point</Button>*/}
-                    <Checkbox checked={this.state.displayBankedTime} inline
+                    <Checkbox tabIndex='11' checked={this.state.displayBankedTime} inline
                        onChange={this.toggleDisplayBanked}
                      onClick={this.toggleDisplayBanked}
                      style={{padding:'7px 0px 0px 28px','textAlign':'center',float:'right', display:'inline-flex',width: '170px',height:'28px'}}>Display banked time</Checkbox>
