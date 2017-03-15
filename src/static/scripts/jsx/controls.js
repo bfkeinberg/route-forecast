@@ -99,7 +99,7 @@ class ControlPoint extends React.Component {
                                style={{'fontSize':'90%','width':'100%','padding':'2px 4px 1px'}}
                                value={this.state.fields['duration']}
                                ref="durationField"
-                               onChange={(event) => this.setState({
+                               onChange={(event) => {if (!Number.isNaN(parseInt(event.target.value,10))) {this.setState({
                                    fields:
                                        {
                                            name:this.state.fields['name'],
@@ -107,8 +107,8 @@ class ControlPoint extends React.Component {
                                            duration:event.target.value,
                                            arrival:this.props.fields['arrival'],
                                            banked:this.props.fields['banked']
-                                       }
-                               })}
+                                       }})}
+                               }}
                                onBlur={event => this.props.onChange(this.state.index,this.state.fields)}
                                onFocus={event => this.focusAndInitialize.call(this,event)}
                                type="number"/>
