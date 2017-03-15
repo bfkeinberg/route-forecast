@@ -19,7 +19,9 @@
         <!--<script src="http://cdn.bootcss.com/react/15.4.1/react-dom.js"></script>-->
         <link href="https://cdnjs.cloudflare.com/ajax/libs/normalize/3.0.2/normalize.min.css" rel="stylesheet">
         <link rel="stylesheet" type="text/css" href="static/style.css">
-        <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+        <link rel="shortcut icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
+        <link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename='favicon-32x32.png') }}">
+        <link rel="icon" type="image/png" sizes="96x96" href="{{ url_for('static', filename='favicon-96x96.png') }}">
         <style>
             .rwgpsLogin {
                 background: url(https://ridewithgps.com/images/logo_trans_black.png?1) no-repeat;

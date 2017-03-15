@@ -174,7 +174,7 @@ def forecast():
     if (today != application.last_request_day):
         application.last_request_day = today
         application.weather_request_count = len(forecast_points)
-    elif len(forecast_points) + application.weather_request_count > 700:
+    elif len(forecast_points) + application.weather_request_count > 800:
         return jsonify({'status': 'Daily count exceeded'}), 400
     else:
         application.weather_request_count += len(forecast_points)
