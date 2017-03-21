@@ -38,7 +38,7 @@ class ForecastTable extends React.Component {
                 var weatherCorrections = Math.round(this.props.weatherCorrectionMinutes) + " minutes lost to wind";
             }
             else {
-                var weatherCorrections = Math.round(this.props.weatherCorrectionMinutes) + " minutes gained from wind";
+                var weatherCorrections = -Math.round(this.props.weatherCorrectionMinutes) + " minutes gained from wind";
             }
         }
         else {
