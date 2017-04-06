@@ -15,6 +15,14 @@ class ControlPoint extends React.Component {
         this.setState({fields:newProps.fields,index:newProps.index});
     }
 
+    componentWillUpdate(nextProps,nextState) {
+        if (nextProps.fields.duration=='' && nextState.fields.duration!='') {
+            let durationField = ReactDOM.findDOMNode(this.refs.durationField);
+            durationField.value = nextState.fields.duration;
+            durationField.select();
+        }
+    }
+
     componentDidMount() {
         ReactDOM.findDOMNode(this.refs.nameField).focus();
     }
@@ -99,7 +107,8 @@ class ControlPoint extends React.Component {
                                style={{'fontSize':'90%','width':'100%','padding':'2px 4px 1px'}}
                                value={this.state.fields['duration']}
                                ref="durationField"
-                               onChange={(event) => {if (!Number.isNaN(parseInt(event.target.value,10))) {this.setState({
+                               onChange={(event) => {if (!Number.isNaN(parseInt(event.target.value,10))) {
+                                   this.setState({
                                    fields:
                                        {
                                            name:this.state.fields['name'],
@@ -111,7 +120,7 @@ class ControlPoint extends React.Component {
                                }}
                                onBlur={event => this.props.onChange(this.state.index,this.state.fields)}
                                onFocus={event => this.focusAndInitialize.call(this,event)}
-                               type="number"/>
+                               type="text"/>
                         <MediaQuery minDeviceWidth={1000}>
                             <InputGroup.Addon>min</InputGroup.Addon>
                         </MediaQuery>
