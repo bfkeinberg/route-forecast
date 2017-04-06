@@ -2,14 +2,14 @@ import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 import loadGoogleMapsAPI from 'load-google-maps-api';
 
-const se_arrow = "http://vector.me/files/images/1/9/194538/south_east_arrow_direction_clip_art.jpg";
-const north_arrow = "http://vector.me/files/images/1/6/163466/black_north_arrow_direction_arrows_pfeil_directions_up.jpg";
-const ne_arrow = "http://vector.me/files/images/1/9/192097/up_right_black_arrow_clip_art.jpg";
-const south_arrow = "http://vector.me/files/images/1/1/118036/downward_black_arrow_clip_art.jpg";
-const sw_arrow = "http://vector.me/files/images/4/5/454768/left_and_down_arrow.gif";
-const west_arrow = "http://vector.me/files/images/4/5/454770/left_arrow.gif";
-const nw_arrow = "http://vector.me/files/images/4/5/454756/forward_and_left_arrow.gif";
-const east_arrow = "http://vector.me/files/images/4/5/454770/left_arrow.gif";
+const se_arrow = "static/arrow_down_right.png";
+const north_arrow = "/static/arrow_north.png";
+const ne_arrow = "/static/arrow_up_right.png";
+const south_arrow = "/static/arrow_down.png";
+const sw_arrow = "http://static/arrow_down_left.png";
+const west_arrow = "/static/arrow_left.png";
+const nw_arrow = "/static/arrow_up_left.png";
+const east_arrow = "/static/arrow_right.png";
 
 class RouteForecastMap extends Component {
 
@@ -26,8 +26,7 @@ class RouteForecastMap extends Component {
         if (bearing < 22 || bearing >= 338) {
             return {
                 url:north_arrow,
-                size: new google.maps.Size(400, 450),
-                scaledSize: new google.maps.Size(20, 20),
+                size: new google.maps.Size(40,40),
                 labelOrigin: new google.maps.Point(0,-10),
                 origin: new google.maps.Point(0,0),
                 anchor: new google.maps.Point(0, 0)
@@ -36,48 +35,43 @@ class RouteForecastMap extends Component {
         if (bearing >= 22 && bearing < 67) {
             return {
                 url:ne_arrow,
-                size: new google.maps.Size(400, 450),
-                scaledSize: new google.maps.Size(20, 20),
+                size: new google.maps.Size(55,55),
                 labelOrigin: new google.maps.Point(0,-10),
                 origin: new google.maps.Point(0,0),
-                anchor: new google.maps.Point(0, 0)
+                anchor: new google.maps.Point(0,0)
             };
         }
         if (bearing >= 67 && bearing <112) {
             return {
                 url:east_arrow,
-                size: new google.maps.Size(410, 500),
-                scaledSize: new google.maps.Size(20, 20),
+                size: new google.maps.Size(40, 40),
                 origin: new google.maps.Point(0,0),
-                labelOrigin: new google.maps.Point(0,-15),
+                labelOrigin: new google.maps.Point(0,-10),
                 anchor: new google.maps.Point(0, 0)
             };
         }
         if (bearing >=112 && bearing < 157) {
             return {
                 url:se_arrow,
-                size: new google.maps.Size(410, 500),
-                scaledSize: new google.maps.Size(20, 20),
+                size: new google.maps.Size(45, 45),
                 origin: new google.maps.Point(0,0),
-                labelOrigin: new google.maps.Point(0,-15),
+                labelOrigin: new google.maps.Point(0,-10),
                 anchor: new google.maps.Point(0, 0)
             };
         }
         if (bearing >=157 && bearing < 202) {
             return {
                 url:south_arrow,
-                size: new google.maps.Size(410, 500),
-                scaledSize: new google.maps.Size(20, 20),
+                size: new google.maps.Size(50, 50),
                 origin: new google.maps.Point(0,0),
-                labelOrigin: new google.maps.Point(0,-15),
+                labelOrigin: new google.maps.Point(0,-10),
                 anchor: new google.maps.Point(0, 0)
             };
         }
         if (bearing >= 202 && bearing < 247) {
             return {
                 url:sw_arrow,
-                size: new google.maps.Size(410, 500),
-                scaledSize: new google.maps.Size(20, 20),
+                size: new google.maps.Size(52, 52),
                 origin: new google.maps.Point(0,0),
                 labelOrigin: new google.maps.Point(0,-10),
                 anchor: new google.maps.Point(0, 0)
@@ -87,8 +81,7 @@ class RouteForecastMap extends Component {
         if (bearing >= 247 && bearing < 302) {
             return {
                 url:west_arrow,
-                size: new google.maps.Size(410, 500),
-                scaledSize: new google.maps.Size(20, 20),
+                size: new google.maps.Size(45, 45),
                 origin: new google.maps.Point(0,0),
                 labelOrigin: new google.maps.Point(0,-10),
                 anchor: new google.maps.Point(0, 0)
@@ -97,8 +90,7 @@ class RouteForecastMap extends Component {
         }
         return {
             url:nw_arrow,
-            size: new google.maps.Size(410, 500),
-            scaledSize: new google.maps.Size(20, 20),
+            size: new google.maps.Size(42,42),
             origin: new google.maps.Point(0,0),
             labelOrigin: new google.maps.Point(0,-10),
             anchor: new google.maps.Point(0, 0)
