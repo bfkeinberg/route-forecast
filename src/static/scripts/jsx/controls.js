@@ -16,7 +16,7 @@ class ControlPoint extends React.Component {
     }
 
     componentWillUpdate(nextProps,nextState) {
-        if (nextProps.fields.duration=='' && nextState.fields.duration!='') {
+        if (nextProps.fields.duration=='' && nextState.fields.duration=='0') {
             let durationField = ReactDOM.findDOMNode(this.refs.durationField);
             durationField.value = nextState.fields.duration;
             durationField.select();
@@ -52,7 +52,9 @@ class ControlPoint extends React.Component {
                 arrival:this.props.fields['arrival'],
                 banked:this.props.fields['banked']}});
         }
-        event.target.select();
+        else {
+            event.target.select();
+        }
     }
 
     render() {
