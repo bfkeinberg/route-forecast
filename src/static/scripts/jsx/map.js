@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom';
 import loadGoogleMapsAPI from 'load-google-maps-api';
 
 const se_arrow = "static/arrow_down_right.png";
-const north_arrow = "/static/arrow_north.png";
+const north_arrow = "/static/arrow_up.png";
 const ne_arrow = "/static/arrow_up_right.png";
 const south_arrow = "/static/arrow_down.png";
 const sw_arrow = "http://static/arrow_down_left.png";
