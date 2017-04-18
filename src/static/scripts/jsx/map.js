@@ -25,7 +25,7 @@ class RouteForecastMap extends Component {
     static selectWindIcon(bearing) {
         if (bearing < 22 || bearing >= 338) {
             return {
-                url:north_arrow,
+                url:south_arrow,
                 size: new google.maps.Size(40,40),
                 labelOrigin: new google.maps.Point(0,-10),
                 origin: new google.maps.Point(0,0),
@@ -34,7 +34,7 @@ class RouteForecastMap extends Component {
         }
         if (bearing >= 22 && bearing < 67) {
             return {
-                url:ne_arrow,
+                url:sw_arrow,
                 size: new google.maps.Size(55,55),
                 labelOrigin: new google.maps.Point(0,-10),
                 origin: new google.maps.Point(0,0),
@@ -43,7 +43,7 @@ class RouteForecastMap extends Component {
         }
         if (bearing >= 67 && bearing <112) {
             return {
-                url:east_arrow,
+                url:west_arrow,
                 size: new google.maps.Size(40, 40),
                 origin: new google.maps.Point(0,0),
                 labelOrigin: new google.maps.Point(0,-10),
@@ -52,7 +52,7 @@ class RouteForecastMap extends Component {
         }
         if (bearing >=112 && bearing < 157) {
             return {
-                url:se_arrow,
+                url:nw_arrow,
                 size: new google.maps.Size(45, 45),
                 origin: new google.maps.Point(0,0),
                 labelOrigin: new google.maps.Point(0,-10),
@@ -61,7 +61,7 @@ class RouteForecastMap extends Component {
         }
         if (bearing >=157 && bearing < 202) {
             return {
-                url:south_arrow,
+                url:north_arrow,
                 size: new google.maps.Size(50, 50),
                 origin: new google.maps.Point(0,0),
                 labelOrigin: new google.maps.Point(0,-10),
@@ -70,7 +70,7 @@ class RouteForecastMap extends Component {
         }
         if (bearing >= 202 && bearing < 247) {
             return {
-                url:sw_arrow,
+                url:ne_arrow,
                 size: new google.maps.Size(52, 52),
                 origin: new google.maps.Point(0,0),
                 labelOrigin: new google.maps.Point(0,-10),
@@ -80,7 +80,7 @@ class RouteForecastMap extends Component {
         }
         if (bearing >= 247 && bearing < 302) {
             return {
-                url:west_arrow,
+                url:east_arrow,
                 size: new google.maps.Size(45, 45),
                 origin: new google.maps.Point(0,0),
                 labelOrigin: new google.maps.Point(0,-10),
@@ -89,7 +89,7 @@ class RouteForecastMap extends Component {
 
         }
         return {
-            url:nw_arrow,
+            url:se_arrow,
             size: new google.maps.Size(42,42),
             origin: new google.maps.Point(0,0),
             labelOrigin: new google.maps.Point(0,-10),
