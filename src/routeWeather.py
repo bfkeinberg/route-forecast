@@ -189,7 +189,12 @@ class WeatherCalculator:
         forecast_time = time_at_point.strftime('%Y-%m-%dT%H:%M:00%z')
         return self.call_weather_service(where.latitude, where.longitude, forecast_time, zone)
 
-    def get_bearing_difference(self,bearing,windBearing):
+    def get_bearing_difference(self,bearing,windDirection):
+        # flip wind bearing because it indicates the direction the wind is coming _from_
+        if (windDirection > 180):
+            windBearing = windDirection - 180
+        else:
+            windBearing = windDirection + 180
         if (bearing - windBearing) < 0:
             relative_bearing1 = bearing - windBearing + 360
         else:
