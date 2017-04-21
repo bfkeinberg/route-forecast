@@ -189,12 +189,7 @@ class WeatherCalculator:
         forecast_time = time_at_point.strftime('%Y-%m-%dT%H:%M:00%z')
         return self.call_weather_service(where.latitude, where.longitude, forecast_time, zone)
 
-    def get_bearing_difference(self,bearing,windDirection):
-        # flip wind bearing because it indicates the direction the wind is coming _from_
-        if (windDirection > 180):
-            windBearing = windDirection - 180
-        else:
-            windBearing = windDirection + 180
+    def get_bearing_difference(self,bearing,windBearing):
         if (bearing - windBearing) < 0:
             relative_bearing1 = bearing - windBearing + 360
         else:
@@ -219,7 +214,7 @@ class WeatherCalculator:
             wind_bearing = current_forecast['windBearing'] if has_wind else None
             relative_bearing = self.get_bearing_difference(bearing, current_forecast['windBearing']) if has_wind and bearing != None else None
             rainy = 'icon' in current_forecast and current_forecast['icon'] == 'rain'
-            self.logger.info('%s %f,%f %s', now, lat, lon, current_forecast)
+            self.logger.info('%s %f,%f %s %d %d', now, lat, lon, current_forecast,bearing,relative_bearing)
             return (now.strftime("%-I:%M%p"), distance, current_forecast['summary'],
                     str(int(round(current_forecast['temperature'])))+'F',
                     str((current_forecast['precipProbability'] * 100)) + '%'

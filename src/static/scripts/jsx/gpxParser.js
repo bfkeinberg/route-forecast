@@ -163,7 +163,11 @@ class AnalyzeRoute {
         let λ2 = point2.lon * degreesToRadians;
         let x = Math.cos(φ1)*Math.sin(φ2) - Math.sin(φ1)*Math.cos(φ2)*Math.cos(λ2-λ1);
         let y = Math.sin(λ2-λ1) * Math.cos(φ2);
-        return Math.atan2(y, x) / degreesToRadians;
+        let relative_bearing = Math.atan2(y, x) / degreesToRadians;
+        if (relative_bearing < 0) {
+            return 360 + relative_bearing;
+        }
+        return relative_bearing;
     }
 
     fillLastControlPoint(finishTime,controls,nextControl) {
@@ -312,13 +316,13 @@ class AnalyzeRoute {
 
     getBearingBetween(trackBearing,windBearing) {
         if ((trackBearing - windBearing) < 0) {
-            var relative_bearing1 = trackBearing - windBearing + 360;
+            var relative_bearing1 = (trackBearing - windBearing) + 360;
         }
         else {
             var relative_bearing1 = trackBearing - windBearing;
         }
         if ((windBearing - trackBearing) < 0) {
-            var relative_bearing2 = windBearing - trackBearing + 360;
+            var relative_bearing2 = (windBearing - trackBearing) + 360;
         }
         else {
             var relative_bearing2 = windBearing - trackBearing;
