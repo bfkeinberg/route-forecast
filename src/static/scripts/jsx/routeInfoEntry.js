@@ -272,7 +272,13 @@ class RouteInfoForm extends React.Component {
 
     handleRwgpsRoute(event) {
         if (event.target.value!='') {
-            this.state.parser.loadRwgpsRoute(event.target.value,this.state.rwgpsRouteIsTrip);
+            // is this just a number or a full url?
+            let route = parseInt(event.target.value);
+            if (isNaN(route)) {
+                let routeParts = event.target.value.split('/');
+                route = routeParts.pop();
+            }
+            this.state.parser.loadRwgpsRoute(route,this.state.rwgpsRouteIsTrip);
             // clear file input to avoid confusion
             document.getElementById('route').value = null;
             this.setState({'routeFileSet':false,'routeUpdating':true});
