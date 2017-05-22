@@ -27,7 +27,7 @@ class RouteForecastMap extends Component {
             return {
                 url:south_arrow,
                 size: new google.maps.Size(40,40),
-                labelOrigin: new google.maps.Point(0,-10),
+                labelOrigin: new google.maps.Point(-5,-15),
                 origin: new google.maps.Point(0,0),
                 anchor: new google.maps.Point(0, 0)
             };
@@ -36,7 +36,7 @@ class RouteForecastMap extends Component {
             return {
                 url:sw_arrow,
                 size: new google.maps.Size(55,55),
-                labelOrigin: new google.maps.Point(0,-10),
+                labelOrigin: new google.maps.Point(-5,-15),
                 origin: new google.maps.Point(0,0),
                 anchor: new google.maps.Point(0,0)
             };
@@ -46,7 +46,7 @@ class RouteForecastMap extends Component {
                 url:west_arrow,
                 size: new google.maps.Size(40, 40),
                 origin: new google.maps.Point(0,0),
-                labelOrigin: new google.maps.Point(0,-10),
+                labelOrigin: new google.maps.Point(-5,-15),
                 anchor: new google.maps.Point(0, 0)
             };
         }
@@ -55,7 +55,7 @@ class RouteForecastMap extends Component {
                 url:nw_arrow,
                 size: new google.maps.Size(45, 45),
                 origin: new google.maps.Point(0,0),
-                labelOrigin: new google.maps.Point(0,-10),
+                labelOrigin: new google.maps.Point(-5,-15),
                 anchor: new google.maps.Point(0, 0)
             };
         }
@@ -64,7 +64,7 @@ class RouteForecastMap extends Component {
                 url:north_arrow,
                 size: new google.maps.Size(50, 50),
                 origin: new google.maps.Point(0,0),
-                labelOrigin: new google.maps.Point(0,-10),
+                labelOrigin: new google.maps.Point(-5,-15),
                 anchor: new google.maps.Point(0, 0)
             };
         }
@@ -73,7 +73,7 @@ class RouteForecastMap extends Component {
                 url:ne_arrow,
                 size: new google.maps.Size(52, 52),
                 origin: new google.maps.Point(0,0),
-                labelOrigin: new google.maps.Point(0,-10),
+                labelOrigin: new google.maps.Point(-5,-15),
                 anchor: new google.maps.Point(0, 0)
             };
 
@@ -83,7 +83,7 @@ class RouteForecastMap extends Component {
                 url:east_arrow,
                 size: new google.maps.Size(45, 45),
                 origin: new google.maps.Point(0,0),
-                labelOrigin: new google.maps.Point(0,-10),
+                labelOrigin: new google.maps.Point(-5,-15),
                 anchor: new google.maps.Point(0, 0)
             };
 
@@ -92,12 +92,12 @@ class RouteForecastMap extends Component {
             url:se_arrow,
             size: new google.maps.Size(42,42),
             origin: new google.maps.Point(0,0),
-            labelOrigin: new google.maps.Point(0,-10),
+            labelOrigin: new google.maps.Point(-5,-15),
             anchor: new google.maps.Point(0, 0)
         };
     }
 
-    static addMarker(latitude, longitude, map, value, title, isRainy, bearing) {
+    static addMarker(latitude, longitude, map, value, title, isRainy, bearing, windSpeed) {
     // Add the marker at the specified location
         let markerIcon = {
                 url: "http://cdn.mysitemyway.com/etc-mysitemyway/icons/legacy-previews/icons/blue-chrome-rain-icons-natural-wonders/050175-blue-chrome-rain-icon-natural-wonders-rain-cloud1.png",
@@ -106,11 +106,28 @@ class RouteForecastMap extends Component {
                 labelOrigin: new google.maps.Point(22,15),
                 anchor: new google.maps.Point(0, 0)
         };
-        return new google.maps.Marker({
+        if (isRainy) {
+            return new google.maps.Marker({
+                position: {lat:latitude,lng:longitude},
+                label: value.toString(),
+                map: map,
+                icon: markerIcon,
+                title: title
+            });
+        }
+        else if (parseInt(windSpeed) > 3) {
+            return new google.maps.Marker({
+                position: {lat:latitude,lng:longitude},
+                label: value.toString(),
+                map: map,
+                icon: RouteForecastMap.selectWindIcon(bearing),
+                title: title
+            });
+        }
+        else return new google.maps.Marker({
             position: {lat:latitude,lng:longitude},
             label: value.toString(),
             map: map,
-            icon: isRainy?markerIcon:RouteForecastMap.selectWindIcon(bearing),
             title: title
         });
     }
@@ -137,7 +154,7 @@ class RouteForecastMap extends Component {
         // marker title now contains both temperature and mileage
         return (
             forecast.map((point, index, data) =>
-                RouteForecastMap.addMarker(point[7], point[8], map, point[3]+'/'+point[1]+'m', point[10], point[12], point[13])
+                RouteForecastMap.addMarker(point[7], point[8], map, point[3]+'/'+point[1]+'m', point[10], point[12], point[13], point[6])
             )
         );
     }

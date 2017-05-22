@@ -77,6 +77,7 @@ class RouteWeatherUI extends React.Component {
                            pace={queryParams.pace}
                            interval={queryParams.interval}
                            rwgpsRoute={queryParams.rwgpsRoute}
+                           maps_api_key={this.state.maps_key}
             />
         );
         const formButton = (

@@ -4,8 +4,8 @@ import os
 import random
 import string
 import tempfile
-import dateutil.tz
 from datetime import *
+import dateutil.tz
 import urllib2
 
 import requests
@@ -58,7 +58,7 @@ def server_error(e):
         else:
             return e.message
     else:
-        return 'An internal error occurred.' + e.message, e.response.status_code
+        return 'An internal error occurred.' + e.message, 500 #e.response.status_code
 
 
 @application.route('/form')
@@ -180,12 +180,16 @@ def forecast():
         application.weather_request_count += len(forecast_points)
     wcalc = WeatherCalculator(session)
     zone = request.form['timezone']
-    offset = long(zone) * 60
-    req_tzinfo = dateutil.tz.tzoffset('local', offset)
-
+    req_tzinfo = dateutil.tz.tzoffset('local', long(zone))
     results = []
     for point in forecast_points:
-        results.append(wcalc.call_weather_service(point['lat'],point['lon'],point['time'],point['distance'],req_tzinfo,
+        # want to correct each time point with this timezone offset
+        # first get the original time
+        uncorrected_time = datetime.fromtimestamp(point['time'])
+        corrected_time = datetime(uncorrected_time.year,uncorrected_time.month,uncorrected_time.day,uncorrected_time.hour,
+                                  uncorrected_time.minute,0,0,req_tzinfo)
+        offset_time = corrected_time.strftime('%Y-%m-%dT%H:%M:%S%z')
+        results.append(wcalc.call_weather_service(point['lat'],point['lon'],offset_time,point['distance'],req_tzinfo,
                                                   point['bearing']))
     return jsonify({'forecast':results})
 

@@ -52,13 +52,14 @@ class RouteInfoForm extends React.Component {
         this.calculateTimeAndDistance = this.calculateTimeAndDistance.bind(this);
         this.makeFullQueryString = this.makeFullQueryString.bind(this);
         this.urlShortenCallback = this.urlShortenCallback.bind(this);
+        this.shortenUrl = this.shortenUrl.bind(this);
         this.controlPoints = [];
         this.forecastRequest = null;
         this.state = {start:RouteInfoForm.findNextStartTime(props.start),
             pace:props.pace==null?defaultPace:props.pace, interval:props.interval==null?defaultIntervalInHours:props.interval,
             xmlhttp : null, routeFileSet:false,
             rwgpsRoute:props.rwgpsRoute==null?'':props.rwgpsRoute, errorDetails:null,
-            pending:false, parser:new AnalyzeRoute(this.setErrorState),
+            pending:false, parser:new AnalyzeRoute(this.setErrorState,this.props.maps_api_key),
             paramsChanged:false, rwgpsRouteIsTrip:false, errorSource:null, succeeded:null, routeUpdating:false,
             fetchAfterLoad : false, shortUrl:''};
     }
@@ -130,7 +131,7 @@ class RouteInfoForm extends React.Component {
         let xmlhttp = new XMLHttpRequest();
         xmlhttp.responseType = 'json';
         xmlhttp.addEventListener('load',this.urlShortenCallback);
-        xmlhttp.open('POST','https://www.googleapis.com/urlshortener/v1/url?key='+'AIzaSyAYuBONqQrBidMOwcM22dDUl28iqv22zKM',true);
+        xmlhttp.open('POST','https://www.googleapis.com/urlshortener/v1/url?key='+this.props.maps_api_key,true);
         xmlhttp.setRequestHeader('Content-Type','application/json; charset=utf-8"');
         xmlhttp.send(JSON.stringify({'longUrl':url}));
     }
@@ -148,11 +149,12 @@ class RouteInfoForm extends React.Component {
 
     calculateTimeAndDistance(props) {
         this.controlPoints = this.copyControls(this.props.controlPoints);
-        let routeInfo = this.state.parser.walkRoute(moment(this.state.start),-new Date().getTimezoneOffset(),
+        let routeInfo = this.state.parser.walkRoute(moment(this.state.start),
             this.state.pace, parseFloat(this.state.interval),props.controlPoints);
         this.props.updateRouteInfo({bounds:routeInfo['bounds'],points:routeInfo['points'],
             name:routeInfo['name'],finishTime:routeInfo['finishTime']}, routeInfo['controls']);
         this.forecastRequest = routeInfo['forecast'];
+        this.timeZonePromise = routeInfo['timeZone'];
     }
 
     requestForecast(event) {
@@ -169,9 +171,13 @@ class RouteInfoForm extends React.Component {
         let formdata = new FormData();
         this.state.xmlhttp.open("POST", this.props.action);
         formdata.append('locations',JSON.stringify(this.forecastRequest));
-        formdata.append('timezone',-new Date().getTimezoneOffset());
-        this.state.xmlhttp.send(formdata);
-        this.setState({pending:true,showForm:false});
+        // send timezone for the route start to the forecast call
+        this.timeZonePromise.then(timeZoneResult => {
+            formdata.append('timezone',timeZoneResult);
+            this.state.xmlhttp.send(formdata);
+            this.setState({pending:true,showForm:false});
+            this.timeZonePromise = null;
+        }, error => {return error});
     }
 
     makeFullQueryString(event) {
@@ -179,9 +185,15 @@ class RouteInfoForm extends React.Component {
         this.shortenUrl(location.origin + '?' + queryString.stringify(query));
     }
 
+    // this function exists to let us preserve the user's specified start time and share the url for this route
+    // with someone in another time zone
+    dateToShortDate(date) {
+        return moment(date).format("ddd MMM D YYYY HH:mm:ss");
+    }
+
     setQueryString(state,controlPoints) {
         if (state.rwgpsRoute != '') {
-            let query = {start:state.start,pace:state.pace,interval:state.interval,rwgpsRoute:state.rwgpsRoute,controlPoints:JSON.stringify(controlPoints)};
+            let query = {start:this.dateToShortDate(state.start),pace:state.pace,interval:state.interval,rwgpsRoute:state.rwgpsRoute,controlPoints:JSON.stringify(controlPoints)};
             history.pushState(null, 'nothing', location.origin + '?' + queryString.stringify(query));
             this.shortenUrl(location.origin + '?' + queryString.stringify(query));
         }
@@ -205,7 +217,7 @@ class RouteInfoForm extends React.Component {
                 this.props.updateForecast(event.target.response);
                 let weatherCorrectionMinutes = this.state.parser.adjustForWind(event.target.response,this.state.pace,this.props.controlPoints,this.state.start);
                 this.props.updateFinishTime(weatherCorrectionMinutes);
-                this.props.updateControls(this.props.controlPoints);
+                // this.props.updateControls(this.props.controlPoints);
             }
             else {
                 if (event.target.response != null) {
@@ -270,14 +282,22 @@ class RouteInfoForm extends React.Component {
         }
     }
 
-    handleRwgpsRoute(event) {
-        if (event.target.value!='') {
+    static getRouteNumberFromValue(value) {
+        if (value!='') {
             // is this just a number or a full url?
-            let route = parseInt(event.target.value);
+            let route = parseInt(value);
             if (isNaN(route)) {
-                let routeParts = event.target.value.split('/');
+                let routeParts = value.split('/');
                 route = routeParts.pop();
             }
+            return route;
+        }
+        return value;
+    }
+
+    handleRwgpsRoute(event) {
+        let route = RouteInfoForm.getRouteNumberFromValue(event.target.value);
+        if (route!='') {
             this.state.parser.loadRwgpsRoute(route,this.state.rwgpsRouteIsTrip);
             // clear file input to avoid confusion
             document.getElementById('route').value = null;
@@ -288,7 +308,8 @@ class RouteInfoForm extends React.Component {
     }
 
     setRwgpsRoute(event) {
-        this.setState({rwgpsRoute : event.target.value});
+        let route = RouteInfoForm.getRouteNumberFromValue(event.target.value);
+        this.setState({rwgpsRoute : route});
         this.state.parser.clear();
     }
 

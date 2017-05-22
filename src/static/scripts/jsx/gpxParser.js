@@ -4,7 +4,7 @@ import moment from 'moment';
 const paceToSpeed = {'A': 10, 'B': 12, 'C': 14, 'C+': 15, 'D-': 15, 'D': 16, 'D+': 17, 'E-': 17, 'E': 18};
 
 class AnalyzeRoute {
-    constructor(options) {
+    constructor(options,maps_api_key) {
         this.reader = new FileReader();
         this.fileDataRead = this.fileDataRead.bind(this);
         this.handleParsedGpx = this.handleParsedGpx.bind(this);
@@ -29,6 +29,7 @@ class AnalyzeRoute {
         this.isTrip = false;
         this.setErrorStateCallback = options;
         this.points = [];
+        this.maps_api_key = maps_api_key;
     }
 
     clear() {
@@ -102,7 +103,7 @@ class AnalyzeRoute {
         xmlhttp.send();
     }
 
-    analyzeRwgpsRoute(startTime,timezone,pace,intervalInHours,controls) {
+    analyzeRwgpsRoute(startTime,pace,intervalInHours,controls) {
         this.nextControl = 0;
         this.pointsInRoute = [];
         let forecastRequests = [];
@@ -126,6 +127,7 @@ class AnalyzeRoute {
             bounds = this.setMinMaxCoords(point,bounds);
             if (first) {
                 forecastRequests.push(this.addToForecast(point, forecastPoint, startTime, accumulatedTime,accumulatedDistanceKm*0.62137));
+                var timeZonePromise = this.findTimezoneForPoint(point.lat,point.lon,startTime);
                 first = false;
             }
             if (previousPoint != null) {
@@ -152,7 +154,7 @@ class AnalyzeRoute {
         let finishTime = this.formatFinishTime(startTime,accumulatedTime,idlingTime);
         this.fillLastControlPoint(finishTime,controls,this.nextControl);
         return {forecast:forecastRequests,points:this.pointsInRoute,name:trackName,controls:controls,bounds:bounds,
-            finishTime: finishTime};
+            finishTime: finishTime, timeZone:timeZonePromise};
     }
 
     getRelativeBearing(point1,point2) {
@@ -181,17 +183,17 @@ class AnalyzeRoute {
         return moment(startTime).add(accumulatedTime+restTime,'hours').format('ddd, MMM DD h:mma');
     }
 
-    walkRoute(startTime,timezone,pace,interval,controls) {
+    walkRoute(startTime,pace,interval,controls) {
         controls.sort((a,b) => a['distance']-b['distance']);
         if (this.gpxResult != null) {
-            return this.analyzeGpxRoute(startTime,timezone,pace,interval,controls);
+            return this.analyzeGpxRoute(startTime,pace,interval,controls);
         } else if (this.rwgpsRouteData != null) {
-            return this.analyzeRwgpsRoute(startTime,timezone,pace,interval,controls);
+            return this.analyzeRwgpsRoute(startTime,pace,interval,controls);
         }
         return null;
     }
 
-    analyzeGpxRoute(startTime, timezone, pace, intervalInHours, controls) {
+    analyzeGpxRoute(startTime, pace, intervalInHours, controls) {
         this.nextControl = 0;
         this.pointsInRoute = [];
         let forecastRequests = [];
@@ -216,6 +218,7 @@ class AnalyzeRoute {
                     bounds = this.setMinMaxCoords(point,bounds);
                     if (first) {
                         forecastRequests.push(this.addToForecast(point, forecastPoint, startTime, accumulatedTime,accumulatedDistanceKm*0.62137));
+                        var timeZonePromise = this.findTimezoneForPoint(point.lat,point.lon,startTime);
                         first = false;
                     }
                     if (previousPoint != null) {
@@ -244,7 +247,32 @@ class AnalyzeRoute {
         let finishTime = this.formatFinishTime(startTime,accumulatedTime,idlingTime);
         this.fillLastControlPoint(finishTime,controls,this.nextControl);
         return {forecast:forecastRequests,points:this.pointsInRoute,name:trackName,controls:controls,bounds:bounds,
-            finishTime:finishTime};
+            finishTime:finishTime,timeZone:timeZonePromise};
+    }
+
+    findTimezoneForPoint(lat,lon,time) {
+        const promise = new Promise((resolve, reject) =>
+            {
+                let xmlhttp = new XMLHttpRequest();
+                xmlhttp.responseType = 'json';
+                xmlhttp.addEventListener('load', event => {
+                    if (event.currentTarget.response.status=='OK') {
+                        // determine total timezone offset in seconds
+                        let tzOffset = (event.currentTarget.response['dstOffset'] + event.currentTarget.response['rawOffset']);
+                        resolve(tzOffset);
+                    }
+                    else {
+                        reject(event.currentTarget.response.error_message);
+                    }
+                });
+                let reqUrl = "https://maps.googleapis.com/maps/api/timezone/json?location=" + lat + "," + lon;
+                reqUrl += "&timestamp=" + time.format("X") + "&key=" + 'AIzaSyBS_wyxfIuLDEJWNOKs4w1NqbmwSDjLqCE';
+                xmlhttp.open('GET',reqUrl,true);
+                xmlhttp.send();
+            }
+        );
+
+        return promise;
     }
 
     rusa_time(accumulatedDistanceInKm, elapsedTimeInHours) {
@@ -307,7 +335,7 @@ class AnalyzeRoute {
             bearing = this.getRelativeBearing(earlierTrackPoint,trackPoint);
         }
         return {lat:trackPoint.lat,lon:trackPoint.lon,distance:Math.round(distance),
-            time:moment(currentTime).add(elapsedTimeInHours,'hours').format('YYYY-MM-DDTHH:mm:00ZZ'),bearing:bearing};
+            time:moment(currentTime).add(elapsedTimeInHours,'hours').unix(),bearing:bearing};
     }
 
     parseRoute(gpxFile) {
