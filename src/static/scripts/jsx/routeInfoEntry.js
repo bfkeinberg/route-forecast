@@ -10,8 +10,7 @@ const queryString = require('query-string');
 
 require('!style!css!flatpickr/dist/themes/confetti.css');
 
-const paceToSpeed = {'A':10, 'B':12, 'C':14, 'C+':15, 'D-':15, 'D':16, 'D+':17, 'E-':17, 'E':18,
-    'A/10':10, 'B/12':12, 'C/14':14, 'C+/15':15, 'D-/15':15, 'D/16':16, 'D+/17':17, 'E-/17':17, 'E':18};
+const paceToSpeed = {'A':10, 'B':12, 'C':14, 'C+':15, 'D-':15, 'D':16, 'D+':17, 'E-':17, 'E':18};
 
 const time_tooltip = (
     <Tooltip id="time_tooltip">When you plan to begin riding</Tooltip>
@@ -398,15 +397,15 @@ class RouteInfoForm extends React.Component {
                             <FormControl tabIndex='3' componentClass="select" value={this.state.pace} name="pace"
                                          style={{'width':'5em','height':'2.8em',paddingRight:'8px'}}
                                          onChange={this.handlePaceChange}>
-                                <option value="A/10">A</option>
-                                <option value="B/12">B</option>
-                                <option value="C/14">C</option>
-                                <option value="C+/15">C+</option>
-                                <option value="D-/15">D-</option>
-                                <option value="D/16">D</option>
-                                <option value="D+/17">D+</option>
-                                <option value="E-/17">E-</option>
-                                <option value="E/18">E</option>
+                                <option value="A">A/10</option>
+                                <option value="B">B/12</option>
+                                <option value="C">C/14</option>
+                                <option value="C+">C+/15</option>
+                                <option value="D-">D/15-</option>
+                                <option value="D">D/16</option>
+                                <option value="D+">D+/17</option>
+                                <option value="E-">E/17-</option>
+                                <option value="E">E/18</option>
                             </FormControl>
                         </OverlayTrigger>
                     </FormGroup>
