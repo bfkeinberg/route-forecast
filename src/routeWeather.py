@@ -202,6 +202,7 @@ class WeatherCalculator:
 
     def call_weather_service(self, lat, lon, current_time, distance, zone, bearing):
         key = os.getenv('DARKSKY_API_KEY')
+        self.logger.info('Time for request is %s',current_time)
         url = "https://api.darksky.net/forecast/{}/{},{},{}?exclude=hourly,daily,flags".format(key, lat, lon, current_time)
         headers = {"Accept-Encoding": "gzip"}
         response = self.session.get(url=url, headers=headers)

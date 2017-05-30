@@ -55,6 +55,7 @@ class RouteInfoForm extends React.Component {
         this.shortenUrl = this.shortenUrl.bind(this);
         this.controlPoints = [];
         this.forecastRequest = null;
+        this.timeZone = null;
         this.state = {start:RouteInfoForm.findNextStartTime(props.start),
             pace:props.pace==null?defaultPace:props.pace, interval:props.interval==null?defaultIntervalInHours:props.interval,
             xmlhttp : null, routeFileSet:false,
@@ -151,10 +152,10 @@ class RouteInfoForm extends React.Component {
         this.controlPoints = this.copyControls(this.props.controlPoints);
         let routeInfo = this.state.parser.walkRoute(moment(this.state.start),
             this.state.pace, parseFloat(this.state.interval),props.controlPoints);
+        this.timeZone = routeInfo['timeZone'];
         this.props.updateRouteInfo({bounds:routeInfo['bounds'],points:routeInfo['points'],
             name:routeInfo['name'],finishTime:routeInfo['finishTime']}, routeInfo['controls']);
         this.forecastRequest = routeInfo['forecast'];
-        this.timeZonePromise = routeInfo['timeZone'];
     }
 
     requestForecast(event) {
@@ -171,13 +172,9 @@ class RouteInfoForm extends React.Component {
         let formdata = new FormData();
         this.state.xmlhttp.open("POST", this.props.action);
         formdata.append('locations',JSON.stringify(this.forecastRequest));
-        // send timezone for the route start to the forecast call
-        this.timeZonePromise.then(timeZoneResult => {
-            formdata.append('timezone',timeZoneResult);
-            this.state.xmlhttp.send(formdata);
-            this.setState({pending:true,showForm:false});
-            this.timeZonePromise = null;
-        }, error => {return error});
+        formdata.append('timezone',this.timeZone);
+        this.state.xmlhttp.send(formdata);
+        this.setState({pending:true,showForm:false});
     }
 
     makeFullQueryString(event) {
@@ -400,15 +397,15 @@ class RouteInfoForm extends React.Component {
                             <FormControl tabIndex='3' componentClass="select" value={this.state.pace} name="pace"
                                          style={{'width':'5em','height':'2.8em',paddingRight:'8px'}}
                                          onChange={this.handlePaceChange}>
-                                <option value="A">A</option>
-                                <option value="B">B</option>
-                                <option value="C">C</option>
-                                <option value="C+">C+</option>
-                                <option value="D-">D-</option>
-                                <option value="D">D</option>
-                                <option value="D+">D+</option>
-                                <option value="E-">E-</option>
-                                <option value="E">E</option>
+                                <option value="A/10">A</option>
+                                <option value="B/12">B</option>
+                                <option value="C/14">C</option>
+                                <option value="C+/15">C+</option>
+                                <option value="D-/15">D-</option>
+                                <option value="D/16">D</option>
+                                <option value="D+/17">D+</option>
+                                <option value="E-/17">E-</option>
+                                <option value="E/18">E</option>
                             </FormControl>
                         </OverlayTrigger>
                     </FormGroup>
