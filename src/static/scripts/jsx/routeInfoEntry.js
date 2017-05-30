@@ -10,7 +10,8 @@ const queryString = require('query-string');
 
 require('!style!css!flatpickr/dist/themes/confetti.css');
 
-const paceToSpeed = {'A':10, 'B':12, 'C':14, 'C+':15, 'D-':15, 'D':16, 'D+':17, 'E-':17, 'E':18};
+const paceToSpeed = {'A':10, 'B':12, 'C':14, 'C+':15, 'D-':15, 'D':16, 'D+':17, 'E-':17, 'E':18,
+    'A/10':10, 'B/12':12, 'C/14':14, 'C+/15':15, 'D-/15':15, 'D/16':16, 'D+/17':17, 'E-/17':17, 'E':18};
 
 const time_tooltip = (
     <Tooltip id="time_tooltip">When you plan to begin riding</Tooltip>
