@@ -169,8 +169,8 @@ def forecast():
     if not request.form.viewkeys() >= {'locations', 'timezone'}:
         return jsonify({'status':'Missing keys'}), 400
     forecast_points = json.loads(request.form['locations'])
-    if len(forecast_points) > 40:
-        return jsonify({'status':'Invalid request'}),400
+    if len(forecast_points) > 50:
+        return jsonify({'status':'Invalid request, increase interval'}),400
     today = datetime.now().date()
     if (today != application.last_request_day):
         application.last_request_day = today
