@@ -401,10 +401,10 @@ class RouteInfoForm extends React.Component {
                                 <option value="B">B/12</option>
                                 <option value="C">C/14</option>
                                 <option value="C+">C+/15</option>
-                                <option value="D-">D/15-</option>
+                                <option value="D-">D-/15-</option>
                                 <option value="D">D/16</option>
                                 <option value="D+">D+/17</option>
-                                <option value="E-">E/17-</option>
+                                <option value="E-">E-/17-</option>
                                 <option value="E">E/18</option>
                             </FormControl>
                         </OverlayTrigger>
