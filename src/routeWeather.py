@@ -1,12 +1,10 @@
+import logging
 import os
 from datetime import *
-import dateutil.tz
 
+import dateutil.tz
 import gpxpy.gpx
 import numericalunits as nu
-import requests
-
-import logging
 
 nu.reset_units()
 nu.set_derived_units_and_constants()
@@ -202,7 +200,6 @@ class WeatherCalculator:
 
     def call_weather_service(self, lat, lon, current_time, distance, zone, bearing):
         key = os.getenv('DARKSKY_API_KEY')
-        self.logger.info('Time for request is %s',current_time)
         url = "https://api.darksky.net/forecast/{}/{},{},{}?exclude=hourly,daily,flags".format(key, lat, lon, current_time)
         headers = {"Accept-Encoding": "gzip"}
         response = self.session.get(url=url, headers=headers)

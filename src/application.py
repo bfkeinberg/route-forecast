@@ -25,6 +25,7 @@ session = requests.Session()
 application.weather_request_count = 0
 application.last_request_day = datetime.now().date()
 logger = logging.getLogger('RoutePlanner')
+logging.basicConfig(level=logging.INFO)
 
 @application.after_request
 def add_header(r):
