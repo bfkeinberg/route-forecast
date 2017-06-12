@@ -84,7 +84,7 @@ def get_rwgps_route():
     route = request.args.get('route')
     if route is None:
         return jsonify({'status':'Missing keys'}), 400
-    logger.info('Request from %s(%s) for rwgps route %s',request.remote_addr,request.environ['REMOTE_ADDR'],route)
+    logger.info('Request from %s(%s) for rwgps route %s',request.remote_addr,request.headers.get('X-Forwarded-For', request.remote_addr),route)
     isTrip = request.args.get('trip')
     if isTrip is None or isTrip != 'true':
         routeType = 'routes'
@@ -171,7 +171,7 @@ def forecast():
     if not request.form.viewkeys() >= {'locations', 'timezone'}:
         return jsonify({'status':'Missing keys'}), 400
     forecast_points = json.loads(request.form['locations'])
-    logger.info('Request from %s(%s) for %d forecast points',request.remote_addr,request.environ['REMOTE_ADDR'],len(forecast_points))
+    logger.info('Request from %s(%s) for %d forecast points',request.remote_addr,request.headers.get('X-Forwarded-For', request.remote_addr),len(forecast_points))
     if len(forecast_points) > 50:
         return jsonify({'status':'Invalid request, increase interval'}),400
     today = datetime.now().date()
