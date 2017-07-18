@@ -178,7 +178,7 @@ class RouteInfoForm extends React.Component {
     }
 
     makeFullQueryString(event) {
-        let query = {start:this.state.start,pace:this.state.pace,interval:this.state.interval,rwgpsRoute:this.state.rwgpsRoute,controlPoints:JSON.stringify(this.props.controlPoints)};
+        let query = {start:this.state.start,pace:this.state.pace,interval:this.state.interval,rwgpsRoute:this.state.rwgpsRoute,controlPoints:this.props.formatControlsForUrl(this.props.controlPoints)};
         this.shortenUrl(location.origin + '?' + queryString.stringify(query));
     }
 
@@ -190,7 +190,7 @@ class RouteInfoForm extends React.Component {
 
     setQueryString(state,controlPoints) {
         if (state.rwgpsRoute != '') {
-            let query = {start:this.dateToShortDate(state.start),pace:state.pace,interval:state.interval,rwgpsRoute:state.rwgpsRoute,controlPoints:JSON.stringify(controlPoints)};
+            let query = {start:this.dateToShortDate(state.start),pace:state.pace,interval:state.interval,rwgpsRoute:state.rwgpsRoute,controlPoints:this.props.formatControlsForUrl(controlPoints)};
             history.pushState(null, 'nothing', location.origin + '?' + queryString.stringify(query));
             this.shortenUrl(location.origin + '?' + queryString.stringify(query));
         }
