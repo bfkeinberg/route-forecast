@@ -22,7 +22,7 @@ module.exports = {
             { test: /\.tsx?$/,
                 exclude: /node_modules/,
                 loader: 'ts-loader' },
-            { test: /\.css$/, loader: "style-loader!css-loader" },
+            { test: /\.css$/, loader: "style-loader!css-loader|source-map-loader" },
             { test: /\.(png|woff2?)$/, loader: "url-loader?limit=100000" },
             { test: /\.jpg$/, loader: "file-loader" },
             { test: /\.(ttf|eot|svg)$/, loader: "file-loader" },

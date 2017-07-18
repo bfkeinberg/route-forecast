@@ -12,7 +12,6 @@ let MediaQuery = require('react-responsive');
 require('!style!css!bootstrap/dist/css/bootstrap.min.css');
 require('!style!css!normalize.css/normalize.css');
 require('!style!css!@blueprintjs/core/dist/blueprint.css');
-require('!style!css!@blueprintjs/datetime/dist/blueprint-datetime.css');
 const queryString = require('query-string');
 import cookie from 'react-cookie';
 
