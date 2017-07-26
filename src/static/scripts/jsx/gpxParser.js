@@ -219,7 +219,7 @@ class AnalyzeRoute {
         return null;
     }
 
-    analyzeGpxRoute(startTime, pace, intervalInHours, controls, metric) {
+    analyzeGpxRoute(userStartTime, pace, intervalInHours, controls, metric) {
         this.nextControl = 0;
         this.pointsInRoute = [];
         let forecastRequests = [];
@@ -234,6 +234,8 @@ class AnalyzeRoute {
         let idlingTime = 0;
         let trackName = null;
         let lastTime = 0;
+        // correct start time for time zone
+        let startTime = new moment.tz(userStartTime.format('YYYY-MM-DDTHH:mm'),this.timeZoneId);
         for (let track of this.gpxResult.tracks) {
             if (trackName == null) {
                 trackName = track.name;
