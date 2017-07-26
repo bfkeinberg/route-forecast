@@ -178,7 +178,7 @@ class AnalyzeRoute {
             forecastRequests.push(this.addToForecast(previousPoint, forecastPoint, startTime, (accumulatedTime + idlingTime),accumulatedDistanceKm*kmToMiles));
         }
         let finishTime = this.formatFinishTime(startTime,accumulatedTime,idlingTime);
-        this.fillLastControlPoint(finishTime,controls,this.nextControl);
+        this.fillLastControlPoint(finishTime,controls,this.nextControl,accumulatedTime+idlingTime,accumulatedDistanceKm);
         return {forecast:forecastRequests,points:this.pointsInRoute,name:trackName,controls:controls,bounds:bounds,
             finishTime: finishTime, timeZone:this.timeZone};
     }
@@ -198,9 +198,11 @@ class AnalyzeRoute {
         return relative_bearing;
     }
 
-    fillLastControlPoint(finishTime,controls,nextControl) {
+    fillLastControlPoint(finishTime,controls,nextControl,totalTime,totalDistanceInKm) {
         while (nextControl < controls.length)   {
             controls[nextControl]['arrival'] = finishTime;
+            // update banked time also, supplying final distance in km and total time taken
+            controls[nextControl]['banked'] = Math.round(this.rusa_time(totalDistanceInKm, totalTime));
             ++nextControl;
         }
     }
@@ -272,7 +274,7 @@ class AnalyzeRoute {
             forecastRequests.push(this.addToForecast(previousPoint, forecastPoint, startTime, (accumulatedTime + idlingTime),accumulatedDistanceKm*kmToMiles));
         }
         let finishTime = this.formatFinishTime(startTime,accumulatedTime,idlingTime);
-        this.fillLastControlPoint(finishTime,controls,this.nextControl);
+        this.fillLastControlPoint(finishTime,controls,this.nextControl,accumulatedTime+idlingTime,accumulatedDistanceKm);
         return {forecast:forecastRequests,points:this.pointsInRoute,name:trackName,controls:controls,bounds:bounds,
             finishTime:finishTime,timeZone:this.timeZone};
     }
