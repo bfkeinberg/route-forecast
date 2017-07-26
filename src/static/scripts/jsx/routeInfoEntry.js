@@ -212,7 +212,7 @@ class RouteInfoForm extends React.Component {
                     return;
                 }
                 this.props.updateForecast(event.target.response);
-                let weatherCorrectionMinutes = this.state.parser.adjustForWind(event.target.response,this.state.pace,this.props.controlPoints,this.state.start);
+                let weatherCorrectionMinutes = this.state.parser.adjustForWind(event.target.response,this.state.pace,this.props.controlPoints,this.state.start,this.props.metric);
                 this.props.updateFinishTime(weatherCorrectionMinutes);
                 // this.props.updateControls(this.props.controlPoints);
             }

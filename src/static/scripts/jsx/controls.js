@@ -214,18 +214,15 @@ class ControlPoints extends React.Component {
                     <Checkbox tabIndex='11' checked={this.state.displayBankedTime} inline
                        onChange={this.toggleDisplayBanked}
                      onClick={this.toggleDisplayBanked}
-                     style={{padding:'7px 0px 0px 28px','textAlign':'center',float:'right', display:'inline-flex',width: '170px',height:'28px'}}>Display banked time</Checkbox>
+                     style={{padding:'7px 0px 0px 26px','textAlign':'center',float:'right', display:'inline-flex',width: '170px',height:'28px'}}>Display banked time</Checkbox>
                     <FormGroup controlId="finishTime" style={{display:'inline-flex'}}>
-                        <ControlLabel style={{width:'8em',display:'flex',float:'right',marginTop:'7px',paddingLeft:'8px'}}>Finish time</ControlLabel>
-                        <FormControl tabIndex='-1' type="text" style={{width:'12em',float:'right',marginTop:'2px',marginBotton:'0px',paddingLeft:'4px',paddingTop:'2px',height:'28px'}}
+                        <ControlLabel style={{width:'7em',display:'flex',float:'right',marginTop:'7px',paddingLeft:'8px'}}>Finish time</ControlLabel>
+                        <FormControl tabIndex='-1' type="text" style={{width:'12em',float:'right',marginTop:'2px',marginBotton:'0px',paddingLeft:'2px',paddingTop:'2px',height:'28px'}}
                                      value={this.props.finishTime}/>
                     </FormGroup>
                     <Checkbox tabIndex='12' checked={this.state.metric} inline
                               onClick={this.toggleMetric}
-/*
-                              onChange={this.toggleMetric}
-*/
-                              style={{padding:'7px 0px 0px 28px','textAlign':'center',float:'right', display:'inline-flex',width:'80px',height:'28px'}}>metric</Checkbox>
+                              style={{padding:'7px 0px 0px 28px','textAlign':'center', display:'inline-flex',float:'right', width:'75px',height:'28px'}}>metric</Checkbox>
                 </ButtonGroup>
                 </ButtonToolbar>
                 <Panel header={title} bsStyle="info" style={{margin:'10px'}}>

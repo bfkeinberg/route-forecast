@@ -46,10 +46,14 @@ class RouteWeatherUI extends React.Component {
 
     parseControls(controlPointString) {
         let controlPointList = controlPointString.split(":");
-        return controlPointList.map(point => {
+        let controlPoints =
+        controlPointList.map(point => {
             let controlPointValues = point.split(",");
             return ({name:controlPointValues[0],distance:controlPointValues[1],duration:controlPointValues[2]});
             });
+        // delete dummy first element
+        controlPoints.splice(0,1);
+        return controlPoints;
     }
 
     updateControls(controlPoints,metric) {
