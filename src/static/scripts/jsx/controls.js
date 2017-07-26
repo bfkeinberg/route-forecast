@@ -145,8 +145,9 @@ class ControlPoints extends React.Component {
         this.updateRow = this.updateRow.bind(this);
         this.removeRow = this.removeRow.bind(this);
         this.toggleDisplayBanked = this.toggleDisplayBanked.bind(this);
+        this.toggleMetric = this.toggleMetric.bind(this);
         this.state = {
-            displayBankedTime : false, controlsChanged:false
+            displayBankedTime : false, controlsChanged:false, metric:this.props.metric
         }
     }
 
@@ -154,26 +155,32 @@ class ControlPoints extends React.Component {
         let controlPoints = this.props.controlPoints;
         let key = controlPoints.length;
         controlPoints.push({name:'',distance:0,duration:'',arrival:"00:00"});
-        this.props.updateControls(controlPoints);
+        this.props.updateControls(controlPoints,this.state.metric);
         this.setState({controlsChanged:true});
     }
 
     removeRow(key) {
         let controlPoints = this.props.controlPoints;
         controlPoints.splice(key,1);
-        this.props.updateControls(controlPoints);
+        this.props.updateControls(controlPoints,this.state.metric);
         this.setState({controlsChanged:true});
     }
 
     updateRow(key,value) {
         let controlPoints = this.props.controlPoints;
         controlPoints[key] = value;
-        this.props.updateControls(controlPoints);
+        this.props.updateControls(controlPoints,this.state.metric);
         this.setState({controlsChanged:true});
     }
 
     toggleDisplayBanked(event) {
         this.setState({displayBankedTime:!this.state.displayBankedTime});
+    }
+
+    toggleMetric(event) {
+        let metric = !this.state.metric
+        this.setState({metric:metric});
+        this.props.updateControls(this.props.controlPoints,metric);
     }
 
     shouldComponentUpdate(newProps,newState) {
@@ -213,6 +220,12 @@ class ControlPoints extends React.Component {
                         <FormControl tabIndex='-1' type="text" style={{width:'12em',float:'right',marginTop:'2px',marginBotton:'0px',paddingLeft:'4px',paddingTop:'2px',height:'28px'}}
                                      value={this.props.finishTime}/>
                     </FormGroup>
+                    <Checkbox tabIndex='12' checked={this.state.metric} inline
+                              onClick={this.toggleMetric}
+/*
+                              onChange={this.toggleMetric}
+*/
+                              style={{padding:'7px 0px 0px 28px','textAlign':'center',float:'right', display:'inline-flex',width:'80px',height:'28px'}}>metric</Checkbox>
                 </ButtonGroup>
                 </ButtonToolbar>
                 <Panel header={title} bsStyle="info" style={{margin:'10px'}}>
@@ -229,7 +242,8 @@ class ControlPoints extends React.Component {
                         <tbody>
                         {this.props.controlPoints.map((row, key) =>
                             <ControlPoint key={key} index={key} onChange={this.updateRow} removeRow={this.removeRow}
-                                          displayBanked={this.state.displayBankedTime} fields={row}/>)}
+                                          displayBanked={this.state.displayBankedTime}
+                                          fields={row}/>)}
                         </tbody>
                     </Table>
                     <div tabIndex="98" onFocus={event => {document.getElementById('addButton').focus()}}></div>

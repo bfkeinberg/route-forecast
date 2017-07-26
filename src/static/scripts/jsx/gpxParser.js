@@ -127,7 +127,7 @@ class AnalyzeRoute {
         xmlhttp.send();
     }
 
-    analyzeRwgpsRoute(userStartTime,pace,intervalInHours,controls) {
+    analyzeRwgpsRoute(userStartTime,pace,intervalInHours,controls,metric) {
         this.nextControl = 0;
         this.pointsInRoute = [];
         let forecastRequests = [];
@@ -163,7 +163,7 @@ class AnalyzeRoute {
                 // then find elapsed time given pace
                 accumulatedTime = this.calculateElapsedTime(accumulatedClimbMeters, accumulatedDistanceKm, baseSpeed);
             }
-            let addedTime = this.checkAndUpdateControls(accumulatedDistanceKm, startTime, (accumulatedTime + idlingTime), controls);
+            let addedTime = this.checkAndUpdateControls(accumulatedDistanceKm, startTime, (accumulatedTime + idlingTime), controls, metric);
             idlingTime += addedTime;
             // see if it's time for forecast
             if (((accumulatedTime + idlingTime) - lastTime) >= intervalInHours) {
@@ -208,17 +208,17 @@ class AnalyzeRoute {
         return moment(startTime).add(accumulatedTime+restTime,'hours').format('ddd, MMM DD h:mma');
     }
 
-    walkRoute(startTime,pace,interval,controls) {
+    walkRoute(startTime,pace,interval,controls,metric) {
         controls.sort((a,b) => a['distance']-b['distance']);
         if (this.gpxResult != null) {
-            return this.analyzeGpxRoute(startTime,pace,interval,controls);
+            return this.analyzeGpxRoute(startTime,pace,interval,controls,metric);
         } else if (this.rwgpsRouteData != null) {
-            return this.analyzeRwgpsRoute(startTime,pace,interval,controls);
+            return this.analyzeRwgpsRoute(startTime,pace,interval,controls,metric);
         }
         return null;
     }
 
-    analyzeGpxRoute(startTime, pace, intervalInHours, controls) {
+    analyzeGpxRoute(startTime, pace, intervalInHours, controls,metric) {
         this.nextControl = 0;
         this.pointsInRoute = [];
         let forecastRequests = [];
@@ -253,7 +253,7 @@ class AnalyzeRoute {
                         // then find elapsed time given pace
                         accumulatedTime = this.calculateElapsedTime(accumulatedClimbMeters, accumulatedDistanceKm, baseSpeed);
                     }
-                    let addedTime = this.checkAndUpdateControls(accumulatedDistanceKm, startTime, (accumulatedTime + idlingTime), controls);
+                    let addedTime = this.checkAndUpdateControls(accumulatedDistanceKm, startTime, (accumulatedTime + idlingTime), controls, metric);
                     idlingTime += addedTime;
                     // see if it's time for forecast
                     if (((accumulatedTime + idlingTime) - lastTime) >= intervalInHours) {
@@ -320,13 +320,21 @@ class AnalyzeRoute {
          return (closetimeMinutes - elapsedMinutes);
     }
 
-    checkAndUpdateControls(distanceInKm, startTime, elapsedTimeInHours, controls) {
+    checkAndUpdateControls(distanceInKm, startTime, elapsedTimeInHours, controls, metric) {
         if (controls.length <= this.nextControl) {
             return 0;
         }
-        let distanceInMiles = distanceInKm*0.62137;
-        if (distanceInMiles < controls[this.nextControl]['distance']) {
-            return 0
+        if (metric)
+        {
+            if (distanceInKm < controls[this.nextControl]['distance']) {
+                return 0
+            }
+        }
+        else {
+            let distanceInMiles = distanceInKm*0.62137;
+            if (distanceInMiles < controls[this.nextControl]['distance']) {
+                return 0
+            }
         }
         let delayInMinutes = controls[this.nextControl]['duration'];
         let arrivalTime = moment(startTime).add(elapsedTimeInHours,'hours');

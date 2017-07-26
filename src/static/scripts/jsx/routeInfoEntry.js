@@ -109,7 +109,7 @@ class RouteInfoForm extends React.Component {
 
     componentWillReceiveProps(nextProps) {
         let controlsEqual = this.compareControls(this.controlPoints,nextProps.controlPoints);
-        if (!controlsEqual && this.state.parser.routeIsLoaded()) {
+        if ((!controlsEqual || (this.props.metric!=nextProps.metric))&& this.state.parser.routeIsLoaded()) {
             this.calculateTimeAndDistance(nextProps);
         }
     }
@@ -150,7 +150,7 @@ class RouteInfoForm extends React.Component {
     calculateTimeAndDistance(props) {
         this.controlPoints = this.copyControls(this.props.controlPoints);
         let routeInfo = this.state.parser.walkRoute(moment(this.state.start),
-            this.state.pace, parseFloat(this.state.interval),props.controlPoints);
+            this.state.pace, parseFloat(this.state.interval),props.controlPoints,props.metric);
         this.timeZone = routeInfo['timeZone'];
         this.props.updateRouteInfo({bounds:routeInfo['bounds'],points:routeInfo['points'],
             name:routeInfo['name'],finishTime:routeInfo['finishTime']}, routeInfo['controls']);
@@ -187,9 +187,10 @@ class RouteInfoForm extends React.Component {
         return moment(date).format("ddd MMM D YYYY HH:mm:ss");
     }
 
-    setQueryString(state,controlPoints) {
+    setQueryString(state,controlPoints,metric) {
         if (state.rwgpsRoute != '') {
-            let query = {start:this.dateToShortDate(state.start),pace:state.pace,interval:state.interval,rwgpsRoute:state.rwgpsRoute,controlPoints:this.props.formatControlsForUrl(controlPoints)};
+            let query = {start:this.dateToShortDate(state.start),pace:state.pace,interval:state.interval,metric:metric,
+                rwgpsRoute:state.rwgpsRoute,controlPoints:this.props.formatControlsForUrl(controlPoints)};
             history.pushState(null, 'nothing', location.origin + '?' + queryString.stringify(query));
             this.shortenUrl(location.origin + '?' + queryString.stringify(query));
         }
@@ -205,7 +206,7 @@ class RouteInfoForm extends React.Component {
             this.forecastRequest = null;
             if (event.target.status==200) {
                 this.setState({errorDetails:null,succeeded:true});
-                this.setQueryString(this.state,this.props.controlPoints);
+                this.setQueryString(this.state,this.props.controlPoints,this.props.metric);
                 if (event.target.response == null) {
                     console.log('missing response');
                     return;

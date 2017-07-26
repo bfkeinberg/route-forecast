@@ -30,7 +30,7 @@ class RouteWeatherUI extends React.Component {
         // new control point url format - <name>,<distance>,<time-in-minutes>:<name>,<distance>,<time-in-minutes>:etc
         this.state = {controlPoints: queryParams.controlPoints==null?[]:this.parseControls(queryParams.controlPoints),
             routeInfo:{bounds:{},points:[], name:'',finishTime:''}, forecast:[], action:script.getAttribute('action'),
-            maps_key:script.getAttribute('maps_api_key'),formVisible:true, weatherCorrectionMinutes:null};
+            maps_key:script.getAttribute('maps_api_key'),formVisible:true, weatherCorrectionMinutes:null, metric:false};
     }
 
     formatOneControl(controlPoint) {
@@ -52,8 +52,8 @@ class RouteWeatherUI extends React.Component {
             });
     }
 
-    updateControls(controlPoints) {
-        this.setState({controlPoints: controlPoints})
+    updateControls(controlPoints,metric) {
+        this.setState({controlPoints: controlPoints, metric:metric})
         if (this.state.routeInfo.name != '') {
             cookie.save(this.state.routeInfo.name,this.formatControlsForUrl(controlPoints));
         }
@@ -63,7 +63,7 @@ class RouteWeatherUI extends React.Component {
         if (this.state.routeInfo.name != routeInfo.name) {
             let savedControlPoints = cookie.load(routeInfo.name);
             if (savedControlPoints != null && savedControlPoints.length > 0) {
-                controlPoints = savedControlPoints;
+                controlPoints = this.parseControls(savedControlPoints);
             }
         }
         if (routeInfo.name != '') {
@@ -92,6 +92,7 @@ class RouteWeatherUI extends React.Component {
                            updateControls={this.updateControls}
                            controlPoints={this.state.controlPoints}
                            formVisible={this.state.formVisible}
+                           metric={this.state.metric}
                            updateFormVisibility={this.updateFormVisibility}
                            updateFinishTime={this.updateFinishTime}
                            start={queryParams.start}
@@ -114,6 +115,7 @@ class RouteWeatherUI extends React.Component {
                         <ControlPointList controlPoints={this.state.controlPoints}
                                           updateControls={this.updateControls}
                                           finishTime={this.state.routeInfo['finishTime']}
+                                          metric={queryParams.metric==null?this.state.metric:queryParams.metric}
                                           name={this.state.routeInfo['name']}/>
                     </SplitPane>
                         <SplitPane defaultSize={500} minSize={150} split="vertical" paneStyle={{'overflow':'scroll'}}>
@@ -129,6 +131,7 @@ class RouteWeatherUI extends React.Component {
                         {this.state.formVisible ? inputForm : formButton}
                         <ControlPointList controlPoints={this.state.controlPoints}
                                           updateControls={this.updateControls}
+                                          metric={queryParams.metric==null?this.state.metric:queryParams.metric}
                                           finishTime={this.state.routeInfo['finishTime']}
                                           name={this.state.routeInfo['name']}/>
                     </SplitPane>
