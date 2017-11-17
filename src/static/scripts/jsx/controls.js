@@ -222,6 +222,7 @@ class ControlPoints extends React.Component {
                     </FormGroup>
                     <Checkbox tabIndex='12' checked={this.state.metric} inline
                               onClick={this.toggleMetric}
+                              onChange={this.toggleMetric}
                               style={{padding:'7px 0px 0px 28px','textAlign':'center', display:'inline-flex',float:'right', width:'75px',height:'28px'}}>metric</Checkbox>
                 </ButtonGroup>
                 </ButtonToolbar>
