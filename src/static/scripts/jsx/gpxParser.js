@@ -2,6 +2,7 @@ let gpxParse = require("gpx-parse-browser");
 import moment from 'moment-timezone';
 
 const paceToSpeed = {'A': 10, 'B': 12, 'C': 14, 'C+': 15, 'D-': 15, 'D': 16, 'D+': 17, 'E-': 17, 'E': 18};
+const kmToMiles = 0.62137;
 
 class AnalyzeRoute {
     constructor(options,maps_api_key) {
@@ -127,7 +128,7 @@ class AnalyzeRoute {
         xmlhttp.send();
     }
 
-    analyzeRwgpsRoute(userStartTime,pace,intervalInHours,controls) {
+    analyzeRwgpsRoute(userStartTime,pace,intervalInHours,controls,metric) {
         this.nextControl = 0;
         this.pointsInRoute = [];
         let forecastRequests = [];
@@ -152,7 +153,7 @@ class AnalyzeRoute {
             this.points.push(point);
             bounds = this.setMinMaxCoords(point,bounds);
             if (first) {
-                forecastRequests.push(this.addToForecast(point, forecastPoint, startTime, accumulatedTime,accumulatedDistanceKm*0.62137));
+                forecastRequests.push(this.addToForecast(point, forecastPoint, startTime, accumulatedTime,accumulatedDistanceKm*kmToMiles));
                 first = false;
             }
             if (previousPoint != null) {
@@ -163,21 +164,21 @@ class AnalyzeRoute {
                 // then find elapsed time given pace
                 accumulatedTime = this.calculateElapsedTime(accumulatedClimbMeters, accumulatedDistanceKm, baseSpeed);
             }
-            let addedTime = this.checkAndUpdateControls(accumulatedDistanceKm, startTime, (accumulatedTime + idlingTime), controls);
+            let addedTime = this.checkAndUpdateControls(accumulatedDistanceKm, startTime, (accumulatedTime + idlingTime), controls, metric);
             idlingTime += addedTime;
             // see if it's time for forecast
             if (((accumulatedTime + idlingTime) - lastTime) >= intervalInHours) {
-                forecastRequests.push(this.addToForecast(point, forecastPoint, startTime, (accumulatedTime + idlingTime),accumulatedDistanceKm*0.62137));
+                forecastRequests.push(this.addToForecast(point, forecastPoint, startTime, (accumulatedTime + idlingTime),accumulatedDistanceKm*kmToMiles));
                 lastTime = accumulatedTime + idlingTime;
                 forecastPoint = point;
             }
             previousPoint = point;
         }
         if (previousPoint != null && accumulatedTime != 0) {
-            forecastRequests.push(this.addToForecast(previousPoint, forecastPoint, startTime, (accumulatedTime + idlingTime),accumulatedDistanceKm*0.62137));
+            forecastRequests.push(this.addToForecast(previousPoint, forecastPoint, startTime, (accumulatedTime + idlingTime),accumulatedDistanceKm*kmToMiles));
         }
         let finishTime = this.formatFinishTime(startTime,accumulatedTime,idlingTime);
-        this.fillLastControlPoint(finishTime,controls,this.nextControl);
+        this.fillLastControlPoint(finishTime,controls,this.nextControl,accumulatedTime+idlingTime,accumulatedDistanceKm);
         return {forecast:forecastRequests,points:this.pointsInRoute,name:trackName,controls:controls,bounds:bounds,
             finishTime: finishTime, timeZone:this.timeZone};
     }
@@ -197,9 +198,11 @@ class AnalyzeRoute {
         return relative_bearing;
     }
 
-    fillLastControlPoint(finishTime,controls,nextControl) {
+    fillLastControlPoint(finishTime,controls,nextControl,totalTime,totalDistanceInKm) {
         while (nextControl < controls.length)   {
             controls[nextControl]['arrival'] = finishTime;
+            // update banked time also, supplying final distance in km and total time taken
+            controls[nextControl]['banked'] = Math.round(this.rusa_time(totalDistanceInKm, totalTime));
             ++nextControl;
         }
     }
@@ -208,17 +211,17 @@ class AnalyzeRoute {
         return moment(startTime).add(accumulatedTime+restTime,'hours').format('ddd, MMM DD h:mma');
     }
 
-    walkRoute(startTime,pace,interval,controls) {
+    walkRoute(startTime,pace,interval,controls,metric) {
         controls.sort((a,b) => a['distance']-b['distance']);
         if (this.gpxResult != null) {
-            return this.analyzeGpxRoute(startTime,pace,interval,controls);
+            return this.analyzeGpxRoute(startTime,pace,interval,controls,metric);
         } else if (this.rwgpsRouteData != null) {
-            return this.analyzeRwgpsRoute(startTime,pace,interval,controls);
+            return this.analyzeRwgpsRoute(startTime,pace,interval,controls,metric);
         }
         return null;
     }
 
-    analyzeGpxRoute(startTime, pace, intervalInHours, controls) {
+    analyzeGpxRoute(userStartTime, pace, intervalInHours, controls, metric) {
         this.nextControl = 0;
         this.pointsInRoute = [];
         let forecastRequests = [];
@@ -233,6 +236,8 @@ class AnalyzeRoute {
         let idlingTime = 0;
         let trackName = null;
         let lastTime = 0;
+        // correct start time for time zone
+        let startTime = new moment.tz(userStartTime.format('YYYY-MM-DDTHH:mm'),this.timeZoneId);
         for (let track of this.gpxResult.tracks) {
             if (trackName == null) {
                 trackName = track.name;
@@ -242,7 +247,7 @@ class AnalyzeRoute {
                     this.points.push(point);
                     bounds = this.setMinMaxCoords(point,bounds);
                     if (first) {
-                        forecastRequests.push(this.addToForecast(point, forecastPoint, startTime, accumulatedTime,accumulatedDistanceKm*0.62137));
+                        forecastRequests.push(this.addToForecast(point, forecastPoint, startTime, accumulatedTime,accumulatedDistanceKm*kmToMiles));
                         first = false;
                     }
                     if (previousPoint != null) {
@@ -253,11 +258,11 @@ class AnalyzeRoute {
                         // then find elapsed time given pace
                         accumulatedTime = this.calculateElapsedTime(accumulatedClimbMeters, accumulatedDistanceKm, baseSpeed);
                     }
-                    let addedTime = this.checkAndUpdateControls(accumulatedDistanceKm, startTime, (accumulatedTime + idlingTime), controls);
+                    let addedTime = this.checkAndUpdateControls(accumulatedDistanceKm, startTime, (accumulatedTime + idlingTime), controls, metric);
                     idlingTime += addedTime;
                     // see if it's time for forecast
                     if (((accumulatedTime + idlingTime) - lastTime) >= intervalInHours) {
-                        forecastRequests.push(this.addToForecast(point, forecastPoint, startTime, (accumulatedTime + idlingTime),accumulatedDistanceKm*0.62137));
+                        forecastRequests.push(this.addToForecast(point, forecastPoint, startTime, (accumulatedTime + idlingTime),accumulatedDistanceKm*kmToMiles));
                         lastTime = accumulatedTime + idlingTime;
                         forecastPoint = point;
                     }
@@ -266,10 +271,10 @@ class AnalyzeRoute {
             }
         }
         if (previousPoint != null && accumulatedTime != 0) {
-            forecastRequests.push(this.addToForecast(previousPoint, forecastPoint, startTime, (accumulatedTime + idlingTime),accumulatedDistanceKm*0.62137));
+            forecastRequests.push(this.addToForecast(previousPoint, forecastPoint, startTime, (accumulatedTime + idlingTime),accumulatedDistanceKm*kmToMiles));
         }
         let finishTime = this.formatFinishTime(startTime,accumulatedTime,idlingTime);
-        this.fillLastControlPoint(finishTime,controls,this.nextControl);
+        this.fillLastControlPoint(finishTime,controls,this.nextControl,accumulatedTime+idlingTime,accumulatedDistanceKm);
         return {forecast:forecastRequests,points:this.pointsInRoute,name:trackName,controls:controls,bounds:bounds,
             finishTime:finishTime,timeZone:this.timeZone};
     }
@@ -320,13 +325,21 @@ class AnalyzeRoute {
          return (closetimeMinutes - elapsedMinutes);
     }
 
-    checkAndUpdateControls(distanceInKm, startTime, elapsedTimeInHours, controls) {
+    checkAndUpdateControls(distanceInKm, startTime, elapsedTimeInHours, controls, metric) {
         if (controls.length <= this.nextControl) {
             return 0;
         }
-        let distanceInMiles = distanceInKm*0.62137;
-        if (distanceInMiles < controls[this.nextControl]['distance']) {
-            return 0
+        if (metric)
+        {
+            if (distanceInKm < controls[this.nextControl]['distance']) {
+                return 0
+            }
+        }
+        else {
+            let distanceInMiles = distanceInKm*kmToMiles;
+            if (distanceInMiles < controls[this.nextControl]['distance']) {
+                return 0
+            }
         }
         let delayInMinutes = controls[this.nextControl]['duration'];
         let arrivalTime = moment(startTime).add(elapsedTimeInHours,'hours');
@@ -339,7 +352,7 @@ class AnalyzeRoute {
     // in hours
     calculateElapsedTime(climbInMeters,distanceInKm,baseSpeed) {
         let climbInFeet = (climbInMeters * 3.2808);
-        let distanceInMiles = distanceInKm*0.62137;
+        let distanceInMiles = distanceInKm*kmToMiles;
         if (distanceInMiles < 1) {
             return 0;
         }
@@ -404,7 +417,7 @@ class AnalyzeRoute {
         return (distance*60)/effectiveSpeed-(distance*60)/initialSpeed;
     }
 
-    adjustForWind(forecastInfo,pace,controls,start) {
+    adjustForWind(forecastInfo,pace,controls,start,metric) {
         if (forecastInfo.length==0) {
             return 0;
         }
@@ -446,14 +459,15 @@ class AnalyzeRoute {
                 let minutesChange = this.windToTimeInMinutes(baseSpeed,distanceInMiles,hilliness,effectiveWindSpeed);
                 totalMinutesLost += minutesChange;
 
+                let desiredDistance = metric ? (totalDistanceInMiles/kmToMiles) : totalDistanceInMiles;
                 if (controls.length > currentControl) {
-                    if (totalDistanceInMiles >= controls[currentControl]['distance']) {
+                    if (desiredDistance >= controls[currentControl]['distance']) {
                         let previousArrivalTime = moment(controls[currentControl]['arrival'],'ddd, MMM DD h:mma');
                         let arrivalTime = previousArrivalTime.add(totalMinutesLost,'minutes');
                         controls[currentControl]['arrival'] = arrivalTime.format('ddd, MMM DD h:mma');
                         let elapsedTimeMs = arrivalTime.toDate()-start;
                         let elapsedDuration = moment.duration(elapsedTimeMs,'ms');
-                        controls[currentControl]['banked'] = Math.round(this.rusa_time(distanceInMiles/0.62137, elapsedDuration.asHours()));
+                        controls[currentControl]['banked'] = Math.round(this.rusa_time(distanceInMiles/kmToMiles, elapsedDuration.asHours()));
                         currentControl++;
                     }
                 }
