@@ -128,7 +128,7 @@ class AnalyzeRoute {
         xmlhttp.send();
     }
 
-    analyzeRwgpsRoute(userStartTime,pace,intervalInHours,controls,metric) {
+    analyzeRwgpsRoute(userStartTime,pace,intervalInHours,controls,unsortedControls,metric) {
         this.nextControl = 0;
         this.pointsInRoute = [];
         let forecastRequests = [];
@@ -179,7 +179,7 @@ class AnalyzeRoute {
         }
         let finishTime = this.formatFinishTime(startTime,accumulatedTime,idlingTime);
         this.fillLastControlPoint(finishTime,controls,this.nextControl,accumulatedTime+idlingTime,accumulatedDistanceKm);
-        return {forecast:forecastRequests,points:this.pointsInRoute,name:trackName,controls:controls,bounds:bounds,
+        return {forecast:forecastRequests,points:this.pointsInRoute,name:trackName,controls:unsortedControls,bounds:bounds,
             finishTime: finishTime, timeZone:this.timeZone};
     }
 
@@ -212,16 +212,17 @@ class AnalyzeRoute {
     }
 
     walkRoute(startTime,pace,interval,controls,metric) {
-        controls.sort((a,b) => a['distance']-b['distance']);
+        let modifiedControls = controls.slice();
+        modifiedControls.sort((a,b) => a['distance']-b['distance']);
         if (this.gpxResult != null) {
-            return this.analyzeGpxRoute(startTime,pace,interval,controls,metric);
+            return this.analyzeGpxRoute(startTime,pace,interval,modifiedControls,controls,metric);
         } else if (this.rwgpsRouteData != null) {
-            return this.analyzeRwgpsRoute(startTime,pace,interval,controls,metric);
+            return this.analyzeRwgpsRoute(startTime,pace,interval,modifiedControls,controls,metric);
         }
         return null;
     }
 
-    analyzeGpxRoute(userStartTime, pace, intervalInHours, controls, metric) {
+    analyzeGpxRoute(userStartTime, pace, intervalInHours, controls, unsortedControls, metric) {
         this.nextControl = 0;
         this.pointsInRoute = [];
         let forecastRequests = [];
@@ -275,7 +276,7 @@ class AnalyzeRoute {
         }
         let finishTime = this.formatFinishTime(startTime,accumulatedTime,idlingTime);
         this.fillLastControlPoint(finishTime,controls,this.nextControl,accumulatedTime+idlingTime,accumulatedDistanceKm);
-        return {forecast:forecastRequests,points:this.pointsInRoute,name:trackName,controls:controls,bounds:bounds,
+        return {forecast:forecastRequests,points:this.pointsInRoute,name:trackName,controls:unsortedControls,bounds:bounds,
             finishTime:finishTime,timeZone:this.timeZone};
     }
 

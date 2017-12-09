@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React from 'react';
 import {FormControl,FormGroup,Button,Modal,Tooltip,OverlayTrigger,ControlLabel} from 'react-bootstrap';
 
 class LoginDialog extends React.Component {

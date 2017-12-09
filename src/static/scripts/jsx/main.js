@@ -1,6 +1,5 @@
-global.jQuery = require('jquery');
-import React, { Component } from 'react';
-import ControlPointList from './controls';
+import React from 'react';
+import ControlPoints from './controls';
 import ReactDOM from 'react-dom';
 import RouteInfoForm from './routeInfoEntry';
 import RouteForecastMap from './map';
@@ -8,12 +7,19 @@ import ForecastTable from './forecastTable';
 import moment from 'moment';
 import SplitPane from 'react-split-pane';
 import { Button } from 'react-bootstrap';
-let MediaQuery = require('react-responsive');
-require('!style!css!bootstrap/dist/css/bootstrap.min.css');
-require('!style!css!normalize.css/normalize.css');
-require('!style!css!@blueprintjs/core/dist/blueprint.css');
-const queryString = require('query-string');
-import cookie from 'react-cookie';
+import MediaQuery from 'react-responsive';
+
+// for react-splitter
+import 'normalize.css/normalize.css';
+
+import '@blueprintjs/core/dist/blueprint.css';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import 'ag-grid/dist/styles/ag-grid.css';
+import 'ag-grid/dist/styles/ag-theme-fresh.css';
+import 'flatpickr/dist/themes/confetti.css';
+
+import queryString from 'query-string';
+import cookie from 'react-cookies';
 
 class RouteWeatherUI extends React.Component {
 
@@ -33,6 +39,37 @@ class RouteWeatherUI extends React.Component {
             maps_key:script.getAttribute('maps_api_key'),formVisible:true, weatherCorrectionMinutes:null, metric:false};
     }
 
+    doControlsMatch(newControl,oldControl) {
+        return newControl.distance===oldControl.distance &&
+            newControl.name===oldControl.name &&
+            newControl.duration===oldControl.duration &&
+            newControl.arrival===oldControl.arrival &&
+            newControl.banked===oldControl.banked;
+    }
+
+    shouldComponentUpdate(newProps,newState) {
+        let controlPoints = this.state.controlPoints;
+        if (this.state.routeInfo.name !== newState.routeInfo.name) {
+            return true;
+        }
+        if (newState.controlPoints.length!==this.state.controlPoints.length) {
+            return true;
+        }
+        if (!newState.controlPoints.every((v,i)=> this.doControlsMatch(v,controlPoints[i]))) {
+            return true;
+        }
+        if (newState.routeInfo.finishTime!==this.state.routeInfo.finishTime) {
+            return true;
+        }
+        if (newState.forecast.length!==this.state.forecast.length) {
+            return true;
+        }
+        if (newState.metric !== this.state.metric) {
+            return true;
+        }
+        return false;
+    }
+
     formatOneControl(controlPoint) {
         if (typeof controlPoint === 'string') {
             return controlPoint;
@@ -49,7 +86,7 @@ class RouteWeatherUI extends React.Component {
         let controlPoints =
         controlPointList.map(point => {
             let controlPointValues = point.split(",");
-            return ({name:controlPointValues[0],distance:controlPointValues[1],duration:controlPointValues[2]});
+            return ({name:controlPointValues[0],distance:Number(controlPointValues[1]),duration:Number(controlPointValues[2])});
             });
         // delete dummy first element
         controlPoints.splice(0,1);
@@ -57,7 +94,7 @@ class RouteWeatherUI extends React.Component {
     }
 
     updateControls(controlPoints,metric) {
-        this.setState({controlPoints: controlPoints, metric:metric})
+        this.setState({controlPoints: controlPoints, metric:metric});
         if (this.state.routeInfo.name != '') {
             cookie.save(this.state.routeInfo.name,this.formatControlsForUrl(controlPoints));
         }
@@ -80,6 +117,7 @@ class RouteWeatherUI extends React.Component {
         let routeInfoCopy = this.state.routeInfo;
         routeInfoCopy.finishTime =
             moment(routeInfoCopy.finishTime,'ddd, MMM DD h:mma').add(weatherCorrectionMinutes,'minutes').format('ddd, MMM DD h:mma');
+        // Perf.start();
         this.setState({'routeInfo':routeInfoCopy,weatherCorrectionMinutes:weatherCorrectionMinutes});
     }
 
@@ -116,10 +154,10 @@ class RouteWeatherUI extends React.Component {
                 <SplitPane defaultSize={300} minSize={150} maxSize={530} split="horizontal">
                     <SplitPane defaultSize={550} minSize={150} split='vertical' pane2Style={{'overflow':'scroll'}}>
                         {inputForm}
-                        <ControlPointList controlPoints={this.state.controlPoints}
+                        <ControlPoints controlPoints={this.state.controlPoints}
                                           updateControls={this.updateControls}
                                           finishTime={this.state.routeInfo['finishTime']}
-                                          metric={queryParams.metric==null?this.state.metric:queryParams.metric}
+                                          metric={queryParams.metric==null?this.state.metric:queryParams.metric=='true'}
                                           name={this.state.routeInfo['name']}/>
                     </SplitPane>
                         <SplitPane defaultSize={500} minSize={150} split="vertical" paneStyle={{'overflow':'scroll'}}>
@@ -133,7 +171,7 @@ class RouteWeatherUI extends React.Component {
                 <SplitPane defaultSize={this.state.formVisible?500:250} minSize={120} maxSize={600} split="horizontal" pane2Style={{'overflow':'scroll'}}>
                     <SplitPane defaultSize={this.state.formVisible?308:33} minSize={30} split="horizontal" pane2Style={{'overflow':'scroll'}}>
                         {this.state.formVisible ? inputForm : formButton}
-                        <ControlPointList controlPoints={this.state.controlPoints}
+                        <ControlPoints controlPoints={this.state.controlPoints}
                                           updateControls={this.updateControls}
                                           metric={queryParams.metric==null?this.state.metric:queryParams.metric}
                                           finishTime={this.state.routeInfo['finishTime']}

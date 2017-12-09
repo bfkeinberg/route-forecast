@@ -32,6 +32,23 @@ class ForecastTable extends React.Component {
         }
     }
 
+/*
+    doesForecastMatch(newForecast,oldForecast) {
+        return (newForecast[0]===oldForecast[0] &&
+            newForecast[1]===oldForecast[1] &&
+            newForecast[2]===oldForecast[2] &&
+            newForecast[3]===oldForecast[3]);
+    }
+
+
+    shouldComponentUpdate(nextProps, newState, nextContext) {
+        let forecast = this.props.forecast;
+        return nextProps.weatherCorrectionMinutes!==this.props.weatherCorrectionMinutes ||
+            nextProps.forecast.length!==this.props.forecast.length ||
+            !nextProps.forecast.every((v,i)=> this.doesForecastMatch(v,forecast[i]));
+    }
+
+*/
     render() {
         if (this.props.weatherCorrectionMinutes != null) {
             if (this.props.weatherCorrectionMinutes >= 0) {
