@@ -53,7 +53,7 @@ class ControlPoints extends React.Component {
     shouldComponentUpdate(nextProps,newState) {
         let controlPoints = this.props.controlPoints;
         if (newState.displayBankedTime !== this.state.displayBankedTime ||
-                newState.lookback != this.state.lookback || this.state.addARow ||
+                newState.lookback != this.state.lookback ||
                 !nextProps.controlPoints.every((v, i)=> this.doControlsMatch(v,controlPoints[i])) ||
                 newState.metric !== this.state.metric
         ) {

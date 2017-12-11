@@ -24,12 +24,7 @@ class ControlTable extends React.Component {
     }
 
     addToRemoveList(row) {
-        let rows = this.state.rowsToRemove;
         this.removeRow(this.api.getRowNode(row));
-/*
-        rows.push(this.api.getRowNode(row));
-        this.setState({rowsToRemove:rows});
-*/
     }
 
     addRow() {
@@ -40,7 +35,6 @@ class ControlTable extends React.Component {
         let result = this.api.updateRowData({add:[row]});
         // focus on new control if one has been added
         this.api.setFocusedCell(this.props.controls.length,'name',null);
-        // this.setState({changed:true});
     }
 
     removeRow(row) {
