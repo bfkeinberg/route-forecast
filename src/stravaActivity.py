@@ -6,8 +6,8 @@ import requests
 from stravalib.client import Client
 
 class StravaActivity:
-    # REDIRECT_URI = 'http://www.cyclerouteforecast.com/stravaAuthReply'
-    REDIRECT_URI = 'http://localhost:5000/stravaAuthReply'
+    REDIRECT_URI = 'http://www.cyclerouteforecast.com/stravaAuthReply'
+    # REDIRECT_URI = 'http://localhost:5000/stravaAuthReply'
     CLIENT_ID = 21996
 
     def __init__(self,client_secret,session):
