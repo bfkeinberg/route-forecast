@@ -25,9 +25,9 @@ class ControlPoints extends React.Component {
         this.setStravaActivity = this.setStravaActivity.bind(this);
         this.updateProgress = this.updateProgress.bind(this);
         this.state = {
-            displayBankedTime : false, metric:this.props.metric, lookback:false,
+            displayBankedTime : false, metric:this.props.metric, lookback:this.props.strava_activity!==undefined,
             stravaAlertVisible: false, stravaError: this.props.strava_error,
-            strava_activity: this.props.strava_activity, isUpdating:false
+            strava_activity: this.props.strava_activity===undefined?' ':this.props.strava_activity, isUpdating:false
         };
         this.stravaParser = new StravaRouteParser(this.updateFromTable,this.updateProgress);
     }
@@ -49,7 +49,7 @@ class ControlPoints extends React.Component {
     }
 
     stravaErrorCallback(error) {
-        this.setState({stravaError:error});
+        this.setState({stravaError:error,stravaAlertVisible:true});
     }
 
     setStravaActivity(event) {
@@ -65,7 +65,7 @@ class ControlPoints extends React.Component {
         if (isNaN(newValue)) {
             return;
         }
-        this.stravaParser.computeActualTimes(newValue,this.props.controlPoints)
+        this.stravaParser.computeActualTimes(newValue,this.props.controlPoints, this.stravaErrorCallback)
     }
 
     componentWillReceiveProps(newProps) {
@@ -74,7 +74,7 @@ class ControlPoints extends React.Component {
         }
         if (newProps.strava_activity !== undefined && newProps.strava_activity !== '') {
             this.setState({strava_activity:newProps.strava_activity});
-            this.stravaParser.computeActualTimes(newProps.strava_activity,newProps.controlPoints, this.stravaErrorCallback);
+            this.stravaParser.computeActualTimes(newProps.strava_activity, newProps.controlPoints, this.stravaErrorCallback);
         }
         if (newProps.strava_error!= undefined) {
             this.setState({stravaError:newProps.strava_error});
@@ -118,7 +118,10 @@ class ControlPoints extends React.Component {
                 newState.lookback !== this.state.lookback ||
                 nextProps.controlPoints.length !== controlPoints.length ||
                 !nextProps.controlPoints.every((v, i)=> this.doControlsMatch(v,controlPoints[i])) ||
-                newState.metric !== this.state.metric
+                newState.metric !== this.state.metric ||
+                newState.strava_activity !== this.state.strava_activity ||
+                newState.stravaError !== this.state.stravaError ||
+                newState.isUpdating !== this.state.isUpdating
         ) {
             return true;
         }
@@ -147,7 +150,7 @@ class ControlPoints extends React.Component {
                     <Checkbox tabIndex='11' checked={this.state.displayBankedTime} inline
                               onChange={this.toggleDisplayBanked} onClick={this.toggleDisplayBanked}
                               style={{padding:'0px 0px 0px 24px', display:'inline-flex'}}>Display banked time</Checkbox>
-                    <Checkbox tabIndex="13" checked={this.state.lookback} inline onClick={this.toggleCompare} style={{display:'inline-flex'}}>Compare</Checkbox>
+                    <Checkbox tabIndex="13" checked={this.state.lookback} inline onChange={this.toggleCompare} onClick={this.toggleCompare} style={{display:'inline-flex'}}>Compare</Checkbox>
                     <FormGroup controlId="actualRide" style={{visibility:this.state.lookback?null:'hidden', display:'inline-flex'}}>
                         <ControlLabel style={{display:'inline-flex'}}>Strava</ControlLabel>
                         <FormControl tabIndex='-1' type="text" style={{display:'inline-flex'}} value={this.state.strava_activity} onChange={this.setStravaActivity} onBlur={this.updateExpectedTimes}/>

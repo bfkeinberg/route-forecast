@@ -1,6 +1,7 @@
 import queryString from 'query-string';
 import moment from 'moment';
 import strava from 'strava-v3'
+import cookie from 'react-cookies';
 
 const metersToMiles = 0.00062137;
 
@@ -32,6 +33,16 @@ class StravaRouteParser {
             activityDataPromise.then(activityStream =>
                 {
                     this.updateProgress(false);
+                    if (activityData.message !== undefined) {
+                        cookie.remove('strava_token');
+                        errorCallback(activityData.message);
+                        return;
+                    }
+                    if (activityStream.message !== undefined) {
+                        cookie.remove('strava_token');
+                        errorCallback(activityStream.message);
+                        return;
+                    }
                     this.updateControls(this.parseActivity(activityData, activityStream, controlPoints));
                 }, error => {
                     if (errorCallback !== undefined) {

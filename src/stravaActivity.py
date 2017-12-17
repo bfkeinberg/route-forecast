@@ -1,8 +1,6 @@
-import json
+from flask import url_for
 import logging
-import urllib2
 from flask import redirect
-import requests
 from stravalib.client import Client
 
 class StravaActivity:
@@ -16,10 +14,8 @@ class StravaActivity:
         self.session = session
         logging.basicConfig(level=logging.INFO)
 
-    def set_api_key(self,key):
-        self.client_secret = key
-
     def authenticate(self,state):
+        # RR = url_for('handle_strava_auth_response')
         client = Client(requests_session=self.session)
         authorize_url = client.authorization_url(client_id=self.CLIENT_ID, redirect_uri=self.REDIRECT_URI, state=state)
         return redirect(authorize_url)
