@@ -28,7 +28,7 @@ class RouteWeatherUI extends React.Component {
         let script = document.getElementById( "routeui" );
         let queryParams = queryString.parse(location.search);
         // new control point url format - <name>,<distance>,<time-in-minutes>:<name>,<distance>,<time-in-minutes>:etc
-        this.state = {controlPoints: queryParams.controlPoints==null?[]:this.parseControls(queryParams.controlPoints),
+        this.state = {controlPoints: queryParams.controlPoints==undefined?[]:this.parseControls(queryParams.controlPoints),
             routeInfo:{bounds:{},points:[], name:'',finishTime:''}, forecast:[], action:script.getAttribute('action'),
             maps_key:script.getAttribute('maps_api_key'),formVisible:true, weatherCorrectionMinutes:null, metric:false};
     }
