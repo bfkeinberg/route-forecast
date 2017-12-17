@@ -1,140 +1,13 @@
-import {Button,ButtonGroup,ButtonToolbar,Glyphicon,Table,Panel,InputGroup} from 'react-bootstrap';
-import {Checkbox,FormGroup,ControlLabel,FormControl} from 'react-bootstrap';
-import React, { Component } from 'react';
-import ReactDOM from 'react-dom';
-let MediaQuery = require('react-responsive');
+import {Button,ButtonGroup,ButtonToolbar,Glyphicon} from 'react-bootstrap';
+import {Checkbox,FormGroup,ControlLabel,FormControl, Alert} from 'react-bootstrap';
+import React from 'react';
+// import MediaQuery from 'react-responsive';
+import ControlTable from './controlTable';
+import StravaRouteParser from './stravaRouteParser';
+import { Spinner } from '@blueprintjs/core';
 
-class ControlPoint extends React.Component {
+class StravaErrorAlert extends React.Component {
 
-    constructor(props) {
-        super(props);
-        this.state = {fields:props.fields,index:props.index};
-    }
-
-    componentWillReceiveProps(newProps) {
-        this.setState({fields:newProps.fields,index:newProps.index});
-    }
-
-    componentWillUpdate(nextProps,nextState) {
-        if (nextProps.fields.duration=='' && nextState.fields.duration=='0') {
-            let durationField = ReactDOM.findDOMNode(this.refs.durationField);
-            durationField.value = nextState.fields.duration;
-            durationField.select();
-        }
-    }
-
-    componentDidMount() {
-        ReactDOM.findDOMNode(this.refs.nameField).focus();
-    }
-
-    computeTabIndex(index,offset) {
-        let baseIndex = index*3 + 12;
-        if (baseIndex > 94) {
-            baseIndex -= 82;
-        }
-        return baseIndex+offset;
-    }
-
-    forceFocusDuration() {
-        if (this.state.fields.duration=='') {
-            let durationField = ReactDOM.findDOMNode(this.refs.durationField);
-            durationField.focus();
-        } else {
-            this.props.onChange(this.state.index,this.state.fields);
-        }
-    }
-
-    focusAndInitialize(event) {
-        if (this.state.fields.duration=='') {
-            this.setState({fields:{name:this.state.fields['name'],
-                distance:this.state.fields['distance'],
-                duration:'0',
-                arrival:this.props.fields['arrival'],
-                banked:this.props.fields['banked']}});
-        }
-        else {
-            event.target.select();
-        }
-    }
-
-    render() {
-        const banked_time = (<td>
-            <InputGroup>
-            <input style={{'fontSize':'90%','width':'100%','padding':'2px 4px 1px'}}
-            value={this.props.fields['banked']} readOnly tabIndex='-1' type="text"/>
-                <MediaQuery minDeviceWidth={1000}>
-                    <InputGroup.Addon>min</InputGroup.Addon>
-                </MediaQuery>
-            </InputGroup>
-        </td>);
-        return (
-            <tr>
-                <td><input tabIndex={this.computeTabIndex(this.props.index,0)}
-                           style={{'fontSize':'90%','width':'100%','padding':'2px 4px 1px'}}
-                            type='text' value={this.state.fields['name']}
-                                ref="nameField"
-                                onChange={event => this.setState({
-                                  fields:
-                                      {
-                                          name: event.target.value,
-                                          distance: this.state.fields['distance'],
-                                          duration: this.state.fields['duration'],
-                                          arrival: this.props.fields['arrival'],
-                                          banked: this.props.fields['banked']
-                                      }
-                           })}
-                           onBlur={event => this.props.onChange(this.state.index,this.state.fields)}
-                           onFocus={event => event.target.select()}
-                /></td>
-                <td><input tabIndex={this.computeTabIndex(this.props.index,1)}
-                           style={{'fontSize':'90%','width':'100%','padding':'2px 4px 1px'}}
-                            value={this.state.fields['distance']}
-                            onChange={(event) => this.setState({
-                                fields:
-                                    {
-                                        name:this.state.fields['name'],
-                                        distance: event.target.value,
-                                        duration: this.state.fields['duration'],
-                                        arrival: this.props.fields['arrival'],
-                                        banked: this.props.fields['banked']
-                                    }
-                            })}
-                            onBlur={event => this.forceFocusDuration.call(this)}
-                            onFocus={event => event.target.select()}
-                            type="number"/>
-                </td>
-                <td>
-                    <InputGroup>
-                        <input tabIndex={this.computeTabIndex(this.props.index,2)}
-                               style={{'fontSize':'90%','width':'100%','padding':'2px 4px 1px'}}
-                               value={this.state.fields['duration']}
-                               ref="durationField"
-                               onChange={(event) => {if (!Number.isNaN(parseInt(event.target.value,10))) {
-                                   this.setState({
-                                   fields:
-                                       {
-                                           name:this.state.fields['name'],
-                                           distance:this.state.fields['distance'],
-                                           duration:event.target.value,
-                                           arrival:this.props.fields['arrival'],
-                                           banked:this.props.fields['banked']
-                                       }})}
-                               }}
-                               onBlur={event => this.props.onChange(this.state.index,this.state.fields)}
-                               onFocus={event => this.focusAndInitialize.call(this,event)}
-                               type="text"/>
-                        <MediaQuery minDeviceWidth={1000}>
-                            <InputGroup.Addon>min</InputGroup.Addon>
-                        </MediaQuery>
-                    </InputGroup>
-                </td>
-                <td><input style={{'fontSize':'90%','width':'100%','padding':'2px 4px 1px 0px'}}
-                            value={this.props.fields['arrival']} readOnly tabIndex='-1' type="text"/></td>
-                {this.props.displayBanked?banked_time:null}
-                <td><Button onClick={() => this.props.removeRow(this.props.index)} style={{width:'90%'}} tabIndex="-1"><Glyphicon glyph="minus-sign"></Glyphicon></Button></td>
-            </tr>
-        );
-    }
 }
 
 class ControlPoints extends React.Component {
@@ -142,35 +15,74 @@ class ControlPoints extends React.Component {
     constructor(props) {
         super(props);
         this.addControl = this.addControl.bind(this);
-        this.updateRow = this.updateRow.bind(this);
-        this.removeRow = this.removeRow.bind(this);
+        this.updateFromTable = this.updateFromTable.bind(this);
         this.toggleDisplayBanked = this.toggleDisplayBanked.bind(this);
         this.toggleMetric = this.toggleMetric.bind(this);
+        this.toggleCompare = this.toggleCompare.bind(this);
+        this.updateExpectedTimes = this.updateExpectedTimes.bind(this);
+        this.stravaErrorCallback = this.stravaErrorCallback.bind(this);
+        this.hideStravaErrorAlert = this.hideStravaErrorAlert.bind(this);
+        this.setStravaActivity = this.setStravaActivity.bind(this);
+        this.updateProgress = this.updateProgress.bind(this);
         this.state = {
-            displayBankedTime : false, controlsChanged:false, metric:this.props.metric
+            displayBankedTime : false, metric:this.props.metric, lookback:this.props.strava_activity!==undefined,
+            stravaAlertVisible: false, stravaError: this.props.strava_error,
+            strava_activity: this.props.strava_activity===undefined?' ':this.props.strava_activity, isUpdating:false
+        };
+        this.stravaParser = new StravaRouteParser(this.updateFromTable,this.updateProgress);
+    }
+
+    static showProgressSpinner(running) {
+        if (running) {
+            return (
+                <Spinner/>
+            );
+        }
+    }
+
+    updateProgress(isUpdating) {
+        this.setState({isUpdating:isUpdating});
+    }
+
+    hideStravaErrorAlert() {
+        this.setState({stravaError:null, stravaAlertVisible:false});
+    }
+
+    stravaErrorCallback(error) {
+        this.setState({stravaError:error,stravaAlertVisible:true});
+    }
+
+    setStravaActivity(event) {
+        let newValue = parseInt(event.target.value,10);
+        if (Number.isNaN(newValue)) {
+            return;
+        }
+        this.setState({strava_activity:newValue});
+    }
+
+    updateExpectedTimes(event) {
+        let newValue = parseInt(event.target.value,10);
+        if (isNaN(newValue)) {
+            return;
+        }
+        this.stravaParser.computeActualTimes(newValue,this.props.controlPoints, this.stravaErrorCallback)
+    }
+
+    componentWillReceiveProps(newProps) {
+        if (newProps.strava_token !== undefined) {
+            this.stravaParser.setToken(newProps.strava_token);
+        }
+        if (newProps.strava_activity !== undefined && newProps.strava_activity !== '') {
+            this.setState({strava_activity:newProps.strava_activity});
+            this.stravaParser.computeActualTimes(newProps.strava_activity, newProps.controlPoints, this.stravaErrorCallback);
+        }
+        if (newProps.strava_error!= undefined) {
+            this.setState({stravaError:newProps.strava_error});
         }
     }
 
     addControl( ) {
-        let controlPoints = this.props.controlPoints;
-        let key = controlPoints.length;
-        controlPoints.push({name:'',distance:0,duration:'',arrival:"00:00"});
-        this.props.updateControls(controlPoints,this.state.metric);
-        this.setState({controlsChanged:true});
-    }
-
-    removeRow(key) {
-        let controlPoints = this.props.controlPoints;
-        controlPoints.splice(key,1);
-        this.props.updateControls(controlPoints,this.state.metric);
-        this.setState({controlsChanged:true});
-    }
-
-    updateRow(key,value) {
-        let controlPoints = this.props.controlPoints;
-        controlPoints[key] = value;
-        this.props.updateControls(controlPoints,this.state.metric);
-        this.setState({controlsChanged:true});
+        this.table.addRow();
     }
 
     toggleDisplayBanked(event) {
@@ -178,78 +90,80 @@ class ControlPoints extends React.Component {
     }
 
     toggleMetric(event) {
-        let metric = !this.state.metric
+        let metric = !this.state.metric;
         this.setState({metric:metric});
         this.props.updateControls(this.props.controlPoints,metric);
     }
 
-    shouldComponentUpdate(newProps,newState) {
-        if (newState.controlsChanged || newState.displayBankedTime != this.state.displayBankedTime ||
-            this.props.controlPoints != newProps.controlPoints) {
+    toggleCompare(event) {
+        let lookback = !this.state.lookback;
+        this.setState({lookback:lookback});
+    }
+
+    updateFromTable(controlPoints) {
+        this.props.updateControls(controlPoints,this.state.metric);
+    }
+
+    doControlsMatch(newControl,oldControl) {
+        return newControl.distance===oldControl.distance &&
+            newControl.name===oldControl.name &&
+            newControl.duration===oldControl.duration &&
+            newControl.arrival===oldControl.arrival &&
+            newControl.banked===oldControl.banked;
+    }
+
+    shouldComponentUpdate(nextProps,newState) {
+        let controlPoints = this.props.controlPoints;
+        if (newState.displayBankedTime !== this.state.displayBankedTime ||
+                newState.lookback !== this.state.lookback ||
+                nextProps.controlPoints.length !== controlPoints.length ||
+                !nextProps.controlPoints.every((v, i)=> this.doControlsMatch(v,controlPoints[i])) ||
+                newState.metric !== this.state.metric ||
+                newState.strava_activity !== this.state.strava_activity ||
+                newState.stravaError !== this.state.stravaError ||
+                newState.isUpdating !== this.state.isUpdating
+        ) {
             return true;
         }
         return false;
     }
 
-    componentDidUpdate() {
-        this.setState({controlsChanged:false});
-    }
-
-    componentWillReceiveProps(newProps) {
-        this.setState({controlsChanged:true});
-    }
-
     render () {
-        const title = this.props.name == '' ?
+        const title = this.props.name === '' ?
             ( <h3 style={{textAlign:"center"}}>Control point list</h3> ) :
             ( <h3 style={{textAlign:"center"}}>Control point list for <i>{this.props.name}</i></h3> );
-        const rusa_banked_header = (<th style={{'fontSize':'80%','width':'17%'}}>Banked time</th>);
         return (
             <div className="controlPoints">
-                <ButtonToolbar style={{paddingTop:'11px',paddingLeft:'4px'}}>
+                <ButtonToolbar style={{display:'inline-flex',flexDirection:'row', paddingTop:'11px',paddingLeft:'4px'}}>
                 {/*<ButtonGroup style={{display:'flex',flexFlow:'row wrap'}}>*/}
                 <ButtonGroup>
                     <Button tabIndex='10' onClick={this.addControl} id='addButton'><Glyphicon glyph="plus-sign"></Glyphicon>Add control point</Button>
                     {/*<Button onClick={this.addControl} id='addButton' style={{display:'inline-flex',width:'165px',height:'34px'}}><Glyphicon glyph="plus-sign"></Glyphicon>Add control point</Button>*/}
-                    <Checkbox tabIndex='11' checked={this.state.displayBankedTime} inline
-                       onChange={this.toggleDisplayBanked}
-                     onClick={this.toggleDisplayBanked}
-                     style={{padding:'7px 0px 0px 26px','textAlign':'center',float:'right', display:'inline-flex',width: '170px',height:'28px'}}>Display banked time</Checkbox>
                     <FormGroup controlId="finishTime" style={{display:'inline-flex'}}>
-                        <ControlLabel style={{width:'7em',display:'flex',float:'right',marginTop:'7px',paddingLeft:'8px'}}>Finish time</ControlLabel>
-                        <FormControl tabIndex='-1' type="text" style={{width:'12em',float:'right',marginTop:'2px',marginBotton:'0px',paddingLeft:'2px',paddingTop:'2px',height:'28px'}}
+                        <ControlLabel style={{width:'7em',display:'inline-flex',marginTop:'7px',paddingLeft:'8px'}}>Finish time</ControlLabel>
+                        <FormControl tabIndex='-1' type="text" style={{display:'inline-flex',width:'12em',marginTop:'3px',marginBotton:'0px',paddingLeft:'2px',paddingTop:'2px',height:'28px'}}
                                      value={this.props.finishTime}/>
                     </FormGroup>
                     <Checkbox tabIndex='12' checked={this.state.metric} inline
-                              onClick={this.toggleMetric}
-                              onChange={this.toggleMetric}
-                              style={{padding:'7px 0px 0px 28px','textAlign':'center', display:'inline-flex',float:'right', width:'75px',height:'28px'}}>metric</Checkbox>
+                              onClick={this.toggleMetric} onChange={this.toggleMetric}
+                              style={{padding:'0px 0px 0px 26px',display:'inline-flex'}}>metric</Checkbox>
+                    <Checkbox tabIndex='11' checked={this.state.displayBankedTime} inline
+                              onChange={this.toggleDisplayBanked} onClick={this.toggleDisplayBanked}
+                              style={{padding:'0px 0px 0px 24px', display:'inline-flex'}}>Display banked time</Checkbox>
+                    <Checkbox tabIndex="13" checked={this.state.lookback} inline onChange={this.toggleCompare} onClick={this.toggleCompare} style={{display:'inline-flex'}}>Compare</Checkbox>
+                    <FormGroup controlId="actualRide" style={{visibility:this.state.lookback?null:'hidden', display:'inline-flex'}}>
+                        <ControlLabel style={{display:'inline-flex'}}>Strava</ControlLabel>
+                        <FormControl tabIndex='-1' type="text" style={{display:'inline-flex'}} value={this.state.strava_activity} onChange={this.setStravaActivity} onBlur={this.updateExpectedTimes}/>
+                        {this.state.stravaAlertVisible?<Alert onDismiss={this.hideStravaErrorAlert} bsStyle='warning'>{this.state.stravaError}</Alert>:null}
+                        {ControlPoints.showProgressSpinner(this.state.isUpdating)}
+                    </FormGroup>
                 </ButtonGroup>
                 </ButtonToolbar>
-                <Panel header={title} bsStyle="info" style={{margin:'10px'}}>
-                    <Table responsive condensed bordered striped hover fill>
-                        <thead>
-                        <tr>
-                            <th style={{'fontSize':'80%','width':'22%'}}>Name</th>
-                            <th style={{'fontSize':'80%','width':'11%'}}>Distance</th>
-                            <th style={{'fontSize':'80%','width':'18%'}}>Expected time spent</th>
-                            <th style={{'fontSize':'80%','width':'28%'}}>Est. arrival time</th>
-                            {this.state.displayBankedTime?rusa_banked_header:null}
-                        </tr>
-                        </thead>
-                        <tbody>
-                        {this.props.controlPoints.map((row, key) =>
-                            <ControlPoint key={key} index={key} onChange={this.updateRow} removeRow={this.removeRow}
-                                          displayBanked={this.state.displayBankedTime}
-                                          fields={row}/>)}
-                        </tbody>
-                    </Table>
-                    <div tabIndex="98" onFocus={event => {document.getElementById('addButton').focus()}}></div>
-                </Panel>
+                <ControlTable rows={this.props.controlPoints.length} controls={this.props.controlPoints}
+                              displayBanked={this.state.displayBankedTime} compare={this.state.lookback} update={this.updateFromTable} ref={(table) => {this.table = table;}}/>
             </div>
         );
     }
 }
 
-module.exports=ControlPoints;
-export default ControlPoint;
+export default ControlPoints;

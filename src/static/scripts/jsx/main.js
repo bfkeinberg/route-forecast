@@ -1,6 +1,5 @@
-global.jQuery = require('jquery');
-import React, { Component } from 'react';
-import ControlPointList from './controls';
+import React from 'react';
+import ControlPoints from './controls';
 import ReactDOM from 'react-dom';
 import RouteInfoForm from './routeInfoEntry';
 import RouteForecastMap from './map';
@@ -8,12 +7,19 @@ import ForecastTable from './forecastTable';
 import moment from 'moment';
 import SplitPane from 'react-split-pane';
 import { Button } from 'react-bootstrap';
-let MediaQuery = require('react-responsive');
-require('!style!css!bootstrap/dist/css/bootstrap.min.css');
-require('!style!css!normalize.css/normalize.css');
-require('!style!css!@blueprintjs/core/dist/blueprint.css');
-const queryString = require('query-string');
-import cookie from 'react-cookie';
+import MediaQuery from 'react-responsive';
+
+// for react-splitter
+import 'normalize.css/normalize.css';
+
+import '@blueprintjs/core/dist/blueprint.css';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import 'ag-grid/dist/styles/ag-grid.css';
+import 'ag-grid/dist/styles/ag-theme-fresh.css';
+import 'flatpickr/dist/themes/confetti.css';
+
+import queryString from 'query-string';
+import cookie from 'react-cookies';
 
 class RouteWeatherUI extends React.Component {
 
@@ -23,17 +29,59 @@ class RouteWeatherUI extends React.Component {
         this.updateRouteInfo = this.updateRouteInfo.bind(this);
         this.updateForecast = this.updateForecast.bind(this);
         this.updateFinishTime = this.updateFinishTime.bind(this);
-        this.formatOneControl = this.formatOneControl.bind(this);
         this.formatControlsForUrl = this.formatControlsForUrl.bind(this);
         let script = document.getElementById( "routeui" );
         let queryParams = queryString.parse(location.search);
+        this.strava_token = RouteWeatherUI.getStravaToken(queryParams);
         // new control point url format - <name>,<distance>,<time-in-minutes>:<name>,<distance>,<time-in-minutes>:etc
-        this.state = {controlPoints: queryParams.controlPoints==null?[]:this.parseControls(queryParams.controlPoints),
+        this.state = {controlPoints: queryParams.controlPoints===null?[]:this.parseControls(queryParams.controlPoints),
             routeInfo:{bounds:{},points:[], name:'',finishTime:''}, forecast:[], action:script.getAttribute('action'),
-            maps_key:script.getAttribute('maps_api_key'),formVisible:true, weatherCorrectionMinutes:null, metric:false};
+            maps_key:script.getAttribute('maps_api_key'), timezone_key:script.getAttribute('timezone_api_key'),
+            formVisible:true, weatherCorrectionMinutes:null, metric:false};
     }
 
-    formatOneControl(controlPoint) {
+    static getStravaToken(queryParams) {
+        if (queryParams.strava_token !== undefined) {
+            cookie.save('strava_token', queryParams.strava_token);
+            return queryParams.strava_token;
+        } else {
+            return cookie.load('strava_token');
+        }
+    }
+
+    static doControlsMatch(newControl,oldControl) {
+        return newControl.distance===oldControl.distance &&
+            newControl.name===oldControl.name &&
+            newControl.duration===oldControl.duration &&
+            newControl.arrival===oldControl.arrival &&
+            newControl.actual===oldControl.actual &&
+            newControl.banked===oldControl.banked;
+    }
+
+    shouldComponentUpdate(newProps,newState) {
+        let controlPoints = this.state.controlPoints;
+        if (this.state.routeInfo.name !== newState.routeInfo.name) {
+            return true;
+        }
+        if (newState.controlPoints.length!==this.state.controlPoints.length) {
+            return true;
+        }
+        if (!newState.controlPoints.every((v,i)=> RouteWeatherUI.doControlsMatch(v,controlPoints[i]))) {
+            return true;
+        }
+        if (newState.routeInfo.finishTime!==this.state.routeInfo.finishTime) {
+            return true;
+        }
+        if (newState.forecast.length!==this.state.forecast.length) {
+            return true;
+        }
+        if (newState.metric !== this.state.metric) {
+            return true;
+        }
+        return false;
+    }
+
+    static formatOneControl(controlPoint) {
         if (typeof controlPoint === 'string') {
             return controlPoint;
         }
@@ -41,7 +89,7 @@ class RouteWeatherUI extends React.Component {
     }
 
     formatControlsForUrl(controlPoints) {
-        return controlPoints.reduce((queryParam,point) => {return this.formatOneControl(queryParam) + ':' + this.formatOneControl(point)},'');
+        return controlPoints.reduce((queryParam,point) => {return RouteWeatherUI.formatOneControl(queryParam) + ':' + RouteWeatherUI.formatOneControl(point)},'');
     }
 
     parseControls(controlPointString) {
@@ -49,7 +97,7 @@ class RouteWeatherUI extends React.Component {
         let controlPoints =
         controlPointList.map(point => {
             let controlPointValues = point.split(",");
-            return ({name:controlPointValues[0],distance:controlPointValues[1],duration:controlPointValues[2]});
+            return ({name:controlPointValues[0],distance:Number(controlPointValues[1]),duration:Number(controlPointValues[2])});
             });
         // delete dummy first element
         controlPoints.splice(0,1);
@@ -57,29 +105,29 @@ class RouteWeatherUI extends React.Component {
     }
 
     updateControls(controlPoints,metric) {
-        this.setState({controlPoints: controlPoints, metric:metric})
-        if (this.state.routeInfo.name != '') {
+        this.setState({controlPoints: controlPoints, metric:metric});
+        if (this.state.routeInfo.name !== '') {
             cookie.save(this.state.routeInfo.name,this.formatControlsForUrl(controlPoints));
         }
     }
 
     updateRouteInfo(routeInfo,controlPoints) {
-        if (this.state.routeInfo.name != routeInfo.name) {
+        if (this.state.routeInfo.name !== routeInfo.name) {
             let savedControlPoints = cookie.load(routeInfo.name);
-            if (savedControlPoints != null && savedControlPoints.length > 0) {
+            if (savedControlPoints !== null && savedControlPoints.length > 0) {
                 controlPoints = this.parseControls(savedControlPoints);
             }
         }
-        if (routeInfo.name != '') {
+        if (routeInfo.name !== '') {
             cookie.save(routeInfo.name,this.formatControlsForUrl(controlPoints));
         }
-        this.setState({'routeInfo':routeInfo,'controlPoints':controlPoints});
+        this.setState({'routeInfo':routeInfo, 'controlPoints':controlPoints});
     }
 
     updateFinishTime(weatherCorrectionMinutes) {
         let routeInfoCopy = this.state.routeInfo;
         routeInfoCopy.finishTime =
-            moment(routeInfoCopy.finishTime,'ddd, MMM DD h:mma').add(weatherCorrectionMinutes,'minutes').format('ddd, MMM DD h:mma');
+            moment(routeInfoCopy.finishTime,'ddd, MMM DD h:mma').add(weatherCorrectionMinutes, 'minutes').format('ddd, MMM DD h:mma');
         this.setState({'routeInfo':routeInfoCopy,weatherCorrectionMinutes:weatherCorrectionMinutes});
     }
 
@@ -104,6 +152,7 @@ class RouteWeatherUI extends React.Component {
                            interval={queryParams.interval}
                            rwgpsRoute={queryParams.rwgpsRoute}
                            maps_api_key={this.state.maps_key}
+                           timezone_api_key={this.state.timezone_key}
                            formatControlsForUrl={this.formatControlsForUrl}
             />
         );
@@ -116,10 +165,13 @@ class RouteWeatherUI extends React.Component {
                 <SplitPane defaultSize={300} minSize={150} maxSize={530} split="horizontal">
                     <SplitPane defaultSize={550} minSize={150} split='vertical' pane2Style={{'overflow':'scroll'}}>
                         {inputForm}
-                        <ControlPointList controlPoints={this.state.controlPoints}
+                        <ControlPoints controlPoints={this.state.controlPoints}
                                           updateControls={this.updateControls}
                                           finishTime={this.state.routeInfo['finishTime']}
-                                          metric={queryParams.metric==null?this.state.metric:queryParams.metric}
+                                          strava_token={this.strava_token}
+                                          strava_activity={queryParams.strava_activity}
+                                          strava_error={queryParams.strava_error}
+                                          metric={queryParams.metric===null?this.state.metric:queryParams.metric==='true'}
                                           name={this.state.routeInfo['name']}/>
                     </SplitPane>
                         <SplitPane defaultSize={500} minSize={150} split="vertical" paneStyle={{'overflow':'scroll'}}>
@@ -133,10 +185,13 @@ class RouteWeatherUI extends React.Component {
                 <SplitPane defaultSize={this.state.formVisible?500:250} minSize={120} maxSize={600} split="horizontal" pane2Style={{'overflow':'scroll'}}>
                     <SplitPane defaultSize={this.state.formVisible?308:33} minSize={30} split="horizontal" pane2Style={{'overflow':'scroll'}}>
                         {this.state.formVisible ? inputForm : formButton}
-                        <ControlPointList controlPoints={this.state.controlPoints}
+                        <ControlPoints controlPoints={this.state.controlPoints}
                                           updateControls={this.updateControls}
-                                          metric={queryParams.metric==null?this.state.metric:queryParams.metric}
+                                          metric={queryParams.metric===null?this.state.metric:queryParams.metric}
+                                          strava_activity={queryParams.strava_activity}
                                           finishTime={this.state.routeInfo['finishTime']}
+                                          strava_error={queryParams.strava_error}
+                                          strava_token={this.strava_token}
                                           name={this.state.routeInfo['name']}/>
                     </SplitPane>
                     <ForecastTable forecast={this.state.forecast} weatherCorrectionMinutes={this.state.weatherCorrectionMinutes}/>

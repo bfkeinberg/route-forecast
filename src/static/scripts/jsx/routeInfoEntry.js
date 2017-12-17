@@ -1,13 +1,12 @@
 import { Spinner } from '@blueprintjs/core';
 import { Panel,FormControl,FormGroup,Form,Glyphicon,Alert,ControlLabel,Button,HelpBlock,Tooltip,OverlayTrigger,Well,InputGroup} from 'react-bootstrap';
-import { Checkbox } from 'react-bootstrap';
+// import { Checkbox } from 'react-bootstrap';
 import moment from 'moment';
-import React, { Component } from 'react';
+import React from 'react';
 import Flatpickr from 'react-flatpickr'
 import AnalyzeRoute from './gpxParser';
 const queryString = require('query-string');
-
-require('!style!css!flatpickr/dist/themes/confetti.css');
+import ShortUrl from './shortUrl';
 
 const paceToSpeed = {'A':10, 'B':12, 'C':14, 'C+':15, 'D-':15, 'D':16, 'D+':17, 'E-':17, 'E':18};
 
@@ -52,16 +51,19 @@ class RouteInfoForm extends React.Component {
         this.makeFullQueryString = this.makeFullQueryString.bind(this);
         this.urlShortenCallback = this.urlShortenCallback.bind(this);
         this.shortenUrl = this.shortenUrl.bind(this);
-        this.controlPoints = [];
         this.forecastRequest = null;
         this.timeZone = null;
+        this.routeFileSet = false;
+        this.xmlhttp = null;
+        this.parser = new AnalyzeRoute(this.setErrorState,this.props.timezone_api_key);
+        this.paramsChanged = false;
         this.state = {start:RouteInfoForm.findNextStartTime(props.start),
             pace:props.pace==null?defaultPace:props.pace, interval:props.interval==null?defaultIntervalInHours:props.interval,
-            xmlhttp : null, routeFileSet:false,
             rwgpsRoute:props.rwgpsRoute==null?'':props.rwgpsRoute, errorDetails:null,
-            pending:false, parser:new AnalyzeRoute(this.setErrorState,this.props.maps_api_key),
-            paramsChanged:false, rwgpsRouteIsTrip:false, errorSource:null, succeeded:null, routeUpdating:false,
-            fetchAfterLoad : false, shortUrl:''};
+            pending:false,
+            rwgpsRouteIsTrip:false, errorSource:null, succeeded:null, routeUpdating:false,
+            shortUrl:'http://www.cyclerouteforecast.com'};
+        this.fetchAfterLoad = false;
     }
 
     static findNextStartTime(start) {
@@ -80,51 +82,31 @@ class RouteInfoForm extends React.Component {
 
     componentDidMount() {
         if (this.state.rwgpsRoute != '') {
-            this.state.parser.loadRwgpsRoute(this.state.rwgpsRoute,this.state.rwgpsRouteIsTrip);
+            this.parser.loadRwgpsRoute(this.state.rwgpsRoute,this.state.rwgpsRouteIsTrip);
             this.setState({routeUpdating:true});
-            this.setState({fetchAfterLoad:true});
+            this.fetchAfterLoad = true;
         }
-    }
-
-    copyControls(controlPoints) {
-        return controlPoints.map(point => {return {distance:point['distance'],duration:point['duration']}});
-    }
-
-    compareControls(lastControlPoints,newControlPoints) {
-        if (lastControlPoints.length != newControlPoints.length &&
-                // prevent updating list before distance has been entered for a new control point
-            (newControlPoints.length==0 || newControlPoints[newControlPoints.length-1]['distance']!=0)) {
-            return false;
-        }
-        for (let index = 0; index < lastControlPoints.length; ++index) {
-            if (lastControlPoints[index]['distance'] != newControlPoints[index]['distance']) {
-                return false;
-            }
-            if (lastControlPoints[index]['duration'] != newControlPoints[index]['duration']) {
-                return false;
-            }
-        }
-        return true;
     }
 
     componentWillReceiveProps(nextProps) {
-        let controlsEqual = this.compareControls(this.controlPoints,nextProps.controlPoints);
-        if ((!controlsEqual || (this.props.metric!=nextProps.metric))&& this.state.parser.routeIsLoaded()) {
+        if (this.parser.routeIsLoaded()) {
             this.calculateTimeAndDistance(nextProps);
         }
     }
 
     componentDidUpdate(prevProps, prevState) {
-        if (this.state.paramsChanged) {
-            this.setState({paramsChanged:false});
-            if (this.state.parser.routeIsLoaded()) {
+        if (this.paramsChanged) {
+            this.paramsChanged = false;
+            if (this.parser.routeIsLoaded()) {
                 this.calculateTimeAndDistance(this.props);
             }
         }
     }
 
     urlShortenCallback(event) {
-        this.setState({shortUrl:event.currentTarget.response['id']});
+        if (event.currentTarget.response['id'] != undefined) {
+            this.setState({shortUrl:event.currentTarget.response['id']});
+        }
     }
 
     shortenUrl(url) {
@@ -139,18 +121,21 @@ class RouteInfoForm extends React.Component {
     updateRouteFile(event) {
         let fileControl = event.target;
         let gpxFiles = fileControl.files;
-        this.setState({routeFileSet : event.target.value != '', fetchAfterLoad:false});
+        this.routeFileSet = event.target.value != '';
+        this.fetchAfterLoad = false;
         if (gpxFiles.length > 0) {
-            this.state.parser.parseRoute(gpxFiles[0]);
+            this.parser.parseRoute(gpxFiles[0]);
             this.setState({rwgpsRoute:'',routeUpdating:true});
             history.pushState(null, 'nothing', location.origin);
         }
     }
 
     calculateTimeAndDistance(props) {
-        this.controlPoints = this.copyControls(this.props.controlPoints);
-        let routeInfo = this.state.parser.walkRoute(moment(this.state.start),
+        let routeInfo = this.parser.walkRoute(moment(this.state.start),
             this.state.pace, parseFloat(this.state.interval),props.controlPoints,props.metric);
+        if (routeInfo===null) {
+            return;
+        }
         this.timeZone = routeInfo['timeZone'];
         this.props.updateRouteInfo({bounds:routeInfo['bounds'],points:routeInfo['points'],
             name:routeInfo['name'],finishTime:routeInfo['finishTime']}, routeInfo['controls']);
@@ -158,21 +143,21 @@ class RouteInfoForm extends React.Component {
     }
 
     requestForecast(event) {
-        if (!this.state.parser.routeIsLoaded()) {
-            this.setState({fetchAfterLoad:true});
+        if (!this.parser.routeIsLoaded()) {
+            this.fetchAfterLoad = true;
             return;
         }
         if (this.forecastRequest == null) {
             this.calculateTimeAndDistance(this.props);
         }
-        this.state.xmlhttp = new XMLHttpRequest();
-        this.state.xmlhttp.onreadystatechange = this.forecastCb;
-        this.state.xmlhttp.responseType = 'json';
+        this.xmlhttp = new XMLHttpRequest();
+        this.xmlhttp.onreadystatechange = this.forecastCb;
+        this.xmlhttp.responseType = 'json';
         let formdata = new FormData();
-        this.state.xmlhttp.open("POST", this.props.action);
+        this.xmlhttp.open("POST", this.props.action);
         formdata.append('locations',JSON.stringify(this.forecastRequest));
         formdata.append('timezone',this.timeZone);
-        this.state.xmlhttp.send(formdata);
+        this.xmlhttp.send(formdata);
         this.setState({pending:true,showForm:false});
     }
 
@@ -188,7 +173,7 @@ class RouteInfoForm extends React.Component {
     }
 
     setQueryString(state,controlPoints,metric) {
-        if (state.rwgpsRoute != '') {
+        if (state.rwgpsRoute !== '') {
             let query = {start:this.dateToShortDate(state.start),pace:state.pace,interval:state.interval,metric:metric,
                 rwgpsRoute:state.rwgpsRoute,controlPoints:this.props.formatControlsForUrl(controlPoints)};
             history.pushState(null, 'nothing', location.origin + '?' + queryString.stringify(query));
@@ -201,29 +186,30 @@ class RouteInfoForm extends React.Component {
     }
 
     forecastCb(event) {
-        if (this.state.xmlhttp.readyState == 4) {
+        if (this.xmlhttp.readyState === 4) {
             this.setState({pending:false});
             this.forecastRequest = null;
-            if (event.target.status==200) {
+            if (event.target.status===200) {
                 this.setState({errorDetails:null,succeeded:true});
                 this.setQueryString(this.state,this.props.controlPoints,this.props.metric);
-                if (event.target.response == null) {
+                if (event.target.response === null) {
                     console.log('missing response');
                     return;
                 }
                 this.props.updateForecast(event.target.response);
-                let weatherCorrectionMinutes = this.state.parser.adjustForWind(event.target.response,this.state.pace,this.props.controlPoints,this.state.start,this.props.metric);
+                let controlsToUpdate = this.props.controlPoints.slice();
+                let weatherCorrectionMinutes = this.parser.adjustForWind(event.target.response,this.state.pace,controlsToUpdate,this.state.start,this.props.metric);
                 this.props.updateFinishTime(weatherCorrectionMinutes);
-                // this.props.updateControls(this.props.controlPoints);
+                this.props.updateControls(controlsToUpdate,this.props.metric);
             }
             else {
-                if (event.target.response != null) {
+                if (event.target.response !== null) {
                     this.setState({errorDetails:event.target.response['status'],
-                        errorCause:this.state.routeFileSet?'gpx':'rwgps', succeeded: false });
+                        errorCause:this.routeFileSet?'gpx':'rwgps', succeeded: false });
                 }
-                else if (event.target.statusText != null) {
+                else if (event.target.statusText !== null) {
                     this.setState({errorDetails:event.target.statusText,
-                        errorCause:this.state.routeFileSet?'gpx':'rwgps',succeeded:false});
+                        errorCause:this.routeFileSet?'gpx':'rwgps',succeeded:false});
                 }
             }
         }
@@ -235,32 +221,36 @@ class RouteInfoForm extends React.Component {
             if (errorSource=='rwgps') {
                 this.setState({rwgpsRoute:'',succeeded:false});
             } else {
-                this.setState({routeFileSet:false,succeeded:false})
+                this.routeFileSet = false;
+                this.setState({succeeded:false})
             }
         } else {
-            if (this.state.fetchAfterLoad) {
+            if (this.fetchAfterLoad) {
                 this.requestForecast();
             }
             else {
                 this.calculateTimeAndDistance(this.props);
             }
-            this.setState({errorDetails:errorDetails,errorSource:null,routeUpdating:false,succeeded:true,fetchAfterLoad:false});
+            this.fetchAfterLoad = false;
+            this.setState({errorDetails:errorDetails,errorSource:null,routeUpdating:false,succeeded:true});
 
         }
     }
 
     disableSubmit() {
-        return (this.state.rwgpsRoute == '' && !this.state.routeFileSet);
+        return (this.state.rwgpsRoute == '' && !this.routeFileSet);
      }
 
     intervalChanged(event) {
         if (event.target.value != '') {
-            this.setState({interval:event.target.value,paramsChanged:true});
+            this.paramsChanged = true;
+            this.setState({interval:event.target.value});
         }
     }
 
     handleDateChange(time) {
-        this.setState({start:time,paramsChanged:true});
+        this.paramsChanged = true;
+        this.setState({start:time});
     }
 
     static showErrorDetails(errorState) {
@@ -295,10 +285,11 @@ class RouteInfoForm extends React.Component {
     handleRwgpsRoute(event) {
         let route = RouteInfoForm.getRouteNumberFromValue(event.target.value);
         if (route!='') {
-            this.state.parser.loadRwgpsRoute(route,this.state.rwgpsRouteIsTrip);
+            this.parser.loadRwgpsRoute(route,this.state.rwgpsRouteIsTrip);
             // clear file input to avoid confusion
             document.getElementById('route').value = null;
-            this.setState({'routeFileSet':false,'routeUpdating':true});
+            this.setState({'routeUpdating':true});
+            this.routeFileSet = false;
         } else if (this.state.errorSource=='rwgps') {
             this.setState({'errorSource':null});
         }
@@ -307,7 +298,7 @@ class RouteInfoForm extends React.Component {
     setRwgpsRoute(event) {
         let route = RouteInfoForm.getRouteNumberFromValue(event.target.value);
         this.setState({rwgpsRoute : route});
-        this.state.parser.clear();
+        this.parser.clear();
     }
 
     isNumberKey(evt) {
@@ -319,7 +310,8 @@ class RouteInfoForm extends React.Component {
     }
 
     handlePaceChange(event) {
-        this.setState({pace:event.target.value,paramsChanged:true});
+        this.paramsChanged = true;
+        this.setState({pace:event.target.value});
     }
 
     decideValidationStateFor(type) {
@@ -328,10 +320,10 @@ class RouteInfoForm extends React.Component {
         }
         else {
             if (this.state.succeeded) {
-                if (this.state.routeFileSet && type=='gpx') {
+                if (this.routeFileSet && type=='gpx') {
                     return 'success';
                 }
-                if (this.state.rwgpsRoute && type=='rwgps') {
+                if (this.rwgpsRoute && type=='rwgps') {
                     return 'success';
                 }
             }
@@ -344,7 +336,24 @@ class RouteInfoForm extends React.Component {
             instance.setDate(this.state.start);
             return;
         }
-        this.setState({start:new Date(dates[0]),paramsChanged:true});
+        this.paramsChanged = true;
+        this.setState({start:new Date(dates[0])});
+    }
+
+    shouldComponentUpdate(nextProps, nextState, nextContext) {
+        return nextState.pace!==this.state.pace ||
+            nextState.interval!==this.state.interval ||
+            nextState.rwgpsRoute!==this.state.rwgpsRoute ||
+            nextState.errorDetails!==this.state.errorDetails ||
+            nextState.pending!==this.state.pending ||
+            nextState.rwgpsRouteIsTrip!==this.state.rwgpsRouteIsTrip ||
+            nextState.errorSource!==this.state.errorSource ||
+            nextState.succeeded!==this.state.succeeded ||
+            nextState.routeUpdating!==this.state.routeUpdating ||
+            nextState.shortUrl!==this.state.shortUrl ||
+            nextProps.metrics!==this.props.metric ||
+            nextState.shortUrl!==this.state.shortUrl ||
+            nextState.start!==this.start.start;
     }
 
     render() {
@@ -410,7 +419,6 @@ class RouteInfoForm extends React.Component {
                         </OverlayTrigger>
                     </FormGroup>
                     <a style={{padding:'8px',display:'inline-flex',marginTop:'5px',marginBottom:'5px'}} href="https://westernwheelersbicycleclub.wildapricot.org/page-1374754" target="_blank">Pace explanation</a>
-                    {/*<HelpBlock style={{flex:'1',display:'inline-flex'}} bsClass='help-block hidden-xs hidden-sm'>Upload a .gpx file describing your route</HelpBlock>*/}
                     <FormGroup bsSize='small'
                                bsClass='formGroup hidden-xs hidden-sm'
                                validationState={this.decideValidationStateFor('gpx',this.state.errorSource,this.state.succeeded)}
@@ -457,14 +465,10 @@ class RouteInfoForm extends React.Component {
                     {RouteInfoForm.showProgressSpinner(this.state.routeUpdating)}
                 </Form>
             </Panel>
-                    <FormGroup bsSize="small">
-                        <FormControl readOnly type="text" style={{marginTop:'10px',marginLeft:'135px',width:'15em',display:this.state.shortUrl==''?'none':'inline-flex'}}
-                                     value={this.state.shortUrl} onFocus={event => {event.target.select();document.execCommand('copy')}}/>
-                    </FormGroup>
+            <ShortUrl shortUrl={this.state.shortUrl}/>
             </div>
         );
     }
 }
 
-module.exports=RouteInfoForm;
 export default RouteInfoForm;

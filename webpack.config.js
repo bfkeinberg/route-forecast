@@ -6,27 +6,39 @@ var APP_DIR = path.resolve(__dirname, 'src/static/scripts/jsx');
 var GPX_DIR = path.resolve(__dirname, 'node_modules/gpx-parse/dist');
 
 module.exports = {
-    debug: true,
+    plugins: [
+        new webpack.LoaderOptionsPlugin({
+            debug: true
+        })
+    ],
     devtool: 'eval-source-map',
 
     entry: [
         APP_DIR + '/main.js'
     ],
     module: {
-        loaders: [
+        rules: [
             {test: /\.jsx?$/,
                 include: APP_DIR,
                 exclude: /node_modules/,
-                loader: "babel"
+                loader: "babel-loader",
+                options: {
+                    cacheDirectory:true
+                }
+            },
+            {test: /\.js$/,
+                use: [{loader:"source-map-loader",options:{enforce: "pre"}}],
             },
             { test: /\.tsx?$/,
                 exclude: /node_modules/,
                 loader: 'ts-loader' },
-            { test: /\.css$/, loader: "style-loader!css-loader|source-map-loader" },
+            { test: /\.css$/, use: [
+                {loader: "style-loader", options: {modules:false, sourceMap:true}},
+                {loader:"css-loader", options: {modules:false, sourceMap:true}},
+                ] },
             { test: /\.(png|woff2?)$/, loader: "url-loader?limit=100000" },
             { test: /\.jpg$/, loader: "file-loader" },
-            { test: /\.(ttf|eot|svg)$/, loader: "file-loader" },
-            { test: /\.json$/, loader: "json-loader"}
+            { test: /\.(ttf|eot|svg)$/, loader: "file-loader" }
         ]
     },
     output: {
@@ -34,12 +46,16 @@ module.exports = {
         filename: "bundle.js",
     },
     resolve: {
-        extensions: ['', '.js', '.jsx', '.ts', '.tsx'],
-        modulesDirectories: ["web_modules", "node_modules",'node_modules/gpx-parse/dist']
+        alias: {
+            "ag-grid-root": path.resolve('./node_modules/ag-grid/dist')
+        },
+        extensions: ['*', '.js', '.jsx', '.ts', '.tsx'],
+        modules: ["web_modules", "node_modules",'node_modules/gpx-parse/dist']
     },
     externals: {
         jquery: 'jQuery'
-        // react: 'React',
-        // "react-dom": "ReactDOM"
+    },
+    node: {
+        fs: 'empty'
     }
 }
