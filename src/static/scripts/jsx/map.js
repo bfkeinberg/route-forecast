@@ -19,7 +19,8 @@ class RouteForecastMap extends Component {
         this.map = null;
         this.markers = [];
         this.routePath = null;
-        this.state = {googleMapsApi:null, googleMapsPromise: loadGoogleMapsAPI({key:this.props.maps_api_key})};
+        this.googleMapsApi = null;
+        this.state = {googleMapsPromise: loadGoogleMapsAPI({key:this.props.maps_api_key})};
     }
 
     static selectWindIcon(bearing) {
@@ -160,7 +161,7 @@ class RouteForecastMap extends Component {
     }
 
     initMap(forecast, routeInfo) {
-        if (this.map==null) {
+        if (this.map===null) {
             return;
         }
         let southWest = { lat:routeInfo['bounds']['min_latitude'], lng:routeInfo['bounds']['min_longitude'] };
@@ -193,19 +194,19 @@ class RouteForecastMap extends Component {
     }
 
     componentDidUpdate(prevProps,prevState) {
-        if (this.state.googleMapsApi == null) {
+        if (this.googleMapsApi == null) {
             this.state.googleMapsPromise.then((googleMaps) => {
-                this.setState({googleMapsApi: googleMaps});
+                this.googleMapsApi = googleMaps;
                 const mapRef = this.refs.mapDiv;
                 const node = ReactDOM.findDOMNode(mapRef);
-                if (node == null) {
+                if (node === null) {
                     return;
                 }
-                if (this.state.googleMapsApi == null) {
+                if (this.googleMapsApi === null) {
                     return;
                 }
-                let map = new this.state.googleMapsApi.Map(node, {mapTypeId: google.maps.MapTypeId.ROADMAP});
-                if (map == null) {
+                let map = new this.googleMapsApi.Map(node, {mapTypeId: google.maps.MapTypeId.ROADMAP});
+                if (map === null) {
                     return;
                 }
                 this.map = map;
@@ -213,10 +214,9 @@ class RouteForecastMap extends Component {
                 console.error(err);
             });
         }
-        this.drawTheMap(this.state.googleMapsApi, this.props.forecast, this.props.routeInfo);
+        this.drawTheMap(this.googleMapsApi, this.props.forecast, this.props.routeInfo);
     }
 
 }
 
-module.exports=RouteForecastMap;
 export default RouteForecastMap;

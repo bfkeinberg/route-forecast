@@ -14,11 +14,8 @@
     </div>
         {% endif %}
         {% endwith %}
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
-        <script src="http://cdn.bootcss.com/react/15.4.1/react.js"></script>
-        <!--<script src="http://cdn.bootcss.com/react/15.4.1/react-dom.js"></script>-->
-        <link href="https://cdnjs.cloudflare.com/ajax/libs/normalize/3.0.2/normalize.min.css" rel="stylesheet">
         <link rel="stylesheet" type="text/css" href="static/style.css">
+        <script src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
         <link rel="shortcut icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
         <link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename='favicon-32x32.png') }}">
         <link rel="icon" type="image/png" sizes="96x96" href="{{ url_for('static', filename='favicon-96x96.png') }}">
@@ -135,6 +132,6 @@
         <div id="container">
             <div id="content"></div>
         </div>
-        <script id='routeui' maps_api_key='{{ maps_key }}' action="{{ url_for('forecast') }}" src="{{ url_for('static', filename='scripts/js/bundle.js') }}"></script>
+        <script id='routeui' timezone_api_key='{{ timezone_api_key }}' maps_api_key='{{ maps_key }}' action="{{ url_for('forecast') }}" src="{{ url_for('static', filename='scripts/js/bundle.js') }}"></script>
     </body>
 </html>
