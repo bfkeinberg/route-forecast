@@ -51,19 +51,18 @@ class RouteInfoForm extends React.Component {
         this.makeFullQueryString = this.makeFullQueryString.bind(this);
         this.urlShortenCallback = this.urlShortenCallback.bind(this);
         this.shortenUrl = this.shortenUrl.bind(this);
-        this.controlPoints = [];
         this.forecastRequest = null;
         this.timeZone = null;
         this.routeFileSet = false;
         this.xmlhttp = null;
-        this.parser = new AnalyzeRoute(this.setErrorState,this.props.maps_api_key);
+        this.parser = new AnalyzeRoute(this.setErrorState,this.props.timezone_api_key);
         this.paramsChanged = false;
         this.state = {start:RouteInfoForm.findNextStartTime(props.start),
             pace:props.pace==null?defaultPace:props.pace, interval:props.interval==null?defaultIntervalInHours:props.interval,
             rwgpsRoute:props.rwgpsRoute==null?'':props.rwgpsRoute, errorDetails:null,
             pending:false,
             rwgpsRouteIsTrip:false, errorSource:null, succeeded:null, routeUpdating:false,
-            shortUrl:''};
+            shortUrl:'http://www.cyclerouteforecast.com'};
         this.fetchAfterLoad = false;
     }
 
@@ -89,10 +88,6 @@ class RouteInfoForm extends React.Component {
         }
     }
 
-    copyControls(controlPoints) {
-        return controlPoints.map(point => {return {distance:point['distance'],duration:point['duration']}});
-    }
-
     componentWillReceiveProps(nextProps) {
         if (this.parser.routeIsLoaded()) {
             this.calculateTimeAndDistance(nextProps);
@@ -109,7 +104,9 @@ class RouteInfoForm extends React.Component {
     }
 
     urlShortenCallback(event) {
-        this.setState({shortUrl:event.currentTarget.response['id']});
+        if (event.currentTarget.response['id'] != undefined) {
+            this.setState({shortUrl:event.currentTarget.response['id']});
+        }
     }
 
     shortenUrl(url) {
@@ -134,7 +131,6 @@ class RouteInfoForm extends React.Component {
     }
 
     calculateTimeAndDistance(props) {
-        this.controlPoints = this.copyControls(this.props.controlPoints);
         let routeInfo = this.parser.walkRoute(moment(this.state.start),
             this.state.pace, parseFloat(this.state.interval),props.controlPoints,props.metric);
         if (routeInfo===null) {
@@ -190,27 +186,28 @@ class RouteInfoForm extends React.Component {
     }
 
     forecastCb(event) {
-        if (this.xmlhttp.readyState == 4) {
+        if (this.xmlhttp.readyState === 4) {
             this.setState({pending:false});
             this.forecastRequest = null;
-            if (event.target.status==200) {
+            if (event.target.status===200) {
                 this.setState({errorDetails:null,succeeded:true});
                 this.setQueryString(this.state,this.props.controlPoints,this.props.metric);
-                if (event.target.response == null) {
+                if (event.target.response === null) {
                     console.log('missing response');
                     return;
                 }
                 this.props.updateForecast(event.target.response);
-                let weatherCorrectionMinutes = this.parser.adjustForWind(event.target.response,this.state.pace,this.props.controlPoints,this.state.start,this.props.metric);
+                let controlsToUpdate = this.props.controlPoints.slice();
+                let weatherCorrectionMinutes = this.parser.adjustForWind(event.target.response,this.state.pace,controlsToUpdate,this.state.start,this.props.metric);
                 this.props.updateFinishTime(weatherCorrectionMinutes);
-                this.props.updateControls(this.props.controlPoints,this.props.metric);
+                this.props.updateControls(controlsToUpdate,this.props.metric);
             }
             else {
-                if (event.target.response != null) {
+                if (event.target.response !== null) {
                     this.setState({errorDetails:event.target.response['status'],
                         errorCause:this.routeFileSet?'gpx':'rwgps', succeeded: false });
                 }
-                else if (event.target.statusText != null) {
+                else if (event.target.statusText !== null) {
                     this.setState({errorDetails:event.target.statusText,
                         errorCause:this.routeFileSet?'gpx':'rwgps',succeeded:false});
                 }

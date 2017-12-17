@@ -1,9 +1,14 @@
 import {Button,ButtonGroup,ButtonToolbar,Glyphicon} from 'react-bootstrap';
-import {Checkbox,FormGroup,ControlLabel,FormControl} from 'react-bootstrap';
+import {Checkbox,FormGroup,ControlLabel,FormControl, Alert} from 'react-bootstrap';
 import React from 'react';
 // import MediaQuery from 'react-responsive';
 import ControlTable from './controlTable';
+import StravaRouteParser from './stravaRouteParser';
+import { Spinner } from '@blueprintjs/core';
 
+class StravaErrorAlert extends React.Component {
+
+}
 
 class ControlPoints extends React.Component {
 
@@ -14,9 +19,66 @@ class ControlPoints extends React.Component {
         this.toggleDisplayBanked = this.toggleDisplayBanked.bind(this);
         this.toggleMetric = this.toggleMetric.bind(this);
         this.toggleCompare = this.toggleCompare.bind(this);
+        this.updateExpectedTimes = this.updateExpectedTimes.bind(this);
+        this.stravaErrorCallback = this.stravaErrorCallback.bind(this);
+        this.hideStravaErrorAlert = this.hideStravaErrorAlert.bind(this);
+        this.setStravaActivity = this.setStravaActivity.bind(this);
+        this.updateProgress = this.updateProgress.bind(this);
         this.state = {
-            displayBankedTime : false, metric:this.props.metric, lookback:false
+            displayBankedTime : false, metric:this.props.metric, lookback:false,
+            stravaAlertVisible: false, stravaError: this.props.strava_error,
+            strava_activity: this.props.strava_activity, isUpdating:false
         };
+        this.stravaParser = new StravaRouteParser(this.updateFromTable,this.updateProgress);
+    }
+
+    static showProgressSpinner(running) {
+        if (running) {
+            return (
+                <Spinner/>
+            );
+        }
+    }
+
+    updateProgress(isUpdating) {
+        this.setState({isUpdating:isUpdating});
+    }
+
+    hideStravaErrorAlert() {
+        this.setState({stravaError:null, stravaAlertVisible:false});
+    }
+
+    stravaErrorCallback(error) {
+        this.setState({stravaError:error});
+    }
+
+    setStravaActivity(event) {
+        let newValue = parseInt(event.target.value,10);
+        if (Number.isNaN(newValue)) {
+            return;
+        }
+        this.setState({strava_activity:newValue});
+    }
+
+    updateExpectedTimes(event) {
+        let newValue = parseInt(event.target.value,10);
+        if (isNaN(newValue)) {
+            return;
+        }
+        this.stravaParser.computeActualTimes(newValue,this.props.controlPoints)
+    }
+
+    componentWillReceiveProps(newProps) {
+        if (newProps.strava_token !== undefined) {
+            this.stravaParser.setToken(newProps.strava_token);
+        }
+        if (newProps.strava_activity !== undefined && newProps.strava_activity !== '') {
+            this.setState({strava_activity:newProps.strava_activity});
+            this.stravaParser.computeActualTimes(newProps.strava_activity,newProps.controlPoints, this.stravaErrorCallback);
+        }
+        if (newProps.strava_error!= undefined) {
+            this.setState({stravaError:newProps.strava_error});
+        }
     }
 
     addControl( ) {
@@ -53,7 +115,8 @@ class ControlPoints extends React.Component {
     shouldComponentUpdate(nextProps,newState) {
         let controlPoints = this.props.controlPoints;
         if (newState.displayBankedTime !== this.state.displayBankedTime ||
-                newState.lookback != this.state.lookback ||
+                newState.lookback !== this.state.lookback ||
+                nextProps.controlPoints.length !== controlPoints.length ||
                 !nextProps.controlPoints.every((v, i)=> this.doControlsMatch(v,controlPoints[i])) ||
                 newState.metric !== this.state.metric
         ) {
@@ -63,10 +126,9 @@ class ControlPoints extends React.Component {
     }
 
     render () {
-        const title = this.props.name == '' ?
+        const title = this.props.name === '' ?
             ( <h3 style={{textAlign:"center"}}>Control point list</h3> ) :
             ( <h3 style={{textAlign:"center"}}>Control point list for <i>{this.props.name}</i></h3> );
-        const rusa_banked_header = (<th style={{'fontSize':'80%','width':'17%'}}>Banked time</th>);
         return (
             <div className="controlPoints">
                 <ButtonToolbar style={{display:'inline-flex',flexDirection:'row', paddingTop:'11px',paddingLeft:'4px'}}>
@@ -86,6 +148,12 @@ class ControlPoints extends React.Component {
                               onChange={this.toggleDisplayBanked} onClick={this.toggleDisplayBanked}
                               style={{padding:'0px 0px 0px 24px', display:'inline-flex'}}>Display banked time</Checkbox>
                     <Checkbox tabIndex="13" checked={this.state.lookback} inline onClick={this.toggleCompare} style={{display:'inline-flex'}}>Compare</Checkbox>
+                    <FormGroup controlId="actualRide" style={{visibility:this.state.lookback?null:'hidden', display:'inline-flex'}}>
+                        <ControlLabel style={{display:'inline-flex'}}>Strava</ControlLabel>
+                        <FormControl tabIndex='-1' type="text" style={{display:'inline-flex'}} value={this.state.strava_activity} onChange={this.setStravaActivity} onBlur={this.updateExpectedTimes}/>
+                        {this.state.stravaAlertVisible?<Alert onDismiss={this.hideStravaErrorAlert} bsStyle='warning'>{this.state.stravaError}</Alert>:null}
+                        {ControlPoints.showProgressSpinner(this.state.isUpdating)}
+                    </FormGroup>
                 </ButtonGroup>
                 </ButtonToolbar>
                 <ControlTable rows={this.props.controlPoints.length} controls={this.props.controlPoints}

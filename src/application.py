@@ -12,8 +12,8 @@ import requests
 from flask import Flask, render_template, request, redirect, url_for, jsonify
 # from flask import flash
 from flask_bower import Bower
-
 from routeWeather import WeatherCalculator
+from stravaActivity import StravaActivity
 
 application = Flask(__name__)
 application.config['MAX_CONTENT_LENGTH'] = 20 * 1024 * 1024
@@ -26,6 +26,10 @@ application.weather_request_count = 0
 application.last_request_day = datetime.now().date()
 logger = logging.getLogger('RoutePlanner')
 logging.basicConfig(level=logging.INFO)
+logging.getLogger('flask_cors').level = logging.DEBUG
+strava_api_key = os.environ.get("STRAVA_API_KEY")
+strava_activity = StravaActivity(strava_api_key,session)
+
 
 @application.after_request
 def add_header(r):
@@ -41,11 +45,13 @@ def add_header(r):
 def inject_api_keys():
     return dict(maps_key=os.getenv('MAPS_KEY', 'NONE'),
                 darksky_api_key=os.getenv('DARKSKY_API_KEY', 'NONE'),
-                rwgps_api_key=os.getenv('RWGPS_API_KEY', 'NONE'))
+                rwgps_api_key=os.getenv('RWGPS_API_KEY', 'NONE'),
+                timezone_api_key=os.getenv('TIMEZONE_API_KEY', 'NONE'))
 
 
 @application.route('/')
 def hello():
+    logger.info("Maps key %s",os.getenv('MAPS_KEY', 'NONE'))
     return render_template('form.html')
 
 
@@ -60,12 +66,53 @@ def server_error(e):
         else:
             return e.message
     else:
-        return 'An internal error occurred.' + e.message, 500 #e.response.status_code
+        return 'An internal error occurred.' + e.message, 500   # e.response.status_code
 
 
 @application.route('/form')
 def form():
     return render_template('form.html', disabled='disabled style=' + "'color:#888;'")
+
+@application.route('/stravaAuthReq')
+def authenticate_with_strava():
+    logger.info('Authenticating with Strava')
+    state = request.args.get('state')
+    if state is None:
+        return jsonify({'status': 'Missing keys'}), 400
+    return strava_activity.authenticate(state)
+
+@application.route('/getStrava', methods=['GET'])
+def get_strava_activity():
+    activity = request.args.get('activityStream')
+    if activity is None:
+        return jsonify({'status': 'Missing activityStream id'}), 400
+    code = request.args.get('code')
+    if activity is None:
+        return jsonify({'status': 'Missing code'}), 400
+
+    logger.info('Request from %s(%s) for Strava route %s', request.remote_addr,
+                request.headers.get('X-Forwarded-For', request.remote_addr), activity)
+
+    return strava_activity.get_activity(code,activity)
+
+
+@application.route('/stravaAuthReply')
+def handle_strava_auth_response():
+    code = request.args.get('code')
+    error = request.args.get('error')
+    state = request.args.get('state')
+    if state != None:
+        restored_state = json.loads(state)
+    else:
+        restored_state={}
+    if error is not None:
+            logger.info('Strava authentication error %s', error)
+    token = strava_activity.get_token(code)
+    restored_state['strava_token'] = token
+    restored_state['strava_error'] = error
+    url = url_for('form', **restored_state)
+
+    return redirect(url)
 
 
 def dl_from_rwgps(route_number):
@@ -83,21 +130,23 @@ def log_in_to_rwgps():
 def get_rwgps_route():
     route = request.args.get('route')
     if route is None:
-        return jsonify({'status':'Missing keys'}), 400
-    logger.info('Request from %s(%s) for rwgps route %s',request.remote_addr,request.headers.get('X-Forwarded-For', request.remote_addr),route)
-    isTrip = request.args.get('trip')
-    if isTrip is None or isTrip != 'true':
-        routeType = 'routes'
+        return jsonify({'status': 'Missing keys'}), 400
+    logger.info('Request from %s(%s) for rwgps route %s',
+                request.remote_addr, request.headers.get('X-Forwarded-For', request.remote_addr), route)
+    is_trip = request.args.get('trip')
+    if is_trip is None or is_trip != 'true':
+        route_type = 'routes'
     else:
-        routeType = 'trips'
+        route_type = 'trips'
     rwgps_api_key = os.environ.get("RWGPS_API_KEY")
     if rwgps_api_key is None:
         return jsonify({'status': 'Missing rwgps API key'}), 500
-    route_info_result = session.get("https://ridewithgps.com/{1}/{0}.json".format(route,routeType),
-                               params={'apikey': rwgps_api_key})
+    route_info_result = session.get("https://ridewithgps.com/{1}/{0}.json".format(route, route_type),
+                                    params={'apikey': rwgps_api_key})
     if route_info_result.status_code != 200:
         return jsonify({'status': route_info_result.text}), route_info_result.status_code
     return jsonify(route_info_result.json())
+
 
 @application.route('/handle_login', methods=['POST'])
 def handle_login():
@@ -142,7 +191,7 @@ def submitted_form():
         gpx_url = "https://ridewithgps.com/trips/{}.gpx?sub_format=track".format(route_number)
         dl_req = session.get(gpx_url)
         if dl_req.status_code == 200:
-            contents = dl_req.content      #  dl_from_rwgps(route_number)
+            contents = dl_req.content       #   dl_from_rwgps(route_number)
         else:
             return jsonify({'status': dl_req.reason}), dl_req.status_code
     else:
@@ -152,30 +201,31 @@ def submitted_form():
         local_file.flush()
         wcalc = WeatherCalculator(session)
         try:
-            forecast = wcalc.calc_weather(float(interval), pace, starting_time=starting_time, tz=timezone,
-                                          route=local_file.name, controls=controls)
+            forecast_result = wcalc.calc_weather(float(interval), pace, starting_time=starting_time, tz=timezone,
+                                                 route=local_file.name, controls=controls)
         except requests.HTTPError as excpt:
             return jsonify({'status': excpt.message}), 500
         except Exception as excpt:
             return jsonify({'status': excpt.message}), 500
         if wcalc.is_error():
-            return jsonify({'status': forecast}), 400
+            return jsonify({'status': forecast_result}), 400
         bounds = wcalc.get_bounds()
         min_lat, min_lon, max_lat, max_lon = bounds
-    return jsonify({'forecast': forecast, 'min_lat': min_lat, 'max_lat': max_lat, 'min_lon': min_lon,
+    return jsonify({'forecast': forecast_result, 'min_lat': min_lat, 'max_lat': max_lat, 'min_lon': min_lon,
                     'max_lon': max_lon, 'points': wcalc.get_points(), 'name': wcalc.get_name(),
-                                'controls': wcalc.get_controls()})
+                    'controls': wcalc.get_controls()})
 
-@application.route('/forecast',methods=['POST'])
+
+@application.route('/forecast', methods=['POST'])
 def forecast():
-    if not request.form.viewkeys() >= {'locations', 'timezone'}:
-        return jsonify({'status':'Missing keys'}), 400
+    if not request.form.keys() >= ['locations', 'timezone']:
+        return jsonify({'status': 'Missing keys'}), 400
     forecast_points = json.loads(request.form['locations'])
-    logger.info('Request from %s(%s) for %d forecast points',request.remote_addr,request.headers.get('X-Forwarded-For', request.remote_addr),len(forecast_points))
+    logger.info('Request from %s(%s) for %d forecast points', request.remote_addr, request.headers.get('X-Forwarded-For', request.remote_addr), len(forecast_points))
     if len(forecast_points) > 50:
-        return jsonify({'status':'Invalid request, increase interval'}),400
+        return jsonify({'status': 'Invalid request, increase interval'}), 400
     today = datetime.now().date()
-    if (today != application.last_request_day):
+    if today != application.last_request_day:
         application.last_request_day = today
         application.weather_request_count = len(forecast_points)
     elif len(forecast_points) + application.weather_request_count > 900:
@@ -197,9 +247,10 @@ def forecast():
         # offset_time = corrected_time.strftime('%Y-%m-%dT%H:%M:%S%z')
         # logger.info("full time %s",offset_time)
         # logger.info("received message time:%s",point['time'])
-        results.append(wcalc.call_weather_service(point['lat'],point['lon'],point['time'],point['distance'],req_tzinfo,
+        results.append(wcalc.call_weather_service(point['lat'], point['lon'], point['time'], point['distance'], req_tzinfo,
                                                   point['bearing']))
-    return jsonify({'forecast':results})
+    return jsonify({'forecast': results})
+
 
 # run the app.
 if __name__ == "__main__":

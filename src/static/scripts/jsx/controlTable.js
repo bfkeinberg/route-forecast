@@ -84,14 +84,6 @@ class ControlTable extends React.Component {
         }
     }
 
-    componentDidMount() {
-        if (!this.state.rowsToRemove.length===0) {
-            this.state.rowsToRemove.forEach(row => this.removeRow(row));
-            this.updateFromGrid();
-            this.setState({rowsToRemove:[],changed:true});
-        }
-    }
-
     componentWillReceiveProps(newProps) {
         if (this.api===undefined || newProps===undefined) {
             return;
@@ -111,6 +103,7 @@ class ControlTable extends React.Component {
             newControl.name===oldControl.name &&
             newControl.duration===oldControl.duration &&
             newControl.arrival===oldControl.arrival &&
+            newControl.actual===oldControl.actual &&
             newControl.banked===oldControl.banked;
     }
 
