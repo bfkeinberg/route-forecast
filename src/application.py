@@ -51,7 +51,6 @@ def inject_api_keys():
 
 @application.route('/')
 def hello():
-    logger.info("Maps key %s",os.getenv('MAPS_KEY', 'NONE'))
     return render_template('form.html')
 
 
@@ -79,22 +78,7 @@ def authenticate_with_strava():
     state = request.args.get('state')
     if state is None:
         return jsonify({'status': 'Missing keys'}), 400
-    return strava_activity.authenticate(state)
-
-@application.route('/getStrava', methods=['GET'])
-def get_strava_activity():
-    activity = request.args.get('activityStream')
-    if activity is None:
-        return jsonify({'status': 'Missing activityStream id'}), 400
-    code = request.args.get('code')
-    if activity is None:
-        return jsonify({'status': 'Missing code'}), 400
-
-    logger.info('Request from %s(%s) for Strava route %s', request.remote_addr,
-                request.headers.get('X-Forwarded-For', request.remote_addr), activity)
-
-    return strava_activity.get_activity(code,activity)
-
+    return strava_activity.authenticate(request.host_url, state)
 
 @application.route('/stravaAuthReply')
 def handle_strava_auth_response():

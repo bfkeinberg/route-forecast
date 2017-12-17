@@ -43,7 +43,7 @@ class StravaRouteParser {
                         errorCallback(activityStream.message);
                         return;
                     }
-                    this.updateControls(this.parseActivity(activityData, activityStream, controlPoints));
+                    this.updateControls(this.parseActivity(activityData, activityStream, controlPoints), this.computeActualFinishTime(activityData));
                 }, error => {
                     if (errorCallback !== undefined) {
                         errorCallback(error);
@@ -61,6 +61,10 @@ class StravaRouteParser {
         });
     }
 
+    computeActualFinishTime(activity) {
+        return moment(activity['start_date']).add(activity['elapsed_time'],'seconds').format('ddd, MMM DD h:mma');
+    }
+
     fetchActivity(activityId) {
         const promise = new Promise((resolve, reject) => {
             strava.activities.get({access_token: this.token, id: activityId},
@@ -76,7 +80,7 @@ class StravaRouteParser {
         return promise;
     }
 
-    walkActivity(start, distance, time, controlPoints) {
+    static walkActivity(start, distance, time, controlPoints) {
         let startMoment = moment(start);
         let controlsCopy = controlPoints.slice();
         let currentControl = controlsCopy.shift();
@@ -100,9 +104,9 @@ class StravaRouteParser {
         let modifiedControls = controlPoints.map(control => Object.assign({}, control));
         modifiedControls.sort((a,b) => a['distance']-b['distance']);
         if (activityStream[0].type==='distance') {
-            this.walkActivity(activity['start_date'], activityStream[0].data, activityStream[1].data,modifiedControls);
+            StravaRouteParser.walkActivity(activity['start_date'], activityStream[0].data, activityStream[1].data,modifiedControls);
         } else {
-            this.walkActivity(activity['start_date'], activityStream[1].data, activityStream[0].data, modifiedControls);
+            StravaRouteParser.walkActivity(activity['start_date'], activityStream[1].data, activityStream[0].data, modifiedControls);
         }
         return modifiedControls;
     }

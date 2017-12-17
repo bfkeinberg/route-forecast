@@ -24,12 +24,14 @@ class ControlPoints extends React.Component {
         this.hideStravaErrorAlert = this.hideStravaErrorAlert.bind(this);
         this.setStravaActivity = this.setStravaActivity.bind(this);
         this.updateProgress = this.updateProgress.bind(this);
+        this.updateActualValues = this.updateActualValues.bind(this);
+        this.changeDisplayFinishTime = this.changeDisplayFinishTime.bind(this);
         this.state = {
             displayBankedTime : false, metric:this.props.metric, lookback:this.props.strava_activity!==undefined,
-            stravaAlertVisible: false, stravaError: this.props.strava_error,
+            stravaAlertVisible: false, stravaError: this.props.strava_error, displayedFinishTime:this.props.finishTime,
             strava_activity: this.props.strava_activity===undefined?' ':this.props.strava_activity, isUpdating:false
         };
-        this.stravaParser = new StravaRouteParser(this.updateFromTable,this.updateProgress);
+        this.stravaParser = new StravaRouteParser(this.updateActualValues, this.updateProgress);
     }
 
     static showProgressSpinner(running) {
@@ -38,6 +40,20 @@ class ControlPoints extends React.Component {
                 <Spinner/>
             );
         }
+    }
+
+    changeDisplayFinishTime(event) {
+        if (event.type === 'mouseenter' && this.props.actualFinishTime !== undefined) {
+            this.setState({displayedFinishTime:this.props.actualFinishTime});
+        }
+        if (event.type === 'mouseleave') {
+            this.setState({displayedFinishTime:this.props.finishTime});
+        }
+    }
+
+    updateActualValues(controlPoints,finishTime) {
+        this.props.updateControls(controlPoints,this.state.metric);
+        this.props.setActualFinishTime(finishTime);
     }
 
     updateProgress(isUpdating) {
@@ -79,6 +95,9 @@ class ControlPoints extends React.Component {
         if (newProps.strava_error!= undefined) {
             this.setState({stravaError:newProps.strava_error});
         }
+        if (newProps.finishTime !== this.props.finishTime) {
+            this.setState({'displayedFinishTime':newProps.finishTime});
+        }
     }
 
     addControl( ) {
@@ -109,6 +128,7 @@ class ControlPoints extends React.Component {
             newControl.name===oldControl.name &&
             newControl.duration===oldControl.duration &&
             newControl.arrival===oldControl.arrival &&
+            newControl.actual===oldControl.actual &&
             newControl.banked===oldControl.banked;
     }
 
@@ -121,7 +141,9 @@ class ControlPoints extends React.Component {
                 newState.metric !== this.state.metric ||
                 newState.strava_activity !== this.state.strava_activity ||
                 newState.stravaError !== this.state.stravaError ||
-                newState.isUpdating !== this.state.isUpdating
+                newState.isUpdating !== this.state.isUpdating ||
+                newState.displayedFinishTime !== this.state.displayedFinishTime ||
+                nextProps.finishTime !== this.props.finishTime
         ) {
             return true;
         }
@@ -141,8 +163,9 @@ class ControlPoints extends React.Component {
                     {/*<Button onClick={this.addControl} id='addButton' style={{display:'inline-flex',width:'165px',height:'34px'}}><Glyphicon glyph="plus-sign"></Glyphicon>Add control point</Button>*/}
                     <FormGroup controlId="finishTime" style={{display:'inline-flex'}}>
                         <ControlLabel style={{width:'7em',display:'inline-flex',marginTop:'7px',paddingLeft:'8px'}}>Finish time</ControlLabel>
-                        <FormControl tabIndex='-1' type="text" style={{display:'inline-flex',width:'12em',marginTop:'3px',marginBotton:'0px',paddingLeft:'2px',paddingTop:'2px',height:'28px'}}
-                                     value={this.props.finishTime}/>
+                        <FormControl tabIndex='-1' type="text" onMouseEnter={this.changeDisplayFinishTime} onMouseLeave={this.changeDisplayFinishTime}
+                                     style={{display:'inline-flex',width:'12em',marginTop:'3px',marginBotton:'0px',paddingLeft:'2px',paddingTop:'2px',height:'28px'}}
+                                     value={this.state.displayedFinishTime}/>
                     </FormGroup>
                     <Checkbox tabIndex='12' checked={this.state.metric} inline
                               onClick={this.toggleMetric} onChange={this.toggleMetric}
