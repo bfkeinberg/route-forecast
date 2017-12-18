@@ -32,7 +32,7 @@ class ControlTable extends React.Component {
             return;
         }
         let row = {name:'',id:this.props.controls.length};
-        let result = this.api.updateRowData({add:[row]});
+        let result = this.api.updateRowData({add:[row], addIndex:row.id});
         // focus on new control if one has been added
         this.api.setFocusedCell(this.props.controls.length,'name',null);
     }
@@ -157,21 +157,23 @@ class ControlTable extends React.Component {
         this.props.controls.forEach((row,key) => row.id=key);
         let displayBanked = this.props.displayBanked;
         return (<div className="ag-theme-fresh">
-            <AgGridReact enableColResize enableSorting animateRows sortingOrder={['asc']} rowData={this.props.controls}
+            <AgGridReact enableColResize enableSorting animateRows sortingOrder={['asc']} unSortIcon rowData={this.props.controls}
                          onGridReady={this.onGridReady} onSortChanged={this.sortChanged}
                          onCellValueChanged={this.cellUpdated} tabToNextCell={this.tabHandler} getRowNodeId={data => data.id}>
-                <AgGridColumn colId='name' field='name' suppressSorting editable={true} headerName='Name'></AgGridColumn>
+                <AgGridColumn colId='name' field='name' unSortIcon={true} suppressSorting editable={true} headerName='Name'></AgGridColumn>
                 <AgGridColumn field='distance' headerTooltip='In miles or km, depending on the metric checkbox'
-                              type={'numericColumn'} editable={true} valueParser={this.setData} valueSetter={this.validateData} headerName='Distance'></AgGridColumn>
+                              type={'numericColumn'} unSortIcon={true} editable={true} valueParser={this.setData} valueSetter={this.validateData} headerName='Distance'></AgGridColumn>
                 <AgGridColumn field='duration' headerTooltip='How many minutes you expect to spend at this control'
                               suppressSorting type={'numericColumn'} editable={true} valueParser={params=>{return Number(params.newValue)}}
                               valueSetter={this.validateData} valueFormatter={this.appendUnit} headerName='Expected time spent'></AgGridColumn>
-                <AgGridColumn field='arrival' headerTooltip='When you are predicted to arrive here'
-                              suppressNavigable suppressSorting headerName='Est. arrival time'></AgGridColumn>
-                <AgGridColumn colId='actual' field='actual' headerTooltip='When you actually arrived here' suppressNavigable hide={!this.props.compare} headerName='Actual arrival time'></AgGridColumn>
+                <AgGridColumn field='arrival' cellClass="align-right" headerTooltip='When you are predicted to arrive here'
+                              cellRenderer="agAnimateShowChangeCellRenderer"
+                              suppressNavigable suppressSorting enableCellChangeFlash={true} headerName='Est. arrival time'></AgGridColumn>
+                <AgGridColumn colId='actual' field='actual' enableCellChangeFlash={true} headerTooltip='When you actually arrived here' suppressNavigable hide={!this.props.compare} headerName='Actual arrival time'></AgGridColumn>
                 <AgGridColumn colId='banked' field='banked' headerTooltip='Time remaining at brevet pace'
-                              suppressNavigable suppressSorting valueFormatter={this.appendUnit} hide={!displayBanked} headerName='Banked time'></AgGridColumn>
-                <AgGridColumn suppressNavigable cellRenderer={this.deleteRenderer}></AgGridColumn>
+                              cellRenderer="agAnimateShowChangeCellRenderer"
+                              suppressNavigable suppressSorting type={'numericColumn'} valueFormatter={this.appendUnit} hide={!displayBanked} headerName='Banked time'></AgGridColumn>
+                <AgGridColumn suppressNavigable suppressSorting cellRenderer={this.deleteRenderer}></AgGridColumn>
             </AgGridReact>
         </div>);
     }
