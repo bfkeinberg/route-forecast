@@ -59,7 +59,9 @@
   },
   "scripts": {
     "test": "python src/application.py",
-    "build": "webpack --progress --verbose --colors --display-error-details --config webpack/common.config.js"
+    "build": "webpack --progress --verbose --colors --display-error-details --config webpack/common.config.js",
+    "prod": "./node_modules/.bin/webpack --config webpack.prod.js",
+    "dev": "./node_modules/.bin/webpack --config webpack.dev.js"
   },
   "repository": {
     "type": "git",

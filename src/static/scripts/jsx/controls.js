@@ -1,4 +1,4 @@
-import {Button,ButtonGroup,ButtonToolbar,Glyphicon} from 'react-bootstrap';
+import {Button,ButtonGroup,ButtonToolbar,Glyphicon, Panel} from 'react-bootstrap';
 import {Checkbox,FormGroup,ControlLabel,FormControl, Alert} from 'react-bootstrap';
 import React from 'react';
 // import MediaQuery from 'react-responsive';
@@ -182,8 +182,11 @@ class ControlPoints extends React.Component {
                     </FormGroup>
                 </ButtonGroup>
                 </ButtonToolbar>
-                <ControlTable rows={this.props.controlPoints.length} controls={this.props.controlPoints}
-                              displayBanked={this.state.displayBankedTime} compare={this.state.lookback} update={this.updateFromTable} ref={(table) => {this.table = table;}}/>
+                <Panel header={title} bsStyle="info" style={{margin:'10px'}}>
+                    <ControlTable rows={this.props.controlPoints.length} controls={this.props.controlPoints}
+                                  displayBanked={this.state.displayBankedTime} compare={this.state.lookback} update={this.updateFromTable} ref={(table) => {this.table = table;}}/>
+                </Panel>
+                <div tabIndex="98" onFocus={event => {document.getElementById('addButton').focus()}}></div>
             </div>
         );
     }
