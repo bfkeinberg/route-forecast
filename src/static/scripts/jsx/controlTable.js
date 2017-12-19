@@ -166,10 +166,11 @@ class ControlTable extends React.Component {
                 <AgGridColumn field='duration' headerTooltip='How many minutes you expect to spend at this control'
                               suppressSorting type={'numericColumn'} editable={true} valueParser={params=>{return Number(params.newValue)}}
                               valueSetter={this.validateData} valueFormatter={this.appendUnit} headerName='Expected time spent'></AgGridColumn>
-                <AgGridColumn field='arrival' cellClass="align-right" headerTooltip='When you are predicted to arrive here'
-                              cellRenderer="agAnimateShowChangeCellRenderer"
+                <AgGridColumn field='arrival' headerTooltip='When you are predicted to arrive here'
+                              cellRenderer="agAnimateShowChangeCellRenderer" type={'numericColumn'}
                               suppressNavigable suppressSorting enableCellChangeFlash={true} headerName='Est. arrival time'></AgGridColumn>
-                <AgGridColumn colId='actual' field='actual' enableCellChangeFlash={true} headerTooltip='When you actually arrived here' suppressNavigable hide={!this.props.compare} headerName='Actual arrival time'></AgGridColumn>
+                <AgGridColumn colId='actual' field='actual' suppressSorting enableCellChangeFlash={true} cellRenderer="agAnimateShowChangeCellRenderer"
+                              headerTooltip='When you actually arrived here' suppressNavigable hide={!this.props.compare} headerName='Actual arrival time'></AgGridColumn>
                 <AgGridColumn colId='banked' field='banked' headerTooltip='Time remaining at brevet pace'
                               cellRenderer="agAnimateShowChangeCellRenderer"
                               suppressNavigable suppressSorting type={'numericColumn'} valueFormatter={this.appendUnit} hide={!displayBanked} headerName='Banked time'></AgGridColumn>

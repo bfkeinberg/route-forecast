@@ -9,6 +9,10 @@ module.exports = {
     plugins: [
         new webpack.LoaderOptionsPlugin({
             debug: true
+        }),
+        new webpack.optimize.UglifyJsPlugin({sourceMap:true}),
+        new webpack.DefinePlugin({
+            'process.env.NODE_ENV': JSON.stringify('production')
         })
     ],
     devtool: 'eval-source-map',
