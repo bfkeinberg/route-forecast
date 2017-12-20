@@ -3,7 +3,7 @@ arrow==0.12.0
 awsebcli==3.12.1
 backports.functools-lru-cache==1.2.1
 blessed==1.14.2
-botocore==1.8.13
+botocore==1.8.17
 cement==2.8.2
 cffi==1.9.1
 click==6.7
