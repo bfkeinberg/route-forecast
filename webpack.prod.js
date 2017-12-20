@@ -12,7 +12,7 @@ module.exports = merge(common, {
         new webpack.optimize.AggressiveMergingPlugin({minSizeReduce:1.3}),
         new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
         new CompressionPlugin({
-            deleteOriginalAssets:true
+            // deleteOriginalAssets:true
         }),
         // new BundleAnalyzerPlugin()
     ]
