@@ -14,8 +14,8 @@
     </div>
         {% endif %}
         {% endwith %}
-        <link rel="stylesheet" type="text/css" href="static/style.css">
-        <script src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+        <!--<link rel="stylesheet" type="text/css" href="static/style.css">-->
+        <script defer="defer" src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
         <link rel="shortcut icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
         <link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename='favicon-32x32.png') }}">
         <link rel="icon" type="image/png" sizes="96x96" href="{{ url_for('static', filename='favicon-96x96.png') }}">
@@ -30,7 +30,7 @@
             }
             label.control-label {
                 padding-left: 8px;
-                /*padding-top: inherit;*/
+                padding-top: inherit;
                 padding-right: 8px;
                 display: inline-flex;
                 align-self: center;

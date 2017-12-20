@@ -1,26 +1,43 @@
+import dateutil.tz
 import json
 import logging
 import os
 import random
+import requests
 import string
 import tempfile
-from datetime import *
-import dateutil.tz
 import urllib2
+from datetime import *
+from flask import Flask, render_template, request, redirect, url_for, jsonify, g
+from flask import current_app, safe_join
+from flask_compress import Compress
 
-import requests
-from flask import Flask, render_template, request, redirect, url_for, jsonify
-# from flask import flash
-from flask_bower import Bower
 from routeWeather import WeatherCalculator
 from stravaActivity import StravaActivity
 
+
+def send_compressed_file(filename, formats=[('br', '.br'), ('gzip', '.gz')]):
+    g.is_compressed = False
+    if not current_app.has_static_folder:
+        raise RuntimeError('No static folder for the current application')
+    accept_encoding = request.headers.get('Accept-Encoding', None)
+    if not accept_encoding:
+        return current_app.send_static_file(filename)
+    encodings = [encoding for encoding in accept_encoding.split(',')]
+    for format, extension in formats:
+        compressed = filename + extension
+        if format in encodings and os.path.exists(safe_join(current_app.static_folder, compressed)):
+            g.is_compressed = True
+            return current_app.send_static_file(compressed)
+    return current_app.send_static_file(filename)
+
 application = Flask(__name__)
+Compress(application)
 application.config['MAX_CONTENT_LENGTH'] = 20 * 1024 * 1024
+application.view_functions['static'] = send_compressed_file
 secret_key = ''.join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(4))
 application.secret_key = secret_key
 logged_into_rwgps = False
-Bower(application)
 session = requests.Session()
 application.weather_request_count = 0
 application.last_request_day = datetime.now().date()
@@ -30,14 +47,16 @@ logging.getLogger('flask_cors').level = logging.DEBUG
 strava_api_key = os.environ.get("STRAVA_API_KEY")
 strava_activity = StravaActivity(strava_api_key,session)
 
-
 @application.after_request
 def add_header(r):
+
     """
     Add headers to both force latest IE rendering engine or Chrome Frame,
     and also to cache the rendered page for 10 minutes.
     """
     r.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
+    if hasattr(g,'is_compressed') and g.is_compressed:
+        r.headers['Content-Encoding'] = 'gzip'
     return r
 
 

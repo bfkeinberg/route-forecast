@@ -27,7 +27,7 @@ module.exports = {
                 loader: 'ts-loader' },
             { test: /\.css$/, use: [
                 {loader: "style-loader", options: {modules:false, sourceMap:true}},
-                {loader:"css-loader", options: {modules:false, sourceMap:true}},
+                {loader:"css-loader", options: {modules:false, sourceMap:true, minimize:true}},
                 ] },
             { test: /\.(png|woff2?)$/, loader: "url-loader?limit=100000" },
             { test: /\.jpg$/, loader: "file-loader" },
