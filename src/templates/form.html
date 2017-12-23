@@ -133,6 +133,7 @@
             <div id="content"></div>
         </div>
         <script id='routeui' timezone_api_key='{{ timezone_api_key }}' maps_api_key='{{ maps_key }}' action="{{ url_for('forecast') }}" src="{{ url_for('static', filename='scripts/js/bundle.js') }}"></script>
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='scripts/js/styles.css') }}">
         <noscript>This application requires JavaScript. Please enable JavaScript to use the application.</noscript>
     </body>
 </html>

@@ -5,7 +5,7 @@ var BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlug
 const CompressionPlugin = require("compression-webpack-plugin");
 module.exports = merge(common, {
     plugins: [
-        new webpack.optimize.UglifyJsPlugin({sourceMap:true}),
+        new webpack.optimize.UglifyJsPlugin({sourceMap:true,comments:false}),
         new webpack.DefinePlugin({
             'process.env.NODE_ENV': JSON.stringify('production')
         }),

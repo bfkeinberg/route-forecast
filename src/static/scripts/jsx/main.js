@@ -6,9 +6,8 @@ import RouteForecastMap from './map';
 import ForecastTable from './forecastTable';
 import moment from 'moment';
 import SplitPane from 'react-split-pane';
-import { Button } from 'react-bootstrap';
+import {Button} from 'react-bootstrap';
 import MediaQuery from 'react-responsive';
-
 // for react-splitter
 import 'normalize.css/normalize.css';
 
@@ -122,7 +121,7 @@ class RouteWeatherUI extends React.Component {
     updateRouteInfo(routeInfo,controlPoints) {
         if (this.state.routeInfo.name !== routeInfo.name) {
             let savedControlPoints = cookie.load(routeInfo.name);
-            if (savedControlPoints !== null && savedControlPoints.length > 0) {
+            if (savedControlPoints !== undefined && savedControlPoints.length > 0) {
                 controlPoints = this.parseControls(savedControlPoints);
             }
         }
