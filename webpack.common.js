@@ -39,11 +39,8 @@ module.exports = {
         filename: "bundle.js",
     },
     resolve: {
-        alias: {
-            "ag-grid-root": path.resolve('./node_modules/ag-grid/dist')
-        },
         extensions: ['*', '.js', '.jsx', '.ts', '.tsx'],
-        modules: ["web_modules", "node_modules",'node_modules/gpx-parse/dist']
+        modules: ["node_modules", GPX_DIR]
     },
     externals: {
         jquery: 'jQuery'
