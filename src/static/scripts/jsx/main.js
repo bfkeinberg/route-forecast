@@ -30,6 +30,7 @@ class RouteWeatherUI extends React.Component {
         this.updateFinishTime = this.updateFinishTime.bind(this);
         this.formatControlsForUrl = this.formatControlsForUrl.bind(this);
         this.setActualFinishTime = this.setActualFinishTime.bind(this);
+        this.invalidateForecast = this.invalidateForecast.bind(this);
         let script = document.getElementById( "routeui" );
         let queryParams = queryString.parse(location.search);
         this.strava_token = RouteWeatherUI.getStravaToken(queryParams);
@@ -37,7 +38,7 @@ class RouteWeatherUI extends React.Component {
         this.state = {controlPoints: queryParams.controlPoints===undefined?[]:this.parseControls(queryParams.controlPoints),
             routeInfo:{bounds:{},points:[], name:'',finishTime:''}, forecast:[], action:script.getAttribute('action'),
             maps_key:script.getAttribute('maps_api_key'), timezone_key:script.getAttribute('timezone_api_key'),
-            formVisible:true, weatherCorrectionMinutes:null, metric:false};
+            formVisible:true, weatherCorrectionMinutes:null, metric:false, forecastValid:false};
     }
 
     static getStravaToken(queryParams) {
@@ -79,6 +80,9 @@ class RouteWeatherUI extends React.Component {
             return true;
         }
         if (newState.actualFinishTime !== this.state.actualFinishTime) {
+            return true;
+        }
+        if (newState.forecastValid !== this.state.forecastValid) {
             return true;
         }
         return false;
@@ -124,6 +128,7 @@ class RouteWeatherUI extends React.Component {
             if (savedControlPoints !== undefined && savedControlPoints.length > 0) {
                 controlPoints = this.parseControls(savedControlPoints);
             }
+            this.setState({forecastValid:false});
         }
         if (routeInfo.name !== '') {
             cookie.save(routeInfo.name,this.formatControlsForUrl(controlPoints));
@@ -139,7 +144,11 @@ class RouteWeatherUI extends React.Component {
     }
 
     updateForecast(forecast) {
-        this.setState({forecast:forecast['forecast'],formVisible:false});
+        this.setState({forecast:forecast['forecast'],formVisible:false, forecastValid:true});
+    }
+
+    invalidateForecast() {
+        this.setState({forecastValid:false});
     }
 
     render() {
@@ -160,6 +169,7 @@ class RouteWeatherUI extends React.Component {
                            maps_api_key={this.state.maps_key}
                            timezone_api_key={this.state.timezone_key}
                            formatControlsForUrl={this.formatControlsForUrl}
+                           invalidateForecast={this.invalidateForecast}
             />
         );
         const formButton = (
@@ -180,6 +190,8 @@ class RouteWeatherUI extends React.Component {
                                           strava_activity={queryParams.strava_activity}
                                           strava_error={queryParams.strava_error}
                                           metric={queryParams.metric===null?this.state.metric:queryParams.metric==='true'}
+                                          forecastValid={this.state.forecastValid}
+                                          invalidateForecast={this.invalidateForecast}
                                           name={this.state.routeInfo['name']}/>
                     </SplitPane>
                         <SplitPane defaultSize={500} minSize={150} split="vertical" paneStyle={{'overflow':'scroll'}}>
@@ -202,6 +214,7 @@ class RouteWeatherUI extends React.Component {
                                           setActualFinishTime={this.setActualFinishTime}
                                           strava_error={queryParams.strava_error}
                                           strava_token={this.strava_token}
+                                          forecastValid={this.state.forecastValid}
                                           name={this.state.routeInfo['name']}/>
                     </SplitPane>
                     <ForecastTable forecast={this.state.forecast} weatherCorrectionMinutes={this.state.weatherCorrectionMinutes}/>

@@ -91,8 +91,12 @@ class AnalyzeRoute {
         if (event.target.status == 200) {
             this.rwgpsRouteData = event.target.response;
             this.gpxResult = null;
-            //TODO route type is hard-coded below, will cause a problem if we ever expose trip support
-            let point = this.rwgpsRouteData['route']['track_points'][0];
+            let rwgpsRouteDatum = this.rwgpsRouteData[this.isTrip?'trip':'route'];
+            if (rwgpsRouteDatum===undefined) {
+                this.setErrorStateCallback('RWGPS route info unavilable','rwgps');
+                return;
+            }
+            let point = rwgpsRouteDatum['track_points'][0];
             //TODO using current date and time for zone lookup could pose a problem in future
             let timeZonePromise = this.findTimezoneForPoint(point.y,point.x,new moment());
             timeZonePromise.then(timeZoneResult => {

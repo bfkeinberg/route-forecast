@@ -1,10 +1,21 @@
-import {Button,ButtonGroup,ButtonToolbar,Glyphicon, Panel} from 'react-bootstrap';
-import {Checkbox,FormGroup,ControlLabel,FormControl, Alert} from 'react-bootstrap';
+import {
+    Alert,
+    Button,
+    ButtonGroup,
+    ButtonToolbar,
+    Checkbox,
+    ControlLabel,
+    FormControl,
+    FormGroup,
+    Glyphicon,
+    Panel
+} from 'react-bootstrap';
 import React from 'react';
 // import MediaQuery from 'react-responsive';
 import ControlTable from './controlTable';
 import StravaRouteParser from './stravaRouteParser';
-import { Spinner } from '@blueprintjs/core';
+import {Spinner} from '@blueprintjs/core';
+import RouteInfoForm from "./routeInfoEntry";
 
 class StravaErrorAlert extends React.Component {
 
@@ -69,7 +80,7 @@ class ControlPoints extends React.Component {
     }
 
     setStravaActivity(event) {
-        let newValue = parseInt(event.target.value,10);
+        let newValue = parseInt(RouteInfoForm.getRouteNumberFromValue(event.target.value), 10);
         if (Number.isNaN(newValue)) {
             return;
         }
@@ -143,7 +154,8 @@ class ControlPoints extends React.Component {
                 newState.stravaError !== this.state.stravaError ||
                 newState.isUpdating !== this.state.isUpdating ||
                 newState.displayedFinishTime !== this.state.displayedFinishTime ||
-                nextProps.finishTime !== this.props.finishTime
+                nextProps.finishTime !== this.props.finishTime ||
+                nextProps.forecastValid !== this.props.forecastValid
         ) {
             return true;
         }
@@ -173,7 +185,7 @@ class ControlPoints extends React.Component {
                     <Checkbox tabIndex='11' checked={this.state.displayBankedTime} inline
                               onChange={this.toggleDisplayBanked} onClick={this.toggleDisplayBanked}
                               style={{padding:'0px 0px 0px 24px', display:'inline-flex'}}>Display banked time</Checkbox>
-                    <Checkbox tabIndex="13" checked={this.state.lookback} inline onChange={this.toggleCompare} onClick={this.toggleCompare} style={{display:'inline-flex'}}>Compare</Checkbox>
+                    <Checkbox tabIndex="13" disabled={!this.props.forecastValid} checked={this.state.lookback} inline onChange={this.toggleCompare} onClick={this.toggleCompare} style={{display:'inline-flex'}}>Compare</Checkbox>
                     <FormGroup controlId="actualRide" style={{visibility:this.state.lookback?null:'hidden', display:'inline-flex'}}>
                         <ControlLabel style={{display:'inline-flex'}}>Strava</ControlLabel>
                         <FormControl tabIndex='-1' type="text" style={{display:'inline-flex'}} value={this.state.strava_activity} onChange={this.setStravaActivity} onBlur={this.updateExpectedTimes}/>

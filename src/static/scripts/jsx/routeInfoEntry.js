@@ -1,12 +1,23 @@
-import { Spinner } from '@blueprintjs/core';
-import { Panel,FormControl,FormGroup,Form,Glyphicon,Alert,ControlLabel,Button,HelpBlock,Tooltip,OverlayTrigger,Well,InputGroup} from 'react-bootstrap';
+import {Spinner} from '@blueprintjs/core';
+import {
+    Alert,
+    Button,
+    ControlLabel,
+    Form,
+    FormControl,
+    FormGroup,
+    OverlayTrigger,
+    Panel,
+    Tooltip
+} from 'react-bootstrap';
 // import { Checkbox } from 'react-bootstrap';
 import moment from 'moment';
 import React from 'react';
 import Flatpickr from 'react-flatpickr'
 import AnalyzeRoute from './gpxParser';
-const queryString = require('query-string');
 import ShortUrl from './shortUrl';
+
+const queryString = require('query-string');
 
 const paceToSpeed = {'A':10, 'B':12, 'C':14, 'C+':15, 'D-':15, 'D':16, 'D+':17, 'E-':17, 'E':18};
 
@@ -81,7 +92,7 @@ class RouteInfoForm extends React.Component {
     }
 
     componentDidMount() {
-        if (this.state.rwgpsRoute != '') {
+        if (this.state.rwgpsRoute !== '') {
             this.parser.loadRwgpsRoute(this.state.rwgpsRoute,this.state.rwgpsRouteIsTrip);
             this.setState({routeUpdating:true});
             this.fetchAfterLoad = true;
@@ -147,7 +158,7 @@ class RouteInfoForm extends React.Component {
             this.fetchAfterLoad = true;
             return;
         }
-        if (this.forecastRequest == null) {
+        if (this.forecastRequest === null) {
             this.calculateTimeAndDistance(this.props);
         }
         this.xmlhttp = new XMLHttpRequest();
@@ -299,6 +310,7 @@ class RouteInfoForm extends React.Component {
         let route = RouteInfoForm.getRouteNumberFromValue(event.target.value);
         this.setState({rwgpsRoute : route});
         this.parser.clear();
+        this.props.invalidateForecast();
     }
 
     isNumberKey(evt) {
