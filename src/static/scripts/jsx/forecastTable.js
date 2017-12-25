@@ -1,5 +1,6 @@
-import React, { Component } from 'react';
-import {Button,Table,Well} from 'react-bootstrap';
+import React from 'react';
+import {Table} from 'react-bootstrap';
+import ErrorBoundary from "./errorBoundary";
 
 class ForecastTable extends React.Component {
 
@@ -50,19 +51,21 @@ class ForecastTable extends React.Component {
 
 */
     render() {
-        if (this.props.weatherCorrectionMinutes != null) {
+        let weatherCorrections;
+        if (this.props.weatherCorrectionMinutes !== null) {
             if (this.props.weatherCorrectionMinutes >= 0) {
-                var weatherCorrections = Math.round(this.props.weatherCorrectionMinutes) + " minutes lost to wind";
+                weatherCorrections = Math.round(this.props.weatherCorrectionMinutes) + " minutes lost to wind";
             }
             else {
-                var weatherCorrections = -Math.round(this.props.weatherCorrectionMinutes) + " minutes gained from wind";
+                weatherCorrections = -Math.round(this.props.weatherCorrectionMinutes) + " minutes gained from wind";
             }
         }
         else {
-            var weatherCorrections = null;
+            weatherCorrections = null;
         }
         return (
                 <div>
+                    <ErrorBoundary>
                     <a tabIndex='-1' href="https://darksky.net/poweredby/">
                         <img src="https://darksky.net/dev/img/attribution/poweredby.png" alt="Powered by DarkSky" width="80" height="40"/>
                     </a>{weatherCorrections}
@@ -80,10 +83,10 @@ class ForecastTable extends React.Component {
                         </thead>
                         {ForecastTable.expandTable(this.props.forecast)}
                     </Table>
+                    </ErrorBoundary>
                 </div>
         );
     }
 }
 
-module.exports=ForecastTable;
 export default ForecastTable;

@@ -10,7 +10,7 @@ import {Button} from 'react-bootstrap';
 import MediaQuery from 'react-responsive';
 // for react-splitter
 import 'normalize.css/normalize.css';
-
+import Promise from 'promise-polyfill';
 import '@blueprintjs/core/dist/blueprint.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'ag-grid/dist/styles/ag-grid.css';
@@ -19,6 +19,12 @@ import 'flatpickr/dist/themes/confetti.css';
 
 import queryString from 'query-string';
 import cookie from 'react-cookies';
+import ErrorBoundary from './errorBoundary';
+
+// To add to window
+if (!window.Promise) {
+    window.Promise = Promise;
+}
 
 class RouteWeatherUI extends React.Component {
 
@@ -154,6 +160,7 @@ class RouteWeatherUI extends React.Component {
     render() {
         let queryParams = queryString.parse(location.search);
         const inputForm = (
+            <ErrorBoundary>
             <RouteInfoForm action={this.state.action}
                            updateRouteInfo={this.updateRouteInfo}
                            updateForecast={this.updateForecast}
@@ -171,6 +178,7 @@ class RouteWeatherUI extends React.Component {
                            formatControlsForUrl={this.formatControlsForUrl}
                            invalidateForecast={this.invalidateForecast}
             />
+            </ErrorBoundary>
         );
         const formButton = (
             <Button bsStyle="primary" onClick={event => this.setState({formVisible:true})}>Show input</Button>
@@ -181,6 +189,7 @@ class RouteWeatherUI extends React.Component {
                 <SplitPane defaultSize={300} minSize={150} maxSize={530} split="horizontal">
                     <SplitPane defaultSize={550} minSize={150} split='vertical' pane2Style={{'overflow':'scroll'}}>
                         {inputForm}
+                        <ErrorBoundary>
                         <ControlPoints controlPoints={this.state.controlPoints}
                                           updateControls={this.updateControls}
                                           finishTime={this.state.routeInfo['finishTime']}
@@ -193,6 +202,7 @@ class RouteWeatherUI extends React.Component {
                                           forecastValid={this.state.forecastValid}
                                           invalidateForecast={this.invalidateForecast}
                                           name={this.state.routeInfo['name']}/>
+                        </ErrorBoundary>
                     </SplitPane>
                         <SplitPane defaultSize={500} minSize={150} split="vertical" paneStyle={{'overflow':'scroll'}}>
                             <ForecastTable forecast={this.state.forecast} weatherCorrectionMinutes={this.state.weatherCorrectionMinutes}/>

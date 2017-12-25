@@ -16,6 +16,7 @@ import ControlTable from './controlTable';
 import StravaRouteParser from './stravaRouteParser';
 import {Spinner} from '@blueprintjs/core';
 import RouteInfoForm from "./routeInfoEntry";
+import ErrorBoundary from './errorBoundary';
 
 class StravaErrorAlert extends React.Component {
 
@@ -195,8 +196,10 @@ class ControlPoints extends React.Component {
                 </ButtonGroup>
                 </ButtonToolbar>
                 <Panel header={title} bsStyle="info" style={{margin:'10px'}}>
+                    <ErrorBoundary>
                     <ControlTable rows={this.props.controlPoints.length} controls={this.props.controlPoints}
                                   displayBanked={this.state.displayBankedTime} compare={this.state.lookback} update={this.updateFromTable} ref={(table) => {this.table = table;}}/>
+                    </ErrorBoundary>
                 </Panel>
                 <div tabIndex="98" onFocus={event => {document.getElementById('addButton').focus()}}></div>
             </div>
