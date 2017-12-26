@@ -8,6 +8,9 @@ module.exports = merge(common, {
                 debug: true
             })
         ],
+        output: {
+            pathinfo:true
+        },
         devtool: 'eval-source-map'
     }
 );

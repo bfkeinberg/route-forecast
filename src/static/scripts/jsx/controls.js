@@ -13,7 +13,7 @@ import {
 import React from 'react';
 // import MediaQuery from 'react-responsive';
 import ControlTable from './controlTable';
-import StravaRouteParser from './stravaRouteParser';
+//import StravaRouteParser from './stravaRouteParser';
 import {Spinner} from '@blueprintjs/core';
 import RouteInfoForm from "./routeInfoEntry";
 import ErrorBoundary from './errorBoundary';
@@ -38,12 +38,12 @@ class ControlPoints extends React.Component {
         this.updateProgress = this.updateProgress.bind(this);
         this.updateActualValues = this.updateActualValues.bind(this);
         this.changeDisplayFinishTime = this.changeDisplayFinishTime.bind(this);
+        this.computeTimesFromStrava = this.computeTimesFromStrava.bind(this);
         this.state = {
             displayBankedTime : false, metric:this.props.metric, lookback:this.props.strava_activity!==undefined,
             stravaAlertVisible: false, stravaError: this.props.strava_error, displayedFinishTime:this.props.finishTime,
             strava_activity: this.props.strava_activity===undefined?' ':this.props.strava_activity, isUpdating:false
         };
-        this.stravaParser = new StravaRouteParser(this.updateActualValues, this.updateProgress);
     }
 
     static showProgressSpinner(running) {
@@ -80,6 +80,11 @@ class ControlPoints extends React.Component {
         this.setState({stravaError:error,stravaAlertVisible:true});
     }
 
+    async getStravaParser() {
+        const parser = await import(/* webpackChunkName: "StravaRouteParser" */ './stravaRouteParser');
+        return parser.default;
+    }
+
     setStravaActivity(event) {
         let newValue = parseInt(RouteInfoForm.getRouteNumberFromValue(event.target.value), 10);
         if (Number.isNaN(newValue)) {
@@ -88,23 +93,33 @@ class ControlPoints extends React.Component {
         this.setState({strava_activity:newValue});
     }
 
+    computeTimesFromStrava(activity, controlPoints) {
+        if (this.stravaParser === undefined) {
+            this.getStravaParser().then( stravaParser => {
+                this.stravaParser = new stravaParser(this.updateActualValues, this.updateProgress);
+                this.stravaParser.setToken(this.props.strava_token);
+                this.stravaParser.computeActualTimes(activity, controlPoints, this.stravaErrorCallback);
+            });
+        } else {
+            this.stravaParser.setToken(this.props.strava_token);
+            this.stravaParser.computeActualTimes(activity, controlPoints, this.stravaErrorCallback);
+        }
+    }
+
     updateExpectedTimes(event) {
         let newValue = parseInt(event.target.value,10);
         if (isNaN(newValue)) {
             return;
         }
-        this.stravaParser.computeActualTimes(newValue,this.props.controlPoints, this.stravaErrorCallback)
+        this.computeTimesFromStrava(newValue,this.props.controlPoints);
     }
 
     componentWillReceiveProps(newProps) {
-        if (newProps.strava_token !== undefined) {
-            this.stravaParser.setToken(newProps.strava_token);
-        }
         if (newProps.strava_activity !== undefined && newProps.strava_activity !== '') {
             this.setState({strava_activity:newProps.strava_activity});
-            this.stravaParser.computeActualTimes(newProps.strava_activity, newProps.controlPoints, this.stravaErrorCallback);
+            this.computeTimesFromStrava(newProps.strava_activity, newProps.controlPoints);
         }
-        if (newProps.strava_error!= undefined) {
+        if (newProps.strava_error !== undefined) {
             this.setState({stravaError:newProps.strava_error});
         }
         if (newProps.finishTime !== this.props.finishTime) {

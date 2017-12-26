@@ -10,11 +10,9 @@ import {
     Panel,
     Tooltip
 } from 'react-bootstrap';
-// import { Checkbox } from 'react-bootstrap';
 import moment from 'moment';
 import React, {Component} from 'react';
 import Flatpickr from 'react-flatpickr'
-import AnalyzeRoute from './gpxParser';
 import ShortUrl from './shortUrl';
 
 const queryString = require('query-string');
@@ -33,6 +31,7 @@ const rwgps_enabled_tooltip = (
     <Tooltip id="rwgps_tooltip">The number for a route on ridewithgps</Tooltip>
 );
 
+// import { Checkbox } from 'react-bootstrap';
 /*
 const rwgps_trip_tooltip = (
     <Tooltip id="trip_tooltip">Ride with GPS has both 'trips' and 'routes'.
@@ -59,14 +58,15 @@ class RouteInfoForm extends Component {
         this.decideValidationStateFor = this.decideValidationStateFor.bind(this);
         this.setRwgpsRoute = this.setRwgpsRoute.bind(this);
         this.setDateAndTime = this.setDateAndTime.bind(this);
+        this.loadFromRideWithGps = this.loadFromRideWithGps.bind(this);
         this.calculateTimeAndDistance = this.calculateTimeAndDistance.bind(this);
         this.makeFullQueryString = this.makeFullQueryString.bind(this);
         this.shortenUrl = this.shortenUrl.bind(this);
+        this.parseGpxFile = this.parseGpxFile.bind(this);
         this.forecastRequest = null;
         this.timeZone = null;
         this.routeFileSet = false;
         this.xmlhttp = null;
-        this.parser = new AnalyzeRoute(this.setErrorState,this.props['timezone_api_key']);
         this.paramsChanged = false;
         this.state = {start:RouteInfoForm.findNextStartTime(props.start),
             pace:props.pace === undefined?defaultPace:props.pace, interval:props.interval === undefined?defaultIntervalInHours:props.interval,
@@ -77,8 +77,13 @@ class RouteInfoForm extends Component {
         this.fetchAfterLoad = false;
     }
 
+    async getRouteParser() {
+        const parser = await import(/* webpackChunkName: "RwgpsParser" */ './gpxParser');
+        return parser.default;
+    }
+
     static findNextStartTime(start) {
-        if (start !== null) {
+        if (start !== undefined) {
             return new Date(start);
         }
         let now = new Date();
@@ -91,16 +96,31 @@ class RouteInfoForm extends Component {
         return now;
     }
 
+    loadFromRideWithGps(routeNumber, isTrip) {
+        if (this.parser === undefined) {
+            this.getRouteParser().then( rwgpsParser => {
+                this.parser = new rwgpsParser(this.setErrorState, this.props['timezone_api_key']);
+                this.parser.loadRwgpsRoute(routeNumber, isTrip);
+            });
+        } else {
+            this.parser.loadRwgpsRoute(routeNumber, isTrip);
+        }
+    }
+
+    routeIsLoaded(parser) {
+        return parser !== undefined && parser.routeIsLoaded();
+    }
+
     componentDidMount() {
         if (this.state.rwgpsRoute !== '') {
-            this.parser.loadRwgpsRoute(this.state.rwgpsRoute,this.state.rwgpsRouteIsTrip);
+            this.loadFromRideWithGps(this.state.rwgpsRoute,this.state.rwgpsRouteIsTrip);
             this.setState({routeUpdating:true});
             this.fetchAfterLoad = true;
         }
     }
 
     componentWillReceiveProps(nextProps) {
-        if (this.parser.routeIsLoaded()) {
+        if (this.routeIsLoaded(this.parser)) {
             this.calculateTimeAndDistance(nextProps);
         }
     }
@@ -108,7 +128,7 @@ class RouteInfoForm extends Component {
     componentDidUpdate(prevProps, prevState) {
         if (this.paramsChanged) {
             this.paramsChanged = false;
-            if (this.parser.routeIsLoaded()) {
+            if (this.routeIsLoaded(this.parser)) {
                 this.calculateTimeAndDistance(this.props);
             }
         }
@@ -134,14 +154,25 @@ class RouteInfoForm extends Component {
         }).catch(error => {this.setState({errorDetails:error})});
     }
 
+    parseGpxFile(file) {
+        if (this.parser === undefined) {
+            this.getRouteParser().then( rwgpsParser => {
+                this.parser = new rwgpsParser(this.setErrorState, this.props['timezone_api_key']);
+                this.parser.parseRoute(file);
+            });
+        } else {
+            this.parser.parseRoute(file);
+        }
+    }
+
     updateRouteFile(event) {
         let fileControl = event.target;
         let gpxFiles = fileControl.files;
         this.routeFileSet = event.target.value !== '';
         this.fetchAfterLoad = false;
         if (gpxFiles.length > 0) {
-            this.parser.parseRoute(gpxFiles[0]);
-            this.setState({rwgpsRoute:'',routeUpdating:true});
+            this.parseGpxFile(gpxFiles[0]);
+            this.setState({rwgpsRoute:'', routeUpdating:true});
             history.pushState(null, 'nothing', location.origin);
         }
     }
@@ -149,7 +180,7 @@ class RouteInfoForm extends Component {
     calculateTimeAndDistance(props) {
         let routeInfo = this.parser.walkRoute(moment(this.state.start),
             this.state.pace, parseFloat(this.state.interval),props.controlPoints,props.metric);
-        if (routeInfo===null) {
+        if (routeInfo === null) {
             return;
         }
         this.timeZone = routeInfo['timeZone'];
@@ -159,7 +190,7 @@ class RouteInfoForm extends Component {
     }
 
     requestForecast() {
-        if (!this.parser.routeIsLoaded()) {
+        if (!this.routeIsLoaded(this.parser)) {
             this.fetchAfterLoad = true;
             return;
         }
@@ -295,7 +326,7 @@ class RouteInfoForm extends Component {
     handleRwgpsRoute(event) {
         let route = RouteInfoForm.getRouteNumberFromValue(event.target.value);
         if (route !== '') {
-            this.parser.loadRwgpsRoute(route,this.state.rwgpsRouteIsTrip);
+            this.loadFromRideWithGps(route,this.state.rwgpsRouteIsTrip);
             // clear file input to avoid confusion
             document.getElementById('route').value = null;
             this.setState({'routeUpdating':true});
@@ -308,7 +339,9 @@ class RouteInfoForm extends Component {
     setRwgpsRoute(event) {
         let route = RouteInfoForm.getRouteNumberFromValue(event.target.value);
         this.setState({rwgpsRoute : route});
-        this.parser.clear();
+        if(this.parser !== undefined) {
+            this.parser.clear();
+        }
         this.props.invalidateForecast();
     }
 

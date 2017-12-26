@@ -18,7 +18,9 @@ module.exports = {
                 exclude: /node_modules/,
                 loader: "babel-loader",
                 options: {
-                    cacheDirectory:true
+                    cacheDirectory:true,
+                    presets: ["babel-preset-env"],
+                    plugins: ['babel-plugin-transform-runtime']
                 }
             },
             {test: /\.js$/,
@@ -47,7 +49,9 @@ module.exports = {
     ],
     output: {
         path: BUILD_DIR,
-        filename: "bundle.js",
+        filename: "[name].bundle.js",
+        chunkFilename: '[name].bundle.js',
+        publicPath: "/static/scripts/js/"
     },
     resolve: {
         extensions: ['*', '.js', '.jsx', '.ts', '.tsx'],
