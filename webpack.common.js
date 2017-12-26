@@ -41,7 +41,7 @@ module.exports = {
         ]
     },
     plugins: [
-        new ExtractTextPlugin("styles.css"),
+        new ExtractTextPlugin({filename:"styles.css",allChunks:true}),
         new CleanWebpackPlugin([BUILD_DIR + '/*.*'] , {watch:true, verbose:true}),
         new webpack.ProvidePlugin({
             fetch: 'imports-loader?this=>global!exports-loader?global.fetch!whatwg-fetch'

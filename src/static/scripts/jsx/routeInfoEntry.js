@@ -73,7 +73,7 @@ class RouteInfoForm extends Component {
             rwgpsRoute:props.rwgpsRoute === undefined?'':props.rwgpsRoute, errorDetails:null,
             pending:false,
             rwgpsRouteIsTrip:false, errorSource:null, succeeded:null, routeUpdating:false,
-            shortUrl:'http://www.cyclerouteforecast.com'};
+            shortUrl:'   '};
         this.fetchAfterLoad = false;
     }
 
@@ -476,7 +476,7 @@ class RouteInfoForm extends Component {
                     <FormGroup
                         validationState={this.decideValidationStateFor('rwgps',this.state.errorSource,this.state.succeeded)}
                         controlId="ridewithgps" style={{flex:'1',display:'inline-flex',marginTop:'5px',marginBottom:'5px'}}>
-                        <ControlLabel>RideWithGps route number</ControlLabel>
+                        <ControlLabel>RideWithGps route</ControlLabel>
                         <OverlayTrigger placement="bottom" overlay={rwgps_enabled_tooltip}>
                             <FormControl tabIndex='5' type="text"
                                          onBlur={this.handleRwgpsRoute}
