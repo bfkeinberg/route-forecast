@@ -86,7 +86,7 @@ class AnalyzeRoute {
     }
 
     loadRwgpsRoute(route,isTrip) {
-        try {
+        return new Promise((resolve, reject) => {
             this.isTrip = isTrip;
             this.rwgpsRouteData = null;
             this.timeZone = null;
@@ -96,29 +96,26 @@ class AnalyzeRoute {
                     }
                 }
             ).then(response => {
-                this.rwgpsRouteData = response;
-                this.gpxResult = null;
-                let rwgpsRouteDatum = this.rwgpsRouteData[this.rwgpsRouteData['trip']===undefined? 'route':'trip'];
-                if (rwgpsRouteDatum===undefined) {
-                    this.setErrorStateCallback('RWGPS route info unavailable','rwgps');
-                    return;
-                }
-                let point = rwgpsRouteDatum['track_points'][0];
-                //TODO using current date and time for zone lookup could pose a problem in future
-                let timeZonePromise = this.findTimezoneForPoint(point.y, point.x, moment());
-                timeZonePromise.then(timeZoneResult => {
-                    this.timeZone = timeZoneResult;
-                    this.setErrorStateCallback(null,null);
-                }, error => {
-                    this.setErrorStateCallback(error,'rwgps');
-                });
+                    this.rwgpsRouteData = response;
+                    this.gpxResult = null;
+                    let rwgpsRouteDatum = this.rwgpsRouteData[this.rwgpsRouteData['trip'] === undefined ? 'route' : 'trip'];
+                    if (rwgpsRouteDatum === undefined) {
+                        reject('RWGPS route info unavailable');
+                    }
+                    let point = rwgpsRouteDatum['track_points'][0];
+                    //TODO using current date and time for zone lookup could pose a problem in future
+                    let timeZonePromise = this.findTimezoneForPoint(point.y, point.x, moment());
+                    timeZonePromise.then(timeZoneResult => {
+                        this.timeZone = timeZoneResult;
+                        resolve(true);
+                    }, error => {
+                        reject(error);
+                    });
                 }
             ).catch(error => {
-                this.setErrorStateCallback(error,'rwgps');
-            })
-        } catch (error) {
-            this.setErrorStateCallback(error, 'rwgps');
-        }
+                reject(error);
+            });
+        });
     }
 
     analyzeRwgpsRoute(userStartTime,pace,intervalInHours,controls,unsortedControls,metric) {

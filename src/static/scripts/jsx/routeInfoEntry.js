@@ -100,10 +100,26 @@ class RouteInfoForm extends Component {
         if (this.parser === undefined) {
             this.getRouteParser().then( rwgpsParser => {
                 this.parser = new rwgpsParser(this.setErrorState, this.props['timezone_api_key']);
-                this.parser.loadRwgpsRoute(routeNumber, isTrip);
+                this.parser.loadRwgpsRoute(routeNumber, isTrip).then( result => {
+                    this.calculateTimeAndDistance(this.props);
+                    this.setErrorState(null,'rwgps');
+                    if (this.fetchAfterLoad) {
+                        this.requestForecast();
+                        this.fetchAfterLoad = false;
+                    }
+                }, error => {this.setErrorState(error,'rwgps');}
+                );
             });
         } else {
-            this.parser.loadRwgpsRoute(routeNumber, isTrip);
+            this.parser.loadRwgpsRoute(routeNumber, isTrip).then( result => {
+                    this.calculateTimeAndDistance(this.props);
+                    this.setErrorState(null,'rwgps');
+                    if (this.fetchAfterLoad) {
+                        this.requestForecast();
+                        this.fetchAfterLoad = false;
+                    }
+                }, error => {this.setErrorState(error,'rwgps');}
+            );
         }
     }
 
@@ -120,20 +136,17 @@ class RouteInfoForm extends Component {
     }
 
     componentWillReceiveProps(nextProps) {
-        if (this.routeIsLoaded(this.parser)) {
-            this.calculateTimeAndDistance(nextProps);
-        }
+        // recalculate if the user updated the controls, say
+        this.calculateTimeAndDistance(nextProps);
     }
 
     componentDidUpdate(prevProps, prevState) {
         if (this.paramsChanged) {
             this.paramsChanged = false;
-            if (this.routeIsLoaded(this.parser)) {
-                this.calculateTimeAndDistance(this.props);
-            }
+            // recalculate if the user changed values in the dialog
+            this.calculateTimeAndDistance(this.props);
         }
     }
-
     shortenUrl(url) {
         fetch('https://www.googleapis.com/urlshortener/v1/url?key='+this.props.maps_api_key,
             {
@@ -178,6 +191,9 @@ class RouteInfoForm extends Component {
     }
 
     calculateTimeAndDistance(props) {
+        if (!this.routeIsLoaded(this.parser)) {
+            return;
+        }
         let routeInfo = this.parser.walkRoute(moment(this.state.start),
             this.state.pace, parseFloat(this.state.interval),props.controlPoints,props.metric);
         if (routeInfo === null) {
@@ -190,6 +206,9 @@ class RouteInfoForm extends Component {
     }
 
     requestForecast() {
+        // this weirdness is to handle the case where the user clicked this button
+        // while the route was loading asynchronously. Putting this state in keeps them from having to wait
+        // until the route is done loading to click.
         if (!this.routeIsLoaded(this.parser)) {
             this.fetchAfterLoad = true;
             return;
@@ -267,13 +286,6 @@ class RouteInfoForm extends Component {
                 this.setState({succeeded:false})
             }
         } else {
-            if (this.fetchAfterLoad) {
-                this.requestForecast();
-            }
-            else {
-                this.calculateTimeAndDistance(this.props);
-            }
-            this.fetchAfterLoad = false;
             this.setState({errorDetails:errorDetails,errorSource:null,routeUpdating:false,succeeded:true});
         }
     }
