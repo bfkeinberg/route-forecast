@@ -70,7 +70,7 @@ def inject_api_keys():
 
 @application.route('/')
 def hello():
-    return render_template('index.html')
+    return render_template('new_index.html')
 
 
 @application.errorhandler(500)
@@ -89,7 +89,7 @@ def server_error(e):
 
 @application.route('/form')
 def form():
-    return render_template('index.html', disabled='disabled style=' + "'color:#888;'")
+    return render_template('new_index.html', disabled='disabled style=' + "'color:#888;'")
 
 @application.route('/stravaAuthReq')
 def authenticate_with_strava():
