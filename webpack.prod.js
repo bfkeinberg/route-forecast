@@ -30,7 +30,7 @@ module.exports = merge(common, {
             }
         }),*/
         new CompressionPlugin({
-            deleteOriginalAssets:true, minRatio:0.85, cache:true
+            /*deleteOriginalAssets:true, */minRatio:0.85, cache:true
         }),
         // new BundleAnalyzerPlugin()
     ]

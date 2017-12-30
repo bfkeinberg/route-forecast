@@ -17,10 +17,6 @@ import {Spinner} from '@blueprintjs/core';
 import RouteInfoForm from "./routeInfoEntry";
 import ErrorBoundary from './errorBoundary';
 
-class StravaErrorAlert extends React.Component {
-
-}
-
 class ControlPoints extends Component {
 
     constructor(props) {
@@ -76,7 +72,7 @@ class ControlPoints extends Component {
     }
 
     stravaErrorCallback(error) {
-        this.setState({stravaError:error,stravaAlertVisible:true});
+        this.setState({stravaError:error,stravaAlertVisible:true,isUpdating:false});
     }
 
     async getStravaParser() {
@@ -185,45 +181,47 @@ class ControlPoints extends Component {
             <div className="controlPoints">
                 <ButtonToolbar style={{display:'inline-flex',flexDirection:'row', paddingTop:'11px',paddingLeft:'4px'}}>
                 {/*<ButtonGroup style={{display:'flex',flexFlow:'row wrap'}}>*/}
-                <ButtonGroup>
-                    <Button tabIndex='10' onClick={this.addControl} id='addButton'><Glyphicon glyph="plus-sign"></Glyphicon>Add control point</Button>
-                    {/*<Button onClick={this.addControl} id='addButton' style={{display:'inline-flex',width:'165px',height:'34px'}}><Glyphicon glyph="plus-sign"></Glyphicon>Add control point</Button>*/}
-                    <FormGroup controlId="finishTime" style={{display:'inline-flex'}}>
-                        <ControlLabel style={{width:'7em',display:'inline-flex',marginTop:'7px',paddingLeft:'8px'}}>Finish time</ControlLabel>
-                        <FormControl tabIndex='-1' type="text" onMouseEnter={this.changeDisplayFinishTime} onMouseLeave={this.changeDisplayFinishTime}
-                                     style={{display:'inline-flex',width:'12em',marginTop:'3px',marginBotton:'0px',paddingLeft:'2px',paddingTop:'2px',height:'28px'}}
-                                     value={this.state.displayedFinishTime}/>
-                    </FormGroup>
-                    <Checkbox tabIndex='12' checked={this.state.metric} inline
-                              onClick={this.toggleMetric} onChange={this.toggleMetric}
-                              style={{padding:'0px 0px 0px 26px',display:'inline-flex'}}>metric</Checkbox>
-                    <Checkbox tabIndex='11' checked={this.state.displayBankedTime} inline
-                              onChange={this.toggleDisplayBanked} onClick={this.toggleDisplayBanked}
-                              style={{padding:'0px 0px 0px 24px', display:'inline-flex'}}>Display banked time</Checkbox>
-                    <Checkbox tabIndex="13" disabled={!this.props.forecastValid} checked={this.state.lookback} inline onChange={this.toggleCompare} onClick={this.toggleCompare} style={{display:'inline-flex'}}>Compare</Checkbox>
-                    <FormGroup controlId="actualRide" style={{visibility:this.state.lookback?null:'hidden', display:'inline-flex'}}>
-                        <ControlLabel style={{display:'inline-flex'}}>Strava</ControlLabel>
-                        <FormControl tabIndex='-1' type="text" style={{display:'inline-flex'}} value={this.state.strava_activity} onChange={this.setStravaActivity} onBlur={this.updateExpectedTimes}/>
-                        {this.state.stravaAlertVisible?<Alert onDismiss={this.hideStravaErrorAlert} bsStyle='warning'>{this.state.stravaError}</Alert>:null}
-                        {ControlPoints.showProgressSpinner(this.state.isUpdating)}
-                    </FormGroup>
-                </ButtonGroup>
+                    <ButtonGroup>
+                        <Button tabIndex='10' onClick={this.addControl} id='addButton'><Glyphicon glyph="plus-sign"></Glyphicon>Add control point</Button>
+                        {/*<Button onClick={this.addControl} id='addButton' style={{display:'inline-flex',width:'165px',height:'34px'}}><Glyphicon glyph="plus-sign"></Glyphicon>Add control point</Button>*/}
+                        <FormGroup controlId="finishTime" style={{display:'inline-flex'}}>
+                            <ControlLabel style={{width:'7em',display:'inline-flex',marginTop:'7px',paddingLeft:'8px'}}>Finish time</ControlLabel>
+                            <FormControl tabIndex='-1' type="text" onMouseEnter={this.changeDisplayFinishTime} onMouseLeave={this.changeDisplayFinishTime}
+                                         style={{display:'inline-flex',width:'12em',marginTop:'3px',marginBotton:'0px',paddingLeft:'2px',paddingTop:'2px',height:'28px'}}
+                                         value={this.state.displayedFinishTime}/>
+                        </FormGroup>
+                        <Checkbox tabIndex='12' checked={this.state.metric} inline
+                                  onClick={this.toggleMetric} onChange={this.toggleMetric}
+                                  style={{padding:'0px 0px 0px 26px',display:'inline-flex'}}>metric</Checkbox>
+                        <Checkbox tabIndex='11' checked={this.state.displayBankedTime} inline
+                                  onChange={this.toggleDisplayBanked} onClick={this.toggleDisplayBanked}
+                                  style={{padding:'0px 0px 0px 24px', display:'inline-flex'}}>Display banked time</Checkbox>
+                        <Checkbox tabIndex="13" disabled={!this.props.forecastValid} checked={this.state.lookback} inline onChange={this.toggleCompare} onClick={this.toggleCompare} style={{display:'inline-flex'}}>Compare</Checkbox>
+                        <ErrorBoundary>
+                            <FormGroup controlId="actualRide" style={{visibility:this.state.lookback ? null : 'hidden', display:'inline-flex'}}>
+                                <ControlLabel style={{display:'inline-flex'}}>Strava</ControlLabel>
+                                <FormControl tabIndex='-1' type="text" style={{display:'inline-flex'}} value={this.state.strava_activity} onChange={this.setStravaActivity} onBlur={this.updateExpectedTimes}/>
+                            </FormGroup>
+                            {this.state.stravaAlertVisible?<Alert onDismiss={this.hideStravaErrorAlert} bsStyle='warning'>{this.state.stravaError}</Alert>:null}
+                            {ControlPoints.showProgressSpinner(this.state.isUpdating)}
+                        </ErrorBoundary>
+                    </ButtonGroup>
                 </ButtonToolbar>
 
-                <MediaQuery minDeviceWidth={1000}>
-                <Panel header={title} bsStyle="info" style={{margin:'10px'}}>
-                    <ErrorBoundary>
-                    <ControlTable rows={this.props.controlPoints.length} controls={this.props.controlPoints}
-                                  displayBanked={this.state.displayBankedTime} compare={this.state.lookback} update={this.updateFromTable} ref={(table) => {this.table = table;}}/>
-                    </ErrorBoundary>
-                </Panel>
-                </MediaQuery>
-                <MediaQuery maxDeviceWidth={800}>
-                    <ErrorBoundary>
-                        <ControlTable rows={this.props.controlPoints.length} controls={this.props.controlPoints}
-                                      displayBanked={this.state.displayBankedTime} compare={this.state.lookback} update={this.updateFromTable} ref={(table) => {this.table = table;}}/>
-                    </ErrorBoundary>
-                </MediaQuery>
+                <ErrorBoundary>
+                    <MediaQuery minDeviceWidth={1000}>
+                        <Panel header={title} bsStyle="info" style={{margin:'10px'}}>
+                            <ErrorBoundary>
+                                <ControlTable rows={this.props.controlPoints.length} controls={this.props.controlPoints}
+                                              displayBanked={this.state.displayBankedTime} compare={this.state.lookback} update={this.updateFromTable} ref={(table) => {this.table = table;}}/>
+                            </ErrorBoundary>
+                        </Panel>
+                    </MediaQuery>
+                    <MediaQuery maxDeviceWidth={800}>
+                                <ControlTable rows={this.props.controlPoints.length} controls={this.props.controlPoints}
+                                              displayBanked={this.state.displayBankedTime} compare={this.state.lookback} update={this.updateFromTable} ref={(table) => {this.table = table;}}/>
+                    </MediaQuery>
+                </ErrorBoundary>
                 <div tabIndex="98" onFocus={event => {document.getElementById('addButton').focus()}}></div>
             </div>
         );

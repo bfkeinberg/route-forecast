@@ -1,0 +1,234 @@
+<div align="left"><span style="font-family: Tahoma,serif; "><span style="font-size: large; ">Ride Rating Classification System</span></span>
+</div>
+
+<div class="ratings" style="text-align: -webkit-center; background-color: rgb(255, 255, 255);">
+    <p><b><span style="font-family: Tahoma,serif; font-size: x-small; "><span class="caps" style="text-transform: uppercase;">PACE / HILLINESS</span>&nbsp;(total climbing if known) /&nbsp;
+        <span class="caps" style="text-transform: uppercase;">DISTANCE</span></span></b></p><p><b style="font-family: Tahoma,serif; font-size: small;"><span class="caps" style="text-transform: uppercase;">
+    RIDE RATING EXAMPLES:</span></b><span style="font-family: Tahoma,serif; font-size: small;">
+    &nbsp;“C+/2/40” indicates a 40-mile ride with about 2000 feet of climbing, ridden at an average speed of 13 (the C+ indicating 1 mph faster than C). “E/4!(9700’)/100” indicates a 100-mile ride with 9700 feet of climbing, some of it very steep, ridden at an average speed of 14 mph.</span>&nbsp;<br></p><p align="center">
+    <span style="font-family: Tahoma,serif; font-size: x-small; "><b><span class="caps" style="text-transform: uppercase;">___</span></b></span></p><p><span
+        style="font-family: Tahoma,serif; font-size: x-small; "><b><span class="caps" style="text-transform: uppercase;">PACE (A-E):</span>
+</b>&nbsp;Indicates the average speed while riding, with A being the slowest and E being the fastest. Non-riding time is not counted, so rides with long stops may have the same average speed as rides with short stops.</span></p><p><span
+        style="font-family: Tahoma,serif; font-size: x-small; "><b><span class="caps" style="text-transform: uppercase;">HILLINESS (0-5):</span></b>&nbsp;Rates the terrain based on the average feet climbed per mile for the entire ride. The formula is HillinessRating = (TotalFeetClimbed / TotalMiles) / 25, which yields:</span></p>
+
+    <table frame="below" rules="cols" style="border-color: rgb(51, 0, 102); margin: auto; text-align: center;">
+        <thead>
+        <tr style="vertical-align: bottom;">
+            <th style="border-bottom: thin solid black;padding: 0.2em 0.5em;"><span
+                    style="font-family: Tahoma,serif; font-size: x-small; ">Hilliness<br>
+                Rating</span></th>
+
+            <th style="border-bottom: thin solid black;padding: 0.2em 0.5em;"><span
+                    style="font-family: Tahoma,serif; font-size: x-small; ">Average Climb<br>
+                Feet/Mile</span></th>
+        </tr>
+        </thead>
+
+        <tbody>
+        <tr>
+            <td style="border-color: rgb(0, 0, 0); padding: 0.2em 0.5em;"><span
+                    style="font-family: Tahoma,serif; font-size: x-small; ">0</span></td>
+
+            <td style="border-color: rgb(0, 0, 0); padding: 0.2em 0.5em;"><span
+                    style="font-family: Tahoma,serif; font-size: x-small; ">0</span></td>
+        </tr>
+
+        <tr>
+            <td style="border-color: rgb(0, 0, 0); padding: 0.2em 0.5em;"><span
+                    style="font-family: Tahoma,serif; font-size: x-small; ">1</span></td>
+
+            <td style="border-color: rgb(0, 0, 0); padding: 0.2em 0.5em;"><span
+                    style="font-family: Tahoma,serif; font-size: x-small; ">25</span></td>
+        </tr>
+
+        <tr>
+            <td style="border-color: rgb(0, 0, 0); padding: 0.2em 0.5em;"><span
+                    style="font-family: Tahoma; font-size: x-small; ">2</span></td>
+
+            <td style="border-color: rgb(0, 0, 0); padding: 0.2em 0.5em;"><font face="Tahoma" size="2">50</font></td>
+        </tr>
+
+        <tr>
+            <td style="border-color: rgb(0, 0, 0); padding: 0.2em 0.5em;"><span
+                    style="font-family: Tahoma; font-size: x-small; ">3</span></td>
+
+            <td style="border-color: rgb(0, 0, 0); padding: 0.2em 0.5em;"><span
+                    style="font-family: Tahoma; font-size: x-small; ">75</span></td>
+        </tr>
+
+        <tr>
+            <td style="border-color: rgb(0, 0, 0); padding: 0.2em 0.5em;"><span
+                    style="font-family: Tahoma; font-size: x-small; ">4</span></td>
+
+            <td style="border-color: rgb(0, 0, 0); padding: 0.2em 0.5em;"><span
+                    style="font-family: Tahoma; font-size: x-small; ">100</span></td>
+        </tr>
+
+        <tr>
+            <td style="border-color: rgb(0, 0, 0); padding: 0.2em 0.5em;"><font face="Tahoma" size="2">5</font></td>
+
+            <td style="border-color: rgb(0, 0, 0); padding: 0.2em 0.5em;"><span
+                    style="font-family: Tahoma; font-size: x-small; ">125</span></td>
+        </tr>
+        </tbody>
+    </table>
+
+    <p><font face="Tahoma" size="2">The longer and steeper and more frequent the hills, the higher the hilliness rating and the slower the average speed. However, a low hilliness rating does not guarantee that a ride contains no long or steep hills because the rating could be diluted by flats around the hills. If a ride contains an unusually challenging hill for its hilliness rating, an exclamation point (“!”) is appended to the hilliness rating. The ride description will provide more details. It is possible but rare to have a hilliness rating greater than 5.</font></p><p><font face="Tahoma" size="2"><b><span class="caps" style="text-transform: uppercase;">DISTANCE:</span></b>&nbsp;Specifies the total mileage for the ride.</font></p><p><font face="Tahoma" size="2"><b><span class="caps" style="text-transform: uppercase;">AVERAGE SPEEDS:</span></b>&nbsp;The average speeds (mph) for the different pace and hilliness ratings are:</font></p>
+
+    <table frame="below" rules="groups" style="border-color: rgb(51, 0, 102); margin: auto; text-align: center;">
+        <colgroup span="1"></colgroup>
+
+        <colgroup span="6"></colgroup>
+
+        <colgroup span="1"></colgroup>
+
+        <colgroup span="1"></colgroup>
+
+        <thead>
+        <tr style="vertical-align: bottom;">
+            <th rowspan="2" style="border-bottom-width: thin; border-bottom-style: solid; border-bottom-color: black; padding: 0.2em 0.5em;"><font face="Tahoma" size="2">Pace<br>
+                Rating</font></th>
+
+            <th colspan="6" style="padding: 0.2em 0.5em;"><font face="Tahoma" size="2">Hilliness Rating</font></th>
+
+            <th colspan="2" style="padding: 0.2em 0.5em;"><span style="font-family: Tahoma,serif; font-size: x-small; ">Benchmark: Old La Honda Rd.</span></th>
+        </tr>
+
+        <tr>
+            <th style="border-bottom-width: thin; border-bottom-style: solid; border-bottom-color: black; padding: 0.2em 0.5em;"><font face="Tahoma" size="2">0</font></th>
+
+            <th style="border-bottom-width: thin; border-bottom-style: solid; border-bottom-color: black; padding: 0.2em 0.5em;"><font face="Tahoma" size="2">1</font></th>
+
+            <th style="border-bottom-width: thin; border-bottom-style: solid; border-bottom-color: black; padding: 0.2em 0.5em;"><font face="Tahoma" size="2">2</font></th>
+
+            <th style="border-bottom-width: thin; border-bottom-style: solid; border-bottom-color: black; padding: 0.2em 0.5em;"><font face="Tahoma" size="2">3</font></th>
+
+            <th style="border-bottom-width: thin; border-bottom-style: solid; border-bottom-color: black; padding: 0.2em 0.5em;"><font face="Tahoma" size="2">4</font></th>
+
+            <th style="border-bottom-width: thin; border-bottom-style: solid; border-bottom-color: black; padding: 0.2em 0.5em;"><font face="Tahoma" size="2">5</font></th>
+
+            <th style="border-bottom-width: thin; border-bottom-style: solid; border-bottom-color: black; padding: 0.2em 0.5em;"><font face="Tahoma" size="2">Time</font></th>
+
+            <th style="border-bottom-width: thin; border-bottom-style: solid; border-bottom-color: black; padding: 0.2em 0.5em;"><font face="Tahoma" size="2">VAM*</font></th>
+        </tr>
+        </thead>
+
+        <tfoot>
+        <tr>
+            <td colspan="9">* VAM = <i>velocità ascensionale media</i>, Italian for “average climbing speed”, expressed in meters/hour</td>
+        </tr>
+        </tfoot>
+
+        <tbody>
+        <tr>
+            <td style="border-color: rgb(0, 0, 0); padding: 0.2em 0.5em;"><span
+                    style="font-family: Tahoma,serif; font-size: x-small; ">A</span></td>
+
+            <td style="border-color: rgb(0, 0, 0); padding: 0.2em 0.5em;"><span
+                    style="font-family: Tahoma,serif; font-size: x-small; ">10</span></td>
+
+            <td style="border-color: rgb(0, 0, 0); padding: 0.2em 0.5em;"><span
+                    style="font-family: Tahoma,serif; font-size: x-small; ">9</span></td>
+
+            <td style="border-color: rgb(0, 0, 0); padding: 0.2em 0.5em;"><span
+                    style="font-family: Tahoma,serif; font-size: x-small; ">8</span></td>
+
+            <td style="border-color: rgb(0, 0, 0); padding: 0.2em 0.5em;"><span
+                    style="font-family: Tahoma; font-size: x-small; ">NA</span></td>
+
+            <td style="border-color: rgb(0, 0, 0); padding: 0.2em 0.5em;"><font face="Tahoma" size="2">NA</font></td>
+
+            <td style="border-color: rgb(0, 0, 0); padding: 0.2em 0.5em;"><font face="Tahoma" size="2">NA</font></td>
+
+            <td style="border-color: rgb(0, 0, 0); padding: 0.2em 0.5em;"><font face="Tahoma" size="2">NA</font></td>
+
+            <td style="border-color: rgb(0, 0, 0); padding: 0.2em 0.5em;"><font face="Tahoma" size="2">NA</font></td>
+        </tr>
+
+        <tr>
+            <td style="border-color: rgb(0, 0, 0); padding: 0.2em 0.5em;"><font face="Tahoma" size="2">B</font></td>
+
+            <td style="border-color: rgb(0, 0, 0); padding: 0.2em 0.5em;"><font face="Tahoma" size="2">12</font></td>
+
+            <td style="border-color: rgb(0, 0, 0); padding: 0.2em 0.5em;"><span
+                    style="font-family: Tahoma; font-size: x-small; ">11</span></td>
+
+            <td style="border-color: rgb(0, 0, 0); padding: 0.2em 0.5em;"><font face="Tahoma" size="2">10</font></td>
+
+            <td style="border-color: rgb(0, 0, 0); padding: 0.2em 0.5em;"><font face="Tahoma" size="2">9</font></td>
+
+            <td style="border-color: rgb(0, 0, 0); padding: 0.2em 0.5em;"><font face="Tahoma" size="2">8</font></td>
+
+            <td style="border-color: rgb(0, 0, 0); padding: 0.2em 0.5em;"><font face="Tahoma" size="2">7</font></td>
+
+            <td style="border-color: rgb(0, 0, 0); padding: 0.2em 0.5em;"><font face="Tahoma" size="2">43–54 min.</font></td>
+
+            <td style="border-color: rgb(0, 0, 0); padding: 0.2em 0.5em;"><font face="Tahoma" size="2">450–550</font></td>
+        </tr>
+
+        <tr>
+            <td style="border-color: rgb(0, 0, 0); padding: 0.2em 0.5em;"><font face="Tahoma" size="2">C</font></td>
+
+            <td style="border-color: rgb(0, 0, 0); padding: 0.2em 0.5em;"><font face="Tahoma" size="2">14</font></td>
+
+            <td style="border-color: rgb(0, 0, 0); padding: 0.2em 0.5em;"><font face="Tahoma" size="2">13</font></td>
+
+            <td style="border-color: rgb(0, 0, 0); padding: 0.2em 0.5em;"><font face="Tahoma" size="2">12</font></td>
+
+            <td style="border-color: rgb(0, 0, 0); padding: 0.2em 0.5em;"><font face="Tahoma" size="2">11</font></td>
+
+            <td style="border-color: rgb(0, 0, 0); padding: 0.2em 0.5em;"><font face="Tahoma" size="2">10</font></td>
+
+            <td style="border-color: rgb(0, 0, 0); padding: 0.2em 0.5em;"><font face="Tahoma" size="2">9</font></td>
+
+            <td style="border-color: rgb(0, 0, 0); padding: 0.2em 0.5em;"><font face="Tahoma" size="2">34–43 min.</font></td>
+
+            <td style="border-color: rgb(0, 0, 0); padding: 0.2em 0.5em;"><font face="Tahoma" size="2">550–700</font></td>
+        </tr>
+
+        <tr>
+            <td style="border-color: rgb(0, 0, 0); padding: 0.2em 0.5em;"><font face="Tahoma" size="2">D</font></td>
+
+            <td style="border-color: rgb(0, 0, 0); padding: 0.2em 0.5em;"><font face="Tahoma" size="2">16</font></td>
+
+            <td style="border-color: rgb(0, 0, 0); padding: 0.2em 0.5em;"><font face="Tahoma" size="2">15</font></td>
+
+            <td style="border-color: rgb(0, 0, 0); padding: 0.2em 0.5em;"><font face="Tahoma" size="2">14</font></td>
+
+            <td style="border-color: rgb(0, 0, 0); padding: 0.2em 0.5em;"><font face="Tahoma" size="2">13</font></td>
+
+            <td style="border-color: rgb(0, 0, 0); padding: 0.2em 0.5em;"><font face="Tahoma" size="2">12</font></td>
+
+            <td style="border-color: rgb(0, 0, 0); padding: 0.2em 0.5em;"><font face="Tahoma" size="2">11</font></td>
+
+            <td style="border-color: rgb(0, 0, 0); padding: 0.2em 0.5em;"><font face="Tahoma" size="2">27–34 min.</font></td>
+
+            <td style="border-color: rgb(0, 0, 0); padding: 0.2em 0.5em;"><font face="Tahoma" size="2">700–875</font></td>
+        </tr>
+
+        <tr>
+            <td style="border-color: rgb(0, 0, 0); padding: 0.2em 0.5em;"><font face="Tahoma" size="2">E</font></td>
+
+            <td style="border-color: rgb(0, 0, 0); padding: 0.2em 0.5em;"><font face="Tahoma" size="2">18</font></td>
+
+            <td style="border-color: rgb(0, 0, 0); padding: 0.2em 0.5em;"><font face="Tahoma" size="2">17</font></td>
+
+            <td style="border-color: rgb(0, 0, 0); padding: 0.2em 0.5em;"><font face="Tahoma" size="2">16</font></td>
+
+            <td style="border-color: rgb(0, 0, 0); padding: 0.2em 0.5em;"><font face="Tahoma" size="2">15</font></td>
+
+            <td style="border-color: rgb(0, 0, 0); padding: 0.2em 0.5em;"><font face="Tahoma" size="2">14</font></td>
+
+            <td style="border-color: rgb(0, 0, 0); padding: 0.2em 0.5em;"><font face="Tahoma" size="2">13</font></td>
+
+            <td style="border-color: rgb(0, 0, 0); padding: 0.2em 0.5em;"><font face="Tahoma" size="2">22–27 min.</font></td>
+
+            <td style="border-color: rgb(0, 0, 0); padding: 0.2em 0.5em;"><font face="Tahoma" size="2">875–1075</font></td>
+        </tr>
+        </tbody>
+    </table>
+
+    <p><font face="Tahoma" size="2">If the pace rating letter has a “+” or “-” appended to it, the average speed is incremented or decremented by 1 mph.</font></p><p><font face="Tahoma" size="2"><b><span class="caps" style="text-transform: uppercase;">CHOOSING YOUR RIDE:</span></b>&nbsp;The speeds in the above table may seem low because you know you can ride faster at times. Remember, however, that the numbers represent&nbsp;<i>the average speed for the entire ride</i>. Don’t attempt rides beyond your ability. If you are taking your first club ride, err on the conservative side. Novice cyclists are welcome on A rides. A, B, and C rides are typically more leisurely and have more regroups than D and E rides, which are brisker-paced rides for more experienced and self-sufficient cyclists.</font></p><p><font face="Tahoma" size="2">If you are unsure which group to go with on hilly rides, time yourself up <a href="http://goo.gl/maps/L0STh" title="open Google Map in a new page/tab" target="_blank">Old La Honda Rd.</a> and compare your time with the time ranges shown in the above table. If your time is within the range for a certain group, you can feel comfortable riding with that group on hilly rides.&nbsp;<i>Note that the OLH time does not refer to your personal best time, but to the time in which you can comfortably climb Old La Honda, and perhaps not just once but repeatedly, because that is the pace the group will be maintaining all day, on multiple climbs.</i></font></p><p><font face="Tahoma" size="2">If you choose to ride with a slower group, you should not expect them to speed up for you, and if you choose to ride with a faster group, you should not expect them to wait for you.</font></p><p><span class="topic" style="font-family: Tahoma; font-size: small; font-weight: bold; text-transform: uppercase;">WEATHER CONSIDERATIONS:</span><span style="font-family: Tahoma; font-size: small;">&nbsp;Rides on pavement may be canceled if rain seems likely during the ride. If in doubt, call the ride leader.</span><br></p>
+</div>
+
+<p style="text-align: -webkit-auto; background-color: rgb(255, 255, 255);"><font face="Tahoma" size="2"><span class="topic" style="font-weight: bold; text-transform: uppercase;">RECOMMENDED EQUIPMENT:</span>&nbsp;As needed, please try to bring basic tools, sunglasses and sunscreen, water bottles, food or food money, a first-aid kit, cell phone, “layered” clothing, etc. Bright clothing is recommended.</font></p><p style="text-align: -webkit-auto; background-color: rgb(255, 255, 255);"><font color="#FF0000" face="Tahoma" size="2"><span class="topic" style="font-weight: bold; text-transform: uppercase;">HELMETS AND WORKING BRAKES ARE REQUIRED FOR ALL RIDES.</span>&nbsp;Please be prepared for the ride. (Make sure your bike is in working order, bring appropriate tools, food, water, clothing, etc.) Guest riders will need to sign a waiver before every ride. Minors need a parent or guardian with them to sign the release.</font></p></div>

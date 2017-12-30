@@ -5,8 +5,8 @@ import os
 import random
 import requests
 import string
-import urllib2
 import sys
+import urllib2
 from datetime import *
 from flask import Flask, render_template, request, redirect, url_for, jsonify, g
 from flask import current_app, safe_join
@@ -23,6 +23,7 @@ application = Flask(__name__,
                                 os.path.abspath(
                                     sys.modules.get(__name__).__file__)), '..')),
                     template_folder='dist', static_folder='dist/static',static_url_path='/static')
+Compress(application)
 session = requests.Session()
 strava_api_key = os.environ.get("STRAVA_API_KEY")
 strava_activity = StravaActivity(strava_api_key, session)
@@ -47,7 +48,6 @@ def send_compressed_file(filename, formats=None):
 
 
 def setup_app():
-    Compress(application)
     application.config['MAX_CONTENT_LENGTH'] = 20 * 1024 * 1024
     application.view_functions['static'] = send_compressed_file
     secret_key = ''.join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(4))

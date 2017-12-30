@@ -16,6 +16,9 @@ class StravaRouteParser {
     }
 
     setToken(token) {
+        if (token === undefined) {
+            return;
+        }
         this.token = token;
         this.authenticated = true;
     }
@@ -54,7 +57,11 @@ class StravaRouteParser {
             );
         }, error => {
             if (errorCallback !== undefined) {
-                errorCallback(error);
+                if (error.msg !== undefined) {
+                    errorCallback(error.msg);
+                } else {
+                    errorCallback(error);
+                }
             } else {
                 console.log('Failed to load Strava activity data', error);
             }

@@ -1,4 +1,4 @@
-import {Spinner, Icon} from '@blueprintjs/core';
+import {Icon, Spinner} from '@blueprintjs/core';
 import {
     Alert,
     Button,
@@ -8,12 +8,15 @@ import {
     FormGroup,
     OverlayTrigger,
     Panel,
+    Popover,
     Tooltip
 } from 'react-bootstrap';
 import moment from 'moment';
 import React, {Component} from 'react';
 import Flatpickr from 'react-flatpickr'
 import ShortUrl from './shortUrl';
+import MediaQuery from 'react-responsive';
+import rideRatingText from './rideRating.htm';
 
 const queryString = require('query-string');
 
@@ -42,6 +45,12 @@ const rwgps_trip_tooltip = (
 const startHour = 7;
 const defaultPace = 'D';
 const defaultIntervalInHours = 1;
+
+const rideRatingDisplay = (
+    <Popover style={{width:450, maxWidth:500}} id="ride-rating-popup" title="Ride rating system">
+        <div dangerouslySetInnerHTML={{__html: rideRatingText}}/>
+    </Popover>
+);
 
 class RouteInfoForm extends Component {
 
@@ -475,7 +484,11 @@ class RouteInfoForm extends Component {
                             </FormControl>
                         </OverlayTrigger>
                     </FormGroup>
-                    <a style={{padding:'8px',display:'inline-flex',marginTop:'5px',marginBottom:'5px'}} href="https://westernwheelersbicycleclub.wildapricot.org/page-1374754" target="_blank">Pace explanation</a>
+
+                    <OverlayTrigger trigger="click" placement="right" rootClose overlay={rideRatingDisplay}>
+                        <Button style={{marginLeft:'7px'}}>Pace explanation</Button>
+                    </OverlayTrigger>
+                    {/*<a style={{padding:'8px',display:'inline-flex',marginTop:'5px',marginBottom:'5px'}} href="https://westernwheelersbicycleclub.wildapricot.org/page-1374754" target="_blank">Pace explanation</a>*/}
                     <FormGroup bsSize='small'
                                bsClass='formGroup hidden-xs hidden-sm'
                                validationState={this.decideValidationStateFor('gpx',this.state.errorSource,this.state.succeeded)}
@@ -512,10 +525,18 @@ class RouteInfoForm extends Component {
                      */}
                     <OverlayTrigger placement='bottom' overlay={forecast_tooltip}>
                         <div style={{'display':'inline-flex',padding:'0px 14px'}} cursor='not-allowed'>
+                            <MediaQuery minDeviceWidth={1000}>
                             <Button tabIndex='6' bsStyle="primary" onClick={this.requestForecast}
                                     style={buttonStyle}
                                     disabled={this.disableSubmit() || this.state.pending} bsSize="large">
                                 {this.state.pending?'Updating...':'Find forecast'}</Button>
+                            </MediaQuery>
+                            <MediaQuery maxDeviceWidth={800}>
+                                <Button tabIndex='6' bsStyle="primary" onClick={this.requestForecast}
+                                        style={buttonStyle}
+                                        disabled={this.disableSubmit() || this.state.pending}>
+                                    {this.state.pending?'Updating...':'Find forecast'}</Button>
+                            </MediaQuery>
                         </div>
                     </OverlayTrigger>
                     {RouteInfoForm.showErrorDetails(this.state.errorDetails)}

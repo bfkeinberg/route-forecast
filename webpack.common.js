@@ -44,11 +44,12 @@ module.exports = {
             },
             { test: /\.(png|woff2?)$/, loader: "url-loader?limit=100000" },
             { test: /\.(png|jpg|ico)$/, loader: "file-loader" },
-            { test: /\.(ttf|eot|svg)$/, loader: "file-loader" }
+            { test: /\.(ttf|eot|svg)$/, loader: "file-loader" },
+            { test: /\.htm$/, use: 'raw-loader'}
         ]
     },
     plugins: [
-        /*new CleanWebpackPlugin([BUILD_DIR + '/!*.*',STATIC_DIR + '/!*.*'] , {watch:true, verbose:false}),*/
+        new CleanWebpackPlugin([BUILD_DIR + '/*.*',STATIC_DIR + '/*.*'] , {watch:true, verbose:false}),
         new ExtractTextPlugin({filename:"styles.css",allChunks:true}),
         new HtmlWebpackPlugin({
             title:'Find weather forecast for route',
