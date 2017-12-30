@@ -209,6 +209,7 @@ class ControlPoints extends Component {
                     </FormGroup>
                 </ButtonGroup>
                 </ButtonToolbar>
+
                 <MediaQuery minDeviceWidth={1000}>
                 <Panel header={title} bsStyle="info" style={{margin:'10px'}}>
                     <ErrorBoundary>

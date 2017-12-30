@@ -2,14 +2,14 @@ import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 import loadGoogleMapsAPI from 'load-google-maps-api';
 
-const se_arrow = "static/arrow_down_right.png";
-const north_arrow = "/static/arrow_up.png";
-const ne_arrow = "/static/arrow_up_right.png";
-const south_arrow = "/static/arrow_down.png";
-const sw_arrow = "/static/arrow_down_left.png";
-const west_arrow = "/static/arrow_left.png";
-const nw_arrow = "/static/arrow_up_left.png";
-const east_arrow = "/static/arrow_right.png";
+import se_arrow from 'Images/arrow_down_right.png';
+import north_arrow from "Images/arrow_up.png";
+import ne_arrow from "Images/arrow_up_right.png";
+import south_arrow from "Images/arrow_down.png";
+import sw_arrow  from "Images/arrow_down_left.png";
+import west_arrow from "Images/arrow_left.png";
+import nw_arrow from "Images/arrow_up_left.png";
+import east_arrow from "Images/arrow_right.png";
 
 class RouteForecastMap extends Component {
 

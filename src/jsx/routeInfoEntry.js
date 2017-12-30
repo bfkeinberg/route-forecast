@@ -1,4 +1,4 @@
-import {Spinner} from '@blueprintjs/core';
+import {Spinner, Icon} from '@blueprintjs/core';
 import {
     Alert,
     Button,
@@ -438,7 +438,8 @@ class RouteInfoForm extends Component {
                         <OverlayTrigger placement='bottom' overlay={time_tooltip}>
                             <ControlLabel>Starting time</ControlLabel>
                         </OverlayTrigger>
-                        <span style={{display: 'inline-flex'}} className="pt-icon-standard pt-icon-calendar"/>
+                        <Icon iconName="calendar"/>
+                        {/*<span style={{display: 'inline-flex'}} className="pt-icon-standard pt-icon-calendar"/>*/}
                         <Flatpickr onChange={this.setDateAndTime}
                                    options={{enableTime: true,
                             altInput: true, altFormat: 'F j, Y h:i K',

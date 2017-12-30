@@ -1,12 +1,37 @@
 const merge = require('webpack-merge');
 const common = require('./webpack.common.js');
-var webpack = require('webpack');
+const webpack = require('webpack');
+var path = require('path');
+// const HtmlCriticalPlugin = require("html-critical-webpack-plugin");
 
 module.exports = merge(common, {
         plugins: [
             new webpack.LoaderOptionsPlugin({
                 debug: true
-            })
+            }),
+/*
+            new HtmlCriticalPlugin({
+                base: path.resolve(__dirname, 'dist/'),
+                src: 'index.html',
+                dest: 'index.html',
+                css:  ['dist/styles.css'],
+                inline: true,
+                minify: true,
+                extract: true,
+                inlineImages: true,
+                assetPaths: ['dist/static'],
+                width: 1400,
+                height: 1200,
+                penthouse: {
+                    blockJSRequests: false,
+                    renderWaitTime: 6000,
+                    keepLargerMediaQueries: true,
+                    screenshots: {
+                        basePath: 'homepage'
+                    },
+                }
+            }),
+*/
         ],
         output: {
             pathinfo:true

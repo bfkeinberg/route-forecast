@@ -5,8 +5,8 @@ import os
 import random
 import requests
 import string
-import tempfile
 import urllib2
+import sys
 from datetime import *
 from flask import Flask, render_template, request, redirect, url_for, jsonify, g
 from flask import current_app, safe_join
@@ -15,8 +15,22 @@ from flask_compress import Compress
 from routeWeather import WeatherCalculator
 from stravaActivity import StravaActivity
 
+logger = logging.getLogger('RoutePlanner')
+application = Flask(__name__,
+                    root_path = os.path.abspath(
+                        os.path.join(
+                            os.path.dirname(
+                                os.path.abspath(
+                                    sys.modules.get(__name__).__file__)), '..')),
+                    template_folder='dist', static_folder='dist/static',static_url_path='/static')
+session = requests.Session()
+strava_api_key = os.environ.get("STRAVA_API_KEY")
+strava_activity = StravaActivity(strava_api_key, session)
 
-def send_compressed_file(filename, formats=[('br', '.br'), ('gzip', '.gz')]):
+
+def send_compressed_file(filename, formats=None):
+    if formats is None:
+        formats = [('br', '.br'), ('gzip', '.gz')]
     g.is_compressed = False
     if not current_app.has_static_folder:
         raise RuntimeError('No static folder for the current application')
@@ -24,28 +38,25 @@ def send_compressed_file(filename, formats=[('br', '.br'), ('gzip', '.gz')]):
     if not accept_encoding:
         return current_app.send_static_file(filename)
     encodings = [encoding for encoding in accept_encoding.split(',')]
-    for format, extension in formats:
+    for enc_format, extension in formats:
         compressed = filename + extension
-        if format in encodings and os.path.exists(safe_join(current_app.static_folder, compressed)):
+        if enc_format in encodings and os.path.exists(safe_join(current_app.static_folder, compressed)):
             g.is_compressed = True
             return current_app.send_static_file(compressed)
     return current_app.send_static_file(filename)
 
-application = Flask(__name__)
-Compress(application)
-application.config['MAX_CONTENT_LENGTH'] = 20 * 1024 * 1024
-application.view_functions['static'] = send_compressed_file
-secret_key = ''.join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(4))
-application.secret_key = secret_key
-logged_into_rwgps = False
-session = requests.Session()
-application.weather_request_count = 0
-application.last_request_day = datetime.now().date()
-logger = logging.getLogger('RoutePlanner')
-logging.basicConfig(level=logging.INFO)
-logging.getLogger('flask_cors').level = logging.DEBUG
-strava_api_key = os.environ.get("STRAVA_API_KEY")
-strava_activity = StravaActivity(strava_api_key,session)
+
+def setup_app():
+    Compress(application)
+    application.config['MAX_CONTENT_LENGTH'] = 20 * 1024 * 1024
+    application.view_functions['static'] = send_compressed_file
+    secret_key = ''.join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(4))
+    application.secret_key = secret_key
+    application.weather_request_count = 0
+    application.last_request_day = datetime.now().date()
+    logging.basicConfig(level=logging.INFO)
+    logging.getLogger('flask_cors').level = logging.DEBUG
+
 
 @application.after_request
 def add_header(r):
@@ -55,8 +66,10 @@ def add_header(r):
     and also to cache the rendered page for 10 minutes.
     """
     r.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
-    if hasattr(g,'is_compressed') and g.is_compressed:
+    if hasattr(g, 'is_compressed') and g.is_compressed:
         r.headers['Content-Encoding'] = 'gzip'
+    if r.content_type == 'application/javascript':
+        r.content_type = 'text/javascript'
     return r
 
 
@@ -70,7 +83,7 @@ def inject_api_keys():
 
 @application.route('/')
 def hello():
-    return render_template('new_index.html')
+    return render_template('index.html')
 
 
 @application.errorhandler(500)
@@ -89,7 +102,8 @@ def server_error(e):
 
 @application.route('/form')
 def form():
-    return render_template('new_index.html', disabled='disabled style=' + "'color:#888;'")
+    return render_template('index.html', disabled='disabled style=' + "'color:#888;'")
+
 
 @application.route('/stravaAuthReq')
 def authenticate_with_strava():
@@ -99,15 +113,16 @@ def authenticate_with_strava():
         return jsonify({'status': 'Missing keys'}), 400
     return strava_activity.authenticate(request.host_url, state)
 
+
 @application.route('/stravaAuthReply')
 def handle_strava_auth_response():
     code = request.args.get('code')
     error = request.args.get('error')
     state = request.args.get('state')
-    if state != None:
+    if state is not None:
         restored_state = json.loads(state)
     else:
-        restored_state={}
+        restored_state = {}
     if error is not None:
             logger.info('Strava authentication error %s', error)
     token = strava_activity.get_token(code)
@@ -170,53 +185,7 @@ def handle_login():
     userinfo = login_result.json()
     if userinfo["user"] is None:
         return jsonify({'loggedIn': False, 'status': 'Invalid rwgps user'}), 401
-    return jsonify({'loggedIn': True})
-
-
-@application.route('/submitted', methods=['POST'])
-def submitted_form():
-    if not request.form.viewkeys() >= {'interval', 'pace', 'starting_time', 'timezone'}:
-        return jsonify({'status': 'Missing keys'}), 400
-    interval = request.form['interval']
-    starting_time = request.form['starting_time']
-    timezone = request.form['timezone']
-    pace = request.form['pace']
-    if 'controls' in request.form:
-        controls = json.loads(request.form['controls'])
-    else:
-        controls = []
-    files = request.files
-    route = files['route']
-    if len(route.filename) > 0:
-        contents = route.read()
-    elif request.form['ridewithgps'] != "":
-        route_number = request.form['ridewithgps']
-        gpx_url = "https://ridewithgps.com/trips/{}.gpx?sub_format=track".format(route_number)
-        dl_req = session.get(gpx_url)
-        if dl_req.status_code == 200:
-            contents = dl_req.content       #   dl_from_rwgps(route_number)
-        else:
-            return jsonify({'status': dl_req.reason}), dl_req.status_code
-    else:
-        return jsonify({'status': 'No route provided'}), 400
-    with tempfile.NamedTemporaryFile(mode='w+') as local_file:
-        local_file.write(contents)
-        local_file.flush()
-        wcalc = WeatherCalculator(session)
-        try:
-            forecast_result = wcalc.calc_weather(float(interval), pace, starting_time=starting_time, tz=timezone,
-                                                 route=local_file.name, controls=controls)
-        except requests.HTTPError as excpt:
-            return jsonify({'status': excpt.message}), 500
-        except Exception as excpt:
-            return jsonify({'status': excpt.message}), 500
-        if wcalc.is_error():
-            return jsonify({'status': forecast_result}), 400
-        bounds = wcalc.get_bounds()
-        min_lat, min_lon, max_lat, max_lon = bounds
-    return jsonify({'forecast': forecast_result, 'min_lat': min_lat, 'max_lat': max_lat, 'min_lon': min_lon,
-                    'max_lon': max_lon, 'points': wcalc.get_points(), 'name': wcalc.get_name(),
-                    'controls': wcalc.get_controls()})
+    return jsonify({'loggedIn': True, 'auth_token': userinfo['user'].auth_token})
 
 
 @application.route('/forecast', methods=['POST'])
@@ -224,7 +193,8 @@ def forecast():
     if not request.form.keys() >= ['locations', 'timezone']:
         return jsonify({'status': 'Missing keys'}), 400
     forecast_points = json.loads(request.form['locations'])
-    logger.info('Request from %s(%s) for %d forecast points', request.remote_addr, request.headers.get('X-Forwarded-For', request.remote_addr), len(forecast_points))
+    logger.info('Request from %s(%s) for %d forecast points', request.remote_addr,
+                request.headers.get('X-Forwarded-For', request.remote_addr), len(forecast_points))
     if len(forecast_points) > 50:
         return jsonify({'status': 'Invalid request, increase interval'}), 400
     today = datetime.now().date()
@@ -256,6 +226,7 @@ def forecast():
 
 
 # run the app.
+setup_app()
 if __name__ == "__main__":
     # Setting debug to True enables debug output. This line should be
     # removed before deploying a production app.

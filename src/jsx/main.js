@@ -16,6 +16,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import 'ag-grid/dist/styles/ag-grid.css';
 import 'ag-grid/dist/styles/ag-theme-fresh.css';
 import 'flatpickr/dist/themes/confetti.css';
+import 'Images/style.css';
 
 import queryString from 'query-string';
 import cookie from 'react-cookies';
