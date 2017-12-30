@@ -2,25 +2,18 @@ const merge = require('webpack-merge');
 const common = require('./webpack.common.js');
 const webpack = require('webpack');
 var path = require('path');
-// const HtmlCriticalPlugin = require("html-critical-webpack-plugin");
-const WebpackCritical = require('webpack-critical');
+const HtmlCriticalPlugin = require("html-critical-webpack-plugin");
 
 module.exports = merge(common, {
         plugins: [
             new webpack.LoaderOptionsPlugin({
                 debug: true
             }),
-/*
-            new WebpackCritical({
-                context: path.resolve(__dirname, 'dist/static')
-            })
-*/
-/*
             new HtmlCriticalPlugin({
                 base: path.resolve(__dirname, 'dist/'),
                 src: 'index.html',
                 dest: 'index.html',
-                css:  ['dist/styles.css'],
+                // css:  ['dist/static/styles.css'],
                 inline: true,
                 minify: true,
                 extract: true,
@@ -37,7 +30,6 @@ module.exports = merge(common, {
                     },
                 }
             }),
-*/
         ],
         output: {
             pathinfo:true

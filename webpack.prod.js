@@ -3,7 +3,6 @@ const common = require('./webpack.common.js');
 const path = require('path');
 const webpack = require('webpack');
 // const HtmlCriticalPlugin = require("html-critical-webpack-plugin");
-const WebpackCritical = require('webpack-critical');
 
 var BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 const CompressionPlugin = require("compression-webpack-plugin");
@@ -29,14 +28,14 @@ module.exports = merge(common, {
                 blockJSRequests: false,
             }
         }),*/
-        new WebpackCritical({
-            context: path.resolve(__dirname, 'dist/static')
-        }),
+
+/*
         new CompressionPlugin({
             deleteOriginalAssets:true, minRatio:0.85, cache:true,
             test:[/\.css/,/\.ttf/,/\.eot/,/\.js/],
             exclude:[/\.png/,/\.ico/,/\.html/]
         }),
+*/
         // new BundleAnalyzerPlugin()
     ]
 });
