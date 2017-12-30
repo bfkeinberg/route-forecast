@@ -486,7 +486,7 @@ class RouteInfoForm extends Component {
                     </FormGroup>
 
                     <OverlayTrigger trigger="click" placement="right" rootClose overlay={rideRatingDisplay}>
-                        <Button style={{marginLeft:'7px'}}>Pace explanation</Button>
+                        <Button style={{marginLeft:'7px'}} bsSize="small">Pace explanation</Button>
                     </OverlayTrigger>
                     {/*<a style={{padding:'8px',display:'inline-flex',marginTop:'5px',marginBottom:'5px'}} href="https://westernwheelersbicycleclub.wildapricot.org/page-1374754" target="_blank">Pace explanation</a>*/}
                     <FormGroup bsSize='small'
@@ -534,7 +534,7 @@ class RouteInfoForm extends Component {
                             <MediaQuery maxDeviceWidth={800}>
                                 <Button tabIndex='6' bsStyle="primary" onClick={this.requestForecast}
                                         style={buttonStyle}
-                                        disabled={this.disableSubmit() || this.state.pending}>
+                                        disabled={this.disableSubmit() || this.state.pending} bsSize="small">
                                     {this.state.pending?'Updating...':'Find forecast'}</Button>
                             </MediaQuery>
                         </div>
