@@ -2,6 +2,7 @@ import dateutil.tz
 import json
 import logging
 import os
+import os.path
 import random
 import requests
 import string
@@ -28,21 +29,26 @@ session = requests.Session()
 strava_api_key = os.environ.get("STRAVA_API_KEY")
 strava_activity = StravaActivity(strava_api_key, session)
 
+def clear_globals():
+    g.extension = None
+    g.compressionType = None
+
 
 def send_compressed_file(filename, formats=None):
     if formats is None:
         formats = [('br', '.br'), ('gzip', '.gz')]
-    g.is_compressed = False
+    g.compressionType = None
     if not current_app.has_static_folder:
         raise RuntimeError('No static folder for the current application')
     accept_encoding = request.headers.get('Accept-Encoding', None)
     if not accept_encoding:
         return current_app.send_static_file(filename)
-    encodings = [encoding for encoding in accept_encoding.split(',')]
+    encodings = [encoding.strip() for encoding in accept_encoding.split(',')]
     for enc_format, extension in formats:
         compressed = filename + extension
         if enc_format in encodings and os.path.exists(safe_join(current_app.static_folder, compressed)):
-            g.is_compressed = True
+            g.compressionType = enc_format
+            g.extension = os.path.splitext(filename)[1][1:]
             return current_app.send_static_file(compressed)
     return current_app.send_static_file(filename)
 
@@ -50,6 +56,7 @@ def send_compressed_file(filename, formats=None):
 def setup_app():
     application.config['MAX_CONTENT_LENGTH'] = 20 * 1024 * 1024
     application.view_functions['static'] = send_compressed_file
+    application.before_request(clear_globals)
     secret_key = ''.join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(4))
     application.secret_key = secret_key
     application.weather_request_count = 0
@@ -66,10 +73,13 @@ def add_header(r):
     and also to cache the rendered page for 10 minutes.
     """
     r.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
-    if hasattr(g, 'is_compressed') and g.is_compressed:
-        r.headers['Content-Encoding'] = 'gzip'
-    if r.content_type == 'application/javascript':
-        r.content_type = 'text/javascript'
+    if hasattr(g, 'compressionType') and g.compressionType is not None:
+        r.headers['Content-Encoding'] = g.compressionType
+    if hasattr(g,'extension'):
+        if g.extension == 'js':
+            r.content_type = 'text/javascript'
+        if g.extension == 'css':
+            r.content_type = 'text/css'
     return r
 
 

@@ -42,9 +42,8 @@ module.exports = {
                     use: [{loader:"css-loader", options: {modules:false, sourceMap:true, minimize:true}}]
                 })
             },
-            { test: /\.(png|woff2?)$/, loader: "url-loader?limit=100000" },
-            { test: /\.(png|jpg|ico)$/, loader: "file-loader" },
-            { test: /\.(ttf|eot|svg)$/, loader: "file-loader" },
+            { test: /\.(png|woff2?|ttf|eot)$/, loader: "url-loader?limit=100000" },
+            { test: /\.(jpg|ico|svg)$/, loader: "file-loader" },
             { test: /\.htm$/, use: 'raw-loader'}
         ]
     },

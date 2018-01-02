@@ -1,8 +1,9 @@
-import React from 'react';
+import React, {Component} from 'react';
 import {Table} from 'react-bootstrap';
 import ErrorBoundary from "./errorBoundary";
+import darkSky from 'Images/darkSkySmall.png';
 
-class ForecastTable extends React.Component {
+class ForecastTable extends Component {
 
     constructor(props) {
         super(props);
@@ -66,9 +67,8 @@ class ForecastTable extends React.Component {
         return (
                 <div>
                     <ErrorBoundary>
-                    <a tabIndex='-1' href="https://darksky.net/poweredby/">
-                        <img src="https://darksky.net/dev/img/attribution/poweredby.png" alt="Powered by DarkSky" width="80" height="40"/>
-                    </a>{weatherCorrections}
+                    <a tabIndex='-1' href="https://darksky.net/poweredby/"><img src={darkSky}/></a>
+                        {weatherCorrections}
                     <Table striped condensed hover bordered>
                         <thead>
                         <tr>

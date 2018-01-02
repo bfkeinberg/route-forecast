@@ -96,6 +96,9 @@ class AnalyzeRoute {
                     }
                 }
             ).then(response => {
+                if (response === undefined) {
+                    reject("Could not get Ride with GPS results");
+                }
                     this.rwgpsRouteData = response;
                     this.gpxResult = null;
                     let rwgpsRouteDatum = this.rwgpsRouteData[this.rwgpsRouteData['trip'] === undefined ? 'route' : 'trip'];
@@ -113,7 +116,7 @@ class AnalyzeRoute {
                     });
                 }
             ).catch(error => {
-                reject(error);
+                reject(error.message);
             });
         });
     }

@@ -146,6 +146,7 @@ class RouteInfoForm extends Component {
 
     componentWillReceiveProps(nextProps) {
         // recalculate if the user updated the controls, say
+        this.setQueryString(this.state, this.props.controlPoints, this.props.metric);
         this.calculateTimeAndDistance(nextProps);
     }
 
@@ -153,6 +154,7 @@ class RouteInfoForm extends Component {
         if (this.paramsChanged) {
             this.paramsChanged = false;
             // recalculate if the user changed values in the dialog
+            this.setQueryString(this.state, this.props.controlPoints, this.props.metric);
             this.calculateTimeAndDistance(this.props);
         }
     }
@@ -247,7 +249,6 @@ class RouteInfoForm extends Component {
                 this.setState({pending:false});
                 this.forecastRequest = null;
                 this.setState({pending:false, errorDetails:null, succeeded:true});
-                this.setQueryString(this.state, this.props.controlPoints, this.props.metric);
                 this.props.updateForecast(response);
                 let controlsToUpdate = this.props.controlPoints.slice();
                 let weatherCorrectionMinutes = this.parser.adjustForWind(response,this.state.pace,controlsToUpdate,this.state.start,this.props.metric);
@@ -486,7 +487,7 @@ class RouteInfoForm extends Component {
                     </FormGroup>
 
                     <OverlayTrigger trigger="click" placement="right" rootClose overlay={rideRatingDisplay}>
-                        <Button style={{marginLeft:'7px'}} bsSize="small">Pace explanation</Button>
+                        <Button style={{marginLeft:'7px'}} bsSize="xsmall">Pace explanation</Button>
                     </OverlayTrigger>
                     {/*<a style={{padding:'8px',display:'inline-flex',marginTop:'5px',marginBottom:'5px'}} href="https://westernwheelersbicycleclub.wildapricot.org/page-1374754" target="_blank">Pace explanation</a>*/}
                     <FormGroup bsSize='small'
@@ -534,7 +535,7 @@ class RouteInfoForm extends Component {
                             <MediaQuery maxDeviceWidth={800}>
                                 <Button tabIndex='6' bsStyle="primary" onClick={this.requestForecast}
                                         style={buttonStyle}
-                                        disabled={this.disableSubmit() || this.state.pending} bsSize="small">
+                                        disabled={this.disableSubmit() || this.state.pending} bsSize="xsmall">
                                     {this.state.pending?'Updating...':'Find forecast'}</Button>
                             </MediaQuery>
                         </div>

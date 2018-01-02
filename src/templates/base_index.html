@@ -9,15 +9,28 @@
         <% if (htmlWebpackPlugin.files.favicon) { %>
             <link rel="shortcut icon" href="<%= htmlWebpackPlugin.files.favicon%>">
         <% } %>
+        <script>
+          function measureCRP() {
+            var t = window.performance.timing,
+              interactive = t.domInteractive - t.domLoading,
+              dcl = t.domContentLoadedEventStart - t.domLoading,
+              complete = t.domComplete - t.domLoading;
+            var stats = document.createElement('p');
+            stats.textContent = 'interactive: ' + interactive + 'ms, ' +
+                'dcl: ' + dcl + 'ms, complete: ' + complete + 'ms';
+            console.log(stats);
+          }
+        </script>
+        <% for (var css in htmlWebpackPlugin.files.css) { %>
+        <link href="<%= htmlWebpackPlugin.files.css[css] %>" rel="stylesheet" type="text/css" >
+        <% } %>
     </head>
-    <body>
+    <body onload="measureCRP()">
         <div id="container">
             <div id="content"></div>
         </div>
         <script type="text/javascript" id='routeui' timezone_api_key='{{ timezone_api_key }}' maps_api_key='{{ maps_key }}' action="{{ url_for('forecast') }}" src='<%= htmlWebpackPlugin.files.js %>'></script>
-        <% for (var css in htmlWebpackPlugin.files.css) { %>
-        <link href="<%= htmlWebpackPlugin.files.css[css] %>" rel="stylesheet" type="text/css" >
-        <% } %>
+        <script type="text/javascript" id="localrouteui" timezone_api_key="{{ timezone_api_key }}" maps_api_key="{{ maps_key }}" action="{{ url_for('forecast') }}" src="/Users/bfeinberg/PycharmProjects/routeWeather/dist/static/main.bundle.js"></script>
         <noscript>This application requires JavaScript. Please enable JavaScript to use the application.</noscript>
     </body>
 </html>

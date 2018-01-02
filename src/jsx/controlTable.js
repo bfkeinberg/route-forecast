@@ -1,7 +1,7 @@
 import React from 'react';
 import {Button} from '@blueprintjs/core';
 
-import {AgGridReact,AgGridColumn} from 'ag-grid-react';
+import {AgGridColumn, AgGridReact} from 'ag-grid-react';
 import ReactDOM from 'react-dom';
 
 class ControlTable extends React.Component {
@@ -43,11 +43,11 @@ class ControlTable extends React.Component {
         this.updateFromGrid();
     }
 
-    appendUnit(cell) {
+    static appendUnit(cell) {
         return cell.value + ' min';
     }
 
-    validateData(params) {
+    static validateData(params) {
         if (Number.isNaN(parseInt(params.newValue,10)) && params.oldValue!==params.newValue) {
             return false;
         }
@@ -65,7 +65,7 @@ class ControlTable extends React.Component {
         return eDiv;
     }
 
-    tabHandler(params) {
+    static tabHandler(params) {
         let nextCell = params.nextCellDef;
         if (params.backwards) {
             return nextCell;
@@ -98,7 +98,7 @@ class ControlTable extends React.Component {
         this.updateFromGrid();
     }
 
-    doControlsMatch(newControl,oldControl) {
+    static doControlsMatch(newControl, oldControl) {
         return newControl.distance===oldControl.distance &&
             newControl.name===oldControl.name &&
             newControl.duration===oldControl.duration &&
@@ -110,8 +110,8 @@ class ControlTable extends React.Component {
     shouldComponentUpdate(nextProps,nextState) {
         // compare controls
         let controls = this.props.controls;
-        return !(nextProps.controls.length==this.props.controls.length &&
-            nextProps.controls.every((v,i)=> this.doControlsMatch(v,controls[i])));
+        return !(nextProps.controls.length===this.props.controls.length &&
+            nextProps.controls.every((v,i)=> ControlTable.doControlsMatch(v,controls[i])));
     }
 
     setData(params) {
@@ -129,16 +129,16 @@ class ControlTable extends React.Component {
             }
         }
         let rowData = params.node.data;
-        if (this.isValidRow(rowData)) {
+        if (ControlTable.isValidRow(rowData)) {
             // update
             this.setState({rowCount:this.api.getModel().getRowCount()});
             this.updateFromGrid();
         }
     }
 
-    isValidRow(rowData) {
+    static isValidRow(rowData) {
         return (rowData.name!==undefined && rowData.distance!==undefined && rowData.duration!==undefined &&
-            rowData.name!=="" && rowData.distance!=="" && rowData.distance != 0 && rowData.duration!=="" && rowData.duration!=0);
+            rowData.name!=="" && rowData.distance!=="" && rowData.distance !== 0 && rowData.duration!=="" && rowData.duration!==0);
     }
 
     sortChanged(params) {
@@ -159,13 +159,13 @@ class ControlTable extends React.Component {
         return (<div className="ag-theme-fresh">
             <AgGridReact enableColResize enableSorting animateRows sortingOrder={['asc']} unSortIcon rowData={this.props.controls}
                          onGridReady={this.onGridReady} onSortChanged={this.sortChanged}
-                         onCellValueChanged={this.cellUpdated} tabToNextCell={this.tabHandler} getRowNodeId={data => data.id}>
+                         onCellValueChanged={this.cellUpdated} tabToNextCell={ControlTable.tabHandler} getRowNodeId={data => data.id}>
                 <AgGridColumn colId='name' field='name' unSortIcon={true} suppressSorting editable={true} headerName='Name'></AgGridColumn>
                 <AgGridColumn field='distance' headerTooltip='In miles or km, depending on the metric checkbox'
-                              type={'numericColumn'} unSortIcon={true} editable={true} valueParser={this.setData} valueSetter={this.validateData} headerName='Distance'></AgGridColumn>
+                              type={'numericColumn'} unSortIcon={true} editable={true} valueParser={this.setData} valueSetter={ControlTable.validateData} headerName='Distance'></AgGridColumn>
                 <AgGridColumn field='duration' headerTooltip='How many minutes you expect to spend at this control'
                               suppressSorting type={'numericColumn'} editable={true} valueParser={params=>{return Number(params.newValue)}}
-                              valueSetter={this.validateData} valueFormatter={this.appendUnit} headerName='Expected time spent'></AgGridColumn>
+                              valueSetter={ControlTable.validateData} valueFormatter={ControlTable.appendUnit} headerName='Expected time spent'></AgGridColumn>
                 <AgGridColumn field='arrival' headerTooltip='When you are predicted to arrive here'
                               cellRenderer="agAnimateShowChangeCellRenderer" type={'numericColumn'}
                               suppressNavigable suppressSorting enableCellChangeFlash={true} headerName='Est. arrival time'></AgGridColumn>
@@ -173,7 +173,7 @@ class ControlTable extends React.Component {
                               headerTooltip='When you actually arrived here' suppressNavigable hide={!this.props.compare} headerName='Actual arrival time'></AgGridColumn>
                 <AgGridColumn colId='banked' field='banked' headerTooltip='Time remaining at brevet pace'
                               cellRenderer="agAnimateShowChangeCellRenderer"
-                              suppressNavigable suppressSorting type={'numericColumn'} valueFormatter={this.appendUnit} hide={!displayBanked} headerName='Banked time'></AgGridColumn>
+                              suppressNavigable suppressSorting type={'numericColumn'} valueFormatter={ControlTable.appendUnit} hide={!displayBanked} headerName='Banked time'></AgGridColumn>
                 <AgGridColumn suppressNavigable suppressSorting cellRenderer={this.deleteRenderer}></AgGridColumn>
             </AgGridReact>
         </div>);

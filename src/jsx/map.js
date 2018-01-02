@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, {Component} from 'react';
 import ReactDOM from 'react-dom';
 import loadGoogleMapsAPI from 'load-google-maps-api';
 
@@ -6,10 +6,11 @@ import se_arrow from 'Images/arrow_down_right.png';
 import north_arrow from "Images/arrow_up.png";
 import ne_arrow from "Images/arrow_up_right.png";
 import south_arrow from "Images/arrow_down.png";
-import sw_arrow  from "Images/arrow_down_left.png";
+import sw_arrow from "Images/arrow_down_left.png";
 import west_arrow from "Images/arrow_left.png";
 import nw_arrow from "Images/arrow_up_left.png";
 import east_arrow from "Images/arrow_right.png";
+import rainCloud from "Images/rainCloud.png";
 
 class RouteForecastMap extends Component {
 
@@ -20,7 +21,8 @@ class RouteForecastMap extends Component {
         this.markers = [];
         this.routePath = null;
         this.googleMapsApi = null;
-        this.state = {googleMapsPromise: loadGoogleMapsAPI({key:this.props.maps_api_key})};
+        this.googleMapsPromise = null;
+        this.state = {map:null};
     }
 
     static selectWindIcon(bearing) {
@@ -101,7 +103,7 @@ class RouteForecastMap extends Component {
     static addMarker(latitude, longitude, map, value, title, isRainy, bearing, windSpeed) {
     // Add the marker at the specified location
         let markerIcon = {
-                url: "http://cdn.mysitemyway.com/etc-mysitemyway/icons/legacy-previews/icons/blue-chrome-rain-icons-natural-wonders/050175-blue-chrome-rain-icon-natural-wonders-rain-cloud1.png",
+                url: rainCloud,
                 size: new google.maps.Size(320, 320),
                 scaledSize: new google.maps.Size(45, 50),
                 labelOrigin: new google.maps.Point(22,15),
@@ -161,27 +163,55 @@ class RouteForecastMap extends Component {
     }
 
     initMap(forecast, routeInfo) {
-        if (this.map===null) {
+        if (this.state.map === null) {
             return;
         }
         let southWest = { lat:routeInfo['bounds']['min_latitude'], lng:routeInfo['bounds']['min_longitude'] };
         let northEast = { lat:routeInfo['bounds']['max_latitude'], lng:routeInfo['bounds']['max_longitude'] };
         let mapBounds = new google.maps.LatLngBounds(southWest,northEast);
-        this.map.fitBounds(mapBounds);
+        this.state.map.fitBounds(mapBounds);
         RouteForecastMap.clearMarkers(this.markers);
-        this.markers = RouteForecastMap.addMarkers(forecast, this.map, this.markers);
+        this.markers = RouteForecastMap.addMarkers(forecast, this.state.map, this.markers);
         let routePoints = routeInfo['points'].map((point) => {return {lat:point.latitude, lng: point.longitude}});
         // clear out old route path line if any
         if (this.routePath != null) {
             this.routePath.setMap(null);
             this.routePath = null;
         }
-        this.routePath = this.drawRoute(routePoints,this.map);
+        this.routePath = this.drawRoute(routePoints,this.state.map);
     };
 
     drawTheMap(gmaps,forecast,routeInfo) {
         if (forecast.length > 0) {
             this.initMap(forecast, routeInfo);
+        }
+    }
+
+    componentWillReceiveProps(newProps) {
+        if (newProps.forecast.length > 0) {
+            if (this.googleMapsPromise === null) {
+                this.googleMapsPromise = loadGoogleMapsAPI({key:this.props.maps_api_key});
+            }
+            if (this.googleMapsApi === null) {
+                this.googleMapsPromise.then((googleMaps) => {
+                    this.googleMapsApi = googleMaps;
+                    const mapRef = this.refs.mapDiv;
+                    const node = ReactDOM.findDOMNode(mapRef);
+                    if (node === null) {
+                        return;
+                    }
+                    if (this.googleMapsApi === null) {
+                        return;
+                    }
+                    let map = new this.googleMapsApi.Map(node, {mapTypeId: google.maps.MapTypeId.ROADMAP});
+                    if (map === null) {
+                        return;
+                    }
+                    this.setState({map : map});
+                }).catch((err) => {
+                    console.error(err);
+                });
+            }
         }
     }
 
@@ -194,26 +224,6 @@ class RouteForecastMap extends Component {
     }
 
     componentDidUpdate(prevProps,prevState) {
-        if (this.googleMapsApi == null) {
-            this.state.googleMapsPromise.then((googleMaps) => {
-                this.googleMapsApi = googleMaps;
-                const mapRef = this.refs.mapDiv;
-                const node = ReactDOM.findDOMNode(mapRef);
-                if (node === null) {
-                    return;
-                }
-                if (this.googleMapsApi === null) {
-                    return;
-                }
-                let map = new this.googleMapsApi.Map(node, {mapTypeId: google.maps.MapTypeId.ROADMAP});
-                if (map === null) {
-                    return;
-                }
-                this.map = map;
-            }).catch((err) => {
-                console.error(err);
-            });
-        }
         this.drawTheMap(this.googleMapsApi, this.props.forecast, this.props.routeInfo);
     }
 
