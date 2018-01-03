@@ -88,6 +88,9 @@ class StravaRouteParser {
     }
 
     static walkActivity(start, distance, time, controlPoints) {
+        if (controlPoints.length===0) {
+            return;
+        }
         let startMoment = moment(start);
         let controlsCopy = controlPoints.slice();
         let currentControl = controlsCopy.shift();

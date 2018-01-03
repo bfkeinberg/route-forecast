@@ -20,7 +20,7 @@ module.exports = merge(common, {
             dest: 'index.html',
             inline: true,
             minify: true,
-            extract: true,
+            extract: false,
             width: 1400,
             height: 1200,
             inlineImages: true,

@@ -168,9 +168,9 @@ class RouteInfoForm extends Component {
                 },
                 body:JSON.stringify({'longUrl':url})})
             .then(response => {
-            if (response.status === 200) {
+            if (response.ok) {
                 return response.json();
-            } else this.setState({errorDetails:JSON.stringify(response)})})
+            } else this.setState({errorDetails:`URL shortener failed with {response.status} {response.statusText}`})})
             .then(responseJson => {
             if (responseJson['id'] !== undefined) {
                 this.setState({shortUrl:responseJson['id']});
@@ -338,16 +338,19 @@ class RouteInfoForm extends Component {
             let route = parseInt(value);
             if (isNaN(route)) {
                 let routeParts = value.split('/');
-                route = routeParts.pop();
+                route = parseInt(routeParts.pop());
             }
             return route;
         }
         return value;
     }
 
-    handleRwgpsRoute(event) {
-        let route = RouteInfoForm.getRouteNumberFromValue(event.target.value);
+    handleRwgpsRoute(value) {
+        let route = RouteInfoForm.getRouteNumberFromValue(value);
         if (route !== '') {
+            if (isNaN(route)) {
+                return;
+            }
             this.loadFromRideWithGps(route,this.state.rwgpsRouteIsTrip);
             // clear file input to avoid confusion
             document.getElementById('route').value = null;
@@ -358,8 +361,11 @@ class RouteInfoForm extends Component {
         }
     }
 
-    setRwgpsRoute(event) {
-        let route = RouteInfoForm.getRouteNumberFromValue(event.target.value);
+    setRwgpsRoute(value) {
+        let route = RouteInfoForm.getRouteNumberFromValue(value);
+        if (isNaN(route)) {
+            return;
+        }
         this.setState({rwgpsRoute : route});
         if(this.parser !== undefined) {
             this.parser.clear();
@@ -436,7 +442,7 @@ class RouteInfoForm extends Component {
         let later = new Date();
         const daysToAdd = 14;
         later.setDate(now.getDate() + daysToAdd);
-        let buttonStyle = this.disableSubmit() ? {pointerEvents : 'none',padding:'14px',display:'inline-flex'} : {padding:'14px'};
+        let buttonStyle = this.disableSubmit() ? {pointerEvents : 'none', display:'inline-flex'} : null;
 
         const header = (<div style={{textAlign:"center",'fontSize':'99%'}}>Forecast and time estimate</div>);
         return (
@@ -506,9 +512,39 @@ class RouteInfoForm extends Component {
                         <ControlLabel>RideWithGps route</ControlLabel>
                         <OverlayTrigger placement="bottom" overlay={rwgps_enabled_tooltip}>
                             <FormControl tabIndex='5' type="text"
-                                         onBlur={this.handleRwgpsRoute}
+                                         onBlur={event => {this.handleRwgpsRoute(event.target.value)}}
                                          onKeyPress={RouteInfoForm.isNumberKey}
-                                         onChange={this.setRwgpsRoute}
+                                         onChange={event => {this.setRwgpsRoute(event.target.value)}}
+                                         onDrop={event => {
+                                             let dt = event.dataTransfer;
+                                             if (dt.items) {
+                                                 for (let i=0; i < dt.items.length; i++) {
+                                                     if (dt.items[i].kind === 'string') {
+                                                         event.preventDefault();
+                                                         dt.items[i].getAsString(value => {
+                                                             this.setRwgpsRoute(value);
+                                                             this.handleRwgpsRoute(value);
+                                                         });
+                                                     } else {
+                                                         console.log('vetoing drop of',i,dt.items[i].kind);
+                                                         return false;
+                                                     }
+                                                 }
+                                             }
+                                             }}
+                                         onDragOver={event => {
+                                             event.preventDefault();
+                                             event.dataTransfer.dropEffect = 'move';
+                                         }}
+                                         onDragEnd={event => {
+                                             let dt = event.dataTransfer;
+                                             if (dt.items) {
+                                                 // Use DataTransferItemList interface to remove the drag data
+                                                 for (let i = 0; i < dt.items.length; i++) {
+                                                     dt.items.remove(i);
+                                                 }
+                                             }
+                                         }}
                                          pattern="[0-9]*"
                                          value={this.state.rwgpsRoute}
                                          style={{'width':'8em',height:'3em', padding:'12px',flex:'1',display:'inline-flex',alignItems:'center'}}/>

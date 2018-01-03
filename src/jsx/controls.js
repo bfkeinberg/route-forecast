@@ -80,8 +80,8 @@ class ControlPoints extends Component {
         return parser.default;
     }
 
-    setStravaActivity(event) {
-        let newValue = parseInt(RouteInfoForm.getRouteNumberFromValue(event.target.value), 10);
+    setStravaActivity(value) {
+        let newValue = parseInt(RouteInfoForm.getRouteNumberFromValue(value), 10);
         if (Number.isNaN(newValue)) {
             return;
         }
@@ -101,8 +101,8 @@ class ControlPoints extends Component {
         }
     }
 
-    updateExpectedTimes(event) {
-        let newValue = parseInt(event.target.value,10);
+    updateExpectedTimes(value) {
+        let newValue = parseInt(value,10);
         if (isNaN(newValue)) {
             return;
         }
@@ -200,7 +200,39 @@ class ControlPoints extends Component {
                         <ErrorBoundary>
                             <FormGroup controlId="actualRide" style={{visibility:this.state.lookback ? null : 'hidden', display:'inline-flex'}}>
                                 <ControlLabel style={{display:'inline-flex'}}>Strava</ControlLabel>
-                                <FormControl tabIndex='-1' type="text" style={{display:'inline-flex'}} value={this.state.strava_activity} onChange={this.setStravaActivity} onBlur={this.updateExpectedTimes}/>
+                                <FormControl tabIndex='-1' type="text" style={{display:'inline-flex'}}
+                                             onDrop={event => {
+                                                 let dt = event.dataTransfer;
+                                                 if (dt.items) {
+                                                     for (let i=0; i < dt.items.length; i++) {
+                                                         if (dt.items[i].kind === 'string') {
+                                                             event.preventDefault();
+                                                             dt.items[i].getAsString(value => {
+                                                                 this.setStravaActivity(value);
+                                                                 this.updateExpectedTimes(this.state.strava_activity);
+                                                             });
+                                                         } else {
+                                                             console.log('vetoing drop of',i,dt.items[i].kind);
+                                                             return false;
+                                                         }
+                                                     }
+                                                 }
+                                             }}
+                                             onDragOver={event => {
+                                                 event.preventDefault();
+                                                 event.dataTransfer.dropEffect = 'move';
+                                             }}
+                                             onDragEnd={event => {
+                                                 let dt = event.dataTransfer;
+                                                 if (dt.items) {
+                                                     // Use DataTransferItemList interface to remove the drag data
+                                                     for (let i = 0; i < dt.items.length; i++) {
+                                                         dt.items.remove(i);
+                                                     }
+                                                 }
+                                             }}
+                                             value={this.state.strava_activity} onChange={event => {this.setStravaActivity(event.target.value)}}
+                                             onBlur={event => {this.updateExpectedTimes(this.state.strava_activity)}}/>
                             </FormGroup>
                             {this.state.stravaAlertVisible?<Alert onDismiss={this.hideStravaErrorAlert} bsStyle='warning'>{this.state.stravaError}</Alert>:null}
                             {ControlPoints.showProgressSpinner(this.state.isUpdating)}
