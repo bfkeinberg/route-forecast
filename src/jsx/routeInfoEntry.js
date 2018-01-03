@@ -455,7 +455,6 @@ class RouteInfoForm extends Component {
                             <ControlLabel>Starting time</ControlLabel>
                         </OverlayTrigger>
                         <Icon iconName="calendar"/>
-                        {/*<span style={{display: 'inline-flex'}} className="pt-icon-standard pt-icon-calendar"/>*/}
                         <Flatpickr onChange={this.setDateAndTime}
                                    options={{enableTime: true,
                             altInput: true, altFormat: 'F j, Y h:i K',

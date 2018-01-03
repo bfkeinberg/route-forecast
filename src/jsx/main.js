@@ -214,7 +214,7 @@ class RouteWeatherUI extends React.Component {
             </MediaQuery>
             <MediaQuery maxDeviceWidth={800}>
                 <SplitPane defaultSize={this.state.formVisible?500:250} minSize={120} maxSize={600} split="horizontal" pane2Style={{'overflow':'scroll'}}>
-                    <SplitPane defaultSize={this.state.formVisible?308:33} minSize={30} split="horizontal" pane2Style={{'overflow':'scroll'}}>
+                    <SplitPane defaultSize={this.state.formVisible?319:33} minSize={30} split="horizontal" pane2Style={{'overflow':'scroll'}}>
                         {this.state.formVisible ? inputForm : formButton}
                         <ControlPoints controlPoints={this.state.controlPoints}
                                           updateControls={this.updateControls}

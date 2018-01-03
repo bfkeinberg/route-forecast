@@ -31,7 +31,7 @@ class ControlTable extends React.Component {
         if (this.api===undefined) {
             return;
         }
-        let row = {name:'',id:this.props.controls.length};
+        let row = {name:'',durarion:0,distance:0,id:this.props.controls.length};
         let result = this.api.updateRowData({add:[row], addIndex:row.id});
         // focus on new control if one has been added
         this.api.setFocusedCell(this.props.controls.length,'name',null);

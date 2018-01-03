@@ -243,10 +243,12 @@ class ControlPoints extends Component {
                 <ErrorBoundary>
                     <MediaQuery minDeviceWidth={1000}>
                         <Panel header={title} bsStyle="info" style={{margin:'10px'}}>
+
                             <ErrorBoundary>
                                 <ControlTable rows={this.props.controlPoints.length} controls={this.props.controlPoints}
                                               displayBanked={this.state.displayBankedTime} compare={this.state.lookback} update={this.updateFromTable} ref={(table) => {this.table = table;}}/>
                             </ErrorBoundary>
+
                         </Panel>
                     </MediaQuery>
                     <MediaQuery maxDeviceWidth={800}>
