@@ -130,6 +130,9 @@ class ControlTable extends Component {
     shouldComponentUpdate(nextProps,nextState) {
         // compare controls
         let controls = this.props.controls;
+        if (nextProps.displayBanked !== this.props.displayBanked) {
+            return true;
+        }
         return !(nextProps.controls.length===this.props.controls.length &&
             nextProps.controls.every((v,i)=> ControlTable.doControlsMatch(v,controls[i])));
     }
@@ -174,6 +177,9 @@ class ControlTable extends Component {
     }
 
     render() {
+        if (this.api !== undefined && window.outerWidth < smallScreenWidth) {
+            this.api.sizeColumnsToFit();
+        }
         this.props.controls.forEach((row,key) => row.id=key);
         let displayBanked = this.props.displayBanked;
         return (<div className="ag-theme-fresh">
