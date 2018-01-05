@@ -46,7 +46,8 @@ class StravaRouteParser {
                         errorCallback(activityStream.message);
                         return;
                     }
-                    this.updateControls(this.parseActivity(activityData, activityStream, controlPoints), this.computeActualFinishTime(activityData));
+                    this.updateControls(this.parseActivity(activityData, activityStream, controlPoints),
+                        this.computeActualFinishTime(activityData), this.wwPaceCalc(activityData));
                 }, error => {
                     if (errorCallback !== undefined) {
                         errorCallback(error);
@@ -66,6 +67,18 @@ class StravaRouteParser {
                 console.log('Failed to load Strava activity data', error);
             }
         });
+    }
+
+    wwPaceCalc(activity) {
+        // all below in meters
+        let average_speed_in_meters = activity.average_speed;
+        let averageSpeedInMilesPerHour = (average_speed_in_meters*3600)*metersToMiles;
+        let climbInMeters = activity.total_elevation_gain;
+        let distanceInMeters = activity.distance;
+        let climbInFeet = (climbInMeters * 3.2808);
+        let distanceInMiles = distanceInMeters*metersToMiles;
+        let hilliness = Math.floor(Math.min((climbInFeet / distanceInMiles) / 25, 5));
+        return averageSpeedInMilesPerHour + hilliness;
     }
 
     computeActualFinishTime(activity) {

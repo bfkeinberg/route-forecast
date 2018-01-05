@@ -22,6 +22,10 @@ import queryString from 'query-string';
 import cookie from 'react-cookies';
 import ErrorBoundary from './errorBoundary';
 
+/*
+TODO:
+integrate with jsErrLog
+ */
 // To add to window
 if (!window.Promise) {
     window.Promise = Promise;
@@ -37,6 +41,7 @@ class RouteWeatherUI extends React.Component {
         this.updateFinishTime = this.updateFinishTime.bind(this);
         this.formatControlsForUrl = this.formatControlsForUrl.bind(this);
         this.setActualFinishTime = this.setActualFinishTime.bind(this);
+        this.setActualPace = this.setActualPace.bind(this);
         this.invalidateForecast = this.invalidateForecast.bind(this);
         let script = document.getElementById( "routeui" );
         let queryParams = queryString.parse(location.search);
@@ -89,6 +94,9 @@ class RouteWeatherUI extends React.Component {
         if (newState.actualFinishTime !== this.state.actualFinishTime) {
             return true;
         }
+        if (newState.actualPace !== this.state.actualPace) {
+            return true;
+        }
         if (newState.forecastValid !== this.state.forecastValid) {
             return true;
         }
@@ -127,6 +135,10 @@ class RouteWeatherUI extends React.Component {
 
     setActualFinishTime(actualFinishTime) {
         this.setState({actualFinishTime:actualFinishTime});
+    }
+
+    setActualPace(actualPace) {
+        this.setState({actualPace:actualPace});
     }
 
     updateRouteInfo(routeInfo,controlPoints) {
@@ -169,6 +181,7 @@ class RouteWeatherUI extends React.Component {
                            controlPoints={this.state.controlPoints}
                            formVisible={this.state.formVisible}
                            metric={this.state.metric}
+                           actualPace={this.state.actualPace}
                            updateFinishTime={this.updateFinishTime}
                            start={queryParams.start}
                            pace={queryParams.pace}
@@ -196,6 +209,7 @@ class RouteWeatherUI extends React.Component {
                                           finishTime={this.state.routeInfo['finishTime']}
                                           actualFinishTime={this.state.actualFinishTime}
                                           setActualFinishTime={this.setActualFinishTime}
+                                          setActualPace={this.setActualPace}
                                           strava_token={this.strava_token}
                                           strava_activity={queryParams.strava_activity}
                                           strava_error={queryParams.strava_error}
@@ -223,12 +237,14 @@ class RouteWeatherUI extends React.Component {
                                           finishTime={this.state.routeInfo['finishTime']}
                                           actualFinishTime={this.state.actualFinishTime}
                                           setActualFinishTime={this.setActualFinishTime}
+                                          setActualPace={this.setActualPace}
                                           strava_error={queryParams.strava_error}
                                           strava_token={this.strava_token}
                                           forecastValid={this.state.forecastValid}
                                           name={this.state.routeInfo['name']}/>
                     </SplitPane>
-                    <ForecastTable forecast={this.state.forecast} weatherCorrectionMinutes={this.state.weatherCorrectionMinutes}/>
+                    {!this.state.formVisible?
+                        <ForecastTable forecast={this.state.forecast} weatherCorrectionMinutes={this.state.weatherCorrectionMinutes}/>:<div/>}
                 </SplitPane>
             </MediaQuery>
         </div>

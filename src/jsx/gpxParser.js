@@ -99,23 +99,23 @@ class AnalyzeRoute {
                 if (response === undefined) {
                     reject("Could not get Ride with GPS results");
                 }
-                    this.rwgpsRouteData = response;
-                    this.gpxResult = null;
-                    let rwgpsRouteDatum = this.rwgpsRouteData[this.rwgpsRouteData['trip'] === undefined ? 'route' : 'trip'];
-                    if (rwgpsRouteDatum === undefined) {
-                        reject('RWGPS route info unavailable');
-                    }
-                    let point = rwgpsRouteDatum['track_points'][0];
-                    //TODO using current date and time for zone lookup could pose a problem in future
-                    let timeZonePromise = this.findTimezoneForPoint(point.y, point.x, moment());
-                    timeZonePromise.then(timeZoneResult => {
-                        this.timeZone = timeZoneResult;
-                        resolve(true);
-                    }, error => {
-                        reject(error);
-                    });
+                this.rwgpsRouteData = response;
+                this.gpxResult = null;
+                let rwgpsRouteDatum = this.rwgpsRouteData[this.rwgpsRouteData['trip'] === undefined ? 'route' : 'trip'];
+                if (rwgpsRouteDatum === undefined) {
+                    reject('RWGPS route info unavailable');
                 }
-            ).catch(error => {
+                let point = rwgpsRouteDatum['track_points'][0];
+                //TODO using current date and time for zone lookup could pose a problem in future
+                let timeZonePromise = this.findTimezoneForPoint(point.y, point.x, moment());
+                timeZonePromise.then(timeZoneResult => {
+                    this.timeZone = timeZoneResult;
+                    resolve(true);
+                }, error => {
+                    reject(error);
+                });
+            },
+            error => {
                 reject(error.message);
             });
         });

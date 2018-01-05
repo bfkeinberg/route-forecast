@@ -1,13 +1,44 @@
+/*
 h1 {
     color: navy;
     margin-left: 20px;
 }
+*/
+#red-tooltip > .tooltip-inner {
+    background-color: #ff363d;
+    color: #000;
+    border: 1px solid #062e56;
+}
+
+#red-tooltip > .tooltip-arrow {
+    border-top: 5px solid #062e56;
+}
+
+#green-tooltip > .tooltip-inner {
+    background-color: #40ff23;
+    color: #000;
+    border: 1px solid #062e56;
+}
+
+#green-tooltip > .tooltip-arrow {
+    border-top: 5px solid #062e56;
+}
+
+@media (min-width: 800px) {
+    input#ridewithgps {
+        width: 8em;
+        height: 3em;
+        padding: 12px;
+    }
+}
+/*
 #content input_1[disabled] {
     color: #DCDAD1;
     padding: 2px;
     margin: 0 0 0 0;
     background-image: none;
 }
+*/
 
 .rwgpsLogin {
     background: url(https://ridewithgps.com/images/logo_trans_black.png?1) no-repeat;

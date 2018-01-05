@@ -9,7 +9,7 @@ module.exports = merge(common, {
             new webpack.LoaderOptionsPlugin({
                 debug: true
             }),
-            new HtmlCriticalPlugin({
+/*            new HtmlCriticalPlugin({
                 base: path.resolve(__dirname, 'dist/'),
                 src: 'index.html',
                 dest: 'index.html',
@@ -28,7 +28,7 @@ module.exports = merge(common, {
                         basePath: 'homepage'
                     },
                 }
-            }),
+            }),*/
         ],
         output: {
             pathinfo:true

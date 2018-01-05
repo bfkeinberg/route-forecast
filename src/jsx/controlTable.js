@@ -1,18 +1,37 @@
-import React from 'react';
+import React, {Component} from 'react';
 import {Button} from '@blueprintjs/core';
 
-import {AgGridColumn, AgGridReact} from 'ag-grid-react';
+import {AgGridReact} from 'ag-grid-react';
 import ReactDOM from 'react-dom';
 
-class ControlTable extends React.Component {
+const smallScreenWidth = 800;
+
+class ControlTable extends Component {
     constructor(props) {
         super(props);
-        this.state = {rowCount:0,rowsToRemove:[]};
-        this.addToRemoveList = this.addToRemoveList.bind(this);
-        this.addRow = this.addRow.bind(this);
-        this.removeRow = this.removeRow.bind(this);
-        this.onGridReady = this.onGridReady.bind(this);
+        let displayBanked = this.props.displayBanked;
         this.deleteRenderer = this.deleteRenderer.bind(this);
+        this.removeRow = this.removeRow.bind(this);
+        this.state = {rowCount:0,
+            columnDefs:[
+                {colId:'name', field:'name', unSortIcon:true, suppressSorting:true, editable:true, headerName:'Name'},
+                {field:'distance', headerTooltip:'In miles or km, depending on the metric checkbox',
+                    type:'numericColumn', unSortIcon:true, editable:true, valueParser:ControlTable.setData, valueSetter:ControlTable.validateData, headerName:'Distance'},
+                {field:'duration', headerTooltip:'How many minutes you expect to spend at this control',
+                    suppressSorting:true, type:'numericColumn', editable:true, valueParser:params=>{return Number(params.newValue)},
+                    valueSetter:ControlTable.validateData, valueFormatter:ControlTable.appendUnit, headerName:'Expected time spent'},
+                {field:'arrival', headerTooltip:'When you are predicted to arrive here',
+                    cellRenderer:"agAnimateShowChangeCellRenderer", type:'numericColumn',
+                    suppressNavigable:true, suppressSorting:true, enableCellChangeFlash:true, headerName:'Est. arrival time'},
+                {colId:'actual', field:'actual', suppressSorting:true, enableCellChangeFlash:true, cellRenderer:"agAnimateShowChangeCellRenderer",
+                    headerTooltip:'When you actually arrived here', suppressNavigable:true, hide:!this.props.compare, headerName:'Actual arrival time'},
+                {colId:'banked', field:'banked', headerTooltip:'Time remaining at brevet pace',
+                    cellRenderer:"agAnimateShowChangeCellRenderer",
+                    suppressNavigable:true, suppressSorting:true, type:'numericColumn', valueFormatter:ControlTable.appendUnit, hide:!displayBanked, headerName:'Banked time'},
+                {suppressNavigable:true, suppressSorting:true, cellRenderer:this.deleteRenderer}
+            ]};
+        this.addRow = this.addRow.bind(this);
+        this.onGridReady = this.onGridReady.bind(this);
         this.cellUpdated = this.cellUpdated.bind(this);
         this.sortChanged = this.sortChanged.bind(this);
         this.updateFromGrid = this.updateFromGrid.bind(this);
@@ -21,20 +40,20 @@ class ControlTable extends React.Component {
     onGridReady(params) {
         this.api = params.api;
         this.columnApi = params.columnApi;
-    }
-
-    addToRemoveList(row) {
-        this.removeRow(this.api.getRowNode(row));
+        if (window.outerWidth < smallScreenWidth) {
+            this.api.autoSizeColumns();
+        }
     }
 
     addRow() {
         if (this.api===undefined) {
             return;
         }
-        let row = {name:'',durarion:0,distance:0,id:this.props.controls.length};
+        let row = {name:'',duration:0,distance:0,id:this.props.controls.length};
         let result = this.api.updateRowData({add:[row], addIndex:row.id});
         // focus on new control if one has been added
         this.api.setFocusedCell(this.props.controls.length,'name',null);
+        // this.api.startEditingCell(this.api.getFocusedCell());
     }
 
     removeRow(row) {
@@ -59,7 +78,8 @@ class ControlTable extends React.Component {
 
     // create a DOM object
     deleteRenderer(params) {
-        const deleteButton = <Button onClick={event=>this.addToRemoveList(params.node.id)} iconName={'delete'}></Button>;
+        let rowNode = this.api.getRowNode(params.node.id);
+        const deleteButton = <Button onClick={event => {this.removeRow(rowNode)}} iconName={'delete'}/>;
         let eDiv = document.createElement('div');
         ReactDOM.render(deleteButton, eDiv);
         return eDiv;
@@ -114,7 +134,7 @@ class ControlTable extends React.Component {
             nextProps.controls.every((v,i)=> ControlTable.doControlsMatch(v,controls[i])));
     }
 
-    setData(params) {
+    static setData(params) {
         return Number(params.newValue);
     }
 
@@ -158,11 +178,14 @@ class ControlTable extends React.Component {
         let displayBanked = this.props.displayBanked;
         return (<div className="ag-theme-fresh">
             <AgGridReact enableColResize enableSorting animateRows sortingOrder={['asc']} unSortIcon rowData={this.props.controls}
-                         onGridReady={this.onGridReady} onSortChanged={this.sortChanged}
-                         onCellValueChanged={this.cellUpdated} tabToNextCell={ControlTable.tabHandler} getRowNodeId={data => data.id}>
-                <AgGridColumn colId='name' field='name' unSortIcon={true} suppressSorting editable={true} headerName='Name'></AgGridColumn>
+    onGridReady={this.onGridReady} onSortChanged={this.sortChanged} singleClickEdit
+    onCellValueChanged={this.cellUpdated} tabToNextCell={ControlTable.tabHandler} getRowNodeId={data => data.id}
+    columnDefs={this.state.columnDefs}/>
+{/*
+            >
+{                <AgGridColumn colId='name' field='name' unSortIcon={<true></true>} suppressSorting editable={true} headerName='Name'></AgGridColumn>
                 <AgGridColumn field='distance' headerTooltip='In miles or km, depending on the metric checkbox'
-                              type={'numericColumn'} unSortIcon={true} editable={true} valueParser={this.setData} valueSetter={ControlTable.validateData} headerName='Distance'></AgGridColumn>
+                              type={'numericColumn'} unSortIcon={true} editable={true} valueParser={ControlTable.setData} valueSetter={ControlTable.validateData} headerName='Distance'></AgGridColumn>
                 <AgGridColumn field='duration' headerTooltip='How many minutes you expect to spend at this control'
                               suppressSorting type={'numericColumn'} editable={true} valueParser={params=>{return Number(params.newValue)}}
                               valueSetter={ControlTable.validateData} valueFormatter={ControlTable.appendUnit} headerName='Expected time spent'></AgGridColumn>
@@ -174,8 +197,8 @@ class ControlTable extends React.Component {
                 <AgGridColumn colId='banked' field='banked' headerTooltip='Time remaining at brevet pace'
                               cellRenderer="agAnimateShowChangeCellRenderer"
                               suppressNavigable suppressSorting type={'numericColumn'} valueFormatter={ControlTable.appendUnit} hide={!displayBanked} headerName='Banked time'></AgGridColumn>
-                <AgGridColumn suppressNavigable suppressSorting cellRenderer={this.deleteRenderer}></AgGridColumn>
-            </AgGridReact>
+                <AgGridColumn suppressNavigable suppressSorting cellRenderer={this.deleteRenderer}></AgGridColumn>*!/}
+            </AgGridReact>*/}
         </div>);
     }
 }

@@ -30,7 +30,7 @@ const interval_tooltip = (
     <Tooltip id="interval_tooltip">How often to generate weather forecast</Tooltip>
 );
 
-const rwgps_enabled_tooltip = (
+const tooltip_rwgps_enabled = (
     <Tooltip id="rwgps_tooltip">The number for a route on ridewithgps</Tooltip>
 );
 
@@ -170,7 +170,7 @@ class RouteInfoForm extends Component {
             .then(response => {
             if (response.ok) {
                 return response.json();
-            } else this.setState({errorDetails:`URL shortener failed with {response.status} {response.statusText}`})})
+            } else this.setState({errorDetails:`URL shortener failed with ${response.status} ${response.statusText}`})})
             .then(responseJson => {
             if (responseJson['id'] !== undefined) {
                 this.setState({shortUrl:responseJson['id']});
@@ -425,13 +425,36 @@ class RouteInfoForm extends Component {
             nextState['shortUrl'] !== this.state.shortUrl ||
             nextProps['metric'] !== this.props.metric ||
             nextState['shortUrl']!== this.state.shortUrl ||
+            nextProps['actualPace']!== this.props.actualPace ||
             nextState['start']!== this.state.start;
+    }
+
+    getAlphaPace(pace) {
+        let alpha = 'A';     // default
+        alpha = Object.keys(paceToSpeed).reverse().find(value => {
+            return (pace > paceToSpeed[value])});
+        return alpha;
+    }
+
+    static getPaceTooltipId(realPace, predictedPace) {
+        if (realPace < predictedPace) {
+            return 'red-tooltip';
+        } else {
+            return 'green-tooltip';
+        }
     }
 
     render() {
         let pace_mph = paceToSpeed[this.state.pace];
-        let pace_text = "Represents climb-adjusted pace - current is ".concat(pace_mph);
-        let pace_tooltip = ( <Tooltip id="pace_tooltip">{pace_text}</Tooltip> );
+        let pace_text;
+        let pace_tooltip_id = 'pace_tooltip';
+        if (this.props.actualPace === undefined) {
+            pace_text = `Represents climb-adjusted pace - current is ${pace_mph}`;
+        } else {
+            pace_tooltip_id = RouteInfoForm.getPaceTooltipId(this.props.actualPace,pace_mph);
+            pace_text = `Actual riding pace was ${this.getAlphaPace(this.props.actualPace)}`;
+        }
+        let pace_tooltip = ( <Tooltip id={pace_tooltip_id}>{pace_text}</Tooltip> );
         let file_upload_tooltip = ( <Tooltip id="upload_tooltip">Upload a .gpx file describing your route</Tooltip> );
         let forecast_tooltip = this.disableSubmit() ? (
             <Tooltip id="forecast_tooltip">Must either upload a gpx file or provide an rwgps route id</Tooltip> ):
@@ -494,6 +517,7 @@ class RouteInfoForm extends Component {
                     <OverlayTrigger trigger="click" placement="right" rootClose overlay={rideRatingDisplay}>
                         <Button style={{marginLeft:'7px'}} bsSize="xsmall">Pace explanation</Button>
                     </OverlayTrigger>
+
                     {/*<a style={{padding:'8px',display:'inline-flex',marginTop:'5px',marginBottom:'5px'}} href="https://westernwheelersbicycleclub.wildapricot.org/page-1374754" target="_blank">Pace explanation</a>*/}
                     <FormGroup bsSize='small'
                                bsClass='formGroup hidden-xs hidden-sm'
@@ -505,11 +529,12 @@ class RouteInfoForm extends Component {
                             <FormControl tabIndex='4' type="file" name='route' accept=".gpx" id='route' onChange={this.updateRouteFile}/>
                         </OverlayTrigger>
                     </FormGroup>
+
                     <FormGroup
                         validationState={this.decideValidationStateFor('rwgps',this.state.errorSource,this.state.succeeded)}
                         controlId="ridewithgps" style={{flex:'1',display:'inline-flex',marginTop:'5px',marginBottom:'5px'}}>
                         <ControlLabel>RideWithGps route</ControlLabel>
-                        <OverlayTrigger placement="bottom" overlay={rwgps_enabled_tooltip}>
+                        <OverlayTrigger placement="bottom" overlay={tooltip_rwgps_enabled}>
                             <FormControl tabIndex='5' type="text"
                                          onBlur={event => {this.handleRwgpsRoute(event.target.value)}}
                                          onKeyPress={RouteInfoForm.isNumberKey}
@@ -546,9 +571,10 @@ class RouteInfoForm extends Component {
                                          }}
                                          pattern="[0-9]*"
                                          value={this.state.rwgpsRoute}
-                                         style={{'width':'8em',height:'3em', padding:'12px',flex:'1',display:'inline-flex',alignItems:'center'}}/>
+                                         style={{flex:'1',display:'inline-flex',alignItems:'center'}}/>
                         </OverlayTrigger>
                     </FormGroup>
+
                     {/* if we want to allow selecting rwgps trips also
 
                      <FormGroup controlId="rwgpsType">
@@ -578,8 +604,13 @@ class RouteInfoForm extends Component {
                     {RouteInfoForm.showErrorDetails(this.state.errorDetails)}
                     {RouteInfoForm.showProgressSpinner(this.state.routeUpdating)}
                 </Form>
-            </Panel>
-            <ShortUrl shortUrl={this.state.shortUrl}/>
+                    <MediaQuery maxDeviceWidth={800}>
+                        <ShortUrl shortUrl={this.state.shortUrl}/>
+                    </MediaQuery>
+                </Panel>
+            <MediaQuery minDeviceWidth={1000}>
+                <ShortUrl shortUrl={this.state.shortUrl}/>
+            </MediaQuery>
             </div>
         );
     }

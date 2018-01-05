@@ -58,9 +58,10 @@ class ControlPoints extends Component {
         }
     }
 
-    updateActualValues(controlPoints,finishTime) {
+    updateActualValues(controlPoints,finishTime,pace) {
         this.props.updateControls(controlPoints,this.state.metric);
         this.props.setActualFinishTime(finishTime);
+        this.props.setActualPace(pace);
     }
 
     updateProgress(isUpdating) {

@@ -51,7 +51,7 @@ module.exports = {
         new CleanWebpackPlugin([BUILD_DIR + '/*.*',STATIC_DIR + '/*.*'] , {watch:true, verbose:false}),
         new ExtractTextPlugin({filename:"styles.css",allChunks:true}),
         new HtmlWebpackPlugin({
-            title:'Find weather forecast for route',
+            title:'Plan long bike ride',
             filename:path.resolve(BUILD_DIR, 'index.html'),
             template:path.resolve(TEMPLATE_DIR,'base_index.html'),
             inject:false,
