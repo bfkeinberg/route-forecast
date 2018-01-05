@@ -41,7 +41,7 @@ class ControlTable extends Component {
         this.api = params.api;
         this.columnApi = params.columnApi;
         if (window.outerWidth < smallScreenWidth) {
-            this.api.autoSizeColumns();
+            this.api.sizeColumnsToFit();
         }
     }
 
