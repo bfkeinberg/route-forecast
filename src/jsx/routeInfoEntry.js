@@ -20,7 +20,7 @@ import rideRatingText from './rideRating.htm';
 
 const queryString = require('query-string');
 
-const paceToSpeed = {'A':10, 'B':12, 'C':14, 'C+':15, 'D-':15, 'D':16, 'D+':17, 'E-':17, 'E':18};
+export const paceToSpeed = {'A':10, 'B':12, 'C':14, 'C+':15, 'D-':15, 'D':16, 'D+':17, 'E-':17, 'E':18};
 
 const time_tooltip = (
     <Tooltip id="time_tooltip">When you plan to begin riding</Tooltip>
