@@ -25,11 +25,11 @@ class ControlPoints extends Component {
         strava_token: PropTypes.string.isRequired,
         controlPoints: PropTypes.array.isRequired,
         finishTime: PropTypes.string.isRequired,
-        strava_error: PropTypes.string.isRequired,
+        strava_error: PropTypes.string,
         setActualPace:PropTypes.func.isRequired,
         setActualFinishTime:PropTypes.func.isRequired,
-        strava_activity:PropTypes.number.isRequired,
-        actualFinishTime:PropTypes.string.isRequired,
+        strava_activity:PropTypes.number,
+        actualFinishTime:PropTypes.string,
         updateControls:PropTypes.func.isRequired,
         forecastValid:PropTypes.bool.isRequired,
         name:PropTypes.string
@@ -213,7 +213,8 @@ class ControlPoints extends Component {
                         <Checkbox tabIndex='11' checked={this.state.displayBankedTime} inline
                                   onChange={this.toggleDisplayBanked} onClick={this.toggleDisplayBanked}
                                   style={{padding:'0px 0px 0px 24px', display:'inline-flex'}}>Display banked time</Checkbox>
-                        <Checkbox tabIndex="13" checked={true} inline onChange={this.toggleCompare} onClick={this.toggleCompare} style={{display:'inline-flex'}}>Compare</Checkbox>
+                        <Checkbox tabIndex="13" checked={this.state.lookback} disabled={!this.props.forecastValid} inline onChange={this.toggleCompare}
+                                  onClick={this.toggleCompare} style={{visibility:this.state.lookback ? null : 'hidden', display:'inline-flex'}}>Compare</Checkbox>
                         <ErrorBoundary>
                             <FormGroup controlId="actualRide" style={{display:'inline-flex'}}>
                                 <ControlLabel style={{display:'inline-flex'}}>Strava</ControlLabel>
@@ -228,9 +229,6 @@ class ControlPoints extends Component {
                                                                  this.setStravaActivity(value);
                                                                  this.updateExpectedTimes(this.state.strava_activity);
                                                              });
-                                                             //this.state.lookback
-                                                             //disabled={!this.props.forecastValid}
-                                                             //style={{visibility:this.state.lookback ? null : 'hidden', display:'inline-flex'}}
                                                          } else {
                                                              console.log('vetoing drop of',i,dt.items[i].kind);
                                                              return false;

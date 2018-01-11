@@ -6,7 +6,7 @@ import PropTypes from 'prop-types';
 
 class ForecastTable extends Component {
     static propTypes = {
-        weatherCorrectionMinutes:PropTypes.number.isRequired,
+        weatherCorrectionMinutes:PropTypes.number,
         forecast:PropTypes.array.isRequired
     };
 

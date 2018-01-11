@@ -57,8 +57,8 @@ class RouteInfoForm extends Component {
     static propTypes = {
         start:PropTypes.string.isRequired,
         pace:PropTypes.string.isRequired,
-        interval:PropTypes.number.isRequired,
-        rwgpsRoute:PropTypes.number.isRequired,
+        interval:PropTypes.string.isRequired,
+        rwgpsRoute:PropTypes.string.isRequired,
         timezone_api_key:PropTypes.string.isRequired,
         controlPoints:PropTypes.array.isRequired,
         metric:PropTypes.bool.isRequired,
@@ -70,7 +70,7 @@ class RouteInfoForm extends Component {
         updateControls:PropTypes.func.isRequired,
         formatControlsForUrl:PropTypes.func.isRequired,
         invalidateForecast:PropTypes.func.isRequired,
-        actualPace:PropTypes.number.isRequired
+        actualPace:PropTypes.number
     };
 
     constructor(props) {

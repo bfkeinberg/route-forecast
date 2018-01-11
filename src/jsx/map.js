@@ -11,7 +11,7 @@ import nw_arrow from "Images/arrow_up_left.png";
 import east_arrow from "Images/arrow_right.png";
 import rainCloud from "Images/rainCloud.png";
 
-const google=window.google;
+/*global google*/
 
 class RouteForecastMap extends Component {
     static propTypes = {
