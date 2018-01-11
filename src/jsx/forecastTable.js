@@ -2,8 +2,13 @@ import React, {Component} from 'react';
 import {Table} from 'react-bootstrap';
 import ErrorBoundary from "./errorBoundary";
 import darkSky from 'Images/darkSkySmall.png';
+import PropTypes from 'prop-types';
 
 class ForecastTable extends Component {
+    static propTypes = {
+        weatherCorrectionMinutes:PropTypes.number.isRequired,
+        forecast:PropTypes.array.isRequired
+    };
 
     constructor(props) {
         super(props);
@@ -17,7 +22,7 @@ class ForecastTable extends Component {
         if (forecast.length > 0 && forecast[0].length > 5) {
             return (
                 <tbody>
-                {forecast.map((point, index, data) =>
+                {forecast.map((point) =>
                     /*<tr key={Math.random().toString(36).slice(2)}>*/
                     <tr key={point[0]+Math.random().toString(10)}>
                         <td>{point[0]}</td>

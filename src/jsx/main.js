@@ -195,7 +195,7 @@ class RouteWeatherUI extends React.Component {
             </ErrorBoundary>
         );
         const formButton = (
-            <Button bsStyle="primary" onClick={event => this.setState({formVisible:true})}>Show input</Button>
+            <Button bsStyle="primary" onClick={() => this.setState({formVisible:true})}>Show input</Button>
         );
         return (
         <div>
@@ -244,7 +244,8 @@ class RouteWeatherUI extends React.Component {
                                           name={this.state.routeInfo['name']}/>
                     </SplitPane>
                     {!this.state.formVisible?
-                        <ForecastTable forecast={this.state.forecast} weatherCorrectionMinutes={this.state.weatherCorrectionMinutes}/>:<div/>}
+                        <ForecastTable forecast={this.state.forecast} weatherCorrectionMinutes={this.state.weatherCorrectionMinutes}/>:
+                        <div/>}
                 </SplitPane>
             </MediaQuery>
         </div>

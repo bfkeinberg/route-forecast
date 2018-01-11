@@ -16,8 +16,24 @@ import ControlTable from './controlTable';
 import {Spinner} from '@blueprintjs/core';
 import RouteInfoForm from "./routeInfoEntry";
 import ErrorBoundary from './errorBoundary';
+import PropTypes from 'prop-types';
 
 class ControlPoints extends Component {
+
+    static propTypes = {
+        metric: PropTypes.bool.isRequired,
+        strava_token: PropTypes.string.isRequired,
+        controlPoints: PropTypes.array.isRequired,
+        finishTime: PropTypes.string.isRequired,
+        strava_error: PropTypes.string.isRequired,
+        setActualPace:PropTypes.func.isRequired,
+        setActualFinishTime:PropTypes.func.isRequired,
+        strava_activity:PropTypes.number.isRequired,
+        actualFinishTime:PropTypes.string.isRequired,
+        updateControls:PropTypes.func.isRequired,
+        forecastValid:PropTypes.bool.isRequired,
+        name:PropTypes.string
+    };
 
     constructor(props) {
         super(props);
@@ -91,8 +107,8 @@ class ControlPoints extends Component {
 
     computeTimesFromStrava(activity, controlPoints) {
         if (this.stravaParser === undefined) {
-            this.getStravaParser().then( stravaParser => {
-                this.stravaParser = new stravaParser(this.updateActualValues, this.updateProgress);
+            this.getStravaParser().then( StravaParser => {
+                this.stravaParser = new StravaParser(this.updateActualValues, this.updateProgress);
                 this.stravaParser.setToken(this.props.strava_token);
                 this.stravaParser.computeActualTimes(activity, controlPoints, this.stravaErrorCallback);
             });
@@ -127,17 +143,17 @@ class ControlPoints extends Component {
         this.table.addRow();
     }
 
-    toggleDisplayBanked(event) {
+    toggleDisplayBanked() {
         this.setState({displayBankedTime:!this.state.displayBankedTime});
     }
 
-    toggleMetric(event) {
+    toggleMetric() {
         let metric = !this.state.metric;
         this.setState({metric:metric});
         this.props.updateControls(this.props.controlPoints,metric);
     }
 
-    toggleCompare(event) {
+    toggleCompare() {
         let lookback = !this.state.lookback;
         this.setState({lookback:lookback});
     }
@@ -197,21 +213,24 @@ class ControlPoints extends Component {
                         <Checkbox tabIndex='11' checked={this.state.displayBankedTime} inline
                                   onChange={this.toggleDisplayBanked} onClick={this.toggleDisplayBanked}
                                   style={{padding:'0px 0px 0px 24px', display:'inline-flex'}}>Display banked time</Checkbox>
-                        <Checkbox tabIndex="13" disabled={!this.props.forecastValid} checked={this.state.lookback} inline onChange={this.toggleCompare} onClick={this.toggleCompare} style={{display:'inline-flex'}}>Compare</Checkbox>
+                        <Checkbox tabIndex="13" checked={true} inline onChange={this.toggleCompare} onClick={this.toggleCompare} style={{display:'inline-flex'}}>Compare</Checkbox>
                         <ErrorBoundary>
-                            <FormGroup controlId="actualRide" style={{visibility:this.state.lookback ? null : 'hidden', display:'inline-flex'}}>
+                            <FormGroup controlId="actualRide" style={{display:'inline-flex'}}>
                                 <ControlLabel style={{display:'inline-flex'}}>Strava</ControlLabel>
                                 <FormControl tabIndex='-1' type="text" style={{display:'inline-flex'}}
                                              onDrop={event => {
                                                  let dt = event.dataTransfer;
                                                  if (dt.items) {
-                                                     for (let i=0; i < dt.items.length; i++) {
+                                                     for (let i=0;i < dt.items.length;i++) {
                                                          if (dt.items[i].kind === 'string') {
                                                              event.preventDefault();
                                                              dt.items[i].getAsString(value => {
                                                                  this.setStravaActivity(value);
                                                                  this.updateExpectedTimes(this.state.strava_activity);
                                                              });
+                                                             //this.state.lookback
+                                                             //disabled={!this.props.forecastValid}
+                                                             //style={{visibility:this.state.lookback ? null : 'hidden', display:'inline-flex'}}
                                                          } else {
                                                              console.log('vetoing drop of',i,dt.items[i].kind);
                                                              return false;
@@ -227,13 +246,13 @@ class ControlPoints extends Component {
                                                  let dt = event.dataTransfer;
                                                  if (dt.items) {
                                                      // Use DataTransferItemList interface to remove the drag data
-                                                     for (let i = 0; i < dt.items.length; i++) {
+                                                     for (let i = 0;i < dt.items.length;i++) {
                                                          dt.items.remove(i);
                                                      }
                                                  }
                                              }}
                                              value={this.state.strava_activity} onChange={event => {this.setStravaActivity(event.target.value)}}
-                                             onBlur={event => {this.updateExpectedTimes(this.state.strava_activity)}}/>
+                                             onBlur={() => {this.updateExpectedTimes(this.state.strava_activity)}}/>
                             </FormGroup>
                             {this.state.stravaAlertVisible?<Alert onDismiss={this.hideStravaErrorAlert} bsStyle='warning'>{this.state.stravaError}</Alert>:null}
                             {ControlPoints.showProgressSpinner(this.state.isUpdating)}
@@ -257,7 +276,7 @@ class ControlPoints extends Component {
                                               displayBanked={this.state.displayBankedTime} compare={this.state.lookback} update={this.updateFromTable} ref={(table) => {this.table = table;}}/>
                     </MediaQuery>
                 </ErrorBoundary>
-                <div tabIndex="98" onFocus={event => {document.getElementById('addButton').focus()}}></div>
+                <div tabIndex="98" onFocus={() => {document.getElementById('addButton').focus()}}></div>
             </div>
         );
     }

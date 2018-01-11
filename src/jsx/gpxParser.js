@@ -48,7 +48,7 @@ class AnalyzeRoute {
         gpxParse.parseGpx(event.target.result, this.handleParsedGpx);
     }
 
-    inProcess(event) {
+    inProcess(/*event*/) {
 
     }
 
@@ -97,13 +97,13 @@ class AnalyzeRoute {
                 }
             ).then(response => {
                 if (response === undefined) {
-                    reject("Could not get Ride with GPS results");
+                    reject(new Error("Could not get Ride with GPS results"));
                 }
                 this.rwgpsRouteData = response;
                 this.gpxResult = null;
                 let rwgpsRouteDatum = this.rwgpsRouteData[this.rwgpsRouteData['trip'] === undefined ? 'route' : 'trip'];
                 if (rwgpsRouteDatum === undefined) {
-                    reject('RWGPS route info unavailable');
+                    reject(new Error('RWGPS route info unavailable'));
                 }
                 let point = rwgpsRouteDatum['track_points'][0];
                 //TODO using current date and time for zone lookup could pose a problem in future

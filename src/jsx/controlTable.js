@@ -3,10 +3,18 @@ import {Button} from '@blueprintjs/core';
 
 import {AgGridReact} from 'ag-grid-react';
 import ReactDOM from 'react-dom';
+import PropTypes from 'prop-types';
 
 const smallScreenWidth = 800;
 
 class ControlTable extends Component {
+    static propTypes = {
+        displayBanked:PropTypes.bool.isRequired,
+        compare:PropTypes.bool.isRequired,
+        controls:PropTypes.array.isRequired,
+        update:PropTypes.func.isRequired
+    };
+
     constructor(props) {
         super(props);
         let displayBanked = this.props.displayBanked;
@@ -50,7 +58,7 @@ class ControlTable extends Component {
             return;
         }
         let row = {name:'',duration:0,distance:0,id:this.props.controls.length};
-        let result = this.api.updateRowData({add:[row], addIndex:row.id});
+        this.api.updateRowData({add:[row], addIndex:row.id});
         // focus on new control if one has been added
         this.api.setFocusedCell(this.props.controls.length,'name',null);
         // this.api.startEditingCell(this.api.getFocusedCell());
@@ -79,7 +87,7 @@ class ControlTable extends Component {
     // create a DOM object
     deleteRenderer(params) {
         let rowNode = this.api.getRowNode(params.node.id);
-        const deleteButton = <Button onClick={event => {this.removeRow(rowNode)}} iconName={'delete'}/>;
+        const deleteButton = <Button onClick={() => {this.removeRow(rowNode)}} iconName={'delete'}/>;
         let eDiv = document.createElement('div');
         ReactDOM.render(deleteButton, eDiv);
         return eDiv;
@@ -127,7 +135,7 @@ class ControlTable extends Component {
             newControl.banked===oldControl.banked;
     }
 
-    shouldComponentUpdate(nextProps,nextState) {
+    shouldComponentUpdate(nextProps) {
         // compare controls
         let controls = this.props.controls;
         if (nextProps.displayBanked !== this.props.displayBanked) {
@@ -164,7 +172,7 @@ class ControlTable extends Component {
             rowData.name!=="" && rowData.distance!=="" && rowData.distance !== 0 && rowData.duration!=="" && rowData.duration!==0);
     }
 
-    sortChanged(params) {
+    sortChanged() {
         this.setState({rowCount:this.api.getModel().getRowCount()});
         this.updateFromGrid();
     }
@@ -181,7 +189,7 @@ class ControlTable extends Component {
             this.api.sizeColumnsToFit();
         }
         this.props.controls.forEach((row,key) => row.id=key);
-        let displayBanked = this.props.displayBanked;
+        // let displayBanked = this.props.displayBanked;
         return (<div className="ag-theme-fresh">
             <AgGridReact enableColResize enableSorting animateRows sortingOrder={['asc']} unSortIcon rowData={this.props.controls}
     onGridReady={this.onGridReady} onSortChanged={this.sortChanged} singleClickEdit

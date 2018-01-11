@@ -1,6 +1,11 @@
-import React from 'react';
+import React, {Component} from 'react';
+import PropTypes from 'prop-types';
 
-class ErrorBoundary extends React.Component {
+class ErrorBoundary extends Component {
+    static propTypes = {
+        children:PropTypes.element.isRequired
+    };
+
     constructor(props) {
         super(props);
         this.state = { error: null, errorInfo: null };

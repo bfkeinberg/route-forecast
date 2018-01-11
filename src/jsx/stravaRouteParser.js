@@ -48,9 +48,9 @@ class StravaRouteParser {
                         errorCallback(activityStream.message);
                         return;
                     }
-                    console.log(this.findMovingAverage(activityData,activityStream,12));
+                    console.log(this.findMovingAverage(activityData,activityStream,4));
                     this.updateControls(this.parseActivity(activityData, activityStream, controlPoints),
-                        this.computeActualFinishTime(activityData), this.wwPaceCalcForActivity(activityData));
+                        this.computeActualFinishTime(activityData), StravaRouteParser.wwPaceCalcForActivity(activityData));
                 }, error => {
                     if (errorCallback !== undefined) {
                         errorCallback(error);
@@ -72,7 +72,7 @@ class StravaRouteParser {
         });
     }
 
-    wwPaceCalcForActivity(activity) {
+    static wwPaceCalcForActivity(activity) {
         // all below in meters
         let average_speed_in_meters = activity.average_speed;
         let averageSpeedInMilesPerHour = (average_speed_in_meters*3600)*metersToMiles;
@@ -202,7 +202,7 @@ class StravaRouteParser {
         return modifiedControls;
     }
 
-    processActivityStream(activityId, controlPoints) {
+    processActivityStream(activityId) {
         const promise = new Promise((resolve, reject) =>
         {
             strava.streams.activity({access_token:this.token, id:activityId, types:'distance,time,moving,altitude'},

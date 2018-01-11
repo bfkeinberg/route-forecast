@@ -1,7 +1,12 @@
-import React from 'react';
-import { FormControl,FormGroup } from 'react-bootstrap';
+import React, {Component} from 'react';
+import {FormControl, FormGroup} from 'react-bootstrap';
+import PropTypes from 'prop-types';
 
-class ShortUrl extends React.Component {
+class ShortUrl extends Component {
+    static propTypes = {
+        shortUrl:PropTypes.string.isRequired
+    };
+
     constructor(props) {
         super(props);
     }

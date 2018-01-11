@@ -17,6 +17,7 @@ import Flatpickr from 'react-flatpickr'
 import ShortUrl from './shortUrl';
 import MediaQuery from 'react-responsive';
 import rideRatingText from './rideRating.htm';
+import PropTypes from 'prop-types';
 
 const queryString = require('query-string');
 
@@ -53,6 +54,24 @@ const rideRatingDisplay = (
 );
 
 class RouteInfoForm extends Component {
+    static propTypes = {
+        start:PropTypes.string.isRequired,
+        pace:PropTypes.string.isRequired,
+        interval:PropTypes.number.isRequired,
+        rwgpsRoute:PropTypes.number.isRequired,
+        timezone_api_key:PropTypes.string.isRequired,
+        controlPoints:PropTypes.array.isRequired,
+        metric:PropTypes.bool.isRequired,
+        maps_api_key:PropTypes.string.isRequired,
+        updateRouteInfo:PropTypes.func.isRequired,
+        action:PropTypes.string.isRequired,
+        updateForecast:PropTypes.func.isRequired,
+        updateFinishTime:PropTypes.func.isRequired,
+        updateControls:PropTypes.func.isRequired,
+        formatControlsForUrl:PropTypes.func.isRequired,
+        invalidateForecast:PropTypes.func.isRequired,
+        actualPace:PropTypes.number.isRequired
+    };
 
     constructor(props) {
         super(props);
@@ -107,27 +126,27 @@ class RouteInfoForm extends Component {
 
     loadFromRideWithGps(routeNumber, isTrip) {
         if (this.parser === undefined) {
-            this.getRouteParser().then( rwgpsParser => {
-                this.parser = new rwgpsParser(this.setErrorState, this.props['timezone_api_key']);
-                this.parser.loadRwgpsRoute(routeNumber, isTrip).then( result => {
+            this.getRouteParser().then( RwgpsParser => {
+                this.parser = new RwgpsParser(this.setErrorState, this.props['timezone_api_key']);
+                this.parser.loadRwgpsRoute(routeNumber, isTrip).then( () => {
                     this.calculateTimeAndDistance(this.props);
                     this.setErrorState(null,'rwgps');
                     if (this.fetchAfterLoad) {
                         this.requestForecast();
                         this.fetchAfterLoad = false;
                     }
-                }, error => {this.setErrorState(error,'rwgps');}
+                }, error => {this.setErrorState(error.message,'rwgps');}
                 );
             });
         } else {
-            this.parser.loadRwgpsRoute(routeNumber, isTrip).then( result => {
+            this.parser.loadRwgpsRoute(routeNumber, isTrip).then( () => {
                     this.calculateTimeAndDistance(this.props);
                     this.setErrorState(null,'rwgps');
                     if (this.fetchAfterLoad) {
                         this.requestForecast();
                         this.fetchAfterLoad = false;
                     }
-                }, error => {this.setErrorState(error,'rwgps');}
+                }, error => {this.setErrorState(error.message,'rwgps');}
             );
         }
     }
@@ -150,7 +169,7 @@ class RouteInfoForm extends Component {
         this.calculateTimeAndDistance(nextProps);
     }
 
-    componentDidUpdate(prevProps, prevState) {
+    componentDidUpdate() {
         if (this.paramsChanged) {
             this.paramsChanged = false;
             // recalculate if the user changed values in the dialog
@@ -158,6 +177,7 @@ class RouteInfoForm extends Component {
             this.calculateTimeAndDistance(this.props);
         }
     }
+
     shortenUrl(url) {
         fetch('https://www.googleapis.com/urlshortener/v1/url?key='+this.props.maps_api_key,
             {
@@ -180,8 +200,8 @@ class RouteInfoForm extends Component {
 
     parseGpxFile(file) {
         if (this.parser === undefined) {
-            this.getRouteParser().then( rwgpsParser => {
-                this.parser = new rwgpsParser(this.setErrorState, this.props['timezone_api_key']);
+            this.getRouteParser().then( RwgpsParser => {
+                this.parser = new RwgpsParser(this.setErrorState, this.props['timezone_api_key']);
                 this.parser.parseRoute(file);
             });
         } else {
@@ -367,7 +387,7 @@ class RouteInfoForm extends Component {
             return;
         }
         this.setState({rwgpsRoute : route});
-        if(this.parser !== undefined) {
+        if (this.parser !== undefined) {
             this.parser.clear();
         }
         this.props.invalidateForecast();
@@ -485,7 +505,7 @@ class RouteInfoForm extends Component {
                             minDate: firstDate,
                             maxDate: later,
                             defaultDate: this.state.start,
-                            dateFormat: 'Y-m-d\TH:i'
+                            dateFormat: 'Y-m-d H:i'
                         }}/>
                     </FormGroup>
                     <FormGroup bsSize='small' controlId="interval" style={{flex:'1',display:'inline-flex',marginTop:'5px',marginBottom:'5px'}}>
@@ -542,7 +562,7 @@ class RouteInfoForm extends Component {
                                          onDrop={event => {
                                              let dt = event.dataTransfer;
                                              if (dt.items) {
-                                                 for (let i=0; i < dt.items.length; i++) {
+                                                 for (let i=0;i < dt.items.length;i++) {
                                                      if (dt.items[i].kind === 'string') {
                                                          event.preventDefault();
                                                          dt.items[i].getAsString(value => {
@@ -564,7 +584,7 @@ class RouteInfoForm extends Component {
                                              let dt = event.dataTransfer;
                                              if (dt.items) {
                                                  // Use DataTransferItemList interface to remove the drag data
-                                                 for (let i = 0; i < dt.items.length; i++) {
+                                                 for (let i = 0;i < dt.items.length;i++) {
                                                      dt.items.remove(i);
                                                  }
                                              }

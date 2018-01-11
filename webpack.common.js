@@ -26,7 +26,7 @@ module.exports = {
                 options: {
                     cacheDirectory:true,
                     presets: ["babel-preset-env"],
-                    plugins: ['babel-plugin-transform-runtime']
+                    plugins: ['babel-plugin-transform-runtime',"transform-class-properties"]
                 }
             },
             {test: /\.js$/,
