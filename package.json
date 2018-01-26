@@ -25,7 +25,7 @@
     "moment": "^2.20.1",
     "moment-timezone": "^0.5.11",
     "net": "^1.0.2",
-    "popper.js": "^1.12.9",
+    "popper.js": "^1.13.0",
     "promise-polyfill": "^7.0.2",
     "prop-types": "^15.6.0",
     "query-string": "^5.0.1",
