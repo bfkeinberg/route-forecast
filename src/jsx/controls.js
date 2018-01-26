@@ -92,7 +92,7 @@ class ControlPoints extends Component {
         this.setState({stravaError:error,stravaAlertVisible:true,isUpdating:false});
     }
 
-    async getStravaParser() {
+    static async getStravaParser() {
         const parser = await import(/* webpackChunkName: "StravaRouteParser" */ './stravaRouteParser');
         return parser.default;
     }
@@ -107,7 +107,7 @@ class ControlPoints extends Component {
 
     computeTimesFromStrava(activity, controlPoints) {
         if (this.stravaParser === undefined) {
-            this.getStravaParser().then( StravaParser => {
+            ControlPoints.getStravaParser().then(StravaParser => {
                 this.stravaParser = new StravaParser(this.updateActualValues, this.updateProgress);
                 this.stravaParser.setToken(this.props.strava_token);
                 this.stravaParser.computeActualTimes(activity, controlPoints, this.stravaErrorCallback);
@@ -162,7 +162,7 @@ class ControlPoints extends Component {
         this.props.updateControls(controlPoints,this.state.metric);
     }
 
-    doControlsMatch(newControl,oldControl) {
+    static doControlsMatch(newControl, oldControl) {
         return newControl.distance===oldControl.distance &&
             newControl.name===oldControl.name &&
             newControl.duration===oldControl.duration &&
@@ -176,7 +176,7 @@ class ControlPoints extends Component {
         if (newState.displayBankedTime !== this.state.displayBankedTime ||
                 newState.lookback !== this.state.lookback ||
                 nextProps.controlPoints.length !== controlPoints.length ||
-                !nextProps.controlPoints.every((v, i)=> this.doControlsMatch(v,controlPoints[i])) ||
+                !nextProps.controlPoints.every((v, i)=> ControlPoints.doControlsMatch(v,controlPoints[i])) ||
                 newState.metric !== this.state.metric ||
                 newState.strava_activity !== this.state.strava_activity ||
                 newState.stravaError !== this.state.stravaError ||
@@ -199,7 +199,7 @@ class ControlPoints extends Component {
                 <ButtonToolbar style={{display:'inline-flex',flexDirection:'row', paddingTop:'11px',paddingLeft:'4px'}}>
                 {/*<ButtonGroup style={{display:'flex',flexFlow:'row wrap'}}>*/}
                     <ButtonGroup>
-                        <Button tabIndex='10' onClick={this.addControl} id='addButton'><Glyphicon glyph="plus-sign"></Glyphicon>Add control point</Button>
+                        <Button tabIndex='10' onClick={this.addControl} id='addButton'><Glyphicon glyph="plus-sign"/>Add control point</Button>
                         {/*<Button onClick={this.addControl} id='addButton' style={{display:'inline-flex',width:'165px',height:'34px'}}><Glyphicon glyph="plus-sign"></Glyphicon>Add control point</Button>*/}
                         <FormGroup controlId="finishTime" style={{display:'inline-flex'}}>
                             <ControlLabel style={{width:'7em',display:'inline-flex',marginTop:'7px',paddingLeft:'8px'}}>Finish time</ControlLabel>
@@ -274,7 +274,7 @@ class ControlPoints extends Component {
                                               displayBanked={this.state.displayBankedTime} compare={this.state.lookback} update={this.updateFromTable} ref={(table) => {this.table = table;}}/>
                     </MediaQuery>
                 </ErrorBoundary>
-                <div tabIndex="98" onFocus={() => {document.getElementById('addButton').focus()}}></div>
+                <div tabIndex="98" onFocus={() => {document.getElementById('addButton').focus()}}/>
             </div>
         );
     }

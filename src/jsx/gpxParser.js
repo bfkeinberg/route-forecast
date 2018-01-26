@@ -6,31 +6,62 @@ const paceToSpeed = {'A': 10, 'B': 12, 'C': 14, 'C+': 15, 'D-': 15, 'D': 16, 'D+
 const kmToMiles = 0.62137;
 
 class AnalyzeRoute {
-    constructor(options,maps_api_key) {
+    constructor() {
         this.reader = new FileReader();
-        this.fileDataRead = this.fileDataRead.bind(this);
-        this.handleParsedGpx = this.handleParsedGpx.bind(this);
         this.walkRoute = this.walkRoute.bind(this);
         this.checkAndUpdateControls = this.checkAndUpdateControls.bind(this);
         this.routeIsLoaded = this.routeIsLoaded.bind(this);
         this.loadRwgpsRoute = this.loadRwgpsRoute.bind(this);
+        this.loadGpxFile = this.loadGpxFile.bind(this);
         this.analyzeRwgpsRoute = this.analyzeRwgpsRoute.bind(this);
         this.analyzeGpxRoute = this.analyzeGpxRoute.bind(this);
         this.clear = this.clear.bind(this);
         this.adjustForWind = this.adjustForWind.bind(this);
-        this.reader.onload = this.fileDataRead;
-        this.reader.onerror = function(event) {
-            console.error("File could not be read! Code " + event.target.error.code);
-        };
-        this.reader.onprogress = this.inProcess;
         this.rwgpsRouteData = null;
         this.gpxResult = null;
         this.isTrip = false;
-        this.setErrorStateCallback = options;
         this.points = [];
-        this.maps_api_key = maps_api_key;
         this.timeZone = null;
         this.timeZoneId = null;
+    }
+
+    loadGpxFile(gpxFile, timezone_api_key) {
+        let reader = new FileReader();
+        const fileLoad = new Promise((resolve, reject) => {
+            reader.onerror = event => reject(event.target.error.code);
+            reader.onload = event => resolve(event.target.result);
+        });
+        reader.readAsText(gpxFile);
+        return new Promise((resolve, reject) => {
+            fileLoad.then(fileData => {
+                this.timeZone = null;
+                const parseGpx = new Promise((resolve, reject) => {
+                    gpxParse.parseGpx(fileData, (error, gpxData) => {
+                        if (error !== null) {
+                            reject(error);          // error in parsing the file
+                        }
+                        resolve(gpxData);
+                    })
+                });
+                parseGpx.then(gpxData => {
+                    this.gpxResult = gpxData;
+                    let point = this.gpxResult.tracks[0].segments[0][0];
+                    // using current date and time for zone lookup could pose a problem in future
+                    let timeZonePromise = this.findTimezoneForPoint(point.lat, point.lon, moment(), timezone_api_key);
+                    timeZonePromise.then(timeZoneResult => {
+                            this.timeZone = timeZoneResult;
+                            resolve(true);
+                        }, error => {
+                            reject(error);          // error getting the time zone
+                        }
+                    );
+                }, error => {
+                    reject(error);      // error parsing gpx
+                });
+            }, error => {
+                reject(error);      // errors in reading the file
+            });
+        });
     }
 
     clear() {
@@ -41,35 +72,6 @@ class AnalyzeRoute {
 
     routeIsLoaded() {
         return this.gpxResult !== null || this.rwgpsRouteData !== null;
-    }
-
-    fileDataRead(event) {
-        this.timeZone = null;
-        gpxParse.parseGpx(event.target.result, this.handleParsedGpx);
-    }
-
-    inProcess(/*event*/) {
-
-    }
-
-    handleParsedGpx(error,data)
-    {
-        if (error !== null) {
-            this.setErrorStateCallback(error, 'gpx');
-        } else {
-            this.gpxResult = data;
-            let point = this.gpxResult.tracks[0].segments[0][0];
-            // using current date and time for zone lookup could pose a problem in future
-            let timeZonePromise = this.findTimezoneForPoint(point.lat, point.lon, moment());
-            timeZonePromise.then(timeZoneResult => {
-                    this.timeZone = timeZoneResult;
-                    this.setErrorStateCallback(null,'gpx');
-                }, error => {
-                    this.setErrorStateCallback(error,'gpx');
-                }
-            );
-            this.setErrorStateCallback(null,'gpx');
-        }
     }
 
     // returns distance traveled in _miles_, and climb in meters
@@ -85,7 +87,7 @@ class AnalyzeRoute {
         }
     }
 
-    loadRwgpsRoute(route,isTrip) {
+    loadRwgpsRoute(route, isTrip, timezone_api_key) {
         return new Promise((resolve, reject) => {
             this.isTrip = isTrip;
             this.rwgpsRouteData = null;
@@ -106,8 +108,8 @@ class AnalyzeRoute {
                     reject(new Error('RWGPS route info unavailable'));
                 }
                 let point = rwgpsRouteDatum['track_points'][0];
-                //TODO using current date and time for zone lookup could pose a problem in future
-                let timeZonePromise = this.findTimezoneForPoint(point.y, point.x, moment());
+                //TODO using current date and time for zone lookup (moment()) could pose a problem in future
+                let timeZonePromise = this.findTimezoneForPoint(point.y, point.x, moment(), timezone_api_key);
                 timeZonePromise.then(timeZoneResult => {
                     this.timeZone = timeZoneResult;
                     resolve(true);
@@ -275,7 +277,7 @@ class AnalyzeRoute {
             finishTime:finishTime,timeZone:this.timeZone};
     }
 
-    findTimezoneForPoint(lat,lon,time) {
+    findTimezoneForPoint(lat, lon, time, maps_api_key) {
         return new Promise((resolve, reject) =>
             {
                 let xmlhttp = new XMLHttpRequest();
@@ -294,7 +296,7 @@ class AnalyzeRoute {
                     }
                 });
                 let reqUrl = "https://maps.googleapis.com/maps/api/timezone/json?location=" + lat + "," + lon;
-                reqUrl += "&timestamp=" + time.format("X") + "&key=" + this.maps_api_key;
+                reqUrl += "&timestamp=" + time.format("X") + "&key=" + maps_api_key;
                 xmlhttp.open('GET',reqUrl,true);
                 xmlhttp.send();
             }
@@ -485,4 +487,4 @@ class AnalyzeRoute {
     }
 }
 
-export default AnalyzeRoute;
+export default new AnalyzeRoute();

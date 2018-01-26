@@ -1,6 +1,5 @@
-import React from 'react';
+import React, {Component} from 'react';
 import ControlPoints from './controls';
-import ReactDOM from 'react-dom';
 import RouteInfoForm from './routeInfoEntry';
 import RouteForecastMap from './map';
 import ForecastTable from './forecastTable';
@@ -25,13 +24,23 @@ import ErrorBoundary from './errorBoundary';
 /*
 TODO:
 integrate with jsErrLog
+immutable.js
+Simplify gpxParser to have one method that analyzes, using destructuring to simplify
+Design the state
+define the state
+Write the actions, with their constants
+Write lower level reducers - route form state, control point state, any others
+Write the top level reducer
+Write a top level component to instantiate the existing top level and wrap it in redux,
+moving the render to that level
+separate network logic out from RouteInfoForm into a container component
  */
 // To add to window
 if (!window.Promise) {
     window.Promise = Promise;
 }
 
-class RouteWeatherUI extends React.Component {
+class RouteWeatherUI extends Component {
 
     constructor(props) {
         super(props);
@@ -213,7 +222,7 @@ class RouteWeatherUI extends React.Component {
                                           strava_token={this.strava_token}
                                           strava_activity={queryParams.strava_activity}
                                           strava_error={queryParams.strava_error}
-                                          metric={queryParams.metric===null?this.state.metric:queryParams.metric==='true'}
+                                          metric={queryParams.metric===null?this.state.metric==='true':queryParams.metric==='true'}
                                           forecastValid={this.state.forecastValid}
                                           invalidateForecast={this.invalidateForecast}
                                           name={this.state.routeInfo['name']}/>
@@ -232,7 +241,7 @@ class RouteWeatherUI extends React.Component {
                         {this.state.formVisible ? inputForm : formButton}
                         <ControlPoints controlPoints={this.state.controlPoints}
                                           updateControls={this.updateControls}
-                                          metric={queryParams.metric===null?this.state.metric:queryParams.metric}
+                                          metric={queryParams.metric===null?this.state.metric==='true':queryParams.metric==='true'}
                                           strava_activity={queryParams.strava_activity}
                                           finishTime={this.state.routeInfo['finishTime']}
                                           actualFinishTime={this.state.actualFinishTime}
@@ -253,7 +262,4 @@ class RouteWeatherUI extends React.Component {
     }
 }
 
-ReactDOM.render(
-  <RouteWeatherUI />,
-  document.getElementById('content')
-);
+export default RouteWeatherUI;

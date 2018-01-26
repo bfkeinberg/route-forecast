@@ -15,7 +15,7 @@ var GPX_DIR = path.resolve(__dirname, 'node_modules/gpx-parse/dist');
 
 module.exports = {
     entry: ['whatwg-fetch',
-        path.resolve(APP_DIR, 'main.js')
+        path.resolve(APP_DIR, 'index.js')
     ],
     module: {
         rules: [

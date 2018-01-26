@@ -65,6 +65,11 @@ class ControlTable extends Component {
     }
 
     removeRow(row) {
+        let rowNode = this.api.getRowNode(row);
+        console.log(`row node to delete for ${row} is ${rowNode}`);
+        if (rowNode === undefined) {
+            return;
+        }
         let transaction = {remove:[row]};
         this.api.updateRowData(transaction);
         this.updateFromGrid();
@@ -86,8 +91,7 @@ class ControlTable extends Component {
 
     // create a DOM object
     deleteRenderer(params) {
-        let rowNode = this.api.getRowNode(params.node.id);
-        const deleteButton = <Button onClick={() => {this.removeRow(rowNode)}} iconName={'delete'}/>;
+        const deleteButton = <Button onClick={() => {this.removeRow(params.node.id)}} iconName={'delete'}/>;
         let eDiv = document.createElement('div');
         ReactDOM.render(deleteButton, eDiv);
         return eDiv;

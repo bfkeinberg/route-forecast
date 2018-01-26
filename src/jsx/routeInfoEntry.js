@@ -55,10 +55,10 @@ const rideRatingDisplay = (
 
 class RouteInfoForm extends Component {
     static propTypes = {
-        start:PropTypes.string.isRequired,
-        pace:PropTypes.string.isRequired,
-        interval:PropTypes.string.isRequired,
-        rwgpsRoute:PropTypes.string.isRequired,
+        start:PropTypes.string,
+        pace:PropTypes.string,
+        interval:PropTypes.string,
+        rwgpsRoute:PropTypes.string,
         timezone_api_key:PropTypes.string.isRequired,
         controlPoints:PropTypes.array.isRequired,
         metric:PropTypes.bool.isRequired,
@@ -71,6 +71,10 @@ class RouteInfoForm extends Component {
         formatControlsForUrl:PropTypes.func.isRequired,
         invalidateForecast:PropTypes.func.isRequired,
         actualPace:PropTypes.number
+    };
+
+    static contextTypes = {
+        store: PropTypes.object
     };
 
     constructor(props) {
@@ -124,31 +128,18 @@ class RouteInfoForm extends Component {
         return now;
     }
 
-    loadFromRideWithGps(routeNumber, isTrip) {
-        if (this.parser === undefined) {
-            this.getRouteParser().then( RwgpsParser => {
-                this.parser = new RwgpsParser(this.setErrorState, this.props['timezone_api_key']);
-                this.parser.loadRwgpsRoute(routeNumber, isTrip).then( () => {
-                    this.calculateTimeAndDistance(this.props);
-                    this.setErrorState(null,'rwgps');
-                    if (this.fetchAfterLoad) {
-                        this.requestForecast();
-                        this.fetchAfterLoad = false;
-                    }
-                }, error => {this.setErrorState(error.message,'rwgps');}
-                );
-            });
-        } else {
-            this.parser.loadRwgpsRoute(routeNumber, isTrip).then( () => {
-                    this.calculateTimeAndDistance(this.props);
-                    this.setErrorState(null,'rwgps');
-                    if (this.fetchAfterLoad) {
-                        this.requestForecast();
-                        this.fetchAfterLoad = false;
-                    }
-                }, error => {this.setErrorState(error.message,'rwgps');}
-            );
-        }
+    async loadFromRideWithGps(routeNumber, isTrip) {
+        const parser = await this.getRouteParser();
+        this.parser = parser;
+        parser.loadRwgpsRoute(routeNumber, isTrip, this.props['timezone_api_key']).then( () => {
+            this.calculateTimeAndDistance(this.props);
+            this.setErrorState(null,'rwgps');
+            if (this.fetchAfterLoad) {
+                this.requestForecast();
+                this.fetchAfterLoad = false;
+            }
+        }, error => {this.setErrorState(error.message,'rwgps');}
+        );
     }
 
     routeIsLoaded(parser) {
@@ -198,15 +189,13 @@ class RouteInfoForm extends Component {
         }).catch(error => {this.setState({errorDetails:error})});
     }
 
-    parseGpxFile(file) {
-        if (this.parser === undefined) {
-            this.getRouteParser().then( RwgpsParser => {
-                this.parser = new RwgpsParser(this.setErrorState, this.props['timezone_api_key']);
-                this.parser.parseRoute(file);
-            });
-        } else {
-            this.parser.parseRoute(file);
-        }
+    async parseGpxFile(file) {
+        const { store } = this.context;
+        const parser = await this.getRouteParser();
+        this.parser = parser;
+        parser.loadGpxFile(file, this.props['timezone_api_key']).then( () => {
+            this.setErrorState(null, 'gpx');
+        }, error => {this.setErrorState(error, 'gpx');});
     }
 
     updateRouteFile(event) {
@@ -277,7 +266,8 @@ class RouteInfoForm extends Component {
             }).catch (error => {
                 let source = this.routeFileSet ? 'gpx' : 'rwgps';
                 this.setState({pending:false});
-                this.setErrorState(error, source);
+                let errorMessage = error.message !== undefined ? error.message : error;
+                this.setErrorState(errorMessage, source);
             }
         )
     }
