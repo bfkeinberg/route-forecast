@@ -14,7 +14,7 @@ var STATIC_DIR = path.resolve(__dirname, 'dist/static');
 var GPX_DIR = path.resolve(__dirname, 'node_modules/gpx-parse/dist');
 
 module.exports = {
-    entry: ['whatwg-fetch',
+    entry: ['babel-polyfill','whatwg-fetch',
         path.resolve(APP_DIR, 'index.js')
     ],
     module: {
@@ -25,8 +25,9 @@ module.exports = {
                 loader: "babel-loader",
                 options: {
                     cacheDirectory:true,
-                    presets: ["babel-preset-env"],
-                    plugins: ['babel-plugin-transform-runtime',"transform-class-properties"]
+                    babelrc: false,
+                    presets: ["babel-preset-env","react","stage-0"],
+                    plugins: ['babel-plugin-transform-runtime',"react-html-attrs", "transform-class-properties"]
                 }
             },
             {test: /\.js$/,
