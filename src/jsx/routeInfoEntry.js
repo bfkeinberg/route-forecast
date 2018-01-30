@@ -18,6 +18,16 @@ import ShortUrl from './shortUrl';
 import MediaQuery from 'react-responsive';
 import rideRatingText from './rideRating.htm';
 import PropTypes from 'prop-types';
+import {
+    loadFromRideWithGps,
+    recalcRoute,
+    requestForecast,
+    setInterval,
+    setPace,
+    setRwgpsRoute
+} from './actions/actions';
+import {connect} from 'react-redux';
+
 
 const queryString = require('query-string');
 
@@ -57,10 +67,10 @@ class RouteInfoForm extends Component {
     static propTypes = {
         start:PropTypes.string,
         pace:PropTypes.string,
-        interval:PropTypes.string,
-        rwgpsRoute:PropTypes.string,
+        interval:PropTypes.number,
+        rwgpsRoute:PropTypes.oneOfType([PropTypes.number,PropTypes.oneOf([''])]),
         timezone_api_key:PropTypes.string.isRequired,
-        controlPoints:PropTypes.array.isRequired,
+        controlPoints:PropTypes.arrayOf(PropTypes.object).isRequired,
         metric:PropTypes.bool.isRequired,
         maps_api_key:PropTypes.string.isRequired,
         updateRouteInfo:PropTypes.func.isRequired,
@@ -142,14 +152,15 @@ class RouteInfoForm extends Component {
         );
     }
 
-    routeIsLoaded(parser) {
-        return parser !== undefined && parser.routeIsLoaded();
+    routeIsLoaded() {
+        return this.props.routeInfo.rwgpsRouteData !== null || this.props.routeInfo.gpxRouteData !== null;
     }
 
     componentDidMount() {
-        if (this.state.rwgpsRoute !== '') {
-            this.loadFromRideWithGps(this.state.rwgpsRoute,this.state.rwgpsRouteIsTrip);
-            this.setState({routeUpdating:true});
+        if (this.props.rwgpsRoute !== '') {
+            this.props.loadFromRideWithGps(this.props.rwgpsRoute,this.state.rwgpsRouteIsTrip,this.props['timezone_api_key'],this.props);
+            // this.loadFromRideWithGps(this.state.rwgpsRoute,this.state.rwgpsRouteIsTrip);
+            // this.setState({routeUpdating:true});
             this.fetchAfterLoad = true;
         }
     }
@@ -157,7 +168,11 @@ class RouteInfoForm extends Component {
     componentWillReceiveProps(nextProps) {
         // recalculate if the user updated the controls, say
         this.setQueryString(this.state, this.props.controlPoints, this.props.metric);
-        this.calculateTimeAndDistance(nextProps);
+        if (nextProps.controlPoints.length !== this.props.controlPoints.length ||
+            !nextProps.controlPoints.every((v, i)=> ControlPoints.doControlsMatch(v,this.props.controlPoints[i]))) {
+            this.props.recalcRoute();
+        }
+        // this.calculateTimeAndDistance(nextProps);
     }
 
     componentDidUpdate() {
@@ -165,7 +180,8 @@ class RouteInfoForm extends Component {
             this.paramsChanged = false;
             // recalculate if the user changed values in the dialog
             this.setQueryString(this.state, this.props.controlPoints, this.props.metric);
-            this.calculateTimeAndDistance(this.props);
+            this.props.recalcRoute();
+            // this.calculateTimeAndDistance(this.props);
         }
     }
 
@@ -229,51 +245,21 @@ class RouteInfoForm extends Component {
         // this weirdness is to handle the case where the user clicked this button
         // while the route was loading asynchronously. Putting this state in keeps them from having to wait
         // until the route is done loading to click.
-        if (!this.routeIsLoaded(this.parser)) {
+        if (!this.routeIsLoaded()) {
             this.fetchAfterLoad = true;
             return;
         }
+        this.props.requestForecast(this.props.routeInfo);
+/*
         if (this.forecastRequest === null) {
             this.calculateTimeAndDistance(this.props);
         }
-        let formdata = new FormData();
-        formdata.append('locations', JSON.stringify(this.forecastRequest));
-        formdata.append('timezone', this.timeZone);
-        this.setState({pending:true,showForm:false});
-        fetch(this.props.action,
-            {
-                method:'POST',
-                body:formdata
-            })
-            .then(response => {
-                if (response.ok) {
-                return response.json();
-                } else {
-                    let error = response.statusText !== undefined ? response.statusText : response['status'];
-                    let source = this.routeFileSet ? 'gpx' : 'rwgps';
-                    this.setErrorState(error, source);
-                    this.setState({pending:false});
-                } })
-            .then(response => {
-                this.setState({pending:false});
-                this.forecastRequest = null;
-                this.setState({pending:false, errorDetails:null, succeeded:true});
-                this.props.updateForecast(response);
-                let controlsToUpdate = this.props.controlPoints.slice();
-                let weatherCorrectionMinutes = this.parser.adjustForWind(response,this.state.pace,controlsToUpdate,this.state.start,this.props.metric);
-                this.props.updateFinishTime(weatherCorrectionMinutes);
-                this.props.updateControls(controlsToUpdate,this.props.metric);
-            }).catch (error => {
-                let source = this.routeFileSet ? 'gpx' : 'rwgps';
-                this.setState({pending:false});
-                let errorMessage = error.message !== undefined ? error.message : error;
-                this.setErrorState(errorMessage, source);
-            }
-        )
+*/
     }
 
     makeFullQueryString() {
-        let query = {start:this.state.start,pace:this.state.pace,interval:this.state.interval,rwgpsRoute:this.state.rwgpsRoute,controlPoints:this.props.formatControlsForUrl(this.props.controlPoints)};
+        let query = {start:this.state.start,pace:this.props.pace,interval:this.props.interval,
+            rwgpsRoute:this.props.rwgpsRoute,controlPoints:this.props.formatControlsForUrl(this.props.controlPoints)};
         this.shortenUrl(location.origin + '?' + queryString.stringify(query));
     }
 
@@ -284,9 +270,9 @@ class RouteInfoForm extends Component {
     }
 
     setQueryString(state,controlPoints,metric) {
-        if (state.rwgpsRoute !== '') {
-            let query = {start:RouteInfoForm.dateToShortDate(state.start),pace:state.pace,interval:state.interval,metric:metric,
-                rwgpsRoute:state.rwgpsRoute,controlPoints:this.props.formatControlsForUrl(controlPoints)};
+        if (this.props.rwgpsRoute !== '') {
+            let query = {start:RouteInfoForm.dateToShortDate(state.start),pace:this.props.pace,interval:this.props.interval,metric:metric,
+                rwgpsRoute:this.props.rwgpsRoute,controlPoints:this.props.formatControlsForUrl(controlPoints)};
             history.pushState(null, 'nothing', location.origin + '?' + queryString.stringify(query));
             this.shortenUrl(location.origin + '?' + queryString.stringify(query));
         }
@@ -311,19 +297,21 @@ class RouteInfoForm extends Component {
     }
 
     disableSubmit() {
-        return (this.state.rwgpsRoute === '' && !this.routeFileSet);
+        return (this.props.rwgpsRoute === '' && !this.routeFileSet);
      }
 
     intervalChanged(event) {
         if (event.target.value !== '') {
             this.paramsChanged = true;
-            this.setState({interval:event.target.value});
+            this.props.setInterval(parseFloat(event.target.value));
+            // this.setState({interval:event.target.value});
         }
     }
 
     handleDateChange(time) {
         this.paramsChanged = true;
-        this.setState({start:time});
+        this.props.setStart(time);
+        // this.setState({start:time});
     }
 
     static showErrorDetails(errorState) {
@@ -361,10 +349,11 @@ class RouteInfoForm extends Component {
             if (isNaN(route)) {
                 return;
             }
-            this.loadFromRideWithGps(route,this.state.rwgpsRouteIsTrip);
+            // this.loadFromRideWithGps(route,this.state.rwgpsRouteIsTrip);
+            this.props.loadFromRideWithGps(route,this.state.rwgpsRouteIsTrip,this.props['timezone_api_key']);
             // clear file input to avoid confusion
             document.getElementById('route').value = null;
-            this.setState({'routeUpdating':true});
+            // this.setState({'routeUpdating':true});
             this.routeFileSet = false;
         } else if (this.state.errorSource === 'rwgps') {
             this.setState({'errorSource':null});
@@ -376,11 +365,14 @@ class RouteInfoForm extends Component {
         if (isNaN(route)) {
             return;
         }
+        this.props.setRwgpsRoute(route);
+/*
         this.setState({rwgpsRoute : route});
         if (this.parser !== undefined) {
             this.parser.clear();
         }
         this.props.invalidateForecast();
+*/
     }
 
     static isNumberKey(event) {
@@ -393,7 +385,8 @@ class RouteInfoForm extends Component {
 
     handlePaceChange(event) {
         this.paramsChanged = true;
-        this.setState({pace:event.target.value});
+        this.props.setPace(event.target.value);
+        // this.setState({pace:event.target.value});
     }
 
     decideValidationStateFor(type) {
@@ -401,7 +394,7 @@ class RouteInfoForm extends Component {
             return 'error';
         }
         else {
-            if (this.state.succeeded) {
+            if (!this.props.errorDetails) {
                 if (this.routeFileSet && type === 'gpx') {
                     return 'success';
                 }
@@ -415,18 +408,19 @@ class RouteInfoForm extends Component {
 
     setDateAndTime(dates, datestr, instance) {
         if (datestr === '') {
-            instance.setDate(this.state.start);
+            instance.setDate(this.props.start);
             return;
         }
         this.paramsChanged = true;
-        this.setState({start:new Date(dates[0])});
+        this.props.setStart(new Date(dates[0]));
+        // this.setState({start:new Date(dates[0])});
     }
 
     shouldComponentUpdate(nextProps, nextState) {
         return nextState.pace!==this.state.pace ||
             nextState.interval!==this.state.interval ||
             nextState.rwgpsRoute!==this.state.rwgpsRoute ||
-            nextState['errorDetails'] !== this.state.errorDetails ||
+            nextProps['errorDetails'] !== this.props.errorDetails ||
             nextState['pending'] !== this.state.pending ||
             nextState.rwgpsRouteIsTrip !== this.state.rwgpsRouteIsTrip ||
             nextState.errorSource !== this.state.errorSource ||
@@ -436,7 +430,7 @@ class RouteInfoForm extends Component {
             nextProps['metric'] !== this.props.metric ||
             nextState['shortUrl']!== this.state.shortUrl ||
             nextProps['actualPace']!== this.props.actualPace ||
-            nextState['start']!== this.state.start;
+            nextProps['start']!== this.props.start;
     }
 
     getAlphaPace(pace) {
@@ -471,7 +465,7 @@ class RouteInfoForm extends Component {
             (<Tooltip id="'forecast_tooltip">Request a ride forecast</Tooltip>);
         const now = new Date();
         // allow us to continue to show the start time if the route was forecast for a time before the present
-        let firstDate = now > this.state.start ? this.state.start : now;
+        let firstDate = now > this.props.start ? this.props.start : now;
         let later = new Date();
         const daysToAdd = 14;
         later.setDate(now.getDate() + daysToAdd);
@@ -502,7 +496,7 @@ class RouteInfoForm extends Component {
                         <ControlLabel>Interval in hours</ControlLabel>
                         <OverlayTrigger placement='bottom' overlay={interval_tooltip}>
                             <FormControl tabIndex='2' type="number" min={0.5} max={2} step={0.5} name="interval" style={{'width':'5em'}}
-                                         value={this.state.interval} onChange={this.intervalChanged}/>
+                                         value={this.props.interval} onChange={this.intervalChanged}/>
                         </OverlayTrigger>
                     </FormGroup>
                     <FormGroup style={{flex:'1',display:'inline-flex',marginTop:'5px',marginBottom:'5px'}} controlId="pace">
@@ -580,7 +574,7 @@ class RouteInfoForm extends Component {
                                              }
                                          }}
                                          pattern="[0-9]*"
-                                         value={this.state.rwgpsRoute}
+                                         value={this.props.rwgpsRoute}
                                          style={{flex:'1',display:'inline-flex',alignItems:'center'}}/>
                         </OverlayTrigger>
                     </FormGroup>
@@ -611,8 +605,8 @@ class RouteInfoForm extends Component {
                             </MediaQuery>
                         </div>
                     </OverlayTrigger>
-                    {RouteInfoForm.showErrorDetails(this.state.errorDetails)}
-                    {RouteInfoForm.showProgressSpinner(this.state.routeUpdating)}
+                    {RouteInfoForm.showErrorDetails(this.props.errorDetails)}
+                    {RouteInfoForm.showProgressSpinner(this.props.fetchingRoute)}
                 </Form>
                     <MediaQuery maxDeviceWidth={800}>
                         <ShortUrl shortUrl={this.state.shortUrl}/>
@@ -626,4 +620,20 @@ class RouteInfoForm extends Component {
     }
 }
 
-export default RouteInfoForm;
+const mapStateToProps = (state, ownProps) =>
+    ({
+        rwgpsRoute: state.uiInfo.rwgpsRoute,
+        start: state.uiInfo.start,
+        pace: state.uiInfo.pace,
+        interval: state.uiInfo.interval,
+        fetchingRoute: state.uiInfo.fetchingRoute,
+        rwgpsRouteIsTrip:state.uiInfo.rwgpsRouteIsTrip,
+        errorDetails:state.uiInfo.errorDetails,
+        routeInfo:state.routeInfo
+    });
+
+const mapDispatchToProps = {
+    loadFromRideWithGps, setRwgpsRoute, setInterval, setPace, requestForecast, recalcRoute
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(RouteInfoForm);

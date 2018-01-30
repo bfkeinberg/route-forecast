@@ -20,6 +20,8 @@ import 'Images/style.css';
 import queryString from 'query-string';
 import cookie from 'react-cookies';
 import ErrorBoundary from './errorBoundary';
+import {connect} from 'react-redux';
+import {setActionUrl} from "./actions/actions";
 
 /*
 TODO:
@@ -55,6 +57,7 @@ class RouteWeatherUI extends Component {
         let script = document.getElementById( "routeui" );
         let queryParams = queryString.parse(location.search);
         this.strava_token = RouteWeatherUI.getStravaToken(queryParams);
+        props.setActionUrl(script.getAttribute('action'));
         // new control point url format - <name>,<distance>,<time-in-minutes>:<name>,<distance>,<time-in-minutes>:etc
         this.state = {controlPoints: queryParams.controlPoints===undefined?[]:this.parseControls(queryParams.controlPoints),
             routeInfo:{bounds:{},points:[], name:'',finishTime:''}, forecast:[], action:script.getAttribute('action'),
@@ -133,6 +136,12 @@ class RouteWeatherUI extends Component {
         // delete dummy first element
         controlPoints.splice(0,1);
         return controlPoints;
+    }
+
+    componentWillReceiveProps(newProps) {
+        if (newProps.name !== '') {
+            cookie.save(newProps.name,this.formatControlsForUrl(newProps.controlPoints));
+        }
     }
 
     updateControls(controlPoints,metric) {
@@ -262,4 +271,14 @@ class RouteWeatherUI extends Component {
     }
 }
 
-export default RouteWeatherUI;
+const mapDispatchToProps = {
+    setActionUrl
+};
+
+const mapStateToProps = (state, ownProps) =>
+    ({
+        controlPoints: state.controls.controlPoints,
+        name: state.routeInfo.name
+    });
+
+export default connect(mapStateToProps, mapDispatchToProps)(RouteWeatherUI);

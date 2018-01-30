@@ -17,6 +17,8 @@ import {Spinner} from '@blueprintjs/core';
 import RouteInfoForm from "./routeInfoEntry";
 import ErrorBoundary from './errorBoundary';
 import PropTypes from 'prop-types';
+import {setActualFinishTime, setStravaActivity, setStravaToken, toggleMetric, updateControls} from './actions/actions';
+import {connect} from 'react-redux';
 
 class ControlPoints extends Component {
 
@@ -33,6 +35,10 @@ class ControlPoints extends Component {
         updateControls:PropTypes.func.isRequired,
         forecastValid:PropTypes.bool.isRequired,
         name:PropTypes.string
+    };
+
+    static contextTypes = {
+        store: PropTypes.object
     };
 
     constructor(props) {
@@ -102,7 +108,8 @@ class ControlPoints extends Component {
         if (Number.isNaN(newValue)) {
             return;
         }
-        this.setState({strava_activity:newValue});
+        this.props.setStravaActivity(newValue);
+        // this.setState({strava_activity:newValue});
     }
 
     computeTimesFromStrava(activity, controlPoints) {
@@ -148,9 +155,12 @@ class ControlPoints extends Component {
     }
 
     toggleMetric() {
+        this.props.toggleMetric();
+/*
         let metric = !this.state.metric;
         this.setState({metric:metric});
         this.props.updateControls(this.props.controlPoints,metric);
+*/
     }
 
     toggleCompare() {
@@ -159,7 +169,7 @@ class ControlPoints extends Component {
     }
 
     updateFromTable(controlPoints) {
-        this.props.updateControls(controlPoints,this.state.metric);
+        this.props.updateControls(controlPoints,this.props.metric);
     }
 
     static doControlsMatch(newControl, oldControl) {
@@ -207,7 +217,7 @@ class ControlPoints extends Component {
                                          style={{display:'inline-flex',width:'12em',marginTop:'3px',marginBotton:'0px',paddingLeft:'2px',paddingTop:'2px',height:'28px'}}
                                          value={this.state.displayedFinishTime}/>
                         </FormGroup>
-                        <Checkbox tabIndex='12' checked={this.state.metric} inline
+                        <Checkbox tabIndex='12' checked={this.props.metric} inline
                                   onClick={this.toggleMetric} onChange={this.toggleMetric}
                                   style={{padding:'0px 0px 0px 26px',display:'inline-flex'}}>metric</Checkbox>
                         <Checkbox tabIndex='11' checked={this.state.displayBankedTime} inline
@@ -280,4 +290,17 @@ class ControlPoints extends Component {
     }
 }
 
-export default ControlPoints;
+const mapStateToProps = (state, ownProps) =>
+    ({
+        metric: state.controls.metric,
+        controlPoints: state.controls.controlPoints,
+        finishTime: state.routeInfo.finishTime,
+        name: state.routeInfo.name,
+        actualFinishTime: state.strava.actualFinishTime
+    });
+
+const mapDispatchToProps = {
+    updateControls, toggleMetric, setStravaToken, setStravaActivity, setActualFinishTime
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(ControlPoints);

@@ -49,7 +49,8 @@ class AnalyzeRoute {
                     // using current date and time for zone lookup could pose a problem in future
                     let timeZonePromise = this.findTimezoneForPoint(point.lat, point.lon, moment(), timezone_api_key);
                     timeZonePromise.then(timeZoneResult => {
-                            this.timeZone = timeZoneResult;
+                            this.timeZone = timeZoneResult.offset;
+                            this.timeZoneId = timeZoneResult.zoneId;
                             resolve(true);
                         }, error => {
                             reject(error);          // error getting the time zone
@@ -100,6 +101,7 @@ class AnalyzeRoute {
             ).then(response => {
                 if (response === undefined) {
                     reject(new Error("Could not get Ride with GPS results"));
+                    return;
                 }
                 this.rwgpsRouteData = response;
                 this.gpxResult = null;
@@ -111,8 +113,9 @@ class AnalyzeRoute {
                 //TODO using current date and time for zone lookup (moment()) could pose a problem in future
                 let timeZonePromise = this.findTimezoneForPoint(point.y, point.x, moment(), timezone_api_key);
                 timeZonePromise.then(timeZoneResult => {
-                    this.timeZone = timeZoneResult;
-                    resolve(true);
+                    this.timeZone = timeZoneResult.offset;
+                    this.timeZoneId = timeZoneResult.zoneId;
+                    resolve({rwgpsRouteData:response,timeZoneOffset:timeZoneResult});
                 }, error => {
                     reject(error);
                 });
@@ -143,6 +146,7 @@ class AnalyzeRoute {
         // correct start time for time zone
         let startTime = moment.tz(userStartTime.format('YYYY-MM-DDTHH:mm'),this.timeZoneId);
         let points = this.rwgpsRouteData[rideType]['track_points'];
+        let testStream = this.rwgpsRouteData[rideType]['track_points'].map(point => ({'lat':point['y'],'lon':point['x'],'elevation':point['e']}));
         for (let trackPoint of points) {
             let point = {'lat':trackPoint['y'],'lon':trackPoint['x'],'elevation':trackPoint['e']};
             this.points.push(point);
@@ -206,16 +210,12 @@ class AnalyzeRoute {
     }
 
     walkRoute(startTime,pace,interval,controls,metric) {
-        try {
-            let modifiedControls = controls.slice();
-            modifiedControls.sort((a,b) => a['distance']-b['distance']);
-            if (this.gpxResult !== null) {
-                return this.analyzeGpxRoute(startTime,pace,interval,modifiedControls,controls,metric);
-            } else if (this.rwgpsRouteData !== null) {
-                return this.analyzeRwgpsRoute(startTime,pace,interval,modifiedControls,controls,metric);
-            }
-        } catch (error) {
-            this.setErrorStateCallback(error,'rwgps');
+        let modifiedControls = controls.slice();
+        modifiedControls.sort((a,b) => a['distance']-b['distance']);
+        if (this.gpxResult !== null) {
+            return this.analyzeGpxRoute(startTime,pace,interval,modifiedControls,controls,metric);
+        } else if (this.rwgpsRouteData !== null) {
+            return this.analyzeRwgpsRoute(startTime,pace,interval,modifiedControls,controls,metric);
         }
         return null;
     }
@@ -235,6 +235,7 @@ class AnalyzeRoute {
         let idlingTime = 0;
         let trackName = null;
         let lastTime = 0;
+        let testStream = this.gpxResult.tracks.reduce((accum,current) => accum.concat(current.segments.reduce((accum,current) => accum.concat(current))));
         // correct start time for time zone
         let startTime = moment.tz(userStartTime.format('YYYY-MM-DDTHH:mm'),this.timeZoneId);
         for (let track of this.gpxResult.tracks) {
@@ -288,10 +289,9 @@ class AnalyzeRoute {
                         let tzOffset = (event.currentTarget.response['dstOffset'] + event.currentTarget.response['rawOffset']);
                         // TODO: manipulating state in this way seems questionable
                         this.timeZoneId = event.currentTarget.response['timeZoneId'];
-                        resolve(tzOffset);
+                        resolve({offset:tzOffset,zoneId:event.currentTarget.response['timeZoneId']});
                     }
                     else {
-                        console.error(event.currentTarget.response['error_message']);
                         reject(event.currentTarget.response['error_message']);
                     }
                 });
