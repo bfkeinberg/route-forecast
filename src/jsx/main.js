@@ -21,7 +21,7 @@ import queryString from 'query-string';
 import cookie from 'react-cookies';
 import ErrorBoundary from './errorBoundary';
 import {connect} from 'react-redux';
-import {setActionUrl} from "./actions/actions";
+import {setActionUrl, setStravaToken} from "./actions/actions";
 
 /*
 TODO:
@@ -36,6 +36,11 @@ Write the top level reducer
 Write a top level component to instantiate the existing top level and wrap it in redux,
 moving the render to that level
 separate network logic out from RouteInfoForm into a container component
+
+feature requests:
+show controls on map
+show both wind arrows and rain cloud
+fix bug involving control with 0 valued time or distance
  */
 // To add to window
 if (!window.Promise) {
@@ -57,6 +62,7 @@ class RouteWeatherUI extends Component {
         let script = document.getElementById( "routeui" );
         let queryParams = queryString.parse(location.search);
         this.strava_token = RouteWeatherUI.getStravaToken(queryParams);
+        props.setStravaToken(this.strava_token);
         props.setActionUrl(script.getAttribute('action'));
         // new control point url format - <name>,<distance>,<time-in-minutes>:<name>,<distance>,<time-in-minutes>:etc
         this.state = {controlPoints: queryParams.controlPoints===undefined?[]:this.parseControls(queryParams.controlPoints),
@@ -83,7 +89,7 @@ class RouteWeatherUI extends Component {
             newControl.banked===oldControl.banked;
     }
 
-    shouldComponentUpdate(newProps,newState) {
+/*    shouldComponentUpdate(newProps,newState) {
         let controlPoints = this.state.controlPoints;
         if (this.state.routeInfo.name !== newState['routeInfo'].name) {
             return true;
@@ -113,7 +119,7 @@ class RouteWeatherUI extends Component {
             return true;
         }
         return false;
-    }
+    }*/
 
     static formatOneControl(controlPoint) {
         if (typeof controlPoint === 'string') {
@@ -272,7 +278,7 @@ class RouteWeatherUI extends Component {
 }
 
 const mapDispatchToProps = {
-    setActionUrl
+    setStravaToken, setActionUrl
 };
 
 const mapStateToProps = (state, ownProps) =>

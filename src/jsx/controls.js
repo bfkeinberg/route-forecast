@@ -17,7 +17,7 @@ import {Spinner} from '@blueprintjs/core';
 import RouteInfoForm from "./routeInfoEntry";
 import ErrorBoundary from './errorBoundary';
 import PropTypes from 'prop-types';
-import {setActualFinishTime, setStravaActivity, setStravaToken, toggleMetric, updateControls} from './actions/actions';
+import {setActualFinishTime, setStravaActivity, toggleMetric, updateControls} from './actions/actions';
 import {connect} from 'react-redux';
 
 class ControlPoints extends Component {
@@ -117,11 +117,11 @@ class ControlPoints extends Component {
             ControlPoints.getStravaParser().then(StravaParser => {
                 this.stravaParser = new StravaParser(this.updateActualValues, this.updateProgress);
                 this.stravaParser.setToken(this.props.strava_token);
-                this.stravaParser.computeActualTimes(activity, controlPoints, this.stravaErrorCallback);
+                this.stravaParser.computeActualTimes(activity, controlPoints, this.props.stravaToken, this.stravaErrorCallback);
             });
         } else {
             this.stravaParser.setToken(this.props.strava_token);
-            this.stravaParser.computeActualTimes(activity, controlPoints, this.stravaErrorCallback);
+            this.stravaParser.computeActualTimes(activity, controlPoints, this.props.stravaToken, this.stravaErrorCallback);
         }
     }
 
@@ -296,11 +296,12 @@ const mapStateToProps = (state, ownProps) =>
         controlPoints: state.controls.controlPoints,
         finishTime: state.routeInfo.finishTime,
         name: state.routeInfo.name,
-        actualFinishTime: state.strava.actualFinishTime
+        actualFinishTime: state.strava.actualFinishTime,
+        stravaToken: state.strava.token
     });
 
 const mapDispatchToProps = {
-    updateControls, toggleMetric, setStravaToken, setStravaActivity, setActualFinishTime
+    updateControls, toggleMetric, setStravaActivity, setActualFinishTime
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(ControlPoints);

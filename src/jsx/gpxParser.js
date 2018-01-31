@@ -51,7 +51,7 @@ class AnalyzeRoute {
                     timeZonePromise.then(timeZoneResult => {
                             this.timeZone = timeZoneResult.offset;
                             this.timeZoneId = timeZoneResult.zoneId;
-                            resolve(true);
+                            resolve({gpxRouteData:gpxData,timeZoneId:timeZoneResult.zoneId,timeZoneOffset:timeZoneResult.offset});
                         }, error => {
                             reject(error);          // error getting the time zone
                         }
@@ -115,7 +115,7 @@ class AnalyzeRoute {
                 timeZonePromise.then(timeZoneResult => {
                     this.timeZone = timeZoneResult.offset;
                     this.timeZoneId = timeZoneResult.zoneId;
-                    resolve({rwgpsRouteData:response,timeZoneOffset:timeZoneResult});
+                    resolve({rwgpsRouteData:response,timeZoneOffset:timeZoneResult.offset,timeZoneId:timeZoneResult.zoneId});
                 }, error => {
                     reject(error);
                 });

@@ -20,8 +20,10 @@ import rideRatingText from './rideRating.htm';
 import PropTypes from 'prop-types';
 import {
     loadFromRideWithGps,
+    loadGpxRoute,
     recalcRoute,
     requestForecast,
+    setErrorDetails,
     setInterval,
     setPace,
     setRwgpsRoute
@@ -65,7 +67,7 @@ const rideRatingDisplay = (
 
 class RouteInfoForm extends Component {
     static propTypes = {
-        start:PropTypes.string,
+        start:PropTypes.instanceOf(Date),
         pace:PropTypes.string,
         interval:PropTypes.number,
         rwgpsRoute:PropTypes.oneOfType([PropTypes.number,PropTypes.oneOf([''])]),
@@ -148,7 +150,7 @@ class RouteInfoForm extends Component {
                 this.requestForecast();
                 this.fetchAfterLoad = false;
             }
-        }, error => {this.setErrorState(error.message,'rwgps');}
+        }, error => {this.props.setErrorDetails(error.message);}
         );
     }
 
@@ -158,7 +160,7 @@ class RouteInfoForm extends Component {
 
     componentDidMount() {
         if (this.props.rwgpsRoute !== '') {
-            this.props.loadFromRideWithGps(this.props.rwgpsRoute,this.state.rwgpsRouteIsTrip,this.props['timezone_api_key'],this.props);
+            this.props.loadFromRideWithGps(this.props.rwgpsRoute,this.state.rwgpsRouteIsTrip,this.props['timezone_api_key']);
             // this.loadFromRideWithGps(this.state.rwgpsRoute,this.state.rwgpsRouteIsTrip);
             // this.setState({routeUpdating:true});
             this.fetchAfterLoad = true;
@@ -215,6 +217,8 @@ class RouteInfoForm extends Component {
     }
 
     updateRouteFile(event) {
+        this.props.loadGpxRoute(event,this.props['timezone_api_key']);
+/*
         let fileControl = event.target;
         let gpxFiles = fileControl.files;
         this.routeFileSet = event.target.value !== '';
@@ -224,6 +228,8 @@ class RouteInfoForm extends Component {
             this.setState({rwgpsRoute:'', routeUpdating:true});
             history.pushState(null, 'nothing', location.origin);
         }
+*/
+        history.pushState(null, 'nothing', location.origin);
     }
 
     calculateTimeAndDistance(props) {
@@ -416,14 +422,15 @@ class RouteInfoForm extends Component {
         // this.setState({start:new Date(dates[0])});
     }
 
+/*
     shouldComponentUpdate(nextProps, nextState) {
-        return nextState.pace!==this.state.pace ||
-            nextState.interval!==this.state.interval ||
-            nextState.rwgpsRoute!==this.state.rwgpsRoute ||
+        return nextProps.pace!==this.props.pace ||
+            nextProps.interval!==this.props.interval ||
+            nextProps.rwgpsRoute!==this.props.rwgpsRoute ||
             nextProps['errorDetails'] !== this.props.errorDetails ||
             nextState['pending'] !== this.state.pending ||
             nextState.rwgpsRouteIsTrip !== this.state.rwgpsRouteIsTrip ||
-            nextState.errorSource !== this.state.errorSource ||
+            nextProps.errorSource !== this.props.errorSource ||
             nextState['succeeded'] !== this.state.succeeded ||
             nextState['routeUpdating'] !== this.state.routeUpdating ||
             nextState['shortUrl'] !== this.state.shortUrl ||
@@ -432,6 +439,7 @@ class RouteInfoForm extends Component {
             nextProps['actualPace']!== this.props.actualPace ||
             nextProps['start']!== this.props.start;
     }
+*/
 
     getAlphaPace(pace) {
         let alpha = 'A';     // default
@@ -629,11 +637,12 @@ const mapStateToProps = (state, ownProps) =>
         fetchingRoute: state.uiInfo.fetchingRoute,
         rwgpsRouteIsTrip:state.uiInfo.rwgpsRouteIsTrip,
         errorDetails:state.uiInfo.errorDetails,
+        errorSource:state.uiInfo.errorSource,
         routeInfo:state.routeInfo
     });
 
 const mapDispatchToProps = {
-    loadFromRideWithGps, setRwgpsRoute, setInterval, setPace, requestForecast, recalcRoute
+    loadFromRideWithGps, loadGpxRoute, setRwgpsRoute, setInterval, setPace, requestForecast, recalcRoute, setErrorDetails
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(RouteInfoForm);

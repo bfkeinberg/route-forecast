@@ -25,13 +25,13 @@ class StravaRouteParser {
         this.authenticated = true;
     }
 
-    computeActualTimes(activityId, controlPoints, errorCallback) {
+    computeActualTimes(activityId, controlPoints, token, errorCallback) {
         if (!this.authenticated) {
             StravaRouteParser.authenticate(activityId);
             return;
         }
         this.updateProgress(true);
-        let activityPromise = this.fetchActivity(activityId);
+        let activityPromise = this.fetchActivity(activityId, token);
         activityPromise.then(activityData =>
         {
             let activityDataPromise = this.processActivityStream(activityId);
@@ -92,9 +92,9 @@ class StravaRouteParser {
         return moment(activity['start_date']).add(activity['elapsed_time'],'seconds').format('ddd, MMM DD h:mma');
     }
 
-    fetchActivity(activityId) {
+    fetchActivity(activityId, token) {
         const promise = new Promise((resolve, reject) => {
-            strava.activities.get({access_token: this.token, id: activityId},
+            strava.activities.get({access_token: token, id: activityId},
                 function (err, payload) {
                     if (err) {
                         reject(err);

@@ -57,8 +57,8 @@ export function recalcRoute() {
 }
 
 export const loadFromRideWithGps = function(routeNumber, isTrip, timezone_api_key) {
-    return async function(dispatch,getState) {
-        dispatch(beginLoadingRoute());
+    return async function(dispatch) {
+        dispatch(beginLoadingRoute('rwgps'));
         const parser = await getRouteParser();
         parser.loadRwgpsRoute(routeNumber, isTrip, timezone_api_key).then( (routeData) => {
                 dispatch(rwgpsRouteLoadingSuccess(routeData));
@@ -69,7 +69,7 @@ export const loadFromRideWithGps = function(routeNumber, isTrip, timezone_api_ke
 };
 
 export const BEGIN_LOADING_ROUTE = 'BEGIN_LOADING_ROUTE';
-function beginLoadingRoute() {
+function beginLoadingRoute(source) {
     return {
         type: BEGIN_LOADING_ROUTE
     }
@@ -149,9 +149,21 @@ function hideForm() {
     }
 }
 
-export const LOAD_GPX_ROUTE = 'LOAD_GPX_ROUTE';
+export function loadGpxRoute(event,timezone_api_key) {
+    return async function (dispatch) {
+        dispatch(beginLoadingRoute());
+        let gpxFiles = event.target.files;
+        if (gpxFiles.length > 0) {
+            const parser = await getRouteParser();
+            parser.loadGpxFile(gpxFiles[0],timezone_api_key).then( gpxData => {
+                    dispatch(gpxRouteLoadingSuccess(gpxData))
+                }, error => dispatch(gpxRouteLoadingFailure(error))
+            );
+        }
 
-export const REQUEST_FORECAST = 'REQUEST_FORECAST';
+    }
+}
+
 export function requestForecast(routeInfo) {
     return function(dispatch,getState) {
         dispatch(beginFetchingForecast());
@@ -181,12 +193,11 @@ export function requestForecast(routeInfo) {
                 dispatch(addWeatherCorrection(weatherCorrectionMinutes));
                 dispatch(updateControls(controlsToUpdate));
             }).catch (error => {
-                let source = this.routeFileSet ? 'gpx' : 'rwgps';
+                let source = getState().routeInfo.gpxRouteData !== null ? 'gpx' : 'rwgps';
                 let errorMessage = error.message !== undefined ? error.message : error;
                 dispatch(forecastFetchFailure(errorMessage,source));
             }
         )
-
     }
 }
 
@@ -271,6 +282,14 @@ export function setActionUrl(action) {
     return {
         type: SET_ACTION_URL,
         action: action
+    };
+}
+
+export const SET_ERROR_DETAILS = 'SET_ERROR_DETAILS';
+export function setErrorDetails(details) {
+    return {
+        type: SET_ERROR_DETAILS,
+        details: details
     };
 }
 

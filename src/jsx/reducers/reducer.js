@@ -59,12 +59,25 @@ import moment from 'moment';
 
 const defaultPace = 'D';
 const defaultIntervalInHours = 1;
+const startHour = 7;
+
+function initialStartTime() {
+    let now = new Date();
+    if (now.getHours() > startHour) {
+        now.setDate(now.getDate() + 1);
+        now.setHours(startHour);
+        now.setMinutes(0);
+        now.setSeconds(0);
+    }
+    return now;
+}
 
 const uiInfo = function(state = {interval:defaultIntervalInHours,pace:defaultPace,rwgpsRoute:'',
-    rwgpsRouteIsTrip:false, formVisible:true, errorDetails:null}, action) {
+    rwgpsRouteIsTrip:false, formVisible:true, errorDetails:null, start:initialStartTime(),
+    succeeded:true}, action) {
     switch (action.type) {
         case Actions.SET_RWGPS_ROUTE:
-            return {...state,rwgpsRoute:action.route};
+            return {...state,rwgpsRoute:action.route,errorSource:'rwgps'};
         case Actions.SET_START:
             return {...state,start:action.start};
         case Actions.SET_PACE:
@@ -72,23 +85,27 @@ const uiInfo = function(state = {interval:defaultIntervalInHours,pace:defaultPac
         case Actions.SET_INTERVAL:
             return {...state,interval:action.interval};
         case Actions.BEGIN_LOADING_ROUTE:
-            return {...state,fetchingRoute:true};
+            return {...state,fetchingRoute:true,errorSource:action.source};
         case Actions.BEGIN_FETCHING_FORECAST:
             return {...state,fetchingForecast:true};
         case Actions.FORECAST_FETCH_SUCCESS:
-            return {...state,fetchingForecast:false,errorDetails:null};
+            return {...state,fetchingForecast:false,errorDetails:null,succeeded:true};
         case Actions.FORECAST_FETCH_FAILURE:
-            return {...state,fetchingForecast:false,errorDetails:action.error,errorSource:action.source};
+            return {...state,fetchingForecast:false,errorDetails:action.error,errorSource:action.source,succeeded:false};
         case Actions.RWGPS_ROUTE_LOADING_SUCCESS:
-            return {...state, fetchingRoute:false, errorDetails:null};
+            return {...state, fetchingRoute:false, errorDetails:null, succeeded:true};
+        case Actions.GPX_ROUTE_LOADING_SUCCESS:
+            return {...state, fetchingRoute:false, errorDetails:null, succeeded:true};
         case Actions.RWGPS_ROUTE_LOADING_FAILURE:
-            return {...state, fetchingRoute:false, errorDetails:action.error, errorSource:'rwgps'};
+            return {...state, fetchingRoute:false, errorDetails:action.error, errorSource:'rwgps', rwgpsRoute:'', succeeded:false};
         case Actions.GPX_ROUTE_LOADING_FAILURE:
-            return {...state, fetchingRoute:false, errorDetails:action.error, errorSource:'gpx'};
+            return {...state, fetchingRoute:false, errorDetails:action.error, errorSource:'gpx', succeeded:false};
         case Actions.SHOW_FORM:
             return {...state, formVisible:true};
         case Actions.HIDE_FORM:
             return {...state,formVisible:false};
+        case Actions.SET_ERROR_DETAILS:
+            return {...state,errorDetails:action.details};
         default:
             return state;
     }
