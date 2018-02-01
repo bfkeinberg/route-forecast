@@ -17,14 +17,22 @@ import {Spinner} from '@blueprintjs/core';
 import RouteInfoForm from "./routeInfoEntry";
 import ErrorBoundary from './errorBoundary';
 import PropTypes from 'prop-types';
-import {setActualFinishTime, setStravaActivity, setStravaError, toggleMetric, updateControls} from './actions/actions';
+import {
+    beginStravaFetch,
+    setActualFinishTime,
+    setStravaActivity,
+    setStravaError,
+    toggleDisplayBanked,
+    toggleMetric,
+    updateControls
+} from './actions/actions';
 import {connect} from 'react-redux';
 
 class ControlPoints extends Component {
 
     static propTypes = {
         metric: PropTypes.bool.isRequired,
-        strava_token: PropTypes.string.isRequired,
+        strava_token: PropTypes.string,
         controlPoints: PropTypes.array.isRequired,
         finishTime: PropTypes.string.isRequired,
         strava_error: PropTypes.string,
@@ -87,6 +95,9 @@ class ControlPoints extends Component {
     }
 
     updateProgress(isUpdating) {
+        if (isUpdating) {
+            this.props.beginStravaFetch();
+        }
         this.setState({isUpdating:isUpdating});
     }
 
@@ -146,7 +157,8 @@ class ControlPoints extends Component {
     }
 
     toggleDisplayBanked() {
-        this.setState({displayBankedTime:!this.state.displayBankedTime});
+        this.props.toggleDisplayBanked();
+        // this.setState({displayBankedTime:!this.state.displayBankedTime});
     }
 
     toggleMetric() {
@@ -297,7 +309,7 @@ const mapStateToProps = (state, ownProps) =>
     });
 
 const mapDispatchToProps = {
-    updateControls, toggleMetric, setStravaActivity, setActualFinishTime, setStravaError
+    updateControls, toggleMetric, setStravaActivity, setActualFinishTime, setStravaError, beginStravaFetch, toggleDisplayBanked
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(ControlPoints);

@@ -247,6 +247,13 @@ export function toggleMetric() {
     };
 }
 
+export const TOGGLE_DISPLAY_BANKED = 'TOGGLE_DISPLAY_BANKED';
+export function toggleDisplayBanked() {
+    return {
+        type: TOGGLE_DISPLAY_BANKED
+    };
+}
+
 export const SET_STRAVA_TOKEN = 'SET_STRAVA_TOKEN';
 export function setStravaToken(token) {
     return {
@@ -268,6 +275,21 @@ export function setStravaError(error) {
     return {
         type: SET_STRAVA_ERROR,
         activity: error
+    };
+}
+
+export const BEGIN_STRAVA_FETCH = 'BEGIN_STRAVA_FETCH';
+export function beginStravaFetch() {
+    return {
+        type: BEGIN_STRAVA_FETCH
+    };
+}
+
+export const STRAVA_FETCH_SUCCESS = 'STRAVA_FETCH_SUCCESS';
+export function setStravaError(data) {
+    return {
+        type: STRAVA_FETCH_SUCCESS,
+        data: data
     };
 }
 

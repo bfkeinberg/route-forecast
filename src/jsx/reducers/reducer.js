@@ -141,6 +141,8 @@ const controls = function(state = {metric:false,controlPoints:[]}, action) {
     switch (action.type) {
         case Actions.TOGGLE_METRIC:
             return {...state, metric:!state.metric};
+        case Actions.TOGGLE_DISPLAY_BANKED:
+            return {...state, displayBanked:!state.displayBanked};
         case Actions.UPDATE_CONTROLS:
             return {...state, controlPoints:action.controls};
         default:
@@ -158,6 +160,10 @@ const strava = function(state = {}, action) {
             return {...state, error:action.error};
         case Actions.SET_ACTUAL_FINISH_TIME:
             return {...state, actualFinishTime:action.finishTime};
+        case Actions.BEGIN_STRAVA_FETCH:
+            return {...state, fetching:true}
+        case Actions.STRAVA_FETCH_SUCCESS:
+            return {...state, fetching:false, data:action.data}
         default:
             return state;
     }
