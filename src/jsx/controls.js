@@ -17,7 +17,7 @@ import {Spinner} from '@blueprintjs/core';
 import RouteInfoForm from "./routeInfoEntry";
 import ErrorBoundary from './errorBoundary';
 import PropTypes from 'prop-types';
-import {setActualFinishTime, setStravaActivity, toggleMetric, updateControls} from './actions/actions';
+import {setActualFinishTime, setStravaActivity, setStravaError, toggleMetric, updateControls} from './actions/actions';
 import {connect} from 'react-redux';
 
 class ControlPoints extends Component {
@@ -95,6 +95,7 @@ class ControlPoints extends Component {
     }
 
     stravaErrorCallback(error) {
+        this.props.setStravaError(error);
         this.setState({stravaError:error,stravaAlertVisible:true,isUpdating:false});
     }
 
@@ -291,11 +292,12 @@ const mapStateToProps = (state, ownProps) =>
         finishTime: state.routeInfo.finishTime,
         name: state.routeInfo.name,
         actualFinishTime: state.strava.actualFinishTime,
-        stravaToken: state.strava.token
+        stravaToken: state.strava.token,
+        strava_error: state.strava.error
     });
 
 const mapDispatchToProps = {
-    updateControls, toggleMetric, setStravaActivity, setActualFinishTime
+    updateControls, toggleMetric, setStravaActivity, setActualFinishTime, setStravaError
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(ControlPoints);

@@ -263,6 +263,14 @@ export function setStravaActivity(activity) {
     };
 }
 
+export const SET_STRAVA_ERROR = 'SET_STRAVA_ERROR';
+export function setStravaError(error) {
+    return {
+        type: SET_STRAVA_ERROR,
+        activity: error
+    };
+}
+
 export const ADD_WEATHER_CORRECTION = 'ADD_WEATHER_CORRECTION';
 export function addWeatherCorrection(weatherCorrection) {
     return {

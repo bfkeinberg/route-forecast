@@ -49,6 +49,7 @@ let state = {
         strava_token:null,
         strava_activity:null,
         strava_error,
+        fetching,
         actualFinishTime:"Fri, Jan 12 3:29pm",
         actualPace: 18.5,
         stravaStreams:{}
@@ -153,6 +154,8 @@ const strava = function(state = {}, action) {
             return {...state, token:action.token};
         case Actions.SET_STRAVA_ACTIVITY:
             return {...state, activity:action.activity};
+        case Actions.SET_STRAVA_ERROR:
+            return {...state, error:action.error};
         case Actions.SET_ACTUAL_FINISH_TIME:
             return {...state, actualFinishTime:action.finishTime};
         default:

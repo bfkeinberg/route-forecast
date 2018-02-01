@@ -21,7 +21,7 @@ import queryString from 'query-string';
 import cookie from 'react-cookies';
 import ErrorBoundary from './errorBoundary';
 import {connect} from 'react-redux';
-import {setActionUrl, setApiKeys, setRwgpsRoute, setStravaToken} from "./actions/actions";
+import {setActionUrl, setApiKeys, setRwgpsRoute, setStravaError, setStravaToken} from "./actions/actions";
 
 /*
 TODO:
@@ -281,7 +281,7 @@ class RouteWeatherUI extends Component {
 }
 
 const mapDispatchToProps = {
-    setStravaToken, setActionUrl, setRwgpsRoute, setApiKeys
+    setStravaToken, setActionUrl, setRwgpsRoute, setApiKeys, setStravaError
 };
 
 const mapStateToProps = (state, ownProps) =>

@@ -118,7 +118,8 @@ class RouteInfoForm extends Component {
             pending:false,
             rwgpsRouteIsTrip:false, errorSource:null, succeeded:null, routeUpdating:false,
             shortUrl:'   '};
-        this.fetchAfterLoad = false;
+        // for when we are loaded with a url that contains a route
+        this.fetchAfterLoad = props.rwgpsRoute !== undefined;
     }
 
     async getRouteParser() {
@@ -160,10 +161,9 @@ class RouteInfoForm extends Component {
 
     componentDidMount() {
         if (this.props.rwgpsRoute !== '') {
-            this.props.loadFromRideWithGps(this.props.rwgpsRoute,this.state.rwgpsRouteIsTrip,this.props['timezone_api_key']);
+            this.props.loadFromRideWithGps(this.props.rwgpsRoute,this.state.rwgpsRouteIsTrip,this.props.timezone_api_key);
             // this.loadFromRideWithGps(this.state.rwgpsRoute,this.state.rwgpsRouteIsTrip);
             // this.setState({routeUpdating:true});
-            this.fetchAfterLoad = true;
         }
     }
 
@@ -222,7 +222,7 @@ class RouteInfoForm extends Component {
     }
 
     updateRouteFile(event) {
-        this.props.loadGpxRoute(event,this.props['timezone_api_key']);
+        this.props.loadGpxRoute(event,this.props.timezone_api_key);
 /*
         let fileControl = event.target;
         let gpxFiles = fileControl.files;
