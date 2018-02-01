@@ -177,7 +177,7 @@ const params = function(state = {}, action) {
         case Actions.SET_ACTION_URL:
             return {...state, action: action.action};
         case Actions.SET_API_KEYS:
-            return {...state, maps_api_key: action.maps_api_key, timezone_api_key:action.timezoneKey};
+            return {...state, maps_api_key: action.mapsKey, timezone_api_key:action.timezoneKey};
         default:
             return state;
     }
