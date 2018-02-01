@@ -45,14 +45,25 @@ async function getRouteParser() {
     return parser.default;
 }
 
+function currentRouteData(getState) {
+    if (getState().routeInfo.rwgpsRouteData !== null) {
+        return getState().routeInfo.rwgpsRouteData;
+    } else {
+        return getState().routeInfo.gpxRouteData;
+    }
+}
+
 export const RECALC_ROUTE = 'RECALC_ROUTE';
 export function recalcRoute() {
     return async function(dispatch, getState) {
         const parser = await getRouteParser();
         dispatch(setRouteInfo(
-            parser.walkRoute(moment(getState().uiInfo.start),
+            parser.walkRoute(
+                currentRouteData(getState),
+                moment(getState().uiInfo.start),
                 getState().uiInfo.pace, getState().uiInfo.interval,
-                getState().controls.controlPoints,getState().controls.metric)));
+                getState().controls.controlPoints,getState().controls.metric,
+                getState().routeInfo.timeZoneId)));
     }
 }
 
@@ -83,17 +94,18 @@ function beginFetchingForecast() {
 }
 
 export const FORECAST_FETCH_SUCCESS = 'FORECAST_FETCH_SUCCESS';
-function forecastFetchSuccess() {
+function forecastFetchSuccess(forecastInfo) {
     return {
-        type: FORECAST_FETCH_SUCCESS
+        type: FORECAST_FETCH_SUCCESS,
+        forecastInfo: forecastInfo
     }
 }
 
 export const FORECAST_FETCH_FAILURE = 'FORECAST_FETCH_FAILURE';
-function forecastFetchFailure(error,source) {
+function forecastFetchFailure(error) {
     return {
         type: FORECAST_FETCH_FAILURE,
-        error:error, source:source
+        error:error
     }
 }
 
@@ -151,7 +163,7 @@ function hideForm() {
 
 export function loadGpxRoute(event,timezone_api_key) {
     return async function (dispatch) {
-        dispatch(beginLoadingRoute());
+        dispatch(beginLoadingRoute('gpx'));
         let gpxFiles = event.target.files;
         if (gpxFiles.length > 0) {
             const parser = await getRouteParser();
@@ -169,7 +181,7 @@ export function requestForecast(routeInfo) {
         dispatch(beginFetchingForecast());
         dispatch(hideForm());
         let formdata = new FormData();
-        formdata.append('locations', JSON.stringify(routeInfo.forecastRequest));
+        formdata.append('locations', JSON.stringify(routeInfo.forecast));
         formdata.append('timezone', routeInfo.timeZoneOffset);
         fetch(getState().params.action,
             {
@@ -181,33 +193,23 @@ export function requestForecast(routeInfo) {
                     return response.json();
                 } else {
                     let error = response.statusText !== undefined ? response.statusText : response['status'];
-                    let source = routeInfo.gpxRouteData !== null ? 'gpx' : 'rwgps';
-                    dispatch(forecastFetchFailure(error,source));
+                    throw new Error(error);
                 } })
             .then(async response => {
-                dispatch(forecastFetchSuccess());
-                dispatch(updateForecastInfo(response));
+                dispatch(forecastFetchSuccess(response));
                 let controlsToUpdate = getState().controls.controlPoints.slice();
                 const parser = await getRouteParser();
                 let weatherCorrectionMinutes = parser.adjustForWind(response,getState().uiInfo.pace,controlsToUpdate,getState().uiInfo.start,getState().uiInfo.metric);
                 dispatch(addWeatherCorrection(weatherCorrectionMinutes));
                 dispatch(updateControls(controlsToUpdate));
             }).catch (error => {
-                let source = getState().routeInfo.gpxRouteData !== null ? 'gpx' : 'rwgps';
                 let errorMessage = error.message !== undefined ? error.message : error;
-                dispatch(forecastFetchFailure(errorMessage,source));
+                dispatch(forecastFetchFailure(errorMessage));
             }
         )
     }
 }
 
-export const UPDATE_FORECAST_INFO = 'UPDATE_FORECAST_INFO';
-export function updateForecastInfo(forecastInfo) {
-    return {
-        type: UPDATE_FORECAST_INFO,
-        forecastInfo: forecastInfo
-    };
-}
 export const SHORTEN_URL = 'SHORTEN_URL';
 
 export const SET_ADDRESS = 'SET_ADDRESS';
@@ -265,7 +267,7 @@ export const ADD_WEATHER_CORRECTION = 'ADD_WEATHER_CORRECTION';
 export function addWeatherCorrection(weatherCorrection) {
     return {
         type: ADD_WEATHER_CORRECTION,
-        finishTime: weatherCorrection
+        weatherCorrectionMinutes: weatherCorrection
     };
 }
 
@@ -285,11 +287,29 @@ export function setActionUrl(action) {
     };
 }
 
+export const SET_API_KEYS = 'SET_API_KEYS';
+export function setApiKeys(mapsKey,timezoneKey) {
+    return {
+        type: SET_API_KEYS,
+        mapsKey: mapsKey,
+        timezoneKey: timezoneKey
+    };
+}
+
 export const SET_ERROR_DETAILS = 'SET_ERROR_DETAILS';
 export function setErrorDetails(details) {
     return {
         type: SET_ERROR_DETAILS,
         details: details
+    };
+}
+
+export const SET_TIME_ZONE = 'SET_TIME_ZONE';
+export function setTimeZone(id,offset) {
+    return {
+        type: SET_TIME_ZONE,
+        id: id,
+        offset: offset
     };
 }
 

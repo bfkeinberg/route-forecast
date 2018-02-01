@@ -202,7 +202,10 @@ def handle_login():
 def forecast():
     if not request.form.keys() >= ['locations', 'timezone']:
         return jsonify({'status': 'Missing keys'}), 400
-    forecast_points = json.loads(request.form['locations'])
+    try:
+        forecast_points = json.loads(request.form['locations'])
+    except ValueError as error:
+        return jsonify({'status': 'Badly formatted forecast locations :' + str(error)}), 400
     logger.info('Request from %s(%s) for %d forecast points', request.remote_addr,
                 request.headers.get('X-Forwarded-For', request.remote_addr), len(forecast_points))
     if len(forecast_points) > 50:

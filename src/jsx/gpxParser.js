@@ -126,7 +126,7 @@ class AnalyzeRoute {
         });
     }
 
-    analyzeRwgpsRoute(userStartTime,pace,intervalInHours,controls,unsortedControls,metric) {
+    analyzeRwgpsRoute(routeData,userStartTime,pace,intervalInHours,controls,unsortedControls,metric, timeZoneId) {
         this.nextControl = 0;
         this.pointsInRoute = [];
         let forecastRequests = [];
@@ -144,9 +144,9 @@ class AnalyzeRoute {
 
         let lastTime = 0;
         // correct start time for time zone
-        let startTime = moment.tz(userStartTime.format('YYYY-MM-DDTHH:mm'),this.timeZoneId);
+        let startTime = moment.tz(userStartTime.format('YYYY-MM-DDTHH:mm'), timeZoneId);
         let points = this.rwgpsRouteData[rideType]['track_points'];
-        let testStream = this.rwgpsRouteData[rideType]['track_points'].map(point => ({'lat':point['y'],'lon':point['x'],'elevation':point['e']}));
+        // let testStream = this.rwgpsRouteData[rideType]['track_points'].map(point => ({'lat':point['y'],'lon':point['x'],'elevation':point['e']}));
         for (let trackPoint of points) {
             let point = {'lat':trackPoint['y'],'lon':trackPoint['x'],'elevation':trackPoint['e']};
             this.points.push(point);
@@ -209,18 +209,18 @@ class AnalyzeRoute {
         return moment(startTime).add(accumulatedTime+restTime,'hours').format('ddd, MMM DD h:mma');
     }
 
-    walkRoute(startTime,pace,interval,controls,metric) {
+    walkRoute(routeData,startTime,pace,interval,controls,metric,timeZoneId) {
         let modifiedControls = controls.slice();
         modifiedControls.sort((a,b) => a['distance']-b['distance']);
         if (this.gpxResult !== null) {
-            return this.analyzeGpxRoute(startTime,pace,interval,modifiedControls,controls,metric);
+            return this.analyzeGpxRoute(routeData,startTime,pace,interval,modifiedControls,controls,metric,timeZoneId);
         } else if (this.rwgpsRouteData !== null) {
-            return this.analyzeRwgpsRoute(startTime,pace,interval,modifiedControls,controls,metric);
+            return this.analyzeRwgpsRoute(routeData,startTime,pace,interval,modifiedControls,controls,metric,timeZoneId);
         }
         return null;
     }
 
-    analyzeGpxRoute(userStartTime, pace, intervalInHours, controls, unsortedControls, metric) {
+    analyzeGpxRoute(routeData,userStartTime, pace, intervalInHours, controls, unsortedControls, metric, timeZoneId) {
         this.nextControl = 0;
         this.pointsInRoute = [];
         let forecastRequests = [];
@@ -235,9 +235,9 @@ class AnalyzeRoute {
         let idlingTime = 0;
         let trackName = null;
         let lastTime = 0;
-        let testStream = this.gpxResult.tracks.reduce((accum,current) => accum.concat(current.segments.reduce((accum,current) => accum.concat(current))));
+        // let testStream = this.gpxResult.tracks.reduce((accum,current) => accum.concat(current.segments.reduce((accum,current) => accum.concat(current))));
         // correct start time for time zone
-        let startTime = moment.tz(userStartTime.format('YYYY-MM-DDTHH:mm'),this.timeZoneId);
+        let startTime = moment.tz(userStartTime.format('YYYY-MM-DDTHH:mm'), timeZoneId);
         for (let track of this.gpxResult.tracks) {
             if (trackName === null) {
                 trackName = track.name;

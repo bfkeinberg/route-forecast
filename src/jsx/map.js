@@ -10,12 +10,13 @@ import west_arrow from "Images/arrow_left.png";
 import nw_arrow from "Images/arrow_up_left.png";
 import east_arrow from "Images/arrow_right.png";
 import rainCloud from "Images/rainCloud.png";
+import {connect} from 'react-redux';
 
 /*global google*/
 
 class RouteForecastMap extends Component {
     static propTypes = {
-        forecast:PropTypes.array.isRequired,
+        forecast:PropTypes.arrayOf(PropTypes.array).isRequired,
         routeInfo:PropTypes.object.isRequired,
         maps_api_key:PropTypes.string.isRequired
     };
@@ -234,4 +235,12 @@ class RouteForecastMap extends Component {
 
 }
 
-export default RouteForecastMap;
+const mapStateToProps = (state, ownProps) =>
+    ({
+        forecast: state.forecast,
+        routeInfo: state.routeInfo,
+        maps_api_key: state.params.maps_api_key
+    });
+
+
+export default connect(mapStateToProps)(RouteForecastMap);

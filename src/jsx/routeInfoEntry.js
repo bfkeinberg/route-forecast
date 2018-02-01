@@ -174,6 +174,11 @@ class RouteInfoForm extends Component {
             !nextProps.controlPoints.every((v, i)=> ControlPoints.doControlsMatch(v,this.props.controlPoints[i]))) {
             this.props.recalcRoute();
         }
+        if (this.fetchAfterLoad && this.props.routeInfo.points !== null) {
+            this.requestForecast();
+            this.fetchAfterLoad = false;
+        }
+
         // this.calculateTimeAndDistance(nextProps);
     }
 
@@ -356,7 +361,7 @@ class RouteInfoForm extends Component {
                 return;
             }
             // this.loadFromRideWithGps(route,this.state.rwgpsRouteIsTrip);
-            this.props.loadFromRideWithGps(route,this.state.rwgpsRouteIsTrip,this.props['timezone_api_key']);
+            this.props.loadFromRideWithGps(route,this.props.rwgpsRouteIsTrip,this.props['timezone_api_key']);
             // clear file input to avoid confusion
             document.getElementById('route').value = null;
             // this.setState({'routeUpdating':true});

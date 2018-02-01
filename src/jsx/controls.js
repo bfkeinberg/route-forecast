@@ -112,17 +112,11 @@ class ControlPoints extends Component {
         // this.setState({strava_activity:newValue});
     }
 
-    computeTimesFromStrava(activity, controlPoints) {
-        if (this.stravaParser === undefined) {
-            ControlPoints.getStravaParser().then(StravaParser => {
-                this.stravaParser = new StravaParser(this.updateActualValues, this.updateProgress);
-                this.stravaParser.setToken(this.props.strava_token);
-                this.stravaParser.computeActualTimes(activity, controlPoints, this.props.stravaToken, this.stravaErrorCallback);
-            });
-        } else {
-            this.stravaParser.setToken(this.props.strava_token);
-            this.stravaParser.computeActualTimes(activity, controlPoints, this.props.stravaToken, this.stravaErrorCallback);
-        }
+    async computeTimesFromStrava(activity, controlPoints) {
+        const StravaParser = await ControlPoints.getStravaParser();
+        const stravaParser = new StravaParser(this.updateActualValues, this.updateProgress);
+        stravaParser.computeActualTimes(activity, controlPoints, this.props.stravaToken).then( result => console.log(result),
+            error => this.stravaErrorCallback(error));
     }
 
     updateExpectedTimes(value) {

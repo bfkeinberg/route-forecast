@@ -10,13 +10,15 @@ let state = {
     routeInfo:{
         rwgpsRouteData:
         gpxRouteData:
-        timeZone:
+        timeZoneOffset:
+        timeZoneId,
         bounds:{min_latitude:0, max_latitude:0, min_longitude:0, max_longitude:0},
         points:[
             {latitude:17.5, longitude:130.9}...
         ],
         name:"This route",
-        finishTime:"Thu, Jan 11 3:29pm"
+        finishTime:"Thu, Jan 11 3:29pm",
+        weatherCorrectionMinutes
     },
     // received from weather forecast, consumed by map and table rendering components
     forecast:[
@@ -91,7 +93,7 @@ const uiInfo = function(state = {interval:defaultIntervalInHours,pace:defaultPac
         case Actions.FORECAST_FETCH_SUCCESS:
             return {...state,fetchingForecast:false,errorDetails:null,succeeded:true};
         case Actions.FORECAST_FETCH_FAILURE:
-            return {...state,fetchingForecast:false,errorDetails:action.error,errorSource:action.source,succeeded:false};
+            return {...state,fetchingForecast:false,errorDetails:action.error,succeeded:false};
         case Actions.RWGPS_ROUTE_LOADING_SUCCESS:
             return {...state, fetchingRoute:false, errorDetails:null, succeeded:true};
         case Actions.GPX_ROUTE_LOADING_SUCCESS:
@@ -111,12 +113,14 @@ const uiInfo = function(state = {interval:defaultIntervalInHours,pace:defaultPac
     }
 };
 
-const routeInfo = function(state = {finishTime:''}, action) {
+const routeInfo = function(state = {finishTime:'',weatherCorrectionMinutes:null}, action) {
     switch (action.type) {
         case Actions.RWGPS_ROUTE_LOADING_SUCCESS:
-            return {...state,rwgpsRouteData:action.routeData.rwgpsRouteData,timeZoneOffset:action.routeData.timeZoneOffset, gpxRouteData:null};
+            return {...state,rwgpsRouteData:action.routeData.rwgpsRouteData,timeZoneOffset:action.routeData.timeZoneOffset,
+                timeZoneId:action.routeData.timeZoneId, gpxRouteData:null};
         case Actions.GPX_ROUTE_LOADING_SUCCESS:
-            return {...state,gpxRouteData:action.routeData.gpxRouteData,timeZoneOffset:action.routeData.timeZoneOffset, rwgpsRouteData:null};
+            return {...state,gpxRouteData:action.routeData.gpxRouteData,timeZoneOffset:action.routeData.timeZoneOffset,
+                timeZoneId:action.routeData.timeZoneId, rwgpsRouteData:null};
         case Actions.SET_ROUTE_INFO:
             return {...state, ...action.routeInfo};
         case Actions.CLEAR_ROUTE_DATA:
@@ -125,7 +129,8 @@ const routeInfo = function(state = {finishTime:''}, action) {
         case Actions.SET_RWGPS_ROUTE:
             return {...state,rwgpsRouteData:null,gpxRouteData:null,points:null,name:''};
         case Actions.ADD_WEATHER_CORRECTION:
-            return {...state,finishTime:moment(state.finishTime,'ddd, MMM DD h:mma').add(action.weatherCorrectionMinutes,'minutes').format('ddd, MMM DD h:mma')};
+            return {...state,weatherCorrectionMinutes:action.weatherCorrectionMinutes,
+                finishTime:moment(state.finishTime,'ddd, MMM DD h:mma').add(action.weatherCorrectionMinutes,'minutes').format('ddd, MMM DD h:mma')};
         default:
             return state;
     }
@@ -155,10 +160,10 @@ const strava = function(state = {}, action) {
     }
 };
 
-const forecast = function(state = {}, action) {
+const forecast = function(state = [], action) {
     switch (action.type) {
-        case Actions.UPDATE_FORECAST_INFO:
-            return {...state, forecast:action.forecastInfo};
+        case Actions.FORECAST_FETCH_SUCCESS:
+            return action.forecastInfo.forecast;
         default:
             return state;
     }
@@ -168,6 +173,8 @@ const params = function(state = {}, action) {
     switch (action.type) {
         case Actions.SET_ACTION_URL:
             return {...state, action: action.action};
+        case Actions.SET_API_KEYS:
+            return {...state, maps_api_key: action.maps_api_key, timezone_api_key:action.timezoneKey};
         default:
             return state;
     }

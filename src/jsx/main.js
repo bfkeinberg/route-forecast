@@ -21,7 +21,7 @@ import queryString from 'query-string';
 import cookie from 'react-cookies';
 import ErrorBoundary from './errorBoundary';
 import {connect} from 'react-redux';
-import {setActionUrl, setStravaToken} from "./actions/actions";
+import {setActionUrl, setApiKeys, setRwgpsRoute, setStravaToken} from "./actions/actions";
 
 /*
 TODO:
@@ -41,6 +41,7 @@ feature requests:
 show controls on map
 show both wind arrows and rain cloud
 fix bug involving control with 0 valued time or distance
+
  */
 // To add to window
 if (!window.Promise) {
@@ -61,9 +62,11 @@ class RouteWeatherUI extends Component {
         this.invalidateForecast = this.invalidateForecast.bind(this);
         let script = document.getElementById( "routeui" );
         let queryParams = queryString.parse(location.search);
+        props.setRwgpsRoute(parseInt(queryParams.rwgpsRoute));
         this.strava_token = RouteWeatherUI.getStravaToken(queryParams);
         props.setStravaToken(this.strava_token);
         props.setActionUrl(script.getAttribute('action'));
+        props.setApiKeys(script.getAttribute('maps_api_key'),script.getAttribute('timezone_api_key'));
         // new control point url format - <name>,<distance>,<time-in-minutes>:<name>,<distance>,<time-in-minutes>:etc
         this.state = {controlPoints: queryParams.controlPoints===undefined?[]:this.parseControls(queryParams.controlPoints),
             routeInfo:{bounds:{},points:[], name:'',finishTime:''}, forecast:[], action:script.getAttribute('action'),
@@ -278,7 +281,7 @@ class RouteWeatherUI extends Component {
 }
 
 const mapDispatchToProps = {
-    setStravaToken, setActionUrl
+    setStravaToken, setActionUrl, setRwgpsRoute, setApiKeys
 };
 
 const mapStateToProps = (state, ownProps) =>

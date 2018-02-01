@@ -25,50 +25,38 @@ class StravaRouteParser {
         this.authenticated = true;
     }
 
-    computeActualTimes(activityId, controlPoints, token, errorCallback) {
-        if (!this.authenticated) {
+    computeActualTimes(activityId, controlPoints, token) {
+        if (token === null) {
             StravaRouteParser.authenticate(activityId);
             return;
         }
         this.updateProgress(true);
         let activityPromise = this.fetchActivity(activityId, token);
-        activityPromise.then(activityData =>
-        {
-            let activityDataPromise = this.processActivityStream(activityId);
-            activityDataPromise.then(activityStream =>
-                {
-                    this.updateProgress(false);
-                    if (activityData.message !== undefined) {
-                        cookie.remove('strava_token');
-                        errorCallback(activityData.message);
-                        return;
+        return new Promise((resolve, reject) => {
+            activityPromise.then(activityData => {
+                let activityDataPromise = this.processActivityStream(activityId);
+                activityDataPromise.then(activityStream => {
+                        this.updateProgress(false);
+                        if (activityData.message !== undefined) {
+                            cookie.remove('strava_token');
+                            errorCallback(activityData.message);
+                            return;
+                        }
+                        if (activityStream.message !== undefined) {
+                            cookie.remove('strava_token');
+                            errorCallback(activityStream.message);
+                            return;
+                        }
+                        console.log(this.findMovingAverage(activityData, activityStream, 4));
+                        resolve(this.updateControls(this.parseActivity(activityData, activityStream, controlPoints),
+                            this.computeActualFinishTime(activityData), StravaRouteParser.wwPaceCalcForActivity(activityData)));
+                    }, error => {
+                        reject(error);
                     }
-                    if (activityStream.message !== undefined) {
-                        cookie.remove('strava_token');
-                        errorCallback(activityStream.message);
-                        return;
-                    }
-                    console.log(this.findMovingAverage(activityData,activityStream,4));
-                    this.updateControls(this.parseActivity(activityData, activityStream, controlPoints),
-                        this.computeActualFinishTime(activityData), StravaRouteParser.wwPaceCalcForActivity(activityData));
-                }, error => {
-                    if (errorCallback !== undefined) {
-                        errorCallback(error);
-                    } else {
-                        console.log('Failed to load Strava activity stream', error);
-                    }
-                }
-            );
-        }, error => {
-            if (errorCallback !== undefined) {
-                if (error.msg !== undefined) {
-                    errorCallback(error.msg);
-                } else {
-                    errorCallback(error);
-                }
-            } else {
-                console.log('Failed to load Strava activity data', error);
-            }
+                );
+            }, error => {
+                reject(error);
+            });
         });
     }
 

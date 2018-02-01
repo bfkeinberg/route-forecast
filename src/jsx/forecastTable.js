@@ -3,11 +3,12 @@ import {Table} from 'react-bootstrap';
 import ErrorBoundary from "./errorBoundary";
 import darkSky from 'Images/darkSkySmall.png';
 import PropTypes from 'prop-types';
+import {connect} from 'react-redux';
 
 class ForecastTable extends Component {
     static propTypes = {
         weatherCorrectionMinutes:PropTypes.number,
-        forecast:PropTypes.array.isRequired
+        forecast:PropTypes.arrayOf(PropTypes.array).isRequired
     };
 
     constructor(props) {
@@ -94,4 +95,10 @@ class ForecastTable extends Component {
     }
 }
 
-export default ForecastTable;
+const mapStateToProps = (state, ownProps) =>
+    ({
+        forecast: state.forecast,
+        weatherCorrectionMinutes: state.routeInfo.weatherCorrectionMinutes
+    });
+
+export default connect(mapStateToProps)(ForecastTable);
