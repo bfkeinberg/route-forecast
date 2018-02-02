@@ -204,8 +204,6 @@ class RouteWeatherUI extends Component {
             <RouteInfoForm action={this.state.action}
                            updateRouteInfo={this.updateRouteInfo}
                            updateForecast={this.updateForecast}
-                           updateControls={this.updateControls}
-                           controlPoints={this.state.controlPoints}
                            formVisible={this.state.formVisible}
                            metric={this.state.metric}
                            actualPace={this.state.actualPace}

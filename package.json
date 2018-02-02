@@ -38,7 +38,7 @@
     "react-flatpickr": "^3.0.0",
     "react-redux": "^5.0.6",
     "react-responsive": "^4.0.3",
-    "react-split-pane": "^0.1.74",
+    "react-split-pane": "^0.1.76",
     "react-toastr": "^3.0.0",
     "redux": "^3.7.2",
     "redux-logger": "^3.0.6",

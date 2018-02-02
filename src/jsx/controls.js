@@ -22,8 +22,10 @@ import {
     setActualFinishTime,
     setStravaActivity,
     setStravaError,
+    stravaFetchSuccess,
     toggleDisplayBanked,
     toggleMetric,
+    toggleStravaAnalysis,
     updateControls
 } from './actions/actions';
 import {connect} from 'react-redux';
@@ -33,7 +35,7 @@ class ControlPoints extends Component {
     static propTypes = {
         metric: PropTypes.bool.isRequired,
         strava_token: PropTypes.string,
-        controlPoints: PropTypes.array.isRequired,
+        controlPoints: PropTypes.arrayOf(PropTypes.object).isRequired,
         finishTime: PropTypes.string.isRequired,
         strava_error: PropTypes.string,
         setActualPace:PropTypes.func.isRequired,
@@ -89,7 +91,7 @@ class ControlPoints extends Component {
     }
 
     updateActualValues(controlPoints,finishTime,pace) {
-        this.props.updateControls(controlPoints,this.state.metric);
+        this.props.updateControls(controlPoints);
         this.props.setActualFinishTime(finishTime);
         this.props.setActualPace(pace);
     }
@@ -98,7 +100,10 @@ class ControlPoints extends Component {
         if (isUpdating) {
             this.props.beginStravaFetch();
         }
-        this.setState({isUpdating:isUpdating});
+        else {
+            this.props.stravaFetchSuccess('');
+        }
+        // this.setState({isUpdating:isUpdating});
     }
 
     hideStravaErrorAlert() {
@@ -171,12 +176,13 @@ class ControlPoints extends Component {
     }
 
     toggleCompare() {
-        let lookback = !this.state.lookback;
-        this.setState({lookback:lookback});
+        this.props.toggleStravaAnalysis();
+        // let lookback = !this.state.lookback;
+        // this.setState({lookback:lookback});
     }
 
     updateFromTable(controlPoints) {
-        this.props.updateControls(controlPoints,this.props.metric);
+        this.props.updateControls(controlPoints);
     }
 
     static doControlsMatch(newControl, oldControl) {
@@ -188,7 +194,7 @@ class ControlPoints extends Component {
             newControl.banked===oldControl.banked;
     }
 
-    shouldComponentUpdate(nextProps,newState) {
+/*    shouldComponentUpdate(nextProps,newState) {
         let controlPoints = this.props.controlPoints;
         if (newState.displayBankedTime !== this.state.displayBankedTime ||
                 newState.lookback !== this.state.lookback ||
@@ -205,7 +211,7 @@ class ControlPoints extends Component {
             return true;
         }
         return false;
-    }
+    }*/
 
     render () {
         const title = this.props.name === '' ?
@@ -230,8 +236,8 @@ class ControlPoints extends Component {
                         <Checkbox tabIndex='11' checked={this.state.displayBankedTime} inline
                                   onChange={this.toggleDisplayBanked} onClick={this.toggleDisplayBanked}
                                   style={{padding:'0px 0px 0px 24px', display:'inline-flex'}}>Display banked time</Checkbox>
-                        <Checkbox tabIndex="13" checked={this.state.lookback} disabled={!this.props.forecastValid} inline onChange={this.toggleCompare}
-                                  onClick={this.toggleCompare} style={{visibility:this.state.lookback ? null : 'hidden', display:'inline-flex'}}>Compare</Checkbox>
+                        <Checkbox tabIndex="13" checked={this.props.stravaAnalysis} disabled={!this.props.forecastValid} inline onChange={this.toggleCompare}
+                                  onClick={this.toggleCompare} style={{visibility:this.props.stravaAnalysis ? null : 'hidden', display:'inline-flex'}}>Compare</Checkbox>
                         <ErrorBoundary>
                             <FormGroup controlId="actualRide" style={{display:'inline-flex'}}>
                                 <ControlLabel style={{display:'inline-flex'}}>Strava</ControlLabel>
@@ -244,7 +250,7 @@ class ControlPoints extends Component {
                                                              event.preventDefault();
                                                              dt.items[i].getAsString(value => {
                                                                  this.setStravaActivity(value);
-                                                                 this.updateExpectedTimes(this.state.strava_activity);
+                                                                 this.updateExpectedTimes(this.props.strava_activity);
                                                              });
                                                          } else {
                                                              console.log('vetoing drop of',i,dt.items[i].kind);
@@ -266,11 +272,11 @@ class ControlPoints extends Component {
                                                      }
                                                  }
                                              }}
-                                             value={this.state.strava_activity} onChange={event => {this.setStravaActivity(event.target.value)}}
-                                             onBlur={() => {this.updateExpectedTimes(this.state.strava_activity)}}/>
+                                             value={this.props.strava_activity} onChange={event => {this.setStravaActivity(event.target.value)}}
+                                             onBlur={() => {this.updateExpectedTimes(this.props.strava_activity)}}/>
                             </FormGroup>
                             {this.state.stravaAlertVisible?<Alert onDismiss={this.hideStravaErrorAlert} bsStyle='warning'>{this.state.stravaError}</Alert>:null}
-                            {ControlPoints.showProgressSpinner(this.state.isUpdating)}
+                            {ControlPoints.showProgressSpinner(this.props.fetchingFromStrava)}
                         </ErrorBoundary>
                     </ButtonGroup>
                 </ButtonToolbar>
@@ -281,14 +287,14 @@ class ControlPoints extends Component {
 
                             <ErrorBoundary>
                                 <ControlTable rows={this.props.controlPoints.length} controls={this.props.controlPoints}
-                                              displayBanked={this.state.displayBankedTime} compare={this.state.lookback} update={this.updateFromTable} ref={(table) => {this.table = table;}}/>
+                                              displayBanked={this.props.displayBanked} compare={this.props.stravaAnalysis} update={this.updateFromTable} ref={(table) => {this.table = table;}}/>
                             </ErrorBoundary>
 
                         </Panel>
                     </MediaQuery>
                     <MediaQuery maxDeviceWidth={800}>
                                 <ControlTable rows={this.props.controlPoints.length} controls={this.props.controlPoints}
-                                              displayBanked={this.state.displayBankedTime} compare={this.state.lookback} update={this.updateFromTable} ref={(table) => {this.table = table;}}/>
+                                              displayBanked={this.props.displayBanked} compare={this.props.stravaAnalysis} update={this.updateFromTable} ref={(table) => {this.table = table;}}/>
                     </MediaQuery>
                 </ErrorBoundary>
                 <div tabIndex="98" onFocus={() => {document.getElementById('addButton').focus()}}/>
@@ -305,11 +311,17 @@ const mapStateToProps = (state, ownProps) =>
         name: state.routeInfo.name,
         actualFinishTime: state.strava.actualFinishTime,
         stravaToken: state.strava.token,
-        strava_error: state.strava.error
+        strava_error: state.strava.error,
+        strava_activity: state.strava.activity,
+        displayBanked: state.controls.displayBanked,
+        stravaAnalysis: state.controls.stravaAnalysis,
+        fetchingFromStrava: state.strava.fetching
     });
 
 const mapDispatchToProps = {
-    updateControls, toggleMetric, setStravaActivity, setActualFinishTime, setStravaError, beginStravaFetch, toggleDisplayBanked
+    updateControls, toggleMetric, setStravaActivity, setActualFinishTime, setStravaError, beginStravaFetch,
+    toggleDisplayBanked, stravaFetchSuccess, toggleStravaAnalysis
 };
 
+export const doControlsMatch = ControlPoints.doControlsMatch;
 export default connect(mapStateToProps, mapDispatchToProps)(ControlPoints);

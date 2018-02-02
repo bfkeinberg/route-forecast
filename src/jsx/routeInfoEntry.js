@@ -29,7 +29,7 @@ import {
     setRwgpsRoute
 } from './actions/actions';
 import {connect} from 'react-redux';
-
+import {doControlsMatch} from "./controls";
 
 const queryString = require('query-string');
 
@@ -79,7 +79,6 @@ class RouteInfoForm extends Component {
         action:PropTypes.string.isRequired,
         updateForecast:PropTypes.func.isRequired,
         updateFinishTime:PropTypes.func.isRequired,
-        updateControls:PropTypes.func.isRequired,
         formatControlsForUrl:PropTypes.func.isRequired,
         invalidateForecast:PropTypes.func.isRequired,
         actualPace:PropTypes.number
@@ -171,7 +170,7 @@ class RouteInfoForm extends Component {
         // recalculate if the user updated the controls, say
         this.setQueryString(this.state, this.props.controlPoints, this.props.metric);
         if (nextProps.controlPoints.length !== this.props.controlPoints.length ||
-            !nextProps.controlPoints.every((v, i)=> ControlPoints.doControlsMatch(v,this.props.controlPoints[i]))) {
+            !nextProps.controlPoints.every((v, i)=> doControlsMatch(v,this.props.controlPoints[i]))) {
             this.props.recalcRoute();
         }
         if (this.fetchAfterLoad && this.props.routeInfo.points !== null) {
@@ -361,7 +360,7 @@ class RouteInfoForm extends Component {
                 return;
             }
             // this.loadFromRideWithGps(route,this.state.rwgpsRouteIsTrip);
-            this.props.loadFromRideWithGps(route,this.props.rwgpsRouteIsTrip,this.props['timezone_api_key']);
+            this.props.loadFromRideWithGps(route,this.props.rwgpsRouteIsTrip,this.props.timezone_api_key);
             // clear file input to avoid confusion
             document.getElementById('route').value = null;
             // this.setState({'routeUpdating':true});
@@ -643,11 +642,12 @@ const mapStateToProps = (state, ownProps) =>
         rwgpsRouteIsTrip:state.uiInfo.rwgpsRouteIsTrip,
         errorDetails:state.uiInfo.errorDetails,
         errorSource:state.uiInfo.errorSource,
-        routeInfo:state.routeInfo
+        routeInfo:state.routeInfo,
+        controlPoints:state.controls.controlPoints
     });
 
 const mapDispatchToProps = {
     loadFromRideWithGps, loadGpxRoute, setRwgpsRoute, setInterval, setPace, requestForecast, recalcRoute, setErrorDetails
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(RouteInfoForm);
+export default connect(mapStateToProps, mapDispatchToProps, null, {pure:true})(RouteInfoForm);

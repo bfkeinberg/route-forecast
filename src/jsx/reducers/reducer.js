@@ -2,6 +2,8 @@
 let state = {
     controls:{
         metric:false,
+        displayBanked,
+        stravaAnalysis,
         controlPoints: [
             {name:'here', distance:20, duration:15, arrival:'Jan 13', actual:'Jan 14', banked:'11:05'}
         ]
@@ -137,12 +139,14 @@ const routeInfo = function(state = {finishTime:'',weatherCorrectionMinutes:null}
     }
 };
 
-const controls = function(state = {metric:false,controlPoints:[]}, action) {
+const controls = function(state = {metric:false,displayBanked:false,stravaAnalysis:false,controlPoints:[]}, action) {
     switch (action.type) {
         case Actions.TOGGLE_METRIC:
             return {...state, metric:!state.metric};
         case Actions.TOGGLE_DISPLAY_BANKED:
             return {...state, displayBanked:!state.displayBanked};
+        case Actions.TOGGLE_STRAVA_ANALYSIS:
+            return {...state, stravaAnalysis:!state.stravaAnalysis};
         case Actions.UPDATE_CONTROLS:
             return {...state, controlPoints:action.controls};
         default:
@@ -164,6 +168,8 @@ const strava = function(state = {}, action) {
             return {...state, fetching:true}
         case Actions.STRAVA_FETCH_SUCCESS:
             return {...state, fetching:false, data:action.data}
+        case Actions.STRAVA_FETCH_FAILURE:
+            return {...state, fetching:false, error:action.error}
         default:
             return state;
     }
