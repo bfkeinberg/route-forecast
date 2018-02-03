@@ -500,6 +500,7 @@ const mapStateToProps = (state, ownProps) =>
         loadingSuccess: state.uiInfo.succeeded,
         start: state.uiInfo.start,
         pace: state.uiInfo.pace,
+        actualPace: state.strava.actualPace,
         interval: state.uiInfo.interval,
         fetchingRoute: state.uiInfo.fetchingRoute,
         rwgpsRouteIsTrip:state.uiInfo.rwgpsRouteIsTrip,

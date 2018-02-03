@@ -30,7 +30,8 @@ import {
     setStart,
     setStravaActivity,
     setStravaError,
-    setStravaToken
+    setStravaToken,
+    updateControls
 } from "./actions/actions";
 
 /*
@@ -38,6 +39,7 @@ TODO:
 integrate with jsErrLog
 immutable.js
 Simplify gpxParser to have one method that analyzes, using destructuring to simplify
+need way to call addRow method on control table
 
 feature requests:
 show controls on map
@@ -57,15 +59,14 @@ class RouteWeatherUI extends Component {
         this.updateControls = this.updateControls.bind(this);
         this.updateRouteInfo = this.updateRouteInfo.bind(this);
         this.formatControlsForUrl = this.formatControlsForUrl.bind(this);
-        this.setActualPace = this.setActualPace.bind(this);
         let queryParams = queryString.parse(location.search);
         this.updateFromQueryParams(this.props, queryParams);
         let script = document.getElementById( "routeui" );
         props.setActionUrl(script.getAttribute('action'));
         props.setApiKeys(script.getAttribute('maps_api_key'),script.getAttribute('timezone_api_key'));
+        this.props.updateControls(queryParams.controlPoints===undefined?[]:this.parseControls(queryParams.controlPoints));
         // new control point url format - <name>,<distance>,<time-in-minutes>:<name>,<distance>,<time-in-minutes>:etc
-        this.state = {controlPoints: queryParams.controlPoints===undefined?[]:this.parseControls(queryParams.controlPoints),
-            routeInfo:{bounds:{},points:[], name:'',finishTime:''},
+        this.state = {routeInfo:{bounds:{},points:[], name:'',finishTime:''},
             formVisible:true};
     }
 
@@ -157,10 +158,6 @@ class RouteWeatherUI extends Component {
         }
     }
 
-    setActualPace(actualPace) {
-        this.setState({actualPace:actualPace});
-    }
-
     updateRouteInfo(routeInfo,controlPoints) {
         if (this.state.routeInfo.name !== routeInfo.name) {
             let savedControlPoints = cookie.load(routeInfo.name);
@@ -190,7 +187,6 @@ class RouteWeatherUI extends Component {
             <ErrorBoundary>
             <RouteInfoForm updateRouteInfo={this.updateRouteInfo}
                            formVisible={this.state.formVisible}
-                           actualPace={this.state.actualPace}
                            formatControlsForUrl={this.formatControlsForUrl}
             />
             </ErrorBoundary>
@@ -205,18 +201,12 @@ class RouteWeatherUI extends Component {
                     <SplitPane defaultSize={550} minSize={150} split='vertical' pane2Style={{'overflow':'scroll'}}>
                         {inputForm}
                         <ErrorBoundary>
-                        <ControlPoints
-                                          updateControls={this.updateControls}
-                                          actualFinishTime={this.state.actualFinishTime}
-                                          setActualPace={this.setActualPace}
-                                          invalidateForecast={this.invalidateForecast}
-                                          name={this.props.name}/>
+                            <ControlPoints updateControls={this.updateControls}/>
                         </ErrorBoundary>
                     </SplitPane>
                         <SplitPane defaultSize={500} minSize={150} split="vertical" paneStyle={{'overflow':'scroll'}}>
                             <ForecastTable forecast={this.state.forecast} weatherCorrectionMinutes={this.state.weatherCorrectionMinutes}/>
-                            <RouteForecastMap maps_api_key={this.state.maps_key}
-                                              forecast={this.state.forecast} routeInfo={this.state.routeInfo}/>
+                            <RouteForecastMap/>
                         </SplitPane>
                 </SplitPane>
             </MediaQuery>
@@ -224,16 +214,9 @@ class RouteWeatherUI extends Component {
                 <SplitPane defaultSize={this.state.formVisible?500:250} minSize={120} maxSize={600} split="horizontal" pane2Style={{'overflow':'scroll'}}>
                     <SplitPane defaultSize={this.state.formVisible?319:33} minSize={30} split="horizontal" pane2Style={{'overflow':'scroll'}}>
                         {this.state.formVisible ? inputForm : formButton}
-                        <ControlPoints controlPoints={this.state.controlPoints}
-                                          updateControls={this.updateControls}
-                                          finishTime={this.state.routeInfo['finishTime']}
-                                          actualFinishTime={this.state.actualFinishTime}
-                                          setActualPace={this.setActualPace}
-                                          name={this.props.name}/>
+                        <ControlPoints updateControls={this.updateControls}/>
                     </SplitPane>
-                    {!this.state.formVisible?
-                        <ForecastTable/>:
-                        <div/>}
+                    {!this.state.formVisible? <ForecastTable/>: <div/>}
                 </SplitPane>
             </MediaQuery>
         </div>
@@ -243,7 +226,7 @@ class RouteWeatherUI extends Component {
 
 const mapDispatchToProps = {
     setStravaToken, setActionUrl, setRwgpsRoute, setApiKeys, setStravaError, setStart, setPace, setInterval, setMetric,
-    setStravaActivity
+    setStravaActivity, updateControls
 };
 
 const mapStateToProps = (state, ownProps) =>

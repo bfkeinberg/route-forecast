@@ -20,6 +20,7 @@ import PropTypes from 'prop-types';
 import {
     beginStravaFetch,
     setActualFinishTime,
+    setActualPace,
     setStravaActivity,
     setStravaError,
     stravaFetchSuccess,
@@ -54,7 +55,6 @@ class ControlPoints extends Component {
     constructor(props) {
         super(props);
         this.addControl = this.addControl.bind(this);
-        this.updateFromTable = this.updateFromTable.bind(this);
         this.toggleDisplayBanked = this.toggleDisplayBanked.bind(this);
         this.toggleMetric = this.toggleMetric.bind(this);
         this.toggleCompare = this.toggleCompare.bind(this);
@@ -172,10 +172,6 @@ class ControlPoints extends Component {
         this.props.toggleStravaAnalysis();
     }
 
-    updateFromTable(controlPoints) {
-        this.props.updateControls(controlPoints);
-    }
-
     static doControlsMatch(newControl, oldControl) {
         return newControl.distance===oldControl.distance &&
             newControl.name===oldControl.name &&
@@ -277,15 +273,15 @@ class ControlPoints extends Component {
                         <Panel header={title} bsStyle="info" style={{margin:'10px'}}>
 
                             <ErrorBoundary>
-                                <ControlTable rows={this.props.controlPoints.length} controls={this.props.controlPoints}
-                                              displayBanked={this.props.displayBanked} compare={this.props.stravaAnalysis} update={this.updateFromTable} ref={(table) => {this.table = table;}}/>
+                                <ControlTable controls={this.props.controlPoints}
+                                              update={this.props.updateControls} ref={(table) => {this.table = table;}}/>
                             </ErrorBoundary>
 
                         </Panel>
                     </MediaQuery>
                     <MediaQuery maxDeviceWidth={800}>
-                                <ControlTable rows={this.props.controlPoints.length} controls={this.props.controlPoints}
-                                              displayBanked={this.props.displayBanked} compare={this.props.stravaAnalysis} update={this.updateFromTable} ref={(table) => {this.table = table;}}/>
+                                <ControlTable controls={this.props.controlPoints}
+                                              update={this.props.updateControls} ref={(table) => {this.table = table;}}/>
                     </MediaQuery>
                 </ErrorBoundary>
                 <div tabIndex="98" onFocus={() => {document.getElementById('addButton').focus()}}/>
@@ -312,7 +308,7 @@ const mapStateToProps = (state, ownProps) =>
 
 const mapDispatchToProps = {
     updateControls, toggleMetric, setStravaActivity, setActualFinishTime, setStravaError, beginStravaFetch,
-    toggleDisplayBanked, stravaFetchSuccess, toggleStravaAnalysis
+    toggleDisplayBanked, stravaFetchSuccess, toggleStravaAnalysis, setActualPace
 };
 
 export const doControlsMatch = ControlPoints.doControlsMatch;

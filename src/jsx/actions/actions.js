@@ -364,6 +364,14 @@ export function setActualFinishTime(finishTime) {
     };
 }
 
+export const SET_ACTUAL_PACE = 'SET_ACTUAL_PACE';
+export function setActualPace(pace) {
+    return {
+        type: SET_ACTUAL_PACE,
+        finishTime: pace
+    };
+}
+
 export const SET_ACTION_URL = 'SET_ACTION_URL';
 export function setActionUrl(action) {
     return {

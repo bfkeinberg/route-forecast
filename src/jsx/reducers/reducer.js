@@ -195,6 +195,8 @@ const strava = function(state = {}, action) {
             }
         case Actions.SET_ACTUAL_FINISH_TIME:
             return {...state, actualFinishTime:action.finishTime};
+        case Actions.SET_ACTUAL_PACE:
+            return {...state, actualPace:action.pace};
         case Actions.BEGIN_STRAVA_FETCH:
             return {...state, fetching:true}
         case Actions.STRAVA_FETCH_SUCCESS:

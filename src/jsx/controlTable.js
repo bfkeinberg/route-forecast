@@ -4,6 +4,7 @@ import {Button} from '@blueprintjs/core';
 import {AgGridReact} from 'ag-grid-react';
 import ReactDOM from 'react-dom';
 import PropTypes from 'prop-types';
+import {connect} from 'react-redux';
 
 const smallScreenWidth = 800;
 
@@ -205,4 +206,10 @@ class ControlTable extends Component {
     }
 }
 
-export default ControlTable;
+const mapStateToProps = (state, ownProps) =>
+    ({
+        displayBanked: state.controls.displayBanked,
+        compare: state.controls.stravaAnalysis
+    });
+
+export default connect(mapStateToProps)(ControlTable);
