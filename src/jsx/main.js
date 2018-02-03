@@ -3,7 +3,6 @@ import ControlPoints from './controls';
 import RouteInfoForm from './routeInfoEntry';
 import RouteForecastMap from './map';
 import ForecastTable from './forecastTable';
-import moment from 'moment';
 import SplitPane from 'react-split-pane';
 import {Button} from 'react-bootstrap';
 import MediaQuery from 'react-responsive';
@@ -21,21 +20,24 @@ import queryString from 'query-string';
 import cookie from 'react-cookies';
 import ErrorBoundary from './errorBoundary';
 import {connect} from 'react-redux';
-import {setActionUrl, setApiKeys, setRwgpsRoute, setStravaError, setStravaToken} from "./actions/actions";
+import {
+    setActionUrl,
+    setApiKeys,
+    setInterval,
+    setMetric,
+    setPace,
+    setRwgpsRoute,
+    setStart,
+    setStravaActivity,
+    setStravaError,
+    setStravaToken
+} from "./actions/actions";
 
 /*
 TODO:
 integrate with jsErrLog
 immutable.js
 Simplify gpxParser to have one method that analyzes, using destructuring to simplify
-Design the state
-define the state
-Write the actions, with their constants
-Write lower level reducers - route form state, control point state, any others
-Write the top level reducer
-Write a top level component to instantiate the existing top level and wrap it in redux,
-moving the render to that level
-separate network logic out from RouteInfoForm into a container component
 
 feature requests:
 show controls on map
@@ -54,24 +56,17 @@ class RouteWeatherUI extends Component {
         super(props);
         this.updateControls = this.updateControls.bind(this);
         this.updateRouteInfo = this.updateRouteInfo.bind(this);
-        this.updateForecast = this.updateForecast.bind(this);
-        this.updateFinishTime = this.updateFinishTime.bind(this);
         this.formatControlsForUrl = this.formatControlsForUrl.bind(this);
-        this.setActualFinishTime = this.setActualFinishTime.bind(this);
         this.setActualPace = this.setActualPace.bind(this);
-        this.invalidateForecast = this.invalidateForecast.bind(this);
-        let script = document.getElementById( "routeui" );
         let queryParams = queryString.parse(location.search);
-        props.setRwgpsRoute(parseInt(queryParams.rwgpsRoute));
-        this.strava_token = RouteWeatherUI.getStravaToken(queryParams);
-        props.setStravaToken(this.strava_token);
+        this.updateFromQueryParams(this.props, queryParams);
+        let script = document.getElementById( "routeui" );
         props.setActionUrl(script.getAttribute('action'));
         props.setApiKeys(script.getAttribute('maps_api_key'),script.getAttribute('timezone_api_key'));
         // new control point url format - <name>,<distance>,<time-in-minutes>:<name>,<distance>,<time-in-minutes>:etc
         this.state = {controlPoints: queryParams.controlPoints===undefined?[]:this.parseControls(queryParams.controlPoints),
-            routeInfo:{bounds:{},points:[], name:'',finishTime:''}, forecast:[], action:script.getAttribute('action'),
-            maps_key:script.getAttribute('maps_api_key'), timezone_key:script.getAttribute('timezone_api_key'),
-            formVisible:true, weatherCorrectionMinutes:null, metric:false, forecastValid:false};
+            routeInfo:{bounds:{},points:[], name:'',finishTime:''},
+            formVisible:true};
     }
 
     static getStravaToken(queryParams) {
@@ -107,9 +102,6 @@ class RouteWeatherUI extends Component {
             return true;
         }
         if (newState.forecast.length!==this.state.forecast.length) {
-            return true;
-        }
-        if (newState.metric !== this.state.metric) {
             return true;
         }
         if (newState.actualFinishTime !== this.state.actualFinishTime) {
@@ -153,15 +145,16 @@ class RouteWeatherUI extends Component {
         }
     }
 
-    updateControls(controlPoints,metric) {
-        this.setState({controlPoints: controlPoints, metric:metric});
+    componentWillMount() {
+        // let queryParams = queryString.parse(location.search);
+        // this.updateFromQueryParams(this.props, queryParams);
+    }
+
+    updateControls(controlPoints) {
+        this.setState({controlPoints: controlPoints});
         if (this.state.routeInfo.name !== '') {
             cookie.save(this.state.routeInfo.name,this.formatControlsForUrl(controlPoints));
         }
-    }
-
-    setActualFinishTime(actualFinishTime) {
-        this.setState({actualFinishTime:actualFinishTime});
     }
 
     setActualPace(actualPace) {
@@ -174,7 +167,6 @@ class RouteWeatherUI extends Component {
             if (savedControlPoints !== undefined && savedControlPoints.length > 0) {
                 controlPoints = this.parseControls(savedControlPoints);
             }
-            this.setState({forecastValid:false});
         }
         if (routeInfo.name !== '') {
             cookie.save(routeInfo.name,this.formatControlsForUrl(controlPoints));
@@ -182,40 +174,24 @@ class RouteWeatherUI extends Component {
         this.setState({'routeInfo':routeInfo, 'controlPoints':controlPoints});
     }
 
-    updateFinishTime(weatherCorrectionMinutes) {
-        let routeInfoCopy = Object.assign({}, this.state.routeInfo);
-        routeInfoCopy.finishTime =
-            moment(routeInfoCopy.finishTime,'ddd, MMM DD h:mma').add(weatherCorrectionMinutes, 'minutes').format('ddd, MMM DD h:mma');
-        this.setState({'routeInfo':routeInfoCopy,weatherCorrectionMinutes:weatherCorrectionMinutes});
-    }
-
-    updateForecast(forecast) {
-        this.setState({forecast:forecast['forecast'],formVisible:false, forecastValid:true});
-    }
-
-    invalidateForecast() {
-        this.setState({forecastValid:false});
+    updateFromQueryParams(props,queryParams) {
+        props.setRwgpsRoute(parseInt(queryParams.rwgpsRoute));
+        props.setStravaToken(RouteWeatherUI.getStravaToken(queryParams));
+        props.setStart(new Date(queryParams.start));
+        props.setPace(queryParams.pace);
+        props.setInterval(parseFloat(queryParams.interval));
+        props.setMetric(queryParams.metric);
+        props.setStravaActivity(queryParams.strava_activity);
+        props.setStravaError(queryParams.strava_error);
     }
 
     render() {
-        let queryParams = queryString.parse(location.search);
         const inputForm = (
             <ErrorBoundary>
-            <RouteInfoForm action={this.state.action}
-                           updateRouteInfo={this.updateRouteInfo}
-                           updateForecast={this.updateForecast}
+            <RouteInfoForm updateRouteInfo={this.updateRouteInfo}
                            formVisible={this.state.formVisible}
-                           metric={this.state.metric}
                            actualPace={this.state.actualPace}
-                           updateFinishTime={this.updateFinishTime}
-                           start={queryParams.start}
-                           pace={queryParams.pace}
-                           interval={queryParams.interval}
-                           rwgpsRoute={queryParams.rwgpsRoute}
-                           maps_api_key={this.state.maps_key}
-                           timezone_api_key={this.state.timezone_key}
                            formatControlsForUrl={this.formatControlsForUrl}
-                           invalidateForecast={this.invalidateForecast}
             />
             </ErrorBoundary>
         );
@@ -229,19 +205,12 @@ class RouteWeatherUI extends Component {
                     <SplitPane defaultSize={550} minSize={150} split='vertical' pane2Style={{'overflow':'scroll'}}>
                         {inputForm}
                         <ErrorBoundary>
-                        <ControlPoints controlPoints={this.state.controlPoints}
+                        <ControlPoints
                                           updateControls={this.updateControls}
-                                          finishTime={this.state.routeInfo['finishTime']}
                                           actualFinishTime={this.state.actualFinishTime}
-                                          setActualFinishTime={this.setActualFinishTime}
                                           setActualPace={this.setActualPace}
-                                          strava_token={this.strava_token}
-                                          strava_activity={queryParams.strava_activity}
-                                          strava_error={queryParams.strava_error}
-                                          metric={queryParams.metric===null?this.state.metric==='true':queryParams.metric==='true'}
-                                          forecastValid={this.state.forecastValid}
                                           invalidateForecast={this.invalidateForecast}
-                                          name={this.state.routeInfo['name']}/>
+                                          name={this.props.name}/>
                         </ErrorBoundary>
                     </SplitPane>
                         <SplitPane defaultSize={500} minSize={150} split="vertical" paneStyle={{'overflow':'scroll'}}>
@@ -257,19 +226,13 @@ class RouteWeatherUI extends Component {
                         {this.state.formVisible ? inputForm : formButton}
                         <ControlPoints controlPoints={this.state.controlPoints}
                                           updateControls={this.updateControls}
-                                          metric={queryParams.metric===null?this.state.metric==='true':queryParams.metric==='true'}
-                                          strava_activity={queryParams.strava_activity}
                                           finishTime={this.state.routeInfo['finishTime']}
                                           actualFinishTime={this.state.actualFinishTime}
-                                          setActualFinishTime={this.setActualFinishTime}
                                           setActualPace={this.setActualPace}
-                                          strava_error={queryParams.strava_error}
-                                          strava_token={this.strava_token}
-                                          forecastValid={this.state.forecastValid}
-                                          name={this.state.routeInfo['name']}/>
+                                          name={this.props.name}/>
                     </SplitPane>
                     {!this.state.formVisible?
-                        <ForecastTable forecast={this.state.forecast} weatherCorrectionMinutes={this.state.weatherCorrectionMinutes}/>:
+                        <ForecastTable/>:
                         <div/>}
                 </SplitPane>
             </MediaQuery>
@@ -279,7 +242,8 @@ class RouteWeatherUI extends Component {
 }
 
 const mapDispatchToProps = {
-    setStravaToken, setActionUrl, setRwgpsRoute, setApiKeys, setStravaError
+    setStravaToken, setActionUrl, setRwgpsRoute, setApiKeys, setStravaError, setStart, setPace, setInterval, setMetric,
+    setStravaActivity
 };
 
 const mapStateToProps = (state, ownProps) =>

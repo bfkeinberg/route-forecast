@@ -237,7 +237,7 @@ class RouteForecastMap extends Component {
 
 const mapStateToProps = (state, ownProps) =>
     ({
-        forecast: state.forecast,
+        forecast: state.forecast.forecast,
         routeInfo: state.routeInfo,
         maps_api_key: state.params.maps_api_key
     });

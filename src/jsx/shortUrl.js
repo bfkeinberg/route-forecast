@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import {FormControl, FormGroup} from 'react-bootstrap';
 import PropTypes from 'prop-types';
+import {connect} from 'react-redux';
 
 class ShortUrl extends Component {
     static propTypes = {
@@ -20,5 +21,9 @@ class ShortUrl extends Component {
         );
     }
 }
+const mapStateToProps = (state, ownProps) =>
+    ({
+        shortUrl: state.uiInfo.shortUrl
+    });
 
-export default ShortUrl;
+export default connect(mapStateToProps)(ShortUrl);

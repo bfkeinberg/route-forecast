@@ -163,16 +163,18 @@ function hideForm() {
 
 export function loadGpxRoute(event,timezone_api_key) {
     return async function (dispatch) {
-        dispatch(beginLoadingRoute('gpx'));
         let gpxFiles = event.target.files;
         if (gpxFiles.length > 0) {
+            dispatch(beginLoadingRoute('gpx'));
             const parser = await getRouteParser();
             parser.loadGpxFile(gpxFiles[0],timezone_api_key).then( gpxData => {
                     dispatch(gpxRouteLoadingSuccess(gpxData))
                 }, error => dispatch(gpxRouteLoadingFailure(error))
             );
         }
-
+        else {
+            dispatch(clearRouteData());
+        }
     }
 }
 
@@ -210,7 +212,37 @@ export function requestForecast(routeInfo) {
     }
 }
 
-export const SHORTEN_URL = 'SHORTEN_URL';
+export const SET_SHORT_URL = 'SET_SHORT_URL';
+export function setShortUrl(url) {
+    return {
+        type: SET_SHORT_URL,
+        url: url
+    }
+}
+
+export function shortenUrl(url) {
+    return function (dispatch,getState) {
+        fetch(`https://www.googleapis.com/urlshortener/v1/url?key=${getState().params.maps_api_key}`,
+            {
+                method:"POST",
+                headers: {
+                    Accept: 'application/json',
+                    'Content-Type': 'application/json',
+                },
+                body:JSON.stringify({'longUrl':url})})
+            .then(response => {
+                if (response.ok) {
+                    return response.json();
+                } else {
+                    dispatch(setErrorDetails(`URL shortener failed with ${response.status} ${response.statusText}`));
+                }})
+            .then(responseJson => {
+                if (responseJson['id'] !== undefined) {
+                    dispatch(setShortUrl(responseJson['id']));
+                }
+            }).catch(error => dispatch(setErrorDetails(error)))
+    };
+}
 
 export const SET_ADDRESS = 'SET_ADDRESS';
 export function setAddress(address) {
@@ -237,6 +269,14 @@ export function updateControls(controls) {
     return {
         type: UPDATE_CONTROLS,
         controls: controls
+    };
+}
+
+export const SET_METRIC = 'SET_METRIC';
+export function setMetric(metric) {
+    return {
+        type: SET_METRIC,
+        metric: metric
     };
 }
 

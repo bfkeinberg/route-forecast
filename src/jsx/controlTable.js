@@ -11,7 +11,7 @@ class ControlTable extends Component {
     static propTypes = {
         displayBanked:PropTypes.bool.isRequired,
         compare:PropTypes.bool.isRequired,
-        controls:PropTypes.array.isRequired,
+        controls:PropTypes.arrayOf(PropTypes.object).isRequired,
         update:PropTypes.func.isRequired
     };
 
@@ -127,6 +127,9 @@ class ControlTable extends Component {
         }
         this.api.setRowData(newProps.controls);
         this.setState({rowCount:this.api.getModel().getRowCount()});
+        if (!this.shouldComponentUpdate(newProps)) {
+            return;
+        }
         this.updateFromGrid();
     }
 
@@ -193,30 +196,11 @@ class ControlTable extends Component {
             this.api.sizeColumnsToFit();
         }
         this.props.controls.forEach((row,key) => row.id=key);
-        // let displayBanked = this.props.displayBanked;
         return (<div className="ag-theme-fresh">
             <AgGridReact enableColResize enableSorting animateRows sortingOrder={['asc']} unSortIcon rowData={this.props.controls}
     onGridReady={this.onGridReady} onSortChanged={this.sortChanged} singleClickEdit
     onCellValueChanged={this.cellUpdated} tabToNextCell={ControlTable.tabHandler} getRowNodeId={data => data.id}
     columnDefs={this.state.columnDefs}/>
-{/*
-            >
-{                <AgGridColumn colId='name' field='name' unSortIcon={<true></true>} suppressSorting editable={true} headerName='Name'></AgGridColumn>
-                <AgGridColumn field='distance' headerTooltip='In miles or km, depending on the metric checkbox'
-                              type={'numericColumn'} unSortIcon={true} editable={true} valueParser={ControlTable.setData} valueSetter={ControlTable.validateData} headerName='Distance'></AgGridColumn>
-                <AgGridColumn field='duration' headerTooltip='How many minutes you expect to spend at this control'
-                              suppressSorting type={'numericColumn'} editable={true} valueParser={params=>{return Number(params.newValue)}}
-                              valueSetter={ControlTable.validateData} valueFormatter={ControlTable.appendUnit} headerName='Expected time spent'></AgGridColumn>
-                <AgGridColumn field='arrival' headerTooltip='When you are predicted to arrive here'
-                              cellRenderer="agAnimateShowChangeCellRenderer" type={'numericColumn'}
-                              suppressNavigable suppressSorting enableCellChangeFlash={true} headerName='Est. arrival time'></AgGridColumn>
-                <AgGridColumn colId='actual' field='actual' suppressSorting enableCellChangeFlash={true} cellRenderer="agAnimateShowChangeCellRenderer"
-                              headerTooltip='When you actually arrived here' suppressNavigable hide={!this.props.compare} headerName='Actual arrival time'></AgGridColumn>
-                <AgGridColumn colId='banked' field='banked' headerTooltip='Time remaining at brevet pace'
-                              cellRenderer="agAnimateShowChangeCellRenderer"
-                              suppressNavigable suppressSorting type={'numericColumn'} valueFormatter={ControlTable.appendUnit} hide={!displayBanked} headerName='Banked time'></AgGridColumn>
-                <AgGridColumn suppressNavigable suppressSorting cellRenderer={this.deleteRenderer}></AgGridColumn>*!/}
-            </AgGridReact>*/}
         </div>);
     }
 }

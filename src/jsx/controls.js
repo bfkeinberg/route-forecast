@@ -126,7 +126,6 @@ class ControlPoints extends Component {
             return;
         }
         this.props.setStravaActivity(newValue);
-        // this.setState({strava_activity:newValue});
     }
 
     async computeTimesFromStrava(activity, controlPoints) {
@@ -163,22 +162,14 @@ class ControlPoints extends Component {
 
     toggleDisplayBanked() {
         this.props.toggleDisplayBanked();
-        // this.setState({displayBankedTime:!this.state.displayBankedTime});
     }
 
     toggleMetric() {
         this.props.toggleMetric();
-/*
-        let metric = !this.state.metric;
-        this.setState({metric:metric});
-        this.props.updateControls(this.props.controlPoints,metric);
-*/
     }
 
     toggleCompare() {
         this.props.toggleStravaAnalysis();
-        // let lookback = !this.state.lookback;
-        // this.setState({lookback:lookback});
     }
 
     updateFromTable(controlPoints) {
@@ -315,7 +306,8 @@ const mapStateToProps = (state, ownProps) =>
         strava_activity: state.strava.activity,
         displayBanked: state.controls.displayBanked,
         stravaAnalysis: state.controls.stravaAnalysis,
-        fetchingFromStrava: state.strava.fetching
+        fetchingFromStrava: state.strava.fetching,
+        forecastValid: state.forecast.valid
     });
 
 const mapDispatchToProps = {

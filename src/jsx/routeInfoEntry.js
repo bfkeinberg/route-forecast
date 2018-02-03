@@ -26,7 +26,9 @@ import {
     setErrorDetails,
     setInterval,
     setPace,
-    setRwgpsRoute
+    setRwgpsRoute,
+    setShortUrl,
+    shortenUrl
 } from './actions/actions';
 import {connect} from 'react-redux';
 import {doControlsMatch} from "./controls";
@@ -55,10 +57,6 @@ const rwgps_trip_tooltip = (
 );
 */
 
-const startHour = 7;
-const defaultPace = 'D';
-const defaultIntervalInHours = 1;
-
 const rideRatingDisplay = (
     <Popover style={{width:450, maxWidth:500}} id="ride-rating-popup" title="Ride rating system">
         <div dangerouslySetInnerHTML={{__html: rideRatingText}}/>
@@ -74,13 +72,8 @@ class RouteInfoForm extends Component {
         timezone_api_key:PropTypes.string.isRequired,
         controlPoints:PropTypes.arrayOf(PropTypes.object).isRequired,
         metric:PropTypes.bool.isRequired,
-        maps_api_key:PropTypes.string.isRequired,
         updateRouteInfo:PropTypes.func.isRequired,
-        action:PropTypes.string.isRequired,
-        updateForecast:PropTypes.func.isRequired,
-        updateFinishTime:PropTypes.func.isRequired,
         formatControlsForUrl:PropTypes.func.isRequired,
-        invalidateForecast:PropTypes.func.isRequired,
         actualPace:PropTypes.number
     };
 
@@ -101,57 +94,11 @@ class RouteInfoForm extends Component {
         this.decideValidationStateFor = this.decideValidationStateFor.bind(this);
         this.setRwgpsRoute = this.setRwgpsRoute.bind(this);
         this.setDateAndTime = this.setDateAndTime.bind(this);
-        this.loadFromRideWithGps = this.loadFromRideWithGps.bind(this);
-        this.calculateTimeAndDistance = this.calculateTimeAndDistance.bind(this);
         this.makeFullQueryString = this.makeFullQueryString.bind(this);
-        this.shortenUrl = this.shortenUrl.bind(this);
-        this.parseGpxFile = this.parseGpxFile.bind(this);
-        this.forecastRequest = null;
-        this.timeZone = null;
-        this.routeFileSet = false;
-        this.xmlhttp = null;
         this.paramsChanged = false;
-        this.state = {start:RouteInfoForm.findNextStartTime(props.start),
-            pace:props.pace === undefined?defaultPace:props.pace, interval:props.interval === undefined?defaultIntervalInHours:props.interval,
-            rwgpsRoute:props.rwgpsRoute === undefined?'':props.rwgpsRoute, errorDetails:null,
-            pending:false,
-            rwgpsRouteIsTrip:false, errorSource:null, succeeded:null, routeUpdating:false,
-            shortUrl:'   '};
+        this.state = {};
         // for when we are loaded with a url that contains a route
         this.fetchAfterLoad = props.rwgpsRoute !== undefined;
-    }
-
-    async getRouteParser() {
-        const parser = await import(/* webpackChunkName: "RwgpsParser" */ './gpxParser');
-        return parser.default;
-    }
-
-    static findNextStartTime(start) {
-        if (start !== undefined) {
-            return new Date(start);
-        }
-        let now = new Date();
-        if (now.getHours() > startHour) {
-            now.setDate(now.getDate() + 1);
-            now.setHours(startHour);
-            now.setMinutes(0);
-            now.setSeconds(0);
-        }
-        return now;
-    }
-
-    async loadFromRideWithGps(routeNumber, isTrip) {
-        const parser = await this.getRouteParser();
-        this.parser = parser;
-        parser.loadRwgpsRoute(routeNumber, isTrip, this.props['timezone_api_key']).then( () => {
-            this.calculateTimeAndDistance(this.props);
-            this.setErrorState(null,'rwgps');
-            if (this.fetchAfterLoad) {
-                this.requestForecast();
-                this.fetchAfterLoad = false;
-            }
-        }, error => {this.props.setErrorDetails(error.message);}
-        );
     }
 
     routeIsLoaded() {
@@ -160,9 +107,7 @@ class RouteInfoForm extends Component {
 
     componentDidMount() {
         if (this.props.rwgpsRoute !== '') {
-            this.props.loadFromRideWithGps(this.props.rwgpsRoute,this.state.rwgpsRouteIsTrip,this.props.timezone_api_key);
-            // this.loadFromRideWithGps(this.state.rwgpsRoute,this.state.rwgpsRouteIsTrip);
-            // this.setState({routeUpdating:true});
+            this.props.loadFromRideWithGps(this.props.rwgpsRoute,this.props.rwgpsRouteIsTrip,this.props.timezone_api_key);
         }
     }
 
@@ -177,8 +122,6 @@ class RouteInfoForm extends Component {
             this.requestForecast();
             this.fetchAfterLoad = false;
         }
-
-        // this.calculateTimeAndDistance(nextProps);
     }
 
     componentDidUpdate() {
@@ -187,68 +130,12 @@ class RouteInfoForm extends Component {
             // recalculate if the user changed values in the dialog
             this.setQueryString(this.state, this.props.controlPoints, this.props.metric);
             this.props.recalcRoute();
-            // this.calculateTimeAndDistance(this.props);
         }
-    }
-
-    shortenUrl(url) {
-        fetch('https://www.googleapis.com/urlshortener/v1/url?key='+this.props.maps_api_key,
-            {
-                method:"POST",
-                headers: {
-                    Accept: 'application/json',
-                    'Content-Type': 'application/json',
-                },
-                body:JSON.stringify({'longUrl':url})})
-            .then(response => {
-            if (response.ok) {
-                return response.json();
-            } else this.setState({errorDetails:`URL shortener failed with ${response.status} ${response.statusText}`})})
-            .then(responseJson => {
-            if (responseJson['id'] !== undefined) {
-                this.setState({shortUrl:responseJson['id']});
-            }
-        }).catch(error => {this.setState({errorDetails:error})});
-    }
-
-    async parseGpxFile(file) {
-        const { store } = this.context;
-        const parser = await this.getRouteParser();
-        this.parser = parser;
-        parser.loadGpxFile(file, this.props['timezone_api_key']).then( () => {
-            this.setErrorState(null, 'gpx');
-        }, error => {this.setErrorState(error, 'gpx');});
     }
 
     updateRouteFile(event) {
         this.props.loadGpxRoute(event,this.props.timezone_api_key);
-/*
-        let fileControl = event.target;
-        let gpxFiles = fileControl.files;
-        this.routeFileSet = event.target.value !== '';
-        this.fetchAfterLoad = false;
-        if (gpxFiles.length > 0) {
-            this.parseGpxFile(gpxFiles[0]);
-            this.setState({rwgpsRoute:'', routeUpdating:true});
-            history.pushState(null, 'nothing', location.origin);
-        }
-*/
         history.pushState(null, 'nothing', location.origin);
-    }
-
-    calculateTimeAndDistance(props) {
-        if (!this.routeIsLoaded(this.parser)) {
-            return;
-        }
-        let routeInfo = this.parser.walkRoute(moment(this.state.start),
-            this.state.pace, parseFloat(this.state.interval),props.controlPoints,props.metric);
-        if (routeInfo === null) {
-            return;
-        }
-        this.timeZone = routeInfo['timeZone'];
-        this.props.updateRouteInfo({bounds:routeInfo['bounds'],points:routeInfo['points'],
-            name:routeInfo['name'],finishTime:routeInfo['finishTime']}, routeInfo['controls']);
-        this.forecastRequest = routeInfo['forecast'];
     }
 
     requestForecast() {
@@ -260,17 +147,12 @@ class RouteInfoForm extends Component {
             return;
         }
         this.props.requestForecast(this.props.routeInfo);
-/*
-        if (this.forecastRequest === null) {
-            this.calculateTimeAndDistance(this.props);
-        }
-*/
     }
 
     makeFullQueryString() {
         let query = {start:this.state.start,pace:this.props.pace,interval:this.props.interval,
             rwgpsRoute:this.props.rwgpsRoute,controlPoints:this.props.formatControlsForUrl(this.props.controlPoints)};
-        this.shortenUrl(location.origin + '?' + queryString.stringify(query));
+        this.props.shortenUrl(location.origin + '?' + queryString.stringify(query));
     }
 
     // this function exists to let us preserve the user's specified start time and share the url for this route
@@ -281,14 +163,14 @@ class RouteInfoForm extends Component {
 
     setQueryString(state,controlPoints,metric) {
         if (this.props.rwgpsRoute !== '') {
-            let query = {start:RouteInfoForm.dateToShortDate(state.start),pace:this.props.pace,interval:this.props.interval,metric:metric,
+            let query = {start:RouteInfoForm.dateToShortDate(this.props.start),pace:this.props.pace,interval:this.props.interval,metric:metric,
                 rwgpsRoute:this.props.rwgpsRoute,controlPoints:this.props.formatControlsForUrl(controlPoints)};
             history.pushState(null, 'nothing', location.origin + '?' + queryString.stringify(query));
-            this.shortenUrl(location.origin + '?' + queryString.stringify(query));
+            this.props.shortenUrl(location.origin + '?' + queryString.stringify(query));
         }
         else {
             history.pushState(null, 'nothing', location.origin);
-            this.setState({shortUrl:''});
+            this.props.setShortUrl('');
         }
     }
 
@@ -307,21 +189,19 @@ class RouteInfoForm extends Component {
     }
 
     disableSubmit() {
-        return (this.props.rwgpsRoute === '' && !this.routeFileSet);
+        return (this.props.rwgpsRoute === '' && this.props.routeInfo.gpxRouteData === null);
      }
 
     intervalChanged(event) {
         if (event.target.value !== '') {
             this.paramsChanged = true;
             this.props.setInterval(parseFloat(event.target.value));
-            // this.setState({interval:event.target.value});
         }
     }
 
     handleDateChange(time) {
         this.paramsChanged = true;
         this.props.setStart(time);
-        // this.setState({start:time});
     }
 
     static showErrorDetails(errorState) {
@@ -359,14 +239,9 @@ class RouteInfoForm extends Component {
             if (isNaN(route)) {
                 return;
             }
-            // this.loadFromRideWithGps(route,this.state.rwgpsRouteIsTrip);
             this.props.loadFromRideWithGps(route,this.props.rwgpsRouteIsTrip,this.props.timezone_api_key);
             // clear file input to avoid confusion
             document.getElementById('route').value = null;
-            // this.setState({'routeUpdating':true});
-            this.routeFileSet = false;
-        } else if (this.state.errorSource === 'rwgps') {
-            this.setState({'errorSource':null});
         }
     }
 
@@ -376,13 +251,6 @@ class RouteInfoForm extends Component {
             return;
         }
         this.props.setRwgpsRoute(route);
-/*
-        this.setState({rwgpsRoute : route});
-        if (this.parser !== undefined) {
-            this.parser.clear();
-        }
-        this.props.invalidateForecast();
-*/
     }
 
     static isNumberKey(event) {
@@ -396,22 +264,16 @@ class RouteInfoForm extends Component {
     handlePaceChange(event) {
         this.paramsChanged = true;
         this.props.setPace(event.target.value);
-        // this.setState({pace:event.target.value});
     }
 
-    decideValidationStateFor(type) {
-        if (type === this.state.errorSource) {
-            return 'error';
-        }
-        else {
-            if (!this.props.errorDetails) {
-                if (this.routeFileSet && type === 'gpx') {
-                    return 'success';
-                }
-                if (this.rwgpsRoute && type === 'rwgps') {
-                    return 'success';
-                }
+    decideValidationStateFor(type,methodUsed,loadingSuccess) {
+        if (type === methodUsed) {
+            if (loadingSuccess) {
+                return 'success';
+            } else {
+                return 'error';
             }
+        } else {
             return null;
         }
     }
@@ -423,7 +285,6 @@ class RouteInfoForm extends Component {
         }
         this.paramsChanged = true;
         this.props.setStart(new Date(dates[0]));
-        // this.setState({start:new Date(dates[0])});
     }
 
 /*
@@ -537,7 +398,7 @@ class RouteInfoForm extends Component {
                     {/*<a style={{padding:'8px',display:'inline-flex',marginTop:'5px',marginBottom:'5px'}} href="https://westernwheelersbicycleclub.wildapricot.org/page-1374754" target="_blank">Pace explanation</a>*/}
                     <FormGroup bsSize='small'
                                bsClass='formGroup hidden-xs hidden-sm'
-                               validationState={this.decideValidationStateFor('gpx',this.state.errorSource,this.state.succeeded)}
+                               validationState={this.decideValidationStateFor('gpx',this.props.loadingSource,this.props.loadingSuccess)}
                                style={{display:'inline-flex',marginTop:'5px',marginBottom:'5px'}}
                                controlId="route">
                         <ControlLabel>Route file</ControlLabel>
@@ -547,7 +408,7 @@ class RouteInfoForm extends Component {
                     </FormGroup>
 
                     <FormGroup
-                        validationState={this.decideValidationStateFor('rwgps',this.state.errorSource,this.state.succeeded)}
+                        validationState={this.decideValidationStateFor('rwgps',this.props.loadingSource,this.props.loadingSuccess)}
                         controlId="ridewithgps" style={{flex:'1',display:'inline-flex',marginTop:'5px',marginBottom:'5px'}}>
                         <ControlLabel>RideWithGps route</ControlLabel>
                         <OverlayTrigger placement="bottom" overlay={tooltip_rwgps_enabled}>
@@ -621,11 +482,11 @@ class RouteInfoForm extends Component {
                     {RouteInfoForm.showProgressSpinner(this.props.fetchingRoute)}
                 </Form>
                     <MediaQuery maxDeviceWidth={800}>
-                        <ShortUrl shortUrl={this.state.shortUrl}/>
+                        <ShortUrl/>
                     </MediaQuery>
                 </Panel>
             <MediaQuery minDeviceWidth={1000}>
-                <ShortUrl shortUrl={this.state.shortUrl}/>
+                <ShortUrl/>
             </MediaQuery>
             </div>
         );
@@ -635,19 +496,23 @@ class RouteInfoForm extends Component {
 const mapStateToProps = (state, ownProps) =>
     ({
         rwgpsRoute: state.uiInfo.rwgpsRoute,
+        loadingSource: state.uiInfo.loadingSource,
+        loadingSuccess: state.uiInfo.succeeded,
         start: state.uiInfo.start,
         pace: state.uiInfo.pace,
         interval: state.uiInfo.interval,
         fetchingRoute: state.uiInfo.fetchingRoute,
         rwgpsRouteIsTrip:state.uiInfo.rwgpsRouteIsTrip,
         errorDetails:state.uiInfo.errorDetails,
-        errorSource:state.uiInfo.errorSource,
         routeInfo:state.routeInfo,
-        controlPoints:state.controls.controlPoints
+        controlPoints:state.controls.controlPoints,
+        timezone_api_key: state.params.timezone_api_key,
+        metric: state.controls.metric
     });
 
 const mapDispatchToProps = {
-    loadFromRideWithGps, loadGpxRoute, setRwgpsRoute, setInterval, setPace, requestForecast, recalcRoute, setErrorDetails
+    loadFromRideWithGps, loadGpxRoute, setRwgpsRoute, setInterval, setPace, requestForecast,
+    recalcRoute, setErrorDetails, setShortUrl, shortenUrl
 };
 
 export default connect(mapStateToProps, mapDispatchToProps, null, {pure:true})(RouteInfoForm);

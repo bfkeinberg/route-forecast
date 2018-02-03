@@ -23,10 +23,13 @@ let state = {
         weatherCorrectionMinutes
     },
     // received from weather forecast, consumed by map and table rendering components
-    forecast:[
+    forecast:{[
         [time, distance, summary, temperature_str, precipitation, cloudCover, windspeed,
         latitude, longitude, temperature_int, long_time, relative_bearing, rain, wind_bearing]
-    ],
+        ]
+        forecastValid:false,
+    },
+
     // entered by user, used to fetch route and request forecast
     ui_fields:[
         start,
@@ -38,14 +41,14 @@ let state = {
         fetchingForecast:false,
         formVisible:true,
         errorDetails,
-        errorSource
+        errorSource,
+        shortUrl
     ],
     params:{
         action: '/forecast',
         maps_key:'dddsss333',
         timezone_key:'eee444333'
     },
-    forecastValid:false,
     fetchAfterLoad:false,
     strava: {
         strava_token:null,
@@ -79,38 +82,54 @@ function initialStartTime() {
 
 const uiInfo = function(state = {interval:defaultIntervalInHours,pace:defaultPace,rwgpsRoute:'',
     rwgpsRouteIsTrip:false, formVisible:true, errorDetails:null, start:initialStartTime(),
-    succeeded:true}, action) {
+    succeeded:true, shortUrl:' '}, action) {
     switch (action.type) {
         case Actions.SET_RWGPS_ROUTE:
-            return {...state,rwgpsRoute:action.route,errorSource:'rwgps'};
+            return {...state,rwgpsRoute:action.route,loadingSource:null,succeeded:null};
+        case Actions.CLEAR_ROUTE_DATA:
+            return {...state,loadingSource:null,succeeded:null};
         case Actions.SET_START:
-            return {...state,start:action.start};
+            if (action.start !== null) {
+                return {...state,start:action.start};
+            } else {
+                return state;
+            }
         case Actions.SET_PACE:
-            return {...state,pace:action.pace};
+            if (action.pace !== null) {
+                return {...state,pace:action.pace};
+            } else {
+                return state;
+            }
         case Actions.SET_INTERVAL:
-            return {...state,interval:action.interval};
+            if (action.interval !== null) {
+                return {...state,interval:action.interval};
+            } else {
+                return state;
+            }
         case Actions.BEGIN_LOADING_ROUTE:
-            return {...state,fetchingRoute:true,errorSource:action.source};
+            return {...state,fetchingRoute:true,loadingSource:action.source};
         case Actions.BEGIN_FETCHING_FORECAST:
             return {...state,fetchingForecast:true};
         case Actions.FORECAST_FETCH_SUCCESS:
-            return {...state,fetchingForecast:false,errorDetails:null,succeeded:true};
+            return {...state,fetchingForecast:false,errorDetails:null};
         case Actions.FORECAST_FETCH_FAILURE:
-            return {...state,fetchingForecast:false,errorDetails:action.error,succeeded:false};
+            return {...state,fetchingForecast:false,errorDetails:action.error};
         case Actions.RWGPS_ROUTE_LOADING_SUCCESS:
             return {...state, fetchingRoute:false, errorDetails:null, succeeded:true};
         case Actions.GPX_ROUTE_LOADING_SUCCESS:
             return {...state, fetchingRoute:false, errorDetails:null, succeeded:true};
         case Actions.RWGPS_ROUTE_LOADING_FAILURE:
-            return {...state, fetchingRoute:false, errorDetails:action.error, errorSource:'rwgps', rwgpsRoute:'', succeeded:false};
+            return {...state, fetchingRoute:false, errorDetails:action.error, rwgpsRoute:'', succeeded:false};
         case Actions.GPX_ROUTE_LOADING_FAILURE:
-            return {...state, fetchingRoute:false, errorDetails:action.error, errorSource:'gpx', succeeded:false};
+            return {...state, fetchingRoute:false, errorDetails:action.error, succeeded:false};
         case Actions.SHOW_FORM:
             return {...state, formVisible:true};
         case Actions.HIDE_FORM:
             return {...state,formVisible:false};
         case Actions.SET_ERROR_DETAILS:
             return {...state,errorDetails:action.details};
+        case Actions.SET_SHORT_URL:
+            return {...state,shortUrl:action.url};
         default:
             return state;
     }
@@ -141,6 +160,12 @@ const routeInfo = function(state = {finishTime:'',weatherCorrectionMinutes:null}
 
 const controls = function(state = {metric:false,displayBanked:false,stravaAnalysis:false,controlPoints:[]}, action) {
     switch (action.type) {
+        case Actions.SET_METRIC:
+            if (action.metric !== undefined) {
+                return {...state, metric:action.metric};
+            } else {
+                return state;
+            }
         case Actions.TOGGLE_METRIC:
             return {...state, metric:!state.metric};
         case Actions.TOGGLE_DISPLAY_BANKED:
@@ -157,11 +182,17 @@ const controls = function(state = {metric:false,displayBanked:false,stravaAnalys
 const strava = function(state = {}, action) {
     switch (action.type) {
         case Actions.SET_STRAVA_TOKEN:
-            return {...state, token:action.token};
+            if (action.token !== undefined) {
+                return {...state, token:action.token};
+            }
         case Actions.SET_STRAVA_ACTIVITY:
-            return {...state, activity:action.activity};
+            if (action.activity !== undefined) {
+                return {...state, activity:action.activity};
+            }
         case Actions.SET_STRAVA_ERROR:
-            return {...state, error:action.error};
+            if (action.error !== undefined) {
+                return {...state, error:action.error};
+            }
         case Actions.SET_ACTUAL_FINISH_TIME:
             return {...state, actualFinishTime:action.finishTime};
         case Actions.BEGIN_STRAVA_FETCH:
@@ -175,10 +206,16 @@ const strava = function(state = {}, action) {
     }
 };
 
-const forecast = function(state = [], action) {
+const forecast = function(state = {forecast:[],valid:false}, action) {
     switch (action.type) {
         case Actions.FORECAST_FETCH_SUCCESS:
-            return action.forecastInfo.forecast;
+            return {...state,forecast:action.forecastInfo.forecast,valid:true};
+        case Actions.SET_RWGPS_ROUTE:
+            return {...state,valid:false};
+        case Actions.GPX_ROUTE_LOADING_SUCCESS:
+            return {...state,valid:false};
+        case Actions.GPX_ROUTE_LOADING_FAILURE:
+            return {...state,valid:false};
         default:
             return state;
     }
