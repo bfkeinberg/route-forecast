@@ -5,6 +5,7 @@ import {AgGridReact} from 'ag-grid-react';
 import ReactDOM from 'react-dom';
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
+import {updateControls} from './actions/actions';
 
 const smallScreenWidth = 800;
 
@@ -13,7 +14,8 @@ class ControlTable extends Component {
         displayBanked:PropTypes.bool.isRequired,
         compare:PropTypes.bool.isRequired,
         controls:PropTypes.arrayOf(PropTypes.object).isRequired,
-        update:PropTypes.func.isRequired
+        updateControls:PropTypes.func.isRequired,
+        count:PropTypes.number.isRequired
     };
 
     constructor(props) {
@@ -63,15 +65,15 @@ class ControlTable extends Component {
         // focus on new control if one has been added
         this.api.setFocusedCell(this.props.controls.length,'name',null);
         // this.api.startEditingCell(this.api.getFocusedCell());
+        this.updateFromGrid();
     }
 
     removeRow(row) {
         let rowNode = this.api.getRowNode(row);
-        console.log(`row node to delete for ${row} is ${rowNode}`);
         if (rowNode === undefined) {
             return;
         }
-        let transaction = {remove:[row]};
+        let transaction = {remove:[rowNode]};
         this.api.updateRowData(transaction);
         this.updateFromGrid();
     }
@@ -123,15 +125,20 @@ class ControlTable extends Component {
         }
         this.columnApi.setColumnVisible('banked',newProps.displayBanked);
         this.columnApi.setColumnVisible('actual',newProps.compare);
+        if (newProps.count > newProps.controls.length) {
+            this.addRow();
+        }
         if (newProps.controls.every(ctl => ctl.id===undefined)) {
             newProps.controls.forEach((row,key) => row.id=key);
         }
         this.api.setRowData(newProps.controls);
         this.setState({rowCount:this.api.getModel().getRowCount()});
+/*
         if (!this.shouldComponentUpdate(newProps)) {
             return;
         }
-        this.updateFromGrid();
+*/
+        // this.updateFromGrid();
     }
 
     static doControlsMatch(newControl, oldControl) {
@@ -143,6 +150,7 @@ class ControlTable extends Component {
             newControl.banked===oldControl.banked;
     }
 
+/*
     shouldComponentUpdate(nextProps) {
         // compare controls
         let controls = this.props.controls;
@@ -153,6 +161,7 @@ class ControlTable extends Component {
             nextProps.controls.every((v,i)=> ControlTable.doControlsMatch(v,controls[i])));
     }
 
+*/
     static setData(params) {
         return Number(params.newValue);
     }
@@ -189,7 +198,7 @@ class ControlTable extends Component {
         let modifiedControls = [];
         this.api.forEachNodeAfterFilterAndSort(node => modifiedControls.push(node.data));
         // modifiedControls.forEach((row,key) => row.id=key);
-        this.props.update(modifiedControls);
+        this.props.updateControls(modifiedControls);
     }
 
     render() {
@@ -209,7 +218,13 @@ class ControlTable extends Component {
 const mapStateToProps = (state, ownProps) =>
     ({
         displayBanked: state.controls.displayBanked,
-        compare: state.controls.stravaAnalysis
+        compare: state.controls.stravaAnalysis,
+        count: state.controls.count,
+        controls: state.controls.controlPoints
     });
 
-export default connect(mapStateToProps)(ControlTable);
+const mapDispatchToProps = {
+    updateControls
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(ControlTable);

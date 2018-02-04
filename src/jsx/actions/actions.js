@@ -264,11 +264,17 @@ export function clearRouteData() {
     };
 }
 export const UPDATE_CONTROLS = 'UPDATE_CONTROLS';
-
 export function updateControls(controls) {
     return {
         type: UPDATE_CONTROLS,
         controls: controls
+    };
+}
+
+export const ADD_CONTROL = 'ADD_CONTROL';
+export function addControl() {
+    return {
+        type: ADD_CONTROL
     };
 }
 

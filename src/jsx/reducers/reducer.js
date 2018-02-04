@@ -85,24 +85,29 @@ const uiInfo = function(state = {interval:defaultIntervalInHours,pace:defaultPac
     succeeded:true, shortUrl:' '}, action) {
     switch (action.type) {
         case Actions.SET_RWGPS_ROUTE:
-            return {...state,rwgpsRoute:action.route,loadingSource:null,succeeded:null};
+            if (action.route !== undefined) {
+                let route = parseInt(action.route);
+                return {...state,rwgpsRoute:route !== NaN ? route : action.route,loadingSource:null,succeeded:null};
+            }
+            return state;
         case Actions.CLEAR_ROUTE_DATA:
             return {...state,loadingSource:null,succeeded:null};
         case Actions.SET_START:
-            if (action.start !== null) {
-                return {...state,start:action.start};
+            let start = new Date(action.start);
+            if (action.start !== undefined) {
+                return {...state,start:start};
             } else {
                 return state;
             }
         case Actions.SET_PACE:
-            if (action.pace !== null) {
+            if (action.pace !== undefined) {
                 return {...state,pace:action.pace};
             } else {
                 return state;
             }
         case Actions.SET_INTERVAL:
-            if (action.interval !== null) {
-                return {...state,interval:action.interval};
+            if (action.interval !== undefined) {
+                return {...state,interval:parseFloat(action.interval)};
             } else {
                 return state;
             }
@@ -158,7 +163,7 @@ const routeInfo = function(state = {finishTime:'',weatherCorrectionMinutes:null}
     }
 };
 
-const controls = function(state = {metric:false,displayBanked:false,stravaAnalysis:false,controlPoints:[]}, action) {
+const controls = function(state = {metric:false,displayBanked:false,stravaAnalysis:false,controlPoints:[],count:0}, action) {
     switch (action.type) {
         case Actions.SET_METRIC:
             if (action.metric !== undefined) {
@@ -173,7 +178,9 @@ const controls = function(state = {metric:false,displayBanked:false,stravaAnalys
         case Actions.TOGGLE_STRAVA_ANALYSIS:
             return {...state, stravaAnalysis:!state.stravaAnalysis};
         case Actions.UPDATE_CONTROLS:
-            return {...state, controlPoints:action.controls};
+            return {...state, controlPoints:action.controls, count:action.controls.length};
+        case Actions.ADD_CONTROL:
+            return {...state, count:state.count+1};
         default:
             return state;
     }

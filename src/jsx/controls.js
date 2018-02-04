@@ -18,6 +18,7 @@ import RouteInfoForm from "./routeInfoEntry";
 import ErrorBoundary from './errorBoundary';
 import PropTypes from 'prop-types';
 import {
+    addControl,
     beginStravaFetch,
     setActualFinishTime,
     setActualPace,
@@ -56,7 +57,6 @@ class ControlPoints extends Component {
         super(props);
         this.addControl = this.addControl.bind(this);
         this.toggleDisplayBanked = this.toggleDisplayBanked.bind(this);
-        this.toggleMetric = this.toggleMetric.bind(this);
         this.toggleCompare = this.toggleCompare.bind(this);
         this.updateExpectedTimes = this.updateExpectedTimes.bind(this);
         this.stravaErrorCallback = this.stravaErrorCallback.bind(this);
@@ -67,7 +67,7 @@ class ControlPoints extends Component {
         this.changeDisplayFinishTime = this.changeDisplayFinishTime.bind(this);
         this.computeTimesFromStrava = this.computeTimesFromStrava.bind(this);
         this.state = {
-            displayBankedTime : false, metric:this.props.metric, lookback:this.props.strava_activity!==undefined,
+            lookback:this.props.strava_activity!==undefined,
             stravaAlertVisible: false, stravaError: this.props.strava_error, displayedFinishTime:this.props.finishTime,
             strava_activity: this.props.strava_activity===undefined?' ':this.props.strava_activity, isUpdating:false
         };
@@ -157,7 +157,7 @@ class ControlPoints extends Component {
     }
 
     addControl( ) {
-        this.table.addRow();
+        this.props.addControl();
     }
 
     toggleDisplayBanked() {
@@ -218,7 +218,7 @@ class ControlPoints extends Component {
                                          value={this.state.displayedFinishTime}/>
                         </FormGroup>
                         <Checkbox tabIndex='12' checked={this.props.metric} inline
-                                  onClick={this.toggleMetric} onChange={this.toggleMetric}
+                                  onClick={this.props.toggleMetric} onChange={this.props.toggleMetric}
                                   style={{padding:'0px 0px 0px 26px',display:'inline-flex'}}>metric</Checkbox>
                         <Checkbox tabIndex='11' checked={this.state.displayBankedTime} inline
                                   onChange={this.toggleDisplayBanked} onClick={this.toggleDisplayBanked}
@@ -271,17 +271,13 @@ class ControlPoints extends Component {
                 <ErrorBoundary>
                     <MediaQuery minDeviceWidth={1000}>
                         <Panel header={title} bsStyle="info" style={{margin:'10px'}}>
-
                             <ErrorBoundary>
-                                <ControlTable controls={this.props.controlPoints}
-                                              update={this.props.updateControls} ref={(table) => {this.table = table;}}/>
+                                <ControlTable  ref={(table) => {this.table = table;}}/>
                             </ErrorBoundary>
-
                         </Panel>
                     </MediaQuery>
                     <MediaQuery maxDeviceWidth={800}>
-                                <ControlTable controls={this.props.controlPoints}
-                                              update={this.props.updateControls} ref={(table) => {this.table = table;}}/>
+                                <ControlTable ref={(table) => {this.table = table;}}/>
                     </MediaQuery>
                 </ErrorBoundary>
                 <div tabIndex="98" onFocus={() => {document.getElementById('addButton').focus()}}/>
@@ -308,7 +304,7 @@ const mapStateToProps = (state, ownProps) =>
 
 const mapDispatchToProps = {
     updateControls, toggleMetric, setStravaActivity, setActualFinishTime, setStravaError, beginStravaFetch,
-    toggleDisplayBanked, stravaFetchSuccess, toggleStravaAnalysis, setActualPace
+    toggleDisplayBanked, stravaFetchSuccess, toggleStravaAnalysis, setActualPace, addControl
 };
 
 export const doControlsMatch = ControlPoints.doControlsMatch;

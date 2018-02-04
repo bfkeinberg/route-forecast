@@ -72,7 +72,6 @@ class RouteInfoForm extends Component {
         timezone_api_key:PropTypes.string.isRequired,
         controlPoints:PropTypes.arrayOf(PropTypes.object).isRequired,
         metric:PropTypes.bool.isRequired,
-        updateRouteInfo:PropTypes.func.isRequired,
         formatControlsForUrl:PropTypes.func.isRequired,
         actualPace:PropTypes.number
     };
