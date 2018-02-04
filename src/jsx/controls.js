@@ -56,7 +56,6 @@ class ControlPoints extends Component {
     constructor(props) {
         super(props);
         this.addControl = this.addControl.bind(this);
-        this.toggleDisplayBanked = this.toggleDisplayBanked.bind(this);
         this.toggleCompare = this.toggleCompare.bind(this);
         this.updateExpectedTimes = this.updateExpectedTimes.bind(this);
         this.stravaErrorCallback = this.stravaErrorCallback.bind(this);
@@ -160,10 +159,6 @@ class ControlPoints extends Component {
         this.props.addControl();
     }
 
-    toggleDisplayBanked() {
-        this.props.toggleDisplayBanked();
-    }
-
     toggleMetric() {
         this.props.toggleMetric();
     }
@@ -221,7 +216,7 @@ class ControlPoints extends Component {
                                   onClick={this.props.toggleMetric} onChange={this.props.toggleMetric}
                                   style={{padding:'0px 0px 0px 26px',display:'inline-flex'}}>metric</Checkbox>
                         <Checkbox tabIndex='11' checked={this.state.displayBankedTime} inline
-                                  onChange={this.toggleDisplayBanked} onClick={this.toggleDisplayBanked}
+                                  onChange={this.props.toggleDisplayBanked} onClick={this.props.toggleDisplayBanked}
                                   style={{padding:'0px 0px 0px 24px', display:'inline-flex'}}>Display banked time</Checkbox>
                         <Checkbox tabIndex="13" checked={this.props.stravaAnalysis} disabled={!this.props.forecastValid} inline onChange={this.toggleCompare}
                                   onClick={this.toggleCompare} style={{visibility:this.props.stravaAnalysis ? null : 'hidden', display:'inline-flex'}}>Compare</Checkbox>
@@ -272,12 +267,12 @@ class ControlPoints extends Component {
                     <MediaQuery minDeviceWidth={1000}>
                         <Panel header={title} bsStyle="info" style={{margin:'10px'}}>
                             <ErrorBoundary>
-                                <ControlTable  ref={(table) => {this.table = table;}}/>
+                                <ControlTable/>
                             </ErrorBoundary>
                         </Panel>
                     </MediaQuery>
                     <MediaQuery maxDeviceWidth={800}>
-                                <ControlTable ref={(table) => {this.table = table;}}/>
+                                <ControlTable/>
                     </MediaQuery>
                 </ErrorBoundary>
                 <div tabIndex="98" onFocus={() => {document.getElementById('addButton').focus()}}/>

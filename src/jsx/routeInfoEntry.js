@@ -89,8 +89,7 @@ class RouteInfoForm extends Component {
         this.intervalChanged = this.intervalChanged.bind(this);
         this.handleRwgpsRoute = this.handleRwgpsRoute.bind(this);
         this.handlePaceChange = this.handlePaceChange.bind(this);
-        this.setErrorState = this.setErrorState.bind(this);
-        this.decideValidationStateFor = this.decideValidationStateFor.bind(this);
+        RouteInfoForm.decideValidationStateFor = RouteInfoForm.decideValidationStateFor.bind(this);
         this.setRwgpsRoute = this.setRwgpsRoute.bind(this);
         this.setDateAndTime = this.setDateAndTime.bind(this);
         this.makeFullQueryString = this.makeFullQueryString.bind(this);
@@ -112,12 +111,13 @@ class RouteInfoForm extends Component {
 
     componentWillReceiveProps(nextProps) {
         // recalculate if the user updated the controls, say
-        this.setQueryString(this.state, this.props.controlPoints, this.props.metric);
+        this.setQueryString(this.props.controlPoints, this.props.metric);
+        // but there must be a better way to tell than this
         if (nextProps.controlPoints.length !== this.props.controlPoints.length ||
             !nextProps.controlPoints.every((v, i)=> doControlsMatch(v,this.props.controlPoints[i]))) {
             this.props.recalcRoute();
         }
-        if (this.fetchAfterLoad && this.props.routeInfo.points !== null) {
+        if (this.fetchAfterLoad && nextProps.routeInfo.points !== null) {
             this.requestForecast();
             this.fetchAfterLoad = false;
         }
@@ -127,13 +127,14 @@ class RouteInfoForm extends Component {
         if (this.paramsChanged) {
             this.paramsChanged = false;
             // recalculate if the user changed values in the dialog
-            this.setQueryString(this.state, this.props.controlPoints, this.props.metric);
+            this.setQueryString(this.props.controlPoints, this.props.metric);
             this.props.recalcRoute();
         }
     }
 
     updateRouteFile(event) {
         this.props.loadGpxRoute(event,this.props.timezone_api_key);
+        // nothing to encode if the URL if we're working from a local file
         history.pushState(null, 'nothing', location.origin);
     }
 
@@ -149,7 +150,7 @@ class RouteInfoForm extends Component {
     }
 
     makeFullQueryString() {
-        let query = {start:this.state.start,pace:this.props.pace,interval:this.props.interval,
+        let query = {start:this.props.start,pace:this.props.pace,interval:this.props.interval,
             rwgpsRoute:this.props.rwgpsRoute,controlPoints:this.props.formatControlsForUrl(this.props.controlPoints)};
         this.props.shortenUrl(location.origin + '?' + queryString.stringify(query));
     }
@@ -160,7 +161,7 @@ class RouteInfoForm extends Component {
         return moment(date).format("ddd MMM D YYYY HH:mm:ss");
     }
 
-    setQueryString(state,controlPoints,metric) {
+    setQueryString(controlPoints, metric) {
         if (this.props.rwgpsRoute !== '') {
             let query = {start:RouteInfoForm.dateToShortDate(this.props.start),pace:this.props.pace,interval:this.props.interval,metric:metric,
                 rwgpsRoute:this.props.rwgpsRoute,controlPoints:this.props.formatControlsForUrl(controlPoints)};
@@ -173,21 +174,8 @@ class RouteInfoForm extends Component {
         }
     }
 
-    setErrorState(errorDetails, errorSource) {
-        if (errorDetails !== null) {
-            this.setState({errorDetails:errorDetails, errorSource:errorSource, routeUpdating:false});
-            if (errorSource === 'rwgps') {
-                this.setState({rwgpsRoute:'',succeeded:false});
-            } else {
-                this.routeFileSet = false;
-                this.setState({succeeded:false})
-            }
-        } else {
-            this.setState({errorDetails:errorDetails,errorSource:null,routeUpdating:false,succeeded:true});
-        }
-    }
-
     disableSubmit() {
+        // can't request a forecast without a route loaded
         return (this.props.rwgpsRoute === '' && this.props.routeInfo.gpxRouteData === null);
      }
 
@@ -265,7 +253,7 @@ class RouteInfoForm extends Component {
         this.props.setPace(event.target.value);
     }
 
-    decideValidationStateFor(type,methodUsed,loadingSuccess) {
+    static decideValidationStateFor(type, methodUsed, loadingSuccess) {
         if (type === methodUsed) {
             if (loadingSuccess) {
                 return 'success';
@@ -374,7 +362,7 @@ class RouteInfoForm extends Component {
                     <FormGroup style={{flex:'1',display:'inline-flex',marginTop:'5px',marginBottom:'5px'}} controlId="pace">
                         <ControlLabel>Pace</ControlLabel>
                         <OverlayTrigger placement="bottom" overlay={pace_tooltip}>
-                            <FormControl tabIndex='3' componentClass="select" value={this.state.pace} name="pace"
+                            <FormControl tabIndex='3' componentClass="select" value={this.props.pace} name="pace"
                                          style={{'width':'5em','height':'2.8em',paddingRight:'8px'}}
                                          onChange={this.handlePaceChange}>
                                 <option value="A">A/10</option>
@@ -394,10 +382,9 @@ class RouteInfoForm extends Component {
                         <Button style={{marginLeft:'7px'}} bsSize="xsmall">Pace explanation</Button>
                     </OverlayTrigger>
 
-                    {/*<a style={{padding:'8px',display:'inline-flex',marginTop:'5px',marginBottom:'5px'}} href="https://westernwheelersbicycleclub.wildapricot.org/page-1374754" target="_blank">Pace explanation</a>*/}
                     <FormGroup bsSize='small'
                                bsClass='formGroup hidden-xs hidden-sm'
-                               validationState={this.decideValidationStateFor('gpx',this.props.loadingSource,this.props.loadingSuccess)}
+                               validationState={RouteInfoForm.decideValidationStateFor('gpx',this.props.loadingSource,this.props.loadingSuccess)}
                                style={{display:'inline-flex',marginTop:'5px',marginBottom:'5px'}}
                                controlId="route">
                         <ControlLabel>Route file</ControlLabel>
@@ -407,7 +394,7 @@ class RouteInfoForm extends Component {
                     </FormGroup>
 
                     <FormGroup
-                        validationState={this.decideValidationStateFor('rwgps',this.props.loadingSource,this.props.loadingSuccess)}
+                        validationState={RouteInfoForm.decideValidationStateFor('rwgps',this.props.loadingSource,this.props.loadingSuccess)}
                         controlId="ridewithgps" style={{flex:'1',display:'inline-flex',marginTop:'5px',marginBottom:'5px'}}>
                         <ControlLabel>RideWithGps route</ControlLabel>
                         <OverlayTrigger placement="bottom" overlay={tooltip_rwgps_enabled}>

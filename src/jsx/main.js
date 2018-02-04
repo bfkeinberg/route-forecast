@@ -76,6 +76,7 @@ class RouteWeatherUI extends Component {
         }
     }
 
+/*
     static doControlsMatch(newControl,oldControl) {
         return newControl.distance===oldControl.distance &&
             newControl.name===oldControl.name &&
@@ -85,6 +86,7 @@ class RouteWeatherUI extends Component {
             newControl.banked===oldControl.banked;
     }
 
+*/
 /*    shouldComponentUpdate(newProps,newState) {
         let controlPoints = this.state.controlPoints;
         if (this.state.routeInfo.name !== newState['routeInfo'].name) {
@@ -160,7 +162,7 @@ class RouteWeatherUI extends Component {
         props.setStart(queryParams.start);
         props.setPace(queryParams.pace);
         props.setInterval(queryParams.interval);
-        props.setMetric(queryParams.metric);
+        props.setMetric(queryParams.metric==="true");
         props.setStravaActivity(queryParams.strava_activity);
         props.setStravaError(queryParams.strava_error);
     }
@@ -168,9 +170,7 @@ class RouteWeatherUI extends Component {
     render() {
         const inputForm = (
             <ErrorBoundary>
-            <RouteInfoForm formVisible={this.state.formVisible}
-                           formatControlsForUrl={this.formatControlsForUrl}
-            />
+                <RouteInfoForm formatControlsForUrl={this.formatControlsForUrl}/>
             </ErrorBoundary>
         );
         const formButton = (

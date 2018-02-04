@@ -23,7 +23,7 @@ class ControlTable extends Component {
         let displayBanked = this.props.displayBanked;
         this.deleteRenderer = this.deleteRenderer.bind(this);
         this.removeRow = this.removeRow.bind(this);
-        this.state = {rowCount:0,
+        this.state = {
             columnDefs:[
                 {colId:'name', field:'name', unSortIcon:true, suppressSorting:true, editable:true, headerName:'Name'},
                 {field:'distance', headerTooltip:'In miles or km, depending on the metric checkbox',
@@ -132,7 +132,6 @@ class ControlTable extends Component {
             newProps.controls.forEach((row,key) => row.id=key);
         }
         this.api.setRowData(newProps.controls);
-        this.setState({rowCount:this.api.getModel().getRowCount()});
 /*
         if (!this.shouldComponentUpdate(newProps)) {
             return;
@@ -141,6 +140,7 @@ class ControlTable extends Component {
         // this.updateFromGrid();
     }
 
+/*
     static doControlsMatch(newControl, oldControl) {
         return newControl.distance===oldControl.distance &&
             newControl.name===oldControl.name &&
@@ -149,6 +149,7 @@ class ControlTable extends Component {
             newControl.actual===oldControl.actual &&
             newControl.banked===oldControl.banked;
     }
+*/
 
 /*
     shouldComponentUpdate(nextProps) {
@@ -179,7 +180,6 @@ class ControlTable extends Component {
         let rowData = params.node.data;
         if (ControlTable.isValidRow(rowData)) {
             // update
-            this.setState({rowCount:this.api.getModel().getRowCount()});
             this.updateFromGrid();
         }
     }
