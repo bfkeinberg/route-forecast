@@ -1,71 +1,139 @@
 import moment from 'moment';
+import cookie from 'react-cookies';
 
 export const SET_RWGPS_ROUTE = 'SET_RWGPS_ROUTE';
-export function setRwgpsRoute(route) {
+export const setRwgpsRoute = function(route) {
     return {
         type: SET_RWGPS_ROUTE,
         route: route
     }
-}
-
-export const SET_GPX_ROUTE = 'SET_GPX_ROUTE';
-export function setGpxRoute(route) {
-    return {
-        type: SET_GPX_ROUTE,
-        route: route
-    }
-}
+};
 
 export const SET_START = 'SET_START';
-export function setStart(start) {
+export const setStart = function (start) {
     return {
         type: SET_START,
         start: start
     }
-}
+};
 
 export const SET_PACE = 'SET_PACE';
-export function setPace(pace) {
+export const setPace = function(pace) {
     return {
         type: SET_PACE,
         pace: pace
     }
-}
+};
 
 export const SET_INTERVAL = 'SET_INTERVAL';
-export function setInterval(interval) {
+export const setInterval = function(interval) {
     return {
         type: SET_INTERVAL,
         interval: interval
     }
-}
+};
 
-async function getRouteParser() {
+const getRouteParser = async function () {
     const parser = await import(/* webpackChunkName: "RwgpsParser" */ '../gpxParser');
     return parser.default;
 }
 
-function currentRouteData(getState) {
+const currentRouteData = function(getState) {
     if (getState().routeInfo.rwgpsRouteData !== null) {
         return getState().routeInfo.rwgpsRouteData;
     } else {
         return getState().routeInfo.gpxRouteData;
     }
-}
+};
 
-export const RECALC_ROUTE = 'RECALC_ROUTE';
-export function recalcRoute() {
+export const SET_ROUTE_INFO = 'SET_ROUTE_INFO';
+const setRouteInfo = function(routeInfo) {
+    return {
+        type: SET_ROUTE_INFO,
+        routeInfo: routeInfo
+    }
+};
+
+export const recalcRoute = function() {
     return async function(dispatch, getState) {
         const parser = await getRouteParser();
         dispatch(setRouteInfo(
             parser.walkRoute(
                 currentRouteData(getState),
+                getState().uiInfo.loadingSource,
                 moment(getState().uiInfo.start),
                 getState().uiInfo.pace, getState().uiInfo.interval,
-                getState().controls.controlPoints,getState().controls.metric,
+                getState().controls.controlPoints.map( control => ({...control})),
+                getState().controls.metric,
                 getState().routeInfo.timeZoneId)));
     }
-}
+};
+
+export const BEGIN_LOADING_ROUTE = 'BEGIN_LOADING_ROUTE';
+const beginLoadingRoute = function (source) {
+    return {
+        type: BEGIN_LOADING_ROUTE,
+        source: source
+    }
+};
+
+export const RWGPS_ROUTE_LOADING_SUCCESS = 'RWGPS_ROUTE_LOADING_SUCCESS';
+const rwgpsRouteLoadingSuccess = function(routeData) {
+    return {
+        type: RWGPS_ROUTE_LOADING_SUCCESS,
+        routeData : routeData
+    }
+};
+
+export const RWGPS_ROUTE_LOADING_FAILURE = 'RWGPS_ROUTE_LOADING_FAILURE';
+const rwgpsRouteLoadingFailure = function(status) {
+    return {
+        type: RWGPS_ROUTE_LOADING_FAILURE,
+        status: status
+    }
+};
+
+export const parseControls = function(controlPointString) {
+    let controlPointList = controlPointString.split(":");
+    let controlPoints =
+        controlPointList.map(point => {
+            let controlPointValues = point.split(",");
+            return ({name:controlPointValues[0],distance:Number(controlPointValues[1]),duration:Number(controlPointValues[2])});
+        });
+    // delete dummy first element
+    controlPoints.splice(0,1);
+    return controlPoints;
+};
+
+const getRouteName = function(routeData) {
+    if (routeData.route !== undefined) {
+        return routeData.route.name;
+    } else if (routeData.trip !== undefined) {
+        return routeData.trip.name;
+    } else {
+        return null;
+    }
+};
+
+export const UPDATE_CONTROLS = 'UPDATE_CONTROLS';
+export const updateControls = function(controls) {
+    return {
+        type: UPDATE_CONTROLS,
+        controls: controls
+    };
+};
+
+export const loadControlsFromCookie = function(routeData) {
+    return function(dispatch) {
+        let routeName = getRouteName(routeData);
+        if (routeName !== null) {
+            let savedControlPoints = cookie.load(routeName);
+            if (savedControlPoints !== undefined && savedControlPoints.length > 0) {
+                dispatch(updateControls(parseControls(savedControlPoints)));
+            }
+        }
+    };
+};
 
 export const loadFromRideWithGps = function(routeNumber, isTrip, timezone_api_key) {
     return async function(dispatch) {
@@ -73,33 +141,27 @@ export const loadFromRideWithGps = function(routeNumber, isTrip, timezone_api_ke
         const parser = await getRouteParser();
         parser.loadRwgpsRoute(routeNumber, isTrip, timezone_api_key).then( (routeData) => {
                 dispatch(rwgpsRouteLoadingSuccess(routeData));
+                dispatch(loadControlsFromCookie(routeData.rwgpsRouteData));
                 dispatch(recalcRoute());
             }, error => {dispatch(rwgpsRouteLoadingFailure(error))}
         );
     };
 };
 
-export const BEGIN_LOADING_ROUTE = 'BEGIN_LOADING_ROUTE';
-function beginLoadingRoute(source) {
-    return {
-        type: BEGIN_LOADING_ROUTE
-    }
-}
-
 export const BEGIN_FETCHING_FORECAST = 'BEGIN_FETCHING_FORECAST';
-function beginFetchingForecast() {
+const beginFetchingForecast = function() {
     return {
         type: BEGIN_FETCHING_FORECAST
     }
-}
+};
 
 export const FORECAST_FETCH_SUCCESS = 'FORECAST_FETCH_SUCCESS';
-function forecastFetchSuccess(forecastInfo) {
+const forecastFetchSuccess = function(forecastInfo) {
     return {
         type: FORECAST_FETCH_SUCCESS,
         forecastInfo: forecastInfo
     }
-}
+};
 
 export const FORECAST_FETCH_FAILURE = 'FORECAST_FETCH_FAILURE';
 function forecastFetchFailure(error) {
@@ -109,43 +171,21 @@ function forecastFetchFailure(error) {
     }
 }
 
-export const RWGPS_ROUTE_LOADING_SUCCESS = 'RWGPS_ROUTE_LOADING_SUCCESS';
-function rwgpsRouteLoadingSuccess(routeData) {
-    return {
-        type: RWGPS_ROUTE_LOADING_SUCCESS,
-        routeData : routeData
-    }
-}
-export const RWGPS_ROUTE_LOADING_FAILURE = 'RWGPS_ROUTE_LOADING_FAILURE';
-function rwgpsRouteLoadingFailure(status) {
-    return {
-        type: RWGPS_ROUTE_LOADING_FAILURE,
-        status: status
-    }
-}
-
 export const GPX_ROUTE_LOADING_SUCCESS = 'GPX_ROUTE_LOADING_SUCCESS';
-function gpxRouteLoadingSuccess(gpxRouteData) {
+const gpxRouteLoadingSuccess = function(gpxRouteData) {
     return {
         type: GPX_ROUTE_LOADING_SUCCESS,
         gpxRouteData: gpxRouteData
     }
-}
+};
+
 export const GPX_ROUTE_LOADING_FAILURE = 'GPX_ROUTE_LOADING_FAILURE';
-function gpxRouteLoadingFailure(status) {
+const gpxRouteLoadingFailure = function(status) {
     return {
         type: GPX_ROUTE_LOADING_FAILURE,
         status: status
     }
-}
-
-export const SET_ROUTE_INFO = 'SET_ROUTE_INFO';
-function setRouteInfo(routeInfo) {
-    return {
-        type: SET_ROUTE_INFO,
-        routeInfo: routeInfo
-    }
-}
+};
 
 export const SHOW_FORM = 'SHOW_FORM';
 function showForm() {
@@ -155,11 +195,11 @@ function showForm() {
 }
 
 export const HIDE_FORM = 'HIDE_FORM';
-function hideForm() {
+const hideForm = function() {
     return {
         type: HIDE_FORM
     }
-}
+};
 
 export function loadGpxRoute(event,timezone_api_key) {
     return async function (dispatch) {
@@ -178,12 +218,20 @@ export function loadGpxRoute(event,timezone_api_key) {
     }
 }
 
+export const ADD_WEATHER_CORRECTION = 'ADD_WEATHER_CORRECTION';
+export const addWeatherCorrection = function(weatherCorrection) {
+    return {
+        type: ADD_WEATHER_CORRECTION,
+        weatherCorrectionMinutes: weatherCorrection
+    };
+};
+
 export function requestForecast(routeInfo) {
     return function(dispatch,getState) {
         dispatch(beginFetchingForecast());
         dispatch(hideForm());
         let formdata = new FormData();
-        formdata.append('locations', JSON.stringify(routeInfo.forecast));
+        formdata.append('locations', JSON.stringify(routeInfo.forecastRequest));
         formdata.append('timezone', routeInfo.timeZoneOffset);
         fetch(getState().params.action,
             {
@@ -199,7 +247,7 @@ export function requestForecast(routeInfo) {
                 } })
             .then(async response => {
                 dispatch(forecastFetchSuccess(response));
-                let controlsToUpdate = getState().controls.controlPoints.slice();
+                let controlsToUpdate = getState().controls.controlPoints.map( control => ({...control}));
                 const parser = await getRouteParser();
                 let weatherCorrectionMinutes = parser.adjustForWind(response,getState().uiInfo.pace,controlsToUpdate,getState().uiInfo.start,getState().uiInfo.metric);
                 dispatch(addWeatherCorrection(weatherCorrectionMinutes));
@@ -213,12 +261,20 @@ export function requestForecast(routeInfo) {
 }
 
 export const SET_SHORT_URL = 'SET_SHORT_URL';
-export function setShortUrl(url) {
+export const setShortUrl = function(url) {
     return {
         type: SET_SHORT_URL,
         url: url
     }
-}
+};
+
+export const SET_ERROR_DETAILS = 'SET_ERROR_DETAILS';
+export const setErrorDetails = function(details) {
+    return {
+        type: SET_ERROR_DETAILS,
+        details: details
+    };
+};
 
 export function shortenUrl(url) {
     return function (dispatch,getState) {
@@ -245,60 +301,55 @@ export function shortenUrl(url) {
 }
 
 export const SET_ADDRESS = 'SET_ADDRESS';
-export function setAddress(address) {
+export const setAddress = function(address) {
     return {
         type: SET_ADDRESS,
         address: address
     };
-}
+};
+
 export const CLEAR_ADDRESS = 'CLEAR_ADDRESS';
-export function clearAddress() {
+export const clearAddress = function() {
     return {
         type: CLEAR_ADDRESS,
     };
-}
+};
+
 export const CLEAR_ROUTE_DATA = 'CLEAR_ROUTE_DATA';
-export function clearRouteData() {
+export const clearRouteData = function() {
     return {
         type: CLEAR_ROUTE_DATA,
     };
-}
-export const UPDATE_CONTROLS = 'UPDATE_CONTROLS';
-export function updateControls(controls) {
-    return {
-        type: UPDATE_CONTROLS,
-        controls: controls
-    };
-}
+};
 
 export const ADD_CONTROL = 'ADD_CONTROL';
-export function addControl() {
+export const addControl = function() {
     return {
         type: ADD_CONTROL
     };
-}
+};
 
 export const SET_METRIC = 'SET_METRIC';
-export function setMetric(metric) {
+export const setMetric = function(metric) {
     return {
         type: SET_METRIC,
         metric: metric
     };
-}
+};
 
 export const TOGGLE_METRIC = 'TOGGLE_METRIC';
-export function toggleMetric() {
+export const toggleMetric = function() {
     return {
         type: TOGGLE_METRIC
     };
-}
+};
 
 export const TOGGLE_DISPLAY_BANKED = 'TOGGLE_DISPLAY_BANKED';
-export function toggleDisplayBanked() {
+export const toggleDisplayBanked = function() {
     return {
         type: TOGGLE_DISPLAY_BANKED
     };
-}
+};
 
 export const TOGGLE_STRAVA_ANALYSIS = 'TOGGLE_STRAVA_ANALYSIS';
 export function toggleStravaAnalysis() {
@@ -308,20 +359,20 @@ export function toggleStravaAnalysis() {
 }
 
 export const SET_STRAVA_TOKEN = 'SET_STRAVA_TOKEN';
-export function setStravaToken(token) {
+export const setStravaToken = function(token) {
     return {
         type: SET_STRAVA_TOKEN,
         token: token
     };
-}
+};
 
 export const SET_STRAVA_ACTIVITY = 'SET_STRAVA_ACTIVITY';
-export function setStravaActivity(activity) {
+export const setStravaActivity = function(activity) {
     return {
         type: SET_STRAVA_ACTIVITY,
         activity: activity
     };
-}
+};
 
 export const SET_STRAVA_ERROR = 'SET_STRAVA_ERROR';
 export function setStravaError(error) {
@@ -332,84 +383,76 @@ export function setStravaError(error) {
 }
 
 export const BEGIN_STRAVA_FETCH = 'BEGIN_STRAVA_FETCH';
-export function beginStravaFetch() {
+export const beginStravaFetch = function() {
     return {
         type: BEGIN_STRAVA_FETCH
     };
-}
+};
 
 export const STRAVA_FETCH_SUCCESS = 'STRAVA_FETCH_SUCCESS';
-export function stravaFetchSuccess(data) {
+export const stravaFetchSuccess = function(data) {
     return {
         type: STRAVA_FETCH_SUCCESS,
         data: data
     };
-}
+};
 
 export const STRAVA_FETCH_FAILURE = 'STRAVA_FETCH_FAILURE';
-export function stravaFetchFailure(error) {
+export const stravaFetchFailure = function(error) {
     return {
         type: STRAVA_FETCH_FAILURE,
         error: error
     };
-}
-
-export const ADD_WEATHER_CORRECTION = 'ADD_WEATHER_CORRECTION';
-export function addWeatherCorrection(weatherCorrection) {
-    return {
-        type: ADD_WEATHER_CORRECTION,
-        weatherCorrectionMinutes: weatherCorrection
-    };
-}
+};
 
 export const SET_ACTUAL_FINISH_TIME = 'SET_ACTUAL_FINISH_TIME';
-export function setActualFinishTime(finishTime) {
+export const setActualFinishTime = function(finishTime) {
     return {
         type: SET_ACTUAL_FINISH_TIME,
         finishTime: finishTime
     };
-}
+};
 
 export const SET_ACTUAL_PACE = 'SET_ACTUAL_PACE';
-export function setActualPace(pace) {
+export const setActualPace = function(pace) {
     return {
         type: SET_ACTUAL_PACE,
         finishTime: pace
     };
-}
+};
 
 export const SET_ACTION_URL = 'SET_ACTION_URL';
-export function setActionUrl(action) {
+export const setActionUrl = function(action) {
     return {
         type: SET_ACTION_URL,
         action: action
     };
-}
+};
 
 export const SET_API_KEYS = 'SET_API_KEYS';
-export function setApiKeys(mapsKey,timezoneKey) {
+export const setApiKeys = function(mapsKey,timezoneKey) {
     return {
         type: SET_API_KEYS,
         mapsKey: mapsKey,
         timezoneKey: timezoneKey
     };
-}
-
-export const SET_ERROR_DETAILS = 'SET_ERROR_DETAILS';
-export function setErrorDetails(details) {
-    return {
-        type: SET_ERROR_DETAILS,
-        details: details
-    };
-}
+};
 
 export const SET_TIME_ZONE = 'SET_TIME_ZONE';
-export function setTimeZone(id,offset) {
+export const setTimeZone = function(id,offset) {
     return {
         type: SET_TIME_ZONE,
         id: id,
         offset: offset
     };
-}
+};
+
+export const LOAD_STRAVA_ACTIVITY = 'LOAD_STRAVA_ACTIVITY';
+export const loadStravaActivity = function(activity) {
+    return {
+        type: LOAD_STRAVA_ACTIVITY,
+        activity: activity
+    };
+};
 
 

@@ -1,27 +1,22 @@
-import React, {Component} from 'react';
+import React from 'react';
 import {FormControl, FormGroup} from 'react-bootstrap';
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 
-class ShortUrl extends Component {
-    static propTypes = {
-        shortUrl:PropTypes.string.isRequired
-    };
+const ShortUrl = ({shortUrl}) => {
+    return (
+        <FormGroup bsSize="small">
+            <FormControl readOnly type="text" style={{marginTop:'10px',marginLeft:'135px',width:'15em',display:shortUrl===''?'none':'inline-flex'}}
+                         value={shortUrl} onFocus={event => {event.target.select();document.execCommand('copy')}}/>
+        </FormGroup>
+    );
+};
 
-    constructor(props) {
-        super(props);
-    }
+ShortUrl.propTypes = {
+    shortUrl:PropTypes.string.isRequired
+};
 
-    render() {
-        return (
-            <FormGroup bsSize="small">
-                <FormControl readOnly type="text" style={{marginTop:'10px',marginLeft:'135px',width:'15em',display:this.props.shortUrl==''?'none':'inline-flex'}}
-                             value={this.props.shortUrl} onFocus={event => {event.target.select();document.execCommand('copy')}}/>
-            </FormGroup>
-        );
-    }
-}
-const mapStateToProps = (state, ownProps) =>
+const mapStateToProps = (state) =>
     ({
         shortUrl: state.uiInfo.shortUrl
     });

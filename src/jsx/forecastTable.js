@@ -95,7 +95,7 @@ class ForecastTable extends Component {
     }
 }
 
-const mapStateToProps = (state, ownProps) =>
+const mapStateToProps = (state) =>
     ({
         forecast: state.forecast.forecast,
         weatherCorrectionMinutes: state.routeInfo.weatherCorrectionMinutes

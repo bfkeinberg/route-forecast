@@ -15,10 +15,11 @@ import 'ag-grid/dist/styles/ag-grid.css';
 import 'ag-grid/dist/styles/ag-theme-fresh.css';
 import 'flatpickr/dist/themes/confetti.css';
 import 'Images/style.css';
+import cookie from 'react-cookies';
 
 import queryString from 'query-string';
-import cookie from 'react-cookies';
 import ErrorBoundary from './errorBoundary';
+import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 import {
     setActionUrl,
@@ -36,7 +37,7 @@ import {
 
 /*
 TODO:
-integrate with jsErrLog
+integrate with error log service
 immutable.js
 Simplify gpxParser to have one method that analyzes, using destructuring to simplify
 
@@ -52,6 +53,11 @@ if (!window.Promise) {
 }
 
 class RouteWeatherUI extends Component {
+    static propTypes = {
+        setActionUrl:PropTypes.func.isRequired,
+        setApiKeys:PropTypes.func.isRequired,
+        updateControls:PropTypes.func.isRequired
+    };
 
     constructor(props) {
         super(props);
@@ -76,46 +82,6 @@ class RouteWeatherUI extends Component {
         }
     }
 
-/*
-    static doControlsMatch(newControl,oldControl) {
-        return newControl.distance===oldControl.distance &&
-            newControl.name===oldControl.name &&
-            newControl.duration===oldControl.duration &&
-            newControl.arrival===oldControl.arrival &&
-            newControl.actual===oldControl.actual &&
-            newControl.banked===oldControl.banked;
-    }
-
-*/
-/*    shouldComponentUpdate(newProps,newState) {
-        let controlPoints = this.state.controlPoints;
-        if (this.state.routeInfo.name !== newState['routeInfo'].name) {
-            return true;
-        }
-        if (newState.controlPoints.length!==this.state.controlPoints.length) {
-            return true;
-        }
-        if (!newState['controlPoints'].every((v,i)=> RouteWeatherUI.doControlsMatch(v,controlPoints[i]))) {
-            return true;
-        }
-        if (newState.routeInfo.finishTime!==this.state.routeInfo.finishTime) {
-            return true;
-        }
-        if (newState.forecast.length!==this.state.forecast.length) {
-            return true;
-        }
-        if (newState.actualFinishTime !== this.state.actualFinishTime) {
-            return true;
-        }
-        if (newState.actualPace !== this.state.actualPace) {
-            return true;
-        }
-        if (newState.forecastValid !== this.state.forecastValid) {
-            return true;
-        }
-        return false;
-    }*/
-
     static formatOneControl(controlPoint) {
         if (typeof controlPoint === 'string') {
             return controlPoint;
@@ -137,18 +103,6 @@ class RouteWeatherUI extends Component {
         // delete dummy first element
         controlPoints.splice(0,1);
         return controlPoints;
-    }
-
-    componentWillReceiveProps(newProps) {
-        if (name !== '') {
-            if (newProps.name !== this.props.name) {
-                let savedControlPoints = cookie.load(routeInfo.name);
-                if (savedControlPoints !== undefined && savedControlPoints.length > 0) {
-                    controlPoints = this.parseControls(savedControlPoints);
-                }
-            }
-            cookie.save(newProps.name,this.formatControlsForUrl(newProps.controlPoints));
-        }
     }
 
     componentWillMount() {
@@ -211,10 +165,9 @@ const mapDispatchToProps = {
     setStravaActivity, updateControls
 };
 
-const mapStateToProps = (state, ownProps) =>
+const mapStateToProps = (state) =>
     ({
-        controlPoints: state.controls.controlPoints,
-        name: state.routeInfo.name
+        controlPoints: state.controls.controlPoints
     });
 
 export default connect(mapStateToProps, mapDispatchToProps)(RouteWeatherUI);

@@ -39,7 +39,7 @@ class ControlTable extends Component {
                 {colId:'banked', field:'banked', headerTooltip:'Time remaining at brevet pace',
                     cellRenderer:"agAnimateShowChangeCellRenderer",
                     suppressNavigable:true, suppressSorting:true, type:'numericColumn', valueFormatter:ControlTable.appendUnit, hide:!displayBanked, headerName:'Banked time'},
-                {suppressNavigable:true, suppressSorting:true, cellRenderer:this.deleteRenderer}
+                {colId:'delete', suppressNavigable:true, suppressSorting:true, cellRenderer:this.deleteRenderer}
             ]};
         this.addRow = this.addRow.bind(this);
         this.onGridReady = this.onGridReady.bind(this);
@@ -128,10 +128,11 @@ class ControlTable extends Component {
         if (newProps.count > newProps.controls.length) {
             this.addRow();
         }
-        if (newProps.controls.every(ctl => ctl.id===undefined)) {
-            newProps.controls.forEach((row,key) => row.id=key);
+        let controlsCopy = newProps.controls.map( control => ({...control}));
+        if (controlsCopy.every(ctl => ctl.id===undefined)) {
+            controlsCopy.forEach((row,key) => row.id=key);
         }
-        this.api.setRowData(newProps.controls);
+        this.api.setRowData(controlsCopy);
 /*
         if (!this.shouldComponentUpdate(newProps)) {
             return;
@@ -140,29 +141,6 @@ class ControlTable extends Component {
         // this.updateFromGrid();
     }
 
-/*
-    static doControlsMatch(newControl, oldControl) {
-        return newControl.distance===oldControl.distance &&
-            newControl.name===oldControl.name &&
-            newControl.duration===oldControl.duration &&
-            newControl.arrival===oldControl.arrival &&
-            newControl.actual===oldControl.actual &&
-            newControl.banked===oldControl.banked;
-    }
-*/
-
-/*
-    shouldComponentUpdate(nextProps) {
-        // compare controls
-        let controls = this.props.controls;
-        if (nextProps.displayBanked !== this.props.displayBanked) {
-            return true;
-        }
-        return !(nextProps.controls.length===this.props.controls.length &&
-            nextProps.controls.every((v,i)=> ControlTable.doControlsMatch(v,controls[i])));
-    }
-
-*/
     static setData(params) {
         return Number(params.newValue);
     }
@@ -205,22 +183,25 @@ class ControlTable extends Component {
         if (this.api !== undefined && window.outerWidth < smallScreenWidth) {
             this.api.sizeColumnsToFit();
         }
+        if (this.columnApi !== undefined) {
+            this.columnApi.autoSizeColumn('delete');
+        }
         this.props.controls.forEach((row,key) => row.id=key);
         return (<div className="ag-theme-fresh">
             <AgGridReact enableColResize enableSorting animateRows sortingOrder={['asc']} unSortIcon rowData={this.props.controls}
-    onGridReady={this.onGridReady} onSortChanged={this.sortChanged} singleClickEdit
-    onCellValueChanged={this.cellUpdated} tabToNextCell={ControlTable.tabHandler} getRowNodeId={data => data.id}
-    columnDefs={this.state.columnDefs}/>
+             onGridReady={this.onGridReady} onSortChanged={this.sortChanged} singleClickEdit
+            onCellValueChanged={this.cellUpdated} tabToNextCell={ControlTable.tabHandler} getRowNodeId={data => data.id}
+            columnDefs={this.state.columnDefs}/>
         </div>);
     }
 }
 
-const mapStateToProps = (state, ownProps) =>
+const mapStateToProps = (state) =>
     ({
         displayBanked: state.controls.displayBanked,
         compare: state.controls.stravaAnalysis,
         count: state.controls.count,
-        controls: state.controls.controlPoints
+        controls: state.controls.controlPoints.map( control => ({...control}))
     });
 
 const mapDispatchToProps = {

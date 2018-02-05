@@ -5,24 +5,20 @@ import 'whatwg-fetch';
 const paceToSpeed = {'A': 10, 'B': 12, 'C': 14, 'C+': 15, 'D-': 15, 'D': 16, 'D+': 17, 'E-': 17, 'E': 18};
 const kmToMiles = 0.62137;
 
+export const finishTimeFormat = 'ddd, MMM DD YYYY h:mma';
+
 class AnalyzeRoute {
     constructor() {
-        this.reader = new FileReader();
         this.walkRoute = this.walkRoute.bind(this);
         this.checkAndUpdateControls = this.checkAndUpdateControls.bind(this);
-        this.routeIsLoaded = this.routeIsLoaded.bind(this);
         this.loadRwgpsRoute = this.loadRwgpsRoute.bind(this);
         this.loadGpxFile = this.loadGpxFile.bind(this);
         this.analyzeRwgpsRoute = this.analyzeRwgpsRoute.bind(this);
         this.analyzeGpxRoute = this.analyzeGpxRoute.bind(this);
         this.clear = this.clear.bind(this);
         this.adjustForWind = this.adjustForWind.bind(this);
-        this.rwgpsRouteData = null;
-        this.gpxResult = null;
         this.isTrip = false;
         this.points = [];
-        this.timeZone = null;
-        this.timeZoneId = null;
     }
 
     loadGpxFile(gpxFile, timezone_api_key) {
@@ -34,7 +30,6 @@ class AnalyzeRoute {
         reader.readAsText(gpxFile);
         return new Promise((resolve, reject) => {
             fileLoad.then(fileData => {
-                this.timeZone = null;
                 const parseGpx = new Promise((resolve, reject) => {
                     gpxParse.parseGpx(fileData, (error, gpxData) => {
                         if (error !== null) {
@@ -44,13 +39,10 @@ class AnalyzeRoute {
                     })
                 });
                 parseGpx.then(gpxData => {
-                    this.gpxResult = gpxData;
                     let point = this.gpxResult.tracks[0].segments[0][0];
                     // using current date and time for zone lookup could pose a problem in future
                     let timeZonePromise = this.findTimezoneForPoint(point.lat, point.lon, moment(), timezone_api_key);
                     timeZonePromise.then(timeZoneResult => {
-                            this.timeZone = timeZoneResult.offset;
-                            this.timeZoneId = timeZoneResult.zoneId;
                             resolve({gpxRouteData:gpxData,timeZoneId:timeZoneResult.zoneId,timeZoneOffset:timeZoneResult.offset});
                         }, error => {
                             reject(error);          // error getting the time zone
@@ -66,13 +58,7 @@ class AnalyzeRoute {
     }
 
     clear() {
-        this.rwgpsRouteData = null;
-        this.gpxResult = null;
         this.points = [];
-    }
-
-    routeIsLoaded() {
-        return this.gpxResult !== null || this.rwgpsRouteData !== null;
     }
 
     // returns distance traveled in _miles_, and climb in meters
@@ -91,8 +77,6 @@ class AnalyzeRoute {
     loadRwgpsRoute(route, isTrip, timezone_api_key) {
         return new Promise((resolve, reject) => {
             this.isTrip = isTrip;
-            this.rwgpsRouteData = null;
-            this.timeZone = null;
             fetch('/rwgps_route?route=' + route + '&trip=' + isTrip).then(response => {
                     if (response.status === 200) {
                         return response.json();
@@ -103,9 +87,7 @@ class AnalyzeRoute {
                     reject(new Error("Could not get Ride with GPS results"));
                     return;
                 }
-                this.rwgpsRouteData = response;
-                this.gpxResult = null;
-                let rwgpsRouteDatum = this.rwgpsRouteData[this.rwgpsRouteData['trip'] === undefined ? 'route' : 'trip'];
+                let rwgpsRouteDatum = response[response['trip'] === undefined ? 'route' : 'trip'];
                 if (rwgpsRouteDatum === undefined) {
                     reject(new Error('RWGPS route info unavailable'));
                 }
@@ -113,8 +95,6 @@ class AnalyzeRoute {
                 //TODO using current date and time for zone lookup (moment()) could pose a problem in future
                 let timeZonePromise = this.findTimezoneForPoint(point.y, point.x, moment(), timezone_api_key);
                 timeZonePromise.then(timeZoneResult => {
-                    this.timeZone = timeZoneResult.offset;
-                    this.timeZoneId = timeZoneResult.zoneId;
                     resolve({rwgpsRouteData:response,timeZoneOffset:timeZoneResult.offset,timeZoneId:timeZoneResult.zoneId});
                 }, error => {
                     reject(error);
@@ -126,7 +106,7 @@ class AnalyzeRoute {
         });
     }
 
-    analyzeRwgpsRoute(routeData,userStartTime,pace,intervalInHours,controls,unsortedControls,metric, timeZoneId) {
+    analyzeRwgpsRoute(routeData,userStartTime,pace,intervalInHours,controls,unsortedControls,metric,timeZoneId) {
         this.nextControl = 0;
         this.pointsInRoute = [];
         let forecastRequests = [];
@@ -140,12 +120,12 @@ class AnalyzeRoute {
         let accumulatedTime = 0;
         let idlingTime = 0;
         let rideType = this.isTrip ? 'trip' : 'route';
-        let trackName = this.rwgpsRouteData[rideType]['name'];
+        let trackName = routeData[rideType].name;
 
         let lastTime = 0;
         // correct start time for time zone
         let startTime = moment.tz(userStartTime.format('YYYY-MM-DDTHH:mm'), timeZoneId);
-        let points = this.rwgpsRouteData[rideType]['track_points'];
+        let points = routeData[rideType].track_points;
         // let testStream = this.rwgpsRouteData[rideType]['track_points'].map(point => ({'lat':point['y'],'lon':point['x'],'elevation':point['e']}));
         for (let trackPoint of points) {
             let point = {'lat':trackPoint['y'],'lon':trackPoint['x'],'elevation':trackPoint['e']};
@@ -177,8 +157,8 @@ class AnalyzeRoute {
         }
         let finishTime = AnalyzeRoute.formatFinishTime(startTime,accumulatedTime,idlingTime);
         AnalyzeRoute.fillLastControlPoint(finishTime,controls,this.nextControl,accumulatedTime+idlingTime,accumulatedDistanceKm);
-        return {forecast:forecastRequests,points:this.pointsInRoute,name:trackName,controls:unsortedControls,bounds:bounds,
-            finishTime: finishTime, timeZone:this.timeZone};
+        return {forecast:forecastRequests,points:this.pointsInRoute,name:trackName,controls:unsortedControls,
+            bounds:bounds, finishTime: finishTime};
     }
 
     static getRelativeBearing(point1,point2) {
@@ -198,23 +178,23 @@ class AnalyzeRoute {
 
     static fillLastControlPoint(finishTime, controls, nextControl, totalTime, totalDistanceInKm) {
         while (nextControl < controls.length)   {
-            controls[nextControl]['arrival'] = finishTime;
+            controls[nextControl].arrival = finishTime;
             // update banked time also, supplying final distance in km and total time taken
-            controls[nextControl]['banked'] = Math.round(AnalyzeRoute.rusa_time(totalDistanceInKm, totalTime));
+            controls[nextControl].banked = Math.round(AnalyzeRoute.rusa_time(totalDistanceInKm, totalTime));
             ++nextControl;
         }
     }
 
     static formatFinishTime(startTime,accumulatedTime,restTime) {
-        return moment(startTime).add(accumulatedTime+restTime,'hours').format('ddd, MMM DD h:mma');
+        return moment(startTime).add(accumulatedTime+restTime,'hours').format(finishTimeFormat);
     }
 
-    walkRoute(routeData,startTime,pace,interval,controls,metric,timeZoneId) {
+    walkRoute(routeData,type,startTime,pace,interval,controls,metric,timeZoneId) {
         let modifiedControls = controls.slice();
         modifiedControls.sort((a,b) => a['distance']-b['distance']);
-        if (this.gpxResult !== null) {
+        if (type === 'gpx') {
             return this.analyzeGpxRoute(routeData,startTime,pace,interval,modifiedControls,controls,metric,timeZoneId);
-        } else if (this.rwgpsRouteData !== null) {
+        } else if (type === 'rwgps') {
             return this.analyzeRwgpsRoute(routeData,startTime,pace,interval,modifiedControls,controls,metric,timeZoneId);
         }
         return null;
@@ -238,7 +218,7 @@ class AnalyzeRoute {
         // let testStream = this.gpxResult.tracks.reduce((accum,current) => accum.concat(current.segments.reduce((accum,current) => accum.concat(current))));
         // correct start time for time zone
         let startTime = moment.tz(userStartTime.format('YYYY-MM-DDTHH:mm'), timeZoneId);
-        for (let track of this.gpxResult.tracks) {
+        for (let track of routeData.tracks) {
             if (trackName === null) {
                 trackName = track.name;
             }
@@ -274,8 +254,8 @@ class AnalyzeRoute {
         }
         let finishTime = AnalyzeRoute.formatFinishTime(startTime,accumulatedTime,idlingTime);
         AnalyzeRoute.fillLastControlPoint(finishTime,controls,this.nextControl,accumulatedTime+idlingTime,accumulatedDistanceKm);
-        return {forecast:forecastRequests,points:this.pointsInRoute,name:trackName,controls:unsortedControls,bounds:bounds,
-            finishTime:finishTime,timeZone:this.timeZone};
+        return {forecast:forecastRequests,points:this.pointsInRoute,name:trackName,controls:unsortedControls,
+            bounds:bounds, finishTime:finishTime};
     }
 
     findTimezoneForPoint(lat, lon, time, maps_api_key) {
@@ -288,7 +268,6 @@ class AnalyzeRoute {
                         // determine total timezone offset in seconds
                         let tzOffset = (event.currentTarget.response['dstOffset'] + event.currentTarget.response['rawOffset']);
                         // TODO: manipulating state in this way seems questionable
-                        this.timeZoneId = event.currentTarget.response['timeZoneId'];
                         resolve({offset:tzOffset,zoneId:event.currentTarget.response['timeZoneId']});
                     }
                     else {
@@ -341,7 +320,7 @@ class AnalyzeRoute {
         }
         let delayInMinutes = controls[this.nextControl]['duration'];
         let arrivalTime = moment(startTime).add(elapsedTimeInHours,'hours');
-        controls[this.nextControl]['arrival'] = arrivalTime.format('ddd, MMM DD h:mma');
+        controls[this.nextControl]['arrival'] = arrivalTime.format(finishTimeFormat);
         controls[this.nextControl]['banked'] = Math.round(AnalyzeRoute.rusa_time(distanceInKm, elapsedTimeInHours));
         this.nextControl++;
         return delayInMinutes/60;      // convert from minutes to hours
@@ -469,10 +448,10 @@ class AnalyzeRoute {
 
                 let desiredDistance = metric ? (totalDistanceInMiles/kmToMiles) : totalDistanceInMiles;
                 if (controls.length > currentControl) {
-                    if (desiredDistance >= controls[currentControl]['distance']) {
-                        let previousArrivalTime = moment(controls[currentControl]['arrival'],'ddd, MMM DD h:mma');
+                    if (desiredDistance >= controls[currentControl].distance) {
+                        let previousArrivalTime = moment(controls[currentControl]['arrival'],finishTimeFormat);
                         let arrivalTime = previousArrivalTime.add(totalMinutesLost,'minutes');
-                        controls[currentControl]['arrival'] = arrivalTime.format('ddd, MMM DD h:mma');
+                        controls[currentControl]['arrival'] = arrivalTime.format(finishTimeFormat);
                         let elapsedTimeMs = arrivalTime.toDate()-start;
                         let elapsedDuration = moment.duration(elapsedTimeMs,'ms');
                         controls[currentControl]['banked'] = Math.round(AnalyzeRoute.rusa_time(totalDistanceInMiles/kmToMiles, elapsedDuration.asHours()));

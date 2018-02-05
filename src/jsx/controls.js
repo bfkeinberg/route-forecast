@@ -46,7 +46,19 @@ class ControlPoints extends Component {
         actualFinishTime:PropTypes.string,
         updateControls:PropTypes.func.isRequired,
         forecastValid:PropTypes.bool.isRequired,
-        name:PropTypes.string
+        name:PropTypes.string,
+        setStravaActivity:PropTypes.func.isRequired,
+        stravaToken:PropTypes.string,
+        beginStravaFetch:PropTypes.func.isRequired,
+        addControl:PropTypes.func.isRequired,
+        setStravaError:PropTypes.func.isRequired,
+        stravaFetchSuccess:PropTypes.func.isRequired,
+        toggleStravaAnalysis:PropTypes.func.isRequired,
+        toggleMetric:PropTypes.func.isRequired,
+        displayBanked:PropTypes.bool.isRequired,
+        fetchingFromStrava:PropTypes.bool,
+        toggleDisplayBanked:PropTypes.func.isRequired,
+        stravaAnalysis: PropTypes.bool.isRequired
     };
 
     static contextTypes = {
@@ -61,8 +73,6 @@ class ControlPoints extends Component {
         this.stravaErrorCallback = this.stravaErrorCallback.bind(this);
         this.hideStravaErrorAlert = this.hideStravaErrorAlert.bind(this);
         this.setStravaActivity = this.setStravaActivity.bind(this);
-        this.updateProgress = this.updateProgress.bind(this);
-        this.updateActualValues = this.updateActualValues.bind(this);
         this.changeDisplayFinishTime = this.changeDisplayFinishTime.bind(this);
         this.computeTimesFromStrava = this.computeTimesFromStrava.bind(this);
         this.state = {
@@ -89,22 +99,6 @@ class ControlPoints extends Component {
         }
     }
 
-    updateActualValues(controlPoints,finishTime,pace) {
-        this.props.updateControls(controlPoints);
-        this.props.setActualFinishTime(finishTime);
-        this.props.setActualPace(pace);
-    }
-
-    updateProgress(isUpdating) {
-        if (isUpdating) {
-            this.props.beginStravaFetch();
-        }
-        else {
-            this.props.stravaFetchSuccess('');
-        }
-        // this.setState({isUpdating:isUpdating});
-    }
-
     hideStravaErrorAlert() {
         this.setState({stravaError:null, stravaAlertVisible:false});
     }
@@ -128,9 +122,13 @@ class ControlPoints extends Component {
     }
 
     async computeTimesFromStrava(activity, controlPoints) {
-        const StravaParser = await ControlPoints.getStravaParser();
-        const stravaParser = new StravaParser(this.updateActualValues, this.updateProgress);
-        stravaParser.computeActualTimes(activity, controlPoints, this.props.stravaToken).then( result => console.log(result),
+        const stravaParser = await ControlPoints.getStravaParser();
+        stravaParser.computeActualTimes(activity, controlPoints, this.props.stravaToken,
+            this.props.beginStravaFetch, this.props.stravaFetchSuccess).then( result => {
+                this.props.updateControls(result.controls);
+                this.props.setActualFinishTime(result.actualFinishTime);
+                this.props.setActualPace(result.actualPace);
+            },
             error => this.stravaErrorCallback(error));
     }
 
@@ -159,10 +157,6 @@ class ControlPoints extends Component {
         this.props.addControl();
     }
 
-    toggleMetric() {
-        this.props.toggleMetric();
-    }
-
     toggleCompare() {
         this.props.toggleStravaAnalysis();
     }
@@ -176,25 +170,6 @@ class ControlPoints extends Component {
             newControl.banked===oldControl.banked;
     }
 
-/*    shouldComponentUpdate(nextProps,newState) {
-        let controlPoints = this.props.controlPoints;
-        if (newState.displayBankedTime !== this.state.displayBankedTime ||
-                newState.lookback !== this.state.lookback ||
-                nextProps.controlPoints.length !== controlPoints.length ||
-                !nextProps.controlPoints.every((v, i)=> ControlPoints.doControlsMatch(v,controlPoints[i])) ||
-                newState.metric !== this.state.metric ||
-                newState.strava_activity !== this.state.strava_activity ||
-                newState.stravaError !== this.state.stravaError ||
-                newState.isUpdating !== this.state.isUpdating ||
-                newState.displayedFinishTime !== this.state.displayedFinishTime ||
-                nextProps.finishTime !== this.props.finishTime ||
-                nextProps.forecastValid !== this.props.forecastValid
-        ) {
-            return true;
-        }
-        return false;
-    }*/
-
     render () {
         const title = this.props.name === '' ?
             ( <h3 style={{textAlign:"center"}}>Control point list</h3> ) :
@@ -205,23 +180,22 @@ class ControlPoints extends Component {
                 {/*<ButtonGroup style={{display:'flex',flexFlow:'row wrap'}}>*/}
                     <ButtonGroup>
                         <Button tabIndex='10' onClick={this.addControl} id='addButton'><Glyphicon glyph="plus-sign"/>Add control point</Button>
-                        {/*<Button onClick={this.addControl} id='addButton' style={{display:'inline-flex',width:'165px',height:'34px'}}><Glyphicon glyph="plus-sign"></Glyphicon>Add control point</Button>*/}
                         <FormGroup controlId="finishTime" style={{display:'inline-flex'}}>
                             <ControlLabel style={{width:'7em',display:'inline-flex',marginTop:'7px',paddingLeft:'8px'}}>Finish time</ControlLabel>
                             <FormControl tabIndex='-1' type="text" onMouseEnter={this.changeDisplayFinishTime} onMouseLeave={this.changeDisplayFinishTime}
-                                         style={{display:'inline-flex',width:'12em',marginTop:'3px',marginBotton:'0px',paddingLeft:'2px',paddingTop:'2px',height:'28px'}}
+                                         style={{paddingLeft:'2px',paddingTop:'2px',height:'28px'}}
                                          value={this.state.displayedFinishTime}/>
                         </FormGroup>
                         <Checkbox tabIndex='12' checked={this.props.metric} inline
-                                  onClick={this.props.toggleMetric} onChange={this.props.toggleMetric}
+                                  onClick={this.props.toggleMetric}
                                   style={{padding:'0px 0px 0px 26px',display:'inline-flex'}}>metric</Checkbox>
-                        <Checkbox tabIndex='11' checked={this.state.displayBankedTime} inline
-                                  onChange={this.props.toggleDisplayBanked} onClick={this.props.toggleDisplayBanked}
+                        <Checkbox tabIndex='11' checked={this.props.displayBanked} inline
+                                   onClick={this.props.toggleDisplayBanked}
                                   style={{padding:'0px 0px 0px 24px', display:'inline-flex'}}>Display banked time</Checkbox>
-                        <Checkbox tabIndex="13" checked={this.props.stravaAnalysis} disabled={!this.props.forecastValid} inline onChange={this.toggleCompare}
-                                  onClick={this.toggleCompare} style={{visibility:this.props.stravaAnalysis ? null : 'hidden', display:'inline-flex'}}>Compare</Checkbox>
+                        <Checkbox tabIndex="13" checked={this.props.stravaAnalysis} disabled={!this.props.forecastValid} inline
+                                  onClick={this.toggleCompare} style={{display:'inline-flex'}}>Compare</Checkbox>
                         <ErrorBoundary>
-                            <FormGroup controlId="actualRide" style={{display:'inline-flex'}}>
+                            <FormGroup controlId="actualRide" style={{display:'inline-flex', visibility:this.props.stravaAnalysis ? null : 'hidden'}}>
                                 <ControlLabel style={{display:'inline-flex'}}>Strava</ControlLabel>
                                 <FormControl tabIndex='-1' type="text" style={{display:'inline-flex'}}
                                              onDrop={event => {
@@ -281,7 +255,7 @@ class ControlPoints extends Component {
     }
 }
 
-const mapStateToProps = (state, ownProps) =>
+const mapStateToProps = (state) =>
     ({
         metric: state.controls.metric,
         controlPoints: state.controls.controlPoints,

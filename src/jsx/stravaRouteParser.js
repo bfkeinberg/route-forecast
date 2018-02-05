@@ -8,48 +8,37 @@ const metersToMiles = 0.00062137;
 const metersToFeet = 3.2808;
 
 class StravaRouteParser {
-    constructor(updateControls,updateProgress) {
-        this.authenticated = false;
+    constructor() {
         this.processActivityStream = this.processActivityStream.bind(this);
         this.fetchActivity = this.fetchActivity.bind(this);
-        this.setToken = this.setToken.bind(this);
-        this.updateControls = updateControls;
-        this.updateProgress = updateProgress;
     }
 
-    setToken(token) {
-        if (token === undefined) {
-            return;
-        }
-        this.token = token;
-        this.authenticated = true;
-    }
-
-    computeActualTimes(activityId, controlPoints, token) {
+    computeActualTimes(activityId, controlPoints, token, beginFetch, endFetch) {
         if (token === null) {
             StravaRouteParser.authenticate(activityId);
             return;
         }
-        this.updateProgress(true);
+        beginFetch();
         let activityPromise = this.fetchActivity(activityId, token);
         return new Promise((resolve, reject) => {
             activityPromise.then(activityData => {
                 let activityDataPromise = this.processActivityStream(activityId);
                 activityDataPromise.then(activityStream => {
-                        this.updateProgress(false);
+                        endFetch('');
                         if (activityData.message !== undefined) {
                             cookie.remove('strava_token');
-                            errorCallback(activityData.message);
+                            reject(activityData.message);
                             return;
                         }
                         if (activityStream.message !== undefined) {
                             cookie.remove('strava_token');
-                            errorCallback(activityStream.message);
+                            reject(activityStream.message);
                             return;
                         }
                         console.log(this.findMovingAverage(activityData, activityStream, 4));
-                        resolve(this.updateControls(this.parseActivity(activityData, activityStream, controlPoints),
-                            this.computeActualFinishTime(activityData), StravaRouteParser.wwPaceCalcForActivity(activityData)));
+                        resolve(({controls:this.parseActivity(activityData, activityStream, controlPoints),
+                            actualFinishTime:this.computeActualFinishTime(activityData),
+                            actualPace:StravaRouteParser.wwPaceCalcForActivity(activityData)}));
                     }, error => {
                         reject(error);
                     }
@@ -215,4 +204,4 @@ class StravaRouteParser {
     }
 }
 
-export default StravaRouteParser;
+export default new StravaRouteParser();

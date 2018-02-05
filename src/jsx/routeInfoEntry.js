@@ -8,7 +8,6 @@ import {
     FormGroup,
     OverlayTrigger,
     Panel,
-    Popover,
     Tooltip
 } from 'react-bootstrap';
 import moment from 'moment';
@@ -16,7 +15,6 @@ import React, {Component} from 'react';
 import Flatpickr from 'react-flatpickr'
 import ShortUrl from './shortUrl';
 import MediaQuery from 'react-responsive';
-import rideRatingText from './rideRating.htm';
 import PropTypes from 'prop-types';
 import {
     loadFromRideWithGps,
@@ -24,14 +22,17 @@ import {
     recalcRoute,
     requestForecast,
     setErrorDetails,
-    setInterval,
     setPace,
     setRwgpsRoute,
     setShortUrl,
+    setStart,
     shortenUrl
 } from './actions/actions';
 import {connect} from 'react-redux';
 import {doControlsMatch} from "./controls";
+import PaceExplanation from './paceExplanation';
+import ForecastInterval from './forecastInterval';
+import cookie from 'react-cookies';
 
 const queryString = require('query-string');
 
@@ -39,10 +40,6 @@ export const paceToSpeed = {'A':10, 'B':12, 'C':14, 'C+':15, 'D-':15, 'D':16, 'D
 
 const time_tooltip = (
     <Tooltip id="time_tooltip">When you plan to begin riding</Tooltip>
-);
-
-const interval_tooltip = (
-    <Tooltip id="interval_tooltip">How often to generate weather forecast</Tooltip>
 );
 
 const tooltip_rwgps_enabled = (
@@ -57,23 +54,36 @@ const rwgps_trip_tooltip = (
 );
 */
 
-const rideRatingDisplay = (
-    <Popover style={{width:450, maxWidth:500}} id="ride-rating-popup" title="Ride rating system">
-        <div dangerouslySetInnerHTML={{__html: rideRatingText}}/>
-    </Popover>
-);
-
 class RouteInfoForm extends Component {
     static propTypes = {
         start:PropTypes.instanceOf(Date),
         pace:PropTypes.string,
         interval:PropTypes.number,
-        rwgpsRoute:PropTypes.oneOfType([PropTypes.number,PropTypes.oneOf([''])]),
+        rwgpsRoute:PropTypes.oneOfType([
+            PropTypes.number,
+            PropTypes.oneOf([''])
+        ]),
         timezone_api_key:PropTypes.string.isRequired,
         controlPoints:PropTypes.arrayOf(PropTypes.object).isRequired,
         metric:PropTypes.bool.isRequired,
         formatControlsForUrl:PropTypes.func.isRequired,
-        actualPace:PropTypes.number
+        actualPace:PropTypes.number,
+        fetchingRoute:PropTypes.bool,
+        errorDetails:PropTypes.string,
+        fetchingForecast:PropTypes.bool,
+        loadingSuccess:PropTypes.bool,
+        loadingSource:PropTypes.string,
+        setPace:PropTypes.func.isRequired,
+        setRwgpsRoute:PropTypes.func.isRequired,
+        setStart:PropTypes.func.isRequired,
+        setShortUrl:PropTypes.func.isRequired,
+        shortenUrl:PropTypes.func.isRequired,
+        routeInfo:PropTypes.object,
+        loadFromRideWithGps:PropTypes.func.isRequired,
+        rwgpsRouteIsTrip:PropTypes.bool.isRequired,
+        recalcRoute:PropTypes.func.isRequired,
+        loadGpxRoute:PropTypes.func.isRequired,
+        requestForecast:PropTypes.func.isRequired,
     };
 
     static contextTypes = {
@@ -86,7 +96,6 @@ class RouteInfoForm extends Component {
         this.disableSubmit = this.disableSubmit.bind(this);
         this.handleDateChange = this.handleDateChange.bind(this);
         this.updateRouteFile = this.updateRouteFile.bind(this);
-        this.intervalChanged = this.intervalChanged.bind(this);
         this.handleRwgpsRoute = this.handleRwgpsRoute.bind(this);
         this.handlePaceChange = this.handlePaceChange.bind(this);
         RouteInfoForm.decideValidationStateFor = RouteInfoForm.decideValidationStateFor.bind(this);
@@ -100,7 +109,7 @@ class RouteInfoForm extends Component {
     }
 
     routeIsLoaded() {
-        return this.props.routeInfo.rwgpsRouteData !== null || this.props.routeInfo.gpxRouteData !== null;
+        return this.props.routeInfo.forecastRequest !== null;
     }
 
     componentDidMount() {
@@ -110,16 +119,16 @@ class RouteInfoForm extends Component {
     }
 
     componentWillReceiveProps(nextProps) {
-        // recalculate if the user updated the controls, say
-        this.setQueryString(this.props.controlPoints, this.props.metric);
-        // but there must be a better way to tell than this
-        if (nextProps.controlPoints.length !== this.props.controlPoints.length ||
-            !nextProps.controlPoints.every((v, i)=> doControlsMatch(v,this.props.controlPoints[i]))) {
-            this.props.recalcRoute();
+        if (nextProps.routeInfo.name !== '') {
+            cookie.save(nextProps.routeInfo.name,this.props.formatControlsForUrl(nextProps.controlPoints));
         }
-        if (this.fetchAfterLoad && nextProps.routeInfo.points !== null) {
-            this.requestForecast();
-            this.fetchAfterLoad = false;
+        // recalculate if the user updated the controls, say
+        // but there must be a better way to tell than this
+        if (nextProps.metric !== this.props.metric ||
+            nextProps.controlPoints.length !== this.props.controlPoints.length ||
+            !nextProps.controlPoints.every((v, i)=> doControlsMatch(v,this.props.controlPoints[i]))) {
+            this.setQueryString(nextProps.controlPoints, nextProps.metric);
+            this.props.recalcRoute();
         }
     }
 
@@ -129,6 +138,10 @@ class RouteInfoForm extends Component {
             // recalculate if the user changed values in the dialog
             this.setQueryString(this.props.controlPoints, this.props.metric);
             this.props.recalcRoute();
+        }
+        if (this.fetchAfterLoad && this.props.routeInfo.points !== null && this.props.routeInfo.forecastRequest !== null) {
+            this.requestForecast();
+            this.fetchAfterLoad = false;
         }
     }
 
@@ -178,13 +191,6 @@ class RouteInfoForm extends Component {
         // can't request a forecast without a route loaded
         return (this.props.rwgpsRoute === '' && this.props.routeInfo.gpxRouteData === null);
      }
-
-    intervalChanged(event) {
-        if (event.target.value !== '') {
-            this.paramsChanged = true;
-            this.props.setInterval(parseFloat(event.target.value));
-        }
-    }
 
     handleDateChange(time) {
         this.paramsChanged = true;
@@ -274,25 +280,6 @@ class RouteInfoForm extends Component {
         this.props.setStart(new Date(dates[0]));
     }
 
-/*
-    shouldComponentUpdate(nextProps, nextState) {
-        return nextProps.pace!==this.props.pace ||
-            nextProps.interval!==this.props.interval ||
-            nextProps.rwgpsRoute!==this.props.rwgpsRoute ||
-            nextProps['errorDetails'] !== this.props.errorDetails ||
-            nextState['pending'] !== this.state.pending ||
-            nextState.rwgpsRouteIsTrip !== this.state.rwgpsRouteIsTrip ||
-            nextProps.errorSource !== this.props.errorSource ||
-            nextState['succeeded'] !== this.state.succeeded ||
-            nextState['routeUpdating'] !== this.state.routeUpdating ||
-            nextState['shortUrl'] !== this.state.shortUrl ||
-            nextProps['metric'] !== this.props.metric ||
-            nextState['shortUrl']!== this.state.shortUrl ||
-            nextProps['actualPace']!== this.props.actualPace ||
-            nextProps['start']!== this.props.start;
-    }
-*/
-
     getAlphaPace(pace) {
         let alpha = 'A';     // default
         alpha = Object.keys(paceToSpeed).reverse().find(value => {
@@ -309,7 +296,7 @@ class RouteInfoForm extends Component {
     }
 
     render() {
-        let pace_mph = paceToSpeed[this.state.pace];
+        let pace_mph = paceToSpeed[this.props.pace];
         let pace_text;
         let pace_tooltip_id = 'pace_tooltip';
         if (this.props.actualPace === undefined) {
@@ -352,13 +339,9 @@ class RouteInfoForm extends Component {
                             dateFormat: 'Y-m-d H:i'
                         }}/>
                     </FormGroup>
-                    <FormGroup bsSize='small' controlId="interval" style={{flex:'1',display:'inline-flex',marginTop:'5px',marginBottom:'5px'}}>
-                        <ControlLabel>Interval in hours</ControlLabel>
-                        <OverlayTrigger placement='bottom' overlay={interval_tooltip}>
-                            <FormControl tabIndex='2' type="number" min={0.5} max={2} step={0.5} name="interval" style={{'width':'5em'}}
-                                         value={this.props.interval} onChange={this.intervalChanged}/>
-                        </OverlayTrigger>
-                    </FormGroup>
+
+                    <ForecastInterval/>
+
                     <FormGroup style={{flex:'1',display:'inline-flex',marginTop:'5px',marginBottom:'5px'}} controlId="pace">
                         <ControlLabel>Pace</ControlLabel>
                         <OverlayTrigger placement="bottom" overlay={pace_tooltip}>
@@ -378,9 +361,7 @@ class RouteInfoForm extends Component {
                         </OverlayTrigger>
                     </FormGroup>
 
-                    <OverlayTrigger trigger="click" placement="right" rootClose overlay={rideRatingDisplay}>
-                        <Button style={{marginLeft:'7px'}} bsSize="xsmall">Pace explanation</Button>
-                    </OverlayTrigger>
+                    <PaceExplanation/>
 
                     <FormGroup bsSize='small'
                                bsClass='formGroup hidden-xs hidden-sm'
@@ -453,14 +434,14 @@ class RouteInfoForm extends Component {
                             <MediaQuery minDeviceWidth={1000}>
                             <Button tabIndex='6' bsStyle="primary" onClick={this.requestForecast}
                                     style={buttonStyle}
-                                    disabled={this.disableSubmit() || this.state.pending} bsSize="large">
-                                {this.state.pending?'Updating...':'Find forecast'}</Button>
+                                    disabled={this.disableSubmit() || this.props.fetchingForecast} bsSize="large">
+                                {this.props.fetchingForecast?'Updating...':'Find forecast'}</Button>
                             </MediaQuery>
                             <MediaQuery maxDeviceWidth={800}>
                                 <Button tabIndex='6' bsStyle="primary" onClick={this.requestForecast}
                                         style={buttonStyle}
-                                        disabled={this.disableSubmit() || this.state.pending} bsSize="xsmall">
-                                    {this.state.pending?'Updating...':'Find forecast'}</Button>
+                                        disabled={this.disableSubmit() || this.props.fetchingForecast} bsSize="xsmall">
+                                    {this.props.fetchingForecast?'Updating...':'Find forecast'}</Button>
                             </MediaQuery>
                         </div>
                     </OverlayTrigger>
@@ -479,7 +460,7 @@ class RouteInfoForm extends Component {
     }
 }
 
-const mapStateToProps = (state, ownProps) =>
+const mapStateToProps = (state) =>
     ({
         rwgpsRoute: state.uiInfo.rwgpsRoute,
         loadingSource: state.uiInfo.loadingSource,
@@ -494,11 +475,12 @@ const mapStateToProps = (state, ownProps) =>
         routeInfo:state.routeInfo,
         controlPoints:state.controls.controlPoints,
         timezone_api_key: state.params.timezone_api_key,
-        metric: state.controls.metric
+        metric: state.controls.metric,
+        fetchingForecast: state.uiInfo.fetchingForecast
     });
 
 const mapDispatchToProps = {
-    loadFromRideWithGps, loadGpxRoute, setRwgpsRoute, setInterval, setPace, requestForecast,
+    loadFromRideWithGps, loadGpxRoute, setRwgpsRoute, setPace, setStart, requestForecast,
     recalcRoute, setErrorDetails, setShortUrl, shortenUrl
 };
 
