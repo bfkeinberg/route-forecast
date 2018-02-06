@@ -57,12 +57,18 @@ const setRouteInfo = function(routeInfo) {
 export const recalcRoute = function() {
     return async function(dispatch, getState) {
         const parser = await getRouteParser();
+        let routeData = currentRouteData(getState);
+        // this may be called before we have chosen a route, in which case it's a noop
+        if (routeData === null) {
+            return;
+        }
         dispatch(setRouteInfo(
             parser.walkRoute(
-                currentRouteData(getState),
-                getState().uiInfo.loadingSource,
-                moment(getState().uiInfo.start),
-                getState().uiInfo.pace, getState().uiInfo.interval,
+                routeData,
+                getState().uiInfo.dialogParams.loadingSource,
+                moment(getState().uiInfo.routeParams.start),
+                getState().uiInfo.routeParams.pace, getState().uiInfo.routeParams.interval,
+                // for immutability
                 getState().controls.controlPoints.map( control => ({...control})),
                 getState().controls.metric,
                 getState().routeInfo.timeZoneId)));
@@ -164,12 +170,12 @@ const forecastFetchSuccess = function(forecastInfo) {
 };
 
 export const FORECAST_FETCH_FAILURE = 'FORECAST_FETCH_FAILURE';
-function forecastFetchFailure(error) {
+const forecastFetchFailure = function(error) {
     return {
         type: FORECAST_FETCH_FAILURE,
         error:error
     }
-}
+};
 
 export const GPX_ROUTE_LOADING_SUCCESS = 'GPX_ROUTE_LOADING_SUCCESS';
 const gpxRouteLoadingSuccess = function(gpxRouteData) {
@@ -188,11 +194,11 @@ const gpxRouteLoadingFailure = function(status) {
 };
 
 export const SHOW_FORM = 'SHOW_FORM';
-function showForm() {
+export const showForm = function() {
     return {
         type: SHOW_FORM
     }
-}
+};
 
 export const HIDE_FORM = 'HIDE_FORM';
 const hideForm = function() {
@@ -201,7 +207,14 @@ const hideForm = function() {
     }
 };
 
-export function loadGpxRoute(event,timezone_api_key) {
+export const CLEAR_ROUTE_DATA = 'CLEAR_ROUTE_DATA';
+export const clearRouteData = function() {
+    return {
+        type: CLEAR_ROUTE_DATA,
+    };
+};
+
+export const loadGpxRoute = function(event,timezone_api_key) {
     return async function (dispatch) {
         let gpxFiles = event.target.files;
         if (gpxFiles.length > 0) {
@@ -216,7 +229,7 @@ export function loadGpxRoute(event,timezone_api_key) {
             dispatch(clearRouteData());
         }
     }
-}
+};
 
 export const ADD_WEATHER_CORRECTION = 'ADD_WEATHER_CORRECTION';
 export const addWeatherCorrection = function(weatherCorrection) {
@@ -226,7 +239,7 @@ export const addWeatherCorrection = function(weatherCorrection) {
     };
 };
 
-export function requestForecast(routeInfo) {
+export const requestForecast = function(routeInfo) {
     return function(dispatch,getState) {
         dispatch(beginFetchingForecast());
         dispatch(hideForm());
@@ -249,7 +262,10 @@ export function requestForecast(routeInfo) {
                 dispatch(forecastFetchSuccess(response));
                 let controlsToUpdate = getState().controls.controlPoints.map( control => ({...control}));
                 const parser = await getRouteParser();
-                let weatherCorrectionMinutes = parser.adjustForWind(response,getState().uiInfo.pace,controlsToUpdate,getState().uiInfo.start,getState().uiInfo.metric);
+                let weatherCorrectionMinutes = parser.adjustForWind(
+                    response,getState().uiInfo.routeParams.pace,
+                    controlsToUpdate,getState().uiInfo.routeParams.start,
+                    getState().uiInfo.routeParams.metric);
                 dispatch(addWeatherCorrection(weatherCorrectionMinutes));
                 dispatch(updateControls(controlsToUpdate));
             }).catch (error => {
@@ -258,7 +274,7 @@ export function requestForecast(routeInfo) {
             }
         )
     }
-}
+};
 
 export const SET_SHORT_URL = 'SET_SHORT_URL';
 export const setShortUrl = function(url) {
@@ -276,7 +292,7 @@ export const setErrorDetails = function(details) {
     };
 };
 
-export function shortenUrl(url) {
+export const shortenUrl = function(url) {
     return function (dispatch,getState) {
         fetch(`https://www.googleapis.com/urlshortener/v1/url?key=${getState().params.maps_api_key}`,
             {
@@ -298,7 +314,7 @@ export function shortenUrl(url) {
                 }
             }).catch(error => dispatch(setErrorDetails(error)))
     };
-}
+};
 
 export const SET_ADDRESS = 'SET_ADDRESS';
 export const setAddress = function(address) {
@@ -312,13 +328,6 @@ export const CLEAR_ADDRESS = 'CLEAR_ADDRESS';
 export const clearAddress = function() {
     return {
         type: CLEAR_ADDRESS,
-    };
-};
-
-export const CLEAR_ROUTE_DATA = 'CLEAR_ROUTE_DATA';
-export const clearRouteData = function() {
-    return {
-        type: CLEAR_ROUTE_DATA,
     };
 };
 
@@ -352,11 +361,11 @@ export const toggleDisplayBanked = function() {
 };
 
 export const TOGGLE_STRAVA_ANALYSIS = 'TOGGLE_STRAVA_ANALYSIS';
-export function toggleStravaAnalysis() {
+export const toggleStravaAnalysis = function() {
     return {
         type: TOGGLE_STRAVA_ANALYSIS
     };
-}
+};
 
 export const SET_STRAVA_TOKEN = 'SET_STRAVA_TOKEN';
 export const setStravaToken = function(token) {
@@ -375,12 +384,12 @@ export const setStravaActivity = function(activity) {
 };
 
 export const SET_STRAVA_ERROR = 'SET_STRAVA_ERROR';
-export function setStravaError(error) {
+export const setStravaError = function(error) {
     return {
         type: SET_STRAVA_ERROR,
         activity: error
     };
-}
+};
 
 export const BEGIN_STRAVA_FETCH = 'BEGIN_STRAVA_FETCH';
 export const beginStravaFetch = function() {

@@ -18,7 +18,7 @@ ShortUrl.propTypes = {
 
 const mapStateToProps = (state) =>
     ({
-        shortUrl: state.uiInfo.shortUrl
+        shortUrl: state.uiInfo.dialogParams.shortUrl
     });
 
 export default connect(mapStateToProps)(ShortUrl);

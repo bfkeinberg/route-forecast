@@ -27,7 +27,7 @@ ForecastInterval.propTypes = {
 
 const mapStateToProps = (state) =>
     ({
-        interval: state.uiInfo.interval
+        interval: state.uiInfo.routeParams.interval
     });
 
 const mapDispatchToProps = {

@@ -32,6 +32,7 @@ import {
     setStravaActivity,
     setStravaError,
     setStravaToken,
+    showForm,
     updateControls
 } from "./actions/actions";
 
@@ -56,7 +57,9 @@ class RouteWeatherUI extends Component {
     static propTypes = {
         setActionUrl:PropTypes.func.isRequired,
         setApiKeys:PropTypes.func.isRequired,
-        updateControls:PropTypes.func.isRequired
+        updateControls:PropTypes.func.isRequired,
+        formVisible:PropTypes.bool.isRequired,
+        showForm:PropTypes.func.isRequired
     };
 
     constructor(props) {
@@ -69,8 +72,7 @@ class RouteWeatherUI extends Component {
         props.setApiKeys(script.getAttribute('maps_api_key'),script.getAttribute('timezone_api_key'));
         this.props.updateControls(queryParams.controlPoints===undefined?[]:this.parseControls(queryParams.controlPoints));
         // new control point url format - <name>,<distance>,<time-in-minutes>:<name>,<distance>,<time-in-minutes>:etc
-        this.state = {routeInfo:{bounds:{},points:[], name:'',finishTime:''},
-            formVisible:true};
+        this.state = {routeInfo:{bounds:{},points:[], name:'',finishTime:''}};
     }
 
     static getStravaToken(queryParams) {
@@ -128,7 +130,7 @@ class RouteWeatherUI extends Component {
             </ErrorBoundary>
         );
         const formButton = (
-            <Button bsStyle="primary" onClick={() => this.setState({formVisible:true})}>Show input</Button>
+            <Button bsStyle="primary" onClick={() => this.props.showForm}>Show input</Button>
         );
         return (
         <div>
@@ -149,10 +151,10 @@ class RouteWeatherUI extends Component {
             <MediaQuery maxDeviceWidth={800}>
                 <SplitPane defaultSize={this.state.formVisible?500:250} minSize={120} maxSize={600} split="horizontal" pane2Style={{'overflow':'scroll'}}>
                     <SplitPane defaultSize={this.state.formVisible?319:33} minSize={30} split="horizontal" pane2Style={{'overflow':'scroll'}}>
-                        {this.state.formVisible ? inputForm : formButton}
+                        {this.props.formVisible ? inputForm : formButton}
                         <ControlPoints/>
                     </SplitPane>
-                    {!this.state.formVisible? <ForecastTable/>: <div/>}
+                    {!this.props.formVisible? <ForecastTable/>: <div/>}
                 </SplitPane>
             </MediaQuery>
         </div>
@@ -162,12 +164,13 @@ class RouteWeatherUI extends Component {
 
 const mapDispatchToProps = {
     setStravaToken, setActionUrl, setRwgpsRoute, setApiKeys, setStravaError, setStart, setPace, setInterval, setMetric,
-    setStravaActivity, updateControls
+    setStravaActivity, updateControls, showForm
 };
 
 const mapStateToProps = (state) =>
     ({
-        controlPoints: state.controls.controlPoints
+        controlPoints: state.controls.controlPoints,
+        formVisible: state.uiInfo.dialogParams.formVisible
     });
 
 export default connect(mapStateToProps, mapDispatchToProps)(RouteWeatherUI);

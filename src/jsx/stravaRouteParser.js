@@ -13,6 +13,38 @@ class StravaRouteParser {
         this.fetchActivity = this.fetchActivity.bind(this);
     }
 
+    fetchStravaActivity(activityId, token) {
+        if (token === null) {
+            StravaRouteParser.authenticate(activityId);
+            return;
+        }
+        let activityPromise = this.fetchActivity(activityId, token);
+        return new Promise((resolve, reject) => {
+            activityPromise.then(activityData => {
+                    let activityDataPromise = this.processActivityStream(activityId);
+                    activityDataPromise.then(activityStream => {
+                            if (activityData.message !== undefined) {
+                                cookie.remove('strava_token');
+                                reject(activityData.message);
+                                return;
+                            }
+                            if (activityStream.message !== undefined) {
+                                cookie.remove('strava_token');
+                                reject(activityStream.message);
+                                return;
+                            }
+                            resolve({activity: activityData, stream: activityStream});
+                        }, error => {
+                            reject(error);
+                        }
+                    );
+                }, error => {
+                    reject(error);
+                }
+            );
+        });
+    }
+
     computeActualTimes(activityId, controlPoints, token, beginFetch, endFetch) {
         if (token === null) {
             StravaRouteParser.authenticate(activityId);

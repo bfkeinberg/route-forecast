@@ -184,7 +184,7 @@ class ControlTable extends Component {
             this.api.sizeColumnsToFit();
         }
         if (this.columnApi !== undefined) {
-            this.columnApi.autoSizeColumn('delete');
+            this.columnApi.setColumnWidth(this.columnApi.getColumn('delete'),20);
         }
         this.props.controls.forEach((row,key) => row.id=key);
         return (<div className="ag-theme-fresh">

@@ -82,66 +82,77 @@ const initialStartTime = function() {
     return now;
 };
 
-const uiInfo = function(state = {interval:defaultIntervalInHours,pace:defaultPace,rwgpsRoute:'',
-    rwgpsRouteIsTrip:false, formVisible:true, errorDetails:null, start:initialStartTime(),
-    succeeded:true, shortUrl:' '}, action) {
+const routeParams = function(state = {interval:defaultIntervalInHours,pace:defaultPace,rwgpsRoute:'',
+    rwgpsRouteIsTrip:false, start:initialStartTime()}, action) {
     switch (action.type) {
         case Actions.SET_RWGPS_ROUTE:
             if (action.route !== undefined) {
                 let route = parseInt(action.route);
-                return {...state,rwgpsRoute:!isNaN(route) ? route : action.route,loadingSource:null,succeeded:null};
+                return {
+                    ...state,
+                    rwgpsRoute: !isNaN(route) ? route : action.route,
+                    loadingSource: null,
+                    succeeded: null
+                };
             }
             return state;
-        case Actions.CLEAR_ROUTE_DATA:
-            return {...state,loadingSource:null,succeeded:null};
         case Actions.SET_START:
             if (action.start !== undefined) {
-                return {...state,start:new Date(action.start)};
+                return {...state, start: new Date(action.start)};
             } else {
                 return state;
             }
         case Actions.SET_PACE:
             if (action.pace !== undefined) {
-                return {...state,pace:action.pace};
+                return {...state, pace: action.pace};
             } else {
                 return state;
             }
         case Actions.SET_INTERVAL:
             if (action.interval !== undefined) {
-                return {...state,interval:parseFloat(action.interval)};
+                return {...state, interval: parseFloat(action.interval)};
             } else {
                 return state;
             }
-        case Actions.BEGIN_LOADING_ROUTE:
-            return {...state,fetchingRoute:true,loadingSource:action.source};
-        case Actions.BEGIN_FETCHING_FORECAST:
-            return {...state,fetchingForecast:true};
-        case Actions.FORECAST_FETCH_SUCCESS:
-            return {...state,fetchingForecast:false,errorDetails:null};
-        case Actions.FORECAST_FETCH_FAILURE:
-            return {...state,fetchingForecast:false,errorDetails:action.error};
-        case Actions.RWGPS_ROUTE_LOADING_SUCCESS:
-            return {...state, fetchingRoute:false, errorDetails:null, succeeded:true};
-        case Actions.GPX_ROUTE_LOADING_SUCCESS:
-            return {...state, fetchingRoute:false, errorDetails:null, succeeded:true};
-        case Actions.RWGPS_ROUTE_LOADING_FAILURE:
-            return {...state, fetchingRoute:false, errorDetails:action.error, rwgpsRoute:'', succeeded:false};
-        case Actions.GPX_ROUTE_LOADING_FAILURE:
-            return {...state, fetchingRoute:false, errorDetails:action.error, succeeded:false};
-        case Actions.SHOW_FORM:
-            return {...state, formVisible:true};
-        case Actions.HIDE_FORM:
-            return {...state,formVisible:false};
-        case Actions.SET_ERROR_DETAILS:
-            return {...state,errorDetails:action.details};
-        case Actions.SET_SHORT_URL:
-            return {...state,shortUrl:action.url};
         default:
             return state;
     }
 };
 
-const routeInfo = function(state = {finishTime:'',weatherCorrectionMinutes:null,forecastRequest:null}, action) {
+const dialogParams = function(state = {formVisible:true, errorDetails:null, succeeded:true, shortUrl:' '}, action) {
+    switch (action.type) {
+        case Actions.CLEAR_ROUTE_DATA:
+            return {...state, loadingSource: null, succeeded: null};
+        case Actions.BEGIN_LOADING_ROUTE:
+            return {...state, fetchingRoute: true, loadingSource: action.source};
+        case Actions.BEGIN_FETCHING_FORECAST:
+            return {...state, fetchingForecast: true};
+        case Actions.FORECAST_FETCH_SUCCESS:
+            return {...state, fetchingForecast: false, errorDetails: null};
+        case Actions.FORECAST_FETCH_FAILURE:
+            return {...state, fetchingForecast: false, errorDetails: action.error};
+        case Actions.RWGPS_ROUTE_LOADING_SUCCESS:
+            return {...state, fetchingRoute: false, errorDetails: null, succeeded: true};
+        case Actions.GPX_ROUTE_LOADING_SUCCESS:
+            return {...state, fetchingRoute: false, errorDetails: null, succeeded: true};
+        case Actions.RWGPS_ROUTE_LOADING_FAILURE:
+            return {...state, fetchingRoute: false, errorDetails: action.error, rwgpsRoute: '', succeeded: false};
+        case Actions.GPX_ROUTE_LOADING_FAILURE:
+            return {...state, fetchingRoute: false, errorDetails: action.error, succeeded: false};
+        case Actions.SHOW_FORM:
+            return {...state, formVisible: true};
+        case Actions.HIDE_FORM:
+            return {...state, formVisible: false};
+        case Actions.SET_ERROR_DETAILS:
+            return {...state, errorDetails: action.details};
+        case Actions.SET_SHORT_URL:
+            return {...state, shortUrl: action.url};
+        default:
+            return state;
+    }
+};
+
+const routeInfo = function(state = {finishTime:'',weatherCorrectionMinutes:null,forecastRequest:null,points:[]}, action) {
     switch (action.type) {
         case Actions.RWGPS_ROUTE_LOADING_SUCCESS:
             return {...state,rwgpsRouteData:action.routeData.rwgpsRouteData,timeZoneOffset:action.routeData.timeZoneOffset,
@@ -151,15 +162,15 @@ const routeInfo = function(state = {finishTime:'',weatherCorrectionMinutes:null,
                 timeZoneId:action.routeData.timeZoneId, rwgpsRouteData:null};
         case Actions.SET_ROUTE_INFO:
             if (action.routeInfo===null) {
-                return {...state,rwgpsRouteData:null,gpxRouteData:null,points:null,bounds:null,name:'',forecastRequest:null};
+                return {...state,rwgpsRouteData:null,gpxRouteData:null,points:[],bounds:null,name:'',forecastRequest:null};
             }
             return {...state, points:action.routeInfo.points,name:action.routeInfo.name,bounds:action.routeInfo.bounds,
                 finishTime:action.routeInfo.finishTime,forecastRequest:action.routeInfo.forecast};
         case Actions.CLEAR_ROUTE_DATA:
-            return {...state,rwgpsRouteData:null,gpxRouteData:null,points:null,bounds:null,name:'',forecastRequest:null};
+            return {...state,rwgpsRouteData:null,gpxRouteData:null,points:[],bounds:null,name:'',forecastRequest:null};
         // clear when the route is changed
         case Actions.SET_RWGPS_ROUTE:
-            return {...state,rwgpsRouteData:null,gpxRouteData:null,points:null,name:'',forecastRequest:null};
+            return {...state,rwgpsRouteData:null,gpxRouteData:null,points:[],name:'',forecastRequest:null};
         case Actions.ADD_WEATHER_CORRECTION:
             return {...state,weatherCorrectionMinutes:action.weatherCorrectionMinutes,
                 finishTime:moment(state.finishTime,finishTimeFormat).add(action.weatherCorrectionMinutes,'minutes').format(finishTimeFormat)};
@@ -172,16 +183,16 @@ const controls = function(state = {metric:false,displayBanked:false,stravaAnalys
     switch (action.type) {
         case Actions.SET_METRIC:
             if (action.metric !== undefined) {
-                return {...state, metric:action.metric};
+                return {...state, metric: action.metric};
             } else {
                 return state;
             }
         case Actions.TOGGLE_METRIC:
-            return {...state, metric:!state.metric};
+            return {...state, metric: !state.metric};
         case Actions.TOGGLE_DISPLAY_BANKED:
-            return {...state, displayBanked:!state.displayBanked};
+            return {...state, displayBanked: !state.displayBanked};
         case Actions.TOGGLE_STRAVA_ANALYSIS:
-            return {...state, stravaAnalysis:!state.stravaAnalysis};
+            return {...state, stravaAnalysis: !state.stravaAnalysis};
         case Actions.UPDATE_CONTROLS: {
             let controls = action.controls.map(control => {
                 if (isNaN(control.banked)) {
@@ -192,10 +203,17 @@ const controls = function(state = {metric:false,displayBanked:false,stravaAnalys
                 }
                 return control;
             });
-            return {...state, controlPoints:controls, count:action.controls.length};
+            return {...state, controlPoints: controls, count: action.controls.length};
         }
-        case Actions.SET_ROUTE_INFO:
-            return {...state, controlPoints:action.routeInfo.controls}
+        case Actions.SET_ROUTE_INFO: {
+            let controls = action.routeInfo.controls.map(control => {
+                if (isNaN(control.banked)) {
+                    control.banked = null;
+                }
+                return control;
+            });
+            return {...state, controlPoints: controls};
+        }
         case Actions.ADD_CONTROL:
             return {...state, count:state.count+1};
         default:
@@ -259,6 +277,7 @@ const params = function(state = {}, action) {
     }
 };
 
-const rootReducer = combineReducers({uiInfo, routeInfo, controls, strava, forecast, params});
+const rootReducer = combineReducers({uiInfo:combineReducers({routeParams,dialogParams}),
+    routeInfo, controls, strava, forecast, params});
 
 export default rootReducer;

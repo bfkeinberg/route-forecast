@@ -33,6 +33,8 @@ import {doControlsMatch} from "./controls";
 import PaceExplanation from './paceExplanation';
 import ForecastInterval from './forecastInterval';
 import cookie from 'react-cookies';
+import RidingPace from './ridingPace';
+import Recalculate from './recalculate';
 
 const queryString = require('query-string');
 
@@ -80,10 +82,10 @@ class RouteInfoForm extends Component {
         shortenUrl:PropTypes.func.isRequired,
         routeInfo:PropTypes.object,
         loadFromRideWithGps:PropTypes.func.isRequired,
-        rwgpsRouteIsTrip:PropTypes.bool.isRequired,
         recalcRoute:PropTypes.func.isRequired,
         loadGpxRoute:PropTypes.func.isRequired,
         requestForecast:PropTypes.func.isRequired,
+        rwgpsRouteIsTrip:PropTypes.bool.isRequired
     };
 
     static contextTypes = {
@@ -98,7 +100,6 @@ class RouteInfoForm extends Component {
         this.updateRouteFile = this.updateRouteFile.bind(this);
         this.handleRwgpsRoute = this.handleRwgpsRoute.bind(this);
         this.handlePaceChange = this.handlePaceChange.bind(this);
-        RouteInfoForm.decideValidationStateFor = RouteInfoForm.decideValidationStateFor.bind(this);
         this.setRwgpsRoute = this.setRwgpsRoute.bind(this);
         this.setDateAndTime = this.setDateAndTime.bind(this);
         this.makeFullQueryString = this.makeFullQueryString.bind(this);
@@ -280,32 +281,7 @@ class RouteInfoForm extends Component {
         this.props.setStart(new Date(dates[0]));
     }
 
-    getAlphaPace(pace) {
-        let alpha = 'A';     // default
-        alpha = Object.keys(paceToSpeed).reverse().find(value => {
-            return (pace > paceToSpeed[value])});
-        return alpha;
-    }
-
-    static getPaceTooltipId(realPace, predictedPace) {
-        if (realPace < predictedPace) {
-            return 'red-tooltip';
-        } else {
-            return 'green-tooltip';
-        }
-    }
-
     render() {
-        let pace_mph = paceToSpeed[this.props.pace];
-        let pace_text;
-        let pace_tooltip_id = 'pace_tooltip';
-        if (this.props.actualPace === undefined) {
-            pace_text = `Represents climb-adjusted pace - current is ${pace_mph}`;
-        } else {
-            pace_tooltip_id = RouteInfoForm.getPaceTooltipId(this.props.actualPace,pace_mph);
-            pace_text = `Actual riding pace was ${this.getAlphaPace(this.props.actualPace)}`;
-        }
-        let pace_tooltip = ( <Tooltip id={pace_tooltip_id}>{pace_text}</Tooltip> );
         let file_upload_tooltip = ( <Tooltip id="upload_tooltip">Upload a .gpx file describing your route</Tooltip> );
         let forecast_tooltip = this.disableSubmit() ? (
             <Tooltip id="forecast_tooltip">Must either upload a gpx file or provide an rwgps route id</Tooltip> ):
@@ -339,28 +315,9 @@ class RouteInfoForm extends Component {
                             dateFormat: 'Y-m-d H:i'
                         }}/>
                     </FormGroup>
-
+                    <Recalculate/>
                     <ForecastInterval/>
-
-                    <FormGroup style={{flex:'1',display:'inline-flex',marginTop:'5px',marginBottom:'5px'}} controlId="pace">
-                        <ControlLabel>Pace</ControlLabel>
-                        <OverlayTrigger placement="bottom" overlay={pace_tooltip}>
-                            <FormControl tabIndex='3' componentClass="select" value={this.props.pace} name="pace"
-                                         style={{'width':'5em','height':'2.8em',paddingRight:'8px'}}
-                                         onChange={this.handlePaceChange}>
-                                <option value="A">A/10</option>
-                                <option value="B">B/12</option>
-                                <option value="C">C/14</option>
-                                <option value="C+">C+/15</option>
-                                <option value="D-">D-/15-</option>
-                                <option value="D">D/16</option>
-                                <option value="D+">D+/17</option>
-                                <option value="E-">E-/17-</option>
-                                <option value="E">E/18</option>
-                            </FormControl>
-                        </OverlayTrigger>
-                    </FormGroup>
-
+                    <RidingPace/>
                     <PaceExplanation/>
 
                     <FormGroup bsSize='small'
@@ -462,21 +419,21 @@ class RouteInfoForm extends Component {
 
 const mapStateToProps = (state) =>
     ({
-        rwgpsRoute: state.uiInfo.rwgpsRoute,
-        loadingSource: state.uiInfo.loadingSource,
-        loadingSuccess: state.uiInfo.succeeded,
-        start: state.uiInfo.start,
-        pace: state.uiInfo.pace,
+        rwgpsRoute: state.uiInfo.routeParams.rwgpsRoute,
+        loadingSource: state.uiInfo.dialogParams.loadingSource,
+        loadingSuccess: state.uiInfo.dialogParams.succeeded,
+        start: state.uiInfo.routeParams.start,
+        pace: state.uiInfo.routeParams.pace,
         actualPace: state.strava.actualPace,
-        interval: state.uiInfo.interval,
-        fetchingRoute: state.uiInfo.fetchingRoute,
-        rwgpsRouteIsTrip:state.uiInfo.rwgpsRouteIsTrip,
-        errorDetails:state.uiInfo.errorDetails,
+        interval: state.uiInfo.routeParams.interval,
+        fetchingRoute: state.uiInfo.dialogParams.fetchingRoute,
+        errorDetails:state.uiInfo.dialogParams.errorDetails,
         routeInfo:state.routeInfo,
         controlPoints:state.controls.controlPoints,
         timezone_api_key: state.params.timezone_api_key,
         metric: state.controls.metric,
-        fetchingForecast: state.uiInfo.fetchingForecast
+        fetchingForecast: state.uiInfo.dialogParams.fetchingForecast,
+        rwgpsRouteIsTrip:state.uiInfo.routeParams.rwgpsRouteIsTrip
     });
 
 const mapDispatchToProps = {
