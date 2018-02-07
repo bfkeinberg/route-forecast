@@ -67,9 +67,9 @@ export const recalcRoute = function() {
                 routeData,
                 getState().uiInfo.dialogParams.loadingSource,
                 moment(getState().uiInfo.routeParams.start),
-                getState().uiInfo.routeParams.pace, getState().uiInfo.routeParams.interval,
-                // for immutability
-                getState().controls.controlPoints.map( control => ({...control})),
+                getState().uiInfo.routeParams.pace,
+                getState().uiInfo.routeParams.interval,
+                getState().controls.userControlPoints,
                 getState().controls.metric,
                 getState().routeInfo.timeZoneId)));
     }
@@ -121,11 +121,19 @@ const getRouteName = function(routeData) {
     }
 };
 
-export const UPDATE_CONTROLS = 'UPDATE_CONTROLS';
-export const updateControls = function(controls) {
+export const UPDATE_USER_CONTROLS = 'UPDATE_USER_CONTROLS';
+export const updateUserControls = function(controls) {
     return {
-        type: UPDATE_CONTROLS,
+        type: UPDATE_USER_CONTROLS,
         controls: controls
+    };
+};
+
+export const UPDATE_CALCULATED_VALUES = 'UPDATE_CALCULATED_VALUES';
+export const updateCalculatedValues = function(values) {
+    return {
+        type: UPDATE_CALCULATED_VALUES,
+        controls: values
     };
 };
 
@@ -135,7 +143,7 @@ export const loadControlsFromCookie = function(routeData) {
         if (routeName !== null) {
             let savedControlPoints = cookie.load(routeName);
             if (savedControlPoints !== undefined && savedControlPoints.length > 0) {
-                dispatch(updateControls(parseControls(savedControlPoints)));
+                dispatch(updateUserControls(parseControls(savedControlPoints)));
             }
         }
     };
@@ -267,7 +275,7 @@ export const requestForecast = function(routeInfo) {
                     controlsToUpdate,getState().uiInfo.routeParams.start,
                     getState().uiInfo.routeParams.metric);
                 dispatch(addWeatherCorrection(weatherCorrectionMinutes));
-                dispatch(updateControls(controlsToUpdate));
+                dispatch(updateCalculatedValues(controlsToUpdate));
             }).catch (error => {
                 let errorMessage = error.message !== undefined ? error.message : error;
                 dispatch(forecastFetchFailure(errorMessage));

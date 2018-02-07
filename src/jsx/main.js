@@ -45,7 +45,6 @@ Simplify gpxParser to have one method that analyzes, using destructuring to simp
 feature requests:
 show controls on map
 show both wind arrows and rain cloud
-fix bug involving control with 0 valued time or distance
 
  */
 // To add to window

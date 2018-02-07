@@ -4,9 +4,16 @@ let state = {
         metric:false,
         displayBanked,
         stravaAnalysis,
-        controlPoints: [
-            {name:'here', distance:20, duration:15, arrival:'Jan 13', actual:'Jan 14', banked:'11:05'}
-        ]
+        /// bad data model
+        /// separate data entered by user from data calculated by route update
+        /// updating actual and predicted arrival times, and banked time, should not force a recalc
+        /// only distance and duration should do that
+        userControlPoints:[
+            name:'here', distance:20, duration:15
+        ],
+        calculatedControlValues:[
+            arrival:'Jan 13', actual:'Jan 14', banked:'11:05'
+        ],
     },
     // input to fetch weather forecast, populated by loading route
     routeInfo:{
@@ -179,7 +186,8 @@ const routeInfo = function(state = {finishTime:'',weatherCorrectionMinutes:null,
     }
 };
 
-const controls = function(state = {metric:false,displayBanked:false,stravaAnalysis:false,controlPoints:[],count:0}, action) {
+const controls = function(state = {metric:false,displayBanked:false,stravaAnalysis:false,
+    userControlPoints:[],calculatedControlValues:[],count:0}, action) {
     switch (action.type) {
         case Actions.SET_METRIC:
             if (action.metric !== undefined) {
@@ -193,8 +201,10 @@ const controls = function(state = {metric:false,displayBanked:false,stravaAnalys
             return {...state, displayBanked: !state.displayBanked};
         case Actions.TOGGLE_STRAVA_ANALYSIS:
             return {...state, stravaAnalysis: !state.stravaAnalysis};
-        case Actions.UPDATE_CONTROLS: {
-            let controls = action.controls.map(control => {
+        case Actions.UPDATE_USER_CONTROLS:
+            return {...state, userControlPoints: action.controls, count: action.controls.length};
+        case Actions.UPDATE_CALCULATED_VALUES: {
+            let controls = action.values.map(control => {
                 if (isNaN(control.banked)) {
                     control.banked = null;
                 }
@@ -203,7 +213,7 @@ const controls = function(state = {metric:false,displayBanked:false,stravaAnalys
                 }
                 return control;
             });
-            return {...state, controlPoints: controls, count: action.controls.length};
+            return {...state, calculatedControlValues: controls};
         }
         case Actions.SET_ROUTE_INFO: {
             let controls = action.routeInfo.controls.map(control => {
@@ -212,7 +222,7 @@ const controls = function(state = {metric:false,displayBanked:false,stravaAnalys
                 }
                 return control;
             });
-            return {...state, controlPoints: controls};
+            return {...state, calculatedControlValues: controls};
         }
         case Actions.ADD_CONTROL:
             return {...state, count:state.count+1};

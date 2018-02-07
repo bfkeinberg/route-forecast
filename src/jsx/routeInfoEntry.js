@@ -1,4 +1,4 @@
-import {Icon, Spinner} from '@blueprintjs/core';
+import {Spinner} from '@blueprintjs/core';
 import {
     Alert,
     Button,
@@ -12,7 +12,6 @@ import {
 } from 'react-bootstrap';
 import moment from 'moment';
 import React, {Component} from 'react';
-import Flatpickr from 'react-flatpickr'
 import ShortUrl from './shortUrl';
 import MediaQuery from 'react-responsive';
 import PropTypes from 'prop-types';
@@ -35,14 +34,12 @@ import ForecastInterval from './forecastInterval';
 import cookie from 'react-cookies';
 import RidingPace from './ridingPace';
 import Recalculate from './recalculate';
+import FileInput from './fileInput';
+import DateSelect from './dateSelect';
 
 const queryString = require('query-string');
 
 export const paceToSpeed = {'A':10, 'B':12, 'C':14, 'C+':15, 'D-':15, 'D':16, 'D+':17, 'E-':17, 'E':18};
-
-const time_tooltip = (
-    <Tooltip id="time_tooltip">When you plan to begin riding</Tooltip>
-);
 
 const tooltip_rwgps_enabled = (
     <Tooltip id="rwgps_tooltip">The number for a route on ridewithgps</Tooltip>
@@ -96,10 +93,7 @@ class RouteInfoForm extends Component {
         super(props);
         this.requestForecast = this.requestForecast.bind(this);
         this.disableSubmit = this.disableSubmit.bind(this);
-        this.handleDateChange = this.handleDateChange.bind(this);
-        this.updateRouteFile = this.updateRouteFile.bind(this);
         this.handleRwgpsRoute = this.handleRwgpsRoute.bind(this);
-        this.handlePaceChange = this.handlePaceChange.bind(this);
         this.setRwgpsRoute = this.setRwgpsRoute.bind(this);
         this.setDateAndTime = this.setDateAndTime.bind(this);
         this.makeFullQueryString = this.makeFullQueryString.bind(this);
@@ -129,7 +123,6 @@ class RouteInfoForm extends Component {
             nextProps.controlPoints.length !== this.props.controlPoints.length ||
             !nextProps.controlPoints.every((v, i)=> doControlsMatch(v,this.props.controlPoints[i]))) {
             this.setQueryString(nextProps.controlPoints, nextProps.metric);
-            this.props.recalcRoute();
         }
     }
 
@@ -144,12 +137,6 @@ class RouteInfoForm extends Component {
             this.requestForecast();
             this.fetchAfterLoad = false;
         }
-    }
-
-    updateRouteFile(event) {
-        this.props.loadGpxRoute(event,this.props.timezone_api_key);
-        // nothing to encode if the URL if we're working from a local file
-        history.pushState(null, 'nothing', location.origin);
     }
 
     requestForecast() {
@@ -192,11 +179,6 @@ class RouteInfoForm extends Component {
         // can't request a forecast without a route loaded
         return (this.props.rwgpsRoute === '' && this.props.routeInfo.gpxRouteData === null);
      }
-
-    handleDateChange(time) {
-        this.paramsChanged = true;
-        this.props.setStart(time);
-    }
 
     static showErrorDetails(errorState) {
         if (errorState !== null) {
@@ -255,11 +237,6 @@ class RouteInfoForm extends Component {
         return charCode;
     }
 
-    handlePaceChange(event) {
-        this.paramsChanged = true;
-        this.props.setPace(event.target.value);
-    }
-
     static decideValidationStateFor(type, methodUsed, loadingSuccess) {
         if (type === methodUsed) {
             if (loadingSuccess) {
@@ -272,26 +249,10 @@ class RouteInfoForm extends Component {
         }
     }
 
-    setDateAndTime(dates, datestr, instance) {
-        if (datestr === '') {
-            instance.setDate(this.props.start);
-            return;
-        }
-        this.paramsChanged = true;
-        this.props.setStart(new Date(dates[0]));
-    }
-
     render() {
-        let file_upload_tooltip = ( <Tooltip id="upload_tooltip">Upload a .gpx file describing your route</Tooltip> );
         let forecast_tooltip = this.disableSubmit() ? (
             <Tooltip id="forecast_tooltip">Must either upload a gpx file or provide an rwgps route id</Tooltip> ):
             (<Tooltip id="'forecast_tooltip">Request a ride forecast</Tooltip>);
-        const now = new Date();
-        // allow us to continue to show the start time if the route was forecast for a time before the present
-        let firstDate = now > this.props.start ? this.props.start : now;
-        let later = new Date();
-        const daysToAdd = 14;
-        later.setDate(now.getDate() + daysToAdd);
         let buttonStyle = this.disableSubmit() ? {pointerEvents : 'none', display:'inline-flex'} : null;
 
         const header = (<div style={{textAlign:"center",'fontSize':'99%'}}>Forecast and time estimate</div>);
@@ -299,38 +260,12 @@ class RouteInfoForm extends Component {
                 <div style={{display:'flex',flexFlow:'row wrap',justifyContent:'space-between',alignItems:'center',alignContent:'space-between',margin:'10px'}}>
                 <Panel style={{marginBottom:'0'}} header={header}>
                 <Form inline id="forecast_form">
-                    <FormGroup tabIndex="1"
-                        style={{flex:'1',display:'inline-flex',alignItems:'center'}} controlId="starting_time">
-                        <OverlayTrigger placement='bottom' overlay={time_tooltip}>
-                            <ControlLabel>Starting time</ControlLabel>
-                        </OverlayTrigger>
-                        <Icon iconName="calendar"/>
-                        <Flatpickr onChange={this.setDateAndTime}
-                                   options={{enableTime: true,
-                            altInput: true, altFormat: 'F j, Y h:i K',
-                            altInputClass: 'dateDisplay',
-                            minDate: firstDate,
-                            maxDate: later,
-                            defaultDate: this.state.start,
-                            dateFormat: 'Y-m-d H:i'
-                        }}/>
-                    </FormGroup>
+                    <DateSelect/>
                     <Recalculate/>
                     <ForecastInterval/>
                     <RidingPace/>
                     <PaceExplanation/>
-
-                    <FormGroup bsSize='small'
-                               bsClass='formGroup hidden-xs hidden-sm'
-                               validationState={RouteInfoForm.decideValidationStateFor('gpx',this.props.loadingSource,this.props.loadingSuccess)}
-                               style={{display:'inline-flex',marginTop:'5px',marginBottom:'5px'}}
-                               controlId="route">
-                        <ControlLabel>Route file</ControlLabel>
-                        <OverlayTrigger placement='bottom' overlay={file_upload_tooltip}>
-                            <FormControl tabIndex='4' type="file" name='route' accept=".gpx" id='route' onChange={this.updateRouteFile}/>
-                        </OverlayTrigger>
-                    </FormGroup>
-
+                    <FileInput/>
                     <FormGroup
                         validationState={RouteInfoForm.decideValidationStateFor('rwgps',this.props.loadingSource,this.props.loadingSuccess)}
                         controlId="ridewithgps" style={{flex:'1',display:'inline-flex',marginTop:'5px',marginBottom:'5px'}}>
@@ -441,4 +376,5 @@ const mapDispatchToProps = {
     recalcRoute, setErrorDetails, setShortUrl, shortenUrl
 };
 
+export const decideValidationStateFor = RouteInfoForm.decideValidationStateFor;
 export default connect(mapStateToProps, mapDispatchToProps, null, {pure:true})(RouteInfoForm);

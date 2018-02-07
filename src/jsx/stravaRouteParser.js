@@ -189,7 +189,7 @@ class StravaRouteParser {
             let distanceInMiles = value * metersToMiles;
             if (distanceInMiles >= currentControl['distance']) {
                 let currentMoment = moment(startMoment).add(time[index],'seconds');
-                currentControl['actual'] = currentMoment.format('ddd, MMM DD h:mma');
+                currentControl.actual = currentMoment.format('ddd, MMM DD h:mma');
                 if (controlsCopy.length===0) {
                     return;
                 } else {

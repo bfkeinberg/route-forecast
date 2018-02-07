@@ -12,7 +12,8 @@ Recalculate.propTypes = {
     pace:PropTypes.string.isRequired,
     interval:PropTypes.number.isRequired,
     recalcRoute:PropTypes.func.isRequired,
-    metric:PropTypes.bool.isRequired
+    metric:PropTypes.bool.isRequired,
+    controls:PropTypes.arrayOf(PropTypes.object).isRequired
 };
 
 const mapStateToProps = (state) =>
@@ -20,7 +21,8 @@ const mapStateToProps = (state) =>
         start: state.uiInfo.routeParams.start,
         pace: state.uiInfo.routeParams.pace,
         interval: state.uiInfo.routeParams.interval,
-        metric: state.controls.metric
+        metric: state.controls.metric,
+        controls: state.controls.userControlPoints
     });
 
 const mapDispatchToProps = {

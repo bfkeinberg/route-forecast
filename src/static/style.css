@@ -58,7 +58,7 @@ label.control-label {
 
 input#finishTime.form-control {
     display: inline-flex;
-    width: 13em;
+    width: 14em;
     margin-top: 3px;
     margin-botton: 0px;
 }

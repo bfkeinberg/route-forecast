@@ -5,15 +5,17 @@ import {AgGridReact} from 'ag-grid-react';
 import ReactDOM from 'react-dom';
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
-import {updateControls} from './actions/actions';
+import {updateUserControls} from './actions/actions';
 
 const smallScreenWidth = 800;
+const deleteColumnWidth = 22;
 
 class ControlTable extends Component {
     static propTypes = {
         displayBanked:PropTypes.bool.isRequired,
         compare:PropTypes.bool.isRequired,
         controls:PropTypes.arrayOf(PropTypes.object).isRequired,
+        calculatedValues:PropTypes.arrayOf(PropTypes.object).isRequired,
         updateControls:PropTypes.func.isRequired,
         count:PropTypes.number.isRequired
     };
@@ -60,7 +62,7 @@ class ControlTable extends Component {
         if (this.api===undefined) {
             return;
         }
-        let row = {name:'',duration:0,distance:0,id:this.props.controls.length};
+        let row = {name:'',duration:'',distance:'',id:this.props.controls.length};
         this.api.updateRowData({add:[row], addIndex:row.id});
         // focus on new control if one has been added
         this.api.setFocusedCell(this.props.controls.length,'name',null);
@@ -128,17 +130,9 @@ class ControlTable extends Component {
         if (newProps.count > newProps.controls.length) {
             this.addRow();
         }
-        let controlsCopy = newProps.controls.map( control => ({...control}));
-        if (controlsCopy.every(ctl => ctl.id===undefined)) {
-            controlsCopy.forEach((row,key) => row.id=key);
-        }
-        this.api.setRowData(controlsCopy);
-/*
-        if (!this.shouldComponentUpdate(newProps)) {
-            return;
-        }
-*/
-        // this.updateFromGrid();
+        let rowData = [];
+        newProps.controls.foreach((item,index) => rowData.push({item, ...newProps.calculatedValues[index], id:index}));
+        this.api.setRowData(rowData);
     }
 
     static setData(params) {
@@ -164,7 +158,7 @@ class ControlTable extends Component {
 
     static isValidRow(rowData) {
         return (rowData.name!==undefined && rowData.distance!==undefined && rowData.duration!==undefined &&
-            rowData.name!=="" && rowData.distance!=="" && rowData.distance !== 0 && rowData.duration!=="" && rowData.duration!==0);
+            rowData.name!=="" && rowData.distance!=="" && rowData.duration!=="");
     }
 
     sortChanged() {
@@ -174,8 +168,9 @@ class ControlTable extends Component {
 
     updateFromGrid() {
         let modifiedControls = [];
-        this.api.forEachNodeAfterFilterAndSort(node => modifiedControls.push(node.data));
-        // modifiedControls.forEach((row,key) => row.id=key);
+        this.api.forEachNodeAfterFilterAndSort(node => {
+            const userValues = (({ name, distance, duration }) => ({ name, distance, duration }))(node.data);
+            modifiedControls.push(userValues)});
         this.props.updateControls(modifiedControls);
     }
 
@@ -184,11 +179,12 @@ class ControlTable extends Component {
             this.api.sizeColumnsToFit();
         }
         if (this.columnApi !== undefined) {
-            this.columnApi.setColumnWidth(this.columnApi.getColumn('delete'),20);
+            this.columnApi.setColumnWidth(this.columnApi.getColumn('delete'),deleteColumnWidth);
         }
-        this.props.controls.forEach((row,key) => row.id=key);
+        let rowData = [];
+        this.props.controls.foreach((item,index) => rowData.push({item, ...this.props.calculatedValues[index], id:index}));
         return (<div className="ag-theme-fresh">
-            <AgGridReact enableColResize enableSorting animateRows sortingOrder={['asc']} unSortIcon rowData={this.props.controls}
+            <AgGridReact enableColResize enableSorting animateRows sortingOrder={['asc']} unSortIcon rowData={rowData}
              onGridReady={this.onGridReady} onSortChanged={this.sortChanged} singleClickEdit
             onCellValueChanged={this.cellUpdated} tabToNextCell={ControlTable.tabHandler} getRowNodeId={data => data.id}
             columnDefs={this.state.columnDefs}/>
@@ -201,11 +197,12 @@ const mapStateToProps = (state) =>
         displayBanked: state.controls.displayBanked,
         compare: state.controls.stravaAnalysis,
         count: state.controls.count,
-        controls: state.controls.controlPoints.map( control => ({...control}))
+        controls: state.controls.userControlPoints,
+        calculatedValues: state.controls.calculatedControlValues
     });
 
 const mapDispatchToProps = {
-    updateControls
+    updateControls : updateUserControls
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(ControlTable);
