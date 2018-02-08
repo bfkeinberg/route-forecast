@@ -33,7 +33,7 @@ import {
     setStravaError,
     setStravaToken,
     showForm,
-    updateControls
+    updateUserControls
 } from "./actions/actions";
 
 /*
@@ -163,7 +163,7 @@ class RouteWeatherUI extends Component {
 
 const mapDispatchToProps = {
     setStravaToken, setActionUrl, setRwgpsRoute, setApiKeys, setStravaError, setStart, setPace, setInterval, setMetric,
-    setStravaActivity, updateControls, showForm
+    setStravaActivity, updateControls:updateUserControls, showForm
 };
 
 const mapStateToProps = (state) =>

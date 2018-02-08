@@ -28,7 +28,6 @@ import {
     shortenUrl
 } from './actions/actions';
 import {connect} from 'react-redux';
-import {doControlsMatch} from "./controls";
 import PaceExplanation from './paceExplanation';
 import ForecastInterval from './forecastInterval';
 import cookie from 'react-cookies';
@@ -95,7 +94,6 @@ class RouteInfoForm extends Component {
         this.disableSubmit = this.disableSubmit.bind(this);
         this.handleRwgpsRoute = this.handleRwgpsRoute.bind(this);
         this.setRwgpsRoute = this.setRwgpsRoute.bind(this);
-        this.setDateAndTime = this.setDateAndTime.bind(this);
         this.makeFullQueryString = this.makeFullQueryString.bind(this);
         this.paramsChanged = false;
         this.state = {};
@@ -120,8 +118,7 @@ class RouteInfoForm extends Component {
         // recalculate if the user updated the controls, say
         // but there must be a better way to tell than this
         if (nextProps.metric !== this.props.metric ||
-            nextProps.controlPoints.length !== this.props.controlPoints.length ||
-            !nextProps.controlPoints.every((v, i)=> doControlsMatch(v,this.props.controlPoints[i]))) {
+            nextProps.controlPoints !== this.props.controlPoints) {
             this.setQueryString(nextProps.controlPoints, nextProps.metric);
         }
     }
@@ -364,7 +361,7 @@ const mapStateToProps = (state) =>
         fetchingRoute: state.uiInfo.dialogParams.fetchingRoute,
         errorDetails:state.uiInfo.dialogParams.errorDetails,
         routeInfo:state.routeInfo,
-        controlPoints:state.controls.controlPoints,
+        controlPoints:state.controls.userControlPoints,
         timezone_api_key: state.params.timezone_api_key,
         metric: state.controls.metric,
         fetchingForecast: state.uiInfo.dialogParams.fetchingForecast,

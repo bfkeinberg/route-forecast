@@ -28,9 +28,10 @@ import {
     toggleDisplayBanked,
     toggleMetric,
     toggleStravaAnalysis,
-    updateControls
+    updateCalculatedValues
 } from './actions/actions';
 import {connect} from 'react-redux';
+import FinishTime from './finishTime';
 
 class ControlPoints extends Component {
 
@@ -68,7 +69,6 @@ class ControlPoints extends Component {
     constructor(props) {
         super(props);
         this.addControl = this.addControl.bind(this);
-        this.toggleCompare = this.toggleCompare.bind(this);
         this.updateExpectedTimes = this.updateExpectedTimes.bind(this);
         this.stravaErrorCallback = this.stravaErrorCallback.bind(this);
         this.hideStravaErrorAlert = this.hideStravaErrorAlert.bind(this);
@@ -157,10 +157,6 @@ class ControlPoints extends Component {
         this.props.addControl();
     }
 
-    toggleCompare() {
-        this.props.toggleStravaAnalysis();
-    }
-
     static doControlsMatch(newControl, oldControl) {
         return newControl.distance===oldControl.distance &&
             newControl.name===oldControl.name &&
@@ -180,12 +176,7 @@ class ControlPoints extends Component {
                 {/*<ButtonGroup style={{display:'flex',flexFlow:'row wrap'}}>*/}
                     <ButtonGroup>
                         <Button tabIndex='10' onClick={this.addControl} id='addButton'><Glyphicon glyph="plus-sign"/>Add control point</Button>
-                        <FormGroup controlId="finishTime" style={{display:'inline-flex'}}>
-                            <ControlLabel style={{width:'7em',display:'inline-flex',marginTop:'7px',paddingLeft:'8px'}}>Finish time</ControlLabel>
-                            <FormControl tabIndex='-1' type="text" onMouseEnter={this.changeDisplayFinishTime} onMouseLeave={this.changeDisplayFinishTime}
-                                         style={{paddingLeft:'2px',paddingTop:'2px',height:'28px'}}
-                                         value={this.state.displayedFinishTime}/>
-                        </FormGroup>
+                        <FinishTime/>
                         <Checkbox tabIndex='12' checked={this.props.metric} inline
                                   onClick={this.props.toggleMetric}
                                   style={{padding:'0px 0px 0px 26px',display:'inline-flex'}}>metric</Checkbox>
@@ -193,7 +184,7 @@ class ControlPoints extends Component {
                                    onClick={this.props.toggleDisplayBanked}
                                   style={{padding:'0px 0px 0px 24px', display:'inline-flex'}}>Display banked time</Checkbox>
                         <Checkbox tabIndex="13" checked={this.props.stravaAnalysis} disabled={!this.props.forecastValid} inline
-                                  onClick={this.toggleCompare} style={{display:'inline-flex'}}>Compare</Checkbox>
+                                  onClick={this.props.toggleStravaAnalysis} style={{display:'inline-flex'}}>Compare</Checkbox>
                         <ErrorBoundary>
                             <FormGroup controlId="actualRide" style={{display:'inline-flex', visibility:this.props.stravaAnalysis ? null : 'hidden'}}>
                                 <ControlLabel style={{display:'inline-flex'}}>Strava</ControlLabel>
@@ -258,7 +249,8 @@ class ControlPoints extends Component {
 const mapStateToProps = (state) =>
     ({
         metric: state.controls.metric,
-        controlPoints: state.controls.controlPoints,
+        controlPoints: state.controls.userControlPoints,
+        calculatedValues: state.controls.calculatedValues,
         finishTime: state.routeInfo.finishTime,
         name: state.routeInfo.name,
         actualFinishTime: state.strava.actualFinishTime,
@@ -272,9 +264,8 @@ const mapStateToProps = (state) =>
     });
 
 const mapDispatchToProps = {
-    updateControls, toggleMetric, setStravaActivity, setActualFinishTime, setStravaError, beginStravaFetch,
+    updateControls:updateCalculatedValues, toggleMetric, setStravaActivity, setActualFinishTime, setStravaError, beginStravaFetch,
     toggleDisplayBanked, stravaFetchSuccess, toggleStravaAnalysis, setActualPace, addControl
 };
 
-export const doControlsMatch = ControlPoints.doControlsMatch;
 export default connect(mapStateToProps, mapDispatchToProps)(ControlPoints);

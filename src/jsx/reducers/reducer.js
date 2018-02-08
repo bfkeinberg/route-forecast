@@ -4,7 +4,6 @@ let state = {
         metric:false,
         displayBanked,
         stravaAnalysis,
-        /// bad data model
         /// separate data entered by user from data calculated by route update
         /// updating actual and predicted arrival times, and banked time, should not force a recalc
         /// only distance and duration should do that
@@ -50,7 +49,8 @@ let state = {
         formVisible:true,
         errorDetails,
         errorSource,
-        shortUrl
+        shortUrl,
+        displayedFinishTime
     ],
     params:{
         action: '/forecast',
@@ -126,7 +126,8 @@ const routeParams = function(state = {interval:defaultIntervalInHours,pace:defau
     }
 };
 
-const dialogParams = function(state = {formVisible:true, errorDetails:null, succeeded:true, shortUrl:' '}, action) {
+const dialogParams = function(state = {formVisible:true, errorDetails:null, succeeded:true, shortUrl:' ',
+loadingSource:null}, action) {
     switch (action.type) {
         case Actions.CLEAR_ROUTE_DATA:
             return {...state, loadingSource: null, succeeded: null};
@@ -216,7 +217,7 @@ const controls = function(state = {metric:false,displayBanked:false,stravaAnalys
             return {...state, calculatedControlValues: controls};
         }
         case Actions.SET_ROUTE_INFO: {
-            let controls = action.routeInfo.controls.map(control => {
+            let controls = action.routeInfo.values.map(control => {
                 if (isNaN(control.banked)) {
                     control.banked = null;
                 }
@@ -226,6 +227,8 @@ const controls = function(state = {metric:false,displayBanked:false,stravaAnalys
         }
         case Actions.ADD_CONTROL:
             return {...state, count:state.count+1};
+        case Actions.SET_DISPLAYED_FINISH_TIME:
+            return {...state, displayedFinishTime:action.displayedTime};
         default:
             return state;
     }

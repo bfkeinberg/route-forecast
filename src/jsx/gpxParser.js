@@ -128,7 +128,7 @@ class AnalyzeRoute {
         let points = routeData[rideType].track_points;
         for (let trackPoint of points) {
             let point = {'lat':trackPoint['y'],'lon':trackPoint['x'],'elevation':trackPoint['e']};
-            this.points.push(point);
+            this.points.push(point);    // TODO: what's the difference between points and pointsInRoute?
             bounds = AnalyzeRoute.setMinMaxCoords(point,bounds);
             if (first) {
                 forecastRequests.push(AnalyzeRoute.addToForecast(point, forecastPoint, startTime, accumulatedTime,accumulatedDistanceKm*kmToMiles));
@@ -142,7 +142,8 @@ class AnalyzeRoute {
                 // then find elapsed time given pace
                 accumulatedTime = AnalyzeRoute.calculateElapsedTime(accumulatedClimbMeters, accumulatedDistanceKm, baseSpeed);
             }
-            idlingTime += this.checkAndUpdateControls(accumulatedDistanceKm, startTime, (accumulatedTime + idlingTime), controls, calculatedValues, metric);
+            idlingTime += this.checkAndUpdateControls(accumulatedDistanceKm, startTime,
+                (accumulatedTime + idlingTime), controls, calculatedValues, metric, this.nextControl);
             // see if it's time for forecast
             if (((accumulatedTime + idlingTime) - lastTime) >= intervalInHours) {
                 forecastRequests.push(AnalyzeRoute.addToForecast(point, forecastPoint, startTime, (accumulatedTime + idlingTime),accumulatedDistanceKm*kmToMiles));
@@ -155,8 +156,10 @@ class AnalyzeRoute {
             forecastRequests.push(AnalyzeRoute.addToForecast(previousPoint, forecastPoint, startTime, (accumulatedTime + idlingTime),accumulatedDistanceKm*kmToMiles));
         }
         let finishTime = AnalyzeRoute.formatFinishTime(startTime,accumulatedTime,idlingTime);
-        AnalyzeRoute.fillLastControlPoint(finishTime,controls,this.nextControl,accumulatedTime+idlingTime,accumulatedDistanceKm);
-        return {forecast:forecastRequests,points:this.pointsInRoute,name:trackName,controls:unsortedControls,
+        AnalyzeRoute.fillLastControlPoint(finishTime, controls, this.nextControl, accumulatedTime + idlingTime,
+            accumulatedDistanceKm, calculatedValues);
+        calculatedValues.sort((a,b) => a['val']-b['val']);
+        return {forecast:forecastRequests,points:this.pointsInRoute,name:trackName,values:calculatedValues,
             bounds:bounds, finishTime: finishTime};
     }
 
@@ -175,14 +178,14 @@ class AnalyzeRoute {
         return relative_bearing;
     }
 
-    static fillLastControlPoint(finishTime, controls, nextControl, totalTime, totalDistanceInKm) {
+    static fillLastControlPoint(finishTime, controls, nextControl, totalTime, totalDistanceInKm, calculatedValues) {
         while (nextControl < controls.length)   {
-            controls[nextControl].arrival = finishTime;
             // update banked time also, supplying final distance in km and total time taken
-            controls[nextControl].banked = Math.round(AnalyzeRoute.rusa_time(totalDistanceInKm, totalTime));
-            if (isNaN(controls[nextControl].banked)) {
+            let banked = Math.round(AnalyzeRoute.rusa_time(totalDistanceInKm, totalTime));
+            if (isNaN(banked)) {
                 console.error("Banked time is NaN in fillLastControlPoint");
             }
+            calculatedValues.push({arrival:finishTime,banked:banked,val:controls[nextControl].distance});
             ++nextControl;
         }
     }
@@ -191,21 +194,23 @@ class AnalyzeRoute {
         return moment(startTime).add(accumulatedTime+restTime,'hours').format(finishTimeFormat);
     }
 
+    // TODO - rather than a top-level method calling two lower level methods, it would be cleaner to have two
+    // top-level methods calling one lower-level method
     walkRoute(routeData,type,startTime,pace,interval,controls,metric,timeZoneId) {
         this.clear();
         let modifiedControls = controls.slice();
         modifiedControls.sort((a,b) => a['distance']-b['distance']);
         if (type === 'gpx') {
-            let stream = this.gpxResult.tracks.reduce((accum,current) => accum.concat(current.segments.reduce((accum,current) => accum.concat(current))));
-            return this.analyzeGpxRoute(routeData,startTime,pace,interval,modifiedControls,controls,metric,timeZoneId);
+            let stream = routeData.tracks.reduce((accum,current) => accum.concat(current.segments.reduce((accum,current) => accum.concat(current))));
+            return this.analyzeGpxRoute(routeData,stream,startTime,pace,interval,modifiedControls,controls,metric,timeZoneId);
         } else if (type === 'rwgps') {
-            let stream = this.rwgpsRouteData[rideType]['track_points'].map(point => ({'lat':point['y'],'lon':point['x'],'elevation':point['e']}));
+            let stream = routeData[this.isTrip ? 'trip' : 'route']['track_points'].map(point => ({'lat':point['y'],'lon':point['x'],'elevation':point['e']}));
             return this.analyzeRwgpsRoute(routeData,stream,startTime,pace,interval,modifiedControls,controls,metric,timeZoneId);
         }
         return null;
     }
 
-    analyzeGpxRoute(routeData,userStartTime, pace, intervalInHours, controls, unsortedControls, metric, timeZoneId) {
+    analyzeGpxRoute(routeData,stream,userStartTime, pace, intervalInHours, controls, unsortedControls, metric, timeZoneId) {
         this.nextControl = 0;
         this.pointsInRoute = [];
         let forecastRequests = [];
@@ -243,7 +248,8 @@ class AnalyzeRoute {
                         // then find elapsed time given pace
                         accumulatedTime = AnalyzeRoute.calculateElapsedTime(accumulatedClimbMeters, accumulatedDistanceKm, baseSpeed);
                     }
-                    idlingTime += this.checkAndUpdateControls(accumulatedDistanceKm, startTime, (accumulatedTime + idlingTime), controls, calculatedValues, metric);
+                    idlingTime += this.checkAndUpdateControls(accumulatedDistanceKm, startTime,
+                        (accumulatedTime + idlingTime), controls, calculatedValues, metric, this.nextControl);
                     // see if it's time for forecast
                     if (((accumulatedTime + idlingTime) - lastTime) >= intervalInHours) {
                         forecastRequests.push(AnalyzeRoute.addToForecast(point, forecastPoint, startTime, (accumulatedTime + idlingTime),accumulatedDistanceKm*kmToMiles));
@@ -258,8 +264,10 @@ class AnalyzeRoute {
             forecastRequests.push(AnalyzeRoute.addToForecast(previousPoint, forecastPoint, startTime, (accumulatedTime + idlingTime),accumulatedDistanceKm*kmToMiles));
         }
         let finishTime = AnalyzeRoute.formatFinishTime(startTime,accumulatedTime,idlingTime);
-        AnalyzeRoute.fillLastControlPoint(finishTime,controls,this.nextControl,accumulatedTime+idlingTime,accumulatedDistanceKm);
-        return {forecast:forecastRequests,points:this.pointsInRoute,name:trackName,controls:unsortedControls,
+        AnalyzeRoute.fillLastControlPoint(finishTime, controls, this.nextControl, accumulatedTime + idlingTime,
+            accumulatedDistanceKm, calculatedValues);
+        calculatedValues.sort((a,b) => a['val']-b['val']);
+        return {forecast:forecastRequests,points:this.pointsInRoute,name:trackName,values:calculatedValues,
             bounds:bounds, finishTime:finishTime};
     }
 
@@ -307,27 +315,30 @@ class AnalyzeRoute {
          return (closetimeMinutes - elapsedMinutes);
     }
 
-    checkAndUpdateControls(distanceInKm, startTime, elapsedTimeInHours, controls, calculatedValues, metric) {
-        if (controls.length <= this.nextControl) {
+    checkAndUpdateControls(distanceInKm, startTime, elapsedTimeInHours, controls, calculatedValues, metric, nextControl) {
+        if (controls.length <= nextControl) {
             return 0;
         }
         if (metric)
         {
-            if (distanceInKm < controls[this.nextControl].distance) {
+            if (distanceInKm < controls[nextControl].distance) {
                 return 0
             }
         }
         else {
             let distanceInMiles = distanceInKm*kmToMiles;
-            if (distanceInMiles < controls[this.nextControl].distance) {
+            if (distanceInMiles < controls[nextControl].distance) {
                 return 0
             }
         }
-        let delayInMinutes = controls[this.nextControl]['duration'];
+        let delayInMinutes = controls[nextControl]['duration'];
         let arrivalTime = moment(startTime).add(elapsedTimeInHours,'hours');
-        controls[this.nextControl].arrival = arrivalTime.format(finishTimeFormat);
-        controls[this.nextControl].banked = Math.round(AnalyzeRoute.rusa_time(distanceInKm, elapsedTimeInHours));
-        if (isNaN(controls[this.nextControl].banked)) {
+        let banked = Math.round(AnalyzeRoute.rusa_time(distanceInKm, elapsedTimeInHours));
+        calculatedValues.push({arrival:arrivalTime.format(finishTimeFormat),
+            banked: banked,
+            val:controls[nextControl].distance
+        });
+        if (isNaN(banked)) {
             console.error("Banked time is NaN in checkAndUpdateControls");
         }
         this.nextControl++;
@@ -411,10 +422,10 @@ class AnalyzeRoute {
         return (distance*60)/effectiveSpeed-(distance*60)/initialSpeed;
     }
 
-    adjustForWind(forecastInfo,pace,controls,start,metric) {
+    adjustForWind(forecastInfo,pace,controls,previouslyCalculatedValues,start,metric) {
         let climbInMeters;
         if (forecastInfo.length===0) {
-            return 0;
+            return {time:0,values:[]};
         }
         let baseSpeed = paceToSpeed[pace];
         let forecast = forecastInfo.forecast.slice().reverse();
@@ -424,6 +435,7 @@ class AnalyzeRoute {
         let totalMinutesLost = 0;
         let totalDistanceInMiles = 0;
         let hilliness;
+        let calculatedValues = [];
 
         for (let currentPoint of this.points) {
             if (previousPoint !== null) {
@@ -455,26 +467,34 @@ class AnalyzeRoute {
                 totalMinutesLost += AnalyzeRoute.windToTimeInMinutes(baseSpeed, distanceInMiles, hilliness, effectiveWindSpeed);
 
                 let desiredDistance = metric ? (totalDistanceInMiles/kmToMiles) : totalDistanceInMiles;
-                if (controls.length > currentControl) {
-                    if (desiredDistance >= controls[currentControl].distance) {
-                        let previousArrivalTime = moment(controls[currentControl]['arrival'],finishTimeFormat);
-                        let arrivalTime = previousArrivalTime.add(totalMinutesLost,'minutes');
-                        controls[currentControl]['arrival'] = arrivalTime.format(finishTimeFormat);
-                        let elapsedTimeMs = arrivalTime.toDate()-start;
-                        let elapsedDuration = moment.duration(elapsedTimeMs,'ms');
-                        controls[currentControl].banked = Math.round(AnalyzeRoute.rusa_time(totalDistanceInMiles/kmToMiles, elapsedDuration.asHours()));
-                        if (isNaN(controls[currentControl].banked)) {
-                            console.error("Banked time is NaN in adjustForWind");
-                        }
-
-                        currentControl++;
-                    }
-                }
-
+                currentControl = AnalyzeRoute.calculateValuesForWind(controls, previouslyCalculatedValues,
+                    calculatedValues, currentControl,
+                    desiredDistance, totalMinutesLost, start, totalDistanceInMiles);
             }
             previousPoint = currentPoint;
         }
-        return totalMinutesLost;
+        return {time:totalMinutesLost,values:calculatedValues};
+    }
+
+    static calculateValuesForWind(controls, previouslyCalculatedValues,
+                                  calculatedValues, currentControl, desiredDistance,
+                                  totalMinutesLost, start, totalDistanceInMiles) {
+        if (controls.length > currentControl) {
+            if (desiredDistance >= controls[currentControl].distance) {
+                let previousArrivalTime = moment(previouslyCalculatedValues[currentControl].arrival, finishTimeFormat);
+                let arrivalTime = previousArrivalTime.add(totalMinutesLost, 'minutes');
+                let elapsedTimeMs = arrivalTime.toDate() - start;
+                let elapsedDuration = moment.duration(elapsedTimeMs, 'ms');
+                let banked = Math.round(AnalyzeRoute.rusa_time(totalDistanceInMiles / kmToMiles, elapsedDuration.asHours()));
+                calculatedValues.push({arrival:arrivalTime.format(finishTimeFormat),banked:banked});
+                if (isNaN(banked)) {
+                    console.error("Banked time is NaN in adjustForWind");
+                }
+
+                currentControl++;
+            }
+        }
+        return currentControl;
     }
 }
 

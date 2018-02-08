@@ -268,14 +268,16 @@ export const requestForecast = function(routeInfo) {
                 } })
             .then(async response => {
                 dispatch(forecastFetchSuccess(response));
-                let controlsToUpdate = getState().controls.controlPoints.map( control => ({...control}));
+                let userControls = getState().controls.userControlPoints;
+                let calculatedValues = getState().controls.calculatedValues;
                 const parser = await getRouteParser();
-                let weatherCorrectionMinutes = parser.adjustForWind(
+                let {weatherCorrectionMinutes,recalculatedValues} = parser.adjustForWind(
                     response,getState().uiInfo.routeParams.pace,
-                    controlsToUpdate,getState().uiInfo.routeParams.start,
+                    userControls, calculatedValues,
+                    getState().uiInfo.routeParams.start,
                     getState().uiInfo.routeParams.metric);
                 dispatch(addWeatherCorrection(weatherCorrectionMinutes));
-                dispatch(updateCalculatedValues(controlsToUpdate));
+                dispatch(updateCalculatedValues(recalculatedValues));
             }).catch (error => {
                 let errorMessage = error.message !== undefined ? error.message : error;
                 dispatch(forecastFetchFailure(errorMessage));
@@ -427,6 +429,14 @@ export const setActualFinishTime = function(finishTime) {
     return {
         type: SET_ACTUAL_FINISH_TIME,
         finishTime: finishTime
+    };
+};
+
+export const SET_DISPLAYED_FINISH_TIME = 'SET_DISPLAYED_FINISH_TIME';
+export const setDisplayedFinishTime = function(displayedTime) {
+    return {
+        type: SET_DISPLAYED_FINISH_TIME,
+        displayedTime: displayedTime
     };
 };
 

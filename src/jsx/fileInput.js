@@ -28,7 +28,7 @@ const FileInput = ({loadingSource,loadingSuccess,loadGpxRoute,timezone_api_key})
 };
 
 FileInput.propTypes = {
-    loadingSource:PropTypes.bool.isRequired,
+    loadingSource:PropTypes.string.isRequired,
     loadingSuccess:PropTypes.bool.isRequired,
     loadGpxRoute:PropTypes.func.isRequired,
     timezone_api_key:PropTypes.string.isRequired
@@ -36,8 +36,8 @@ FileInput.propTypes = {
 
 const mapStateToProps = (state) =>
     ({
-        loadingSource: state.uiInfo.routeParams.pace,
-        loadingSuccess: state.strava.actualPace,
+        loadingSource: state.uiInfo.dialogParams.loadingSource,
+        loadingSuccess: state.uiInfo.dialogParams.succeeded,
         timezone_api_key: state.params.timezone_api_key
     });
 

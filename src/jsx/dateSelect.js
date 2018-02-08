@@ -33,7 +33,7 @@ const DateSelect = ({start,setStart}) => {
                 <ControlLabel>Starting time</ControlLabel>
             </OverlayTrigger>
             <Icon iconName="calendar"/>
-            <Flatpickr onChange={(dates, datestr, instance) => {
+            <Flatpickr onChange={(dates) => {
                 setStart(new Date(dates[0]));
             }}
                        options={{enableTime: true,
@@ -49,15 +49,13 @@ const DateSelect = ({start,setStart}) => {
 };
 
 DateSelect.propTypes = {
-    start:PropTypes.string.isRequired,
-    setStart:PropTypes.func.isRequired,
-    actualPace:PropTypes.number
+    start:PropTypes.instanceOf(Date).isRequired,
+    setStart:PropTypes.func.isRequired
 };
 
 const mapStateToProps = (state) =>
     ({
-        start: state.uiInfo.routeParams.pace,
-        actualPace: state.strava.actualPace
+        start: state.uiInfo.routeParams.start
     });
 
 const mapDispatchToProps = {
