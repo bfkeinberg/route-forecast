@@ -133,7 +133,7 @@ export const UPDATE_CALCULATED_VALUES = 'UPDATE_CALCULATED_VALUES';
 export const updateCalculatedValues = function(values) {
     return {
         type: UPDATE_CALCULATED_VALUES,
-        controls: values
+        values: values
     };
 };
 
@@ -269,9 +269,9 @@ export const requestForecast = function(routeInfo) {
             .then(async response => {
                 dispatch(forecastFetchSuccess(response));
                 let userControls = getState().controls.userControlPoints;
-                let calculatedValues = getState().controls.calculatedValues;
+                let calculatedValues = getState().controls.calculatedControlValues;
                 const parser = await getRouteParser();
-                let {weatherCorrectionMinutes,recalculatedValues} = parser.adjustForWind(
+                let {time:weatherCorrectionMinutes,values:recalculatedValues} = parser.adjustForWind(
                     response,getState().uiInfo.routeParams.pace,
                     userControls, calculatedValues,
                     getState().uiInfo.routeParams.start,
@@ -326,18 +326,18 @@ export const shortenUrl = function(url) {
     };
 };
 
-export const SET_ADDRESS = 'SET_ADDRESS';
-export const setAddress = function(address) {
+export const SET_QUERY = 'SET_QUERY';
+export const setQueryString = function(query) {
     return {
-        type: SET_ADDRESS,
-        address: address
+        type: SET_QUERY,
+        queryString: query
     };
 };
 
-export const CLEAR_ADDRESS = 'CLEAR_ADDRESS';
-export const clearAddress = function() {
+export const CLEAR_QUERY = 'CLEAR_QUERY';
+export const clearQueryString = function() {
     return {
-        type: CLEAR_ADDRESS,
+        type: CLEAR_QUERY,
     };
 };
 

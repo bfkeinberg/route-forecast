@@ -8,7 +8,7 @@ import {connect} from 'react-redux';
 import {updateUserControls} from './actions/actions';
 
 const smallScreenWidth = 800;
-const deleteColumnWidth = 22;
+const deleteColumnWidth = 38;
 
 class ControlTable extends Component {
     static propTypes = {
@@ -131,7 +131,7 @@ class ControlTable extends Component {
             this.addRow();
         }
         let rowData = [];
-        newProps.controls.forEach((item,index) => rowData.push({item, ...newProps.calculatedValues[index], id:index}));
+        newProps.controls.forEach((item,index) => rowData.push({...item, ...newProps.calculatedValues[index], id:index}));
         this.api.setRowData(rowData);
     }
 
@@ -182,7 +182,7 @@ class ControlTable extends Component {
             this.columnApi.setColumnWidth(this.columnApi.getColumn('delete'),deleteColumnWidth);
         }
         let rowData = [];
-        this.props.controls.forEach((item,index) => rowData.push({item, ...this.props.calculatedValues[index], id:index}));
+        this.props.controls.forEach((item,index) => rowData.push({...item, ...this.props.calculatedValues[index], id:index}));
         return (<div className="ag-theme-fresh">
             <AgGridReact enableColResize enableSorting animateRows sortingOrder={['asc']} unSortIcon rowData={rowData}
              onGridReady={this.onGridReady} onSortChanged={this.sortChanged} singleClickEdit

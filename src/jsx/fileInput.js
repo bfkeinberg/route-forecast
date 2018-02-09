@@ -28,8 +28,8 @@ const FileInput = ({loadingSource,loadingSuccess,loadGpxRoute,timezone_api_key})
 };
 
 FileInput.propTypes = {
-    loadingSource:PropTypes.string.isRequired,
-    loadingSuccess:PropTypes.bool.isRequired,
+    loadingSource:PropTypes.string,
+    loadingSuccess:PropTypes.bool,
     loadGpxRoute:PropTypes.func.isRequired,
     timezone_api_key:PropTypes.string.isRequired
 };

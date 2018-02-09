@@ -35,6 +35,7 @@ import {
     showForm,
     updateUserControls
 } from "./actions/actions";
+import QueryString from './queryString';
 
 /*
 TODO:
@@ -106,11 +107,6 @@ class RouteWeatherUI extends Component {
         return controlPoints;
     }
 
-    componentWillMount() {
-        // let queryParams = queryString.parse(location.search);
-        // this.updateFromQueryParams(this.props, queryParams);
-    }
-
     updateFromQueryParams(props,queryParams) {
         props.setRwgpsRoute(queryParams.rwgpsRoute);
         props.setStravaToken(RouteWeatherUI.getStravaToken(queryParams));
@@ -133,6 +129,7 @@ class RouteWeatherUI extends Component {
         );
         return (
         <div>
+            <QueryString/>
             <MediaQuery minDeviceWidth={1000}>
                 <SplitPane defaultSize={300} minSize={150} maxSize={530} split="horizontal">
                     <SplitPane defaultSize={550} minSize={150} split='vertical' pane2Style={{'overflow':'scroll'}}>

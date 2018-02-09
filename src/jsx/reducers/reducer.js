@@ -152,6 +152,9 @@ loadingSource:null}, action) {
         case Actions.HIDE_FORM:
             return {...state, formVisible: false};
         case Actions.SET_ERROR_DETAILS:
+            if (action.details instanceof Error) {
+                return {...state, errorDetails: action.details.toString()};
+            }
             return {...state, errorDetails: action.details};
         case Actions.SET_SHORT_URL:
             return {...state, shortUrl: action.url};
@@ -188,7 +191,7 @@ const routeInfo = function(state = {finishTime:'',weatherCorrectionMinutes:null,
 };
 
 const controls = function(state = {metric:false,displayBanked:false,stravaAnalysis:false,
-    userControlPoints:[],calculatedControlValues:[],count:0}, action) {
+    userControlPoints:[],calculatedControlValues:[],count:0,displayedFinishTime:'',queryString:null}, action) {
     switch (action.type) {
         case Actions.SET_METRIC:
             if (action.metric !== undefined) {
@@ -205,30 +208,21 @@ const controls = function(state = {metric:false,displayBanked:false,stravaAnalys
         case Actions.UPDATE_USER_CONTROLS:
             return {...state, userControlPoints: action.controls, count: action.controls.length};
         case Actions.UPDATE_CALCULATED_VALUES: {
-            let controls = action.values.map(control => {
-                if (isNaN(control.banked)) {
-                    control.banked = null;
-                }
-                if (control.arrival === "Invalid date") {
-                    control.arrival = null;
-                }
-                return control;
-            });
-            return {...state, calculatedControlValues: controls};
+            return {...state, calculatedControlValues: action.values};
         }
         case Actions.SET_ROUTE_INFO: {
-            let controls = action.routeInfo.values.map(control => {
-                if (isNaN(control.banked)) {
-                    control.banked = null;
-                }
-                return control;
-            });
-            return {...state, calculatedControlValues: controls};
+            return {...state, calculatedControlValues: action.routeInfo.values,
+                displayedFinishTime:action.routeInfo.finishTime};
         }
         case Actions.ADD_CONTROL:
             return {...state, count:state.count+1};
         case Actions.SET_DISPLAYED_FINISH_TIME:
             return {...state, displayedFinishTime:action.displayedTime};
+        case Actions.SET_QUERY:
+            // here because it encodes the user entered controls
+            return {...state, queryString:action.queryString};
+        case Actions.CLEAR_QUERY:
+            return {...state, queryString:null};
         default:
             return state;
     }

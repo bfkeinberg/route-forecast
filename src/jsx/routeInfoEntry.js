@@ -10,7 +10,6 @@ import {
     Panel,
     Tooltip
 } from 'react-bootstrap';
-import moment from 'moment';
 import React, {Component} from 'react';
 import ShortUrl from './shortUrl';
 import MediaQuery from 'react-responsive';
@@ -23,9 +22,7 @@ import {
     setErrorDetails,
     setPace,
     setRwgpsRoute,
-    setShortUrl,
-    setStart,
-    shortenUrl
+    setStart
 } from './actions/actions';
 import {connect} from 'react-redux';
 import PaceExplanation from './paceExplanation';
@@ -35,8 +32,6 @@ import RidingPace from './ridingPace';
 import Recalculate from './recalculate';
 import FileInput from './fileInput';
 import DateSelect from './dateSelect';
-
-const queryString = require('query-string');
 
 export const paceToSpeed = {'A':10, 'B':12, 'C':14, 'C+':15, 'D-':15, 'D':16, 'D+':17, 'E-':17, 'E':18};
 
@@ -74,8 +69,6 @@ class RouteInfoForm extends Component {
         setPace:PropTypes.func.isRequired,
         setRwgpsRoute:PropTypes.func.isRequired,
         setStart:PropTypes.func.isRequired,
-        setShortUrl:PropTypes.func.isRequired,
-        shortenUrl:PropTypes.func.isRequired,
         routeInfo:PropTypes.object,
         loadFromRideWithGps:PropTypes.func.isRequired,
         recalcRoute:PropTypes.func.isRequired,
@@ -94,7 +87,6 @@ class RouteInfoForm extends Component {
         this.disableSubmit = this.disableSubmit.bind(this);
         this.handleRwgpsRoute = this.handleRwgpsRoute.bind(this);
         this.setRwgpsRoute = this.setRwgpsRoute.bind(this);
-        this.makeFullQueryString = this.makeFullQueryString.bind(this);
         this.paramsChanged = false;
         this.state = {};
         // for when we are loaded with a url that contains a route
@@ -115,21 +107,9 @@ class RouteInfoForm extends Component {
         if (nextProps.routeInfo.name !== '') {
             cookie.save(nextProps.routeInfo.name,this.props.formatControlsForUrl(nextProps.controlPoints));
         }
-        // recalculate if the user updated the controls, say
-        // but there must be a better way to tell than this
-        if (nextProps.metric !== this.props.metric ||
-            nextProps.controlPoints !== this.props.controlPoints) {
-            this.setQueryString(nextProps.controlPoints, nextProps.metric);
-        }
     }
 
     componentDidUpdate() {
-        if (this.paramsChanged) {
-            this.paramsChanged = false;
-            // recalculate if the user changed values in the dialog
-            this.setQueryString(this.props.controlPoints, this.props.metric);
-            this.props.recalcRoute();
-        }
         if (this.fetchAfterLoad && this.props.routeInfo.points !== null && this.props.routeInfo.forecastRequest !== null) {
             this.requestForecast();
             this.fetchAfterLoad = false;
@@ -145,31 +125,6 @@ class RouteInfoForm extends Component {
             return;
         }
         this.props.requestForecast(this.props.routeInfo);
-    }
-
-    makeFullQueryString() {
-        let query = {start:this.props.start,pace:this.props.pace,interval:this.props.interval,
-            rwgpsRoute:this.props.rwgpsRoute,controlPoints:this.props.formatControlsForUrl(this.props.controlPoints)};
-        this.props.shortenUrl(location.origin + '?' + queryString.stringify(query));
-    }
-
-    // this function exists to let us preserve the user's specified start time and share the url for this route
-    // with someone in another time zone
-    static dateToShortDate(date) {
-        return moment(date).format("ddd MMM D YYYY HH:mm:ss");
-    }
-
-    setQueryString(controlPoints, metric) {
-        if (this.props.rwgpsRoute !== '') {
-            let query = {start:RouteInfoForm.dateToShortDate(this.props.start),pace:this.props.pace,interval:this.props.interval,metric:metric,
-                rwgpsRoute:this.props.rwgpsRoute,controlPoints:this.props.formatControlsForUrl(controlPoints)};
-            history.pushState(null, 'nothing', location.origin + '?' + queryString.stringify(query));
-            this.props.shortenUrl(location.origin + '?' + queryString.stringify(query));
-        }
-        else {
-            history.pushState(null, 'nothing', location.origin);
-            this.props.setShortUrl('');
-        }
     }
 
     disableSubmit() {
@@ -370,7 +325,7 @@ const mapStateToProps = (state) =>
 
 const mapDispatchToProps = {
     loadFromRideWithGps, loadGpxRoute, setRwgpsRoute, setPace, setStart, requestForecast,
-    recalcRoute, setErrorDetails, setShortUrl, shortenUrl
+    recalcRoute, setErrorDetails
 };
 
 export const decideValidationStateFor = RouteInfoForm.decideValidationStateFor;
