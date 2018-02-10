@@ -13,7 +13,7 @@ const formatOneControl = function(controlPoint) {
 };
 
 const formatControlsForUrl = function(controlPoints) {
-    return controlPoints.reduce((queryParam,point) => {
+    return controlPoints.filter(point => point.name !== '').reduce((queryParam,point) => {
         return `${formatOneControl(queryParam)}:${formatOneControl(point)}`},'');
 };
 
@@ -24,18 +24,20 @@ const dateToShortDate = function(date) {
 };
 
 const QueryString = ({routeNumber,start,pace,interval,metric,controls,setQueryString,shortenUrl}) => {
-    let query = location.origin;
+    let url = location.origin;
     if (routeNumber !== '') {
         let query = {start:dateToShortDate(start),pace:pace,interval:interval,metric:metric,
             rwgpsRoute:routeNumber,controlPoints:formatControlsForUrl(controls)};
-        query += `?${queryString.stringify(query)}`;
-        shortenUrl(query);
+        url += `/?${queryString.stringify(query)}`;
+        if (url !== location.href) {
+            shortenUrl(url);
+        }
     }
     else {
         setShortUrl('');
     }
-    history.pushState(null, 'nothing', query);
-    setQueryString(query)
+    history.pushState(null, 'nothing', url);
+    // setQueryString(url);
     return null;
 };
 

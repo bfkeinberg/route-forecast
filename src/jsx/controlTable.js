@@ -8,7 +8,7 @@ import {connect} from 'react-redux';
 import {updateUserControls} from './actions/actions';
 
 const smallScreenWidth = 800;
-const deleteColumnWidth = 38;
+const deleteColumnWidth = 39;
 
 class ControlTable extends Component {
     static propTypes = {

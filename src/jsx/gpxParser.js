@@ -10,6 +10,8 @@ export const finishTimeFormat = 'ddd, MMM DD YYYY h:mma';
 class AnalyzeRoute {
     constructor() {
         this.walkRoute = this.walkRoute.bind(this);
+        this.walkRwgpsRoute = this.walkRwgpsRoute.bind(this);
+        this.walkGpxRoute = this.walkGpxRoute.bind(this);
         this.checkAndUpdateControls = this.checkAndUpdateControls.bind(this);
         this.loadRwgpsRoute = this.loadRwgpsRoute.bind(this);
         this.loadGpxFile = this.loadGpxFile.bind(this);
@@ -106,7 +108,7 @@ class AnalyzeRoute {
         });
     }
 
-    analyzeRwgpsRoute(routeData,stream,userStartTime,pace,intervalInHours,controls,unsortedControls,metric,timeZoneId) {
+    analyzeRwgpsRoute(routeData, stream, userStartTime, pace, intervalInHours, controls, metric, timeZoneId) {
         this.nextControl = 0;
         this.pointsInRoute = [];
         let forecastRequests = [];
@@ -202,15 +204,29 @@ class AnalyzeRoute {
         modifiedControls.sort((a,b) => a['distance']-b['distance']);
         if (type === 'gpx') {
             let stream = routeData.tracks.reduce((accum,current) => accum.concat(current.segments.reduce((accum,current) => accum.concat(current))));
-            return this.analyzeGpxRoute(routeData,stream,startTime,pace,interval,modifiedControls,controls,metric,timeZoneId);
+            return this.analyzeGpxRoute(routeData, stream, startTime, pace, interval, modifiedControls, metric, timeZoneId);
         } else if (type === 'rwgps') {
             let stream = routeData[this.isTrip ? 'trip' : 'route']['track_points'].map(point => ({'lat':point['y'],'lon':point['x'],'elevation':point['e']}));
-            return this.analyzeRwgpsRoute(routeData,stream,startTime,pace,interval,modifiedControls,controls,metric,timeZoneId);
+            return this.analyzeRwgpsRoute(routeData, stream, startTime, pace, interval, modifiedControls, metric, timeZoneId);
         }
         return null;
     }
 
-    analyzeGpxRoute(routeData,stream,userStartTime, pace, intervalInHours, controls, unsortedControls, metric, timeZoneId) {
+    walkRwgpsRoute(routeData,startTime,pace,interval,controls,metric,timeZoneId) {
+        let modifiedControls = controls.slice();
+        modifiedControls.sort((a,b) => a['distance']-b['distance']);
+        let stream = routeData[this.isTrip ? 'trip' : 'route']['track_points'].map(point => ({'lat':point['y'],'lon':point['x'],'elevation':point['e']}));
+        return this.analyzeRwgpsRoute(routeData, stream, startTime, pace, interval, modifiedControls, metric, timeZoneId);
+    }
+
+    walkGpxRoute(routeData,startTime,pace,interval,controls,metric,timeZoneId) {
+        let modifiedControls = controls.slice();
+        modifiedControls.sort((a,b) => a['distance']-b['distance']);
+        let stream = routeData.tracks.reduce((accum,current) => accum.concat(current.segments.reduce((accum,current) => accum.concat(current))));
+        return this.analyzeGpxRoute(routeData, stream, startTime, pace, interval, modifiedControls, metric, timeZoneId);
+    }
+
+    analyzeGpxRoute(routeData, stream, userStartTime, pace, intervalInHours, controls, metric, timeZoneId) {
         this.nextControl = 0;
         this.pointsInRoute = [];
         let forecastRequests = [];
@@ -331,7 +347,7 @@ class AnalyzeRoute {
                 return 0
             }
         }
-        let delayInMinutes = controls[nextControl]['duration'];
+        let delayInMinutes = controls[nextControl].duration;
         let arrivalTime = moment(startTime).add(elapsedTimeInHours,'hours');
         let banked = Math.round(AnalyzeRoute.rusa_time(distanceInKm, elapsedTimeInHours));
         calculatedValues.push({arrival:arrivalTime.format(finishTimeFormat),
