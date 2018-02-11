@@ -36,14 +36,6 @@ export const setInterval = function(interval) {
 const getRouteParser = async function () {
     const parser = await import(/* webpackChunkName: "RwgpsParser" */ '../gpxParser');
     return parser.default;
-}
-
-const currentRouteData = function(getState) {
-    if (getState().routeInfo.rwgpsRouteData !== null) {
-        return getState().routeInfo.rwgpsRouteData;
-    } else {
-        return getState().routeInfo.gpxRouteData;
-    }
 };
 
 export const SET_ROUTE_INFO = 'SET_ROUTE_INFO';
@@ -57,21 +49,28 @@ const setRouteInfo = function(routeInfo) {
 export const recalcRoute = function() {
     return async function(dispatch, getState) {
         const parser = await getRouteParser();
-        let routeData = currentRouteData(getState);
         // this may be called before we have chosen a route, in which case it's a noop
-        if (routeData === null) {
-            return;
+        if (getState().routeInfo.rwgpsRouteData !== null) {
+            dispatch(setRouteInfo(
+                parser.walkRwgpsRoute(
+                    getState().routeInfo.rwgpsRouteData,
+                    moment(getState().uiInfo.routeParams.start),
+                    getState().uiInfo.routeParams.pace,
+                    getState().uiInfo.routeParams.interval,
+                    getState().controls.userControlPoints,
+                    getState().controls.metric,
+                    getState().routeInfo.timeZoneId)));
+        } else if (getState().routeInfo.gpxRouteData !== null) {
+            dispatch(setRouteInfo(
+                parser.walkGpxRoute(
+                    getState().routeInfo.gpxRouteData,
+                    moment(getState().uiInfo.routeParams.start),
+                    getState().uiInfo.routeParams.pace,
+                    getState().uiInfo.routeParams.interval,
+                    getState().controls.userControlPoints,
+                    getState().controls.metric,
+                    getState().routeInfo.timeZoneId)));
         }
-        dispatch(setRouteInfo(
-            parser.walkRoute(
-                routeData,
-                getState().uiInfo.dialogParams.loadingSource,
-                moment(getState().uiInfo.routeParams.start),
-                getState().uiInfo.routeParams.pace,
-                getState().uiInfo.routeParams.interval,
-                getState().controls.userControlPoints,
-                getState().controls.metric,
-                getState().routeInfo.timeZoneId)));
     }
 };
 
@@ -272,10 +271,12 @@ export const requestForecast = function(routeInfo) {
                 let calculatedValues = getState().controls.calculatedControlValues;
                 const parser = await getRouteParser();
                 let {time:weatherCorrectionMinutes,values:recalculatedValues} = parser.adjustForWind(
-                    response,getState().uiInfo.routeParams.pace,
+                    getState().forecast.forecast,
+                    getState().routeInfo.points,
+                    getState().uiInfo.routeParams.pace,
                     userControls, calculatedValues,
                     getState().uiInfo.routeParams.start,
-                    getState().uiInfo.routeParams.metric);
+                    getState().controls.metric);
                 dispatch(addWeatherCorrection(weatherCorrectionMinutes));
                 dispatch(updateCalculatedValues(recalculatedValues));
             }).catch (error => {
@@ -482,4 +483,18 @@ export const loadStravaActivity = function(activity) {
     };
 };
 
+const getStravaParser = async function() {
+    const parser = await import(/* webpackChunkName: "StravaRouteParser" */ '../stravaRouteParser');
+    return parser.default;
+};
+
+const computeTimesFromStrava = function (activity,controls,result) {
+    return result;
+};
+
+export const updateExpectedTimes = function(activity) {
+    return function (dispatch,getState) {
+        computeTimesFromStrava(activity,getState().controls.userControlPoints,getState().controls.calculatedControlValues);
+    }
+};
 

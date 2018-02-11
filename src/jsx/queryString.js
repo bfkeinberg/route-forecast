@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
-import {setQueryString, setShortUrl, shortenUrl} from "./actions/actions";
+import {setShortUrl, shortenUrl} from "./actions/actions";
 import moment from 'moment';
 
 const queryString = require('query-string');
@@ -23,13 +23,13 @@ const dateToShortDate = function(date) {
     return moment(date).format("ddd MMM D YYYY HH:mm:ss");
 };
 
-const QueryString = ({routeNumber,start,pace,interval,metric,controls,setQueryString,shortenUrl}) => {
+const QueryString = ({routeNumber,start,pace,interval,metric,controls,/*setQueryString,*/shortenUrl,shortUrl}) => {
     let url = location.origin;
     if (routeNumber !== '') {
         let query = {start:dateToShortDate(start),pace:pace,interval:interval,metric:metric,
             rwgpsRoute:routeNumber,controlPoints:formatControlsForUrl(controls)};
         url += `/?${queryString.stringify(query)}`;
-        if (url !== location.href) {
+        if (url !== location.href || shortUrl === ' ') {
             shortenUrl(url);
         }
     }
@@ -49,10 +49,11 @@ QueryString.propTypes = {
     start:PropTypes.instanceOf(Date).isRequired,
     pace:PropTypes.string.isRequired,
     interval:PropTypes.number.isRequired,
-    setQueryString:PropTypes.func.isRequired,
+    // setQueryString:PropTypes.func.isRequired,
     shortenUrl:PropTypes.func.isRequired,
     setShortUrl:PropTypes.func.isRequired,
-    controls:PropTypes.arrayOf(PropTypes.object).isRequired
+    controls:PropTypes.arrayOf(PropTypes.object).isRequired,
+    shortUrl: PropTypes.string
 };
 
 const mapStateToProps = (state) =>
@@ -62,11 +63,12 @@ const mapStateToProps = (state) =>
         pace: state.uiInfo.routeParams.pace,
         interval: state.uiInfo.routeParams.interval,
         metric: state.controls.metric,
-        controls: state.controls.userControlPoints
+        controls: state.controls.userControlPoints,
+        shortUrl: state.uiInfo.dialogParams.shortUrl
     });
 
 const mapDispatchToProps = {
-    setQueryString, shortenUrl, setShortUrl
+    /*setQueryString, */shortenUrl, setShortUrl
 };
 
 export default connect(mapStateToProps,mapDispatchToProps)(QueryString);

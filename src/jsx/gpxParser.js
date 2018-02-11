@@ -9,7 +9,6 @@ export const finishTimeFormat = 'ddd, MMM DD YYYY h:mma';
 
 class AnalyzeRoute {
     constructor() {
-        this.walkRoute = this.walkRoute.bind(this);
         this.walkRwgpsRoute = this.walkRwgpsRoute.bind(this);
         this.walkGpxRoute = this.walkGpxRoute.bind(this);
         this.checkAndUpdateControls = this.checkAndUpdateControls.bind(this);
@@ -17,10 +16,8 @@ class AnalyzeRoute {
         this.loadGpxFile = this.loadGpxFile.bind(this);
         this.analyzeRwgpsRoute = this.analyzeRwgpsRoute.bind(this);
         this.analyzeGpxRoute = this.analyzeGpxRoute.bind(this);
-        this.clear = this.clear.bind(this);
         this.adjustForWind = this.adjustForWind.bind(this);
         this.isTrip = false;
-        this.points = [];
     }
 
     loadGpxFile(gpxFile, timezone_api_key) {
@@ -59,13 +56,8 @@ class AnalyzeRoute {
         });
     }
 
-    clear() {
-        this.points = [];
-    }
-
     // returns distance traveled in _miles_, and climb in meters
     findDeltas(previousPoint, currentPoint) {
-        this.pointsInRoute.push({'latitude': currentPoint.lat, 'longitude': currentPoint.lon});
         // calculate distance and elevation from last
         let distanceFromLast = gpxParse.utils.calculateDistance(previousPoint.lat, previousPoint.lon,
             currentPoint.lat,currentPoint.lon);
@@ -110,7 +102,6 @@ class AnalyzeRoute {
 
     analyzeRwgpsRoute(routeData, stream, userStartTime, pace, intervalInHours, controls, metric, timeZoneId) {
         this.nextControl = 0;
-        this.pointsInRoute = [];
         let forecastRequests = [];
         let baseSpeed = paceToSpeed[pace];
         let bounds = {min_latitude:90, min_longitude:180, max_latitude:-90, max_longitude:-180};
@@ -127,10 +118,7 @@ class AnalyzeRoute {
         let lastTime = 0;
         // correct start time for time zone
         let startTime = moment.tz(userStartTime.format('YYYY-MM-DDTHH:mm'), timeZoneId);
-        let points = routeData[rideType].track_points;
-        for (let trackPoint of points) {
-            let point = {'lat':trackPoint['y'],'lon':trackPoint['x'],'elevation':trackPoint['e']};
-            this.points.push(point);    // TODO: what's the difference between points and pointsInRoute?
+        stream.forEach(point => {
             bounds = AnalyzeRoute.setMinMaxCoords(point,bounds);
             if (first) {
                 forecastRequests.push(AnalyzeRoute.addToForecast(point, forecastPoint, startTime, accumulatedTime,accumulatedDistanceKm*kmToMiles));
@@ -153,7 +141,7 @@ class AnalyzeRoute {
                 forecastPoint = point;
             }
             previousPoint = point;
-        }
+        });
         if (previousPoint !== null && accumulatedTime !== 0) {
             forecastRequests.push(AnalyzeRoute.addToForecast(previousPoint, forecastPoint, startTime, (accumulatedTime + idlingTime),accumulatedDistanceKm*kmToMiles));
         }
@@ -161,7 +149,7 @@ class AnalyzeRoute {
         AnalyzeRoute.fillLastControlPoint(finishTime, controls, this.nextControl, accumulatedTime + idlingTime,
             accumulatedDistanceKm, calculatedValues);
         calculatedValues.sort((a,b) => a['val']-b['val']);
-        return {forecast:forecastRequests,points:this.pointsInRoute,name:trackName,values:calculatedValues,
+        return {forecast:forecastRequests,points:stream,name:trackName,values:calculatedValues,
             bounds:bounds, finishTime: finishTime};
     }
 
@@ -196,22 +184,6 @@ class AnalyzeRoute {
         return moment(startTime).add(accumulatedTime+restTime,'hours').format(finishTimeFormat);
     }
 
-    // TODO - rather than a top-level method calling two lower level methods, it would be cleaner to have two
-    // top-level methods calling one lower-level method
-    walkRoute(routeData,type,startTime,pace,interval,controls,metric,timeZoneId) {
-        this.clear();
-        let modifiedControls = controls.slice();
-        modifiedControls.sort((a,b) => a['distance']-b['distance']);
-        if (type === 'gpx') {
-            let stream = routeData.tracks.reduce((accum,current) => accum.concat(current.segments.reduce((accum,current) => accum.concat(current))));
-            return this.analyzeGpxRoute(routeData, stream, startTime, pace, interval, modifiedControls, metric, timeZoneId);
-        } else if (type === 'rwgps') {
-            let stream = routeData[this.isTrip ? 'trip' : 'route']['track_points'].map(point => ({'lat':point['y'],'lon':point['x'],'elevation':point['e']}));
-            return this.analyzeRwgpsRoute(routeData, stream, startTime, pace, interval, modifiedControls, metric, timeZoneId);
-        }
-        return null;
-    }
-
     walkRwgpsRoute(routeData,startTime,pace,interval,controls,metric,timeZoneId) {
         let modifiedControls = controls.slice();
         modifiedControls.sort((a,b) => a['distance']-b['distance']);
@@ -228,7 +200,6 @@ class AnalyzeRoute {
 
     analyzeGpxRoute(routeData, stream, userStartTime, pace, intervalInHours, controls, metric, timeZoneId) {
         this.nextControl = 0;
-        this.pointsInRoute = [];
         let forecastRequests = [];
         let baseSpeed = paceToSpeed[pace];
         let bounds = {min_latitude:90, min_longitude:180, max_latitude:-90, max_longitude:-180};
@@ -244,36 +215,34 @@ class AnalyzeRoute {
         let calculatedValues = [];
         // correct start time for time zone
         let startTime = moment.tz(userStartTime.format('YYYY-MM-DDTHH:mm'), timeZoneId);
+        stream.forEach(point => {
+            bounds = AnalyzeRoute.setMinMaxCoords(point,bounds);
+            if (first) {
+                forecastRequests.push(AnalyzeRoute.addToForecast(point, forecastPoint, startTime, accumulatedTime,accumulatedDistanceKm*kmToMiles));
+                first = false;
+            }
+            if (previousPoint !== null) {
+                let deltas = this.findDeltas(previousPoint,point);
+                accumulatedDistanceKm += deltas['distance'];
+                // accumulate elevation gain
+                accumulatedClimbMeters += deltas['climb'];
+                // then find elapsed time given pace
+                accumulatedTime = AnalyzeRoute.calculateElapsedTime(accumulatedClimbMeters, accumulatedDistanceKm, baseSpeed);
+            }
+            idlingTime += this.checkAndUpdateControls(accumulatedDistanceKm, startTime,
+                (accumulatedTime + idlingTime), controls, calculatedValues, metric, this.nextControl);
+            // see if it's time for forecast
+            if (((accumulatedTime + idlingTime) - lastTime) >= intervalInHours) {
+                forecastRequests.push(AnalyzeRoute.addToForecast(point, forecastPoint, startTime, (accumulatedTime + idlingTime),accumulatedDistanceKm*kmToMiles));
+                lastTime = accumulatedTime + idlingTime;
+                forecastPoint = point;
+            }
+            previousPoint = point;
+        });
         for (let track of routeData.tracks) {
             if (trackName === null) {
                 trackName = track.name;
-            }
-            for (let segment of track.segments) {
-                for (let point of segment) {
-                    this.points.push(point);
-                    bounds = AnalyzeRoute.setMinMaxCoords(point,bounds);
-                    if (first) {
-                        forecastRequests.push(AnalyzeRoute.addToForecast(point, forecastPoint, startTime, accumulatedTime,accumulatedDistanceKm*kmToMiles));
-                        first = false;
-                    }
-                    if (previousPoint !== null) {
-                        let deltas = this.findDeltas(previousPoint,point);
-                        accumulatedDistanceKm += deltas['distance'];
-                        // accumulate elevation gain
-                        accumulatedClimbMeters += deltas['climb'];
-                        // then find elapsed time given pace
-                        accumulatedTime = AnalyzeRoute.calculateElapsedTime(accumulatedClimbMeters, accumulatedDistanceKm, baseSpeed);
-                    }
-                    idlingTime += this.checkAndUpdateControls(accumulatedDistanceKm, startTime,
-                        (accumulatedTime + idlingTime), controls, calculatedValues, metric, this.nextControl);
-                    // see if it's time for forecast
-                    if (((accumulatedTime + idlingTime) - lastTime) >= intervalInHours) {
-                        forecastRequests.push(AnalyzeRoute.addToForecast(point, forecastPoint, startTime, (accumulatedTime + idlingTime),accumulatedDistanceKm*kmToMiles));
-                        lastTime = accumulatedTime + idlingTime;
-                        forecastPoint = point;
-                    }
-                    previousPoint = point;
-                }
+                break;
             }
         }
         if (previousPoint !== null && accumulatedTime !== 0) {
@@ -283,7 +252,7 @@ class AnalyzeRoute {
         AnalyzeRoute.fillLastControlPoint(finishTime, controls, this.nextControl, accumulatedTime + idlingTime,
             accumulatedDistanceKm, calculatedValues);
         calculatedValues.sort((a,b) => a['val']-b['val']);
-        return {forecast:forecastRequests,points:this.pointsInRoute,name:trackName,values:calculatedValues,
+        return {forecast:forecastRequests,points:stream,name:trackName,values:calculatedValues,
             bounds:bounds, finishTime:finishTime};
     }
 
@@ -355,7 +324,7 @@ class AnalyzeRoute {
             val:controls[nextControl].distance
         });
         if (isNaN(banked)) {
-            console.error("Banked time is NaN in checkAndUpdateControls");
+            throw new Error("Banked time is NaN in checkAndUpdateControls");
         }
         this.nextControl++;
         return delayInMinutes/60;      // convert from minutes to hours
@@ -438,13 +407,13 @@ class AnalyzeRoute {
         return (distance*60)/effectiveSpeed-(distance*60)/initialSpeed;
     }
 
-    adjustForWind(forecastInfo,pace,controls,previouslyCalculatedValues,start,metric) {
+    adjustForWind(forecastInfo,stream,pace,controls,previouslyCalculatedValues,start,metric) {
         let climbInMeters;
         if (forecastInfo.length===0) {
             return {time:0,values:[]};
         }
         let baseSpeed = paceToSpeed[pace];
-        let forecast = forecastInfo.forecast.slice().reverse();
+        let forecast = forecastInfo.slice().reverse();
         let currentForecast = forecast.pop();
         let currentControl = 0;
         let previousPoint = null;
@@ -453,7 +422,7 @@ class AnalyzeRoute {
         let hilliness;
         let calculatedValues = [];
 
-        for (let currentPoint of this.points) {
+        stream.forEach(currentPoint => {
             if (previousPoint !== null) {
                 let distanceInMiles = gpxParse.utils.calculateDistance(previousPoint.lat, previousPoint.lon,
                     currentPoint.lat,currentPoint.lon);
@@ -469,7 +438,7 @@ class AnalyzeRoute {
                     hilliness = Math.floor(Math.min((climbInFeet / distanceInMiles) / 25, 5));
                 }
                 else {
-                    continue;
+                    return;
                 }
                 // get current forecast
                 if (forecast.length > 0 && totalDistanceInMiles>forecast[forecast.length-1][1]) {
@@ -488,7 +457,8 @@ class AnalyzeRoute {
                     desiredDistance, totalMinutesLost, start, totalDistanceInMiles);
             }
             previousPoint = currentPoint;
-        }
+        });
+
         return {time:totalMinutesLost,values:calculatedValues};
     }
 

@@ -11,6 +11,7 @@ import nw_arrow from "Images/arrow_up_left.png";
 import east_arrow from "Images/arrow_right.png";
 import rainCloud from "Images/rainCloud.png";
 import {connect} from 'react-redux';
+import ErrorBoundary from "./errorBoundary";
 
 /*global google*/
 
@@ -173,13 +174,13 @@ class RouteForecastMap extends Component {
         if (this.state.map === null) {
             return;
         }
-        let southWest = { lat:routeInfo['bounds']['min_latitude'], lng:routeInfo['bounds']['min_longitude'] };
-        let northEast = { lat:routeInfo['bounds']['max_latitude'], lng:routeInfo['bounds']['max_longitude'] };
+        let southWest = { lat:routeInfo.bounds.min_latitude, lng:routeInfo.bounds.min_longitude };
+        let northEast = { lat:routeInfo.bounds.max_latitude, lng:routeInfo.bounds.max_longitude };
         let mapBounds = new google.maps.LatLngBounds(southWest,northEast);
         this.state.map.fitBounds(mapBounds);
         RouteForecastMap.clearMarkers(this.markers);
         this.markers = RouteForecastMap.addMarkers(forecast, this.state.map);
-        let routePoints = routeInfo['points'].map((point) => {return {lat:point.latitude, lng: point.longitude}});
+        let routePoints = routeInfo.points.map((point) => {return {lat:point.lat, lng: point.lon}});
         // clear out old route path line if any
         if (this.routePath != null) {
             this.routePath.setMap(null);
@@ -223,9 +224,11 @@ class RouteForecastMap extends Component {
 
     render() {
         return (
-            <div id="map" ref={mapDiv => this.mapDiv = mapDiv} style={{'height':'100%'}}>
-                <h2 style={{padding:'18px', textAlign:"center"}}>Forecast map</h2>
-            </div>
+            <ErrorBoundary>
+                <div id="map" ref={mapDiv => this.mapDiv = mapDiv} style={{'height':'100%'}}>
+                    <h2 style={{padding:'18px', textAlign:"center"}}>Forecast map</h2>
+                </div>
+            </ErrorBoundary>
         );
     }
 

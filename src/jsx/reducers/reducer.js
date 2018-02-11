@@ -73,6 +73,7 @@ import * as Actions from '../actions/actions';
 import {combineReducers} from 'redux';
 import moment from 'moment';
 import {finishTimeFormat} from '../gpxParser';
+import RouteInfoForm from "../routeInfoEntry";
 
 const defaultPace = 'D';
 const defaultIntervalInHours = 1;
@@ -235,10 +236,16 @@ const strava = function(state = {}, action) {
                 return {...state, token:action.token};
             }
             else {return state;}
-        case Actions.SET_STRAVA_ACTIVITY:
-            if (action.activity !== undefined) {
-                return {...state, activity:action.activity};
-            } else {return state;}
+        case Actions.SET_STRAVA_ACTIVITY: {
+            if (action.activity === undefined) {
+                return state;
+            }
+            let newValue = parseInt(RouteInfoForm.getRouteNumberFromValue(action.activity), 10);
+            if (Number.isNaN(newValue)) {
+                return state;
+            }
+            return {...state, activity:newValue};
+        }
         case Actions.SET_STRAVA_ERROR:
             if (action.error !== undefined) {
                 return {...state, error:action.error};
