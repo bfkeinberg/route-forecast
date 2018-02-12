@@ -169,7 +169,7 @@ class ControlTable extends Component {
     updateFromGrid() {
         let modifiedControls = [];
         this.api.forEachNodeAfterFilterAndSort(node => {
-            const userValues = (({ name, distance, duration }) => ({ name, distance, duration }))(node.data);
+            const userValues = (({ name, distance, duration, id }) => ({ name, distance, duration, id }))(node.data);
             modifiedControls.push(userValues)});
         this.props.updateControls(modifiedControls);
     }

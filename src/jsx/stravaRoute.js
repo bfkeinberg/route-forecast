@@ -17,7 +17,9 @@ const StravaRoute = ({stravaAnalysis,setStravaActivity,strava_activity,updateExp
                                          event.preventDefault();
                                          dt.items[i].getAsString(value => {
                                              setStravaActivity(value);
-                                             updateExpectedTimes(strava_activity);
+                                             if (strava_activity !== ' ') {
+                                                 updateExpectedTimes(strava_activity);
+                                             }
                                          });
                                      } else {
                                          console.log('vetoing drop of',i,dt.items[i].kind);
@@ -40,14 +42,17 @@ const StravaRoute = ({stravaAnalysis,setStravaActivity,strava_activity,updateExp
                              }
                          }}
                          value={strava_activity} onChange={event => {setStravaActivity(event.target.value)}}
-                         onBlur={() => {updateExpectedTimes(strava_activity)}}/>
+                         onBlur={() => {if (strava_activity !== ' ') {updateExpectedTimes(strava_activity)}}}/>
         </FormGroup>
     );
 };
 
 StravaRoute.propTypes = {
     stravaAnalysis:PropTypes.bool.isRequired,
-    strava_activity:PropTypes.number,
+    strava_activity:PropTypes.oneOfType([
+        PropTypes.number,
+        PropTypes.oneOf([' '])
+    ]).isRequired,
     setStravaActivity:PropTypes.func.isRequired,
     updateExpectedTimes:PropTypes.func.isRequired
 };
@@ -55,8 +60,7 @@ StravaRoute.propTypes = {
 const mapStateToProps = (state) =>
     ({
         stravaAnalysis: state.controls.stravaAnalysis,
-        strava_activity: state.strava.activity,
-        timezone_api_key: state.params.timezone_api_key
+        strava_activity: state.strava.activity
     });
 
 const mapDispatchToProps = {

@@ -1,28 +1,14 @@
-import {
-    Alert,
-    Button,
-    ButtonGroup,
-    ButtonToolbar,
-    Checkbox,
-    ControlLabel,
-    FormControl,
-    FormGroup,
-    Glyphicon,
-    Panel
-} from 'react-bootstrap';
+import {Alert, Button, ButtonGroup, ButtonToolbar, Checkbox, Glyphicon, Panel} from 'react-bootstrap';
 import React, {Component} from 'react';
 import MediaQuery from 'react-responsive';
 import ControlTable from './controlTable';
 import {Spinner} from '@blueprintjs/core';
-import RouteInfoForm from "./routeInfoEntry";
 import ErrorBoundary from './errorBoundary';
 import PropTypes from 'prop-types';
 import {
     addControl,
     beginStravaFetch,
-    setActualFinishTime,
     setActualPace,
-    setStravaActivity,
     setStravaError,
     stravaFetchSuccess,
     toggleDisplayBanked,
@@ -32,6 +18,7 @@ import {
 } from './actions/actions';
 import {connect} from 'react-redux';
 import FinishTime from './finishTime';
+import StravaRoute from './stravaRoute';
 
 class ControlPoints extends Component {
 
@@ -42,13 +29,14 @@ class ControlPoints extends Component {
         finishTime: PropTypes.string.isRequired,
         strava_error: PropTypes.string,
         setActualPace:PropTypes.func.isRequired,
-        setActualFinishTime:PropTypes.func.isRequired,
-        strava_activity:PropTypes.number,
+        strava_activity:PropTypes.oneOfType([
+            PropTypes.number,
+            PropTypes.oneOf([' '])
+        ]),
         actualFinishTime:PropTypes.string,
         updateControls:PropTypes.func.isRequired,
         forecastValid:PropTypes.bool.isRequired,
         name:PropTypes.string,
-        setStravaActivity:PropTypes.func.isRequired,
         stravaToken:PropTypes.string,
         beginStravaFetch:PropTypes.func.isRequired,
         addControl:PropTypes.func.isRequired,
@@ -72,13 +60,12 @@ class ControlPoints extends Component {
         this.updateExpectedTimes = this.updateExpectedTimes.bind(this);
         this.stravaErrorCallback = this.stravaErrorCallback.bind(this);
         this.hideStravaErrorAlert = this.hideStravaErrorAlert.bind(this);
-        this.setStravaActivity = this.setStravaActivity.bind(this);
         this.changeDisplayFinishTime = this.changeDisplayFinishTime.bind(this);
         this.computeTimesFromStrava = this.computeTimesFromStrava.bind(this);
         this.state = {
             lookback:this.props.strava_activity!==undefined,
             stravaAlertVisible: false, stravaError: this.props.strava_error, displayedFinishTime:this.props.finishTime,
-            strava_activity: this.props.strava_activity===undefined?' ':this.props.strava_activity, isUpdating:false
+            strava_activity: this.props.strava_activity===undefined?' ':this.props.strava_activity
         };
     }
 
@@ -105,20 +92,12 @@ class ControlPoints extends Component {
 
     stravaErrorCallback(error) {
         this.props.setStravaError(error);
-        this.setState({stravaError:error,stravaAlertVisible:true,isUpdating:false});
+        this.setState({stravaError:error,stravaAlertVisible:true});
     }
 
     static async getStravaParser() {
         const parser = await import(/* webpackChunkName: "StravaRouteParser" */ './stravaRouteParser');
         return parser.default;
-    }
-
-    setStravaActivity(value) {
-        let newValue = parseInt(RouteInfoForm.getRouteNumberFromValue(value), 10);
-        if (Number.isNaN(newValue)) {
-            return;
-        }
-        this.props.setStravaActivity(newValue);
     }
 
     async computeTimesFromStrava(activity, controlPoints) {
@@ -141,10 +120,12 @@ class ControlPoints extends Component {
     }
 
     componentWillReceiveProps(newProps) {
+/*
         if (newProps.strava_activity !== undefined && newProps.strava_activity !== '') {
             this.setState({strava_activity:newProps.strava_activity});
             this.computeTimesFromStrava(newProps.strava_activity, newProps.controlPoints);
         }
+*/
         if (newProps.strava_error !== undefined) {
             this.setState({stravaError:newProps.strava_error});
         }
@@ -155,15 +136,6 @@ class ControlPoints extends Component {
 
     addControl( ) {
         this.props.addControl();
-    }
-
-    static doControlsMatch(newControl, oldControl) {
-        return newControl.distance===oldControl.distance &&
-            newControl.name===oldControl.name &&
-            newControl.duration===oldControl.duration &&
-            newControl.arrival===oldControl.arrival &&
-            newControl.actual===oldControl.actual &&
-            newControl.banked===oldControl.banked;
     }
 
     render () {
@@ -186,42 +158,7 @@ class ControlPoints extends Component {
                         <Checkbox tabIndex="13" checked={this.props.stravaAnalysis} disabled={!this.props.forecastValid} inline
                                   onClick={this.props.toggleStravaAnalysis} style={{display:'inline-flex'}}>Compare</Checkbox>
                         <ErrorBoundary>
-                            <FormGroup controlId="actualRide" style={{display:'inline-flex', visibility:this.props.stravaAnalysis ? null : 'hidden'}}>
-                                <ControlLabel style={{display:'inline-flex'}}>Strava</ControlLabel>
-                                <FormControl tabIndex='-1' type="text" style={{display:'inline-flex'}}
-                                             onDrop={event => {
-                                                 let dt = event.dataTransfer;
-                                                 if (dt.items) {
-                                                     for (let i=0;i < dt.items.length;i++) {
-                                                         if (dt.items[i].kind === 'string') {
-                                                             event.preventDefault();
-                                                             dt.items[i].getAsString(value => {
-                                                                 this.setStravaActivity(value);
-                                                                 this.updateExpectedTimes(this.props.strava_activity);
-                                                             });
-                                                         } else {
-                                                             console.log('vetoing drop of',i,dt.items[i].kind);
-                                                             return false;
-                                                         }
-                                                     }
-                                                 }
-                                             }}
-                                             onDragOver={event => {
-                                                 event.preventDefault();
-                                                 event.dataTransfer.dropEffect = 'move';
-                                             }}
-                                             onDragEnd={event => {
-                                                 let dt = event.dataTransfer;
-                                                 if (dt.items) {
-                                                     // Use DataTransferItemList interface to remove the drag data
-                                                     for (let i = 0;i < dt.items.length;i++) {
-                                                         dt.items.remove(i);
-                                                     }
-                                                 }
-                                             }}
-                                             value={this.props.strava_activity} onChange={event => {this.setStravaActivity(event.target.value)}}
-                                             onBlur={() => {this.updateExpectedTimes(this.props.strava_activity)}}/>
-                            </FormGroup>
+                            <StravaRoute/>
                             {this.state.stravaAlertVisible?<Alert onDismiss={this.hideStravaErrorAlert} bsStyle='warning'>{this.state.stravaError}</Alert>:null}
                             {ControlPoints.showProgressSpinner(this.props.fetchingFromStrava)}
                         </ErrorBoundary>
@@ -253,7 +190,6 @@ const mapStateToProps = (state) =>
         calculatedValues: state.controls.calculatedValues,
         finishTime: state.routeInfo.finishTime,
         name: state.routeInfo.name,
-        actualFinishTime: state.strava.actualFinishTime,
         stravaToken: state.strava.token,
         strava_error: state.strava.error,
         strava_activity: state.strava.activity,
@@ -264,7 +200,7 @@ const mapStateToProps = (state) =>
     });
 
 const mapDispatchToProps = {
-    updateControls:updateCalculatedValues, toggleMetric, setStravaActivity, setActualFinishTime, setStravaError, beginStravaFetch,
+    updateControls:updateCalculatedValues, toggleMetric, setStravaError, beginStravaFetch,
     toggleDisplayBanked, stravaFetchSuccess, toggleStravaAnalysis, setActualPace, addControl
 };
 

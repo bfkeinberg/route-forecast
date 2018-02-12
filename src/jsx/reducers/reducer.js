@@ -78,6 +78,7 @@ import RouteInfoForm from "../routeInfoEntry";
 const defaultPace = 'D';
 const defaultIntervalInHours = 1;
 const startHour = 7;
+const defaultAnalysisIntervalInHours = 12;
 
 const initialStartTime = function() {
     let now = new Date();
@@ -208,8 +209,12 @@ const controls = function(state = {metric:false,displayBanked:false,stravaAnalys
             return {...state, stravaAnalysis: !state.stravaAnalysis};
         case Actions.UPDATE_USER_CONTROLS:
             return {...state, userControlPoints: action.controls, count: action.controls.length};
-        case Actions.UPDATE_CALCULATED_VALUES: {
+        case Actions.UPDATE_CALCULATED_VALUES:
             return {...state, calculatedControlValues: action.values};
+        case Actions.UPDATE_ACTUAL_ARRIVAL_TIMES: {
+            let calculatedValues = [];
+            state.calculatedControlValues.forEach((item,index) => calculatedValues.push({...item, ...action.arrivalTimes[index].time}));
+            return {...state, calculatedControlValues:calculatedValues};
         }
         case Actions.SET_ROUTE_INFO: {
             return {...state, calculatedControlValues: action.routeInfo.values,
@@ -229,7 +234,8 @@ const controls = function(state = {metric:false,displayBanked:false,stravaAnalys
     }
 };
 
-const strava = function(state = {}, action) {
+const strava = function(state = {interval:defaultAnalysisIntervalInHours,activity:' ',
+fetching:false}, action) {
     switch (action.type) {
         case Actions.SET_STRAVA_TOKEN:
             if (action.token !== undefined) {
@@ -244,7 +250,7 @@ const strava = function(state = {}, action) {
             if (Number.isNaN(newValue)) {
                 return state;
             }
-            return {...state, activity:newValue};
+            return {...state, activity:newValue, activityData:null, activityStream:null};
         }
         case Actions.SET_STRAVA_ERROR:
             if (action.error !== undefined) {
@@ -257,11 +263,11 @@ const strava = function(state = {}, action) {
         case Actions.BEGIN_STRAVA_FETCH:
             return {...state, fetching:true};
         case Actions.STRAVA_FETCH_SUCCESS:
-            return {...state, fetching:false, data:action.data};
+            return {...state, fetching:false, activityData:action.data.activity, activityStream:action.data.stream};
         case Actions.STRAVA_FETCH_FAILURE:
             return {...state, fetching:false, error:action.error};
-        case Actions.SET_STRAVA_DATA:
-            return {...state, activityData:action.activityData.activity, activityStream:action.activityData.stream};
+        case Actions.SET_ANALYSIS_INTERVAL:
+            return {...state, analysisInterval:action.interval};
         default:
             return state;
     }

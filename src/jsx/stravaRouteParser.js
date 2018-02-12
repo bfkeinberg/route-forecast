@@ -10,6 +10,7 @@ const metersToFeet = 3.2808;
 class StravaRouteParser {
     constructor() {
         this.processActivityStream = this.processActivityStream.bind(this);
+        this.computeTimesFromData = this.computeTimesFromData.bind(this);
         this.fetchActivity = this.fetchActivity.bind(this);
     }
 
@@ -21,7 +22,7 @@ class StravaRouteParser {
         let activityPromise = this.fetchActivity(activityId, token);
         return new Promise((resolve, reject) => {
             activityPromise.then(activityData => {
-                    let activityDataPromise = this.processActivityStream(activityId);
+                    let activityDataPromise = this.processActivityStream(activityId,token);
                     activityDataPromise.then(activityStream => {
                             if (activityData.message !== undefined) {
                                 cookie.remove('strava_token');
@@ -45,6 +46,12 @@ class StravaRouteParser {
         });
     }
 
+    computeTimesFromData(controlPoints, activityData, activityStream) {
+        return ({controls:this.parseActivity(activityData, activityStream, controlPoints),
+            actualFinishTime:this.computeActualFinishTime(activityData),
+            actualPace:StravaRouteParser.wwPaceCalcForActivity(activityData)});
+    }
+
     computeActualTimes(activityId, controlPoints, token, beginFetch, endFetch) {
         if (token === null) {
             StravaRouteParser.authenticate(activityId);
@@ -54,7 +61,7 @@ class StravaRouteParser {
         let activityPromise = this.fetchActivity(activityId, token);
         return new Promise((resolve, reject) => {
             activityPromise.then(activityData => {
-                let activityDataPromise = this.processActivityStream(activityId);
+                let activityDataPromise = this.processActivityStream(activityId,token);
                 activityDataPromise.then(activityStream => {
                         endFetch('');
                         if (activityData.message !== undefined) {
@@ -67,7 +74,7 @@ class StravaRouteParser {
                             reject(activityStream.message);
                             return;
                         }
-                        console.log(this.findMovingAverage(activityData, activityStream, 4));
+                        console.log(this.findMovingAverages(activityData, activityStream, 4));
                         resolve(({controls:this.parseActivity(activityData, activityStream, controlPoints),
                             actualFinishTime:this.computeActualFinishTime(activityData),
                             actualPace:StravaRouteParser.wwPaceCalcForActivity(activityData)}));
@@ -116,7 +123,7 @@ class StravaRouteParser {
         return promise;
     }
 
-    findMovingAverage(activity,activityStreams,intervalInHours) {
+    findMovingAverages(activity,activityStreams,intervalInHours) {
         let start = moment(activity['start_date']);
         let intervalInSeconds = intervalInHours * 3600;
         let distances = activityStreams.filter(stream => stream.type === 'distance')[0].data;
@@ -177,7 +184,7 @@ class StravaRouteParser {
         return alpha;
     }
 
-    static walkActivity(start, distance, time, controlPoints) {
+    static walkActivity(start, distance, time, controlPoints, arrivalTimes) {
         if (controlPoints.length === 0) {
             return;
         }
@@ -187,9 +194,9 @@ class StravaRouteParser {
         let index = 0;
         for (let value of distance) {
             let distanceInMiles = value * metersToMiles;
-            if (distanceInMiles >= currentControl['distance']) {
+            if (distanceInMiles >= currentControl.distance) {
                 let currentMoment = moment(startMoment).add(time[index],'seconds');
-                currentControl.actual = currentMoment.format('ddd, MMM DD h:mma');
+                arrivalTimes.push({time:currentMoment.format('ddd, MMM DD h:mma'),val:currentControl.id});
                 if (controlsCopy.length===0) {
                     return;
                 } else {
@@ -201,20 +208,22 @@ class StravaRouteParser {
     }
 
     parseActivity(activity, activityStream, controlPoints) {
-        let modifiedControls = controlPoints.map(control => Object.assign({}, control));
+        let arrivalTimes = [];
+        let modifiedControls = controlPoints.slice();
         modifiedControls.sort((a,b) => a['distance']-b['distance']);
         if (activityStream[0].type==='distance') {
-            StravaRouteParser.walkActivity(activity['start_date'], activityStream[0].data, activityStream[1].data,modifiedControls);
+            StravaRouteParser.walkActivity(activity['start_date'], activityStream[0].data, activityStream[1].data,modifiedControls,arrivalTimes);
         } else {
-            StravaRouteParser.walkActivity(activity['start_date'], activityStream[1].data, activityStream[0].data, modifiedControls);
+            StravaRouteParser.walkActivity(activity['start_date'], activityStream[1].data, activityStream[0].data, modifiedControls,arrivalTimes);
         }
-        return modifiedControls;
+        arrivalTimes.sort((a,b) => a['val']-b['val']);
+        return arrivalTimes;
     }
 
-    processActivityStream(activityId) {
+    processActivityStream(activityId,token) {
         const promise = new Promise((resolve, reject) =>
         {
-            strava.streams.activity({access_token:this.token, id:activityId, types:'distance,time,moving,altitude'},
+            strava.streams.activity({access_token:token, id:activityId, types:'distance,time,moving,altitude'},
                 function(err,payload)
                 {
                     if (err) {

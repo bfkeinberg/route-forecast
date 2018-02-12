@@ -321,7 +321,7 @@ class AnalyzeRoute {
         let banked = Math.round(AnalyzeRoute.rusa_time(distanceInKm, elapsedTimeInHours));
         calculatedValues.push({arrival:arrivalTime.format(finishTimeFormat),
             banked: banked,
-            val:controls[nextControl].distance
+            val:controls[nextControl].id
         });
         if (isNaN(banked)) {
             throw new Error("Banked time is NaN in checkAndUpdateControls");

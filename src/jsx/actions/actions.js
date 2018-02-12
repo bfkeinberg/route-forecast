@@ -449,6 +449,14 @@ export const setActualPace = function(pace) {
     };
 };
 
+export const UPDATE_ACTUAL_ARRIVAL_TIMES = 'UPDATE_ACTUAL_ARRIVAL_TIMES';
+export const updateActualArrivalTimes = function(times) {
+    return {
+        type: UPDATE_ACTUAL_ARRIVAL_TIMES,
+        arrivalTimes: times
+    };
+};
+
 export const SET_ACTION_URL = 'SET_ACTION_URL';
 export const setActionUrl = function(action) {
     return {
@@ -475,35 +483,43 @@ export const setTimeZone = function(id,offset) {
     };
 };
 
+export const SET_ANALYSIS_INTERVAL = 'SET_ANALYSIS_INTERVAL';
+export const setAnalysisInterval = function(interval) {
+    return {
+        type: SET_ANALYSIS_INTERVAL,
+        interval: interval
+    };
+};
+
 const getStravaParser = async function() {
     const parser = await import(/* webpackChunkName: "StravaRouteParser" */ '../stravaRouteParser');
     return parser.default;
 };
 
-export const SET_STRAVA_DATA = 'SET_STRAVA_DATA';
-const setStravaData = function (stravaActivityData) {
-    return {
-        type: SET_STRAVA_DATA,
-        activityData: stravaActivityData
-    };
-};
-
 export const loadStravaActivity = function(activity) {
     return async function (dispatch, getState) {
+        if (getState().strava.activityData !== null) {
+            return ({data:getState().strava.activityData,streams:getState().strava.activityStreams})
+        }
         const parser = await getStravaParser();
-        const result = parser.fetchStravaActivity(activity, getState().strava.token);
-        return setStravaData(result);
+        dispatch(beginStravaFetch());
+        parser.fetchStravaActivity(activity, getState().strava.token).then(result => {
+            return dispatch(stravaFetchSuccess(result));
+        }, error => {
+            return dispatch(stravaFetchFailure(error));
+        });
     }
-
-};
-
-const computeTimesFromStrava = function(activity,controls,results) {
-    return results;
 };
 
 export const updateExpectedTimes = function(activity) {
     return function (dispatch,getState) {
-        computeTimesFromStrava(activity,getState().controls.userControlPoints,getState().controls.calculatedControlValues);
+        dispatch(loadStravaActivity(activity)).then( async result => {
+            const parser = await getStravaParser();
+            return dispatch(updateActualArrivalTimes(parser.computeTimesFromData(getState().controls.userControlPoints,
+                result.data, result.streams)));
+        }, error => {
+            dispatch(setStravaError(error));
+        });
     }
 };
 
