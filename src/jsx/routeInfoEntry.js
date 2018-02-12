@@ -1,29 +1,10 @@
 import {Spinner} from '@blueprintjs/core';
-import {
-    Alert,
-    Button,
-    ControlLabel,
-    Form,
-    FormControl,
-    FormGroup,
-    OverlayTrigger,
-    Panel,
-    Tooltip
-} from 'react-bootstrap';
+import {Alert, Button, Form, OverlayTrigger, Panel, Tooltip} from 'react-bootstrap';
 import React, {Component} from 'react';
 import ShortUrl from './shortUrl';
 import MediaQuery from 'react-responsive';
 import PropTypes from 'prop-types';
-import {
-    loadFromRideWithGps,
-    loadGpxRoute,
-    recalcRoute,
-    requestForecast,
-    setErrorDetails,
-    setPace,
-    setRwgpsRoute,
-    setStart
-} from './actions/actions';
+import {loadFromRideWithGps, recalcRoute, requestForecast, setErrorDetails} from './actions/actions';
 import {connect} from 'react-redux';
 import PaceExplanation from './paceExplanation';
 import ForecastInterval from './forecastInterval';
@@ -32,12 +13,7 @@ import RidingPace from './ridingPace';
 import Recalculate from './recalculate';
 import FileInput from './fileInput';
 import DateSelect from './dateSelect';
-
-export const paceToSpeed = {'A':10, 'B':12, 'C':14, 'C+':15, 'D-':15, 'D':16, 'D+':17, 'E-':17, 'E':18};
-
-const tooltip_rwgps_enabled = (
-    <Tooltip id="rwgps_tooltip">The number for a route on ridewithgps</Tooltip>
-);
+import RideWithGpsId from './rideWithGpsId';
 
 // import { Checkbox } from 'react-bootstrap';
 /*
@@ -49,30 +25,18 @@ const rwgps_trip_tooltip = (
 
 class RouteInfoForm extends Component {
     static propTypes = {
-        start:PropTypes.instanceOf(Date),
-        pace:PropTypes.string,
-        interval:PropTypes.number,
         rwgpsRoute:PropTypes.oneOfType([
             PropTypes.number,
             PropTypes.oneOf([''])
         ]),
-        timezone_api_key:PropTypes.string.isRequired,
         controlPoints:PropTypes.arrayOf(PropTypes.object).isRequired,
-        metric:PropTypes.bool.isRequired,
         formatControlsForUrl:PropTypes.func.isRequired,
-        actualPace:PropTypes.number,
         fetchingRoute:PropTypes.bool,
         errorDetails:PropTypes.string,
         fetchingForecast:PropTypes.bool,
-        loadingSuccess:PropTypes.bool,
-        loadingSource:PropTypes.string,
-        setPace:PropTypes.func.isRequired,
-        setRwgpsRoute:PropTypes.func.isRequired,
-        setStart:PropTypes.func.isRequired,
         routeInfo:PropTypes.object,
         loadFromRideWithGps:PropTypes.func.isRequired,
         recalcRoute:PropTypes.func.isRequired,
-        loadGpxRoute:PropTypes.func.isRequired,
         requestForecast:PropTypes.func.isRequired,
         rwgpsRouteIsTrip:PropTypes.bool.isRequired
     };
@@ -85,9 +49,6 @@ class RouteInfoForm extends Component {
         super(props);
         this.requestForecast = this.requestForecast.bind(this);
         this.disableSubmit = this.disableSubmit.bind(this);
-        this.handleRwgpsRoute = this.handleRwgpsRoute.bind(this);
-        this.setRwgpsRoute = this.setRwgpsRoute.bind(this);
-        this.paramsChanged = false;
         this.state = {};
         // for when we are loaded with a url that contains a route
         this.fetchAfterLoad = props.rwgpsRoute !== undefined;
@@ -99,7 +60,7 @@ class RouteInfoForm extends Component {
 
     componentDidMount() {
         if (this.props.rwgpsRoute !== '') {
-            this.props.loadFromRideWithGps(this.props.rwgpsRoute,this.props.rwgpsRouteIsTrip,this.props.timezone_api_key);
+            this.props.loadFromRideWithGps(this.props.rwgpsRoute,this.props.rwgpsRouteIsTrip);
         }
     }
 
@@ -161,26 +122,6 @@ class RouteInfoForm extends Component {
         return value;
     }
 
-    handleRwgpsRoute(value) {
-        let route = RouteInfoForm.getRouteNumberFromValue(value);
-        if (route !== '') {
-            if (isNaN(route)) {
-                return;
-            }
-            this.props.loadFromRideWithGps(route,this.props.rwgpsRouteIsTrip,this.props.timezone_api_key);
-            // clear file input to avoid confusion
-            document.getElementById('route').value = null;
-        }
-    }
-
-    setRwgpsRoute(value) {
-        let route = RouteInfoForm.getRouteNumberFromValue(value);
-        if (isNaN(route)) {
-            return;
-        }
-        this.props.setRwgpsRoute(route);
-    }
-
     static isNumberKey(event) {
         const charCode = (event.which) ? event.which : event.keyCode;
         if ((charCode < 48 || charCode > 57))
@@ -218,50 +159,7 @@ class RouteInfoForm extends Component {
                     <RidingPace/>
                     <PaceExplanation/>
                     <FileInput/>
-                    <FormGroup
-                        validationState={RouteInfoForm.decideValidationStateFor('rwgps',this.props.loadingSource,this.props.loadingSuccess)}
-                        controlId="ridewithgps" style={{flex:'1',display:'inline-flex',marginTop:'5px',marginBottom:'5px'}}>
-                        <ControlLabel>RideWithGps route</ControlLabel>
-                        <OverlayTrigger placement="bottom" overlay={tooltip_rwgps_enabled}>
-                            <FormControl tabIndex='5' type="text"
-                                         onBlur={event => {this.handleRwgpsRoute(event.target.value)}}
-                                         onKeyPress={RouteInfoForm.isNumberKey}
-                                         onChange={event => {this.setRwgpsRoute(event.target.value)}}
-                                         onDrop={event => {
-                                             let dt = event.dataTransfer;
-                                             if (dt.items) {
-                                                 for (let i=0;i < dt.items.length;i++) {
-                                                     if (dt.items[i].kind === 'string') {
-                                                         event.preventDefault();
-                                                         dt.items[i].getAsString(value => {
-                                                             this.setRwgpsRoute(value);
-                                                             this.handleRwgpsRoute(value);
-                                                         });
-                                                     } else {
-                                                         console.log('vetoing drop of',i,dt.items[i].kind);
-                                                         return false;
-                                                     }
-                                                 }
-                                             }
-                                             }}
-                                         onDragOver={event => {
-                                             event.preventDefault();
-                                             event.dataTransfer.dropEffect = 'move';
-                                         }}
-                                         onDragEnd={event => {
-                                             let dt = event.dataTransfer;
-                                             if (dt.items) {
-                                                 // Use DataTransferItemList interface to remove the drag data
-                                                 for (let i = 0;i < dt.items.length;i++) {
-                                                     dt.items.remove(i);
-                                                 }
-                                             }
-                                         }}
-                                         pattern="[0-9]*"
-                                         value={this.props.rwgpsRoute}
-                                         style={{flex:'1',display:'inline-flex',alignItems:'center'}}/>
-                        </OverlayTrigger>
-                    </FormGroup>
+                    <RideWithGpsId/>
 
                     {/* if we want to allow selecting rwgps trips also
 
@@ -307,25 +205,16 @@ class RouteInfoForm extends Component {
 const mapStateToProps = (state) =>
     ({
         rwgpsRoute: state.uiInfo.routeParams.rwgpsRoute,
-        loadingSource: state.uiInfo.dialogParams.loadingSource,
-        loadingSuccess: state.uiInfo.dialogParams.succeeded,
-        start: state.uiInfo.routeParams.start,
-        pace: state.uiInfo.routeParams.pace,
-        actualPace: state.strava.actualPace,
-        interval: state.uiInfo.routeParams.interval,
         fetchingRoute: state.uiInfo.dialogParams.fetchingRoute,
         errorDetails:state.uiInfo.dialogParams.errorDetails,
         routeInfo:state.routeInfo,
         controlPoints:state.controls.userControlPoints,
-        timezone_api_key: state.params.timezone_api_key,
-        metric: state.controls.metric,
         fetchingForecast: state.uiInfo.dialogParams.fetchingForecast,
-        rwgpsRouteIsTrip:state.uiInfo.routeParams.rwgpsRouteIsTrip
+        rwgpsRouteIsTrip:state.uiInfo.routeParams.rwgpsRouteIsTrip,
     });
 
 const mapDispatchToProps = {
-    loadFromRideWithGps, loadGpxRoute, setRwgpsRoute, setPace, setStart, requestForecast,
-    recalcRoute, setErrorDetails
+    loadFromRideWithGps, requestForecast, recalcRoute, setErrorDetails
 };
 
 export const decideValidationStateFor = RouteInfoForm.decideValidationStateFor;

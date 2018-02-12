@@ -95,7 +95,7 @@ const routeParams = function(state = {interval:defaultIntervalInHours,pace:defau
     switch (action.type) {
         case Actions.SET_RWGPS_ROUTE:
             if (action.route !== undefined) {
-                let route = parseInt(action.route);
+                let route = RouteInfoForm.getRouteNumberFromValue(action.route);
                 return {
                     ...state,
                     rwgpsRoute: !isNaN(route) ? route : action.route,
@@ -260,6 +260,8 @@ const strava = function(state = {}, action) {
             return {...state, fetching:false, data:action.data};
         case Actions.STRAVA_FETCH_FAILURE:
             return {...state, fetching:false, error:action.error};
+        case Actions.SET_STRAVA_DATA:
+            return {...state, activityData:action.activityData.activity, activityStream:action.activityData.stream};
         default:
             return state;
     }

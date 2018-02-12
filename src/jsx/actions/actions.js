@@ -148,11 +148,11 @@ export const loadControlsFromCookie = function(routeData) {
     };
 };
 
-export const loadFromRideWithGps = function(routeNumber, isTrip, timezone_api_key) {
-    return async function(dispatch) {
+export const loadFromRideWithGps = function(routeNumber, isTrip) {
+    return async function(dispatch, getState) {
         dispatch(beginLoadingRoute('rwgps'));
         const parser = await getRouteParser();
-        parser.loadRwgpsRoute(routeNumber, isTrip, timezone_api_key).then( (routeData) => {
+        parser.loadRwgpsRoute(routeNumber, isTrip, getState().params.timezone_api_key).then( (routeData) => {
                 dispatch(rwgpsRouteLoadingSuccess(routeData));
                 dispatch(loadControlsFromCookie(routeData.rwgpsRouteData));
                 dispatch(recalcRoute());
@@ -475,21 +475,30 @@ export const setTimeZone = function(id,offset) {
     };
 };
 
-export const LOAD_STRAVA_ACTIVITY = 'LOAD_STRAVA_ACTIVITY';
-export const loadStravaActivity = function(activity) {
-    return {
-        type: LOAD_STRAVA_ACTIVITY,
-        activity: activity
-    };
-};
-
 const getStravaParser = async function() {
     const parser = await import(/* webpackChunkName: "StravaRouteParser" */ '../stravaRouteParser');
     return parser.default;
 };
 
-const computeTimesFromStrava = function (activity,controls,result) {
-    return result;
+export const SET_STRAVA_DATA = 'SET_STRAVA_DATA';
+const setStravaData = function (stravaActivityData) {
+    return {
+        type: SET_STRAVA_DATA,
+        activityData: stravaActivityData
+    };
+};
+
+export const loadStravaActivity = function(activity) {
+    return async function (dispatch, getState) {
+        const parser = await getStravaParser();
+        const result = parser.fetchStravaActivity(activity, getState().strava.token);
+        return setStravaData(result);
+    }
+
+};
+
+const computeTimesFromStrava = function(activity,controls,results) {
+    return results;
 };
 
 export const updateExpectedTimes = function(activity) {

@@ -87,8 +87,8 @@ const mapStateToProps = (state) =>
     ({
         loadingSource: state.uiInfo.dialogParams.loadingSource,
         loadingSuccess: state.uiInfo.dialogParams.succeeded,
-        rwgpsRoute:state.uiInfo.rwgpsRoute,
-        rwgpsRouteIsTrip:state.uiInfo.rwgpsRouteIsTrip,
+        rwgpsRoute:state.uiInfo.routeParams.rwgpsRoute,
+        rwgpsRouteIsTrip:state.uiInfo.routeParams.rwgpsRouteIsTrip,
         timezone_api_key:state.params.timezone_api_key
     });
 
