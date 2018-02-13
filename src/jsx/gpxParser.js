@@ -100,7 +100,7 @@ class AnalyzeRoute {
         });
     }
 
-    analyzeRwgpsRoute(routeData, stream, userStartTime, pace, intervalInHours, controls, metric, timeZoneId) {
+    analyzeRwgpsRoute(trackName, stream, userStartTime, pace, intervalInHours, controls, metric, timeZoneId) {
         this.nextControl = 0;
         let forecastRequests = [];
         let baseSpeed = paceToSpeed[pace];
@@ -112,8 +112,6 @@ class AnalyzeRoute {
         let accumulatedClimbMeters = 0;
         let accumulatedTime = 0;
         let idlingTime = 0;
-        let rideType = this.isTrip ? 'trip' : 'route';
-        let trackName = routeData[rideType].name;
         let calculatedValues = [];
         let lastTime = 0;
         // correct start time for time zone
@@ -188,17 +186,20 @@ class AnalyzeRoute {
         let modifiedControls = controls.slice();
         modifiedControls.sort((a,b) => a['distance']-b['distance']);
         let stream = routeData[this.isTrip ? 'trip' : 'route']['track_points'].map(point => ({'lat':point['y'],'lon':point['x'],'elevation':point['e']}));
-        return this.analyzeRwgpsRoute(routeData, stream, startTime, pace, interval, modifiedControls, metric, timeZoneId);
+        let rideType = this.isTrip ? 'trip' : 'route';
+        let trackName = routeData[rideType].name;
+        return this.analyzeRwgpsRoute(trackName, stream, startTime, pace, interval, modifiedControls, metric, timeZoneId);
     }
 
     walkGpxRoute(routeData,startTime,pace,interval,controls,metric,timeZoneId) {
         let modifiedControls = controls.slice();
         modifiedControls.sort((a,b) => a['distance']-b['distance']);
         let stream = routeData.tracks.reduce((accum,current) => accum.concat(current.segments.reduce((accum,current) => accum.concat(current))));
-        return this.analyzeGpxRoute(routeData, stream, startTime, pace, interval, modifiedControls, metric, timeZoneId);
+        let trackName = routeData.tracks[0].name;
+        return this.analyzeRwgpsRoute(trackName, stream, startTime, pace, interval, modifiedControls, metric, timeZoneId);
     }
 
-    analyzeGpxRoute(routeData, stream, userStartTime, pace, intervalInHours, controls, metric, timeZoneId) {
+    analyzeGpxRoute(trackName, stream, userStartTime, pace, intervalInHours, controls, metric, timeZoneId) {
         this.nextControl = 0;
         let forecastRequests = [];
         let baseSpeed = paceToSpeed[pace];
@@ -210,7 +211,6 @@ class AnalyzeRoute {
         let accumulatedClimbMeters = 0;
         let accumulatedTime = 0;
         let idlingTime = 0;
-        let trackName = null;
         let lastTime = 0;
         let calculatedValues = [];
         // correct start time for time zone
@@ -239,12 +239,6 @@ class AnalyzeRoute {
             }
             previousPoint = point;
         });
-        for (let track of routeData.tracks) {
-            if (trackName === null) {
-                trackName = track.name;
-                break;
-            }
-        }
         if (previousPoint !== null && accumulatedTime !== 0) {
             forecastRequests.push(AnalyzeRoute.addToForecast(previousPoint, forecastPoint, startTime, (accumulatedTime + idlingTime),accumulatedDistanceKm*kmToMiles));
         }

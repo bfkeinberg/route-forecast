@@ -5,43 +5,22 @@ import ControlTable from './controlTable';
 import {Spinner} from '@blueprintjs/core';
 import ErrorBoundary from './errorBoundary';
 import PropTypes from 'prop-types';
-import {
-    addControl,
-    beginStravaFetch,
-    setActualPace,
-    setStravaError,
-    stravaFetchSuccess,
-    toggleDisplayBanked,
-    toggleMetric,
-    toggleStravaAnalysis,
-    updateCalculatedValues
-} from './actions/actions';
+import {addControl, toggleDisplayBanked, toggleMetric, toggleStravaAnalysis} from './actions/actions';
 import {connect} from 'react-redux';
-import FinishTime from './finishTime';
+import FinishTime from './ui/finishTime';
 import StravaRoute from './stravaRoute';
 
 class ControlPoints extends Component {
 
     static propTypes = {
         metric: PropTypes.bool.isRequired,
-        strava_token: PropTypes.string,
-        controlPoints: PropTypes.arrayOf(PropTypes.object).isRequired,
-        finishTime: PropTypes.string.isRequired,
         strava_error: PropTypes.string,
-        setActualPace:PropTypes.func.isRequired,
-        strava_activity:PropTypes.oneOfType([
-            PropTypes.number,
-            PropTypes.oneOf([' '])
-        ]),
         actualFinishTime:PropTypes.string,
         updateControls:PropTypes.func.isRequired,
         forecastValid:PropTypes.bool.isRequired,
         name:PropTypes.string,
-        stravaToken:PropTypes.string,
-        beginStravaFetch:PropTypes.func.isRequired,
         addControl:PropTypes.func.isRequired,
         setStravaError:PropTypes.func.isRequired,
-        stravaFetchSuccess:PropTypes.func.isRequired,
         toggleStravaAnalysis:PropTypes.func.isRequired,
         toggleMetric:PropTypes.func.isRequired,
         displayBanked:PropTypes.bool.isRequired,
@@ -57,15 +36,9 @@ class ControlPoints extends Component {
     constructor(props) {
         super(props);
         this.addControl = this.addControl.bind(this);
-        this.updateExpectedTimes = this.updateExpectedTimes.bind(this);
-        this.stravaErrorCallback = this.stravaErrorCallback.bind(this);
         this.hideStravaErrorAlert = this.hideStravaErrorAlert.bind(this);
-        this.changeDisplayFinishTime = this.changeDisplayFinishTime.bind(this);
-        this.computeTimesFromStrava = this.computeTimesFromStrava.bind(this);
         this.state = {
-            lookback:this.props.strava_activity!==undefined,
-            stravaAlertVisible: false, stravaError: this.props.strava_error, displayedFinishTime:this.props.finishTime,
-            strava_activity: this.props.strava_activity===undefined?' ':this.props.strava_activity
+            stravaAlertVisible: false, stravaError: this.props.strava_error
         };
     }
 
@@ -77,60 +50,13 @@ class ControlPoints extends Component {
         }
     }
 
-    changeDisplayFinishTime(event) {
-        if (event.type === 'mouseenter' && this.props.actualFinishTime !== undefined) {
-            this.setState({displayedFinishTime:this.props.actualFinishTime});
-        }
-        if (event.type === 'mouseleave') {
-            this.setState({displayedFinishTime:this.props.finishTime});
-        }
-    }
-
     hideStravaErrorAlert() {
         this.setState({stravaError:null, stravaAlertVisible:false});
     }
 
-    stravaErrorCallback(error) {
-        this.props.setStravaError(error);
-        this.setState({stravaError:error,stravaAlertVisible:true});
-    }
-
-    static async getStravaParser() {
-        const parser = await import(/* webpackChunkName: "StravaRouteParser" */ './stravaRouteParser');
-        return parser.default;
-    }
-
-    async computeTimesFromStrava(activity, controlPoints) {
-        const stravaParser = await ControlPoints.getStravaParser();
-        stravaParser.computeActualTimes(activity, controlPoints, this.props.stravaToken,
-            this.props.beginStravaFetch, this.props.stravaFetchSuccess).then( result => {
-                this.props.updateControls(result.controls);
-                this.props.setActualFinishTime(result.actualFinishTime);
-                this.props.setActualPace(result.actualPace);
-            },
-            error => this.stravaErrorCallback(error));
-    }
-
-    updateExpectedTimes(value) {
-        let newValue = parseInt(value,10);
-        if (isNaN(newValue)) {
-            return;
-        }
-        this.computeTimesFromStrava(newValue,this.props.controlPoints);
-    }
-
     componentWillReceiveProps(newProps) {
-/*
-        if (newProps.strava_activity !== undefined && newProps.strava_activity !== '') {
-            this.setState({strava_activity:newProps.strava_activity});
-            this.computeTimesFromStrava(newProps.strava_activity, newProps.controlPoints);
-        }
-*/
         if (newProps.strava_error !== undefined) {
-            this.setState({stravaError:newProps.strava_error});
-        }
-        if (newProps.finishTime !== this.props.finishTime) {
-            this.setState({'displayedFinishTime':newProps.finishTime});
+            this.setState({stravaError:newProps.strava_error,stravaAlertVisible:true});
         }
     }
 
@@ -186,13 +112,9 @@ class ControlPoints extends Component {
 const mapStateToProps = (state) =>
     ({
         metric: state.controls.metric,
-        controlPoints: state.controls.userControlPoints,
         calculatedValues: state.controls.calculatedValues,
-        finishTime: state.routeInfo.finishTime,
         name: state.routeInfo.name,
-        stravaToken: state.strava.token,
         strava_error: state.strava.error,
-        strava_activity: state.strava.activity,
         displayBanked: state.controls.displayBanked,
         stravaAnalysis: state.controls.stravaAnalysis,
         fetchingFromStrava: state.strava.fetching,
@@ -200,8 +122,7 @@ const mapStateToProps = (state) =>
     });
 
 const mapDispatchToProps = {
-    updateControls:updateCalculatedValues, toggleMetric, setStravaError, beginStravaFetch,
-    toggleDisplayBanked, stravaFetchSuccess, toggleStravaAnalysis, setActualPace, addControl
+    toggleMetric, toggleDisplayBanked, toggleStravaAnalysis, addControl
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(ControlPoints);

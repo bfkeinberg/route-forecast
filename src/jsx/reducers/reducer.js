@@ -213,7 +213,7 @@ const controls = function(state = {metric:false,displayBanked:false,stravaAnalys
             return {...state, calculatedControlValues: action.values};
         case Actions.UPDATE_ACTUAL_ARRIVAL_TIMES: {
             let calculatedValues = [];
-            state.calculatedControlValues.forEach((item,index) => calculatedValues.push({...item, ...action.arrivalTimes[index].time}));
+            state.calculatedControlValues.forEach((item,index) => calculatedValues.push({...item, actual:action.arrivalTimes[index].time}));
             return {...state, calculatedControlValues:calculatedValues};
         }
         case Actions.SET_ROUTE_INFO: {
@@ -234,8 +234,8 @@ const controls = function(state = {metric:false,displayBanked:false,stravaAnalys
     }
 };
 
-const strava = function(state = {interval:defaultAnalysisIntervalInHours,activity:' ',
-fetching:false}, action) {
+const strava = function(state = {interval:defaultAnalysisIntervalInHours,activity:'',
+    fetching:false}, action) {
     switch (action.type) {
         case Actions.SET_STRAVA_TOKEN:
             if (action.token !== undefined) {
@@ -268,6 +268,8 @@ fetching:false}, action) {
             return {...state, fetching:false, error:action.error};
         case Actions.SET_ANALYSIS_INTERVAL:
             return {...state, analysisInterval:action.interval};
+        case Actions.SET_PACE_OVER_TIME:
+            return {...state,calculatedPaces:action.calculatedPaces};
         default:
             return state;
     }

@@ -51,7 +51,7 @@ StravaRoute.propTypes = {
     stravaAnalysis:PropTypes.bool.isRequired,
     strava_activity:PropTypes.oneOfType([
         PropTypes.number,
-        PropTypes.oneOf([' '])
+        PropTypes.oneOf([''])
     ]).isRequired,
     setStravaActivity:PropTypes.func.isRequired,
     updateExpectedTimes:PropTypes.func.isRequired

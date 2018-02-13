@@ -445,7 +445,7 @@ export const SET_ACTUAL_PACE = 'SET_ACTUAL_PACE';
 export const setActualPace = function(pace) {
     return {
         type: SET_ACTUAL_PACE,
-        finishTime: pace
+        pace: pace
     };
 };
 
@@ -498,28 +498,49 @@ const getStravaParser = async function() {
 
 export const loadStravaActivity = function(activity) {
     return async function (dispatch, getState) {
-        if (getState().strava.activityData !== null) {
-            return ({data:getState().strava.activityData,streams:getState().strava.activityStreams})
+        if (getState().strava.activityData !== null && getState().strava.activityStream !== null) {
+            return new Promise((resolve) => {
+                resolve({
+                    activity: getState().strava.activityData,
+                    stream: getState().strava.activityStream
+                });
+            });
         }
         const parser = await getStravaParser();
         dispatch(beginStravaFetch());
-        parser.fetchStravaActivity(activity, getState().strava.token).then(result => {
-            return dispatch(stravaFetchSuccess(result));
-        }, error => {
-            return dispatch(stravaFetchFailure(error));
-        });
+        return parser.fetchStravaActivity(activity, getState().strava.token);
     }
 };
 
 export const updateExpectedTimes = function(activity) {
     return function (dispatch,getState) {
         dispatch(loadStravaActivity(activity)).then( async result => {
+            dispatch(stravaFetchSuccess(result));
             const parser = await getStravaParser();
-            return dispatch(updateActualArrivalTimes(parser.computeTimesFromData(getState().controls.userControlPoints,
-                result.data, result.streams)));
+            let timesFromData = parser.computeTimesFromData(getState().controls.userControlPoints,
+                result.activity, result.stream);
+            dispatch(updateActualArrivalTimes(timesFromData.controls));
+            dispatch(setActualPace(timesFromData.actualPace));
+            return dispatch(setActualFinishTime(timesFromData.actualFinishTime));
         }, error => {
-            dispatch(setStravaError(error));
+            dispatch(stravaFetchFailure(error));
         });
+    }
+};
+
+export const SET_PACE_OVER_TIME = 'SET_PACE_OVER_TIME';
+export const setPaceOverTime = function(calculatedPaces) {
+    return {
+        type: SET_PACE_OVER_TIME,
+        calculatedPaces: calculatedPaces
+    };
+};
+
+export const getPaceOverTime = function(intervalInHours) {
+    return async function (dispatch,getState) {
+        const parser = await getStravaParser();
+        return dispatch(setPaceOverTime(parser.findMovingAverages(getState().strava.activityData,
+            getState().strava.activityStream, intervalInHours)));
     }
 };
 

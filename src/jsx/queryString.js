@@ -23,11 +23,13 @@ const dateToShortDate = function(date) {
     return moment(date).format("ddd MMM D YYYY HH:mm:ss");
 };
 
-const QueryString = ({routeNumber,start,pace,interval,metric,controls,/*setQueryString,*/shortenUrl,shortUrl}) => {
+const QueryString = ({routeNumber,start,pace,interval,metric,controls,/*setQueryString,*/
+                         shortenUrl,shortUrl,strava_activity}) => {
     let url = location.origin;
     if (routeNumber !== '') {
         let query = {start:dateToShortDate(start),pace:pace,interval:interval,metric:metric,
-            rwgpsRoute:routeNumber,controlPoints:formatControlsForUrl(controls)};
+            rwgpsRoute:routeNumber,controlPoints:formatControlsForUrl(controls),
+            strava_activity:strava_activity};
         url += `/?${queryString.stringify(query)}`;
         if (url !== location.href || shortUrl === ' ') {
             shortenUrl(url);
@@ -43,6 +45,10 @@ const QueryString = ({routeNumber,start,pace,interval,metric,controls,/*setQuery
 
 QueryString.propTypes = {
     routeNumber:PropTypes.oneOfType([
+        PropTypes.number,
+        PropTypes.oneOf([''])
+    ]),
+    strava_activity:PropTypes.oneOfType([
         PropTypes.number,
         PropTypes.oneOf([''])
     ]),
@@ -64,7 +70,8 @@ const mapStateToProps = (state) =>
         interval: state.uiInfo.routeParams.interval,
         metric: state.controls.metric,
         controls: state.controls.userControlPoints,
-        shortUrl: state.uiInfo.dialogParams.shortUrl
+        shortUrl: state.uiInfo.dialogParams.shortUrl,
+        strava_activity: state.strava.activity
     });
 
 const mapDispatchToProps = {

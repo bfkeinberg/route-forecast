@@ -2,7 +2,7 @@ import queryString from 'query-string';
 import moment from 'moment';
 import strava from 'strava-v3'
 import cookie from 'react-cookies';
-import {paceToSpeed} from './ridingPace';
+import {paceToSpeed} from './ui/ridingPace';
 
 const metersToMiles = 0.00062137;
 const metersToFeet = 3.2808;
@@ -74,7 +74,6 @@ class StravaRouteParser {
                             reject(activityStream.message);
                             return;
                         }
-                        console.log(this.findMovingAverages(activityData, activityStream, 4));
                         resolve(({controls:this.parseActivity(activityData, activityStream, controlPoints),
                             actualFinishTime:this.computeActualFinishTime(activityData),
                             actualPace:StravaRouteParser.wwPaceCalcForActivity(activityData)}));

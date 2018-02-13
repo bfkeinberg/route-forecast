@@ -1,19 +1,19 @@
 import {Spinner} from '@blueprintjs/core';
 import {Alert, Button, Form, OverlayTrigger, Panel, Tooltip} from 'react-bootstrap';
 import React, {Component} from 'react';
-import ShortUrl from './shortUrl';
+import ShortUrl from './ui/shortUrl';
 import MediaQuery from 'react-responsive';
 import PropTypes from 'prop-types';
 import {loadFromRideWithGps, recalcRoute, requestForecast, setErrorDetails} from './actions/actions';
 import {connect} from 'react-redux';
 import PaceExplanation from './paceExplanation';
-import ForecastInterval from './forecastInterval';
+import ForecastInterval from './ui/forecastInterval';
 import cookie from 'react-cookies';
-import RidingPace from './ridingPace';
+import RidingPace from './ui/ridingPace';
 import Recalculate from './recalculate';
-import FileInput from './fileInput';
-import DateSelect from './dateSelect';
-import RideWithGpsId from './rideWithGpsId';
+import FileInput from './ui/fileInput';
+import DateSelect from './ui/dateSelect';
+import RideWithGpsId from './ui/rideWithGpsId';
 
 // import { Checkbox } from 'react-bootstrap';
 /*
