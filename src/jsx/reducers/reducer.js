@@ -171,8 +171,8 @@ const routeInfo = function(state = {finishTime:'',weatherCorrectionMinutes:null,
             return {...state,rwgpsRouteData:action.routeData.rwgpsRouteData,timeZoneOffset:action.routeData.timeZoneOffset,
                 timeZoneId:action.routeData.timeZoneId, gpxRouteData:null};
         case Actions.GPX_ROUTE_LOADING_SUCCESS:
-            return {...state,gpxRouteData:action.routeData.gpxRouteData,timeZoneOffset:action.routeData.timeZoneOffset,
-                timeZoneId:action.routeData.timeZoneId, rwgpsRouteData:null};
+            return {...state,gpxRouteData:action.gpxRouteData,timeZoneOffset:action.timeZoneOffset,
+                timeZoneId:action.timeZoneId, rwgpsRouteData:null};
         case Actions.SET_ROUTE_INFO:
             if (action.routeInfo===null) {
                 return {...state,rwgpsRouteData:null,gpxRouteData:null,points:[],bounds:null,name:'',forecastRequest:null};
@@ -234,8 +234,8 @@ const controls = function(state = {metric:false,displayBanked:false,stravaAnalys
     }
 };
 
-const strava = function(state = {interval:defaultAnalysisIntervalInHours,activity:'',
-    fetching:false}, action) {
+const strava = function(state = {analysisInterval:defaultAnalysisIntervalInHours,activity:'',
+    fetching:false,calculatedPaces:null}, action) {
     switch (action.type) {
         case Actions.SET_STRAVA_TOKEN:
             if (action.token !== undefined) {
@@ -250,7 +250,7 @@ const strava = function(state = {interval:defaultAnalysisIntervalInHours,activit
             if (Number.isNaN(newValue)) {
                 return state;
             }
-            return {...state, activity:newValue, activityData:null, activityStream:null};
+            return {...state, activity:newValue, activityData:null, activityStream:null, calculatedPaces:null};
         }
         case Actions.SET_STRAVA_ERROR:
             if (action.error !== undefined) {
@@ -267,7 +267,7 @@ const strava = function(state = {interval:defaultAnalysisIntervalInHours,activit
         case Actions.STRAVA_FETCH_FAILURE:
             return {...state, fetching:false, error:action.error};
         case Actions.SET_ANALYSIS_INTERVAL:
-            return {...state, analysisInterval:action.interval};
+            return {...state, analysisInterval:parseInt(action.interval)};
         case Actions.SET_PACE_OVER_TIME:
             return {...state,calculatedPaces:action.calculatedPaces};
         default:

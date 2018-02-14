@@ -38,7 +38,7 @@ class AnalyzeRoute {
                     })
                 });
                 parseGpx.then(gpxData => {
-                    let point = this.gpxResult.tracks[0].segments[0][0];
+                    let point = gpxData.tracks[0].segments[0][0];
                     // using current date and time for zone lookup could pose a problem in future
                     let timeZonePromise = this.findTimezoneForPoint(point.lat, point.lon, moment(), timezone_api_key);
                     timeZonePromise.then(timeZoneResult => {

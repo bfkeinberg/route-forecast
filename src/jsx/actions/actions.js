@@ -33,6 +33,14 @@ export const setInterval = function(interval) {
     }
 };
 
+export const SET_ROUTE_IS_TRIP = 'SET_ROUTE_IS_TRIP';
+export const setRouteIsTrip = function(routeIsTrip) {
+    return {
+        type: SET_ROUTE_IS_TRIP,
+        interval: routeIsTrip
+    }
+};
+
 const getRouteParser = async function () {
     const parser = await import(/* webpackChunkName: "RwgpsParser" */ '../gpxParser');
     return parser.default;

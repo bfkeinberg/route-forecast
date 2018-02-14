@@ -2,18 +2,19 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import {ControlLabel, FormControl, FormGroup, OverlayTrigger, Tooltip} from 'react-bootstrap';
 import {connect} from 'react-redux';
-import {setAnalysisInterval} from "../actions/actions";
+import {getPaceOverTime, setAnalysisInterval} from "../actions/actions";
 
-const AnalysisInterval = ({interval,setInterval}) => {
+const AnalysisInterval = ({interval,setInterval,getPaceOverTime,visible}) => {
     const interval_tooltip_id = 'interval_tooltip';
     const interval_tooltip_text = 'Interval at which to calculate effective pace';
     let interval_tooltip = ( <Tooltip id={interval_tooltip_id}>{interval_tooltip_text}</Tooltip> );
+    const isVisible = visible ? 'inline-flex' : 'none';
     return (
-        <FormGroup style={{flex:'1',display:'inline-flex'}} controlId="analysisInterval">
+        <FormGroup style={{flex:'1',display:isVisible}} controlId="analysisInterval">
             <ControlLabel>Analysis Interval</ControlLabel>
             <OverlayTrigger placement="bottom" overlay={interval_tooltip}>
                 <FormControl componentClass="select" value={interval} name="analysisInterval"
-                             onChange={event => {setInterval(event.target.value)}}>
+                             onChange={event => {setInterval(event.target.value);getPaceOverTime(event.target.value)}}>
                     <option value="4">4</option>
                     <option value="8">8</option>
                     <option value="12">12</option>
@@ -25,8 +26,10 @@ const AnalysisInterval = ({interval,setInterval}) => {
 };
 
 AnalysisInterval.propTypes = {
-    interval:PropTypes.string.isRequired,
-    setInterval:PropTypes.func.isRequired
+    interval:PropTypes.number.isRequired,
+    setInterval:PropTypes.func.isRequired,
+    visible:PropTypes.bool.isRequired,
+    getPaceOverTime:PropTypes.func
 };
 
 const mapStateToProps = (state) =>
@@ -35,7 +38,7 @@ const mapStateToProps = (state) =>
     });
 
 const mapDispatchToProps = {
-    setAnalysisInterval
+    setInterval:setAnalysisInterval,getPaceOverTime
 };
 
 export default connect(mapStateToProps,mapDispatchToProps)(AnalysisInterval);

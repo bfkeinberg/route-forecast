@@ -3,6 +3,7 @@ import {Table} from 'react-bootstrap';
 import ErrorBoundary from "./errorBoundary";
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
+import 'animate.css/animate.min.css';
 
 class PaceTable extends Component {
     static propTypes = {
@@ -15,28 +16,23 @@ class PaceTable extends Component {
     }
 
     static expandTable(paces) {
-        const redText = ({color:'red'});
-        const orange = ({color:'darkOrange'});
-        const skyBlue = ({color:'deepSkyBlue'});
-        if (paces.length > 0) {
-            return (
-                <tbody>
-                {paces.map((pace) =>
-                    <tr key={pace.distance+Math.random().toString(10)}>
-                        <td>{pace.time}</td>
-                        <td>{pace.pace}</td>
-                        <td>{pace.alphaPace}</td>
-                        <td>{pace.distance}</td>
-                    </tr>
-                )}
-                </tbody>
-            );
-        }
+        return (
+            <tbody>
+            {paces.map((pace) =>
+                <tr key={pace.distance+Math.random().toString(10)}>
+                    <td>{pace.time}</td>
+                    <td>{pace.pace.toFixed(1)}</td>
+                    <td>{pace.alphaPace}</td>
+                    <td>{pace.distance.toFixed(0)}</td>
+                </tr>
+            )}
+            </tbody>
+        );
     }
 
     render() {
         return (
-                <div>
+                <div className="animated slideInLeft">
                     <ErrorBoundary>
                     <Table striped condensed hover bordered>
                         <thead>
@@ -57,7 +53,7 @@ class PaceTable extends Component {
 
 const mapStateToProps = (state) =>
     ({
-        calculatedPaces: state.strava.calculatedPaces,
+        calculatedPaces: state.strava.calculatedPaces
     });
 
 export default connect(mapStateToProps)(PaceTable);

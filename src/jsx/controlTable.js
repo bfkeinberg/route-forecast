@@ -41,7 +41,8 @@ class ControlTable extends Component {
                 {colId:'banked', field:'banked', headerTooltip:'Time remaining at brevet pace',
                     cellRenderer:"agAnimateShowChangeCellRenderer",
                     suppressNavigable:true, suppressSorting:true, type:'numericColumn', valueFormatter:ControlTable.appendUnit, hide:!displayBanked, headerName:'Banked time'},
-                {colId:'delete', suppressNavigable:true, suppressSorting:true, cellRenderer:this.deleteRenderer}
+                {colId:'delete', suppressNavigable:true, suppressSorting:true, suppressSizeToFit: true,
+                    pinned:'right', cellRenderer:this.deleteRenderer}
             ]};
         this.addRow = this.addRow.bind(this);
         this.onGridReady = this.onGridReady.bind(this);
@@ -133,6 +134,10 @@ class ControlTable extends Component {
         let rowData = [];
         newProps.controls.forEach((item,index) => rowData.push({...item, ...newProps.calculatedValues[index], id:index}));
         this.api.setRowData(rowData);
+        if (newProps.displayBanked !== this.props.displayBanked || newProps.compare !== this.props.compare) {
+            this.columnApi.autoSizeAllColumns();
+            // this.api.sizeColumnsToFit();
+        }
     }
 
     static setData(params) {

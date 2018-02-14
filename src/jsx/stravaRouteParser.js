@@ -123,7 +123,7 @@ class StravaRouteParser {
     }
 
     findMovingAverages(activity,activityStreams,intervalInHours) {
-        let start = moment(activity['start_date']);
+        let start = moment(activity.start_date);
         let intervalInSeconds = intervalInHours * 3600;
         let distances = activityStreams.filter(stream => stream.type === 'distance')[0].data;
         let times = activityStreams.filter(stream => stream.type === 'time')[0].data;

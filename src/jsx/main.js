@@ -36,12 +36,12 @@ import {
     updateUserControls
 } from "./actions/actions";
 import QueryString from './queryString';
+import PaceTable from './paceTable';
 
 /*
 TODO:
 integrate with error log service
 immutable.js
-Simplify gpxParser to have one method that analyzes, using destructuring to simplify
 
 feature requests:
 show controls on map
@@ -59,7 +59,8 @@ class RouteWeatherUI extends Component {
         setApiKeys:PropTypes.func.isRequired,
         updateControls:PropTypes.func.isRequired,
         formVisible:PropTypes.bool.isRequired,
-        showForm:PropTypes.func.isRequired
+        showForm:PropTypes.func.isRequired,
+        showPacePerTme:PropTypes.bool.isRequired
     };
 
     constructor(props) {
@@ -139,14 +140,14 @@ class RouteWeatherUI extends Component {
                         </ErrorBoundary>
                     </SplitPane>
                         <SplitPane defaultSize={500} minSize={150} split="vertical" paneStyle={{'overflow':'scroll'}}>
-                            <ForecastTable/>
+                            {this.props.showPacePerTme?<PaceTable/>:<ForecastTable/>}
                             <RouteForecastMap/>
                         </SplitPane>
                 </SplitPane>
             </MediaQuery>
             <MediaQuery maxDeviceWidth={800}>
-                <SplitPane defaultSize={this.state.formVisible?500:250} minSize={120} maxSize={600} split="horizontal" pane2Style={{'overflow':'scroll'}}>
-                    <SplitPane defaultSize={this.state.formVisible?319:33} minSize={30} split="horizontal" pane2Style={{'overflow':'scroll'}}>
+                <SplitPane defaultSize={this.props.formVisible?500:250} minSize={120} maxSize={600} split="horizontal" pane2Style={{'overflow':'scroll'}}>
+                    <SplitPane defaultSize={this.props.formVisible?319:33} minSize={30} split="horizontal" pane2Style={{'overflow':'scroll'}}>
                         {this.props.formVisible ? inputForm : formButton}
                         <ControlPoints/>
                     </SplitPane>
@@ -166,7 +167,8 @@ const mapDispatchToProps = {
 const mapStateToProps = (state) =>
     ({
         controlPoints: state.controls.controlPoints,
-        formVisible: state.uiInfo.dialogParams.formVisible
+        formVisible: state.uiInfo.dialogParams.formVisible,
+        showPacePerTme:state.controls.stravaAnalysis && state.strava.calculatedPaces !== null
     });
 
 export default connect(mapStateToProps, mapDispatchToProps)(RouteWeatherUI);

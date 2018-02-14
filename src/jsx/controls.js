@@ -9,6 +9,7 @@ import {addControl, toggleDisplayBanked, toggleMetric, toggleStravaAnalysis} fro
 import {connect} from 'react-redux';
 import FinishTime from './ui/finishTime';
 import StravaRoute from './stravaRoute';
+import AnalysisInterval from './ui/analysisInterval';
 
 class ControlPoints extends Component {
 
@@ -16,11 +17,10 @@ class ControlPoints extends Component {
         metric: PropTypes.bool.isRequired,
         strava_error: PropTypes.string,
         actualFinishTime:PropTypes.string,
-        updateControls:PropTypes.func.isRequired,
+        hasStravaData:PropTypes.bool.isRequired,
         forecastValid:PropTypes.bool.isRequired,
         name:PropTypes.string,
         addControl:PropTypes.func.isRequired,
-        setStravaError:PropTypes.func.isRequired,
         toggleStravaAnalysis:PropTypes.func.isRequired,
         toggleMetric:PropTypes.func.isRequired,
         displayBanked:PropTypes.bool.isRequired,
@@ -68,6 +68,7 @@ class ControlPoints extends Component {
         const title = this.props.name === '' ?
             ( <h3 style={{textAlign:"center"}}>Control point list</h3> ) :
             ( <h3 style={{textAlign:"center"}}>Control point list for <i>{this.props.name}</i></h3> );
+        const showAnalysisInterval = this.props.hasStravaData && this.props.stravaAnalysis;
         return (
             <div className="controlPoints">
                 <ButtonToolbar style={{display:'inline-flex',flexDirection:'row', paddingTop:'11px',paddingLeft:'4px'}}>
@@ -75,16 +76,16 @@ class ControlPoints extends Component {
                     <ButtonGroup>
                         <Button tabIndex='10' onClick={this.addControl} id='addButton'><Glyphicon glyph="plus-sign"/>Add control point</Button>
                         <FinishTime/>
-                        <Checkbox tabIndex='12' checked={this.props.metric} inline
-                                  onClick={this.props.toggleMetric}
+                        <Checkbox tabIndex='12' checked={this.props.metric} inline onClick={this.props.toggleMetric}
                                   style={{padding:'0px 0px 0px 26px',display:'inline-flex'}}>metric</Checkbox>
                         <Checkbox tabIndex='11' checked={this.props.displayBanked} inline
-                                   onClick={this.props.toggleDisplayBanked}
+                                  onClick={this.props.toggleDisplayBanked}
                                   style={{padding:'0px 0px 0px 24px', display:'inline-flex'}}>Display banked time</Checkbox>
                         <Checkbox tabIndex="13" checked={this.props.stravaAnalysis} disabled={!this.props.forecastValid} inline
                                   onClick={this.props.toggleStravaAnalysis} style={{display:'inline-flex'}}>Compare</Checkbox>
                         <ErrorBoundary>
                             <StravaRoute/>
+                            <AnalysisInterval visible={showAnalysisInterval}/>
                             {this.state.stravaAlertVisible?<Alert onDismiss={this.hideStravaErrorAlert} bsStyle='warning'>{this.state.stravaError}</Alert>:null}
                             {ControlPoints.showProgressSpinner(this.props.fetchingFromStrava)}
                         </ErrorBoundary>
@@ -118,7 +119,8 @@ const mapStateToProps = (state) =>
         displayBanked: state.controls.displayBanked,
         stravaAnalysis: state.controls.stravaAnalysis,
         fetchingFromStrava: state.strava.fetching,
-        forecastValid: state.forecast.valid
+        forecastValid: state.forecast.valid,
+        hasStravaData: state.strava.activityData !== null
     });
 
 const mapDispatchToProps = {

@@ -6,7 +6,7 @@ import {setStravaActivity, updateExpectedTimes} from "./actions/actions";
 
 const StravaRoute = ({stravaAnalysis,setStravaActivity,strava_activity,updateExpectedTimes}) => {
     return (
-        <FormGroup controlId="actualRide" style={{display:'inline-flex', visibility:stravaAnalysis ? null : 'hidden'}}>
+        <FormGroup controlId="actualRide" style={{display:stravaAnalysis?'inline-flex':'none'}}>
             <ControlLabel style={{display:'inline-flex'}}>Strava</ControlLabel>
             <FormControl tabIndex='-1' type="text" style={{display:'inline-flex'}}
                          onDrop={event => {

@@ -15,14 +15,6 @@ import FileInput from './ui/fileInput';
 import DateSelect from './ui/dateSelect';
 import RideWithGpsId from './ui/rideWithGpsId';
 
-// import { Checkbox } from 'react-bootstrap';
-/*
-const rwgps_trip_tooltip = (
-    <Tooltip id="trip_tooltip">Ride with GPS has both 'trips' and 'routes'.
-        Routes are created with the planner, trips are recorded rides.</Tooltip>
-);
-*/
-
 class RouteInfoForm extends Component {
     static propTypes = {
         rwgpsRoute:PropTypes.oneOfType([
@@ -163,13 +155,6 @@ class RouteInfoForm extends Component {
 
                     {/* if we want to allow selecting rwgps trips also
 
-                     <FormGroup controlId="rwgpsType">
-                     <ControlLabel style={{padding:'10px'}}>RideWithGps trip</ControlLabel>
-                     <OverlayTrigger overlay={rwgps_trip_tooltip}>
-                     <Checkbox onClick={event => this.setState({rwgpsRouteIsTrip:!this.state.rwgpsRouteIsTrip})}
-                     checked={this.state.rwgpsRouteIsTrip}>Rwgps number is a trip</Checkbox>
-                     </OverlayTrigger>
-                     </FormGroup>
                      */}
                     <OverlayTrigger placement='bottom' overlay={forecast_tooltip}>
                         <div style={{'display':'inline-flex',padding:'0px 14px'}} cursor='not-allowed'>
