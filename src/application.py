@@ -24,6 +24,7 @@ application = Flask(__name__,
                                 os.path.abspath(
                                     sys.modules.get(__name__).__file__)), '..')),
                     template_folder='dist', static_folder='dist/static',static_url_path='/static')
+logger.info('Starting rando plan server')
 Compress(application)
 session = requests.Session()
 strava_api_key = os.environ.get("STRAVA_API_KEY")

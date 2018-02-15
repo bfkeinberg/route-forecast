@@ -32,7 +32,7 @@ class PaceTable extends Component {
 
     render() {
         return (
-                <div className="animated slideInLeft">
+                <div className="animated slideInRight">
                     <ErrorBoundary>
                     <Table striped condensed hover bordered>
                         <thead>

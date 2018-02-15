@@ -1,0 +1,42 @@
+runtime: python27
+api_version: 1
+threadsafe: true
+
+handlers:
+- url: /static
+  static_dir: dist/static
+  application_readable: true
+
+- url: /(.*\.(ico|png))$
+  static_files: dist/static/\1
+  upload: static/.*\.(ico|png)$
+  application_readable: true
+
+- url: /.*
+  script: src.application.application
+
+env_variables:
+   MAPS_KEY: 'AIzaSyDLmXz6JFen9Y9ZfwFcuJWdrRmq-kBjnKs'
+   DARKSKY_API_KEY: '9f1075d7f3960b4ec949f0dddae04cfc'
+   RWGPS_API_KEY: '91a12f680b4e0ef87f500f039c76e449'
+   STRAVA_API_KEY: '14f3f80e3a99ce401d48009af8105fd6b25373ef'
+   TIMEZONE_API_KEY: 'AIzaSyBS_wyxfIuLDEJWNOKs4w1NqbmwSDjLqCE'
+
+skip_files:
+-  node_modules/
+-  .git/
+-  .idea/
+-  src/static/
+-  src/jsx/
+-  src/templates/
+- ^(.*/)?.*\.py[co]$
+- ^(.*/)?.*\.json$
+- ^(.*/)?\..*$
+
+libraries:
+- name: flask
+  version: "latest"
+- name: werkzeug
+  version: "latest"
+- name: yaml
+  version: 'latest'

@@ -54,7 +54,7 @@ class ForecastTable extends Component {
             weatherCorrections = null;
         }
         return (
-                <div>
+                <div className="animated slideInLeft">
                     <ErrorBoundary>
                     <a tabIndex='-1' href="https://darksky.net/poweredby/"><img src={darkSky}/></a>
                         {weatherCorrections}
