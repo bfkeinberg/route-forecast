@@ -194,7 +194,7 @@ class AnalyzeRoute {
     walkGpxRoute(routeData,startTime,pace,interval,controls,metric,timeZoneId) {
         let modifiedControls = controls.slice();
         modifiedControls.sort((a,b) => a['distance']-b['distance']);
-        let stream = routeData.tracks.reduce((accum,current) => accum.concat(current.segments.reduce((accum,current) => accum.concat(current))));
+        let stream = routeData.tracks.reduce((accum,current) => accum.concat(current.segments.reduce((accum,current) => accum.concat(current),[])),[]);
         let trackName = routeData.tracks[0].name;
         return this.analyzeRwgpsRoute(trackName, stream, startTime, pace, interval, modifiedControls, metric, timeZoneId);
     }

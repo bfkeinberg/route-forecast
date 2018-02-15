@@ -193,10 +193,12 @@ const forecastFetchFailure = function(error) {
 };
 
 export const GPX_ROUTE_LOADING_SUCCESS = 'GPX_ROUTE_LOADING_SUCCESS';
-const gpxRouteLoadingSuccess = function(gpxRouteData) {
+const gpxRouteLoadingSuccess = function(result) {
     return {
         type: GPX_ROUTE_LOADING_SUCCESS,
-        gpxRouteData: gpxRouteData
+        gpxRouteData: result.gpxRouteData,
+        timeZoneId: result.timeZoneId,
+        timeZoneOffset: result.timeZoneOffset
     }
 };
 
@@ -237,6 +239,7 @@ export const loadGpxRoute = function(event,timezone_api_key) {
             const parser = await getRouteParser();
             parser.loadGpxFile(gpxFiles[0],timezone_api_key).then( gpxData => {
                     dispatch(gpxRouteLoadingSuccess(gpxData))
+                    dispatch(recalcRoute());
                 }, error => dispatch(gpxRouteLoadingFailure(error))
             );
         }
