@@ -45,7 +45,6 @@ immutable.js
 
 feature requests:
 show controls on map
-show both wind arrows and rain cloud
 
  */
 // To add to window
@@ -73,7 +72,7 @@ class RouteWeatherUI extends Component {
         props.setApiKeys(script.getAttribute('maps_api_key'),script.getAttribute('timezone_api_key'));
         this.props.updateControls(queryParams.controlPoints===undefined?[]:this.parseControls(queryParams.controlPoints));
         // new control point url format - <name>,<distance>,<time-in-minutes>:<name>,<distance>,<time-in-minutes>:etc
-        this.state = {routeInfo:{bounds:{},points:[], name:'',finishTime:''}};
+        this.state = {};
     }
 
     static getStravaToken(queryParams) {

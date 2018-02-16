@@ -117,30 +117,32 @@ class RouteForecastMap extends Component {
                 labelOrigin: new google.maps.Point(22,15),
                 anchor: new google.maps.Point(0, 0)
         };
+        let markers = [];
         if (isRainy) {
-            return new google.maps.Marker({
+            markers.push(new google.maps.Marker({
                 position: {lat:latitude,lng:longitude},
                 label: value.toString(),
                 map: map,
                 icon: markerIcon,
                 title: title
-            });
+            }));
         }
-        else if (parseInt(windSpeed) > 3) {
-            return new google.maps.Marker({
+        if (parseInt(windSpeed) > 3) {
+            markers.push(new google.maps.Marker({
                 position: {lat:latitude,lng:longitude},
                 label: value.toString(),
                 map: map,
                 icon: RouteForecastMap.selectWindIcon(bearing),
                 title: title
-            });
+            }));
         }
-        else return new google.maps.Marker({
+        else markers.push(new google.maps.Marker({
             position: {lat:latitude,lng:longitude},
             label: value.toString(),
             map: map,
             title: title
-        });
+        }));
+        return markers;
     }
 
     drawRoute(points,map) {
@@ -165,8 +167,9 @@ class RouteForecastMap extends Component {
         // marker title now contains both temperature and mileage
         return (
             forecast.map((point) =>
-                RouteForecastMap.addMarker(point[7], point[8], map, point[1], point[10] + '\n' + point[3], point[12], point[13], point[6])
-            )
+                RouteForecastMap.addMarker(point[7], point[8], map, point[1], point[10] + '\n' + point[3],
+                    point[12], point[13], point[6])
+            ).reduce((acc,cur) => acc.concat(cur))
         );
     }
 

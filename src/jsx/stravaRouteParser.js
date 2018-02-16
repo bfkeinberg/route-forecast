@@ -52,41 +52,6 @@ class StravaRouteParser {
             actualPace:StravaRouteParser.wwPaceCalcForActivity(activityData)});
     }
 
-    computeActualTimes(activityId, controlPoints, token, beginFetch, endFetch) {
-        if (token === null) {
-            StravaRouteParser.authenticate(activityId);
-            return;
-        }
-        beginFetch();
-        let activityPromise = this.fetchActivity(activityId, token);
-        return new Promise((resolve, reject) => {
-            activityPromise.then(activityData => {
-                let activityDataPromise = this.processActivityStream(activityId,token);
-                activityDataPromise.then(activityStream => {
-                        endFetch('');
-                        if (activityData.message !== undefined) {
-                            cookie.remove('strava_token');
-                            reject(activityData.message);
-                            return;
-                        }
-                        if (activityStream.message !== undefined) {
-                            cookie.remove('strava_token');
-                            reject(activityStream.message);
-                            return;
-                        }
-                        resolve(({controls:this.parseActivity(activityData, activityStream, controlPoints),
-                            actualFinishTime:this.computeActualFinishTime(activityData),
-                            actualPace:StravaRouteParser.wwPaceCalcForActivity(activityData)}));
-                    }, error => {
-                        reject(error);
-                    }
-                );
-            }, error => {
-                reject(error);
-            });
-        });
-    }
-
     static wwPaceCalcForActivity(activity) {
         // all below in meters
         let average_speed_in_meters = activity.average_speed;

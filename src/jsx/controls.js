@@ -16,7 +16,6 @@ class ControlPoints extends Component {
     static propTypes = {
         metric: PropTypes.bool.isRequired,
         strava_error: PropTypes.string,
-        actualFinishTime:PropTypes.string,
         hasStravaData:PropTypes.bool.isRequired,
         forecastValid:PropTypes.bool.isRequired,
         name:PropTypes.string,
@@ -27,10 +26,6 @@ class ControlPoints extends Component {
         fetchingFromStrava:PropTypes.bool,
         toggleDisplayBanked:PropTypes.func.isRequired,
         stravaAnalysis: PropTypes.bool.isRequired
-    };
-
-    static contextTypes = {
-        store: PropTypes.object
     };
 
     constructor(props) {
