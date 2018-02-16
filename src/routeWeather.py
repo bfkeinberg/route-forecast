@@ -6,6 +6,8 @@ from datetime import *
 nu.reset_units()
 nu.set_derived_units_and_constants()
 
+from google.appengine.api import urlfetch
+import json
 
 class WeatherError(Exception):
     def __init__(self, value):
@@ -63,11 +65,12 @@ class WeatherCalculator:
         key = os.getenv('DARKSKY_API_KEY')
         url = "https://api.darksky.net/forecast/{}/{},{},{}?exclude=hourly,daily,flags".format(key, lat, lon, current_time)
         headers = {"Accept-Encoding": "gzip"}
-        response = self.session.get(url=url, headers=headers)
+        response = urlfetch.fetch(url, headers=headers, validate_certificate=True)
+        # response = self.session.get(url=url, headers=headers)
         # if True: #response.status_code == 200:
         if response.status_code == 200:
             # current_forecast = {u'ozone': 310.21, u'temperature': 53.32, u'icon': u'partly-cloudy-day', u'dewPoint': 45.71, u'humidity': 0.75, u'visibility': 10, u'summary': u'Partly Cloudy', u'apparentTemperature': 53.32, u'pressure': 1027.3, u'windSpeed': 4.65, u'cloudCover': 0.37, u'time': 1485391860, u'windBearing': 290, u'precipIntensity': 0, u'precipProbability': 0}
-            current_forecast = response.json()['currently']
+            current_forecast = json.loads(response.content)['currently']
             now = datetime.fromtimestamp(current_forecast['time'], zone)
             has_wind = 'windSpeed' in current_forecast
             wind_bearing = current_forecast['windBearing'] if has_wind else None

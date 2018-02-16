@@ -11,7 +11,6 @@ class AnalyzeRoute {
     constructor() {
         this.walkRwgpsRoute = this.walkRwgpsRoute.bind(this);
         this.walkGpxRoute = this.walkGpxRoute.bind(this);
-        this.checkAndUpdateControls = this.checkAndUpdateControls.bind(this);
         this.loadRwgpsRoute = this.loadRwgpsRoute.bind(this);
         this.loadGpxFile = this.loadGpxFile.bind(this);
         this.analyzeRoute = this.analyzeRoute.bind(this);
@@ -83,6 +82,7 @@ class AnalyzeRoute {
                 let rwgpsRouteDatum = response[response['trip'] === undefined ? 'route' : 'trip'];
                 if (rwgpsRouteDatum === undefined) {
                     reject(new Error('RWGPS route info unavailable'));
+                    return;
                 }
                 let point = rwgpsRouteDatum['track_points'][0];
                 //TODO using current date and time for zone lookup (moment()) could pose a problem in future
@@ -100,7 +100,40 @@ class AnalyzeRoute {
     }
 
     analyzeRoute(trackName, stream, userStartTime, pace, intervalInHours, controls, metric, timeZoneId) {
-        this.nextControl = 0;
+
+        let nextControl = 0;
+
+        const checkAndUpdateControls = function(distanceInKm, startTime, elapsedTimeInHours, controls,
+                                                calculatedValues, metric) {
+            if (controls.length <= nextControl) {
+                return 0;
+            }
+            if (metric)
+            {
+                if (distanceInKm < controls[nextControl].distance) {
+                    return 0
+                }
+            }
+            else {
+                let distanceInMiles = distanceInKm*kmToMiles;
+                if (distanceInMiles < controls[nextControl].distance) {
+                    return 0
+                }
+            }
+            let delayInMinutes = controls[nextControl].duration;
+            let arrivalTime = moment(startTime).add(elapsedTimeInHours,'hours');
+            let banked = Math.round(AnalyzeRoute.rusa_time(distanceInKm, elapsedTimeInHours));
+            calculatedValues.push({arrival:arrivalTime.format(finishTimeFormat),
+                banked: banked,
+                val:controls[nextControl].id
+            });
+            if (isNaN(banked)) {
+                throw new Error("Banked time is NaN in checkAndUpdateControls");
+            }
+            nextControl++;
+            return delayInMinutes/60;      // convert from minutes to hours
+        };
+
         let forecastRequests = [];
         let baseSpeed = paceToSpeed[pace];
         let bounds = {min_latitude:90, min_longitude:180, max_latitude:-90, max_longitude:-180};
@@ -129,8 +162,8 @@ class AnalyzeRoute {
                 // then find elapsed time given pace
                 accumulatedTime = AnalyzeRoute.calculateElapsedTime(accumulatedClimbMeters, accumulatedDistanceKm, baseSpeed);
             }
-            idlingTime += this.checkAndUpdateControls(accumulatedDistanceKm, startTime,
-                (accumulatedTime + idlingTime), controls, calculatedValues, metric, this.nextControl);
+            idlingTime += checkAndUpdateControls(accumulatedDistanceKm, startTime,
+                (accumulatedTime + idlingTime), controls, calculatedValues, metric);
             // see if it's time for forecast
             if (((accumulatedTime + idlingTime) - lastTime) >= intervalInHours) {
                 forecastRequests.push(AnalyzeRoute.addToForecast(point, forecastPoint, startTime, (accumulatedTime + idlingTime),accumulatedDistanceKm*kmToMiles));
@@ -143,7 +176,7 @@ class AnalyzeRoute {
             forecastRequests.push(AnalyzeRoute.addToForecast(previousPoint, forecastPoint, startTime, (accumulatedTime + idlingTime),accumulatedDistanceKm*kmToMiles));
         }
         let finishTime = AnalyzeRoute.formatFinishTime(startTime,accumulatedTime,idlingTime);
-        AnalyzeRoute.fillLastControlPoint(finishTime, controls, this.nextControl, accumulatedTime + idlingTime,
+        AnalyzeRoute.fillLastControlPoint(finishTime, controls, nextControl, accumulatedTime + idlingTime,
             accumulatedDistanceKm, calculatedValues);
         calculatedValues.sort((a,b) => a['val']-b['val']);
         return {forecast:forecastRequests,points:stream,name:trackName,values:calculatedValues,
@@ -207,7 +240,6 @@ class AnalyzeRoute {
                     if (event.currentTarget.response.status==='OK') {
                         // determine total timezone offset in seconds
                         let tzOffset = (event.currentTarget.response['dstOffset'] + event.currentTarget.response['rawOffset']);
-                        // TODO: manipulating state in this way seems questionable
                         resolve({offset:tzOffset,zoneId:event.currentTarget.response['timeZoneId']});
                     }
                     else {
@@ -240,36 +272,6 @@ class AnalyzeRoute {
              closetimeMinutes = 4500 + ((accumulatedDistance - 1000000) * 0.0045);
          }
          return (closetimeMinutes - elapsedMinutes);
-    }
-
-    checkAndUpdateControls(distanceInKm, startTime, elapsedTimeInHours, controls, calculatedValues, metric, nextControl) {
-        if (controls.length <= nextControl) {
-            return 0;
-        }
-        if (metric)
-        {
-            if (distanceInKm < controls[nextControl].distance) {
-                return 0
-            }
-        }
-        else {
-            let distanceInMiles = distanceInKm*kmToMiles;
-            if (distanceInMiles < controls[nextControl].distance) {
-                return 0
-            }
-        }
-        let delayInMinutes = controls[nextControl].duration;
-        let arrivalTime = moment(startTime).add(elapsedTimeInHours,'hours');
-        let banked = Math.round(AnalyzeRoute.rusa_time(distanceInKm, elapsedTimeInHours));
-        calculatedValues.push({arrival:arrivalTime.format(finishTimeFormat),
-            banked: banked,
-            val:controls[nextControl].id
-        });
-        if (isNaN(banked)) {
-            throw new Error("Banked time is NaN in checkAndUpdateControls");
-        }
-        this.nextControl++;
-        return delayInMinutes/60;      // convert from minutes to hours
     }
 
     // in hours
