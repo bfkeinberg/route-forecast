@@ -3,16 +3,29 @@ import {Button} from '@blueprintjs/core';
 
 import {AgGridReact} from 'ag-grid-react';
 import ReactDOM from 'react-dom';
+import PropTypes from 'prop-types';
+import {connect} from 'react-redux';
+import {updateUserControls} from './actions/actions';
 
 const smallScreenWidth = 800;
+const deleteColumnWidth = 39;
 
 class ControlTable extends Component {
+    static propTypes = {
+        displayBanked:PropTypes.bool.isRequired,
+        compare:PropTypes.bool.isRequired,
+        controls:PropTypes.arrayOf(PropTypes.object).isRequired,
+        calculatedValues:PropTypes.arrayOf(PropTypes.object).isRequired,
+        updateControls:PropTypes.func.isRequired,
+        count:PropTypes.number.isRequired
+    };
+
     constructor(props) {
         super(props);
         let displayBanked = this.props.displayBanked;
         this.deleteRenderer = this.deleteRenderer.bind(this);
         this.removeRow = this.removeRow.bind(this);
-        this.state = {rowCount:0,
+        this.state = {
             columnDefs:[
                 {colId:'name', field:'name', unSortIcon:true, suppressSorting:true, editable:true, headerName:'Name'},
                 {field:'distance', headerTooltip:'In miles or km, depending on the metric checkbox',
@@ -28,7 +41,8 @@ class ControlTable extends Component {
                 {colId:'banked', field:'banked', headerTooltip:'Time remaining at brevet pace',
                     cellRenderer:"agAnimateShowChangeCellRenderer",
                     suppressNavigable:true, suppressSorting:true, type:'numericColumn', valueFormatter:ControlTable.appendUnit, hide:!displayBanked, headerName:'Banked time'},
-                {suppressNavigable:true, suppressSorting:true, cellRenderer:this.deleteRenderer}
+                {colId:'delete', suppressNavigable:true, suppressSorting:true, suppressSizeToFit: true,
+                    pinned:'right', cellRenderer:this.deleteRenderer}
             ]};
         this.addRow = this.addRow.bind(this);
         this.onGridReady = this.onGridReady.bind(this);
@@ -49,20 +63,20 @@ class ControlTable extends Component {
         if (this.api===undefined) {
             return;
         }
-        let row = {name:'',duration:0,distance:0,id:this.props.controls.length};
-        let result = this.api.updateRowData({add:[row], addIndex:row.id});
+        let row = {name:'',duration:'',distance:'',id:this.props.controls.length};
+        this.api.updateRowData({add:[row], addIndex:row.id});
         // focus on new control if one has been added
         this.api.setFocusedCell(this.props.controls.length,'name',null);
         // this.api.startEditingCell(this.api.getFocusedCell());
+        this.updateFromGrid();
     }
 
     removeRow(row) {
         let rowNode = this.api.getRowNode(row);
-        console.log(`row node to delete for ${row} is ${rowNode}`);
         if (rowNode === undefined) {
             return;
         }
-        let transaction = {remove:[row]};
+        let transaction = {remove:[rowNode]};
         this.api.updateRowData(transaction);
         this.updateFromGrid();
     }
@@ -114,31 +128,16 @@ class ControlTable extends Component {
         }
         this.columnApi.setColumnVisible('banked',newProps.displayBanked);
         this.columnApi.setColumnVisible('actual',newProps.compare);
-        if (newProps.controls.every(ctl => ctl.id===undefined)) {
-            newProps.controls.forEach((row,key) => row.id=key);
+        if (newProps.count > newProps.controls.length) {
+            this.addRow();
         }
-        this.api.setRowData(newProps.controls);
-        this.setState({rowCount:this.api.getModel().getRowCount()});
-        this.updateFromGrid();
-    }
-
-    static doControlsMatch(newControl, oldControl) {
-        return newControl.distance===oldControl.distance &&
-            newControl.name===oldControl.name &&
-            newControl.duration===oldControl.duration &&
-            newControl.arrival===oldControl.arrival &&
-            newControl.actual===oldControl.actual &&
-            newControl.banked===oldControl.banked;
-    }
-
-    shouldComponentUpdate(nextProps,nextState) {
-        // compare controls
-        let controls = this.props.controls;
-        if (nextProps.displayBanked !== this.props.displayBanked) {
-            return true;
+        let rowData = [];
+        newProps.controls.forEach((item,index) => rowData.push({...item, ...newProps.calculatedValues[index], id:index}));
+        this.api.setRowData(rowData);
+        if (newProps.displayBanked !== this.props.displayBanked || newProps.compare !== this.props.compare) {
+            this.columnApi.autoSizeAllColumns();
+            // this.api.sizeColumnsToFit();
         }
-        return !(nextProps.controls.length===this.props.controls.length &&
-            nextProps.controls.every((v,i)=> ControlTable.doControlsMatch(v,controls[i])));
     }
 
     static setData(params) {
@@ -158,59 +157,57 @@ class ControlTable extends Component {
         let rowData = params.node.data;
         if (ControlTable.isValidRow(rowData)) {
             // update
-            this.setState({rowCount:this.api.getModel().getRowCount()});
             this.updateFromGrid();
         }
     }
 
     static isValidRow(rowData) {
         return (rowData.name!==undefined && rowData.distance!==undefined && rowData.duration!==undefined &&
-            rowData.name!=="" && rowData.distance!=="" && rowData.distance !== 0 && rowData.duration!=="" && rowData.duration!==0);
+            rowData.name!=="" && rowData.distance!=="" && rowData.duration!=="");
     }
 
-    sortChanged(params) {
+    sortChanged() {
         this.setState({rowCount:this.api.getModel().getRowCount()});
         this.updateFromGrid();
     }
 
     updateFromGrid() {
         let modifiedControls = [];
-        this.api.forEachNodeAfterFilterAndSort(node => modifiedControls.push(node.data));
-        // modifiedControls.forEach((row,key) => row.id=key);
-        this.props.update(modifiedControls);
+        this.api.forEachNodeAfterFilterAndSort(node => {
+            const userValues = (({ name, distance, duration, id }) => ({ name, distance, duration, id }))(node.data);
+            modifiedControls.push(userValues)});
+        this.props.updateControls(modifiedControls);
     }
 
     render() {
         if (this.api !== undefined && window.outerWidth < smallScreenWidth) {
             this.api.sizeColumnsToFit();
         }
-        this.props.controls.forEach((row,key) => row.id=key);
-        let displayBanked = this.props.displayBanked;
+        if (this.columnApi !== undefined) {
+            this.columnApi.setColumnWidth(this.columnApi.getColumn('delete'),deleteColumnWidth);
+        }
+        let rowData = [];
+        this.props.controls.forEach((item,index) => rowData.push({...item, ...this.props.calculatedValues[index], id:index}));
         return (<div className="ag-theme-fresh">
-            <AgGridReact enableColResize enableSorting animateRows sortingOrder={['asc']} unSortIcon rowData={this.props.controls}
-    onGridReady={this.onGridReady} onSortChanged={this.sortChanged} singleClickEdit
-    onCellValueChanged={this.cellUpdated} tabToNextCell={ControlTable.tabHandler} getRowNodeId={data => data.id}
-    columnDefs={this.state.columnDefs}/>
-{/*
-            >
-{                <AgGridColumn colId='name' field='name' unSortIcon={<true></true>} suppressSorting editable={true} headerName='Name'></AgGridColumn>
-                <AgGridColumn field='distance' headerTooltip='In miles or km, depending on the metric checkbox'
-                              type={'numericColumn'} unSortIcon={true} editable={true} valueParser={ControlTable.setData} valueSetter={ControlTable.validateData} headerName='Distance'></AgGridColumn>
-                <AgGridColumn field='duration' headerTooltip='How many minutes you expect to spend at this control'
-                              suppressSorting type={'numericColumn'} editable={true} valueParser={params=>{return Number(params.newValue)}}
-                              valueSetter={ControlTable.validateData} valueFormatter={ControlTable.appendUnit} headerName='Expected time spent'></AgGridColumn>
-                <AgGridColumn field='arrival' headerTooltip='When you are predicted to arrive here'
-                              cellRenderer="agAnimateShowChangeCellRenderer" type={'numericColumn'}
-                              suppressNavigable suppressSorting enableCellChangeFlash={true} headerName='Est. arrival time'></AgGridColumn>
-                <AgGridColumn colId='actual' field='actual' suppressSorting enableCellChangeFlash={true} cellRenderer="agAnimateShowChangeCellRenderer"
-                              headerTooltip='When you actually arrived here' suppressNavigable hide={!this.props.compare} headerName='Actual arrival time'></AgGridColumn>
-                <AgGridColumn colId='banked' field='banked' headerTooltip='Time remaining at brevet pace'
-                              cellRenderer="agAnimateShowChangeCellRenderer"
-                              suppressNavigable suppressSorting type={'numericColumn'} valueFormatter={ControlTable.appendUnit} hide={!displayBanked} headerName='Banked time'></AgGridColumn>
-                <AgGridColumn suppressNavigable suppressSorting cellRenderer={this.deleteRenderer}></AgGridColumn>*!/}
-            </AgGridReact>*/}
+            <AgGridReact enableColResize enableSorting animateRows sortingOrder={['asc']} unSortIcon rowData={rowData}
+             onGridReady={this.onGridReady} onSortChanged={this.sortChanged} singleClickEdit
+            onCellValueChanged={this.cellUpdated} tabToNextCell={ControlTable.tabHandler} getRowNodeId={data => data.id}
+            columnDefs={this.state.columnDefs}/>
         </div>);
     }
 }
 
-export default ControlTable;
+const mapStateToProps = (state) =>
+    ({
+        displayBanked: state.controls.displayBanked,
+        compare: state.controls.stravaAnalysis,
+        count: state.controls.count,
+        controls: state.controls.userControlPoints,
+        calculatedValues: state.controls.calculatedControlValues
+    });
+
+const mapDispatchToProps = {
+    updateControls : updateUserControls
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(ControlTable);

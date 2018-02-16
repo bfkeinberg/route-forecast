@@ -1,6 +1,7 @@
 {
-  "presets": ["es2015","stage-0","react"],
+  "presets": ["es2015","react","stage-0"],
   "plugins": [
-    "react-html-attrs"
+    "react-html-attrs",
+    "transform-class-properties"
   ]
 }

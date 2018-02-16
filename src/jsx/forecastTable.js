@@ -2,8 +2,14 @@ import React, {Component} from 'react';
 import {Table} from 'react-bootstrap';
 import ErrorBoundary from "./errorBoundary";
 import darkSky from 'Images/darkSkySmall.png';
+import PropTypes from 'prop-types';
+import {connect} from 'react-redux';
 
 class ForecastTable extends Component {
+    static propTypes = {
+        weatherCorrectionMinutes:PropTypes.number,
+        forecast:PropTypes.arrayOf(PropTypes.array).isRequired
+    };
 
     constructor(props) {
         super(props);
@@ -17,7 +23,7 @@ class ForecastTable extends Component {
         if (forecast.length > 0 && forecast[0].length > 5) {
             return (
                 <tbody>
-                {forecast.map((point, index, data) =>
+                {forecast.map((point) =>
                     /*<tr key={Math.random().toString(36).slice(2)}>*/
                     <tr key={point[0]+Math.random().toString(10)}>
                         <td>{point[0]}</td>
@@ -34,23 +40,6 @@ class ForecastTable extends Component {
         }
     }
 
-/*
-    doesForecastMatch(newForecast,oldForecast) {
-        return (newForecast[0]===oldForecast[0] &&
-            newForecast[1]===oldForecast[1] &&
-            newForecast[2]===oldForecast[2] &&
-            newForecast[3]===oldForecast[3]);
-    }
-
-
-    shouldComponentUpdate(nextProps, newState, nextContext) {
-        let forecast = this.props.forecast;
-        return nextProps.weatherCorrectionMinutes!==this.props.weatherCorrectionMinutes ||
-            nextProps.forecast.length!==this.props.forecast.length ||
-            !nextProps.forecast.every((v,i)=> this.doesForecastMatch(v,forecast[i]));
-    }
-
-*/
     render() {
         let weatherCorrections;
         if (this.props.weatherCorrectionMinutes !== null) {
@@ -65,7 +54,7 @@ class ForecastTable extends Component {
             weatherCorrections = null;
         }
         return (
-                <div>
+                <div className="animated slideInLeft">
                     <ErrorBoundary>
                     <a tabIndex='-1' href="https://darksky.net/poweredby/"><img src={darkSky}/></a>
                         {weatherCorrections}
@@ -89,4 +78,10 @@ class ForecastTable extends Component {
     }
 }
 
-export default ForecastTable;
+const mapStateToProps = (state) =>
+    ({
+        forecast: state.forecast.forecast,
+        weatherCorrectionMinutes: state.routeInfo.weatherCorrectionMinutes
+    });
+
+export default connect(mapStateToProps)(ForecastTable);

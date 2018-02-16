@@ -1,14 +1,20 @@
 import React from 'react';
-import {FormControl,FormGroup,Button,Modal,Tooltip,OverlayTrigger,ControlLabel} from 'react-bootstrap';
+import {Button, ControlLabel, FormControl, FormGroup, Modal, OverlayTrigger, Tooltip} from 'react-bootstrap';
+import PropTypes from 'prop-types';
 
 class LoginDialog extends React.Component {
+    static propTypes = {
+        loginCb:PropTypes.func.isRequired
+    };
+
     constructor(props) {
         super(props);
         this.open = this.open.bind(this);
         this.close = this.close.bind(this);
         this.logIn = this.logIn.bind(this);
         this.logInCb = this.logInCb.bind(this);
-        this.state = {username: '', password: '', showModal: false, xmlhttp : new XMLHttpRequest(), status:''};
+        this.xmlhttp = new XMLHttpRequest();
+        this.state = {username: '', password: '', showModal: false, status:''};
     }
 
     open() {
@@ -19,33 +25,33 @@ class LoginDialog extends React.Component {
         this.setState({showModal: false});
     }
 
-    logIn(event) {
-        this.state.xmlhttp.onreadystatechange = this.logInCb;
-        this.state.xmlhttp.responseType = 'json';
+    logIn() {
+        this.xmlhttp.onreadystatechange = this.logInCb;
+        this.xmlhttp.responseType = 'json';
         let loginform = document.getElementById("rwgps_login_form");
         let formdata = new FormData(loginform);
-        this.state.xmlhttp.open("POST","/handle_login");
-        this.state.xmlhttp.send(formdata);
+        this.xmlhttp.open("POST","/handle_login");
+        this.xmlhttp.send(formdata);
     }
 
     logInCb(event) {
-        if (this.state.xmlhttp.readyState == 4) {
-            let resultFields = event.target.responseText != '' ? JSON.parse(event.target.responseText) : null;
+        if (this.xmlhttp.readyState === 4) {
+            let resultFields = event.target.responseText !== '' ? JSON.parse(event.target.responseText) : null;
             if (event.target.status==200) {
-                this.state.status='';
+                this.setState({status:''});
                 this.close();
                 this.props.loginCb(event.target);
             }
             else {
                 // error handling
-                this.setState({status:resultFields != null ? resultFields['status'] : 'Unknown error'});
+                this.setState({status:resultFields !== null ? resultFields['status'] : 'Unknown error'});
 
             }
         }
     }
 
     no_login_failure() {
-        return this.state.status == '' ? 'success' : 'error';
+        return this.state.status === '' ? 'success' : 'error';
     }
 
     render() {
@@ -91,5 +97,4 @@ class LoginDialog extends React.Component {
     }
 }
 
-module.exports=LoginDialog;
 export default LoginDialog;

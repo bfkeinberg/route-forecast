@@ -55,6 +55,13 @@ label.control-label {
     display: inline-flex;
     align-self: center;
 }
+
+input#finishTime.form-control {
+    display: inline-flex;
+    width: 14em;
+    margin-top: 3px;
+    margin-botton: 0px;
+}
 input#interval.form-control {
     padding-top: 5px;
     display: inline-flex;

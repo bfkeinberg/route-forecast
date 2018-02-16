@@ -5,8 +5,11 @@ import os
 import os.path
 import random
 import requests
+# App Engine specific
+import requests_toolbelt.adapters.appengine
 import string
 import sys
+import urllib
 import urllib2
 from datetime import *
 from flask import Flask, render_template, request, redirect, url_for, jsonify, g
@@ -16,6 +19,13 @@ from flask_compress import Compress
 from routeWeather import WeatherCalculator
 from stravaActivity import StravaActivity
 
+# Use the App Engine Requests adapter. This makes sure that Requests uses
+# URLFetch.
+requests_toolbelt.adapters.appengine.monkeypatch()
+
+from google.appengine.api import urlfetch
+# end App Engine specific
+
 logger = logging.getLogger('RoutePlanner')
 application = Flask(__name__,
                     root_path = os.path.abspath(
@@ -24,6 +34,7 @@ application = Flask(__name__,
                                 os.path.abspath(
                                     sys.modules.get(__name__).__file__)), '..')),
                     template_folder='dist', static_folder='dist/static',static_url_path='/static')
+logger.info('Starting rando plan server')
 Compress(application)
 session = requests.Session()
 strava_api_key = os.environ.get("STRAVA_API_KEY")
@@ -169,11 +180,16 @@ def get_rwgps_route():
     rwgps_api_key = os.environ.get("RWGPS_API_KEY")
     if rwgps_api_key is None:
         return jsonify({'status': 'Missing rwgps API key'}), 500
-    route_info_result = session.get("https://ridewithgps.com/{1}/{0}.json".format(route, route_type),
-                                    params={'apikey': rwgps_api_key})
+    # route_info_result = session.get("https://ridewithgps.com/{1}/{0}.json".format(route, route_type),
+    #                                 params={'apikey': rwgps_api_key})
+    url_params = urllib.urlencode({'apikey': rwgps_api_key})
+    logger.info("https://ridewithgps.com/{1}/{0}.json?{2}".format(route, route_type,url_params))
+    route_info_result = urlfetch.fetch("https://ridewithgps.com/{1}/{0}.json?{2}".format(route, route_type,url_params),
+                                       validate_certificate=True)
     if route_info_result.status_code != 200:
-        return jsonify({'status': route_info_result.text}), route_info_result.status_code
-    return jsonify(route_info_result.json())
+        logger.error(route_info_result.headers)
+        return jsonify({'status': route_info_result.status_code}), route_info_result.status_code
+    return route_info_result.content
 
 
 @application.route('/handle_login', methods=['POST'])
@@ -202,7 +218,10 @@ def handle_login():
 def forecast():
     if not request.form.keys() >= ['locations', 'timezone']:
         return jsonify({'status': 'Missing keys'}), 400
-    forecast_points = json.loads(request.form['locations'])
+    try:
+        forecast_points = json.loads(request.form['locations'])
+    except ValueError as error:
+        return jsonify({'status': 'Badly formatted forecast locations :' + str(error)}), 400
     logger.info('Request from %s(%s) for %d forecast points', request.remote_addr,
                 request.headers.get('X-Forwarded-For', request.remote_addr), len(forecast_points))
     if len(forecast_points) > 50:
