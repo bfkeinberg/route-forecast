@@ -43,9 +43,6 @@ TODO:
 integrate with error log service
 immutable.js
 
-feature requests:
-show controls on map - would need to compute their coordinates while walking the route
-
  */
 // To add to window
 if (!window.Promise) {
@@ -98,9 +95,9 @@ class RouteWeatherUI extends Component {
     parseControls(controlPointString) {
         let controlPointList = controlPointString.split(":");
         let controlPoints =
-        controlPointList.map(point => {
+        controlPointList.map((point,index) => {
             let controlPointValues = point.split(",");
-            return ({name:controlPointValues[0],distance:Number(controlPointValues[1]),duration:Number(controlPointValues[2])});
+            return ({name:controlPointValues[0],distance:Number(controlPointValues[1]),duration:Number(controlPointValues[2]), id:index});
             });
         // delete dummy first element
         controlPoints.splice(0,1);

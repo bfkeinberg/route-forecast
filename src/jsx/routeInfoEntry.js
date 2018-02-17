@@ -14,6 +14,7 @@ import Recalculate from './recalculate';
 import FileInput from './ui/fileInput';
 import DateSelect from './ui/dateSelect';
 import RideWithGpsId from './ui/rideWithGpsId';
+import RwGpsTypeSelector from './ui/rwGpsTypeSelector';
 
 class RouteInfoForm extends Component {
     static propTypes = {
@@ -152,10 +153,7 @@ class RouteInfoForm extends Component {
                     <PaceExplanation/>
                     <FileInput/>
                     <RideWithGpsId/>
-
-                    {/* if we want to allow selecting rwgps trips also
-
-                     */}
+                    <RwGpsTypeSelector visible={false}/>
                     <OverlayTrigger placement='bottom' overlay={forecast_tooltip}>
                         <div style={{'display':'inline-flex',padding:'0px 14px'}} cursor='not-allowed'>
                             <MediaQuery minDeviceWidth={1000}>

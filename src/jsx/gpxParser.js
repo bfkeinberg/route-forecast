@@ -1,11 +1,10 @@
 let gpxParse = require("gpx-parse-browser");
 import moment from 'moment-timezone';
 import 'whatwg-fetch';
+import {finishTimeFormat} from './reducers/reducer';
 
 const paceToSpeed = {'A': 10, 'B': 12, 'C': 14, 'C+': 15, 'D-': 15, 'D': 16, 'D+': 17, 'E-': 17, 'E': 18};
 const kmToMiles = 0.62137;
-
-import {finishTimeFormat} from './reducers/reducer';
 
 class AnalyzeRoute {
     constructor() {
@@ -104,7 +103,7 @@ class AnalyzeRoute {
         let nextControl = 0;
 
         const checkAndUpdateControls = function(distanceInKm, startTime, elapsedTimeInHours, controls,
-                                                calculatedValues, metric) {
+                                                calculatedValues, metric, point) {
             if (controls.length <= nextControl) {
                 return 0;
             }
@@ -125,11 +124,8 @@ class AnalyzeRoute {
             let banked = Math.round(AnalyzeRoute.rusa_time(distanceInKm, elapsedTimeInHours));
             calculatedValues.push({arrival:arrivalTime.format(finishTimeFormat),
                 banked: banked,
-                val:controls[nextControl].id
+                val:controls[nextControl].id, ...point
             });
-            if (isNaN(banked)) {
-                throw new Error("Banked time is NaN in checkAndUpdateControls");
-            }
             nextControl++;
             return delayInMinutes/60;      // convert from minutes to hours
         };
@@ -163,7 +159,8 @@ class AnalyzeRoute {
                 accumulatedTime = AnalyzeRoute.calculateElapsedTime(accumulatedClimbMeters, accumulatedDistanceKm, baseSpeed);
             }
             idlingTime += checkAndUpdateControls(accumulatedDistanceKm, startTime,
-                (accumulatedTime + idlingTime), controls, calculatedValues, metric);
+                (accumulatedTime + idlingTime), controls, calculatedValues, metric,
+                point);
             // see if it's time for forecast
             if (((accumulatedTime + idlingTime) - lastTime) >= intervalInHours) {
                 forecastRequests.push(AnalyzeRoute.addToForecast(point, forecastPoint, startTime, (accumulatedTime + idlingTime),accumulatedDistanceKm*kmToMiles));
@@ -302,10 +299,6 @@ class AnalyzeRoute {
             time:moment(currentTime).add(elapsedTimeInHours,'hours').format('YYYY-MM-DDTHH:mm:00ZZ'),bearing:bearing};
     }
 
-    parseRoute(gpxFile) {
-        this.reader.readAsText(gpxFile);
-    }
-
     static getBearingBetween(trackBearing,windBearing) {
         let relative_bearing2;
         let relative_bearing1;
@@ -416,10 +409,7 @@ class AnalyzeRoute {
                 let elapsedTimeMs = arrivalTime.toDate() - start;
                 let elapsedDuration = moment.duration(elapsedTimeMs, 'ms');
                 let banked = Math.round(AnalyzeRoute.rusa_time(totalDistanceInMiles / kmToMiles, elapsedDuration.asHours()));
-                calculatedValues.push({arrival:arrivalTime.format(finishTimeFormat),banked:banked});
-                if (isNaN(banked)) {
-                    console.error("Banked time is NaN in adjustForWind");
-                }
+                calculatedValues.push({...previouslyCalculatedValues[currentControl], arrival:arrivalTime.format(finishTimeFormat),banked:banked});
 
                 currentControl++;
             }

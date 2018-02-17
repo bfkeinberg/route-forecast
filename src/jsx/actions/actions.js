@@ -109,9 +109,9 @@ const rwgpsRouteLoadingFailure = function(status) {
 export const parseControls = function(controlPointString) {
     let controlPointList = controlPointString.split(":");
     let controlPoints =
-        controlPointList.map(point => {
+        controlPointList.map((point,index) => {
             let controlPointValues = point.split(",");
-            return ({name:controlPointValues[0],distance:Number(controlPointValues[1]),duration:Number(controlPointValues[2])});
+            return ({name:controlPointValues[0],distance:Number(controlPointValues[1]),duration:Number(controlPointValues[2]),id:index});
         });
     // delete dummy first element
     controlPoints.splice(0,1);

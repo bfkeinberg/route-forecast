@@ -12,6 +12,7 @@ import east_arrow from "Images/arrow_right.png";
 import rainCloud from "Images/rainCloud.png";
 import {connect} from 'react-redux';
 import ErrorBoundary from "./errorBoundary";
+import circus_tent from 'Images/circus tent.png';
 
 /*global google*/
 
@@ -19,7 +20,9 @@ class RouteForecastMap extends Component {
     static propTypes = {
         forecast:PropTypes.arrayOf(PropTypes.array).isRequired,
         routeInfo:PropTypes.object.isRequired,
-        maps_api_key:PropTypes.string.isRequired
+        maps_api_key:PropTypes.string.isRequired,
+        controls:PropTypes.arrayOf(PropTypes.object),
+        controlNames:PropTypes.arrayOf(PropTypes.string)
     };
 
     constructor(props) {
@@ -110,7 +113,7 @@ class RouteForecastMap extends Component {
 
     static addMarker(latitude, longitude, map, value, title, isRainy, bearing, windSpeed) {
     // Add the marker at the specified location
-        let markerIcon = {
+        const markerIcon = {
                 url: rainCloud,
                 size: new google.maps.Size(320, 320),
                 scaledSize: new google.maps.Size(45, 50),
@@ -145,6 +148,22 @@ class RouteForecastMap extends Component {
         return markers;
     }
 
+    static addControlMarker(latitude, longitude, map, value='') {
+        const controlIcon = {
+            url: circus_tent,
+            size: new google.maps.Size(225, 225),
+            scaledSize: new google.maps.Size(40, 40),
+            labelOrigin: new google.maps.Point(22,15),
+            anchor: new google.maps.Point(0, 0)
+        };
+        return new google.maps.Marker({
+            position: {lat: latitude, lng: longitude},
+            label: value,
+            icon:controlIcon,
+            map: map
+        });
+    }
+
     drawRoute(points,map) {
         let routeLine = new google.maps.Polyline({
             path: points,
@@ -163,14 +182,14 @@ class RouteForecastMap extends Component {
         markers.length = 0;
     }
 
-    static addMarkers(forecast, map) {
+    static addMarkers(forecast, controls, controlNames, map) {
         // marker title now contains both temperature and mileage
         return (
             forecast.map((point) =>
                 RouteForecastMap.addMarker(point[7], point[8], map, point[1], point[10] + '\n' + point[3],
                     point[12], point[13], point[6])
-            ).reduce((acc,cur) => acc.concat(cur))
-        );
+            ).reduce((acc, cur) => acc.concat(cur)).concat(
+                controls.map((control,index) => RouteForecastMap.addControlMarker(control.lat, control.lon, map, controlNames[index]))));
     }
 
     initMap(forecast, routeInfo) {
@@ -182,7 +201,7 @@ class RouteForecastMap extends Component {
         let mapBounds = new google.maps.LatLngBounds(southWest,northEast);
         this.state.map.fitBounds(mapBounds);
         RouteForecastMap.clearMarkers(this.markers);
-        this.markers = RouteForecastMap.addMarkers(forecast, this.state.map);
+        this.markers = RouteForecastMap.addMarkers(forecast, this.props.controls, this.props.controlNames, this.state.map);
         let routePoints = routeInfo.points.map((point) => {return {lat:point.lat, lng: point.lon}});
         // clear out old route path line if any
         if (this.routePath != null) {
@@ -245,7 +264,9 @@ const mapStateToProps = (state) =>
     ({
         forecast: state.forecast.forecast,
         routeInfo: state.routeInfo,
-        maps_api_key: state.params.maps_api_key
+        maps_api_key: state.params.maps_api_key,
+        controls: state.controls.calculatedControlValues,
+        controlNames: state.controls.userControlPoints.map(control => control.name)
     });
 
 
