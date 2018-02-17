@@ -44,7 +44,7 @@ integrate with error log service
 immutable.js
 
 feature requests:
-show controls on map
+show controls on map - would need to compute their coordinates while walking the route
 
  */
 // To add to window

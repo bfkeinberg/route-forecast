@@ -5,7 +5,7 @@ import 'whatwg-fetch';
 const paceToSpeed = {'A': 10, 'B': 12, 'C': 14, 'C+': 15, 'D-': 15, 'D': 16, 'D+': 17, 'E-': 17, 'E': 18};
 const kmToMiles = 0.62137;
 
-export const finishTimeFormat = 'ddd, MMM DD YYYY h:mma';
+import {finishTimeFormat} from './reducers/reducer';
 
 class AnalyzeRoute {
     constructor() {

@@ -72,7 +72,8 @@ let state = {
 import * as Actions from '../actions/actions';
 import {combineReducers} from 'redux';
 import moment from 'moment';
-import {finishTimeFormat} from '../gpxParser';
+export const finishTimeFormat = 'ddd, MMM DD YYYY h:mma';
+
 import RouteInfoForm from "../routeInfoEntry";
 
 const defaultPace = 'D';

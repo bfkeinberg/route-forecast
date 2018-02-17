@@ -26,8 +26,9 @@ module.exports = {
                 options: {
                     cacheDirectory:true,
                     babelrc: false,
-                    presets: ["babel-preset-env","react","stage-0"],
-                    plugins: ['babel-plugin-transform-runtime',"react-html-attrs", "transform-class-properties"]
+                    presets: ["babel-preset-env","babel-preset-react","babel-preset-stage-0"],
+                    plugins: ['babel-plugin-transform-runtime',"react-html-attrs", "transform-class-properties"],
+                    comments:true
                 }
             },
             {test: /\.js$/,
