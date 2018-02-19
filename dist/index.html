@@ -21,11 +21,7 @@
           }
         </script>
         
-        <style type="text/css">
-            html{font-family:sans-serif;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%}body{margin:0}::-webkit-input-placeholder{color:inherit;opacity:.54}::-webkit-file-upload-button{-webkit-appearance:button;font:inherit}html{box-sizing:border-box}*,:after,:before{box-sizing:inherit}body{text-transform:none;line-height:1.28581;letter-spacing:0;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen,Ubuntu,Cantarell,Open Sans,Helvetica Neue,Icons16,sans-serif;font-size:14px;font-weight:400;color:#182026}:focus{outline:2px auto rgba(19,124,189,.5);outline-offset:2px;-moz-outline-radius:6px}html{font-family:sans-serif;-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%}body{margin:0}*,:after,:before{-webkit-box-sizing:border-box;-moz-box-sizing:border-box;box-sizing:border-box}html{font-size:10px}body{font-family:Helvetica Neue,Helvetica,Arial,sans-serif;font-size:14px;line-height:1.42857143;color:#333;background-color:#fff}@-ms-viewport{width:device-width}
-        </style>
-        <link href="/static/styles.css" rel="preload" type="text/css" as="style" onload="this.onload=null;this.rel='stylesheet'">
-        <noscript><link href="/static/styles.css" rel="stylesheet" type="text/css"></noscript>
+        <link href="/static/styles.css" rel="stylesheet" type="text/css">
         
     </head>
     <body onload="measureCRP()">
@@ -33,8 +29,6 @@
             <div id="content"></div>
         </div>
         <script type="text/javascript" id="routeui" timezone_api_key="{{ timezone_api_key }}" maps_api_key="{{ maps_key }}" action="{{ url_for('forecast') }}" src="/static/main.bundle.js"></script>
-        <script type="text/javascript" id="localrouteui" timezone_api_key="{{ timezone_api_key }}" maps_api_key="{{ maps_key }}" action="{{ url_for('forecast') }}" src="/Users/bfeinberg/PycharmProjects/routeWeather/dist/static/main.bundle.js"></script>
         <noscript>This application requires JavaScript. Please enable JavaScript to use the application.</noscript>
-        <script>!function(t){"use strict";t.loadCSS||(t.loadCSS=function(){});var e=loadCSS.relpreload={};if(e.support=function(){var e;try{e=t.document.createElement("link").relList.supports("preload")}catch(t){e=!1}return function(){return e}}(),e.bindMediaToggle=function(t){var e=t.media||"all";function a(){t.media=e}t.addEventListener?t.addEventListener("load",a):t.attachEvent&&t.attachEvent("onload",a),setTimeout(function(){t.rel="stylesheet",t.media="only x"}),setTimeout(a,3e3)},e.poly=function(){if(!e.support())for(var a=t.document.getElementsByTagName("link"),n=0;n<a.length;n++){var o=a[n];"preload"!==o.rel||"style"!==o.getAttribute("as")||o.getAttribute("data-loadcss")||(o.setAttribute("data-loadcss",!0),e.bindMediaToggle(o))}},!e.support()){e.poly();var a=t.setInterval(e.poly,500);t.addEventListener?t.addEventListener("load",function(){e.poly(),t.clearInterval(a)}):t.attachEvent&&t.attachEvent("onload",function(){e.poly(),t.clearInterval(a)})}"undefined"!=typeof exports?exports.loadCSS=loadCSS:t.loadCSS=loadCSS}("undefined"!=typeof global?global:this);</script>
     </body>
 </html>

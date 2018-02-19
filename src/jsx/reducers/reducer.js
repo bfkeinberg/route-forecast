@@ -72,9 +72,9 @@ let state = {
 import * as Actions from '../actions/actions';
 import {combineReducers} from 'redux';
 import moment from 'moment';
-export const finishTimeFormat = 'ddd, MMM DD YYYY h:mma';
-
 import RouteInfoForm from "../routeInfoEntry";
+
+export const finishTimeFormat = 'ddd, MMM DD YYYY h:mma';
 
 const defaultPace = 'D';
 const defaultIntervalInHours = 1;
@@ -141,7 +141,7 @@ loadingSource:null}, action) {
         case Actions.FORECAST_FETCH_SUCCESS:
             return {...state, fetchingForecast: false, errorDetails: null};
         case Actions.FORECAST_FETCH_FAILURE:
-            return {...state, fetchingForecast: false, errorDetails: action.error};
+            return {...state, fetchingForecast: false, errorDetails: typeof action.error === 'object' ? action.error.message : action.error};
         case Actions.RWGPS_ROUTE_LOADING_SUCCESS:
             return {...state, fetchingRoute: false, errorDetails: null, succeeded: true};
         case Actions.GPX_ROUTE_LOADING_SUCCESS:
@@ -266,7 +266,7 @@ const strava = function(state = {analysisInterval:defaultAnalysisIntervalInHours
         case Actions.STRAVA_FETCH_SUCCESS:
             return {...state, fetching:false, activityData:action.data.activity, activityStream:action.data.stream};
         case Actions.STRAVA_FETCH_FAILURE:
-            return {...state, fetching:false, error:action.error};
+            return {...state, fetching:false, errorDetails:typeof action.error === 'object' ? action.error.message : action.error};
         case Actions.SET_ANALYSIS_INTERVAL:
             return {...state, analysisInterval:parseInt(action.interval)};
         case Actions.SET_PACE_OVER_TIME:
