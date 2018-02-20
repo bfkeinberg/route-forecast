@@ -124,6 +124,8 @@ const routeParams = function(state = {interval:defaultIntervalInHours,pace:defau
             } else {
                 return state;
             }
+        case Actions.TOGGLE_ROUTE_IS_TRIP:
+            return {...status,rwgpsRouteIsTrip:!state.rwgpsRouteIsTrip}
         default:
             return state;
     }
@@ -235,7 +237,7 @@ const controls = function(state = {metric:false,displayBanked:false,stravaAnalys
     }
 };
 
-const strava = function(state = {analysisInterval:defaultAnalysisIntervalInHours,activity:'',
+const strava = function(state = {analysisInterval:defaultAnalysisIntervalInHours,activity:'',token:null,
     fetching:false,calculatedPaces:null}, action) {
     switch (action.type) {
         case Actions.SET_STRAVA_TOKEN:

@@ -33,11 +33,10 @@ export const setInterval = function(interval) {
     }
 };
 
-export const SET_ROUTE_IS_TRIP = 'SET_ROUTE_IS_TRIP';
-export const setRouteIsTrip = function(routeIsTrip) {
+export const TOGGLE_ROUTE_IS_TRIP = 'TOGGLE_ROUTE_IS_TRIP';
+export const toggleRouteIsTrip = function() {
     return {
-        type: SET_ROUTE_IS_TRIP,
-        interval: routeIsTrip
+        type: TOGGLE_ROUTE_IS_TRIP
     }
 };
 
@@ -409,7 +408,7 @@ export const SET_STRAVA_ERROR = 'SET_STRAVA_ERROR';
 export const setStravaError = function(error) {
     return {
         type: SET_STRAVA_ERROR,
-        activity: error
+        error: error
     };
 };
 
@@ -535,6 +534,7 @@ export const updateExpectedTimes = function(activity) {
             return dispatch(setActualFinishTime(timesFromData.actualFinishTime));
         }, error => {
             dispatch(stravaFetchFailure(error));
+            dispatch(setStravaToken(null))
         });
     }
 };

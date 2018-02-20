@@ -59,15 +59,15 @@ class ControlTable extends Component {
         }
     }
 
-    addRow() {
+    addRow(newProps) {
         if (this.api===undefined) {
             return;
         }
         let row = {name:'',duration:'',distance:'',id:this.props.controls.length};
         this.api.updateRowData({add:[row], addIndex:row.id});
         // focus on new control if one has been added
-        this.api.setFocusedCell(this.props.controls.length,'name',null);
-        // this.api.startEditingCell(this.api.getFocusedCell());
+        this.api.setFocusedCell(newProps.controls.length,'name',null);
+        this.api.startEditingCell(this.api.getFocusedCell());
         this.updateFromGrid();
     }
 
@@ -129,7 +129,7 @@ class ControlTable extends Component {
         this.columnApi.setColumnVisible('banked',newProps.displayBanked);
         this.columnApi.setColumnVisible('actual',newProps.compare);
         if (newProps.count > newProps.controls.length) {
-            this.addRow();
+            this.addRow(newProps);
         }
         let rowData = [];
         newProps.controls.forEach((item,index) => rowData.push({...item, ...newProps.calculatedValues[index], id:index}));

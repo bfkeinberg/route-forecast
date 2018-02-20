@@ -152,7 +152,7 @@ class RouteForecastMap extends Component {
         const controlIcon = {
             url: circus_tent,
             size: new google.maps.Size(225, 225),
-            scaledSize: new google.maps.Size(35, 35),
+            scaledSize: new google.maps.Size(32, 32),
             labelOrigin: new google.maps.Point(22,15),
             anchor: new google.maps.Point(0, 0)
         };
