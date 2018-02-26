@@ -176,7 +176,7 @@ class AnalyzeRoute {
         AnalyzeRoute.fillLastControlPoint(finishTime, controls, nextControl, accumulatedTime + idlingTime,
             accumulatedDistanceKm, calculatedValues);
         calculatedValues.sort((a,b) => a['val']-b['val']);
-        return {forecast:forecastRequests,points:stream,name:trackName,values:calculatedValues,
+        return {forecastRequest:forecastRequests,points:stream,name:trackName,values:calculatedValues,
             bounds:bounds, finishTime: finishTime};
     }
 

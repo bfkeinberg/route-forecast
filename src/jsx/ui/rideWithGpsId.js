@@ -22,6 +22,14 @@ const RideWithGpsId = ({setRwgpsRoute,loadingSource,loadingSuccess,rwgpsRoute,rw
         }
     };
 
+    const isNumberKey = function(event) {
+        const charCode = (event.which) ? event.which : event.keyCode;
+        if ((charCode < 48 || charCode > 57))
+            return false;
+
+        return charCode;
+    };
+
     return (
         <FormGroup
             validationState={RouteInfoForm.decideValidationStateFor('rwgps',loadingSource,loadingSuccess)}
@@ -30,7 +38,7 @@ const RideWithGpsId = ({setRwgpsRoute,loadingSource,loadingSuccess,rwgpsRoute,rw
             <OverlayTrigger placement="bottom" overlay={tooltip_rwgps_enabled}>
                 <FormControl tabIndex='5' type="text"
                              onBlur={event => {handleRwgpsRoute(event.target.value)}}
-                             onKeyPress={RouteInfoForm.isNumberKey}
+                             onKeyPress={isNumberKey}
                              onChange={event => {setRwgpsRoute(event.target.value)}}
                              onDrop={event => {
                                  let dt = event.dataTransfer;

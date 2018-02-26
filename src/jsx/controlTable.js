@@ -65,9 +65,6 @@ class ControlTable extends Component {
         }
         let row = {name:'',duration:'',distance:'',id:this.props.controls.length};
         this.api.updateRowData({add:[row], addIndex:row.id});
-        // focus on new control if one has been added
-        this.api.setFocusedCell(newProps.controls.length,'name',null);
-        this.api.startEditingCell(this.api.getFocusedCell());
         this.updateFromGrid();
     }
 
@@ -179,6 +176,14 @@ class ControlTable extends Component {
         this.props.updateControls(modifiedControls);
     }
 
+    componentDidUpdate() {
+        // focus on new control if one has been added
+        if (this.api !== undefined && this.props.controls.length > 0 && this.props.controls[this.props.controls.length-1].name==='') {
+            this.api.setFocusedCell(this.props.controls.length-1,'name');
+            this.api.startEditingCell({colKey:'name',rowIndex:this.props.controls.length-1});
+        }
+    }
+
     render() {
         if (this.api !== undefined && window.outerWidth < smallScreenWidth) {
             this.api.sizeColumnsToFit();
@@ -190,7 +195,7 @@ class ControlTable extends Component {
         this.props.controls.forEach((item,index) => rowData.push({...item, ...this.props.calculatedValues[index], id:index}));
         return (<div className="ag-theme-fresh">
             <AgGridReact enableColResize enableSorting animateRows sortingOrder={['asc']} unSortIcon rowData={rowData}
-             onGridReady={this.onGridReady} onSortChanged={this.sortChanged} singleClickEdit
+             onGridReady={this.onGridReady} onSortChanged={this.sortChanged} singleClickEdit //editType={'fullRow'}
             onCellValueChanged={this.cellUpdated} tabToNextCell={ControlTable.tabHandler} getRowNodeId={data => data.id}
             columnDefs={this.state.columnDefs}/>
         </div>);

@@ -19,9 +19,9 @@ import circus_tent from 'Images/circus tent.png';
 class RouteForecastMap extends Component {
     static propTypes = {
         forecast:PropTypes.arrayOf(PropTypes.array).isRequired,
-        routeInfo:PropTypes.object.isRequired,
+        routeInfo:PropTypes.shape({bounds:PropTypes.object,points:PropTypes.array}).isRequired,
         maps_api_key:PropTypes.string.isRequired,
-        controls:PropTypes.arrayOf(PropTypes.object),
+        controls:PropTypes.arrayOf(PropTypes.shape({lat:PropTypes.number,lon:PropTypes.number})),
         controlNames:PropTypes.arrayOf(PropTypes.string)
     };
 
@@ -212,7 +212,7 @@ class RouteForecastMap extends Component {
     }
 
     drawTheMap(gmaps,forecast,routeInfo) {
-        if (forecast.length > 0) {
+        if (forecast.length > 0 && routeInfo.bounds !== null) {
             this.initMap(forecast, routeInfo);
         }
     }

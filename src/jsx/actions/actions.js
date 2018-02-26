@@ -45,42 +45,6 @@ const getRouteParser = async function () {
     return parser.default;
 };
 
-export const SET_ROUTE_INFO = 'SET_ROUTE_INFO';
-const setRouteInfo = function(routeInfo) {
-    return {
-        type: SET_ROUTE_INFO,
-        routeInfo: routeInfo
-    }
-};
-
-export const recalcRoute = function() {
-    return async function(dispatch, getState) {
-        const parser = await getRouteParser();
-        // this may be called before we have chosen a route, in which case it's a noop
-        if (getState().routeInfo.rwgpsRouteData !== null) {
-            dispatch(setRouteInfo(
-                parser.walkRwgpsRoute(
-                    getState().routeInfo.rwgpsRouteData,
-                    moment(getState().uiInfo.routeParams.start),
-                    getState().uiInfo.routeParams.pace,
-                    getState().uiInfo.routeParams.interval,
-                    getState().controls.userControlPoints,
-                    getState().controls.metric,
-                    getState().routeInfo.timeZoneId)));
-        } else if (getState().routeInfo.gpxRouteData !== null) {
-            dispatch(setRouteInfo(
-                parser.walkGpxRoute(
-                    getState().routeInfo.gpxRouteData,
-                    moment(getState().uiInfo.routeParams.start),
-                    getState().uiInfo.routeParams.pace,
-                    getState().uiInfo.routeParams.interval,
-                    getState().controls.userControlPoints,
-                    getState().controls.metric,
-                    getState().routeInfo.timeZoneId)));
-        }
-    }
-};
-
 export const BEGIN_LOADING_ROUTE = 'BEGIN_LOADING_ROUTE';
 const beginLoadingRoute = function (source) {
     return {
@@ -155,16 +119,23 @@ export const loadControlsFromCookie = function(routeData) {
     };
 };
 
-export const loadFromRideWithGps = function(routeNumber, isTrip) {
-    return async function(dispatch, getState) {
-        dispatch(beginLoadingRoute('rwgps'));
-        const parser = await getRouteParser();
-        parser.loadRwgpsRoute(routeNumber, isTrip, getState().params.timezone_api_key).then( (routeData) => {
-                dispatch(rwgpsRouteLoadingSuccess(routeData));
-                dispatch(loadControlsFromCookie(routeData.rwgpsRouteData));
-                dispatch(recalcRoute());
-            }, error => {dispatch(rwgpsRouteLoadingFailure(error))}
-        );
+export const SET_FETCH_AFTER_LOAD = 'SET_FETCH_AFTER_LOAD';
+export const setFetchAfterLoad = (fetchAfterLoad) => {return {
+    type: SET_FETCH_AFTER_LOAD,
+    fetchAfterLoad: fetchAfterLoad
+}};
+
+/*
+setRouteInfo => requestForecast
+recalcRoute => setRouteInfo
+
+ */
+
+export const ADD_WEATHER_CORRECTION = 'ADD_WEATHER_CORRECTION';
+export const addWeatherCorrection = function(weatherCorrection) {
+    return {
+        type: ADD_WEATHER_CORRECTION,
+        weatherCorrectionMinutes: weatherCorrection
     };
 };
 
@@ -191,69 +162,11 @@ const forecastFetchFailure = function(error) {
     }
 };
 
-export const GPX_ROUTE_LOADING_SUCCESS = 'GPX_ROUTE_LOADING_SUCCESS';
-const gpxRouteLoadingSuccess = function(result) {
-    return {
-        type: GPX_ROUTE_LOADING_SUCCESS,
-        gpxRouteData: result.gpxRouteData,
-        timeZoneId: result.timeZoneId,
-        timeZoneOffset: result.timeZoneOffset
-    }
-};
-
-export const GPX_ROUTE_LOADING_FAILURE = 'GPX_ROUTE_LOADING_FAILURE';
-const gpxRouteLoadingFailure = function(status) {
-    return {
-        type: GPX_ROUTE_LOADING_FAILURE,
-        status: status
-    }
-};
-
-export const SHOW_FORM = 'SHOW_FORM';
-export const showForm = function() {
-    return {
-        type: SHOW_FORM
-    }
-};
-
 export const HIDE_FORM = 'HIDE_FORM';
 const hideForm = function() {
     return {
         type: HIDE_FORM
     }
-};
-
-export const CLEAR_ROUTE_DATA = 'CLEAR_ROUTE_DATA';
-export const clearRouteData = function() {
-    return {
-        type: CLEAR_ROUTE_DATA,
-    };
-};
-
-export const loadGpxRoute = function(event,timezone_api_key) {
-    return async function (dispatch) {
-        let gpxFiles = event.target.files;
-        if (gpxFiles.length > 0) {
-            dispatch(beginLoadingRoute('gpx'));
-            const parser = await getRouteParser();
-            parser.loadGpxFile(gpxFiles[0],timezone_api_key).then( gpxData => {
-                    dispatch(gpxRouteLoadingSuccess(gpxData))
-                    dispatch(recalcRoute());
-                }, error => dispatch(gpxRouteLoadingFailure(error))
-            );
-        }
-        else {
-            dispatch(clearRouteData());
-        }
-    }
-};
-
-export const ADD_WEATHER_CORRECTION = 'ADD_WEATHER_CORRECTION';
-export const addWeatherCorrection = function(weatherCorrection) {
-    return {
-        type: ADD_WEATHER_CORRECTION,
-        weatherCorrectionMinutes: weatherCorrection
-    };
 };
 
 export const requestForecast = function(routeInfo) {
@@ -262,7 +175,7 @@ export const requestForecast = function(routeInfo) {
         dispatch(hideForm());
         let formdata = new FormData();
         formdata.append('locations', JSON.stringify(routeInfo.forecastRequest));
-        formdata.append('timezone', routeInfo.timeZoneOffset);
+        formdata.append('timezone', getState().routeInfo.timeZoneOffset);
         fetch(getState().params.action,
             {
                 method:'POST',
@@ -294,6 +207,111 @@ export const requestForecast = function(routeInfo) {
                 dispatch(forecastFetchFailure(errorMessage));
             }
         )
+    }
+};
+
+export const SET_ROUTE_INFO = 'SET_ROUTE_INFO';
+const setRouteInfo = (routeInfo) => {
+    return (dispatch,getState) => {
+        if (getState().routeInfo.fetchAfterLoad && routeInfo.forecastRequest !== null) {
+            dispatch(requestForecast(routeInfo));
+            dispatch(setFetchAfterLoad(false));
+        }
+        return dispatch({
+            type: SET_ROUTE_INFO,
+            routeInfo: routeInfo
+        });
+    };
+};
+
+export const recalcRoute = function() {
+    return async function(dispatch, getState) {
+        const parser = await getRouteParser();
+        // this may be called before we have chosen a route, in which case it's a noop
+        if (getState().routeInfo.rwgpsRouteData !== null) {
+            dispatch(setRouteInfo(
+                parser.walkRwgpsRoute(
+                    getState().routeInfo.rwgpsRouteData,
+                    moment(getState().uiInfo.routeParams.start),
+                    getState().uiInfo.routeParams.pace,
+                    getState().uiInfo.routeParams.interval,
+                    getState().controls.userControlPoints,
+                    getState().controls.metric,
+                    getState().routeInfo.timeZoneId)));
+        } else if (getState().routeInfo.gpxRouteData !== null) {
+            dispatch(setRouteInfo(
+                parser.walkGpxRoute(
+                    getState().routeInfo.gpxRouteData,
+                    moment(getState().uiInfo.routeParams.start),
+                    getState().uiInfo.routeParams.pace,
+                    getState().uiInfo.routeParams.interval,
+                    getState().controls.userControlPoints,
+                    getState().controls.metric,
+                    getState().routeInfo.timeZoneId)));
+        }
+    }
+};
+
+export const loadFromRideWithGps = function(routeNumber, isTrip) {
+    return async function(dispatch, getState) {
+        dispatch(beginLoadingRoute('rwgps'));
+        const parser = await getRouteParser();
+        parser.loadRwgpsRoute(routeNumber, isTrip, getState().params.timezone_api_key).then( (routeData) => {
+                dispatch(rwgpsRouteLoadingSuccess(routeData));
+                dispatch(loadControlsFromCookie(routeData.rwgpsRouteData));
+                dispatch(recalcRoute());
+            }, error => {dispatch(rwgpsRouteLoadingFailure(error))}
+        );
+    };
+};
+
+export const GPX_ROUTE_LOADING_SUCCESS = 'GPX_ROUTE_LOADING_SUCCESS';
+const gpxRouteLoadingSuccess = function(result) {
+    return {
+        type: GPX_ROUTE_LOADING_SUCCESS,
+        gpxRouteData: result.gpxRouteData,
+        timeZoneId: result.timeZoneId,
+        timeZoneOffset: result.timeZoneOffset
+    }
+};
+
+export const GPX_ROUTE_LOADING_FAILURE = 'GPX_ROUTE_LOADING_FAILURE';
+const gpxRouteLoadingFailure = function(status) {
+    return {
+        type: GPX_ROUTE_LOADING_FAILURE,
+        status: status
+    }
+};
+
+export const SHOW_FORM = 'SHOW_FORM';
+export const showForm = function() {
+    return {
+        type: SHOW_FORM
+    }
+};
+
+export const CLEAR_ROUTE_DATA = 'CLEAR_ROUTE_DATA';
+export const clearRouteData = function() {
+    return {
+        type: CLEAR_ROUTE_DATA,
+    };
+};
+
+export const loadGpxRoute = function(event,timezone_api_key) {
+    return async function (dispatch) {
+        let gpxFiles = event.target.files;
+        if (gpxFiles.length > 0) {
+            dispatch(beginLoadingRoute('gpx'));
+            const parser = await getRouteParser();
+            parser.loadGpxFile(gpxFiles[0],timezone_api_key).then( gpxData => {
+                    dispatch(gpxRouteLoadingSuccess(gpxData))
+                    dispatch(recalcRoute());
+                }, error => dispatch(gpxRouteLoadingFailure(error))
+            );
+        }
+        else {
+            dispatch(clearRouteData());
+        }
     }
 };
 

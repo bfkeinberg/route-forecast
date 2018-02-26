@@ -14,7 +14,7 @@ const RwGpsTypeSelector = (rwgpsRouteIsTrip,toggleRouteIsTrip,visible) => {
         <FormGroup controlId="rwgpsType" style={{display:isVisible}}>
             <ControlLabel style={{padding:'10px'}}>RideWithGps trip</ControlLabel>
             <OverlayTrigger overlay={rwgps_trip_tooltip}>
-                <Checkbox onClick={event => toggleRouteIsTrip} onChange={event => toggleRouteIsTrip}
+                <Checkbox onClick={() => toggleRouteIsTrip} onChange={() => toggleRouteIsTrip}
                           checked={rwgpsRouteIsTrip}>Rwgps number is a trip</Checkbox>
             </OverlayTrigger>
         </FormGroup>

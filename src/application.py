@@ -222,6 +222,8 @@ def forecast():
         forecast_points = json.loads(request.form['locations'])
     except ValueError as error:
         return jsonify({'status': 'Badly formatted forecast locations :' + str(error)}), 400
+    if forecast_points == None:
+        return jsonify('No forecast points provided',400)
     logger.info('Request from %s(%s) for %d forecast points', request.remote_addr,
                 request.headers.get('X-Forwarded-For', request.remote_addr), len(forecast_points))
     if len(forecast_points) > 50:

@@ -24,6 +24,7 @@ class PaceTable extends Component {
                     <td>{pace.pace.toFixed(1)}</td>
                     <td>{pace.alphaPace}</td>
                     <td>{pace.distance.toFixed(0)}</td>
+                    <td>{pace.climb.toFixed(0)}</td>
                 </tr>
             )}
             </tbody>
@@ -41,6 +42,7 @@ class PaceTable extends Component {
                             <th style={{'fontSize':'80%'}}>Pace</th>
                             <th style={{'fontSize':'80%'}}>WW Pace</th>
                             <th style={{'fontSize':'80%'}}>Distance</th>
+                            <th style={{'fontSize':'80%'}}>Climb</th>
                         </tr>
                         </thead>
                         {PaceTable.expandTable(this.props.calculatedPaces)}

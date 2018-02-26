@@ -48,7 +48,7 @@ class StravaRouteParser {
 
     computeTimesFromData(controlPoints, activityData, activityStream) {
         return ({controls:this.parseActivity(activityData, activityStream, controlPoints),
-            actualFinishTime:this.computeActualFinishTime(activityData),
+            actualFinishTime:StravaRouteParser.computeActualFinishTime(activityData),
             actualPace:StravaRouteParser.wwPaceCalcForActivity(activityData)});
     }
 
@@ -68,12 +68,12 @@ class StravaRouteParser {
         return averageSpeedInMilesPerHour + hilliness;
     }
 
-    computeActualFinishTime(activity) {
+    static computeActualFinishTime(activity) {
         return moment(activity['start_date']).add(activity['elapsed_time'],'seconds').format('ddd, MMM DD h:mma');
     }
 
     fetchActivity(activityId, token) {
-        const promise = new Promise((resolve, reject) => {
+        return new Promise((resolve, reject) => {
             strava.activities.get({access_token: token, id: activityId},
                 function (err, payload) {
                     if (err) {
@@ -84,7 +84,6 @@ class StravaRouteParser {
                 }
             );
         });
-        return promise;
     }
 
     findMovingAverages(activity,activityStreams,intervalInHours) {
@@ -104,6 +103,26 @@ class StravaRouteParser {
         let intervalElevationGainMeters = 0;
         let lastElevation = null;
         let averages = [];
+
+        const addToAverages = function (intervalStartTimeSeconds, startingDistanceMeters, distance,
+                                        lastMovingTimeSeconds, value, movingNow) {
+            // compute average, set up for next interval
+            let currentMoment = moment(start).add(intervalStartTimeSeconds, 'seconds');
+            let distanceTraveledMeters = distance - startingDistanceMeters;
+            let distanceTraveledMiles = distanceTraveledMeters * metersToMiles;
+            // regardless of whether we're moving at this point, sum up the moving time
+            if (movingNow) {
+                intervalMovingTimeSeconds += (value - lastMovingTimeSeconds);
+            }
+            let movingAverage = (distanceTraveledMiles) / (intervalMovingTimeSeconds / 3600);
+            let climbInFeet = intervalElevationGainMeters * metersToFeet;
+            let pace = StravaRouteParser.wwPaceCalc(climbInFeet, distanceTraveledMiles, movingAverage);
+            return({
+                speed: movingAverage, distance: distanceTraveledMiles, climb: climbInFeet,
+                pace: pace, alphaPace: StravaRouteParser.getAlphaPace(pace), time: currentMoment.format('ddd, MMM DD h:mma')
+            });
+        };
+
         for (let value of times) {
             if (moving[index] === true && !isMoving) {
                 lastMovingTimeSeconds = value;
@@ -112,24 +131,19 @@ class StravaRouteParser {
                 intervalMovingTimeSeconds += (value - lastMovingTimeSeconds);
                 isMoving = false
             }
-            if (lastElevation != null && altitudes[index] > lastElevation) {
-                intervalElevationGainMeters += (altitudes[index] - lastElevation);
+            // try to apply some smoothing to elevation gain
+            if (lastElevation !== null) {
+                if (altitudes[index] > (lastElevation + 0.2)) {
+                    intervalElevationGainMeters += (altitudes[index] - lastElevation);
+                }
+                else if (altitudes[index] > (lastElevation + 0.1)) {
+                    intervalElevationGainMeters += (altitudes[index] - lastElevation)/2;
+                }
             }
             lastElevation = altitudes[index];
             if ((value - intervalStartTimeSeconds) >= intervalInSeconds) {
-                // compute average, set up for next interval
-                let currentMoment = moment(start).add(intervalStartTimeSeconds,'seconds');
-                let distanceTraveledMeters = distances[index] - startingDistanceMeters;
-                let distanceTraveledMiles = distanceTraveledMeters*metersToMiles;
-                // regardless of whether we're moving at this point, sum up the moving time
-                if (moving[index]) {
-                    intervalMovingTimeSeconds += (value - lastMovingTimeSeconds);
-                }
-                let movingAverage = (distanceTraveledMiles)/(intervalMovingTimeSeconds/3600);
-                let climbInFeet = intervalElevationGainMeters*metersToFeet;
-                let pace = StravaRouteParser.wwPaceCalc(climbInFeet,distanceTraveledMiles,movingAverage);
-                averages.push({speed:movingAverage,distance:distanceTraveledMiles,climb: climbInFeet,
-                    pace:pace, alphaPace:this.getAlphaPace(pace),time:currentMoment.format('ddd, MMM DD h:mma')});
+                averages.push(addToAverages(intervalStartTimeSeconds,startingDistanceMeters,distances[index],
+                    lastMovingTimeSeconds,value,moving[index]));
                 intervalMovingTimeSeconds = 0;
                 intervalStartTimeSeconds = value;
                 startingDistanceMeters = distances[index];
@@ -138,10 +152,14 @@ class StravaRouteParser {
             }
             ++index;
         }
+        if (intervalMovingTimeSeconds > 0) {
+            averages.push(addToAverages(intervalStartTimeSeconds,startingDistanceMeters,distances[distances.length-1],
+                lastMovingTimeSeconds,times[times.length-1],moving[moving.length-1]));
+        }
         return averages;
     }
 
-    getAlphaPace(pace) {
+    static getAlphaPace(pace) {
         let alpha = 'A';     // default
         alpha = Object.keys(paceToSpeed).reverse().find(value => {
             return (pace > paceToSpeed[value])});

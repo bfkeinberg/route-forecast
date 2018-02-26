@@ -132,7 +132,7 @@ const routeParams = function(state = {interval:defaultIntervalInHours,pace:defau
 };
 
 const dialogParams = function(state = {formVisible:true, errorDetails:null, succeeded:true, shortUrl:' ',
-loadingSource:null}, action) {
+loadingSource:null,fetchingForecast:false}, action) {
     switch (action.type) {
         case Actions.CLEAR_ROUTE_DATA:
             return {...state, loadingSource: null, succeeded: null};
@@ -168,7 +168,8 @@ loadingSource:null}, action) {
     }
 };
 
-const routeInfo = function(state = {finishTime:'',weatherCorrectionMinutes:null,forecastRequest:null,points:[]}, action) {
+const routeInfo = function(state = {finishTime:'',weatherCorrectionMinutes:null,forecastRequest:null,points:[],
+fetchAfterLoad:false,bounds:null}, action) {
     switch (action.type) {
         case Actions.RWGPS_ROUTE_LOADING_SUCCESS:
             return {...state,rwgpsRouteData:action.routeData.rwgpsRouteData,timeZoneOffset:action.routeData.timeZoneOffset,
@@ -181,7 +182,7 @@ const routeInfo = function(state = {finishTime:'',weatherCorrectionMinutes:null,
                 return {...state,rwgpsRouteData:null,gpxRouteData:null,points:[],bounds:null,name:'',forecastRequest:null};
             }
             return {...state, points:action.routeInfo.points,name:action.routeInfo.name,bounds:action.routeInfo.bounds,
-                finishTime:action.routeInfo.finishTime,forecastRequest:action.routeInfo.forecast};
+                finishTime:action.routeInfo.finishTime,forecastRequest:action.routeInfo.forecastRequest};
         case Actions.CLEAR_ROUTE_DATA:
             return {...state,rwgpsRouteData:null,gpxRouteData:null,points:[],bounds:null,name:'',forecastRequest:null};
         // clear when the route is changed
@@ -190,6 +191,8 @@ const routeInfo = function(state = {finishTime:'',weatherCorrectionMinutes:null,
         case Actions.ADD_WEATHER_CORRECTION:
             return {...state,weatherCorrectionMinutes:action.weatherCorrectionMinutes,
                 finishTime:moment(state.finishTime,finishTimeFormat).add(action.weatherCorrectionMinutes,'minutes').format(finishTimeFormat)};
+        case Actions.SET_FETCH_AFTER_LOAD:
+            return {...state, fetchAfterLoad:action.fetchAfterLoad};
         default:
             return state;
     }

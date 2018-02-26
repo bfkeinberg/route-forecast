@@ -24,6 +24,7 @@ import {connect} from 'react-redux';
 import {
     setActionUrl,
     setApiKeys,
+    setFetchAfterLoad,
     setInterval,
     setMetric,
     setPace,
@@ -56,7 +57,8 @@ class RouteWeatherUI extends Component {
         updateControls:PropTypes.func.isRequired,
         formVisible:PropTypes.bool.isRequired,
         showForm:PropTypes.func.isRequired,
-        showPacePerTme:PropTypes.bool.isRequired
+        showPacePerTme:PropTypes.bool.isRequired,
+        setFetchAfterLoad:PropTypes.func.isRequired
     };
 
     constructor(props) {
@@ -106,6 +108,10 @@ class RouteWeatherUI extends Component {
 
     updateFromQueryParams(props,queryParams) {
         props.setRwgpsRoute(queryParams.rwgpsRoute);
+        // force forecast fetch when our initial url contains a route number
+        if (queryParams.rwgpsRoute !== undefined) {
+            props.setFetchAfterLoad(true);
+        }
         props.setStravaToken(RouteWeatherUI.getStravaToken(queryParams));
         props.setStart(queryParams.start);
         props.setPace(queryParams.pace);
@@ -157,7 +163,7 @@ class RouteWeatherUI extends Component {
 
 const mapDispatchToProps = {
     setStravaToken, setActionUrl, setRwgpsRoute, setApiKeys, setStravaError, setStart, setPace, setInterval, setMetric,
-    setStravaActivity, updateControls:updateUserControls, showForm
+    setStravaActivity, updateControls:updateUserControls, showForm, setFetchAfterLoad
 };
 
 const mapStateToProps = (state) =>
