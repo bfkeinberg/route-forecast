@@ -1,27 +1,25 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {ControlLabel, FormControl, FormGroup, OverlayTrigger, Tooltip} from 'react-bootstrap';
+import {Label, Input, FormGroup, Tooltip, UncontrolledTooltip} from 'reactstrap';
 import {connect} from 'react-redux';
 import {getPaceOverTime, setAnalysisInterval} from "../actions/actions";
 
 const AnalysisInterval = ({interval,setInterval,getPaceOverTime,visible}) => {
-    const interval_tooltip_id = 'interval_tooltip';
     const interval_tooltip_text = 'Interval at which to calculate effective pace';
-    let interval_tooltip = ( <Tooltip id={interval_tooltip_id}>{interval_tooltip_text}</Tooltip> );
     const isVisible = visible ? 'inline-flex' : 'none';
     return (
-        <FormGroup style={{flex:'1',display:isVisible}} controlId="analysisInterval">
-            <ControlLabel>Analysis Interval</ControlLabel>
-            <OverlayTrigger placement="bottom" overlay={interval_tooltip}>
-                <FormControl componentClass="select" value={interval} name="analysisInterval"
+        <FormGroup size='sm' style={{flex:'1',display:isVisible}}>
+            <UncontrolledTooltip placement="bottom" target='interval'>{interval_tooltip_text}</UncontrolledTooltip>
+            <Label>Analysis Interval
+                <Input id='interval' type="select" value={interval} name="analysisInterval"
                              onChange={event => {setInterval(event.target.value);getPaceOverTime(event.target.value)}}>
                     <option value="4">4</option>
                     <option value="6">6</option>
                     <option value="8">8</option>
                     <option value="12">12</option>
                     <option value="24">24</option>
-                </FormControl>
-            </OverlayTrigger>
+                </Input>
+            </Label>
         </FormGroup>
     );
 };

@@ -4,7 +4,7 @@ import RouteInfoForm from './routeInfoEntry';
 import RouteForecastMap from './map';
 import ForecastTable from './forecastTable';
 import SplitPane from 'react-split-pane';
-import {Button} from 'react-bootstrap';
+import {Button} from 'reactstrap';
 import MediaQuery from 'react-responsive';
 // for react-splitter
 import 'normalize.css/normalize.css';

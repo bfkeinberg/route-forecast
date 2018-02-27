@@ -1,21 +1,23 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {ControlLabel, FormControl, FormGroup} from 'react-bootstrap';
+import {Label, Input, FormGroup} from 'reactstrap';
 import {connect} from 'react-redux';
 import {setDisplayedFinishTime} from "../actions/actions";
 
 const FinishTime = ({finishTime,actualFinishTime,displayedFinishTime,setDisplayedFinishTime}) => {
     return (
-        <FormGroup controlId="finishTime" style={{display:'inline-flex'}}>
-            <ControlLabel style={{width:'7em',display:'inline-flex',marginTop:'7px',paddingLeft:'8px'}}>Finish time</ControlLabel>
-            <FormControl tabIndex='-1' type="text"
-                         onMouseEnter={() => {
-                if (actualFinishTime !== undefined) {
-                    setDisplayedFinishTime(actualFinishTime);
-                }}}
-                         onMouseLeave={() => setDisplayedFinishTime(finishTime)}
-                         style={{paddingLeft:'2px',paddingTop:'2px',height:'28px'}}
-                         value={displayedFinishTime}/>
+        <FormGroup size='sm' style={{display:'inline-flex'}}>
+            <Label size='sm'
+                   style={{width:'7em',display:'inline-flex',marginTop:'7px',paddingLeft:'8px',paddingTop:'2px',height:'28px'}}>
+                <Input tabIndex='-1' type="text"
+                             onMouseEnter={() => {
+                    if (actualFinishTime !== undefined) {
+                        setDisplayedFinishTime(actualFinishTime);
+                    }}}
+                             onMouseLeave={() => setDisplayedFinishTime(finishTime)}
+                             value={displayedFinishTime}/>
+                Finish time
+            </Label>
         </FormGroup>
         );
 };

@@ -117,7 +117,7 @@ class StravaRouteParser {
             let movingAverage = (distanceTraveledMiles) / (intervalMovingTimeSeconds / 3600);
             let climbInFeet = intervalElevationGainMeters * metersToFeet;
             let pace = StravaRouteParser.wwPaceCalc(climbInFeet, distanceTraveledMiles, movingAverage);
-            return({
+            return ({
                 speed: movingAverage, distance: distanceTraveledMiles, climb: climbInFeet,
                 pace: pace, alphaPace: StravaRouteParser.getAlphaPace(pace), time: currentMoment.format('ddd, MMM DD h:mma')
             });

@@ -1,5 +1,5 @@
 import React from 'react';
-import {Button, ControlLabel, FormControl, FormGroup, Modal, OverlayTrigger, Tooltip} from 'react-bootstrap';
+import {Button, Label, Input, FormFeedback, FormGroup, Modal, Tooltip} from 'reactstrap';
 import PropTypes from 'prop-types';
 
 class LoginDialog extends React.Component {
@@ -55,7 +55,6 @@ class LoginDialog extends React.Component {
     }
 
     render() {
-        let rwgps_login_tooltip = (<Tooltip id="rwgps_login_tooltip">Needed to enable entering rwgps route numbers</Tooltip>);
         return (
             <div>
                 <Modal show={this.state.showModal} onHide={this.close}>
@@ -68,20 +67,20 @@ class LoginDialog extends React.Component {
                         {this.state.status}
                         <form id="rwgps_login_form">
                             <FormGroup controlId="username" validationState={this.no_login_failure()}>
-                                <ControlLabel>User name</ControlLabel>
-                                <FormControl type="text" value={this.state.username}
+                                <Label for='usernameInput'>User name</Label>
+                                <FormControl id='usernameInput' type="text" value={this.state.username}
                                              name='username'
                                              onChange={event => this.setState({username: event.target.value})}
                                              required/>
-                                <FormControl.Feedback/>
+                                <FormFeedback/>
                             </FormGroup>
                             <FormGroup controlId="password" validationState={this.no_login_failure()}>
-                                <ControlLabel>Password</ControlLabel>
-                                <FormControl type="password" value={this.state.password}
+                                <Label for='passwordInput'>Password</Label>
+                                <Input id='passwordInput' type="password" value={this.state.password}
                                              name="password"
                                              onChange={event => this.setState({password: event.target.value})}
                                              required/>
-                                <FormControl.Feedback/>
+                                <FormFeedback/>
                             </FormGroup>
                             <Button bsStyle="primary" onClick={this.logIn}>Log in</Button>
                             <Button onClick={this.close}>Cancel</Button>
@@ -89,9 +88,8 @@ class LoginDialog extends React.Component {
                     </Modal.Body>
                 </Modal>
                 <span style={{padding:'10px'}}>Log into RideWithGps</span>
-                <OverlayTrigger overlay={rwgps_login_tooltip}>
-                    <Button style={{padding:'10px'}} onClick={this.open} bsClass="rwgpsLogin">Login</Button>
-                </OverlayTrigger>
+                <Tooltip target='login' id="rwgps_login_tooltip">Needed to enable entering rwgps route numbers</Tooltip>
+                <Button id='login' style={{padding:'10px'}} onClick={this.open} bsClass="rwgpsLogin">Login</Button>
             </div>
         );
     }

@@ -59,7 +59,7 @@ class ControlTable extends Component {
         }
     }
 
-    addRow(newProps) {
+    addRow() {
         if (this.api===undefined) {
             return;
         }
@@ -126,7 +126,7 @@ class ControlTable extends Component {
         this.columnApi.setColumnVisible('banked',newProps.displayBanked);
         this.columnApi.setColumnVisible('actual',newProps.compare);
         if (newProps.count > newProps.controls.length) {
-            this.addRow(newProps);
+            this.addRow();
         }
         let rowData = [];
         newProps.controls.forEach((item,index) => rowData.push({...item, ...newProps.calculatedValues[index], id:index}));

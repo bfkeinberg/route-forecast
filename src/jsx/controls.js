@@ -1,4 +1,5 @@
-import {Alert, Button, ButtonGroup, ButtonToolbar, Checkbox, Glyphicon, Panel} from 'react-bootstrap';
+import {Alert, Button, ButtonGroup, ButtonToolbar, Input, Label, Card, CardBody, CardTitle} from 'reactstrap';
+import {Icon} from '@blueprintjs/core';
 import React, {Component} from 'react';
 import MediaQuery from 'react-responsive';
 import ControlTable from './controlTable';
@@ -8,7 +9,7 @@ import PropTypes from 'prop-types';
 import {addControl, toggleDisplayBanked, toggleMetric, toggleStravaAnalysis} from './actions/actions';
 import {connect} from 'react-redux';
 import FinishTime from './ui/finishTime';
-import StravaRoute from './stravaRoute';
+import StravaRoute from './ui/stravaRoute';
 import AnalysisInterval from './ui/analysisInterval';
 
 class ControlPoints extends Component {
@@ -61,23 +62,31 @@ class ControlPoints extends Component {
 
     render () {
         const title = this.props.name === '' ?
-            ( <h3 style={{textAlign:"center"}}>Control point list</h3> ) :
-            ( <h3 style={{textAlign:"center"}}>Control point list for <i>{this.props.name}</i></h3> );
+            (<div style={{textAlign:"center"}}>Control point list</div>) :
+            (<div style={{textAlign:"center"}}>Control point list for <i>{this.props.name}</i></div>);
         const showAnalysisInterval = this.props.hasStravaData && this.props.stravaAnalysis;
         return (
             <div className="controlPoints">
                 <ButtonToolbar style={{display:'inline-flex',flexDirection:'row', paddingTop:'11px',paddingLeft:'4px'}}>
                 {/*<ButtonGroup style={{display:'flex',flexFlow:'row wrap'}}>*/}
                     <ButtonGroup>
-                        <Button tabIndex='10' onClick={this.addControl} id='addButton'><Glyphicon glyph="plus-sign"/>Add control point</Button>
+                        <Button size='sm' tabIndex='10' onClick={this.addControl} id='addButton'><Icon iconName="add"/>Add control point</Button>
                         <FinishTime/>
-                        <Checkbox tabIndex='12' checked={this.props.metric} inline onClick={this.props.toggleMetric}
-                                  style={{padding:'0px 0px 0px 26px',display:'inline-flex'}}>metric</Checkbox>
-                        <Checkbox tabIndex='11' checked={this.props.displayBanked} inline
-                                  onClick={this.props.toggleDisplayBanked}
-                                  style={{padding:'0px 0px 0px 24px', display:'inline-flex'}}>Display banked time</Checkbox>
-                        <Checkbox tabIndex="13" checked={this.props.stravaAnalysis} disabled={!this.props.forecastValid} inline
-                                  onClick={this.props.toggleStravaAnalysis} style={{display:'inline-flex'}}>Compare</Checkbox>
+                        <Label size='sm' style={{padding:'0px 0px 0px 26px',display:'inline-flex'}} check>
+                            <Input type='checkbox' tabIndex='12' checked={this.props.metric} onClick={this.props.toggleMetric}
+                                      />
+                            metric
+                        </Label>
+                        <Label style={{padding:'0px 0px 0px 24px', display:'inline-flex'}} size='sm' check>
+                            <Input type='checkbox' tabIndex='11' checked={this.props.displayBanked}
+                                      onClick={this.props.toggleDisplayBanked}/>
+                            Display banked time
+                        </Label>
+                        <Label size='sm' style={{display:'inline-flex'}} check>
+                            <Input type='checkbox' tabIndex="13" checked={this.props.stravaAnalysis} disabled={!this.props.forecastValid}
+                                   onClick={this.props.toggleStravaAnalysis} />
+                            Compare
+                        </Label>
                         <ErrorBoundary>
                             <StravaRoute/>
                             <AnalysisInterval visible={showAnalysisInterval}/>
@@ -89,11 +98,14 @@ class ControlPoints extends Component {
 
                 <ErrorBoundary>
                     <MediaQuery minDeviceWidth={1000}>
-                        <Panel header={title} bsStyle="info" style={{margin:'10px'}}>
-                            <ErrorBoundary>
-                                <ControlTable/>
-                            </ErrorBoundary>
-                        </Panel>
+                        <Card color="info" style={{margin:'10px'}}>
+                            <CardBody>
+                                <CardTitle>{title}</CardTitle>
+                                <ErrorBoundary>
+                                    <ControlTable/>
+                                </ErrorBoundary>
+                            </CardBody>
+                        </Card>
                     </MediaQuery>
                     <MediaQuery maxDeviceWidth={800}>
                                 <ControlTable/>
