@@ -1,5 +1,5 @@
 import {Spinner} from '@blueprintjs/core';
-import {Alert, Form, Card, CardBody, CardTitle} from 'reactstrap';
+import {Alert, Form, Card, CardBody, CardTitle, Col, Row} from 'reactstrap';
 import React, {Component} from 'react';
 import ShortUrl from './ui/shortUrl';
 import MediaQuery from 'react-responsive';
@@ -31,10 +31,6 @@ class RouteInfoForm extends Component {
         errorDetails:PropTypes.string,
         routeInfo:PropTypes.shape({name:PropTypes.string}),
         loadFromRideWithGps:PropTypes.func.isRequired
-    };
-
-    static contextTypes = {
-        store: PropTypes.object
     };
 
     constructor(props) {
@@ -96,18 +92,30 @@ class RouteInfoForm extends Component {
     }
 
     render() {
-        const header = (<div style={{textAlign:"center",'fontSize':'99%'}}>Forecast and time estimate</div>);
+        const header = (<div style={{textAlign:"center",'fontSize':'90%'}}>Forecast and time estimate</div>);
         return (
-            <div style={{display:'flex',flexFlow:'row wrap',justifyContent:'space-between',alignItems:'center',alignContent:'space-between',margin:'10px'}}>
-                <Card style={{marginBottom:'0'}}>
+            <div>
+                <Card>
                     <CardBody>
-                        <CardTitle>{header}</CardTitle>
+                        <CardTitle className='dlgTitle' tag='h6'>{header}</CardTitle>
                     <Form inline id="forecast_form">
-                        <DateSelect/>
-                        <Recalculate/>
-                        <ForecastInterval/>
-                        <RidingPace/>
-                        <PaceExplanation/>
+                        <Row>
+                            <Col>
+                                <DateSelect/>
+                                <Recalculate/>
+                            </Col>
+                        </Row>
+                        <Row>
+                            <Col sm="5">
+                                <ForecastInterval/>
+                            </Col>
+                            <Col sm="4">
+                                <RidingPace/>
+                            </Col>
+                            <Col sm="1">
+                                <PaceExplanation/>
+                            </Col>
+                        </Row>
                         <FileInput/>
                         <RideWithGpsId/>
                         <RwGpsTypeSelector visible={false}/>

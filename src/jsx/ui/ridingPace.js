@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {Label, Input, FormGroup, Tooltip, UncontrolledTooltip} from 'reactstrap';
+import {Label, Input, FormGroup, UncontrolledTooltip} from 'reactstrap';
 import {connect} from 'react-redux';
 import {setPace} from "../actions/actions";
 
@@ -32,12 +32,11 @@ const RidingPace = ({pace,actualPace,setPace}) => {
         pace_text = `Actual riding pace was ${getAlphaPace(actualPace)}`;
     }
     return (
-        <FormGroup style={{flex:'1',display:'inline-flex',marginTop:'5px',marginBottom:'5px'}}>
-            <Label for='paceInput'>Pace</Label>
+        <FormGroup>
+            <Label size='sm' tag='b' for='paceInput'>Pace</Label>
             <UncontrolledTooltip target='paceInput' placement="bottom" id={pace_tooltip_id}>{pace_text}</UncontrolledTooltip>
             <Input tabIndex='3' type="select" value={pace} name="pace"
-                   id='paceInput' style={{'width':'5em','height':'2.8em',paddingRight:'8px'}}
-                         onChange={event => {setPace(event.target.value)}}>
+                   id='paceInput' onChange={event => {setPace(event.target.value)}}>
                 <option value="A">A/10</option>
                 <option value="B">B/12</option>
                 <option value="C">C/14</option>

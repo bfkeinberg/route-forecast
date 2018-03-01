@@ -68,7 +68,7 @@ class LoginDialog extends React.Component {
                         <form id="rwgps_login_form">
                             <FormGroup controlId="username" validationState={this.no_login_failure()}>
                                 <Label for='usernameInput'>User name</Label>
-                                <FormControl id='usernameInput' type="text" value={this.state.username}
+                                <Input id='usernameInput' type="text" value={this.state.username}
                                              name='username'
                                              onChange={event => this.setState({username: event.target.value})}
                                              required/>

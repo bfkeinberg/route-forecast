@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {Label, Input, FormGroup, Tooltip, UncontrolledTooltip} from 'reactstrap';
+import {Label, Input, FormGroup, UncontrolledTooltip} from 'reactstrap';
 import RouteInfoForm from "../routeInfoEntry";
 import {connect} from 'react-redux';
 import {loadFromRideWithGps, setRwgpsRoute} from "../actions/actions";
@@ -28,11 +28,10 @@ const RideWithGpsId = ({setRwgpsRoute,loadingSource,loadingSuccess,rwgpsRoute,rw
     };
 
     return (
-        <FormGroup
-            style={{flex:'1',display:'inline-flex',marginTop:'5px',marginBottom:'5px'}}>
-            <Label for='rwgps_route'>RideWithGps route</Label>
+        <FormGroup inline>
+            <Label for='rwgps_route' size='sm' tag='b'>RideWithGps route</Label>
             <UncontrolledTooltip placement="bottom" target='rwgps_route'>The number for a route on ridewithgps</UncontrolledTooltip>
-            <Input id='rwgps_route' tabIndex='5' type="text"
+            <Input id='rwgps_route' size="8" bsSize='xsm' tabIndex='5' type="text"
                    {...RouteInfoForm.decideValidationStateFor('rwgps',loadingSource,loadingSuccess)}
                          onBlur={event => {handleRwgpsRoute(event.target.value)}}
                          onKeyPress={isNumberKey}

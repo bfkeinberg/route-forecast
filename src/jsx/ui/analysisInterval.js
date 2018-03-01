@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {Label, Input, FormGroup, Tooltip, UncontrolledTooltip} from 'reactstrap';
+import {Label, Input, FormGroup, UncontrolledTooltip} from 'reactstrap';
 import {connect} from 'react-redux';
 import {getPaceOverTime, setAnalysisInterval} from "../actions/actions";
 
@@ -9,9 +9,9 @@ const AnalysisInterval = ({interval,setInterval,getPaceOverTime,visible}) => {
     const isVisible = visible ? 'inline-flex' : 'none';
     return (
         <FormGroup size='sm' style={{flex:'1',display:isVisible}}>
-            <UncontrolledTooltip placement="bottom" target='interval'>{interval_tooltip_text}</UncontrolledTooltip>
+            <UncontrolledTooltip placement="bottom" target='analysisInterval'>{interval_tooltip_text}</UncontrolledTooltip>
             <Label>Analysis Interval
-                <Input id='interval' type="select" value={interval} name="analysisInterval"
+                <Input id='analysisInterval' type="select" value={interval} name="analysisInterval"
                              onChange={event => {setInterval(event.target.value);getPaceOverTime(event.target.value)}}>
                     <option value="4">4</option>
                     <option value="6">6</option>

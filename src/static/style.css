@@ -56,6 +56,15 @@ label.control-label {
     align-self: center;
 }
 
+.dlgTitle {
+    background-color: rgba(245, 245, 245, 0.91);
+}
+
+.cpListTitle {
+    color: rgba(64, 111, 140, 0.87);
+    background-color: rgba(221, 237, 246, 0.85);
+}
+
 input#finishTime.form-control {
     display: inline-flex;
     width: 14em;

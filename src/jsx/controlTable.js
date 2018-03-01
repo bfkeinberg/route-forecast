@@ -17,7 +17,8 @@ class ControlTable extends Component {
         controls:PropTypes.arrayOf(PropTypes.object).isRequired,
         calculatedValues:PropTypes.arrayOf(PropTypes.object).isRequired,
         updateControls:PropTypes.func.isRequired,
-        count:PropTypes.number.isRequired
+        count:PropTypes.number.isRequired,
+        metric:PropTypes.bool.isRequired
     };
 
     constructor(props) {
@@ -28,7 +29,7 @@ class ControlTable extends Component {
         this.state = {
             columnDefs:[
                 {colId:'name', field:'name', unSortIcon:true, suppressSorting:true, editable:true, headerName:'Name'},
-                {field:'distance', headerTooltip:'In miles or km, depending on the metric checkbox',
+                {field:'distance', headerTooltip:`In ${props.metric?'km':'miles'}`,
                     type:'numericColumn', unSortIcon:true, editable:true, valueParser:ControlTable.setData, valueSetter:ControlTable.validateData, headerName:'Distance'},
                 {field:'duration', headerTooltip:'How many minutes you expect to spend at this control',
                     suppressSorting:true, type:'numericColumn', editable:true, valueParser:params=>{return Number(params.newValue)},
@@ -125,6 +126,14 @@ class ControlTable extends Component {
         }
         this.columnApi.setColumnVisible('banked',newProps.displayBanked);
         this.columnApi.setColumnVisible('actual',newProps.compare);
+
+        let col = this.columnApi.getColumn("distance");
+        let colDef = col.getColDef();
+        colDef.headerTooltip = `In ${newProps.metric?'km':'miles'}`;
+
+        // the column is now updated. to reflect the header change, get the grid refresh the header
+        this.api.refreshHeader();
+
         if (newProps.count > newProps.controls.length) {
             this.addRow();
         }
@@ -206,6 +215,7 @@ const mapStateToProps = (state) =>
     ({
         displayBanked: state.controls.displayBanked,
         compare: state.controls.stravaAnalysis,
+        metric: state.controls.metric,
         count: state.controls.count,
         controls: state.controls.userControlPoints,
         calculatedValues: state.controls.calculatedControlValues

@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import Flatpickr from 'react-flatpickr'
 import {Icon} from '@blueprintjs/core';
-import {Label, FormGroup, Tooltip, UncontrolledTooltip} from 'reactstrap';
+import {Label, FormGroup, UncontrolledTooltip} from 'reactstrap';
 import {connect} from 'react-redux';
 import {setStart} from "../actions/actions";
 
@@ -23,24 +23,22 @@ const DateSelect = ({start,setStart}) => {
     later.setDate(now.getDate() + daysToAdd);
 
     return (
-        <FormGroup size='sm' tabIndex="1"
+        <FormGroup row size='sm' tabIndex="1"
                    style={{flex:'1',display:'inline-flex',alignItems:'center'}}>
             <UncontrolledTooltip placement='bottom' target="startingTime">When you plan to begin riding</UncontrolledTooltip>
             <Icon iconName="calendar"/>
-            <Label size='sm' id='startingTime'>
-                <Flatpickr onChange={(dates) => {
-                    setStart(new Date(dates[0]));
-                }}
-                           options={{enableTime: true,
-                               altInput: true, altFormat: 'F j, Y h:i K',
-                               altInputClass: 'dateDisplay',
-                               minDate: firstDate,
-                               maxDate: later,
-                               defaultDate: start,
-                               dateFormat: 'Y-m-d H:i'
-                           }}/>
-                Starting time
-            </Label>
+            <Label for='calendar' size='sm' tag='b' id='startingTime'>Starting time</Label>
+            <Flatpickr id='calendar' onChange={(dates) => {
+                setStart(new Date(dates[0]));
+            }}
+                       options={{enableTime: true,
+                           altInput: true, altFormat: 'F j, Y h:i K',
+                           altInputClass: 'dateDisplay',
+                           minDate: firstDate,
+                           maxDate: later,
+                           defaultDate: start,
+                           dateFormat: 'Y-m-d H:i'
+                       }}/>
         </FormGroup>
     );
 };

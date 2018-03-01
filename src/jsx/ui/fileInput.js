@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {Label, Input, FormGroup, Tooltip, UncontrolledTooltip} from 'reactstrap';
+import {Label, Input, FormGroup, UncontrolledTooltip} from 'reactstrap';
 import {connect} from 'react-redux';
 import {loadGpxRoute} from "../actions/actions";
 import {decideValidationStateFor} from "../routeInfoEntry";
@@ -8,21 +8,18 @@ import {decideValidationStateFor} from "../routeInfoEntry";
 const FileInput = ({loadingSource,loadingSuccess,loadGpxRoute,timezone_api_key}) => {
     const ok=decideValidationStateFor('gpx',loadingSource,loadingSuccess);
     return (
-        <FormGroup size='sm'
-                   className='formGroup d-none d-md-block'
-                   style={{display:'inline-flex',marginTop:'5px',marginBottom:'5px'}}>
+        <FormGroup inline size='xsm'
+                   className='formGroup d-none d-md-block'>
             <UncontrolledTooltip placement='bottom' target='routeFile'>Upload a .gpx file describing your route</UncontrolledTooltip>
-            <Label size='sm'>
-                <Input bsSize='sm' tabIndex='4' type="file" name='route'
-                       accept=".gpx" id='routeFile' {...ok}
-                       onChange={event => {
-                        // nothing to encode if the URL if we're working from a local file
-                        history.pushState(null, 'nothing', location.origin);
-                        loadGpxRoute(event,timezone_api_key);
-                    }
-                }/>
-                Route file
-            </Label>
+            <Label for='routeFile' size='sm' tag='b'>Route file</Label>
+            <Input tabIndex='4' type="file" name='route'
+                   accept=".gpx" id='routeFile' {...ok}
+                   onChange={event => {
+                    // nothing to encode if the URL if we're working from a local file
+                    history.pushState(null, 'nothing', location.origin);
+                    loadGpxRoute(event,timezone_api_key);
+                }
+            }/>
         </FormGroup>
     );
 };
