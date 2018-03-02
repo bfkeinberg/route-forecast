@@ -8,8 +8,8 @@ const FinishTime = ({finishTime,actualFinishTime,displayedFinishTime,setDisplaye
     return (
         <FormGroup>
             <Label for="finishTime" size='sm' tag='b'>Finish time</Label>
-            <Input style={{width:'7em',height:'28px'}}
-                size="12" bsSize='md' tabIndex='-1' type="text" id="finishTime"
+            <Input style={{width:'10em',height:'28px'}}
+                size="8" bsSize='sm' tabIndex='-1' type="text" id="finishTime"
                          onMouseEnter={() => {
                 if (actualFinishTime !== undefined) {
                     setDisplayedFinishTime(actualFinishTime);

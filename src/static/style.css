@@ -65,6 +65,16 @@ label.control-label {
     background-color: rgba(221, 237, 246, 0.85);
 }
 
+.rideRatingPopup {
+    border-style: ridge;
+    border-width: medium;
+}
+
+img#stravaImage {
+    width: 6rem;
+    height: 2.8rem;
+}
+
 input#finishTime.form-control {
     display: inline-flex;
     width: 14em;

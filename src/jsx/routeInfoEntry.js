@@ -16,7 +16,8 @@ import DateSelect from './ui/dateSelect';
 import RideWithGpsId from './ui/rideWithGpsId';
 import RwGpsTypeSelector from './ui/rwGpsTypeSelector';
 import ForecastButton from './ui/forecastButton';
-import Strava from 'Images/api_logo_pwrdBy_strava_stack_light.png';
+import AnalysisButton from './ui/analysisButton';
+import StravaDialog from './stravaDialog';
 
 class RouteInfoForm extends Component {
     static propTypes = {
@@ -116,7 +117,11 @@ class RouteInfoForm extends Component {
                                 <PaceExplanation/>
                             </Col>
                         </Row>
-                        <FileInput/>
+                        <Row>
+                            <Col sm="12">
+                                <FileInput/>
+                            </Col>
+                        </Row>
                         <RideWithGpsId/>
                         <RwGpsTypeSelector visible={false}/>
                         <ForecastButton/>
@@ -129,7 +134,15 @@ class RouteInfoForm extends Component {
                     </CardBody>
                 </Card>
             <MediaQuery minDeviceWidth={1000}>
-                <ShortUrl/>
+                <Row>
+                    <Col>
+                        <ShortUrl/>
+                    </Col>
+                    <Col>
+                        <AnalysisButton/>
+                        <StravaDialog/>
+                    </Col>
+                </Row>
             </MediaQuery>
             </div>
         );

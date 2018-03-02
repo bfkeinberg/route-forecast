@@ -12,7 +12,7 @@ const FileInput = ({loadingSource,loadingSuccess,loadGpxRoute,timezone_api_key})
                    className='formGroup d-none d-md-block'>
             <UncontrolledTooltip placement='bottom' target='routeFile'>Upload a .gpx file describing your route</UncontrolledTooltip>
             <Label for='routeFile' size='sm' tag='b'>Route file</Label>
-            <Input tabIndex='4' type="file" name='route'
+            <Input bsSize='sm' tabIndex='4' type="file" name='route'
                    accept=".gpx" id='routeFile' {...ok}
                    onChange={event => {
                     // nothing to encode if the URL if we're working from a local file

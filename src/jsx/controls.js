@@ -1,29 +1,23 @@
-import {Alert, Button, Row, Col,
+import {Button, Row, Col,
     Container, Input, Label, Card, CardBody,
-    Form, CardTitle} from 'reactstrap';
+    CardTitle} from 'reactstrap';
 import {Icon} from '@blueprintjs/core';
 import React, {Component} from 'react';
 import MediaQuery from 'react-responsive';
 import ControlTable from './controlTable';
-import {Spinner} from '@blueprintjs/core';
 import ErrorBoundary from './errorBoundary';
 import PropTypes from 'prop-types';
-import {addControl, toggleDisplayBanked, toggleMetric, toggleStravaAnalysis} from './actions/actions';
+import {addControl, toggleDisplayBanked, toggleMetric} from './actions/actions';
 import {connect} from 'react-redux';
 import FinishTime from './ui/finishTime';
-import StravaRoute from './ui/stravaRoute';
-import AnalysisInterval from './ui/analysisInterval';
 
 class ControlPoints extends Component {
 
     static propTypes = {
         metric: PropTypes.bool.isRequired,
-        strava_error: PropTypes.string,
         hasStravaData:PropTypes.bool.isRequired,
-        forecastValid:PropTypes.bool.isRequired,
         name:PropTypes.string,
         addControl:PropTypes.func.isRequired,
-        toggleStravaAnalysis:PropTypes.func.isRequired,
         toggleMetric:PropTypes.func.isRequired,
         displayBanked:PropTypes.bool.isRequired,
         fetchingFromStrava:PropTypes.bool,
@@ -34,28 +28,7 @@ class ControlPoints extends Component {
     constructor(props) {
         super(props);
         this.addControl = this.addControl.bind(this);
-        this.hideStravaErrorAlert = this.hideStravaErrorAlert.bind(this);
-        this.state = {
-            stravaAlertVisible: false, stravaError: this.props.strava_error
-        };
-    }
-
-    static showProgressSpinner(running) {
-        if (running) {
-            return (
-                <Spinner/>
-            );
-        }
-    }
-
-    hideStravaErrorAlert() {
-        this.setState({stravaError:null, stravaAlertVisible:false});
-    }
-
-    componentWillReceiveProps(newProps) {
-        if (newProps.strava_error !== undefined) {
-            this.setState({stravaError:newProps.strava_error,stravaAlertVisible:true});
-        }
+        this.state = {};
     }
 
     addControl( ) {
@@ -66,7 +39,6 @@ class ControlPoints extends Component {
         const title = this.props.name === '' ?
             (<div style={{textAlign:"center"}}>Control point list</div>) :
             (<div style={{textAlign:"center"}}>Control point list for <i>{this.props.name}</i></div>);
-        const showAnalysisInterval = this.props.hasStravaData && this.props.stravaAnalysis;
         return (
             <div className="controlPoints">
                 <Container fluid={true}>
@@ -89,19 +61,6 @@ class ControlPoints extends Component {
                         <Col>
                             <Input id='banked' type='checkbox' tabIndex='11' checked={this.props.displayBanked}
                                       onClick={this.props.toggleDisplayBanked}/>
-                        </Col>
-                        <Col sm={{size:"auto"}}>
-                            <Label for='analysis' size='sm'>Compare</Label>
-                        </Col>
-                        <Col>
-                            <Input id='analysis' type='checkbox' tabIndex="13" checked={this.props.stravaAnalysis} disabled={!this.props.forecastValid}
-                                   onClick={this.props.toggleStravaAnalysis} />
-                            <ErrorBoundary>
-                                <StravaRoute/>
-                                <AnalysisInterval visible={showAnalysisInterval}/>
-                                {this.state.stravaAlertVisible?<Alert onDismiss={this.hideStravaErrorAlert} bsStyle='warning'>{this.state.stravaError}</Alert>:null}
-                                {ControlPoints.showProgressSpinner(this.props.fetchingFromStrava)}
-                            </ErrorBoundary>
                         </Col>
                     </Row>
                 </Container>
@@ -131,16 +90,14 @@ const mapStateToProps = (state) =>
         metric: state.controls.metric,
         calculatedValues: state.controls.calculatedValues,
         name: state.routeInfo.name,
-        strava_error: state.strava.error,
         displayBanked: state.controls.displayBanked,
         stravaAnalysis: state.controls.stravaAnalysis,
         fetchingFromStrava: state.strava.fetching,
-        forecastValid: state.forecast.valid,
         hasStravaData: state.strava.activityData !== null
     });
 
 const mapDispatchToProps = {
-    toggleMetric, toggleDisplayBanked, toggleStravaAnalysis, addControl
+    toggleMetric, toggleDisplayBanked, addControl
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(ControlPoints);
