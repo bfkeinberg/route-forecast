@@ -14,7 +14,6 @@ class AnalyzeRoute {
         this.loadGpxFile = this.loadGpxFile.bind(this);
         this.analyzeRoute = this.analyzeRoute.bind(this);
         this.adjustForWind = this.adjustForWind.bind(this);
-        this.isTrip = false;
     }
 
     loadGpxFile(gpxFile, timezone_api_key) {
@@ -67,7 +66,6 @@ class AnalyzeRoute {
 
     loadRwgpsRoute(route, isTrip, timezone_api_key) {
         return new Promise((resolve, reject) => {
-            this.isTrip = isTrip;
             fetch('/rwgps_route?route=' + route + '&trip=' + isTrip).then(response => {
                     if (response.status === 200) {
                         return response.json();
@@ -214,9 +212,8 @@ class AnalyzeRoute {
     walkRwgpsRoute(routeData,startTime,pace,interval,controls,metric,timeZoneId) {
         let modifiedControls = controls.slice();
         modifiedControls.sort((a,b) => a['distance']-b['distance']);
-        let stream = routeData[this.isTrip ? 'trip' : 'route']['track_points'].map(point => ({'lat':point['y'],'lon':point['x'],'elevation':point['e']}));
-        let rideType = this.isTrip ? 'trip' : 'route';
-        let trackName = routeData[rideType].name;
+        let stream = routeData[routeData.type]['track_points'].map(point => ({'lat':point['y'],'lon':point['x'],'elevation':point['e']}));
+        let trackName = routeData[routeData.type].name;
         return this.analyzeRoute(trackName, stream, startTime, pace, interval, modifiedControls, metric, timeZoneId);
     }
 

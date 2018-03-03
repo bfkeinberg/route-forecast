@@ -15,7 +15,7 @@ const RideWithGpsId = ({setRwgpsRoute,loadingSource,loadingSuccess,rwgpsRoute,rw
             }
             loadFromRideWithGps(route,rwgpsRouteIsTrip,timezone_api_key);
             // clear file input to avoid confusion
-            document.getElementById('route').value = null;
+            document.getElementById('routeFile').value = null;
         }
     };
 
@@ -26,49 +26,48 @@ const RideWithGpsId = ({setRwgpsRoute,loadingSource,loadingSuccess,rwgpsRoute,rw
 
         return charCode;
     };
-
     return (
         <FormGroup inline>
             <Label for='rwgps_route' size='sm' tag='b'>RideWithGps route</Label>
             <UncontrolledTooltip placement="bottom" target='rwgps_route'>The number for a route on ridewithgps</UncontrolledTooltip>
-            <Input id='rwgps_route' size="8" bsSize='xsm' tabIndex='5' type="text"
+            <Input id='rwgps_route'
+                   size="9" bsSize='xsm' tabIndex='5' type="text"
                    {...RouteInfoForm.decideValidationStateFor('rwgps',loadingSource,loadingSuccess)}
-                         onBlur={event => {handleRwgpsRoute(event.target.value)}}
-                         onKeyPress={isNumberKey}
-                         onChange={event => {setRwgpsRoute(event.target.value)}}
-                         onDrop={event => {
-                             let dt = event.dataTransfer;
-                             if (dt.items) {
-                                 for (let i=0;i < dt.items.length;i++) {
-                                     if (dt.items[i].kind === 'string') {
-                                         event.preventDefault();
-                                         dt.items[i].getAsString(value => {
-                                             setRwgpsRoute(value);
-                                             handleRwgpsRoute(value);
-                                         });
-                                     } else {
-                                         console.log('vetoing drop of',i,dt.items[i].kind);
-                                         return false;
-                                     }
-                                 }
+                 onBlur={event => {handleRwgpsRoute(event.target.value)}}
+                 onKeyPress={isNumberKey}
+                 onChange={event => {setRwgpsRoute(event.target.value)}}
+                 onDrop={event => {
+                     let dt = event.dataTransfer;
+                     if (dt.items) {
+                         for (let i=0;i < dt.items.length;i++) {
+                             if (dt.items[i].kind === 'string') {
+                                 event.preventDefault();
+                                 dt.items[i].getAsString(value => {
+                                     setRwgpsRoute(value);
+                                     handleRwgpsRoute(value);
+                                 });
+                             } else {
+                                 console.log('vetoing drop of',i,dt.items[i].kind);
+                                 return false;
                              }
-                         }}
-                         onDragOver={event => {
-                             event.preventDefault();
-                             event.dataTransfer.dropEffect = 'move';
-                         }}
-                         onDragEnd={event => {
-                             let dt = event.dataTransfer;
-                             if (dt.items) {
-                                 // Use DataTransferItemList interface to remove the drag data
-                                 for (let i = 0;i < dt.items.length;i++) {
-                                     dt.items.remove(i);
-                                 }
-                             }
-                         }}
-                         pattern="[0-9]*"
-                         value={rwgpsRoute}
-                         style={{flex:'1',display:'inline-flex',alignItems:'center'}}/>
+                         }
+                     }
+                 }}
+                 onDragOver={event => {
+                     event.preventDefault();
+                     event.dataTransfer.dropEffect = 'move';
+                 }}
+                 onDragEnd={event => {
+                     let dt = event.dataTransfer;
+                     if (dt.items) {
+                         // Use DataTransferItemList interface to remove the drag data
+                         for (let i = 0;i < dt.items.length;i++) {
+                             dt.items.remove(i);
+                         }
+                     }
+                 }}
+                 pattern="[0-9]*"
+                 value={rwgpsRoute}/>
         </FormGroup>
     );
 };

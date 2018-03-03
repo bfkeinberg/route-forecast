@@ -27,7 +27,7 @@ const ForecastButton = ({fetchingForecast,requestForecast,routeInfo,submitDisabl
             <MediaQuery minDeviceWidth={1000}>
                 <Button tabIndex='6' color="primary" onClick={forecastClick}
                         style={buttonStyle}
-                        disabled={submitDisabled || fetchingForecast} size="lg">
+                        disabled={submitDisabled || fetchingForecast}>
                     {fetchingForecast?'Updating...':'Find forecast'}</Button>
             </MediaQuery>
             <MediaQuery maxDeviceWidth={800}>

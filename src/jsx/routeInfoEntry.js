@@ -54,7 +54,7 @@ class RouteInfoForm extends Component {
     static showErrorDetails(errorState) {
         if (errorState !== null) {
             return (
-                <Alert style={{padding:'10px'}} bsStyle="danger">{errorState}</Alert>
+                <Alert style={{padding:'10px'}} color="danger">{errorState}</Alert>
             );
         }
     }
@@ -83,9 +83,9 @@ class RouteInfoForm extends Component {
     static decideValidationStateFor(type, methodUsed, loadingSuccess) {
         if (type === methodUsed) {
             if (loadingSuccess) {
-                return 'valid';
+                return {'valid':null};
             } else {
-                return 'invalid';
+                return {'invalid':null};
             }
         } else {
             return null;
@@ -122,9 +122,17 @@ class RouteInfoForm extends Component {
                                 <FileInput/>
                             </Col>
                         </Row>
-                        <RideWithGpsId/>
-                        <RwGpsTypeSelector visible={false}/>
-                        <ForecastButton/>
+                        <Row>
+                            <Col sm={{size:"auto"}}>
+                                <RideWithGpsId/>
+                            </Col>
+                            <Col size={{size:"auto"}}>
+                                <RwGpsTypeSelector visible={false}/>
+                            </Col>
+                            <Col size={{size:"auto"}}>
+                                <ForecastButton/>
+                            </Col>
+                        </Row>
                         {RouteInfoForm.showErrorDetails(this.props.errorDetails)}
                         {RouteInfoForm.showProgressSpinner(this.props.fetchingRoute)}
                     </Form>

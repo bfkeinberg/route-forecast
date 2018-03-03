@@ -40,6 +40,10 @@ h1 {
 }
 */
 
+.rwgps_route {
+    font-size: 90%;
+}
+
 .rwgpsLogin {
     background: url(https://ridewithgps.com/images/logo_trans_black.png?1) no-repeat;
     height:40px;
@@ -112,6 +116,7 @@ select#pace.form-control {
 .dateDisplay {
     width: 15em;
     padding-top: 5px;
+    font-size: 80%;
     font-weight: bold;
     display: inline-flex;
 }
