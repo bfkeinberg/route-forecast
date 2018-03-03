@@ -117,12 +117,12 @@ class RouteInfoForm extends Component {
                                 <PaceExplanation/>
                             </Col>
                         </Row>
-                        <Row>
-                            <Col sm="12">
+                        <Row noGutters>
+                            <Col sm={{size:"auto"}}>
                                 <FileInput/>
                             </Col>
                         </Row>
-                        <Row>
+                        <Row noGutters>
                             <Col sm={{size:"auto"}}>
                                 <RideWithGpsId/>
                             </Col>
