@@ -1,14 +1,14 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {ControlLabel, FormControl, FormGroup} from 'react-bootstrap';
+import {Label, Input, FormGroup} from 'reactstrap';
 import {connect} from 'react-redux';
-import {setStravaActivity, updateExpectedTimes} from "./actions/actions";
+import {setStravaActivity, updateExpectedTimes} from "../actions/actions";
 
 const StravaRoute = ({stravaAnalysis,setStravaActivity,strava_activity,updateExpectedTimes}) => {
     return (
-        <FormGroup controlId="actualRide" style={{display:stravaAnalysis?'inline-flex':'none'}}>
-            <ControlLabel style={{display:'inline-flex'}}>Strava</ControlLabel>
-            <FormControl tabIndex='-1' type="text" style={{display:'inline-flex'}}
+        <FormGroup style={{display:stravaAnalysis?'inline-flex':'none'}}>
+            <Label style={{display:'inline-flex'}}>
+`            <Input tabIndex='-1' type="text" style={{display:'inline-flex'}}
                          onDrop={event => {
                              let dt = event.dataTransfer;
                              if (dt.items) {
@@ -42,7 +42,8 @@ const StravaRoute = ({stravaAnalysis,setStravaActivity,strava_activity,updateExp
                              }
                          }}
                          value={strava_activity} onChange={event => {setStravaActivity(event.target.value)}}
-                         onBlur={() => {if (strava_activity !== ' ') {updateExpectedTimes(strava_activity)}}}/>
+                         onBlur={() => {if (strava_activity !== ' ') {updateExpectedTimes(strava_activity)}}}/>`
+                Strava</Label>
         </FormGroup>
     );
 };

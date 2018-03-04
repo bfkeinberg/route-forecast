@@ -187,6 +187,13 @@ def get_rwgps_route():
     route_info_result = urlfetch.fetch("https://ridewithgps.com/{1}/{0}.json?{2}".format(route, route_type,url_params),
                                        validate_certificate=True)
     if route_info_result.status_code != 200:
+        if route_type == 'routes':
+            route_type = 'trips'
+        elif route_type == 'trips':
+            route_type = 'routes'
+        route_info_result = urlfetch.fetch("https://ridewithgps.com/{1}/{0}.json?{2}".format(route, route_type,url_params),
+                                       validate_certificate=True)
+    if route_info_result.status_code != 200:
         logger.error(route_info_result.headers)
         return jsonify({'status': route_info_result.status_code}), route_info_result.status_code
     return route_info_result.content

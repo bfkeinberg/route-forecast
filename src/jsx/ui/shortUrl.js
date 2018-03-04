@@ -1,13 +1,13 @@
 import React from 'react';
-import {FormControl, FormGroup} from 'react-bootstrap';
+import {Input, FormGroup} from 'reactstrap';
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 
 const ShortUrl = ({shortUrl}) => {
     return (
-        <FormGroup bsSize="small">
-            <FormControl readOnly type="text" style={{marginTop:'10px',marginLeft:'135px',width:'15em',display:shortUrl===''?'none':'inline-flex'}}
-                         value={shortUrl} onFocus={event => {event.target.select();document.execCommand('copy')}}/>
+        <FormGroup size='sm' style={{marginTop:'10px',marginLeft:'135px',width:'15em',display:shortUrl===''?'none':'inline-flex'}}>
+            <Input bsSize="small" readOnly type="text" value={shortUrl}
+                   onFocus={event => {event.target.select();document.execCommand('copy')}}/>
         </FormGroup>
     );
 };

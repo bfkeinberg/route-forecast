@@ -149,9 +149,11 @@ loadingSource:null,fetchingForecast:false}, action) {
         case Actions.GPX_ROUTE_LOADING_SUCCESS:
             return {...state, fetchingRoute: false, errorDetails: null, succeeded: true};
         case Actions.RWGPS_ROUTE_LOADING_FAILURE:
-            return {...state, fetchingRoute: false, errorDetails: action.error, rwgpsRoute: '', succeeded: false};
+            return {...state, fetchingRoute: false, rwgpsRoute: '', succeeded: false,
+                errorDetails: (typeof action.status === 'object' ? action.status.message : action.status)};
         case Actions.GPX_ROUTE_LOADING_FAILURE:
-            return {...state, fetchingRoute: false, errorDetails: action.error, succeeded: false};
+            return {...state, fetchingRoute: false, succeeded: false,
+                errorDetails: (typeof action.status === 'object' ? action.status.message : action.status)};
         case Actions.SHOW_FORM:
             return {...state, formVisible: true};
         case Actions.HIDE_FORM:
@@ -241,7 +243,7 @@ const controls = function(state = {metric:false,displayBanked:false,stravaAnalys
 };
 
 const strava = function(state = {analysisInterval:defaultAnalysisIntervalInHours,activity:'',token:null,
-    fetching:false,calculatedPaces:null}, action) {
+    fetching:false,calculatedPaces:null,errorDetails:null}, action) {
     switch (action.type) {
         case Actions.SET_STRAVA_TOKEN:
             if (action.token !== undefined) {

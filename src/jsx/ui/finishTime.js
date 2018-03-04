@@ -1,20 +1,20 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {ControlLabel, FormControl, FormGroup} from 'react-bootstrap';
+import {Label, Input, FormGroup} from 'reactstrap';
 import {connect} from 'react-redux';
 import {setDisplayedFinishTime} from "../actions/actions";
 
 const FinishTime = ({finishTime,actualFinishTime,displayedFinishTime,setDisplayedFinishTime}) => {
     return (
-        <FormGroup controlId="finishTime" style={{display:'inline-flex'}}>
-            <ControlLabel style={{width:'7em',display:'inline-flex',marginTop:'7px',paddingLeft:'8px'}}>Finish time</ControlLabel>
-            <FormControl tabIndex='-1' type="text"
+        <FormGroup>
+            <Label for="finishTime" size='sm' tag='b'>Finish time</Label>
+            <Input style={{width:'13em',height:'28px'}}
+                size="8" bsSize='sm' tabIndex='-1' type="text" id="finishTime"
                          onMouseEnter={() => {
                 if (actualFinishTime !== undefined) {
                     setDisplayedFinishTime(actualFinishTime);
                 }}}
                          onMouseLeave={() => setDisplayedFinishTime(finishTime)}
-                         style={{paddingLeft:'2px',paddingTop:'2px',height:'28px'}}
                          value={displayedFinishTime}/>
         </FormGroup>
         );

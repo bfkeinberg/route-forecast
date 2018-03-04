@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {ControlLabel, FormControl, FormGroup, OverlayTrigger, Tooltip} from 'react-bootstrap';
+import {Label, Input, FormGroup, UncontrolledTooltip} from 'reactstrap';
 import {connect} from 'react-redux';
 import {setPace} from "../actions/actions";
 
@@ -31,25 +31,22 @@ const RidingPace = ({pace,actualPace,setPace}) => {
         pace_tooltip_id = getPaceTooltipId(actualPace,pace_mph);
         pace_text = `Actual riding pace was ${getAlphaPace(actualPace)}`;
     }
-    let pace_tooltip = ( <Tooltip id={pace_tooltip_id}>{pace_text}</Tooltip> );
     return (
-        <FormGroup style={{flex:'1',display:'inline-flex',marginTop:'5px',marginBottom:'5px'}} controlId="pace">
-            <ControlLabel>Pace</ControlLabel>
-            <OverlayTrigger placement="bottom" overlay={pace_tooltip}>
-                <FormControl tabIndex='3' componentClass="select" value={pace} name="pace"
-                             style={{'width':'5em','height':'2.8em',paddingRight:'8px'}}
-                             onChange={event => {setPace(event.target.value)}}>
-                    <option value="A">A/10</option>
-                    <option value="B">B/12</option>
-                    <option value="C">C/14</option>
-                    <option value="C+">C+/15</option>
-                    <option value="D-">D-/15-</option>
-                    <option value="D">D/16</option>
-                    <option value="D+">D+/17</option>
-                    <option value="E-">E-/17-</option>
-                    <option value="E">E/18</option>
-                </FormControl>
-            </OverlayTrigger>
+        <FormGroup>
+            <Label size='sm' tag='b' for='paceInput'>Pace</Label>
+            <UncontrolledTooltip target='paceInput' placement="bottom" id={pace_tooltip_id}>{pace_text}</UncontrolledTooltip>
+            <Input tabIndex='3' type="select" value={pace} name="pace"
+                   id='paceInput' onChange={event => {setPace(event.target.value)}}>
+                <option value="A">A/10</option>
+                <option value="B">B/12</option>
+                <option value="C">C/14</option>
+                <option value="C+">C+/15</option>
+                <option value="D-">D-/15-</option>
+                <option value="D">D/16</option>
+                <option value="D+">D+/17</option>
+                <option value="E-">E-/17-</option>
+                <option value="E">E/18</option>
+            </Input>
         </FormGroup>
     );
 };

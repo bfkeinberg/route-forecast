@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {Table} from 'react-bootstrap';
+import {Table} from 'reactstrap';
 import ErrorBoundary from "./errorBoundary";
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
@@ -7,7 +7,13 @@ import 'animate.css/animate.min.css';
 
 class PaceTable extends Component {
     static propTypes = {
-        calculatedPaces:PropTypes.arrayOf(PropTypes.object).isRequired
+        calculatedPaces:PropTypes.arrayOf(PropTypes.shape({
+            distance:PropTypes.number.isRequired,
+            time:PropTypes.string.isRequired,
+            pace:PropTypes.string,
+            alphaPace:PropTypes.string.isRequired,
+            climb:PropTypes.number
+        })).isRequired
     };
 
     constructor(props) {
