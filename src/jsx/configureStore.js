@@ -2,6 +2,7 @@ import {applyMiddleware, createStore} from 'redux';
 import thunkMiddleware from 'redux-thunk';
 import {createLogger} from 'redux-logger';
 import rootReducer from './reducers/reducer';
+import createRavenMiddleware from "raven-for-redux";
 
 const loggerMiddleware = createLogger();
 
@@ -16,7 +17,10 @@ export default function configureStore(preloadedState) {
         preloadedState,
         applyMiddleware(
             thunkMiddleware,
-            loggerMiddleware
+            loggerMiddleware,
+            createRavenMiddleware(Raven, {
+                // Optionally pass some options here.
+            })
         )
     )
 }

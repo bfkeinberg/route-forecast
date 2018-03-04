@@ -40,14 +40,9 @@ import PaceTable from './paceTable';
 
 /*
 TODO:
-integrate with error log service
 immutable.js
 
  */
-// To add to window
-if (!window.Promise) {
-    window.Promise = Promise;
-}
 
 class RouteWeatherUI extends Component {
     static propTypes = {
