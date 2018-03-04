@@ -12,7 +12,7 @@ const AnalysisInterval = ({interval,setInterval,getPaceOverTime,visible}) => {
             <UncontrolledTooltip placement="bottom" target='analysisInterval'>{interval_tooltip_text}</UncontrolledTooltip>
             <Label>Analysis Interval
                 <Input id='analysisInterval' type="select" value={interval} name="analysisInterval"
-                             onChange={event => {setInterval(event.target.value);getPaceOverTime(event.target.value)}}>
+                             onChange={event => {setInterval(event.target.value);getPaceOverTime()}}>
                     <option value="4">4</option>
                     <option value="6">6</option>
                     <option value="8">8</option>

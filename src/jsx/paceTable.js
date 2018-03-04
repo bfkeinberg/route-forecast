@@ -10,7 +10,7 @@ class PaceTable extends Component {
         calculatedPaces:PropTypes.arrayOf(PropTypes.shape({
             distance:PropTypes.number.isRequired,
             time:PropTypes.string.isRequired,
-            pace:PropTypes.string,
+            pace:PropTypes.number,
             alphaPace:PropTypes.string.isRequired,
             climb:PropTypes.number
         })).isRequired
@@ -41,7 +41,7 @@ class PaceTable extends Component {
         return (
                 <div className="animated slideInRight">
                     <ErrorBoundary>
-                    <Table striped condensed hover bordered>
+                    <Table striped responsive hover bordered>
                         <thead>
                         <tr>
                             <th style={{'fontSize':'80%'}}>Time</th>

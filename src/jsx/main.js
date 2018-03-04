@@ -4,7 +4,6 @@ import RouteInfoForm from './routeInfoEntry';
 import RouteForecastMap from './map';
 import ForecastTable from './forecastTable';
 import SplitPane from 'react-split-pane';
-import {Button} from 'reactstrap';
 import MediaQuery from 'react-responsive';
 // for react-splitter
 import 'normalize.css/normalize.css';
@@ -16,7 +15,7 @@ import 'ag-grid/dist/styles/ag-theme-fresh.css';
 import 'flatpickr/dist/themes/confetti.css';
 import 'Images/style.css';
 import cookie from 'react-cookies';
-
+import {Button} from 'reactstrap';
 import queryString from 'query-string';
 import ErrorBoundary from './errorBoundary';
 import PropTypes from 'prop-types';
@@ -65,7 +64,7 @@ class RouteWeatherUI extends Component {
         super(props);
         this.formatControlsForUrl = this.formatControlsForUrl.bind(this);
         let queryParams = queryString.parse(location.search);
-        this.updateFromQueryParams(this.props, queryParams);
+        RouteWeatherUI.updateFromQueryParams(this.props, queryParams);
         let script = document.getElementById( "routeui" );
         props.setActionUrl(script.getAttribute('action'));
         props.setApiKeys(script.getAttribute('maps_api_key'),script.getAttribute('timezone_api_key'));
@@ -106,7 +105,7 @@ class RouteWeatherUI extends Component {
         return controlPoints;
     }
 
-    updateFromQueryParams(props,queryParams) {
+    static updateFromQueryParams(props, queryParams) {
         props.setRwgpsRoute(queryParams.rwgpsRoute);
         // force forecast fetch when our initial url contains a route number
         if (queryParams.rwgpsRoute !== undefined) {

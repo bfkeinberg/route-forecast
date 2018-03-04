@@ -53,10 +53,10 @@ const RideWithGpsId = ({setRwgpsRoute,loadingSource,loadingSuccess,rwgpsRoute,rw
                          }
                      }
                  }}
-                 onDragOver={event => {
+                 /*onDragOver={event => {
                      event.preventDefault();
                      event.dataTransfer.dropEffect = 'move';
-                 }}
+                 }}*/
                  onDragEnd={event => {
                      let dt = event.dataTransfer;
                      if (dt.items) {
