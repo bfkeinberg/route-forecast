@@ -73,7 +73,6 @@ def setup_app():
     application.weather_request_count = 0
     application.last_request_day = datetime.now().date()
     logging.basicConfig(level=logging.INFO)
-    logging.getLogger('flask_cors').level = logging.DEBUG
 
 
 @application.after_request
