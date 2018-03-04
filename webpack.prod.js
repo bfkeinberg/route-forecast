@@ -3,9 +3,10 @@ const common = require('./webpack.common.js');
 const path = require('path');
 const webpack = require('webpack');
 const HtmlCriticalPlugin = require("html-critical-webpack-plugin");
-
-var BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
+const BrotliPlugin = require('brotli-webpack-plugin');
+const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 const CompressionPlugin = require("compression-webpack-plugin");
+
 module.exports = merge(common, {
     plugins: [
         new webpack.optimize.UglifyJsPlugin({sourceMap:true,comments:false}),
@@ -37,6 +38,12 @@ module.exports = merge(common, {
             minRatio:0.85, cache:true,
             test:[/\.css/,/\.ttf/,/\.eot/,/\.js/],
             exclude:[/\.png/,/\.ico/,/\.html/]
+        }),
+        new BrotliPlugin({
+            asset: '[path].br[query]',
+            test: /\.(js|css|html|svg)$/,
+            threshold: 10240,
+            minRatio: 0.8
         }),
         // new BundleAnalyzerPlugin()
     ]
