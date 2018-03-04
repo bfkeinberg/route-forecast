@@ -38,7 +38,9 @@ const QueryString = ({routeNumber,start,pace,interval,metric,controls,/*setQuery
     else {
         setShortUrl('');
     }
-    history.pushState(null, 'nothing', url);
+    if (window.chrome !== undefined) {
+        history.pushState(null, 'nothing', url);
+    }
     // setQueryString(url);
     return null;
 };

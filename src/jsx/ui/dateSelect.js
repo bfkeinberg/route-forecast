@@ -26,7 +26,7 @@ const DateSelect = ({start,setStart}) => {
         <FormGroup row size='sm' tabIndex="1"
                    style={{flex:'1',display:'inline-flex',alignItems:'center'}}>
             <UncontrolledTooltip placement='bottom' target="startingTime">When you plan to begin riding</UncontrolledTooltip>
-            <Icon iconName="calendar"/>
+            <Icon icon="calendar"/>
             <Label for='calendar' size='sm' tag='b' id='startingTime'>Starting time</Label>
             <Flatpickr id='calendar' onChange={(dates) => {
                 setStart(new Date(dates[0]));

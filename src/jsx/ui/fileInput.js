@@ -20,7 +20,9 @@ const FileInput = ({loadingSource,loadingSuccess,loadGpxRoute,timezone_api_key})
                            accept=".gpx" id='routeFile' {...ok}
                            onChange={event => {
                             // nothing to encode if the URL if we're working from a local file
-                            history.pushState(null, 'nothing', location.origin);
+                               if (window.chrome !== undefined) {
+                                   history.pushState(null, 'nothing', location.origin);
+                               }
                             loadGpxRoute(event,timezone_api_key);
                         }
                     }/>
