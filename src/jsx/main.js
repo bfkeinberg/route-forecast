@@ -4,13 +4,13 @@ import RouteInfoForm from './routeInfoEntry';
 import RouteForecastMap from './map';
 import ForecastTable from './forecastTable';
 import SplitPane from 'react-split-pane';
-import {Button} from 'react-bootstrap';
+import {Button} from 'reactstrap';
 import MediaQuery from 'react-responsive';
 // for react-splitter
 import 'normalize.css/normalize.css';
 import Promise from 'promise-polyfill';
-import '@blueprintjs/core/dist/blueprint.css';
-import 'bootstrap/dist/css/bootstrap.min.css';
+import '@blueprintjs/core/lib/css/blueprint.css';
+import 'bootstrap/dist/css/bootstrap.css';
 import 'ag-grid/dist/styles/ag-grid.css';
 import 'ag-grid/dist/styles/ag-theme-fresh.css';
 import 'flatpickr/dist/themes/confetti.css';

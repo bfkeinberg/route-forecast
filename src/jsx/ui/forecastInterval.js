@@ -1,21 +1,17 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {ControlLabel, FormControl, FormGroup, OverlayTrigger, Tooltip} from 'react-bootstrap';
+import {Label, Input, FormGroup, UncontrolledTooltip} from 'reactstrap';
 import {connect} from 'react-redux';
 import {setInterval} from "../actions/actions";
 
-const interval_tooltip = (
-    <Tooltip id="interval_tooltip">How often to generate weather forecast</Tooltip>
-);
-
 const ForecastInterval = ({interval,setInterval}) => {
     return (
-        <FormGroup bsSize='small' controlId="interval" style={{flex:'1',display:'inline-flex',marginTop:'5px',marginBottom:'5px'}}>
-            <ControlLabel>Interval in hours</ControlLabel>
-            <OverlayTrigger placement='bottom' overlay={interval_tooltip}>
-                <FormControl tabIndex='2' type="number" min={0.5} max={2} step={0.5} name="interval" style={{'width':'5em'}}
-                             value={interval} onChange={event => {setInterval(event.target.value)}}/>
-            </OverlayTrigger>
+        <FormGroup inline row size='lg'>
+            <UncontrolledTooltip target='interval' placement='bottom'>How often to generate weather forecast</UncontrolledTooltip>
+            <Label for='interval' size='sm' tag='b'>Interval in hours</Label>
+            <Input size="5" bsSize='xsm' id='interval' tabIndex='2' type="number"
+                   min={0.5} max={2} step={0.5} name="interval"
+                 value={interval} onChange={event => {setInterval(event.target.value)}}/>
         </FormGroup>
     );
 };

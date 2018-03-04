@@ -74,7 +74,7 @@ module.exports = {
         path: STATIC_DIR,
         filename: "[name].bundle.js",
         chunkFilename: '[name].bundle.js',
-        publicPath: "/static/"
+        publicPath: "static/"
     },
     resolve: {
         extensions: ['*', '.js', '.jsx', '.ts', '.tsx'],
@@ -84,4 +84,4 @@ module.exports = {
     node: {
         fs: 'empty'
     }
-}
+};

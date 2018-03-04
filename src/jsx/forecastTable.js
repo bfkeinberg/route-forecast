@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {Table} from 'react-bootstrap';
+import {Table} from 'reactstrap';
 import ErrorBoundary from "./errorBoundary";
 import darkSky from 'Images/darkSkySmall.png';
 import PropTypes from 'prop-types';
@@ -58,7 +58,7 @@ class ForecastTable extends Component {
                     <ErrorBoundary>
                     <a tabIndex='-1' href="https://darksky.net/poweredby/"><img src={darkSky}/></a>
                         {weatherCorrections}
-                    <Table striped condensed hover bordered>
+                    <Table striped size='sm' hover bordered responsive>
                         <thead>
                         <tr>
                             <th style={{'fontSize':'80%'}}>Time</th>

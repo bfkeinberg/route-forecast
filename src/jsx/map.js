@@ -118,7 +118,7 @@ class RouteForecastMap extends Component {
                 size: new google.maps.Size(320, 320),
                 scaledSize: new google.maps.Size(45, 50),
                 labelOrigin: new google.maps.Point(22,15),
-                anchor: new google.maps.Point(0, 0)
+                anchor: new google.maps.Point(-15, -15)
         };
         let markers = [];
         if (isRainy) {

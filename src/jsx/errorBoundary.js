@@ -16,7 +16,7 @@ class ErrorBoundary extends Component {
         this.setState({
             error: error,
             errorInfo: errorInfo
-        })
+        });
         // You can also log error messages to an error reporting service here
     }
 
@@ -26,6 +26,8 @@ class ErrorBoundary extends Component {
             return (
                 <div>
                     <h2>Something went wrong.</h2>
+                    <h4>{this.state.error.message}</h4>
+                    <h4>{this.state.errorInfo.componentStack}</h4>
                     <details style={{ whiteSpace: 'pre-wrap' }}>
                         {this.state.error && this.state.error.toString()}
                         <br />

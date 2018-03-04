@@ -33,11 +33,11 @@ module.exports = merge(common, {
                 },
             }
         }),
-        /*new CompressionPlugin({
-            deleteOriginalAssets:true, minRatio:0.85, cache:true,
+        new CompressionPlugin({
+            minRatio:0.85, cache:true,
             test:[/\.css/,/\.ttf/,/\.eot/,/\.js/],
             exclude:[/\.png/,/\.ico/,/\.html/]
-        }),*/
+        }),
         // new BundleAnalyzerPlugin()
     ]
 });

@@ -2,13 +2,9 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import Flatpickr from 'react-flatpickr'
 import {Icon} from '@blueprintjs/core';
-import {ControlLabel, FormGroup, OverlayTrigger, Tooltip} from 'react-bootstrap';
+import {Label, FormGroup, UncontrolledTooltip} from 'reactstrap';
 import {connect} from 'react-redux';
 import {setStart} from "../actions/actions";
-
-const time_tooltip = (
-    <Tooltip id="time_tooltip">When you plan to begin riding</Tooltip>
-);
 
 /*const setDateAndTime = function(dates, datestr, instance) {
     if (datestr === '') {
@@ -27,13 +23,12 @@ const DateSelect = ({start,setStart}) => {
     later.setDate(now.getDate() + daysToAdd);
 
     return (
-        <FormGroup tabIndex="1"
-                   style={{flex:'1',display:'inline-flex',alignItems:'center'}} controlId="starting_time">
-            <OverlayTrigger placement='bottom' overlay={time_tooltip}>
-                <ControlLabel>Starting time</ControlLabel>
-            </OverlayTrigger>
-            <Icon iconName="calendar"/>
-            <Flatpickr onChange={(dates) => {
+        <FormGroup row size='sm' tabIndex="1"
+                   style={{flex:'1',display:'inline-flex',alignItems:'center'}}>
+            <UncontrolledTooltip placement='bottom' target="startingTime">When you plan to begin riding</UncontrolledTooltip>
+            <Icon icon="calendar"/>
+            <Label for='calendar' size='sm' tag='b' id='startingTime'>Starting time</Label>
+            <Flatpickr id='calendar' onChange={(dates) => {
                 setStart(new Date(dates[0]));
             }}
                        options={{enableTime: true,

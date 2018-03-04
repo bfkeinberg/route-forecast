@@ -1,19 +1,37 @@
-import {Button, OverlayTrigger, Popover} from 'react-bootstrap';
+import {Button, Popover, PopoverHeader, PopoverBody} from 'reactstrap';
 import rideRatingText from './rideRating.htm';
-import React from 'react';
+import React, {Component} from 'react';
 
-const rideRatingDisplay = (
-    <Popover style={{width:450, maxWidth:500}} id="ride-rating-popup" title="Ride rating system">
-        <div dangerouslySetInnerHTML={{__html: rideRatingText}}/>
-    </Popover>
-);
+class PaceExplanation extends Component {
+    constructor(props) {
+        super(props);
+        this.toggle = this.toggle.bind(this);
+        this.state = {
+            isOpen: false
+        };
+    }
 
-const PaceExplanation = () => {
-    return (
-        <OverlayTrigger trigger="click" placement="right" rootClose overlay={rideRatingDisplay}>
-            <Button style={{marginLeft: '7px'}} bsSize="xsmall">Pace explanation</Button>
-        </OverlayTrigger>);
-};
+    toggle() {
+        this.setState({
+            isOpen: !this.state.isOpen
+        });
+    }
+
+    render() {
+        return (
+            <div>
+                <Button id='rideRatingPopup' onClick={this.toggle} size="sm">Pace explanation</Button>
+                <Popover innerClassName='rideRatingPopup' isOpen={this.state.isOpen} placement='right'
+                         toggle={this.toggle} style={{width:450, maxWidth:500}} target='rideRatingPopup'>
+                    <PopoverHeader>Ride rating system</PopoverHeader>
+                    <PopoverBody>
+                        <div dangerouslySetInnerHTML={{__html: rideRatingText}}/>
+                    </PopoverBody>
+                </Popover>
+            </div>
+        );
+    }
+}
 
 export default PaceExplanation;
 
