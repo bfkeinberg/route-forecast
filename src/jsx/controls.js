@@ -42,23 +42,23 @@ class ControlPoints extends Component {
         return (
             <div className="controlPoints">
                 <Container fluid={true}>
-                    <Row noGutters>
+                    <Row noGutters className="justify-content-sm-around">
                         <Col sm={{size:'auto'}}>
                             <Button size='sm' tabIndex='10' onClick={this.addControl} id='addButton'><Icon iconName="add"/>Add control point</Button>
                         </Col>
-                        <Col sm="4">
+                        <Col sm={{size:"auto"}}>
                             <FinishTime/>
                         </Col>
-                        <Col sm="1">
+                        <Col sm={{size:"auto"}}>
                             <Label size='sm' for='metric' check>metric</Label>
                         </Col>
-                        <Col sm={{size:"auto"}}>
+                        <Col sm="1">
                             <Input size='1' id='metric' type='checkbox' tabIndex='12' checked={this.props.metric} onClick={this.props.toggleMetric}/>
                         </Col>
-                        <Col sm="2">
+                        <Col sm={{size:"auto"}}>
                             <Label for='banked' size="sm">Display banked time</Label>
                         </Col>
-                        <Col sm={{size:"auto"}}>
+                        <Col sm="1">
                             <Input id='banked' type='checkbox' tabIndex='11' checked={this.props.displayBanked}
                                       onClick={this.props.toggleDisplayBanked}/>
                         </Col>
