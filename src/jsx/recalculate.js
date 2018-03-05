@@ -2,7 +2,10 @@ import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 import {recalcRoute} from "./actions/actions";
 
-const Recalculate = ({recalcRoute}) => {
+const Recalculate = ({rwgpsRoute,recalcRoute}) => {
+    if (rwgpsRoute === '') {
+        return null;
+    }
     recalcRoute();
     return null;
 };
@@ -22,7 +25,8 @@ const mapStateToProps = (state) =>
         pace: state.uiInfo.routeParams.pace,
         interval: state.uiInfo.routeParams.interval,
         metric: state.controls.metric,
-        controls: state.controls.userControlPoints
+        controls: state.controls.userControlPoints,
+        rwgpsRoute:state.uiInfo.routeParams.rwgpsRoute
     });
 
 const mapDispatchToProps = {
