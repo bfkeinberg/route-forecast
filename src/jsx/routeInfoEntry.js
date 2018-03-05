@@ -1,5 +1,5 @@
 import {Spinner} from '@blueprintjs/core';
-import {Alert, Form, Card, CardBody, CardTitle, Col, Row} from 'reactstrap';
+import {Alert, Form, Card, CardBody, CardTitle, Col, Row, Container} from 'reactstrap';
 import React, {Component} from 'react';
 import ShortUrl from './ui/shortUrl';
 import MediaQuery from 'react-responsive';
@@ -142,15 +142,17 @@ class RouteInfoForm extends Component {
                     </CardBody>
                 </Card>
             <MediaQuery minDeviceWidth={1000}>
-                <Row>
-                    <Col>
-                        <ShortUrl/>
-                    </Col>
-                    <Col>
-                        <AnalysisButton/>
-                        <StravaDialog/>
-                    </Col>
-                </Row>
+                <Container fluid={true}>
+                    <Row className="justify-content-sm-between">
+                        <Col>
+                            <ShortUrl/>
+                        </Col>
+                        <Col>
+                            <AnalysisButton/>
+                            <StravaDialog/>
+                        </Col>
+                    </Row>
+                </Container>
             </MediaQuery>
             </div>
         );
