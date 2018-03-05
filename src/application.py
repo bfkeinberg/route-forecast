@@ -102,7 +102,7 @@ def inject_api_keys():
 
 
 @application.route('/')
-def hello():
+def root():
     return render_template('index.html')
 
 
@@ -118,11 +118,6 @@ def server_error(e):
             return e.message
     else:
         return 'An internal error occurred.' + e.message, 500   # e.response.status_code
-
-
-@application.route('/form')
-def form():
-    return render_template('index.html', disabled='disabled style=' + "'color:#888;'")
 
 
 @application.route('/stravaAuthReq')
@@ -148,7 +143,7 @@ def handle_strava_auth_response():
     token = strava_activity.get_token(code)
     restored_state['strava_token'] = token
     restored_state['strava_error'] = error
-    url = url_for('form', **restored_state)
+    url = url_for('root', **restored_state)
 
     return redirect(url)
 
