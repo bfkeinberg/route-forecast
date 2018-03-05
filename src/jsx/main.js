@@ -9,7 +9,7 @@ import MediaQuery from 'react-responsive';
 import 'normalize.css/normalize.css';
 import Promise from 'promise-polyfill';
 import '@blueprintjs/core/lib/css/blueprint.css';
-import 'bootstrap/dist/css/bootstrap.css';
+import 'bootstrap/dist/css/bootstrap.min.css';
 import 'ag-grid/dist/styles/ag-grid.css';
 import 'ag-grid/dist/styles/ag-theme-fresh.css';
 import 'flatpickr/dist/themes/confetti.css';
