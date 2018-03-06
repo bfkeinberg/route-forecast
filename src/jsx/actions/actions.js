@@ -1,6 +1,18 @@
 import moment from 'moment';
 import cookie from 'react-cookies';
 
+const sanitizeCookieName = (cookieName) => {
+    return cookieName.replace(/[ =/]/,'');
+};
+
+export const saveCookie = (name,value) => {
+    cookie.save(sanitizeCookieName(name),value);
+};
+
+export const loadCookie = (name) => {
+    return cookie.load(sanitizeCookieName(name));
+};
+
 export const SET_RWGPS_ROUTE = 'SET_RWGPS_ROUTE';
 export const setRwgpsRoute = function(route) {
     return {
@@ -111,7 +123,7 @@ export const loadControlsFromCookie = function(routeData) {
     return function(dispatch) {
         let routeName = getRouteName(routeData);
         if (routeName !== null) {
-            let savedControlPoints = cookie.load(routeName);
+            let savedControlPoints = loadCookie(routeName);
             if (savedControlPoints !== undefined && savedControlPoints.length > 0) {
                 dispatch(updateUserControls(parseControls(savedControlPoints)));
             }

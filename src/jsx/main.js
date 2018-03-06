@@ -14,7 +14,6 @@ import 'ag-grid/dist/styles/ag-grid.css';
 import 'ag-grid/dist/styles/ag-theme-fresh.css';
 import 'flatpickr/dist/themes/confetti.css';
 import 'Images/style.css';
-import cookie from 'react-cookies';
 import {Button} from 'reactstrap';
 import queryString from 'query-string';
 import ErrorBoundary from './errorBoundary';
@@ -33,7 +32,9 @@ import {
     setStravaError,
     setStravaToken,
     showForm,
-    updateUserControls
+    updateUserControls,
+    loadCookie,
+    saveCookie
 } from "./actions/actions";
 import QueryString from './queryString';
 import PaceTable from './paceTable';
@@ -70,10 +71,10 @@ class RouteWeatherUI extends Component {
 
     static getStravaToken(queryParams) {
         if (queryParams.strava_token !== undefined) {
-            cookie.save('strava_token', queryParams.strava_token);
+            saveCookie('strava_token', queryParams.strava_token);
             return queryParams.strava_token;
         } else {
-            return cookie.load('strava_token');
+            return loadCookie('strava_token');
         }
     }
 
@@ -162,7 +163,6 @@ const mapDispatchToProps = {
 
 const mapStateToProps = (state) =>
     ({
-        controlPoints: state.controls.controlPoints,
         formVisible: state.uiInfo.dialogParams.formVisible,
         showPacePerTme:state.controls.stravaAnalysis && state.strava.calculatedPaces !== null
     });

@@ -4,11 +4,10 @@ import React, {Component} from 'react';
 import ShortUrl from './ui/shortUrl';
 import MediaQuery from 'react-responsive';
 import PropTypes from 'prop-types';
-import {loadFromRideWithGps, setErrorDetails} from './actions/actions';
+import {loadFromRideWithGps, setErrorDetails, saveCookie} from './actions/actions';
 import {connect} from 'react-redux';
 import PaceExplanation from './paceExplanation';
 import ForecastInterval from './ui/forecastInterval';
-import cookie from 'react-cookies';
 import RidingPace from './ui/ridingPace';
 import Recalculate from './recalculate';
 import FileInput from './ui/fileInput';
@@ -47,7 +46,7 @@ class RouteInfoForm extends Component {
 
     componentWillReceiveProps(nextProps) {
         if (nextProps.routeInfo.name !== '') {
-            cookie.save(nextProps.routeInfo.name,this.props.formatControlsForUrl(nextProps.controlPoints));
+            saveCookie(nextProps.routeInfo.name,this.props.formatControlsForUrl(nextProps.controlPoints));
         }
     }
 
