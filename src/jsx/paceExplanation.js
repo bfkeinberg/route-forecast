@@ -20,7 +20,7 @@ class PaceExplanation extends Component {
     render() {
         return (
             <div>
-                <Button id='rideRatingPopup' onClick={this.toggle} size="sm">Pace explanation</Button>
+                <Button id='rideRatingPopup' onClick={this.toggle} color='info' size="sm">Pace explanation</Button>
                 <Popover innerClassName='rideRatingPopup' isOpen={this.state.isOpen} placement='right'
                          toggle={this.toggle} style={{width:450, maxWidth:500}} target='rideRatingPopup'>
                     <PopoverHeader>Ride rating system</PopoverHeader>

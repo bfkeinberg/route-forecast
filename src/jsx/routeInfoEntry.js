@@ -17,6 +17,7 @@ import RwGpsTypeSelector from './ui/rwGpsTypeSelector';
 import ForecastButton from './ui/forecastButton';
 import AnalysisButton from './ui/analysisButton';
 import StravaDialog from './stravaDialog';
+import BugReportButton from './ui/bugReportButton';
 
 class RouteInfoForm extends Component {
     static propTypes = {
@@ -143,12 +144,15 @@ class RouteInfoForm extends Component {
             <MediaQuery minDeviceWidth={1000}>
                 <Container fluid={true}>
                     <Row className="justify-content-sm-between">
-                        <Col>
+                        <Col sm={{size:"auto"}}>
                             <ShortUrl/>
                         </Col>
                         <Col>
                             <AnalysisButton/>
                             <StravaDialog/>
+                        </Col>
+                        <Col>
+                            <BugReportButton/>
                         </Col>
                     </Row>
                 </Container>

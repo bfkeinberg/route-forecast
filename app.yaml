@@ -32,9 +32,6 @@ skip_files:
 - ^(.*/)?.*\.py[co]$
 - ^(.*/)?.*\.json$
 - ^(.*/)?\..*$
-- ./.*.png^
-- ./.*.css^
-- ./.*.js^
 
 libraries:
 - name: flask

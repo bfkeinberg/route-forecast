@@ -16,7 +16,7 @@ class AnalyzeRoute {
         this.adjustForWind = this.adjustForWind.bind(this);
     }
 
-    loadGpxFile(gpxFile, timezone_api_key) {
+    loadGpxFile(gpxFile) {
         let reader = new FileReader();
         const fileLoad = new Promise((resolve, reject) => {
             reader.onerror = event => reject(event.target.error.code);
@@ -34,15 +34,7 @@ class AnalyzeRoute {
                     })
                 });
                 parseGpx.then(gpxData => {
-                    let point = gpxData.tracks[0].segments[0][0];
-                    // using current date and time for zone lookup could pose a problem in future
-                    let timeZonePromise = this.findTimezoneForPoint(point.lat, point.lon, moment(), timezone_api_key);
-                    timeZonePromise.then(timeZoneResult => {
-                            resolve({gpxRouteData:gpxData,timeZoneId:timeZoneResult.zoneId,timeZoneOffset:timeZoneResult.offset});
-                        }, error => {
-                            reject(error);          // error getting the time zone
-                        }
-                    );
+                    resolve(gpxData);
                 }, error => {
                     reject(error);      // error parsing gpx
                 });
@@ -64,7 +56,7 @@ class AnalyzeRoute {
         }
     }
 
-    loadRwgpsRoute(route, isTrip, timezone_api_key) {
+    loadRwgpsRoute(route, isTrip) {
         return new Promise((resolve, reject) => {
             fetch('/rwgps_route?route=' + route + '&trip=' + isTrip).then(response => {
                     if (response.status === 200) {
@@ -81,14 +73,7 @@ class AnalyzeRoute {
                     reject(new Error('RWGPS route info unavailable'));
                     return;
                 }
-                let point = rwgpsRouteDatum['track_points'][0];
-                //TODO using current date and time for zone lookup (moment()) could pose a problem in future
-                let timeZonePromise = this.findTimezoneForPoint(point.y, point.x, moment(), timezone_api_key);
-                timeZonePromise.then(timeZoneResult => {
-                    resolve({rwgpsRouteData:response,timeZoneOffset:timeZoneResult.offset,timeZoneId:timeZoneResult.zoneId});
-                }, error => {
-                    reject(error);
-                });
+                resolve(response);
             },
             error => {
                 reject(error.message);
@@ -122,7 +107,7 @@ class AnalyzeRoute {
             let banked = Math.round(AnalyzeRoute.rusa_time(distanceInKm, elapsedTimeInHours));
             calculatedValues.push({arrival:arrivalTime.format(finishTimeFormat),
                 banked: banked,
-                val:controls[nextControl].id, ...point
+                val:controls[nextControl].id, lat:point.lat, lon:point.lon
             });
             nextControl++;
             return delayInMinutes/60;      // convert from minutes to hours

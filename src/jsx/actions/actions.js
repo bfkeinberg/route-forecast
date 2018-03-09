@@ -137,12 +137,6 @@ export const setFetchAfterLoad = (fetchAfterLoad) => {return {
     fetchAfterLoad: fetchAfterLoad
 }};
 
-/*
-setRouteInfo => requestForecast
-recalcRoute => setRouteInfo
-
- */
-
 export const ADD_WEATHER_CORRECTION = 'ADD_WEATHER_CORRECTION';
 export const addWeatherCorrection = function(weatherCorrection) {
     return {
@@ -236,41 +230,78 @@ const setRouteInfo = (routeInfo) => {
     };
 };
 
+export const SET_TIME_ZONE = 'SET_TIME_ZONE';
+export const setTimeZone = function(id,offset) {
+    return {
+        type: SET_TIME_ZONE,
+        id: id,
+        offset: offset
+    };
+};
+
+export const SET_ERROR_DETAILS = 'SET_ERROR_DETAILS';
+export const setErrorDetails = function(details) {
+    return {
+        type: SET_ERROR_DETAILS,
+        details: details
+    };
+};
+
 export const recalcRoute = function() {
     return async function(dispatch, getState) {
         const parser = await getRouteParser();
+        // need to get the time zone here, once we know our chose start time
         // this may be called before we have chosen a route, in which case it's a noop
         if (getState().routeInfo.rwgpsRouteData !== null) {
-            dispatch(setRouteInfo(
-                parser.walkRwgpsRoute(
-                    getState().routeInfo.rwgpsRouteData,
-                    moment(getState().uiInfo.routeParams.start),
-                    getState().uiInfo.routeParams.pace,
-                    getState().uiInfo.routeParams.interval,
-                    getState().controls.userControlPoints,
-                    getState().controls.metric,
-                    getState().routeInfo.timeZoneId)));
+            let type = getState().routeInfo.rwgpsRouteData['trip'] === undefined ? 'route' : 'trip';
+            let rwgpsRouteDatum = getState().routeInfo.rwgpsRouteData[type];
+            let point = rwgpsRouteDatum['track_points'][0];
+            let timeZonePromise = parser.findTimezoneForPoint(point.y, point.x,
+                moment(getState().uiInfo.routeParams.start), getState().params.timezone_api_key);
+            timeZonePromise.then(timeZoneResult => {
+                dispatch(setTimeZone(timeZoneResult.zoneId,timeZoneResult.offset));
+                dispatch(setRouteInfo(
+                    parser.walkRwgpsRoute(
+                        getState().routeInfo.rwgpsRouteData,
+                        moment(getState().uiInfo.routeParams.start),
+                        getState().uiInfo.routeParams.pace,
+                        getState().uiInfo.routeParams.interval,
+                        getState().controls.userControlPoints,
+                        getState().controls.metric,
+                        timeZoneResult.zoneId)));
+            }, error => {
+                dispatch(setErrorDetails(error));
+            });
+
         } else if (getState().routeInfo.gpxRouteData !== null) {
-            dispatch(setRouteInfo(
-                parser.walkGpxRoute(
-                    getState().routeInfo.gpxRouteData,
-                    moment(getState().uiInfo.routeParams.start),
-                    getState().uiInfo.routeParams.pace,
-                    getState().uiInfo.routeParams.interval,
-                    getState().controls.userControlPoints,
-                    getState().controls.metric,
-                    getState().routeInfo.timeZoneId)));
+            let point = getState().routeInfo.gpxRouteData.tracks[0].segments[0][0];
+            let timeZonePromise = parser.findTimezoneForPoint(point.lat, point.lon,
+                moment(getState().uiInfo.routeParams.start), getState().params.timezone_api_key);
+            timeZonePromise.then(timeZoneResult => {
+                dispatch(setTimeZone(timeZoneResult.zoneId,timeZoneResult.offset));
+                dispatch(setRouteInfo(
+                    parser.walkGpxRoute(
+                        getState().routeInfo.gpxRouteData,
+                        moment(getState().uiInfo.routeParams.start),
+                        getState().uiInfo.routeParams.pace,
+                        getState().uiInfo.routeParams.interval,
+                        getState().controls.userControlPoints,
+                        getState().controls.metric,
+                        timeZoneResult.zoneId)));
+            }, error => {
+                dispatch(setErrorDetails(error));
+            });
         }
     }
 };
 
 export const loadFromRideWithGps = function(routeNumber, isTrip) {
-    return async function(dispatch, getState) {
+    return async function(dispatch) {
         dispatch(beginLoadingRoute('rwgps'));
         const parser = await getRouteParser();
-        parser.loadRwgpsRoute(routeNumber, isTrip, getState().params.timezone_api_key).then( (routeData) => {
+        parser.loadRwgpsRoute(routeNumber, isTrip).then( (routeData) => {
                 dispatch(rwgpsRouteLoadingSuccess(routeData));
-                dispatch(loadControlsFromCookie(routeData.rwgpsRouteData));
+                dispatch(loadControlsFromCookie(routeData));
                 dispatch(recalcRoute());
             }, error => {dispatch(rwgpsRouteLoadingFailure(error))}
         );
@@ -281,9 +312,7 @@ export const GPX_ROUTE_LOADING_SUCCESS = 'GPX_ROUTE_LOADING_SUCCESS';
 const gpxRouteLoadingSuccess = function(result) {
     return {
         type: GPX_ROUTE_LOADING_SUCCESS,
-        gpxRouteData: result.gpxRouteData,
-        timeZoneId: result.timeZoneId,
-        timeZoneOffset: result.timeZoneOffset
+        gpxRouteData: result
     }
 };
 
@@ -309,14 +338,14 @@ export const clearRouteData = function() {
     };
 };
 
-export const loadGpxRoute = function(event,timezone_api_key) {
+export const loadGpxRoute = function(event) {
     return async function (dispatch) {
         let gpxFiles = event.target.files;
         if (gpxFiles.length > 0) {
             dispatch(beginLoadingRoute('gpx'));
             const parser = await getRouteParser();
-            parser.loadGpxFile(gpxFiles[0],timezone_api_key).then( gpxData => {
-                    dispatch(gpxRouteLoadingSuccess(gpxData))
+            parser.loadGpxFile(gpxFiles[0]).then( gpxData => {
+                    dispatch(gpxRouteLoadingSuccess(gpxData));
                     dispatch(recalcRoute());
                 }, error => dispatch(gpxRouteLoadingFailure(error))
             );
@@ -333,14 +362,6 @@ export const setShortUrl = function(url) {
         type: SET_SHORT_URL,
         url: url
     }
-};
-
-export const SET_ERROR_DETAILS = 'SET_ERROR_DETAILS';
-export const setErrorDetails = function(details) {
-    return {
-        type: SET_ERROR_DETAILS,
-        details: details
-    };
 };
 
 export const shortenUrl = function(url) {
@@ -511,15 +532,6 @@ export const setApiKeys = function(mapsKey,timezoneKey) {
         type: SET_API_KEYS,
         mapsKey: mapsKey,
         timezoneKey: timezoneKey
-    };
-};
-
-export const SET_TIME_ZONE = 'SET_TIME_ZONE';
-export const setTimeZone = function(id,offset) {
-    return {
-        type: SET_TIME_ZONE,
-        id: id,
-        offset: offset
     };
 };
 

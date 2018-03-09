@@ -75,8 +75,13 @@ label.control-label {
 }
 
 img#stravaImage {
-    width: 6rem;
-    height: 2.8rem;
+    width: 5.2rem;
+    height: 2.6rem;
+}
+
+img#bugImage {
+    width: 2rem;
+    height: 2rem;
 }
 
 input#finishTime.form-control {

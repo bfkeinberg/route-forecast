@@ -1,15 +1,22 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {Container, Button} from 'reactstrap';
+import {Container} from 'reactstrap';
 import {connect} from 'react-redux';
 import {toggleStravaAnalysis} from "../actions/actions";
 import Strava from 'Images/api_logo_pwrdBy_strava_stack_light.png';
+import {Button} from '@blueprintjs/core';
 
 const AnalysisButton = ({stravaAnalysis,enabled,toggleStravaAnalysis}) => {
+    let classes = 'pt-small pt-minimal';
+    if (stravaAnalysis) {
+        classes += ' pt-active';
+    }
     return (
         <Container>
-            <Button active={stravaAnalysis} size="sm" outline={true} tabIndex='-1' id='enableAnalysis' disabled={!enabled}
+            <Button className={classes} tabIndex='-1' id='enableAnalysis' disabled={!enabled}
                     onClick={toggleStravaAnalysis}><img id='stravaImage' src={Strava}/></Button>
+            {/*<Button active={stravaAnalysis} size="sm" outline={true} tabIndex='-1' id='enableAnalysis' disabled={!enabled}*/}
+                    {/*onClick={toggleStravaAnalysis}><img id='stravaImage' src={Strava}/></Button>*/}
         </Container>
         );
 };

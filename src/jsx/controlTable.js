@@ -1,6 +1,5 @@
 import React, {Component} from 'react';
 import {Button} from '@blueprintjs/core';
-
 import {AgGridReact} from 'ag-grid-react';
 import ReactDOM from 'react-dom';
 import PropTypes from 'prop-types';
@@ -95,7 +94,7 @@ class ControlTable extends Component {
 
     // create a DOM object
     deleteRenderer(params) {
-        const deleteButton = <Button onClick={() => {this.removeRow(params.node.id)}} iconName={'delete'}/>;
+        const deleteButton = <Button onClick={() => {this.removeRow(params.node.id)}} class={'pt-minimal'} icon={'delete'}/>;
         let eDiv = document.createElement('div');
         ReactDOM.render(deleteButton, eDiv);
         return eDiv;
@@ -203,7 +202,8 @@ class ControlTable extends Component {
         let rowData = [];
         this.props.controls.forEach((item,index) => rowData.push({...item, ...this.props.calculatedValues[index], id:index}));
         return (<div className="ag-theme-fresh">
-            <AgGridReact enableColResize enableSorting animateRows sortingOrder={['asc']} unSortIcon rowData={rowData}
+            <AgGridReact enableCellChangeFlash={true} enableColResize enableSorting animateRows
+                         sortingOrder={['asc']} unSortIcon rowData={rowData}
              onGridReady={this.onGridReady} onSortChanged={this.sortChanged} singleClickEdit //editType={'fullRow'}
             onCellValueChanged={this.cellUpdated} tabToNextCell={ControlTable.tabHandler} getRowNodeId={data => data.id}
             columnDefs={this.state.columnDefs}/>

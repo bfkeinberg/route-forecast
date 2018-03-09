@@ -1,7 +1,5 @@
-import {Button, Row, Col,
-    Container, Input, Label, Card, CardBody,
-    CardTitle} from 'reactstrap';
-import {Icon} from '@blueprintjs/core';
+import {Row, Col, Container, Input, Label, Card, CardBody, CardTitle} from 'reactstrap';
+import {Button} from '@blueprintjs/core';
 import React, {Component} from 'react';
 import MediaQuery from 'react-responsive';
 import ControlTable from './controlTable';
@@ -44,7 +42,9 @@ class ControlPoints extends Component {
                 <Container fluid={true}>
                     <Row noGutters className="justify-content-sm-around">
                         <Col sm={{size:'auto'}}>
-                            <Button size='sm' tabIndex='10' onClick={this.addControl} id='addButton'><Icon iconName="add"/>Add control point</Button>
+                            {/*<button type='button' class='pt-button pt-small pt-minimal pt-icon-add' tabIndex='10' onClick={this.addControl} id='addButton'><Icon icon="add"/>Add control point</button>*/}
+                            <Button class={'pt-minimal'} tabIndex='10' onClick={this.addControl} id='addButton' icon={"add"}>Add control point</Button>
+                            {/*<Button size='sm' tabIndex='10' onClick={this.addControl} id='addButton'><Icon icon="add"/>Add control point</Button>*/}
                         </Col>
                         <Col sm={{size:"auto"}}>
                             <FinishTime/>
@@ -52,13 +52,13 @@ class ControlPoints extends Component {
                         <Col sm={{size:"auto"}}>
                             <Label size='sm' for='metric' check>metric</Label>
                         </Col>
-                        <Col sm="1">
+                        <Col sm={{size:"auto"}}>
                             <Input size='1' id='metric' type='checkbox' tabIndex='12' checked={this.props.metric} onClick={this.props.toggleMetric}/>
                         </Col>
                         <Col sm={{size:"auto"}}>
                             <Label for='banked' size="sm">Display banked time</Label>
                         </Col>
-                        <Col sm="1">
+                        <Col sm={{size:"auto"}}>
                             <Input id='banked' type='checkbox' tabIndex='11' checked={this.props.displayBanked}
                                       onClick={this.props.toggleDisplayBanked}/>
                         </Col>

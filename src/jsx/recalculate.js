@@ -2,8 +2,8 @@ import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 import {recalcRoute} from "./actions/actions";
 
-const Recalculate = ({rwgpsRoute,recalcRoute}) => {
-    if (rwgpsRoute === '') {
+const Recalculate = ({rwgpsRoute,gpxRouteData,recalcRoute}) => {
+    if (rwgpsRoute === '' && gpxRouteData===null) {
         return null;
     }
     recalcRoute();
@@ -16,6 +16,11 @@ Recalculate.propTypes = {
     interval:PropTypes.number.isRequired,
     recalcRoute:PropTypes.func.isRequired,
     metric:PropTypes.bool.isRequired,
+    gpxRouteData:PropTypes.object,
+    rwgpsRoute:PropTypes.oneOfType([
+        PropTypes.number,
+        PropTypes.oneOf([''])
+    ]),
     controls:PropTypes.arrayOf(PropTypes.object).isRequired
 };
 
@@ -26,7 +31,8 @@ const mapStateToProps = (state) =>
         interval: state.uiInfo.routeParams.interval,
         metric: state.controls.metric,
         controls: state.controls.userControlPoints,
-        rwgpsRoute:state.uiInfo.routeParams.rwgpsRoute
+        rwgpsRoute:state.uiInfo.routeParams.rwgpsRoute,
+        gpxRouteData:state.routeInfo.gpxRouteData
     });
 
 const mapDispatchToProps = {

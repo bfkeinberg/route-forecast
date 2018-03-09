@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {Button, Tooltip, UncontrolledTooltip} from 'reactstrap';
+import {Button, UncontrolledTooltip} from 'reactstrap';
 import {connect} from 'react-redux';
 import {requestForecast, setFetchAfterLoad} from "../actions/actions";
 import MediaQuery from 'react-responsive';

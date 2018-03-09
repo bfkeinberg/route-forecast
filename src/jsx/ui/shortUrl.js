@@ -6,7 +6,7 @@ import {connect} from 'react-redux';
 const ShortUrl = ({shortUrl}) => {
     return (
         <FormGroup size='sm' style={{display:shortUrl===' '?'none':'inline-flex'}}>
-            <Input size='20' bsSize="xsm" readOnly type="text" value={shortUrl}
+            <Input size='20' bsSize="sm" readOnly type="text" value={shortUrl}
                    onFocus={event => {event.target.select();document.execCommand('copy')}}/>
         </FormGroup>
     );

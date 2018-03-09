@@ -5,7 +5,7 @@ import {connect} from 'react-redux';
 import {loadGpxRoute} from "../actions/actions";
 import {decideValidationStateFor} from "../routeInfoEntry";
 
-const FileInput = ({loadingSource,loadingSuccess,loadGpxRoute,timezone_api_key}) => {
+const FileInput = ({loadingSource,loadingSuccess,loadGpxRoute}) => {
     const ok=decideValidationStateFor('gpx',loadingSource,loadingSuccess);
     return (
         <FormGroup size='sm'
@@ -23,7 +23,7 @@ const FileInput = ({loadingSource,loadingSuccess,loadGpxRoute,timezone_api_key})
                                if (window.chrome !== undefined) {
                                    history.pushState(null, 'nothing', location.origin);
                                }
-                            loadGpxRoute(event,timezone_api_key);
+                            loadGpxRoute(event);
                         }
                     }/>
                 </Col>
@@ -35,15 +35,13 @@ const FileInput = ({loadingSource,loadingSuccess,loadGpxRoute,timezone_api_key})
 FileInput.propTypes = {
     loadingSource:PropTypes.string,
     loadingSuccess:PropTypes.bool,
-    loadGpxRoute:PropTypes.func.isRequired,
-    timezone_api_key:PropTypes.string.isRequired
+    loadGpxRoute:PropTypes.func.isRequired
 };
 
 const mapStateToProps = (state) =>
     ({
         loadingSource: state.uiInfo.dialogParams.loadingSource,
-        loadingSuccess: state.uiInfo.dialogParams.succeeded,
-        timezone_api_key: state.params.timezone_api_key
+        loadingSuccess: state.uiInfo.dialogParams.succeeded
     });
 
 const mapDispatchToProps = {

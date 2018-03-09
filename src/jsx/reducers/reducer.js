@@ -173,12 +173,12 @@ loadingSource:null,fetchingForecast:false}, action) {
 const routeInfo = function(state = {finishTime:'',weatherCorrectionMinutes:null,forecastRequest:null,points:[],
 fetchAfterLoad:false,bounds:null}, action) {
     switch (action.type) {
+        case Actions.SET_TIME_ZONE:
+            return {...state,timeZoneOffset:action.offset,timeZoneId:action.id};
         case Actions.RWGPS_ROUTE_LOADING_SUCCESS:
-            return {...state,rwgpsRouteData:action.routeData.rwgpsRouteData,timeZoneOffset:action.routeData.timeZoneOffset,
-                timeZoneId:action.routeData.timeZoneId, gpxRouteData:null};
+            return {...state,rwgpsRouteData:action.routeData,gpxRouteData:null};
         case Actions.GPX_ROUTE_LOADING_SUCCESS:
-            return {...state,gpxRouteData:action.gpxRouteData,timeZoneOffset:action.timeZoneOffset,
-                timeZoneId:action.timeZoneId, rwgpsRouteData:null};
+            return {...state,gpxRouteData:action.gpxRouteData,rwgpsRouteData:null};
         case Actions.SET_ROUTE_INFO:
             if (action.routeInfo===null) {
                 return {...state,rwgpsRouteData:null,gpxRouteData:null,points:[],bounds:null,name:'',forecastRequest:null};
