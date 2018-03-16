@@ -4,7 +4,7 @@ import {Label, Input, FormGroup, UncontrolledTooltip} from 'reactstrap';
 import {connect} from 'react-redux';
 import {setPace} from "../actions/actions";
 
-export const paceToSpeed = {'A':10, 'B':12, 'C':14, 'C+':15, 'D-':15, 'D':16, 'D+':17, 'E-':17, 'E':18};
+export const paceToSpeed = {'A':10, 'B':12, 'C-':13, 'C':14, 'C+':15, 'D-':15, 'D':16, 'D+':17, 'E-':17, 'E':18};
 
 const getAlphaPace = function(pace) {
     let alpha = 'A';     // default
@@ -39,6 +39,7 @@ const RidingPace = ({pace,actualPace,setPace}) => {
                    id='paceInput' onChange={event => {setPace(event.target.value)}}>
                 <option value="A">A/10</option>
                 <option value="B">B/12</option>
+                <option value="C-">C-/13</option>
                 <option value="C">C/14</option>
                 <option value="C+">C+/15</option>
                 <option value="D-">D-/15-</option>
