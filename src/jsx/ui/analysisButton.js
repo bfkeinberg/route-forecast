@@ -15,8 +15,6 @@ const AnalysisButton = ({stravaAnalysis,enabled,toggleStravaAnalysis}) => {
         <Container>
             <Button className={classes} tabIndex='-1' id='enableAnalysis' disabled={!enabled}
                     onClick={toggleStravaAnalysis}><img id='stravaImage' src={Strava}/></Button>
-            {/*<Button active={stravaAnalysis} size="sm" outline={true} tabIndex='-1' id='enableAnalysis' disabled={!enabled}*/}
-                    {/*onClick={toggleStravaAnalysis}><img id='stravaImage' src={Strava}/></Button>*/}
         </Container>
         );
 };

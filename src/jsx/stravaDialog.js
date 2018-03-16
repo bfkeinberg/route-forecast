@@ -35,7 +35,7 @@ class StravaDialog extends Component {
     }
 
     componentWillReceiveProps(newProps) {
-        if (newProps.strava_error !== undefined) {
+        if (newProps.strava_error !== null) {
             this.setState({stravaAlertVisible:true});
         }
     }
@@ -45,7 +45,7 @@ class StravaDialog extends Component {
             isOpen: !this.state.isOpen
         });
     }
-
+//{/*toggle={this.setState({stravaAlertVisible:false})}*/}
     render() {
         return (
             <ErrorBoundary>
@@ -57,7 +57,7 @@ class StravaDialog extends Component {
                         <StravaRoute/>
                         <AnalysisInterval visible={this.props.showAnalysisInterval}/>
                         <Button outline onClick={this.props.getPaceOverTime}>Perform analysis</Button>
-                        {this.state.stravaAlertVisible?<Alert onDismiss={this.setState({stravaAlertVisible:false})} bsStyle='warning'>{this.props.strava_error}</Alert>:null}
+                        <Alert isOpen={this.state.stravaAlertVisible}  color='warning'>{this.props.strava_error}</Alert>
                         {StravaDialog.showProgressSpinner(this.props.fetchingFromStrava)}
                     </PopoverBody>
                 </Popover>
@@ -68,7 +68,7 @@ class StravaDialog extends Component {
 
 const mapStateToProps = (state) =>
     ({
-        strava_error: state.strava.error,
+        strava_error: state.strava.errorDetails,
         stravaAnalysis: state.controls.stravaAnalysis,
         fetchingFromStrava: state.strava.fetching,
         showAnalysisInterval: state.strava.activityData !== null && state.controls.stravaAnalysis

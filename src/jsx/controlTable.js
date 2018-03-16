@@ -185,20 +185,21 @@ class ControlTable extends Component {
     }
 
     componentDidUpdate() {
-        // focus on new control if one has been added
-        if (this.api !== undefined && this.props.controls.length > 0 && this.props.controls[this.props.controls.length-1].name==='') {
-            this.api.setFocusedCell(this.props.controls.length-1,'name');
-            this.api.startEditingCell({colKey:'name',rowIndex:this.props.controls.length-1});
-        }
-    }
-
-    render() {
         if (this.api !== undefined && window.outerWidth < smallScreenWidth) {
             this.api.sizeColumnsToFit();
         }
         if (this.columnApi !== undefined) {
             this.columnApi.setColumnWidth(this.columnApi.getColumn('delete'),deleteColumnWidth);
         }
+        // focus on new control if one has been added
+        if (this.api !== undefined && this.props.controls.length > 0 && this.props.controls[this.props.controls.length-1].name==='') {
+            log('setting focused cell');
+            this.api.setFocusedCell(this.props.controls.length-1,'name');
+            this.api.startEditingCell({colKey:'name',rowIndex:this.props.controls.length-1});
+        }
+    }
+
+    render() {
         let rowData = [];
         this.props.controls.forEach((item,index) => rowData.push({...item, ...this.props.calculatedValues[index], id:index}));
         return (<div className="ag-theme-fresh">
