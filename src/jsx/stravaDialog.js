@@ -45,7 +45,9 @@ class StravaDialog extends Component {
             isOpen: !this.state.isOpen
         });
     }
+
 //{/*toggle={this.setState({stravaAlertVisible:false})}*/}
+
     render() {
         return (
             <ErrorBoundary>

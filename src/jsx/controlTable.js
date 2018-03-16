@@ -193,7 +193,7 @@ class ControlTable extends Component {
         }
         // focus on new control if one has been added
         if (this.api !== undefined && this.props.controls.length > 0 && this.props.controls[this.props.controls.length-1].name==='') {
-            log('setting focused cell');
+            console.log('setting focused cell');
             this.api.setFocusedCell(this.props.controls.length-1,'name');
             this.api.startEditingCell({colKey:'name',rowIndex:this.props.controls.length-1});
         }
