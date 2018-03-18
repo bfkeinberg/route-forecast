@@ -254,11 +254,9 @@ const strava = function(state = {analysisInterval:defaultAnalysisIntervalInHours
             if (action.activity === undefined) {
                 return state;
             }
-            let newValue = parseInt(RouteInfoForm.getRouteNumberFromValue(action.activity), 10);
-            if (Number.isNaN(newValue)) {
-                return state;
-            }
-            return {...state, activity:newValue, activityData:null, activityStream:null, calculatedPaces:null};
+            let newValue = RouteInfoForm.getRouteNumberFromValue(action.activity);
+            return {...state, activity:!isNaN(newValue) ? newValue : action.activity,
+                activityData:null, activityStream:null, calculatedPaces:null};
         }
         case Actions.SET_STRAVA_ERROR:
             if (action.error !== undefined) {

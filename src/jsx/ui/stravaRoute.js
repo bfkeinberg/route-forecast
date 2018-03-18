@@ -17,7 +17,7 @@ const StravaRoute = ({stravaAnalysis,setStravaActivity,strava_activity,updateExp
                                      event.preventDefault();
                                      dt.items[i].getAsString(value => {
                                          setStravaActivity(value);
-                                         if (strava_activity !== ' ') {
+                                         if (strava_activity !== '') {
                                              updateExpectedTimes(strava_activity);
                                          }
                                      });
@@ -44,7 +44,7 @@ const StravaRoute = ({stravaAnalysis,setStravaActivity,strava_activity,updateExp
                          }
                      }}
                      value={strava_activity} onChange={event => {setStravaActivity(event.target.value)}}
-                     onBlur={() => {if (strava_activity !== ' ') {updateExpectedTimes(strava_activity)}}}/>
+                     onBlur={() => {if (strava_activity !== '') {updateExpectedTimes(strava_activity)}}}/>
     </FormGroup>
     );
 };
