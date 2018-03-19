@@ -3,7 +3,7 @@ import {connect} from 'react-redux';
 import {setShortUrl, shortenUrl} from "./actions/actions";
 import moment from 'moment';
 
-const queryString = require('query-string');
+import queryString from 'query-string';
 
 const formatOneControl = function(controlPoint) {
     if (typeof controlPoint === 'string') {
@@ -23,7 +23,7 @@ const dateToShortDate = function(date) {
     return moment(date).format("ddd MMM D YYYY HH:mm:ss");
 };
 
-const QueryString = ({routeNumber,start,pace,interval,metric,controls,/*setQueryString,*/
+const QueryStringUpdater = ({routeNumber,start,pace,interval,metric,controls,/*setQueryString,*/
                          shortenUrl,shortUrl,strava_activity}) => {
     let url = location.origin;
     if (routeNumber !== '') {
@@ -45,7 +45,7 @@ const QueryString = ({routeNumber,start,pace,interval,metric,controls,/*setQuery
     return null;
 };
 
-QueryString.propTypes = {
+QueryStringUpdater.propTypes = {
     routeNumber:PropTypes.oneOfType([
         PropTypes.number,
         PropTypes.oneOf([''])
@@ -80,5 +80,5 @@ const mapDispatchToProps = {
     /*setQueryString, */shortenUrl, setShortUrl
 };
 
-export default connect(mapStateToProps,mapDispatchToProps)(QueryString);
+export default connect(mapStateToProps,mapDispatchToProps)(QueryStringUpdater);
 

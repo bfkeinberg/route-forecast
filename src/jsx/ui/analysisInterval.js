@@ -13,6 +13,8 @@ const AnalysisInterval = ({interval,setInterval,getPaceOverTime,visible}) => {
             <Label>Analysis Interval
                 <Input id='analysisInterval' type="select" value={interval} name="analysisInterval"
                              onChange={event => {setInterval(event.target.value);getPaceOverTime()}}>
+                    <option value="1">1</option>
+                    <option value="2">2</option>
                     <option value="4">4</option>
                     <option value="6">6</option>
                     <option value="8">8</option>

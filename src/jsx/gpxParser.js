@@ -3,7 +3,8 @@ import moment from 'moment-timezone';
 import 'whatwg-fetch';
 import {finishTimeFormat} from './reducers/reducer';
 
-const paceToSpeed = {'A': 10, 'B': 12, 'C': 14, 'C+': 15, 'D-': 15, 'D': 16, 'D+': 17, 'E-': 17, 'E': 18};
+import {paceToSpeed} from "./ui/ridingPace";
+
 const kmToMiles = 0.62137;
 
 class AnalyzeRoute {
@@ -369,6 +370,9 @@ class AnalyzeRoute {
                 // adjust speed
                 let effectiveWindSpeed = Math.cos((Math.PI / 180)*relativeBearing)*parseInt(currentForecast[6]);
                 totalMinutesLost += AnalyzeRoute.windToTimeInMinutes(baseSpeed, distanceInMiles, hilliness, effectiveWindSpeed);
+                if (isNaN(totalMinutesLost)) {
+                    console.log('total minutes lost is invalid');
+                }
 
                 let desiredDistance = metric ? (totalDistanceInMiles/kmToMiles) : totalDistanceInMiles;
                 currentControl = AnalyzeRoute.calculateValuesForWind(controls, previouslyCalculatedValues,
