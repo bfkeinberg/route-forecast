@@ -23,7 +23,8 @@ class StravaDialog extends Component {
         fetchingFromStrava:PropTypes.bool,
         stravaAnalysis: PropTypes.bool.isRequired,
         toggleStravaAnalysis: PropTypes.func.isRequired,
-        getPaceOverTime: PropTypes.func.isRequired
+        getPaceOverTime: PropTypes.func.isRequired,
+        disableAnalysis:PropTypes.bool.isRequired
     };
 
     static showProgressSpinner(running) {
@@ -46,19 +47,17 @@ class StravaDialog extends Component {
         });
     }
 
-//{/*toggle={this.setState({stravaAlertVisible:false})}*/}
-
     render() {
         return (
             <ErrorBoundary>
                 <Popover id='analysisControls' target='enableAnalysis' /*onClick={this.props.toggleStravaAnalysis}*/
                          size="sm" isOpen={this.props.stravaAnalysis} placement='auto-end' hideArrow={true}
-                         toggle={this.props.toggleStravaAnalysis}>
-                    <PopoverHeader>Analyze with Strava</PopoverHeader>
+                         delay={{show:0,hide:2}}>
+                    <PopoverHeader className={'stravaDialogTitle'}>Analyze with Strava</PopoverHeader>
                     <PopoverBody>
                         <StravaRoute/>
-                        <AnalysisInterval visible={this.props.showAnalysisInterval}/>
-                        <Button outline onClick={this.props.getPaceOverTime}>Perform analysis</Button>
+                        <AnalysisInterval visible={true}/>
+                        <Button disabled={this.props.disableAnalysis} outline onClick={this.props.getPaceOverTime}>Perform analysis</Button>
                         <Alert isOpen={this.state.stravaAlertVisible}  color='warning'>{this.props.strava_error}</Alert>
                         {StravaDialog.showProgressSpinner(this.props.fetchingFromStrava)}
                     </PopoverBody>
@@ -73,7 +72,7 @@ const mapStateToProps = (state) =>
         strava_error: state.strava.errorDetails,
         stravaAnalysis: state.controls.stravaAnalysis,
         fetchingFromStrava: state.strava.fetching,
-        showAnalysisInterval: state.strava.activityData !== null && state.controls.stravaAnalysis
+        disableAnalysis: state.strava.activityData === null
     });
 
 const mapDispatchToProps = {

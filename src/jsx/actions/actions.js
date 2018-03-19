@@ -564,23 +564,6 @@ export const loadStravaActivity = function(activity) {
     }
 };
 
-export const updateExpectedTimes = function(activity) {
-    return function (dispatch,getState) {
-        dispatch(loadStravaActivity(activity)).then( async result => {
-            dispatch(stravaFetchSuccess(result));
-            const parser = await getStravaParser();
-            let timesFromData = parser.computeTimesFromData(getState().controls.userControlPoints,
-                result.activity, result.stream);
-            dispatch(updateActualArrivalTimes(timesFromData.controls));
-            dispatch(setActualPace(timesFromData.actualPace));
-            return dispatch(setActualFinishTime(timesFromData.actualFinishTime));
-        }, error => {
-            dispatch(stravaFetchFailure(error));
-            dispatch(setStravaToken(null))
-        });
-    }
-};
-
 export const SET_PACE_OVER_TIME = 'SET_PACE_OVER_TIME';
 export const setPaceOverTime = function(calculatedPaces) {
     return {
@@ -596,4 +579,32 @@ export const getPaceOverTime = function() {
             getState().strava.activityStream, getState().strava.analysisInterval)));
     }
 };
+
+export const updateExpectedTimes = function(activity) {
+    return function (dispatch,getState) {
+        dispatch(loadStravaActivity(activity)).then( async result => {
+            dispatch(stravaFetchSuccess(result));
+            const parser = await getStravaParser();
+            let timesFromData = parser.computeTimesFromData(getState().controls.userControlPoints,
+                result.activity, result.stream);
+            dispatch(updateActualArrivalTimes(timesFromData.controls));
+            dispatch(setActualPace(timesFromData.actualPace));
+            dispatch(setActualFinishTime(timesFromData.actualFinishTime));
+            return dispatch(getPaceOverTime());
+        }, error => {
+            dispatch(stravaFetchFailure(error));
+            dispatch(setStravaToken(null))
+        });
+    }
+};
+
+export const SUBRANGE_MAP = 'SUBRANGE_MAP';
+export const setSubrange = function(start,finish) {
+    return {
+        type: SUBRANGE_MAP,
+        start: start,
+        finish: finish
+    };
+};
+
 

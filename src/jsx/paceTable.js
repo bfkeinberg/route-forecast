@@ -4,6 +4,7 @@ import ErrorBoundary from "./errorBoundary";
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 import 'animate.css/animate.min.css';
+import {setSubrange} from './actions/actions';
 
 class PaceTable extends Component {
     static propTypes = {
@@ -13,19 +14,26 @@ class PaceTable extends Component {
             pace:PropTypes.number,
             alphaPace:PropTypes.string.isRequired,
             climb:PropTypes.number
-        })).isRequired
+        })).isRequired,
+        setSubrange:PropTypes.func.isRequired
     };
 
     constructor(props) {
         super(props);
+        this.expandTable = this.expandTable.bind(this);
+        this.updateSubrange = this.updateSubrange.bind(this);
         this.state = {};
     }
 
-    static expandTable(paces) {
+    updateSubrange(event) {
+        this.props.setSubrange(event.currentTarget.getAttribute('start'),event.currentTarget.getAttribute('end'));
+    }
+
+    expandTable(paces) {
         return (
             <tbody>
             {paces.map((pace) =>
-                <tr key={pace.distance+Math.random().toString(10)}>
+                <tr key={pace.distance+Math.random().toString(10)} start={pace.start} end={pace.end} onClick={this.updateSubrange}>
                     <td>{pace.time}</td>
                     <td>{pace.pace.toFixed(1)}</td>
                     <td>{pace.alphaPace}</td>
@@ -51,7 +59,7 @@ class PaceTable extends Component {
                             <th style={{'fontSize':'80%'}}>Climb</th>
                         </tr>
                         </thead>
-                        {PaceTable.expandTable(this.props.calculatedPaces)}
+                        {this.expandTable(this.props.calculatedPaces)}
                     </Table>
                     </ErrorBoundary>
                 </div>
@@ -64,4 +72,8 @@ const mapStateToProps = (state) =>
         calculatedPaces: state.strava.calculatedPaces
     });
 
-export default connect(mapStateToProps)(PaceTable);
+const mapDispatchToProps = {
+    setSubrange
+};
+
+export default connect(mapStateToProps,mapDispatchToProps)(PaceTable);

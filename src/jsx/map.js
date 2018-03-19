@@ -22,7 +22,8 @@ class RouteForecastMap extends Component {
         routeInfo:PropTypes.shape({bounds:PropTypes.object,points:PropTypes.array}).isRequired,
         maps_api_key:PropTypes.string.isRequired,
         controls:PropTypes.arrayOf(PropTypes.shape({lat:PropTypes.number,lon:PropTypes.number})),
-        controlNames:PropTypes.arrayOf(PropTypes.string)
+        controlNames:PropTypes.arrayOf(PropTypes.string),
+        subrange:PropTypes.arrayOf(PropTypes.number)
     };
 
     constructor(props) {
@@ -31,6 +32,7 @@ class RouteForecastMap extends Component {
         this.map = null;
         this.markers = [];
         this.routePath = null;
+        this.highlightPath = null;
         this.googleMapsApi = null;
         this.googleMapsPromise = null;
         this.state = {map:null};
@@ -164,7 +166,7 @@ class RouteForecastMap extends Component {
         });
     }
 
-    drawRoute(points,map) {
+    static drawRoute(points, map) {
         let routeLine = new google.maps.Polyline({
             path: points,
             geodesic: true,
@@ -175,6 +177,21 @@ class RouteForecastMap extends Component {
 
         routeLine.setMap(map);
         return routeLine;
+    }
+
+    static drawHighlight(points,subrange,map) {
+        if (subrange.length!==2) {
+            return null;
+        }
+        const highlightPoints = points.filter(point => point.dist >= subrange[0] && point.dist <= subrange[1]);
+        const highlight = new google.maps.Polyline({
+            path:highlightPoints, geodesic:true,
+            strokeColor: '#67ff99',
+            strokeOpacity: 0.9,
+            strokeWeight: 3
+        });
+        highlight.setMap(map);
+        return highlight;
     }
 
     static clearMarkers(markers) {
@@ -202,13 +219,18 @@ class RouteForecastMap extends Component {
         this.state.map.fitBounds(mapBounds);
         RouteForecastMap.clearMarkers(this.markers);
         this.markers = RouteForecastMap.addMarkers(forecast, this.props.controls, this.props.controlNames, this.state.map);
-        let routePoints = routeInfo.points.map((point) => {return {lat:point.lat, lng: point.lon}});
+        let routePoints = routeInfo.points.map((point) => {return {lat:point.lat, lng: point.lon, dist:point.dist}});
         // clear out old route path line if any
-        if (this.routePath != null) {
+        if (this.routePath !== null) {
             this.routePath.setMap(null);
             this.routePath = null;
         }
-        this.routePath = this.drawRoute(routePoints,this.state.map);
+        if (this.highlightPath !== null) {
+            this.highlightPath.setMap(null);
+            this.highlightPath = null;
+        }
+        this.routePath = RouteForecastMap.drawRoute(routePoints,this.state.map);
+        this.highlightPath = RouteForecastMap.drawHighlight(routePoints,this.props.subrange,this.state.map);
     }
 
     drawTheMap(gmaps,forecast,routeInfo) {
@@ -266,7 +288,8 @@ const mapStateToProps = (state) =>
         routeInfo: state.routeInfo,
         maps_api_key: state.params.maps_api_key,
         controls: state.controls.calculatedControlValues,
-        controlNames: state.controls.userControlPoints.map(control => control.name)
+        controlNames: state.controls.userControlPoints.map(control => control.name),
+        subrange: state.strava.subrange
     });
 
 

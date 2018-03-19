@@ -84,11 +84,16 @@ img#bugImage {
     height: 2rem;
 }
 
+.stravaDialogTitle {
+    text-align: center;
+    background-color: rgba(255,138,236,0.37);
+}
+
 input#finishTime.form-control {
     display: inline-flex;
     width: 14em;
     margin-top: 3px;
-    margin-botton: 0px;
+    margin-bottom: 0px;
 }
 input#interval.form-control {
     padding-top: 5px;

@@ -8,7 +8,7 @@ const StravaRoute = ({stravaAnalysis,setStravaActivity,strava_activity,updateExp
     return (
         <FormGroup style={{display:stravaAnalysis?'inline-flex':'none'}}>
             <Label for='stravaRoute'>Strava</Label>
-            <Input id='stravaRoute' tabIndex='-1' type="text"
+            <Input autoFocus id='stravaRoute' tabIndex='-1' type="text"
                      onDrop={event => {
                          let dt = event.dataTransfer;
                          if (dt.items) {

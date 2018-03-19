@@ -243,7 +243,8 @@ const controls = function(state = {metric:false,displayBanked:false,stravaAnalys
 };
 
 const strava = function(state = {analysisInterval:defaultAnalysisIntervalInHours,activity:'',token:null,
-    fetching:false,calculatedPaces:null,errorDetails:null}, action) {
+    fetching:false,calculatedPaces:null,errorDetails:null, subrange:[]},
+                        action) {
     switch (action.type) {
         case Actions.SET_STRAVA_TOKEN:
             if (action.token !== undefined) {
@@ -256,7 +257,7 @@ const strava = function(state = {analysisInterval:defaultAnalysisIntervalInHours
             }
             let newValue = RouteInfoForm.getRouteNumberFromValue(action.activity);
             return {...state, activity:!isNaN(newValue) ? newValue : action.activity,
-                activityData:null, activityStream:null, calculatedPaces:null};
+                activityData:null, activityStream:null, calculatedPaces:null, subrange:[]};
         }
         case Actions.SET_STRAVA_ERROR:
             if (action.error !== undefined) {
@@ -273,9 +274,16 @@ const strava = function(state = {analysisInterval:defaultAnalysisIntervalInHours
         case Actions.STRAVA_FETCH_FAILURE:
             return {...state, fetching:false, errorDetails:typeof action.error === 'object' ? action.error.message : action.error};
         case Actions.SET_ANALYSIS_INTERVAL:
-            return {...state, analysisInterval:parseInt(action.interval)};
+            return {...state, analysisInterval:parseInt(action.interval),subrange:[]};
         case Actions.SET_PACE_OVER_TIME:
             return {...state,calculatedPaces:action.calculatedPaces};
+        case Actions.SUBRANGE_MAP:
+            return {...state,subrange:
+                [
+                    parseFloat(action.start),
+                    parseFloat(action.finish)
+                ]
+            };
         default:
             return state;
     }

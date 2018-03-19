@@ -198,7 +198,7 @@ class AnalyzeRoute {
     walkRwgpsRoute(routeData,startTime,pace,interval,controls,metric,timeZoneId) {
         let modifiedControls = controls.slice();
         modifiedControls.sort((a,b) => a['distance']-b['distance']);
-        let stream = routeData[routeData.type]['track_points'].map(point => ({'lat':point['y'],'lon':point['x'],'elevation':point['e']}));
+        let stream = routeData[routeData.type]['track_points'].map(point => ({lat:point.y,lon:point.x,elevation:point.e, dist:point.d}));
         let trackName = routeData[routeData.type].name;
         return this.analyzeRoute(trackName, stream, startTime, pace, interval, modifiedControls, metric, timeZoneId);
     }
