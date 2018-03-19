@@ -27,7 +27,10 @@ class ControlTable extends Component {
         this.removeRow = this.removeRow.bind(this);
         this.state = {
             columnDefs:[
-                {colId:'name', field:'name', suppressSorting:true, editable:true, menuTabs:['generalMenuTab','columnsMenuTab'], headerName:'Name'},
+                {colId:'name', field:'name', suppressSorting:true, editable:true, menuTabs:[
+                    'generalMenuTab',
+                    'columnsMenuTab'
+                ], headerName:'Name'},
                 {field:'distance', headerTooltip:`In ${props.metric?'km':'miles'}`,
                     type:'numericColumn', unSortIcon:true, editable:true, valueParser:ControlTable.setData, valueSetter:ControlTable.validateData, headerName:'Distance'},
                 {field:'duration', headerTooltip:'How many minutes you expect to spend at this control',
