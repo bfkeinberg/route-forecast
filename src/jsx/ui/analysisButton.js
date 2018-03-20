@@ -6,14 +6,14 @@ import {toggleStravaAnalysis} from "../actions/actions";
 import Strava from 'Images/api_logo_pwrdBy_strava_stack_light.png';
 import {Button} from '@blueprintjs/core';
 
-const AnalysisButton = ({stravaAnalysis,enabled,toggleStravaAnalysis}) => {
+const AnalysisButton = ({stravaAnalysis,toggleStravaAnalysis}) => {
     let classes = 'pt-small pt-minimal';
     if (stravaAnalysis) {
         classes += ' pt-active';
     }
     return (
         <Container>
-            <Button className={classes} tabIndex='-1' id='enableAnalysis' disabled={!enabled}
+            <Button className={classes} tabIndex='-1' id='enableAnalysis'
                     onClick={toggleStravaAnalysis}><img id='stravaImage' src={Strava}/></Button>
         </Container>
         );
@@ -28,7 +28,6 @@ AnalysisButton.propTypes = {
 const mapStateToProps = (state) =>
     ({
         stravaAnalysis: state.controls.stravaAnalysis,
-        enabled: state.forecast.valid
     });
 
 const mapDispatchToProps = {
