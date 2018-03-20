@@ -15,7 +15,8 @@ class PaceTable extends Component {
             alphaPace:PropTypes.string.isRequired,
             climb:PropTypes.number
         })).isRequired,
-        setSubrange:PropTypes.func.isRequired
+        setSubrange:PropTypes.func.isRequired,
+        actualPace:PropTypes.number.isRequired
     };
 
     constructor(props) {
@@ -49,18 +50,19 @@ class PaceTable extends Component {
         return (
                 <div className="animated slideInRight">
                     <ErrorBoundary>
-                    <Table striped responsive hover bordered>
-                        <thead>
-                        <tr>
-                            <th style={{'fontSize':'80%'}}>Time</th>
-                            <th style={{'fontSize':'80%'}}>Pace</th>
-                            <th style={{'fontSize':'80%'}}>WW Pace</th>
-                            <th style={{'fontSize':'80%'}}>Distance</th>
-                            <th style={{'fontSize':'80%'}}>Climb</th>
-                        </tr>
-                        </thead>
-                        {this.expandTable(this.props.calculatedPaces)}
-                    </Table>
+                        <div id="paceSpan">Overall pace was {this.props.actualPace.toFixed(1)}</div>
+                        <Table striped responsive hover bordered>
+                            <thead>
+                            <tr>
+                                <th style={{'fontSize':'80%'}}>Time</th>
+                                <th style={{'fontSize':'80%'}}>Pace</th>
+                                <th style={{'fontSize':'80%'}}>WW Pace</th>
+                                <th style={{'fontSize':'80%'}}>Distance</th>
+                                <th style={{'fontSize':'80%'}}>Climb</th>
+                            </tr>
+                            </thead>
+                            {this.expandTable(this.props.calculatedPaces)}
+                        </Table>
                     </ErrorBoundary>
                 </div>
         );
@@ -69,7 +71,8 @@ class PaceTable extends Component {
 
 const mapStateToProps = (state) =>
     ({
-        calculatedPaces: state.strava.calculatedPaces
+        calculatedPaces: state.strava.calculatedPaces,
+        actualPace: state.strava.actualPace
     });
 
 const mapDispatchToProps = {

@@ -24,17 +24,17 @@ const getPaceTooltipId = function(realPace, predictedPace) {
 const RidingPace = ({pace,actualPace,setPace}) => {
     let pace_mph = paceToSpeed[pace];
     let pace_text;
-    let pace_tooltip_id = 'pace_tooltip';
+    let pace_tooltip_class = 'pace_tooltip';
     if (actualPace === undefined) {
         pace_text = `Represents climb-adjusted pace - current is ${pace_mph}`;
     } else {
-        pace_tooltip_id = getPaceTooltipId(actualPace,pace_mph);
+        pace_tooltip_class = getPaceTooltipId(actualPace,pace_mph);
         pace_text = `Actual riding pace was ${getAlphaPace(actualPace)}`;
     }
     return (
         <FormGroup>
             <Label size='sm' tag='b' for='paceInput'>Pace</Label>
-            <UncontrolledTooltip target='paceInput' placement="bottom" id={pace_tooltip_id}>{pace_text}</UncontrolledTooltip>
+            <UncontrolledTooltip innerClassName={pace_tooltip_class} target='paceInput' placement="bottom">{pace_text}</UncontrolledTooltip>
             <Input tabIndex='3' type="select" value={pace} name="pace"
                    id='paceInput' onChange={event => {setPace(event.target.value)}}>
                 <option value="A">A/10</option>

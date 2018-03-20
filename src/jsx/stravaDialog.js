@@ -19,7 +19,6 @@ class StravaDialog extends Component {
 
     static propTypes = {
         strava_error: PropTypes.string,
-        showAnalysisInterval:PropTypes.bool.isRequired,
         fetchingFromStrava:PropTypes.bool,
         stravaAnalysis: PropTypes.bool.isRequired,
         toggleStravaAnalysis: PropTypes.func.isRequired,
