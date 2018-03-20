@@ -1,6 +1,5 @@
 const path = require('path');
-const ExtractTextPlugin = require("extract-text-webpack-plugin");
-const webpack = require('webpack');
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
 const ScriptExtHtmlWebpackPlugin = require('script-ext-html-webpack-plugin');
@@ -14,8 +13,7 @@ var STATIC_DIR = path.resolve(__dirname, 'dist/static');
 var GPX_DIR = path.resolve(__dirname, 'node_modules/gpx-parse/dist');
 
 module.exports = {
-    entry: ['babel-polyfill','whatwg-fetch',
-        path.resolve(APP_DIR, 'index.js')
+    entry: ['babel-polyfill', path.resolve(APP_DIR, 'index.js')
     ],
     module: {
         rules: [
@@ -38,11 +36,10 @@ module.exports = {
                 exclude: /node_modules/,
                 loader: 'ts-loader' },
             { test: /\.css$/,
-                use:
-                ExtractTextPlugin.extract({
-                    fallback: "style-loader",
-                    use: [{loader:"css-loader", options: {modules:false, sourceMap:true, minimize:true}}]
-                })
+                use: [
+                    MiniCssExtractPlugin.loader,
+                    "css-loader"
+                ]
             },
             { test: /\.(png|woff2?|ttf|eot)$/, loader: "url-loader?limit=100000" },
             { test: /\.(jpg|ico|svg)$/, loader: "file-loader" },
@@ -51,13 +48,19 @@ module.exports = {
     },
     plugins: [
         new CleanWebpackPlugin([BUILD_DIR + '/*.*',STATIC_DIR + '/*.*'] , {watch:true, verbose:false}),
-        new ExtractTextPlugin({filename:"styles.css",allChunks:true}),
+        new MiniCssExtractPlugin({
+            // Options similar to the same options in webpackOptions.output
+            // both options are optional
+            filename: "[name].css",
+            chunkFilename: "[id].css"
+        }),
         new HtmlWebpackPlugin({
             title:'Plan long bike ride',
             filename:path.resolve(BUILD_DIR, 'index.html'),
             template:path.resolve(TEMPLATE_DIR,'base_index.html'),
             inject:false,
             minify:{minifyURLs:true,removeComments:true},
+            chunksSortMode:'none',
             // favicon:'src/static/favicon.ico'
         }),
         new ScriptExtHtmlWebpackPlugin({custom:[{
@@ -65,9 +68,6 @@ module.exports = {
             {test:'main',attribute:'timezone_api_key',value:'{{ timezone_api_key }}'},
             {test:'main',attribute:'maps_api_key',value:'{{ maps_key }}'},
         ]}),
-        new webpack.ProvidePlugin({
-            fetch: 'imports-loader?this=>global!exports-loader?global.fetch!whatwg-fetch'
-        }),
         new CopyWebpackPlugin([{from:SRC_STATIC_DIR + '/favicon*.*',to:STATIC_DIR, flatten:true}])
     ],
     output: {

@@ -79,6 +79,7 @@
     "html-webpack-plugin": "^3.0.7",
     "imports-loader": "^0.8.0",
     "json-loader": "^0.5.4",
+    "mini-css-extract-plugin": "^0.2.0",
     "minimalcss": "^0.7.3",
     "penthouse": "^1.4.1",
     "raw-loader": "^0.5.1",
@@ -90,8 +91,9 @@
     "ts-loader": "^4.1.0",
     "uglifyjs-webpack-plugin": "^1.2.4",
     "url-loader": "^1.0.1",
-    "webpack": "^3.11.0",
+    "webpack": "^4.1.1",
     "webpack-bundle-analyzer": "^2.11.1",
+    "webpack-cli": "^2.0.12",
     "webpack-closure-compiler": "^2.1.6",
     "webpack-merge": "^4.1.2",
     "webpack-plugin-critical": "^1.0.0",
@@ -100,8 +102,8 @@
   "scripts": {
     "test": "python src/application.py",
     "build": "webpack --progress --verbose --colors --display-error-details --config webpack/common.config.js",
-    "prod": "./node_modules/.bin/webpack --config webpack.prod.js",
-    "dev": "./node_modules/.bin/webpack --progress --colors --display-error-details --config webpack.dev.js",
+    "prod": "./node_modules/.bin/webpack --mode production --config webpack.prod.js",
+    "dev": "./node_modules/.bin/webpack --mode development --progress --colors --display-error-details --config webpack.dev.js",
     "lint": "eslint src"
   },
   "repository": {

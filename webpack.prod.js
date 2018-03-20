@@ -11,7 +11,6 @@ const ClosureCompilerPlugin = require('webpack-closure-compiler');
 module.exports = merge(common, {
     plugins: [
         new ClosureCompilerPlugin({concurrency: 3}),
-        // new webpack.optimize.UglifyJsPlugin({sourceMap:true,comments:false}),
         new webpack.DefinePlugin({
             'process.env.NODE_ENV': JSON.stringify('production')
         }),
@@ -47,6 +46,6 @@ module.exports = merge(common, {
             threshold: 10240,
             minRatio: 0.8
         }),
-        // new BundleAnalyzerPlugin()
+        new BundleAnalyzerPlugin()
     ]
 });
