@@ -21,7 +21,6 @@ const AnalysisButton = ({stravaAnalysis,toggleStravaAnalysis}) => {
 
 AnalysisButton.propTypes = {
     stravaAnalysis:PropTypes.bool.isRequired,
-    enabled: PropTypes.bool.isRequired,
     toggleStravaAnalysis:PropTypes.func.isRequired
 };
 

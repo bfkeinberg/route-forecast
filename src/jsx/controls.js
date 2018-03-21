@@ -2,12 +2,25 @@ import {Row, Col, Container, Input, Label, Card, CardBody, CardTitle} from 'reac
 import {Button} from '@blueprintjs/core';
 import React, {Component} from 'react';
 import MediaQuery from 'react-responsive';
-import ControlTable from './controlTable';
 import ErrorBoundary from './errorBoundary';
 import PropTypes from 'prop-types';
 import {addControl, toggleDisplayBanked, toggleMetric} from './actions/actions';
 import {connect} from 'react-redux';
 import FinishTime from './ui/finishTime';
+import Loadable from 'react-loadable';
+
+const LoadableControlTable = Loadable({
+    loader: () => import(/* webpackChunkName: "ControlTable" */'./controlTable'),
+    loading(props) {
+        if (props.error) {
+            return <div>Error loading control table!</div>;
+        } else if (props.pastDelay) {
+            return <div>Loading control table...</div>;
+        } else {
+            return null;
+        }
+    }
+});
 
 class ControlPoints extends Component {
 
@@ -20,7 +33,8 @@ class ControlPoints extends Component {
         displayBanked:PropTypes.bool.isRequired,
         fetchingFromStrava:PropTypes.bool,
         toggleDisplayBanked:PropTypes.func.isRequired,
-        stravaAnalysis: PropTypes.bool.isRequired
+        stravaAnalysis: PropTypes.bool.isRequired,
+        hasControls:PropTypes.bool.isRequired
     };
 
     constructor(props) {
@@ -34,9 +48,16 @@ class ControlPoints extends Component {
     }
 
     render () {
-        const title = this.props.name === '' ?
-            (<div style={{textAlign:"center"}}>Control point list</div>) :
-            (<div style={{textAlign:"center"}}>Control point list for <i>{this.props.name}</i></div>);
+        let title;
+        let table = (<div/>);
+        if (this.props.name === '') {
+            title = (<div id={'controlListTitle'}>Control point list</div>);
+        } else {
+            title = (<div id={'controlListTitle'}>Control point list for <i>{this.props.name}</i></div>);
+        }
+        if (this.props.name !== '' || this.props.hasControls) {
+            table = (<LoadableControlTable/>);
+        }
         return (
             <div className="controlPoints">
                 <Container fluid={true}>
@@ -70,13 +91,13 @@ class ControlPoints extends Component {
                             <CardBody>
                                 <CardTitle className="cpListTitle" tag='h6'>{title}</CardTitle>
                                 <ErrorBoundary>
-                                    <ControlTable/>
+                                    {table}
                                 </ErrorBoundary>
                             </CardBody>
                         </Card>
                     </MediaQuery>
                     <MediaQuery maxDeviceWidth={800}>
-                                <ControlTable/>
+                        {table}
                     </MediaQuery>
                 </ErrorBoundary>
                 <div tabIndex="98" onFocus={() => {document.getElementById('addButton').focus()}}/>
@@ -88,6 +109,7 @@ class ControlPoints extends Component {
 const mapStateToProps = (state) =>
     ({
         metric: state.controls.metric,
+        hasControls: state.controls.count !== 0,
         calculatedValues: state.controls.calculatedValues,
         name: state.routeInfo.name,
         displayBanked: state.controls.displayBanked,

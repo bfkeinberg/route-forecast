@@ -19,7 +19,7 @@
     border-bottom-color: #40ff23;
 }
 
-#paceSpan {
+#controlListTitle, #paceSpan {
     text-align: center;
 }
 
