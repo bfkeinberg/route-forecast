@@ -73,7 +73,7 @@ import * as Actions from '../actions/actions';
 import {combineReducers} from 'redux';
 import moment from 'moment';
 import RouteInfoForm from "../routeInfoEntry";
-import Immutable from 'immutable';
+// import Immutable from 'immutable';
 
 export const finishTimeFormat = 'ddd, MMM DD YYYY h:mma';
 

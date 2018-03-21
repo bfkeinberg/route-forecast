@@ -7,9 +7,9 @@ import PropTypes from 'prop-types';
 import {addControl, toggleDisplayBanked, toggleMetric} from './actions/actions';
 import {connect} from 'react-redux';
 import FinishTime from './ui/finishTime';
-import Loadable from 'react-loadable';
+import loadable from 'react-loadable';
 
-const LoadableControlTable = Loadable({
+const LoadableControlTable = loadable({
     loader: () => import(/* webpackChunkName: "ControlTable" */'./controlTable'),
     loading(props) {
         if (props.error) {
