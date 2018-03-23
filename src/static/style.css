@@ -30,14 +30,6 @@
         padding: 12px;
     }
 }
-/*
-#content input_1[disabled] {
-    color: #DCDAD1;
-    padding: 2px;
-    margin: 0 0 0 0;
-    background-image: none;
-}
-*/
 
 .rwgps_route {
     font-size: 90%;
@@ -48,9 +40,11 @@
     height:40px;
     width:179px;
 }
+
 form.form-inline {
     margin-bottom: 0;
 }
+
 label.control-label {
     padding-left: 8px;
     padding-top: inherit;
@@ -85,7 +79,8 @@ img#bugImage {
 
 .stravaDialogTitle {
     text-align: center;
-    background-color: rgba(255,138,236,0.37);
+    background-color: rgba(234, 89, 41, 0.91);
+    color: rgb(255, 255, 255);
 }
 
 input#finishTime.form-control {
