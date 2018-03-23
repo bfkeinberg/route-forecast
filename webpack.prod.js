@@ -28,11 +28,8 @@ module.exports = merge(common, {
             inlineImages: true,
             assetPaths: ['dist/static'],
             penthouse: {
-                renderWaitTime: 6000,
+                renderWaitTime: 3000,
                 blockJSRequests: false,
-                screenshots: {
-                    basePath: 'homepage'
-                },
             }
         }),
         new CompressionPlugin({
