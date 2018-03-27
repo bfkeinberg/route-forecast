@@ -6,15 +6,11 @@ const HtmlCriticalPlugin = require("html-critical-webpack-plugin");
 const BrotliPlugin = require('brotli-webpack-plugin');
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 const CompressionPlugin = require("compression-webpack-plugin");
-const ClosureCompilerPlugin = require('webpack-closure-compiler');
+const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 
 module.exports = merge(common, {
     plugins: [
-        new ClosureCompilerPlugin({concurrency: 3}),
-        new webpack.DefinePlugin({
-            'process.env.NODE_ENV': JSON.stringify('production')
-        }),
-        new webpack.optimize.AggressiveMergingPlugin({minSizeReduce:1.4}),
+        new UglifyJsPlugin({sourceMap:true}),
         new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
         new HtmlCriticalPlugin({
             base: path.resolve(__dirname, 'dist/'),
