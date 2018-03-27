@@ -161,7 +161,7 @@ class StravaRouteParser {
     }
 
     static getAlphaPace(pace) {
-        let alpha = 'A';     // default
+        let alpha = 'A-';     // default
         alpha = Object.keys(paceToSpeed).reverse().find(value => {
             return (pace > paceToSpeed[value])});
         return alpha;
@@ -224,6 +224,7 @@ class StravaRouteParser {
     static authenticate(activityId) {
         let params = queryString.parse(location.search);
         params['strava_activity'] = activityId;
+        params['strava_analysis'] = true;
         window.location.href = '/stravaAuthReq?state=' + JSON.stringify(params);
     }
 }
