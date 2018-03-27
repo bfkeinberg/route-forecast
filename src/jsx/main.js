@@ -33,7 +33,8 @@ import {
     showForm,
     updateUserControls,
     loadCookie,
-    saveCookie
+    saveCookie,
+    toggleStravaAnalysis
 } from "./actions/actions";
 import QueryString from './queryString';
 import PaceTable from './paceTable';
@@ -52,7 +53,8 @@ class RouteWeatherUI extends Component {
         formVisible:PropTypes.bool.isRequired,
         showForm:PropTypes.func.isRequired,
         showPacePerTme:PropTypes.bool.isRequired,
-        setFetchAfterLoad:PropTypes.func.isRequired
+        setFetchAfterLoad:PropTypes.func.isRequired,
+        toggleStravaAnalysis: PropTypes.func.isRequired
     };
 
     constructor(props) {
@@ -113,6 +115,9 @@ class RouteWeatherUI extends Component {
         props.setMetric(queryParams.metric==="true");
         props.setStravaActivity(queryParams.strava_activity);
         props.setStravaError(queryParams.strava_error);
+        if (queryParams.strava_analysis !== undefined) {
+            props.toggleStravaAnalysis();
+        }
     }
 
     render() {
@@ -157,7 +162,7 @@ class RouteWeatherUI extends Component {
 
 const mapDispatchToProps = {
     setStravaToken, setActionUrl, setRwgpsRoute, setApiKeys, setStravaError, setStart, setPace, setInterval, setMetric,
-    setStravaActivity, updateControls:updateUserControls, showForm, setFetchAfterLoad
+    setStravaActivity, updateControls:updateUserControls, showForm, setFetchAfterLoad, toggleStravaAnalysis
 };
 
 const mapStateToProps = (state) =>
