@@ -244,7 +244,7 @@ const controls = function(state = {metric:false,displayBanked:false,stravaAnalys
 };
 
 const strava = function(state = {analysisInterval:defaultAnalysisIntervalInHours,activity:'',token:null,
-    fetching:false,calculatedPaces:null,errorDetails:null, subrange:[]},
+    fetching:false,activityData:null,calculatedPaces:null,errorDetails:null, subrange:[]},
                         action) {
     switch (action.type) {
         case Actions.SET_STRAVA_TOKEN:
