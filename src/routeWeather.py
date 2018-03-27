@@ -19,8 +19,6 @@ class WeatherError(Exception):
 
 class WeatherCalculator:
 
-    paceToSpeed = {'A': 10, 'B': 12, 'C': 14, 'C+': 15, 'D-': 15, 'D': 16, 'D+': 17, 'E-': 17, 'E': 18}
-
     def __init__(self,session):
         self.min_latitude = 90
         self.min_longitude = 180
