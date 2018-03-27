@@ -8,6 +8,7 @@ handlers:
 - url: /static
   static_dir: dist/static
   application_readable: true
+  secure: always
 
 - url: /(.*\.(ico|png))$
   static_files: dist/static/\1
