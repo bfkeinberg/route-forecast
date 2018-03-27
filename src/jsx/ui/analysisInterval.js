@@ -2,9 +2,9 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import {Label, Input, FormGroup, UncontrolledTooltip} from 'reactstrap';
 import {connect} from 'react-redux';
-import {setAnalysisInterval} from "../actions/actions";
+import {setAnalysisInterval,getPaceOverTime} from "../actions/actions";
 
-const AnalysisInterval = ({interval,setInterval,visible}) => {
+const AnalysisInterval = ({interval,setInterval,visible,getPaceOverTime}) => {
     const interval_tooltip_text = 'Interval at which to calculate effective pace';
     const isVisible = visible ? 'inline-flex' : 'none';
     return (
@@ -12,7 +12,7 @@ const AnalysisInterval = ({interval,setInterval,visible}) => {
             <UncontrolledTooltip placement="bottom" target='analysisInterval'>{interval_tooltip_text}</UncontrolledTooltip>
             <Label>Analysis Interval
                 <Input id='analysisInterval' type="select" value={interval} name="analysisInterval"
-                             onChange={event => {setInterval(event.target.value)}}>
+                             onChange={event => {setInterval(event.target.value);getPaceOverTime()}}>
                     <option value="1">1</option>
                     <option value="2">2</option>
                     <option value="4">4</option>
@@ -29,7 +29,8 @@ const AnalysisInterval = ({interval,setInterval,visible}) => {
 AnalysisInterval.propTypes = {
     interval:PropTypes.number.isRequired,
     setInterval:PropTypes.func.isRequired,
-    visible:PropTypes.bool.isRequired
+    visible:PropTypes.bool.isRequired,
+    getPaceOverTime:PropTypes.func.isRequired
 };
 
 const mapStateToProps = (state) =>
@@ -38,7 +39,7 @@ const mapStateToProps = (state) =>
     });
 
 const mapDispatchToProps = {
-    setInterval:setAnalysisInterval
+    setInterval:setAnalysisInterval, getPaceOverTime
 };
 
 export default connect(mapStateToProps,mapDispatchToProps)(AnalysisInterval);
