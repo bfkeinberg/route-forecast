@@ -574,6 +574,9 @@ export const setPaceOverTime = function(calculatedPaces) {
 
 export const getPaceOverTime = function() {
     return async function (dispatch,getState) {
+        if (getState().strava.activityData===null) {
+            return;
+        }
         const parser = await getStravaParser();
         return dispatch(setPaceOverTime(parser.findMovingAverages(getState().strava.activityData,
             getState().strava.activityStream, getState().strava.analysisInterval)));
