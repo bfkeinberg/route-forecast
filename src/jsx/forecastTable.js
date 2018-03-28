@@ -4,28 +4,38 @@ import ErrorBoundary from "./errorBoundary";
 import darkSky from 'Images/darkSkySmall.png';
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
+import {setWeatherRange} from './actions/actions';
+
+const milesToKm = 1609.34;
 
 class ForecastTable extends Component {
     static propTypes = {
         weatherCorrectionMinutes:PropTypes.number,
-        forecast:PropTypes.arrayOf(PropTypes.array).isRequired
+        forecast:PropTypes.arrayOf(PropTypes.array).isRequired,
+        setWeatherRange:PropTypes.func.isRequired
     };
 
     constructor(props) {
         super(props);
+        this.expandTable = this.expandTable.bind(this);
         this.state = {};
     }
 
-    static expandTable(forecast) {
+    updateWeatherRange = (event) => this.props.setWeatherRange(event.currentTarget.getAttribute('start'),event.currentTarget.getAttribute('end'));
+
+    expandTable(forecast) {
         const redText = ({color:'red'});
         const orange = ({color:'darkOrange'});
         const skyBlue = ({color:'deepSkyBlue'});
         if (forecast.length > 0 && forecast[0].length > 5) {
             return (
                 <tbody>
-                {forecast.map((point) =>
+                {forecast.map((point,index) =>
                     /*<tr key={Math.random().toString(36).slice(2)}>*/
-                    <tr key={point[0]+Math.random().toString(10)}>
+                    <tr key={point[0]+Math.random().toString(10)}
+                        start={point[1]*milesToKm}
+                        end={index!==forecast.length-1?forecast[index+1][1]*milesToKm:null}
+                        onClick={this.updateWeatherRange}>
                         <td>{point[0]}</td>
                         <td>{point[1]}</td>
                         <td>{point[2]}</td>
@@ -70,7 +80,7 @@ class ForecastTable extends Component {
                             <th style={{'fontSize':'80%'}}>Wind speed</th>
                         </tr>
                         </thead>
-                        {ForecastTable.expandTable(this.props.forecast)}
+                        {this.expandTable(this.props.forecast)}
                     </Table>
                     </ErrorBoundary>
                 </div>
@@ -84,4 +94,8 @@ const mapStateToProps = (state) =>
         weatherCorrectionMinutes: state.routeInfo.weatherCorrectionMinutes
     });
 
-export default connect(mapStateToProps)(ForecastTable);
+const mapDispatchToProps = {
+    setWeatherRange
+};
+
+export default connect(mapStateToProps,mapDispatchToProps)(ForecastTable);

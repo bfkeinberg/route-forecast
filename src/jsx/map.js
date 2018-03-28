@@ -23,7 +23,11 @@ class RouteForecastMap extends Component {
         maps_api_key:PropTypes.string.isRequired,
         controls:PropTypes.arrayOf(PropTypes.shape({lat:PropTypes.number,lon:PropTypes.number})),
         controlNames:PropTypes.arrayOf(PropTypes.string),
-        subrange:PropTypes.arrayOf(PropTypes.number)
+        subrange:PropTypes.arrayOf(PropTypes.number),
+        selection:PropTypes.arrayOf(PropTypes.oneOfType([
+            PropTypes.number,
+            PropTypes.oneOf(null)
+            ]))
     };
 
     constructor(props) {
@@ -183,7 +187,8 @@ class RouteForecastMap extends Component {
         if (subrange.length!==2) {
             return null;
         }
-        const highlightPoints = points.filter(point => point.dist >= subrange[0] && point.dist <= subrange[1]);
+        const highlightPoints = points.filter(point => point.dist >= subrange[0] &&
+            (isNaN(subrange[1]) || point.dist <= subrange[1]));
         const highlight = new google.maps.Polyline({
             path:highlightPoints, geodesic:true,
             strokeColor: '#67ff99',
@@ -285,11 +290,12 @@ class RouteForecastMap extends Component {
 const mapStateToProps = (state) =>
     ({
         forecast: state.forecast.forecast,
+        selection: state.forecast.range,
         routeInfo: state.routeInfo,
         maps_api_key: state.params.maps_api_key,
         controls: state.controls.calculatedControlValues,
         controlNames: state.controls.userControlPoints.map(control => control.name),
-        subrange: state.strava.subrange
+        subrange: state.strava.subrange.length > 0 ? state.strava.subrange : state.forecast.range
     });
 
 

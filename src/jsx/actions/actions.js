@@ -610,4 +610,13 @@ export const setSubrange = function(start,finish) {
     };
 };
 
+export const SET_WEATHER_RANGE = 'SET_WEATHER_RANGE';
+export const setWeatherRange = function(start,finish) {
+    return {
+        type: SET_WEATHER_RANGE,
+        start: start,
+        finish: finish
+    };
+};
+
 

@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import PropTypes from 'prop-types';
 
+/*global Raven*/
 class ErrorBoundary extends Component {
     static propTypes = {
         children:PropTypes.node.isRequired

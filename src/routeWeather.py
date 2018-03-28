@@ -75,7 +75,9 @@ class WeatherCalculator:
             relative_bearing = self.get_bearing_difference(bearing, current_forecast['windBearing']) if has_wind and bearing != None else None
             rainy = 'icon' in current_forecast and current_forecast['icon'] == 'rain'
             self.logger.info('%s %f,%f %s %d %d', now, lat, lon, current_forecast,bearing if bearing!=None else 0,relative_bearing if relative_bearing!=None else 0)
-            return (now.strftime("%-I:%M%p"), distance, current_forecast['summary'],
+            return (now.strftime("%-I:%M%p"),
+                    distance,
+                    current_forecast['summary'],
                     str(int(round(current_forecast['temperature'])))+'F',
                     str((current_forecast['precipProbability'] * 100)) + '%'
                     if 'precipProbability' in current_forecast else '<unavailable>',
@@ -83,8 +85,13 @@ class WeatherCalculator:
                     if 'cloudCover' in current_forecast else '<unavailable>',
                     str(int(round(current_forecast['windSpeed']))) + ' mph'
                     if has_wind else '<unavailable>',
-                    lat, lon, int(round(current_forecast['temperature'])), now.strftime("%a %b %-d %-I:%M%p %Y"),
-                    relative_bearing, rainy, wind_bearing
+                    lat,
+                    lon,
+                    int(round(current_forecast['temperature'])),
+                    now.strftime("%a %b %-d %-I:%M%p %Y"),
+                    relative_bearing,
+                    rainy,
+                    wind_bearing
                     )
         else:
             response.raise_for_status()

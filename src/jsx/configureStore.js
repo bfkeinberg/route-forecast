@@ -5,6 +5,7 @@ import rootReducer from './reducers/reducer';
 import createRavenMiddleware from "raven-for-redux";
 
 const loggerMiddleware = createLogger();
+/*global Raven*/
 
 /**
  *

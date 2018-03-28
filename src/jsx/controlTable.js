@@ -9,6 +9,23 @@ import {updateUserControls} from './actions/actions';
 const smallScreenWidth = 800;
 const deleteColumnWidth = 39;
 
+class DeleteRenderer extends Component {
+    static propTypes = {
+        context: PropTypes.object.isRequired,
+        node: PropTypes.object.isRequired
+    };
+
+    constructor(props) {
+        super(props);
+    }
+
+    invokeDelete = () => {this.props.context.componentParent.removeRow(this.props.node.id)};
+
+    render() {
+        return (<Button onClick={this.invokeDelete} class={'pt-minimal'} icon={'delete'}/>);
+    }
+}
+
 class ControlTable extends Component {
     static propTypes = {
         displayBanked:PropTypes.bool.isRequired,
@@ -26,6 +43,8 @@ class ControlTable extends Component {
         this.deleteRenderer = this.deleteRenderer.bind(this);
         this.removeRow = this.removeRow.bind(this);
         this.state = {
+            context: { componentParent: this },
+            frameworkComponents: { deleteRenderer: DeleteRenderer },
             columnDefs:[
                 {colId:'name', field:'name', suppressSorting:true, editable:true, menuTabs:[
                     'generalMenuTab',
@@ -45,7 +64,7 @@ class ControlTable extends Component {
                     cellRenderer:"agAnimateShowChangeCellRenderer",
                     suppressNavigable:true, suppressSorting:true, type:'numericColumn', valueFormatter:ControlTable.appendUnit, hide:!displayBanked, headerName:'Banked time'},
                 {colId:'delete', suppressNavigable:true, suppressSorting:true, suppressSizeToFit: true,
-                    pinned:'right', cellRenderer:this.deleteRenderer}
+                    pinned:'right', cellRenderer:'deleteRenderer'}
             ]};
         this.addRow = this.addRow.bind(this);
         this.onGridReady = this.onGridReady.bind(this);
@@ -100,6 +119,7 @@ class ControlTable extends Component {
         const deleteButton = <Button onClick={() => {this.removeRow(params.node.id)}} class={'pt-minimal'} icon={'delete'}/>;
         let eDiv = document.createElement('div');
         ReactDOM.render(deleteButton, eDiv);
+        console.log(`making a new delete button DOM object for ${params.node.id}`);
         return eDiv;
     }
 
@@ -189,7 +209,8 @@ class ControlTable extends Component {
 
     componentDidUpdate() {
         if (this.api !== undefined/* && window.outerWidth < smallScreenWidth*/) {
-            this.api.sizeColumnsToFit();
+            // this.api.sizeColumnsToFit();
+            this.columnApi.autoSizeAllColumns();
         }
         if (this.columnApi !== undefined) {
             this.columnApi.setColumnWidth(this.columnApi.getColumn('delete'),deleteColumnWidth);
@@ -208,6 +229,7 @@ class ControlTable extends Component {
         return (<div className="ag-theme-fresh">
             <AgGridReact enableCellChangeFlash={true} enableColResize enableSorting animateRows
                          sortingOrder={['asc']} unSortIcon rowData={rowData}
+                         context={this.state.context} frameworkComponents={this.state.frameworkComponents}
              onGridReady={this.onGridReady} onSortChanged={this.sortChanged} singleClickEdit //editType={'fullRow'}
             onCellValueChanged={this.cellUpdated} tabToNextCell={ControlTable.tabHandler} getRowNodeId={data => data.id}
             columnDefs={this.state.columnDefs}/>

@@ -290,16 +290,23 @@ const strava = function(state = {analysisInterval:defaultAnalysisIntervalInHours
     }
 };
 
-const forecast = function(state = {forecast:[],valid:false}, action) {
+const forecast = function(state = {forecast:[],valid:false,range:[]}, action) {
     switch (action.type) {
         case Actions.FORECAST_FETCH_SUCCESS:
-            return {...state,forecast:action.forecastInfo.forecast,valid:true};
+            return {...state,forecast:action.forecastInfo.forecast,valid:true,range:[]};
         case Actions.SET_RWGPS_ROUTE:
-            return {...state,valid:false};
+            return {...state,valid:false,range:[]};
         case Actions.GPX_ROUTE_LOADING_SUCCESS:
             return {...state,valid:false};
         case Actions.GPX_ROUTE_LOADING_FAILURE:
             return {...state,valid:false};
+        case Actions.SET_WEATHER_RANGE:
+            return {...state,range:
+                [
+                    parseFloat(action.start),
+                    parseFloat(action.finish)
+                ]
+            };
         default:
             return state;
     }
