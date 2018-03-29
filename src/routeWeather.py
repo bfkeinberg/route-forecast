@@ -75,24 +75,26 @@ class WeatherCalculator:
             relative_bearing = self.get_bearing_difference(bearing, current_forecast['windBearing']) if has_wind and bearing != None else None
             rainy = 'icon' in current_forecast and current_forecast['icon'] == 'rain'
             self.logger.info('%s %f,%f %s %d %d', now, lat, lon, current_forecast,bearing if bearing!=None else 0,relative_bearing if relative_bearing!=None else 0)
-            return (now.strftime("%-I:%M%p"),
-                    distance,
-                    current_forecast['summary'],
-                    str(int(round(current_forecast['temperature'])))+'F',
-                    str((current_forecast['precipProbability'] * 100)) + '%'
+            return {
+                "time":now.strftime("%-I:%M%p"),
+                "distance":distance,
+                "summary":current_forecast['summary'],
+                "tempStr":str(int(round(current_forecast['temperature'])))+'F',
+                "precip":str((current_forecast['precipProbability'] * 100)) + '%'
                     if 'precipProbability' in current_forecast else '<unavailable>',
-                    str(current_forecast['cloudCover'] * 100) + '%'
+                "cloudCover":str(current_forecast['cloudCover'] * 100) + '%'
                     if 'cloudCover' in current_forecast else '<unavailable>',
-                    str(int(round(current_forecast['windSpeed']))) + ' mph'
+                "windSpeed":str(int(round(current_forecast['windSpeed']))) + ' mph'
                     if has_wind else '<unavailable>',
-                    lat,
-                    lon,
-                    int(round(current_forecast['temperature'])),
-                    now.strftime("%a %b %-d %-I:%M%p %Y"),
-                    relative_bearing,
-                    rainy,
-                    wind_bearing
-                    )
+                "lat":lat,
+                "lon":lon,
+                "temp":int(round(current_forecast['temperature'])),
+                "fullTime":now.strftime("%a %b %-d %-I:%M%p %Y"),
+                "relBearing":relative_bearing,
+                "rainy":rainy,
+                "windBearing":wind_bearing,
+                "gust":str(int(round(current_forecast['windGust'])))  + ' mph' if "windGust" in current_forecast else '<unavailable>'
+            }
         else:
-            response.raise_for_status()
+            raise urllib2.HTTPError(code=response.status_code)
         return None

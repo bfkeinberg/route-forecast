@@ -83,6 +83,22 @@ img#bugImage {
     color: rgb(255, 255, 255);
 }
 
+.headerCell {
+    font-size: 80%;
+}
+
+.redText {
+    color:red;
+}
+
+.orangeText {
+    color:darkOrange;
+}
+
+.skyBlueText {
+    color:deepSkyBlue;
+}
+
 input#finishTime.form-control {
     display: inline-flex;
     width: 14em;

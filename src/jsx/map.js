@@ -18,16 +18,12 @@ import circus_tent from 'Images/circus tent.png';
 
 class RouteForecastMap extends Component {
     static propTypes = {
-        forecast:PropTypes.arrayOf(PropTypes.array).isRequired,
+        forecast:PropTypes.arrayOf(PropTypes.object).isRequired,
         routeInfo:PropTypes.shape({bounds:PropTypes.object,points:PropTypes.array}).isRequired,
         maps_api_key:PropTypes.string.isRequired,
         controls:PropTypes.arrayOf(PropTypes.shape({lat:PropTypes.number,lon:PropTypes.number})),
         controlNames:PropTypes.arrayOf(PropTypes.string),
-        subrange:PropTypes.arrayOf(PropTypes.number),
-        selection:PropTypes.arrayOf(PropTypes.oneOfType([
-            PropTypes.number,
-            PropTypes.oneOf(null)
-            ]))
+        subrange:PropTypes.arrayOf(PropTypes.number)
     };
 
     constructor(props) {
@@ -208,8 +204,8 @@ class RouteForecastMap extends Component {
         // marker title now contains both temperature and mileage
         return (
             forecast.map((point) =>
-                RouteForecastMap.addMarker(point[7], point[8], map, point[1], point[10] + '\n' + point[3],
-                    point[12], point[13], point[6])
+                RouteForecastMap.addMarker(point.lat, point.lon, map, point.distance, point.fullTime + '\n' + point.tempStr,
+                    point.rainy, point.windBearing, point.windSpeed)
             ).reduce((acc, cur) => acc.concat(cur)).concat(
                 controls.map((control,index) => RouteForecastMap.addControlMarker(control.lat, control.lon, map, controlNames[index]))));
     }
@@ -264,8 +260,8 @@ class RouteForecastMap extends Component {
                         return;
                     }
                     this.setState({map : map});
-                }).catch((err) => {
-                    console.error(err);
+                },error => {console.log(error)})
+                    .catch((err) => {console.error(err);
                 });
             }
         }
@@ -290,7 +286,6 @@ class RouteForecastMap extends Component {
 const mapStateToProps = (state) =>
     ({
         forecast: state.forecast.forecast,
-        selection: state.forecast.range,
         routeInfo: state.routeInfo,
         maps_api_key: state.params.maps_api_key,
         controls: state.controls.calculatedControlValues,

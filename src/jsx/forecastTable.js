@@ -11,38 +11,50 @@ const milesToKm = 1609.34;
 class ForecastTable extends Component {
     static propTypes = {
         weatherCorrectionMinutes:PropTypes.number,
-        forecast:PropTypes.arrayOf(PropTypes.array).isRequired,
+        forecast:PropTypes.arrayOf(PropTypes.object).isRequired,
         setWeatherRange:PropTypes.func.isRequired
     };
 
     constructor(props) {
         super(props);
         this.expandTable = this.expandTable.bind(this);
-        this.state = {};
+        this.state = {showGusts:false};
     }
 
     updateWeatherRange = (event) => this.props.setWeatherRange(event.currentTarget.getAttribute('start'),event.currentTarget.getAttribute('end'));
 
+    static windStyle(point) {
+        if (point.relBearing <90) {
+            if (Math.cos((Math.PI / 180) * point.relBearing) * parseInt(point.windSpeed) > 10) {
+                return 'redText';
+            } else {
+                return 'orangeText';
+            }
+        } else {
+            return 'skyBlueText';
+        }
+    }
+
+    toggleGustDisplay = () => this.setState({showGusts:!this.state.showGusts});
+
     expandTable(forecast) {
-        const redText = ({color:'red'});
-        const orange = ({color:'darkOrange'});
-        const skyBlue = ({color:'deepSkyBlue'});
-        if (forecast.length > 0 && forecast[0].length > 5) {
+        forecast.forEach(point => console.log(point.gust, point.relBearing,point.windBearing));
+        if (forecast.length > 0) {
             return (
                 <tbody>
                 {forecast.map((point,index) =>
                     /*<tr key={Math.random().toString(36).slice(2)}>*/
-                    <tr key={point[0]+Math.random().toString(10)}
-                        start={point[1]*milesToKm}
-                        end={index!==forecast.length-1?forecast[index+1][1]*milesToKm:null}
+                    <tr key={point.time+Math.random().toString(10)}
+                        start={point.distance*milesToKm}
+                        end={index!==forecast.length-1?forecast[index+1].distance*milesToKm:null}
                         onClick={this.updateWeatherRange}>
-                        <td>{point[0]}</td>
-                        <td>{point[1]}</td>
-                        <td>{point[2]}</td>
-                        <td>{point[3]}</td>
-                        <td>{point[4]}</td>
-                        <td>{point[5]}</td>
-                        <td style={point[11]<90?(Math.cos((Math.PI / 180)*point[11])*parseInt(point[6])>10?redText:orange):skyBlue}>{point[6]}</td>
+                        <td>{point.time}</td>
+                        <td>{point.distance}</td>
+                        <td>{point.summary}</td>
+                        <td>{point.tempStr}</td>
+                        <td>{point.precip}</td>
+                        <td>{point.cloudCover}</td>
+                        <td className={ForecastTable.windStyle(point)}>{this.state.showGusts?<i>{point.gust}</i>:point.windSpeed}</td>
                     </tr>
                 )}
                 </tbody>
@@ -63,6 +75,7 @@ class ForecastTable extends Component {
         else {
             weatherCorrections = null;
         }
+        const windHeader = this.state.showGusts ? 'Wind gust' : 'Wind speed';
         return (
                 <div className="animated slideInLeft">
                     <ErrorBoundary>
@@ -71,13 +84,13 @@ class ForecastTable extends Component {
                     <Table striped size='sm' hover bordered responsive>
                         <thead>
                         <tr>
-                            <th style={{'fontSize':'80%'}}>Time</th>
-                            <th style={{'fontSize':'80%'}}>Mile</th>
-                            <th style={{'fontSize':'80%'}}>Summary</th>
-                            <th style={{'fontSize':'80%'}}>Temperature</th>
-                            <th style={{'fontSize':'80%'}}>Chance of rain</th>
-                            <th style={{'fontSize':'80%'}}>Cloud cover</th>
-                            <th style={{'fontSize':'80%'}}>Wind speed</th>
+                            <th className={'headerCell'}>Time</th>
+                            <th className={'headerCell'}>Mile</th>
+                            <th className={'headerCell'}>Summary</th>
+                            <th className={'headerCell'}>Temperature</th>
+                            <th className={'headerCell'}>Chance of rain</th>
+                            <th className={'headerCell'}>Cloud cover</th>
+                            <th className={'headerCell'} onClick={this.toggleGustDisplay}>{windHeader}</th>
                         </tr>
                         </thead>
                         {this.expandTable(this.props.forecast)}

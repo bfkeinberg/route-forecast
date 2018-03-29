@@ -128,39 +128,48 @@ class AnalyzeRoute {
         let lastTime = 0;
         // correct start time for time zone
         let startTime = moment.tz(userStartTime.format('YYYY-MM-DDTHH:mm'), timeZoneId);
+        let bearings = [];
         stream.forEach(point => {
             bounds = AnalyzeRoute.setMinMaxCoords(point,bounds);
             if (first) {
-                forecastRequests.push(AnalyzeRoute.addToForecast(point, forecastPoint, startTime, accumulatedTime,accumulatedDistanceKm*kmToMiles));
+                forecastRequests.push(AnalyzeRoute.addToForecast(point, startTime, accumulatedTime, accumulatedDistanceKm * kmToMiles));
+                forecastPoint = point;
                 first = false;
             }
-            if (previousPoint !== null) {
+            else if (previousPoint !== null) {
                 let deltas = this.findDeltas(previousPoint,point);
-                accumulatedDistanceKm += deltas['distance'];
+                accumulatedDistanceKm += deltas.distance;
                 // accumulate elevation gain
-                accumulatedClimbMeters += deltas['climb'];
+                accumulatedClimbMeters += deltas.climb;
                 // then find elapsed time given pace
                 accumulatedTime = AnalyzeRoute.calculateElapsedTime(accumulatedClimbMeters, accumulatedDistanceKm, baseSpeed);
             }
-            idlingTime += checkAndUpdateControls(accumulatedDistanceKm, startTime,
-                (accumulatedTime + idlingTime), controls, calculatedValues, metric,
-                point);
+            idlingTime += checkAndUpdateControls(accumulatedDistanceKm, startTime, (accumulatedTime + idlingTime),
+                controls, calculatedValues, metric, point);
             // see if it's time for forecast
             if (((accumulatedTime + idlingTime) - lastTime) >= intervalInHours) {
-                forecastRequests.push(AnalyzeRoute.addToForecast(point, forecastPoint, startTime, (accumulatedTime + idlingTime),accumulatedDistanceKm*kmToMiles));
+                forecastRequests.push(AnalyzeRoute.addToForecast(point, startTime, (accumulatedTime + idlingTime),
+                    accumulatedDistanceKm * kmToMiles));
                 lastTime = accumulatedTime + idlingTime;
+                bearings.push(AnalyzeRoute.getRelativeBearing(forecastPoint,point));
                 forecastPoint = point;
             }
             previousPoint = point;
         });
         if (previousPoint !== null && accumulatedTime !== 0) {
-            forecastRequests.push(AnalyzeRoute.addToForecast(previousPoint, forecastPoint, startTime, (accumulatedTime + idlingTime),accumulatedDistanceKm*kmToMiles));
+            forecastRequests.push(AnalyzeRoute.addToForecast(previousPoint, startTime, (accumulatedTime + idlingTime),
+                accumulatedDistanceKm * kmToMiles));
+            let lastBearing = AnalyzeRoute.getRelativeBearing(forecastPoint,previousPoint);
+            bearings.push(lastBearing);
+            bearings.push(lastBearing);
         }
         let finishTime = AnalyzeRoute.formatFinishTime(startTime,accumulatedTime,idlingTime);
         AnalyzeRoute.fillLastControlPoint(finishTime, controls, nextControl, accumulatedTime + idlingTime,
             accumulatedDistanceKm, calculatedValues);
-        calculatedValues.sort((a,b) => a['val']-b['val']);
-        return {forecastRequest:forecastRequests,points:stream,name:trackName,values:calculatedValues,
+        calculatedValues.sort((a,b) => a.val-b.val);
+        forecastRequests.forEach(request => request.bearing = bearings.shift());
+        return {forecastRequest:forecastRequests,
+            points:stream,name:trackName,values:calculatedValues,
             bounds:bounds, finishTime: finishTime};
     }
 
@@ -266,20 +275,16 @@ class AnalyzeRoute {
     }
 
     static setMinMaxCoords(trackPoint,bounds) {
-        bounds['min_latitude'] = Math.min(trackPoint.lat, bounds['min_latitude']);
-        bounds['min_longitude'] = Math.min(trackPoint.lon, bounds['min_longitude']);
-        bounds['max_latitude'] = Math.max(trackPoint.lat, bounds['max_latitude']);
-        bounds['max_longitude'] = Math.max(trackPoint.lon, bounds['max_longitude']);
+        bounds.min_latitude = Math.min(trackPoint.lat, bounds.min_latitude);
+        bounds.min_longitude = Math.min(trackPoint.lon, bounds.min_longitude);
+        bounds.max_latitude = Math.max(trackPoint.lat, bounds.max_latitude);
+        bounds.max_longitude = Math.max(trackPoint.lon, bounds.max_longitude);
         return bounds;
     }
 
-    static addToForecast(trackPoint, earlierTrackPoint, currentTime, elapsedTimeInHours, distance) {
-        let bearing = null;
-        if (earlierTrackPoint !== null) {
-            bearing = AnalyzeRoute.getRelativeBearing(earlierTrackPoint,trackPoint);
-        }
+    static addToForecast(trackPoint, currentTime, elapsedTimeInHours, distance) {
         return {lat:trackPoint.lat,lon:trackPoint.lon,distance:Math.round(distance),
-            time:moment(currentTime).add(elapsedTimeInHours,'hours').format('YYYY-MM-DDTHH:mm:00ZZ'),bearing:bearing};
+            time:moment(currentTime).add(elapsedTimeInHours,'hours').format('YYYY-MM-DDTHH:mm:00ZZ')};
     }
 
     static getBearingBetween(trackBearing,windBearing) {
@@ -361,14 +366,14 @@ class AnalyzeRoute {
                     return;
                 }
                 // get current forecast
-                if (forecast.length > 0 && totalDistanceInMiles>forecast[forecast.length-1][1]) {
+                if (forecast.length > 0 && totalDistanceInMiles>forecast[forecast.length-1].distance) {
                     currentForecast = forecast.pop();
                 }
                 // get bearing between the two points
                 let trackBearing = AnalyzeRoute.getRelativeBearing(previousPoint,currentPoint);
-                let relativeBearing = AnalyzeRoute.getBearingBetween(trackBearing,currentForecast[13]);
+                let relativeBearing = AnalyzeRoute.getBearingBetween(trackBearing,currentForecast.windBearing);
                 // adjust speed
-                let effectiveWindSpeed = Math.cos((Math.PI / 180)*relativeBearing)*parseInt(currentForecast[6]);
+                let effectiveWindSpeed = Math.cos((Math.PI / 180)*relativeBearing)*parseInt(currentForecast.windSpeed);
                 totalMinutesLost += AnalyzeRoute.windToTimeInMinutes(baseSpeed, distanceInMiles, hilliness, effectiveWindSpeed);
                 if (isNaN(totalMinutesLost)) {
                     console.log('total minutes lost is invalid');

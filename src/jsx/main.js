@@ -140,7 +140,7 @@ class RouteWeatherUI extends Component {
                             <ControlPoints/>
                         </ErrorBoundary>
                     </SplitPane>
-                        <SplitPane defaultSize={500} minSize={150} split="vertical" paneStyle={{'overflow':'scroll'}}>
+                        <SplitPane defaultSize={545} minSize={150} split="vertical" paneStyle={{'overflow':'scroll'}}>
                             {this.props.showPacePerTme?<PaceTable/>:<ForecastTable/>}
                             <RouteForecastMap/>
                         </SplitPane>
