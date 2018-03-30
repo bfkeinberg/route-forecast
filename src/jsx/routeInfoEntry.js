@@ -72,8 +72,7 @@ class RouteInfoForm extends Component {
             // is this just a number or a full url?
             let route = parseInt(value);
             if (isNaN(route)) {
-                let routeParts = value.split('/');
-                route = parseInt(routeParts.pop());
+                route = value.split('/').map(part => parseInt(part)).find(val => !isNaN(val));
             }
             return route;
         }
