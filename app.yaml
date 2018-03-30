@@ -17,6 +17,7 @@ handlers:
 
 - url: /.*
   script: src.application.application
+  secure: always
 
 env_variables:
    MAPS_KEY: 'AIzaSyDLmXz6JFen9Y9ZfwFcuJWdrRmq-kBjnKs'
