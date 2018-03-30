@@ -21,7 +21,14 @@ class ForecastTable extends Component {
         this.state = {showGusts:false};
     }
 
-    updateWeatherRange = (event) => this.props.setWeatherRange(event.currentTarget.getAttribute('start'),event.currentTarget.getAttribute('end'));
+    updateWeatherRange = (event) => {this.props.setWeatherRange(event.currentTarget.getAttribute('start'),
+        event.currentTarget.getAttribute('end'));
+        if (this.selectedRow!==undefined) {
+            this.selectedRow.classList.remove('highlighted');
+        }
+        event.currentTarget.className = 'highlighted';
+        this.selectedRow = event.currentTarget;
+    }
 
     static windStyle(point) {
         if (point.relBearing <90) {
@@ -38,7 +45,6 @@ class ForecastTable extends Component {
     toggleGustDisplay = () => this.setState({showGusts:!this.state.showGusts});
 
     expandTable(forecast) {
-        forecast.forEach(point => console.log(point.gust, point.relBearing,point.windBearing));
         if (forecast.length > 0) {
             return (
                 <tbody>
@@ -81,7 +87,7 @@ class ForecastTable extends Component {
                     <ErrorBoundary>
                     <a tabIndex='-1' href="https://darksky.net/poweredby/"><img src={darkSky}/></a>
                         {weatherCorrections}
-                    <Table striped size='sm' hover bordered responsive>
+                    <Table size='sm' hover bordered responsive>
                         <thead>
                         <tr>
                             <th className={'headerCell'}>Time</th>

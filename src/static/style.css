@@ -31,6 +31,10 @@
     }
 }
 
+.highlighted {
+    background-color: rgba(167,207,255,0.4);
+}
+
 .rwgps_route {
     font-size: 90%;
 }
