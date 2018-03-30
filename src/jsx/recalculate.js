@@ -6,7 +6,6 @@ const Recalculate = ({rwgpsRoute,gpxRouteData,recalcRoute}) => {
     if (rwgpsRoute === '' && gpxRouteData===null) {
         return null;
     }
-    console.log('calling recalc due to changed props');
     recalcRoute();
     return null;
 };

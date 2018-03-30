@@ -21,14 +21,11 @@ class ForecastTable extends Component {
         this.state = {showGusts:false};
     }
 
-    updateWeatherRange = (event) => {this.props.setWeatherRange(event.currentTarget.getAttribute('start'),
-        event.currentTarget.getAttribute('end'));
-        if (this.selectedRow!==undefined) {
-            this.selectedRow.classList.remove('highlighted');
-        }
-        event.currentTarget.className = 'highlighted';
-        this.selectedRow = event.currentTarget;
-    }
+    updateWeatherRange = (event) => {
+        const start = parseInt(event.currentTarget.getAttribute('start'));
+        this.props.setWeatherRange(start, event.currentTarget.getAttribute('end'));
+        this.setState({selectedRow:start});
+    };
 
     static windStyle(point) {
         if (point.relBearing <90) {
@@ -53,6 +50,7 @@ class ForecastTable extends Component {
                     <tr key={point.time+Math.random().toString(10)}
                         start={point.distance*milesToKm}
                         end={index!==forecast.length-1?forecast[index+1].distance*milesToKm:null}
+                        className={this.state.selectedRow===parseInt(point.distance*milesToKm)?'highlighted':null}
                         onClick={this.updateWeatherRange}>
                         <td>{point.time}</td>
                         <td>{point.distance}</td>
