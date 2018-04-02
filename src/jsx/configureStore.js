@@ -19,9 +19,9 @@ export default function configureStore(preloadedState) {
         applyMiddleware(
             thunkMiddleware,
             loggerMiddleware,
-            createRavenMiddleware(Raven, {
+/*            createRavenMiddleware(Raven, {
                 // Optionally pass some options here.
-            })
+            })*/
         )
     )
 }
