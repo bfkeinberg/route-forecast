@@ -230,7 +230,7 @@ class ControlTable extends Component {
             <AgGridReact enableCellChangeFlash={true} enableColResize enableSorting animateRows
                          sortingOrder={['asc']} unSortIcon rowData={rowData}
                          context={this.state.context} frameworkComponents={this.state.frameworkComponents}
-             onGridReady={this.onGridReady} onSortChanged={this.sortChanged} singleClickEdit //editType={'fullRow'}
+             onGridReady={this.onGridReady} onSortChanged={this.sortChanged} singleClickEdit editType={'fullRow'}
             onCellValueChanged={this.cellUpdated} tabToNextCell={ControlTable.tabHandler} getRowNodeId={data => data.id}
             columnDefs={this.state.columnDefs}/>
         </div>);
