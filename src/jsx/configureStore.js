@@ -19,9 +19,11 @@ export default function configureStore(preloadedState) {
         applyMiddleware(
             thunkMiddleware,
             loggerMiddleware,
-/*            createRavenMiddleware(Raven, {
-                // Optionally pass some options here.
-            })*/
+            createRavenMiddleware(Raven, {
+                stateTransformer: state => {Object.keys(state).
+                filter(key => (key !== 'routeInfo' && key !== 'forecast')).
+                reduce((res, key) => Object.assign(res, { [key]: state[key] }), {})}
+            })
         )
-    )
+    );
 }
