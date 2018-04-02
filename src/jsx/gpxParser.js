@@ -130,6 +130,9 @@ class AnalyzeRoute {
         let startTime = moment.tz(userStartTime.format('YYYY-MM-DDTHH:mm'), timeZoneId);
         let bearings = [];
         stream.forEach(point => {
+            if (point.lat===undefined && point.lon===undefined) {
+                return;
+            }
             bounds = AnalyzeRoute.setMinMaxCoords(point,bounds);
             if (first) {
                 forecastRequests.push(AnalyzeRoute.addToForecast(point, startTime, accumulatedTime, accumulatedDistanceKm * kmToMiles));
@@ -348,7 +351,16 @@ class AnalyzeRoute {
         let calculatedValues = [];
 
         stream.forEach(currentPoint => {
+            if (currentPoint.lat===undefined && currentPoint.lon===undefined) {
+                return;
+            }
             if (previousPoint !== null) {
+                if (previousPoint.lon===undefined || previousPoint.lat===undefined) {
+                    console.log('previous point undefined in adjustForWind');
+                }
+                if (currentPoint.lon===undefined || currentPoint.lat===undefined) {
+                    console.log('current point undefined in adjustForWind');
+                }
                 let distanceInMiles = gpxParse.utils.calculateDistance(previousPoint.lat, previousPoint.lon,
                     currentPoint.lat,currentPoint.lon);
                 totalDistanceInMiles += distanceInMiles;

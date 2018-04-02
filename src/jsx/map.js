@@ -220,7 +220,7 @@ class RouteForecastMap extends Component {
         this.state.map.fitBounds(mapBounds);
         RouteForecastMap.clearMarkers(this.markers);
         this.markers = RouteForecastMap.addMarkers(forecast, this.props.controls, this.props.controlNames, this.state.map);
-        let routePoints = routeInfo.points.map((point) => {return {lat:point.lat, lng: point.lon, dist:point.dist}});
+        let routePoints = routeInfo.points.filter(point => point.lat !== undefined && point.lon !== undefined).map((point) => {return {lat:point.lat, lng: point.lon, dist:point.dist}});
         // clear out old route path line if any
         if (this.routePath !== null) {
             this.routePath.setMap(null);
