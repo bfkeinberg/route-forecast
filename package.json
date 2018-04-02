@@ -22,7 +22,7 @@
     "immutable": "^3.8.2",
     "jquery": "^3.3.1",
     "load-google-maps-api": "^1.2.1",
-    "moment": "^2.21.0",
+    "moment": "^2.22.0",
     "moment-timezone": "^0.5.11",
     "net": "^1.0.2",
     "npm": "^5.8.0",
@@ -46,10 +46,10 @@
     "redux-logger": "^3.0.6",
     "redux-thunk": "^2.2.0",
     "strava-v3": "^1.14.0",
-    "tls": "0.0.1",
-    "whatwg-fetch": "^2.0.3"
+    "tls": "0.0.1"
   },
   "devDependencies": {
+    "@sentry/webpack-plugin": "^1.5.0",
     "babel-cli": "^6.18.0",
     "babel-core": "^6.0.0",
     "babel-eslint": "^8.2.2",
@@ -70,7 +70,7 @@
     "criticalcss": "^2.1.0",
     "css-loader": "^0.28.11",
     "eslint": "^4.19.1",
-    "eslint-plugin-babel": "^4.1.2",
+    "eslint-plugin-babel": "^5.0.0",
     "eslint-plugin-import": "^2.10.0",
     "eslint-plugin-react": "^7.7.0",
     "exports-loader": "^0.7.0",
