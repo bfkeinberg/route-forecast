@@ -2,6 +2,9 @@ import logging
 import numericalunits as nu
 import os
 from datetime import *
+import urllib2
+import StringIO
+import gzip
 
 nu.reset_units()
 nu.set_derived_units_and_constants()
@@ -65,10 +68,17 @@ class WeatherCalculator:
         headers = {"Accept-Encoding": "gzip"}
         response = urlfetch.fetch(url, headers=headers, validate_certificate=True)
         # response = self.session.get(url=url, headers=headers)
-        # if True: #response.status_code == 200:
         if response.status_code == 200:
-            # current_forecast = {u'ozone': 310.21, u'temperature': 53.32, u'icon': u'partly-cloudy-day', u'dewPoint': 45.71, u'humidity': 0.75, u'visibility': 10, u'summary': u'Partly Cloudy', u'apparentTemperature': 53.32, u'pressure': 1027.3, u'windSpeed': 4.65, u'cloudCover': 0.37, u'time': 1485391860, u'windBearing': 290, u'precipIntensity': 0, u'precipProbability': 0}
-            current_forecast = json.loads(response.content)['currently']
+            response_data = response.content
+            if 'content-encoding' in response.headers and response.headers['content-encoding'] == 'gzip':
+                response_data = gzip.GzipFile(fileobj=StringIO.StringIO(response.content)).read()
+            try:
+                json_response = json.loads(response_data)
+            except ValueError as ve:
+                self.logger.error('Error in DarkSky response - %s %s', ve, response.content)
+                ve.args += (response.content,)
+                raise
+            current_forecast = json_response['currently']
             now = datetime.fromtimestamp(current_forecast['time'], zone)
             has_wind = 'windSpeed' in current_forecast
             wind_bearing = current_forecast['windBearing'] if has_wind else None

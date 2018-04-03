@@ -233,7 +233,7 @@ def forecast():
     if today != application.last_request_day:
         application.last_request_day = today
         application.weather_request_count = len(forecast_points)
-    elif len(forecast_points) + application.weather_request_count > 900:
+    elif len(forecast_points) + application.weather_request_count > 910:
         return jsonify({'status': 'Daily count exceeded'}), 400
     else:
         application.weather_request_count += len(forecast_points)
@@ -243,17 +243,10 @@ def forecast():
     # logger.info("Zone: %d Zone info : %s offset:%s", long(zone), req_tzinfo, req_tzinfo.utcoffset(10))
     results = []
     for point in forecast_points:
-        # want to correct each time point with this timezone offset
-        # first get the original time
-        # uncorrected_time = datetime.fromtimestamp(point['time'],req_tzinfo)
-        # corrected_time = datetime(uncorrected_time.year,uncorrected_time.month,uncorrected_time.day,uncorrected_time.hour,
-        #                           uncorrected_time.minute,0,0,req_tzinfo)
-        # logger.info("Uncorrected time:%s corrected time:%s", uncorrected_time, corrected_time)
-        # offset_time = corrected_time.strftime('%Y-%m-%dT%H:%M:%S%z')
-        # logger.info("full time %s",offset_time)
-        # logger.info("received message time:%s",point['time'])
-        results.append(wcalc.call_weather_service(point['lat'], point['lon'], point['time'], point['distance'], req_tzinfo,
-                                                  point['bearing']))
+        try:
+            results.append(wcalc.call_weather_service(point['lat'], point['lon'], point['time'], point['distance'], req_tzinfo, point['bearing']))
+        except ValueError as ve:
+            return jsonify({'status': 'Error calling weather service : ' + str(ve)}), 400
     return jsonify({'forecast': results})
 
 
