@@ -20,12 +20,19 @@ module.exports = {
             {test: /\.jsx?$/,
                 include: APP_DIR,
                 exclude: /node_modules/,
+                // how to include specific modules in babel
+                // include: [APP_DIR,QUERY_STRING_DIR,STRICT_URI_ENCODE_DIR],
+                // exclude: /node_modules\/(?!(query-string|strict-uri-encode)\/).*/,
                 loader: "babel-loader",
                 options: {
                     cacheDirectory:true,
                     babelrc: false,
-                    presets: [["babel-preset-env",{targets:{browsers:["last 3 versions","Explorer 11"]}}],"babel-preset-react","babel-preset-stage-0"],
-                    plugins: ['babel-plugin-transform-runtime',"react-html-attrs", "transform-class-properties","transform-es2015-arrow-functions"],
+                    presets: ["babel-preset-env","babel-preset-react","babel-preset-stage-0"],
+                    // how to target specific browsers
+                    // presets: [["babel-preset-env",{targets:{browsers:["last 3 versions","Explorer 11"]}}],"babel-preset-react","babel-preset-stage-0"],
+                    plugins: ['babel-plugin-transform-runtime',"react-html-attrs", "transform-class-properties"],
+                    // if we want to remove arrow functions as well
+                    // plugins: ['babel-plugin-transform-runtime',"react-html-attrs", "transform-class-properties","transform-es2015-arrow-functions"],
                     comments:true
                 }
             },
