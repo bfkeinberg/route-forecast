@@ -127,7 +127,7 @@ class RouteWeatherUI extends Component {
             </ErrorBoundary>
         );
         const formButton = (
-            <Button bsStyle="primary" onClick={() => this.props.showForm}>Show input</Button>
+            <Button color="primary" onClick={this.props.showForm}>Show input</Button>
         );
         return (
         <div>
@@ -147,11 +147,8 @@ class RouteWeatherUI extends Component {
                 </SplitPane>
             </MediaQuery>
             <MediaQuery maxDeviceWidth={800}>
-                <SplitPane defaultSize={this.props.formVisible?500:250} minSize={120} maxSize={600} split="horizontal" pane2Style={{'overflow':'scroll'}}>
-                    <SplitPane defaultSize={this.props.formVisible?319:33} minSize={30} split="horizontal" pane2Style={{'overflow':'scroll'}}>
-                        {this.props.formVisible ? inputForm : formButton}
-                        <ControlPoints/>
-                    </SplitPane>
+                <SplitPane defaultSize={this.props.formVisible?410:50} minSize={this.props.formVisible?120:20} maxSize={600} split="horizontal" pane2Style={{'overflow':'scroll'}}>
+                    {this.props.formVisible ? inputForm : formButton}
                     {!this.props.formVisible? <ForecastTable/>: <div/>}
                 </SplitPane>
             </MediaQuery>
