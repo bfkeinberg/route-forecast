@@ -23,15 +23,40 @@
             console.log(stats);
           }
         </script>
+        <script>
+            function supportsArrowFunctions() {
+                try {
+                    new Function("(a) => a");
+                    return true;
+                }
+                catch (err) {
+                    return false;
+                }
+            }
+        </script>
+        <script>
+            function addScriptTag() {
+                if (supportsArrowFunctions()) {
+                    let element = document.createElement('script');
+                    element.setAttribute('id', 'routeui');
+                    element.setAttribute('timezone_api_key', '{{ timezone_api_key }}');
+                    element.setAttribute('maps_api_key', '{{ maps_key }}');
+                    element.setAttribute('action', '{{ url_for("forecast") }}');
+                    element.setAttribute('src', '<%= htmlWebpackPlugin.files.js %>');
+                    document.body.appendChild(element);
+                } else {
+                    document.write("Sorry, this browser is not supported. Please try a newer one such as Chrome or Firefox");
+                }
+            }
+        </script>
         <% for (var css in htmlWebpackPlugin.files.css) { %>
         <link href="<%= htmlWebpackPlugin.files.css[css] %>" rel="stylesheet" type="text/css" >
         <% } %>
     </head>
-    <body onload="measureCRP()">
+    <body onload="addScriptTag();measureCRP()">
         <div id="container">
             <div id="content"></div>
         </div>
-        <script type="text/javascript" id='routeui' timezone_api_key='{{ timezone_api_key }}' maps_api_key='{{ maps_key }}' action="{{ url_for('forecast') }}" src='<%= htmlWebpackPlugin.files.js %>'></script>
         <noscript>This application requires JavaScript. Please enable JavaScript to use the application.</noscript>
     </body>
 </html>
