@@ -24,8 +24,8 @@ module.exports = {
                 options: {
                     cacheDirectory:true,
                     babelrc: false,
-                    presets: ["babel-preset-env","babel-preset-react","babel-preset-stage-0"],
-                    plugins: ['babel-plugin-transform-runtime',"react-html-attrs", "transform-class-properties"],
+                    presets: [["babel-preset-env",{targets:{browsers:["last 3 versions","Explorer 11"]}}],"babel-preset-react","babel-preset-stage-0"],
+                    plugins: ['babel-plugin-transform-runtime',"react-html-attrs", "transform-class-properties","transform-es2015-arrow-functions"],
                     comments:true
                 }
             },
