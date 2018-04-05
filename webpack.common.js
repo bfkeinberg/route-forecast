@@ -5,12 +5,12 @@ const CleanWebpackPlugin = require('clean-webpack-plugin');
 const ScriptExtHtmlWebpackPlugin = require('script-ext-html-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 
-var APP_DIR = path.resolve(__dirname, 'src/jsx');
-var TEMPLATE_DIR = path.resolve(__dirname, 'src/templates');
-var SRC_STATIC_DIR = path.resolve(__dirname, 'src/static');
-var BUILD_DIR = path.resolve(__dirname, 'dist');
-var STATIC_DIR = path.resolve(__dirname, 'dist/static');
-var GPX_DIR = path.resolve(__dirname, 'node_modules/gpx-parse/dist');
+const APP_DIR = path.resolve(__dirname, 'src/jsx');
+const TEMPLATE_DIR = path.resolve(__dirname, 'src/templates');
+const SRC_STATIC_DIR = path.resolve(__dirname, 'src/static');
+const BUILD_DIR = path.resolve(__dirname, 'dist');
+const STATIC_DIR = path.resolve(__dirname, 'dist/static');
+const GPX_DIR = path.resolve(__dirname, 'node_modules/gpx-parse/dist');
 
 module.exports = {
     entry: ['babel-polyfill', path.resolve(APP_DIR, 'index.js')
@@ -20,12 +20,19 @@ module.exports = {
             {test: /\.jsx?$/,
                 include: APP_DIR,
                 exclude: /node_modules/,
+                // how to include specific modules in babel
+                // include: [APP_DIR,QUERY_STRING_DIR,STRICT_URI_ENCODE_DIR],
+                // exclude: /node_modules\/(?!(query-string|strict-uri-encode)\/).*/,
                 loader: "babel-loader",
                 options: {
                     cacheDirectory:true,
                     babelrc: false,
                     presets: ["babel-preset-env","babel-preset-react","babel-preset-stage-0"],
+                    // how to target specific browsers
+                    // presets: [["babel-preset-env",{targets:{browsers:["last 3 versions","Explorer 11"]}}],"babel-preset-react","babel-preset-stage-0"],
                     plugins: ['babel-plugin-transform-runtime',"react-html-attrs", "transform-class-properties"],
+                    // if we want to remove arrow functions as well
+                    // plugins: ['babel-plugin-transform-runtime',"react-html-attrs", "transform-class-properties","transform-es2015-arrow-functions"],
                     comments:true
                 }
             },

@@ -112,9 +112,11 @@ class RouteInfoForm extends Component {
                             <Col sm="4">
                                 <RidingPace/>
                             </Col>
-                            <Col sm="1">
-                                <PaceExplanation/>
-                            </Col>
+                            <MediaQuery minDeviceWidth={1000}>
+                                <Col sm="1">
+                                    <PaceExplanation/>
+                                </Col>
+                            </MediaQuery>
                         </Row>
                         <Row noGutters>
                             <Col sm={{size:"auto"}}>

@@ -1,7 +1,6 @@
 import {Row, Col, Container, Input, Label, Card, CardBody, CardTitle} from 'reactstrap';
 import {Button} from '@blueprintjs/core';
 import React, {Component} from 'react';
-import MediaQuery from 'react-responsive';
 import ErrorBoundary from './errorBoundary';
 import PropTypes from 'prop-types';
 import {addControl, toggleDisplayBanked, toggleMetric} from './actions/actions';
@@ -86,19 +85,14 @@ class ControlPoints extends Component {
                     </Row>
                 </Container>
                 <ErrorBoundary>
-                    <MediaQuery minDeviceWidth={1000}>
-                        <Card style={{margin:'10px'}}>
-                            <CardBody>
-                                <CardTitle className="cpListTitle" tag='h6'>{title}</CardTitle>
-                                <ErrorBoundary>
-                                    {table}
-                                </ErrorBoundary>
-                            </CardBody>
-                        </Card>
-                    </MediaQuery>
-                    <MediaQuery maxDeviceWidth={800}>
-                        {table}
-                    </MediaQuery>
+                    <Card style={{margin:'10px'}}>
+                        <CardBody>
+                            <CardTitle className="cpListTitle" tag='h6'>{title}</CardTitle>
+                            <ErrorBoundary>
+                                {table}
+                            </ErrorBoundary>
+                        </CardBody>
+                    </Card>
                 </ErrorBoundary>
                 <div tabIndex="98" onFocus={() => {document.getElementById('addButton').focus()}}/>
             </div>

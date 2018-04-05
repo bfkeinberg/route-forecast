@@ -378,7 +378,7 @@ export const shortenUrl = function(url) {
                 if (response.ok) {
                     return response.json();
                 } else {
-                    dispatch(setErrorDetails(`URL shortener failed with ${response.status} ${response.statusText}`));
+                    throw Error(`URL shortener failed with ${response.status} ${response.statusText}`);
                 }})
             .then(responseJson => {
                 if (responseJson['id'] !== undefined) {
