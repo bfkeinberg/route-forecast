@@ -5,12 +5,12 @@ const CleanWebpackPlugin = require('clean-webpack-plugin');
 const ScriptExtHtmlWebpackPlugin = require('script-ext-html-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 
-var APP_DIR = path.resolve(__dirname, 'src/jsx');
-var TEMPLATE_DIR = path.resolve(__dirname, 'src/templates');
-var SRC_STATIC_DIR = path.resolve(__dirname, 'src/static');
-var BUILD_DIR = path.resolve(__dirname, 'dist');
-var STATIC_DIR = path.resolve(__dirname, 'dist/static');
-var GPX_DIR = path.resolve(__dirname, 'node_modules/gpx-parse/dist');
+const APP_DIR = path.resolve(__dirname, 'src/jsx');
+const TEMPLATE_DIR = path.resolve(__dirname, 'src/templates');
+const SRC_STATIC_DIR = path.resolve(__dirname, 'src/static');
+const BUILD_DIR = path.resolve(__dirname, 'dist');
+const STATIC_DIR = path.resolve(__dirname, 'dist/static');
+const GPX_DIR = path.resolve(__dirname, 'node_modules/gpx-parse/dist');
 
 module.exports = {
     entry: ['babel-polyfill', path.resolve(APP_DIR, 'index.js')
