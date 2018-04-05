@@ -1,5 +1,3 @@
-@supports (-webkit-overflow-scrolling: touch) { /* CSS specific to iOS devices */ body{ cursor:pointer; } }
-
 .red-tooltip {
     background-color: #ff363d;
     color: #000;
