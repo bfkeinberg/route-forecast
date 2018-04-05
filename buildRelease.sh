@@ -1,5 +1,6 @@
 #!/bin/sh
 # do checkins, possibly resolving issues in github or sentry in the checkin comment
+# optionally create github release tag
 # create new pending release, then add commits to it
 VERSION=$(sentry-cli releases propose-version)
 sentry-cli releases new $VERSION
