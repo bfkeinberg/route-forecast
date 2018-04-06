@@ -5,15 +5,14 @@ import RouteInfoForm from "../routeInfoEntry";
 import {connect} from 'react-redux';
 import {loadFromRideWithGps, setRwgpsRoute} from "../actions/actions";
 
-const RideWithGpsId = ({setRwgpsRoute,loadingSource,loadingSuccess,rwgpsRoute,rwgpsRouteIsTrip,loadFromRideWithGps,
-                           timezone_api_key}) => {
+const RideWithGpsId = ({setRwgpsRoute,loadingSource,loadingSuccess,rwgpsRoute,rwgpsRouteIsTrip,loadFromRideWithGps}) => {
     const handleRwgpsRoute = function(value) {
         let route = RouteInfoForm.getRouteNumberFromValue(value);
         if (route !== '') {
             if (isNaN(route)) {
                 return;
             }
-            loadFromRideWithGps(route,rwgpsRouteIsTrip,timezone_api_key);
+            loadFromRideWithGps(route,rwgpsRouteIsTrip);
             // clear file input to avoid confusion
             document.getElementById('routeFile').value = null;
         }
@@ -81,8 +80,7 @@ RideWithGpsId.propTypes = {
         PropTypes.number,
         PropTypes.oneOf([''])
     ]),
-    rwgpsRouteIsTrip:PropTypes.bool.isRequired,
-    timezone_api_key:PropTypes.string.isRequired
+    rwgpsRouteIsTrip:PropTypes.bool.isRequired
 };
 
 const mapStateToProps = (state) =>
@@ -90,8 +88,7 @@ const mapStateToProps = (state) =>
         loadingSource: state.uiInfo.dialogParams.loadingSource,
         loadingSuccess: state.uiInfo.dialogParams.succeeded,
         rwgpsRoute:state.uiInfo.routeParams.rwgpsRoute,
-        rwgpsRouteIsTrip:state.uiInfo.routeParams.rwgpsRouteIsTrip,
-        timezone_api_key:state.params.timezone_api_key
+        rwgpsRouteIsTrip:state.uiInfo.routeParams.rwgpsRouteIsTrip
     });
 
 const mapDispatchToProps = {
