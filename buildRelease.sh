@@ -10,4 +10,4 @@ sentry-cli releases set-commits --auto $VERSION
 # deploy build to GAE
 gcloud app deploy --project route-forecast
 # mark Sentry release as deployed
-sentry-cli releases $VERSION new
+sentry-cli releases deploys $VERSION new --env production
