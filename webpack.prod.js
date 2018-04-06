@@ -33,7 +33,8 @@ module.exports = merge(common, {
             include: '.',
             ignoreFile: '.sentrycliignore',
             ignore: ['node_modules', 'webpack.config.js', 'webpack.common.js', 'webpack.dev.js'],
-            configFile: 'sentry.properties'
+            configFile: 'sentry.properties',
+            stripPrefix: ['~/dist']
         }),
         new CompressionPlugin({
             minRatio:0.85, cache:true,
