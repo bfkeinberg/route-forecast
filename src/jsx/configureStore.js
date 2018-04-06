@@ -7,6 +7,16 @@ import createRavenMiddleware from "raven-for-redux";
 const loggerMiddleware = createLogger();
 /*global Raven*/
 
+const bannedActionKeys = [
+    'routeData',
+    'controls',
+    'values',
+    'forecastInfo',
+    'gpxRouteData',
+    'data',
+    'arrivalTimes',
+    'calculatedPaces'
+];
 /**
  *
  * @param {Object} preloadedState from server?
@@ -22,7 +32,12 @@ export default function configureStore(preloadedState) {
             createRavenMiddleware(Raven, {
                 stateTransformer: state => {Object.assign(...Object.keys(state)
                     .filter(key => (key !== 'routeInfo' && key !== 'forecast'))
-                    .map( key => ({ [key]: state[key] }) ) )}
+                    .map( key => ({ [key]: state[key] }) ) )},
+                breadcrumbDataFromAction: action => {
+                    Object.assign(...Object.keys(action)
+                        .filter(key => (!bannedActionKeys.find(key)))
+                        .map( key => ({ [key]: action[key] }) ) )
+                }
             })
         )
     );
