@@ -35,9 +35,10 @@
             }
         </script>
         <script>
+            "use strict";
             function addScriptTag() {
                 if (supportsArrowFunctions()) {
-                    var element = document.createElement('script');
+                    let element = document.createElement('script');
                     element.setAttribute('id', 'routeui');
                     element.setAttribute('timezone_api_key', '{{ timezone_api_key }}');
                     element.setAttribute('maps_api_key', '{{ maps_key }}');

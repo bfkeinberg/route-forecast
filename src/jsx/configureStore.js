@@ -34,8 +34,8 @@ export default function configureStore(preloadedState) {
                     .filter(key => (key !== 'routeInfo' && key !== 'forecast'))
                     .map( key => ({ [key]: state[key] }) ) )},
                 breadcrumbDataFromAction: action => {
-                    Object.assign(...Object.keys(action)
-                        .filter(key => (!bannedActionKeys.find(key)))
+                    return Object.assign(...Object.keys(action)
+                        .filter(key => (!bannedActionKeys.includes(key)))
                         .map( key => ({ [key]: action[key] }) ) )
                 }
             })
