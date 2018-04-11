@@ -129,10 +129,7 @@ class AnalyzeRoute {
         // correct start time for time zone
         let startTime = moment.tz(userStartTime.format('YYYY-MM-DDTHH:mm'), timeZoneId);
         let bearings = [];
-        stream.forEach(point => {
-            if (point.lat===undefined && point.lon===undefined) {
-                return;
-            }
+        stream.filter(point.lat!==undefined && point.lon!==undefined).forEach(point => {
             bounds = AnalyzeRoute.setMinMaxCoords(point,bounds);
             if (first) {
                 forecastRequests.push(AnalyzeRoute.addToForecast(point, startTime, accumulatedTime, accumulatedDistanceKm * kmToMiles));
@@ -313,22 +310,22 @@ class AnalyzeRoute {
         let initialSpeed = baseSpeed - hilliness;
         switch (hilliness) {
             case 0:
-                adjustedWindSpeed = windSpeed * 0.5;
+                adjustedWindSpeed = windSpeed * 0.6;
                 break;
             case 1:
-                adjustedWindSpeed = windSpeed * 0.45;
+                adjustedWindSpeed = windSpeed * 0.5;
                 break;
             case 2:
-                adjustedWindSpeed = windSpeed * 0.4;
+                adjustedWindSpeed = windSpeed * 0.45;
                 break;
             case 3:
-                adjustedWindSpeed = windSpeed * 0.35;
+                adjustedWindSpeed = windSpeed * 0.4;
                 break;
             case 4:
-                adjustedWindSpeed = windSpeed * 0.3;
+                adjustedWindSpeed = windSpeed * 0.4;
                 break;
             default:
-                adjustedWindSpeed = windSpeed * 0.25;
+                adjustedWindSpeed = windSpeed * 0.4;
         }
         let effectiveSpeed = initialSpeed - adjustedWindSpeed;
         // will be negative for a tailwind
@@ -386,6 +383,10 @@ class AnalyzeRoute {
                 let relativeBearing = AnalyzeRoute.getBearingBetween(trackBearing,currentForecast.windBearing);
                 // adjust speed
                 let effectiveWindSpeed = Math.cos((Math.PI / 180)*relativeBearing)*parseInt(currentForecast.windSpeed);
+                // an attempt to account for gusts
+                if (currentForecast.gust !== undefined && currentForecast.gust > effectiveWindSpeed) {
+                    effectiveWindSpeed += (currentForecast.gust - effectiveWindSpeed)/2;
+                }
                 totalMinutesLost += AnalyzeRoute.windToTimeInMinutes(baseSpeed, distanceInMiles, hilliness, effectiveWindSpeed);
                 if (isNaN(totalMinutesLost)) {
                     console.log('total minutes lost is invalid');
