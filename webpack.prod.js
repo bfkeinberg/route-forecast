@@ -34,7 +34,6 @@ module.exports = merge(common, {
             ignoreFile: '.sentrycliignore',
             ignore: ['node_modules', 'webpack.config.js', 'webpack.common.js', 'webpack.dev.js'],
             configFile: 'sentry.properties',
-            stripPrefix: ['~/dist'],
             stripCommonPrefix:true,
             rewrite:true
         }),
