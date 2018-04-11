@@ -129,7 +129,7 @@ class AnalyzeRoute {
         // correct start time for time zone
         let startTime = moment.tz(userStartTime.format('YYYY-MM-DDTHH:mm'), timeZoneId);
         let bearings = [];
-        stream.filter(point.lat!==undefined && point.lon!==undefined).forEach(point => {
+        stream.filter(point => point.lat!==undefined && point.lon!==undefined).forEach(point => {
             bounds = AnalyzeRoute.setMinMaxCoords(point,bounds);
             if (first) {
                 forecastRequests.push(AnalyzeRoute.addToForecast(point, startTime, accumulatedTime, accumulatedDistanceKm * kmToMiles));

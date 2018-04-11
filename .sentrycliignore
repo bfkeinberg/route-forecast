@@ -2,6 +2,7 @@ lib
 webpack.common.js
 webpack.dev.js
 webpack.prod.js
+webpack.prod-nosentry.js
 crittest.js
 phtest.js
 routeWeather.*
