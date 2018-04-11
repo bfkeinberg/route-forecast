@@ -7,7 +7,6 @@ const BrotliPlugin = require('brotli-webpack-plugin');
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 const CompressionPlugin = require("compression-webpack-plugin");
 const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
-const SentryCliPlugin = require('@sentry/webpack-plugin');
 
 module.exports = merge(common, {
     plugins: [
@@ -28,12 +27,6 @@ module.exports = merge(common, {
                 renderWaitTime: 3000,
                 blockJSRequests: false,
             }
-        }),
-        new SentryCliPlugin({
-            include: '.',
-            ignoreFile: '.sentrycliignore',
-            ignore: ['node_modules', 'webpack.config.js', 'webpack.common.js', 'webpack.dev.js'],
-            configFile: 'sentry.properties'
         }),
         new CompressionPlugin({
             minRatio:0.85, cache:true,
