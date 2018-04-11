@@ -347,17 +347,8 @@ class AnalyzeRoute {
         let hilliness;
         let calculatedValues = [];
 
-        stream.forEach(currentPoint => {
-            if (currentPoint.lat===undefined && currentPoint.lon===undefined) {
-                return;
-            }
+        stream.filter(point => point.lat !== undefined && point.lon !== undefined).forEach(currentPoint => {
             if (previousPoint !== null) {
-                if (previousPoint.lon===undefined || previousPoint.lat===undefined) {
-                    console.log('previous point undefined in adjustForWind');
-                }
-                if (currentPoint.lon===undefined || currentPoint.lat===undefined) {
-                    console.log('current point undefined in adjustForWind');
-                }
                 let distanceInMiles = gpxParse.utils.calculateDistance(previousPoint.lat, previousPoint.lon,
                     currentPoint.lat,currentPoint.lon);
                 totalDistanceInMiles += distanceInMiles;
@@ -384,13 +375,10 @@ class AnalyzeRoute {
                 // adjust speed
                 let effectiveWindSpeed = Math.cos((Math.PI / 180)*relativeBearing)*parseInt(currentForecast.windSpeed);
                 // an attempt to account for gusts
-                if (currentForecast.gust !== undefined && currentForecast.gust > effectiveWindSpeed) {
-                    effectiveWindSpeed += (currentForecast.gust - effectiveWindSpeed)/2;
+                if (currentForecast.gust !== undefined && parseInt(currentForecast.gust) > effectiveWindSpeed) {
+                    effectiveWindSpeed += (parseInt(currentForecast.gust) - effectiveWindSpeed)/2;
                 }
                 totalMinutesLost += AnalyzeRoute.windToTimeInMinutes(baseSpeed, distanceInMiles, hilliness, effectiveWindSpeed);
-                if (isNaN(totalMinutesLost)) {
-                    console.log('total minutes lost is invalid');
-                }
 
                 let desiredDistance = metric ? (totalDistanceInMiles/kmToMiles) : totalDistanceInMiles;
                 currentControl = AnalyzeRoute.calculateValuesForWind(controls, previouslyCalculatedValues,
