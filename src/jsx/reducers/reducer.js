@@ -295,7 +295,7 @@ const forecast = function(state = {forecast:[],valid:false,range:[]}, action) {
         case Actions.FORECAST_FETCH_SUCCESS:
             return {...state,forecast:action.forecastInfo.forecast,valid:true,range:[]};
         case Actions.SET_RWGPS_ROUTE:
-            return {...state,valid:false,range:[]};
+            return {...state,valid:false,range:[],forecast:[]};
         case Actions.GPX_ROUTE_LOADING_SUCCESS:
             return {...state,valid:false};
         case Actions.GPX_ROUTE_LOADING_FAILURE:
