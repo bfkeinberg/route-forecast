@@ -2,7 +2,6 @@ import logging
 import numericalunits as nu
 import os
 from datetime import *
-import urllib2
 import StringIO
 import gzip
 
@@ -13,11 +12,12 @@ from google.appengine.api import urlfetch
 import json
 
 class WeatherError(Exception):
-    def __init__(self, value):
+    def __init__(self, value, details):
         self.value = value
+        self.details = details.rstrip()
 
     def __str__(self):
-        return repr(self.value)
+        return repr(self.value) + ' ' + repr(self.details)
 
 
 class WeatherCalculator:
@@ -106,5 +106,5 @@ class WeatherCalculator:
                 "gust":str(int(round(current_forecast['windGust'])))  + ' mph' if "windGust" in current_forecast else '<unavailable>'
             }
         else:
-            raise urllib2.HTTPError(code=response.status_code)
+            raise WeatherError(value=response.status_code,details=response.content)
         return None

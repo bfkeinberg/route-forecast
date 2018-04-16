@@ -7,6 +7,7 @@ import random
 import requests
 # App Engine specific
 import requests_toolbelt.adapters.appengine
+
 import string
 import sys
 import urllib
@@ -16,12 +17,13 @@ from flask import Flask, render_template, request, redirect, url_for, jsonify, g
 from flask import current_app, safe_join
 from flask_compress import Compress
 
-from routeWeather import WeatherCalculator
+from routeWeather import WeatherCalculator, WeatherError
 from stravaActivity import StravaActivity
 
 # Use the App Engine Requests adapter. This makes sure that Requests uses
 # URLFetch.
 requests_toolbelt.adapters.appengine.monkeypatch()
+requests.packages.urllib3.disable_warnings(requests.packages.urllib3.contrib.appengine.AppEnginePlatformWarning)
 
 from google.appengine.api import urlfetch
 # end App Engine specific
@@ -173,7 +175,7 @@ def get_rwgps_route():
         route_type = 'trips'
     rwgps_api_key = os.environ.get("RWGPS_API_KEY")
     if rwgps_api_key is None:
-        return jsonify({'status': 'Missing rwgps API key'}), 500
+        return jsonify({'details': 'Missing rwgps API key'}), 500
     # route_info_result = session.get("https://ridewithgps.com/{1}/{0}.json".format(route, route_type),
     #                                 params={'apikey': rwgps_api_key})
     url_params = urllib.urlencode({'apikey': rwgps_api_key})
@@ -189,7 +191,7 @@ def get_rwgps_route():
                                        validate_certificate=True)
     if route_info_result.status_code != 200:
         logger.error(route_info_result.headers)
-        return jsonify({'status': route_info_result.status_code}), route_info_result.status_code
+        return jsonify({'details': route_info_result.status_code}), route_info_result.status_code
     return route_info_result.content
 
 
@@ -222,19 +224,19 @@ def forecast():
     try:
         forecast_points = json.loads(request.form['locations'])
     except ValueError as error:
-        return jsonify({'status': 'Badly formatted forecast locations :' + str(error)}), 400
+        return jsonify({'details': 'Badly formatted forecast locations :' + str(error)}), 400
     if forecast_points == None:
         return jsonify('No forecast points provided',400)
     logger.info('Request from %s(%s) for %d forecast points', request.remote_addr,
                 request.headers.get('X-Forwarded-For', request.remote_addr), len(forecast_points))
     if len(forecast_points) > 50:
-        return jsonify({'status': 'Invalid request, increase interval'}), 400
+        return jsonify({'details': 'Invalid request, increase forecast time interval'}), 400
     today = datetime.now().date()
     if today != application.last_request_day:
         application.last_request_day = today
         application.weather_request_count = len(forecast_points)
     elif len(forecast_points) + application.weather_request_count > 910:
-        return jsonify({'status': 'Daily count exceeded'}), 400
+        return jsonify({'details': 'Daily count exceeded'}), 400
     else:
         application.weather_request_count += len(forecast_points)
     wcalc = WeatherCalculator(session)
@@ -245,8 +247,9 @@ def forecast():
     for point in forecast_points:
         try:
             results.append(wcalc.call_weather_service(point['lat'], point['lon'], point['time'], point['distance'], req_tzinfo, point['bearing']))
-        except ValueError as ve:
-            return jsonify({'status': 'Error calling weather service : ' + str(ve)}), 400
+        except (ValueError, WeatherError) as ve:
+            logger.error(str(ve))
+            return jsonify({'details': 'Error calling weather service : ' + str(ve)}), 400
     return jsonify({'forecast': results})
 
 

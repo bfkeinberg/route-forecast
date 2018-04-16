@@ -187,13 +187,18 @@ export const requestForecast = function(routeInfo) {
                 method:'POST',
                 body:formdata
             })
-            .then(response => {
+            .then(async response => {
                 if (response.ok) {
                     return response.json();
                 } else {
+                    let details = await response.json();
+                    if (details !== undefined) {
+                        throw new Error(details.details);
+                    }
                     let error = response.statusText !== undefined ? response.statusText : response['status'];
                     throw new Error(error);
-                } })
+                }
+            })
             .then(async response => {
                 dispatch(forecastFetchSuccess(response));
                 let userControls = getState().controls.userControlPoints;
