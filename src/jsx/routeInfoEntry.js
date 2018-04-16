@@ -4,7 +4,7 @@ import React, {Component} from 'react';
 import ShortUrl from './ui/shortUrl';
 import MediaQuery from 'react-responsive';
 import PropTypes from 'prop-types';
-import {loadFromRideWithGps, setErrorDetails, saveCookie} from './actions/actions';
+import {loadFromRideWithGps, saveCookie} from './actions/actions';
 import {connect} from 'react-redux';
 import PaceExplanation from './paceExplanation';
 import ForecastInterval from './ui/forecastInterval';
@@ -174,7 +174,7 @@ const mapStateToProps = (state) =>
     });
 
 const mapDispatchToProps = {
-    loadFromRideWithGps, setErrorDetails
+    loadFromRideWithGps
 };
 
 export const decideValidationStateFor = RouteInfoForm.decideValidationStateFor;

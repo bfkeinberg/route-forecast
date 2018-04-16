@@ -38,7 +38,7 @@
     "react-responsive": "^4.1.0",
     "react-split-pane": "^0.1.77",
     "react-toastr": "^3.0.0",
-    "react-transition-group": "^2.3.0",
+    "react-transition-group": "^2.3.1",
     "reactstrap": "^5.0.0",
     "redux": "^3.7.2",
     "redux-logger": "^3.0.6",

@@ -19,7 +19,12 @@ import circus_tent from 'Images/circus tent.png';
 class RouteForecastMap extends Component {
     static propTypes = {
         forecast:PropTypes.arrayOf(PropTypes.object).isRequired,
-        routeInfo:PropTypes.shape({bounds:PropTypes.object,points:PropTypes.array}).isRequired,
+        bounds:PropTypes.shape({
+            min_latitude:PropTypes.number.isRequired, max_latitude:PropTypes.number.isRequired,
+            min_longitude:PropTypes.number.isRequired, max_longitude:PropTypes.number.isRequired}),
+        points:PropTypes.arrayOf(PropTypes.shape({
+            lat:PropTypes.number.isRequired, lon:PropTypes.number.isRequired,elevation:PropTypes.number.isRequired,
+            dist:PropTypes.number.isRequired})),
         maps_api_key:PropTypes.string.isRequired,
         controls:PropTypes.arrayOf(PropTypes.shape({lat:PropTypes.number,lon:PropTypes.number})),
         controlNames:PropTypes.arrayOf(PropTypes.string),
@@ -210,17 +215,17 @@ class RouteForecastMap extends Component {
                 controls.map((control,index) => RouteForecastMap.addControlMarker(control.lat, control.lon, map, controlNames[index]))));
     }
 
-    initMap(forecast, routeInfo) {
+    initMap(forecast, bounds,points) {
         if (this.state.map === null) {
             return;
         }
-        let southWest = { lat:routeInfo.bounds.min_latitude, lng:routeInfo.bounds.min_longitude };
-        let northEast = { lat:routeInfo.bounds.max_latitude, lng:routeInfo.bounds.max_longitude };
+        let southWest = { lat:bounds.min_latitude, lng:bounds.min_longitude };
+        let northEast = { lat:bounds.max_latitude, lng:bounds.max_longitude };
         let mapBounds = new google.maps.LatLngBounds(southWest,northEast);
         this.state.map.fitBounds(mapBounds);
         RouteForecastMap.clearMarkers(this.markers);
         this.markers = RouteForecastMap.addMarkers(forecast, this.props.controls, this.props.controlNames, this.state.map);
-        let routePoints = routeInfo.points.filter(point => point.lat !== undefined && point.lon !== undefined).map((point) => {return {lat:point.lat, lng: point.lon, dist:point.dist}});
+        let routePoints = points.filter(point => point.lat !== undefined && point.lon !== undefined).map((point) => {return {lat:point.lat, lng: point.lon, dist:point.dist}});
         // clear out old route path line if any
         if (this.routePath !== null) {
             this.routePath.setMap(null);
@@ -234,9 +239,9 @@ class RouteForecastMap extends Component {
         this.highlightPath = RouteForecastMap.drawHighlight(routePoints,this.props.subrange,this.state.map);
     }
 
-    drawTheMap(gmaps,forecast,routeInfo) {
-        if (forecast.length > 0 && routeInfo.bounds !== null) {
-            this.initMap(forecast, routeInfo);
+    drawTheMap(gmaps,forecast,bounds, points) {
+        if (forecast.length > 0 && bounds !== null) {
+            this.initMap(forecast, bounds, points);
         }
     }
 
@@ -278,7 +283,7 @@ class RouteForecastMap extends Component {
     }
 
     componentDidUpdate() {
-        this.drawTheMap(this.googleMapsApi, this.props.forecast, this.props.routeInfo);
+        this.drawTheMap(this.googleMapsApi, this.props.forecast, this.props.bounds, this.props.points);
     }
 
 }
@@ -286,7 +291,8 @@ class RouteForecastMap extends Component {
 const mapStateToProps = (state) =>
     ({
         forecast: state.forecast.forecast,
-        routeInfo: state.routeInfo,
+        bounds:state.routeInfo.bounds,
+        points:state.routeInfo.points,
         maps_api_key: state.params.maps_api_key,
         controls: state.controls.calculatedControlValues,
         controlNames: state.controls.userControlPoints.map(control => control.name),
