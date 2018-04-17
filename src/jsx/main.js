@@ -34,7 +34,9 @@ import {
     updateUserControls,
     loadCookie,
     saveCookie,
-    toggleStravaAnalysis
+    toggleStravaAnalysis,
+    loadFromRideWithGps,
+    reset
 } from "./actions/actions";
 import QueryString from './queryString';
 import PaceTable from './paceTable';
@@ -54,7 +56,10 @@ class RouteWeatherUI extends Component {
         showForm:PropTypes.func.isRequired,
         showPacePerTme:PropTypes.bool.isRequired,
         setFetchAfterLoad:PropTypes.func.isRequired,
-        toggleStravaAnalysis: PropTypes.func.isRequired
+        toggleStravaAnalysis: PropTypes.func.isRequired,
+        loadFromRideWithGps: PropTypes.func.isRequired,
+        rwgpsRouteIsTrip: PropTypes.bool.isRequired,
+        reset: PropTypes.func.isRequired
     };
 
     constructor(props) {
@@ -120,6 +125,19 @@ class RouteWeatherUI extends Component {
         }
     }
 
+    componentDidMount() {
+        window.onpopstate = (event) => {
+            if (event.state === null) {
+                this.props.reset();
+            } else {
+                RouteWeatherUI.updateFromQueryParams(this.props, event.state);
+                if (event.state.rwgpsRoute !== undefined) {
+                    this.props.loadFromRideWithGps(event.state.rwgpsRoute,this.props.rwgpsRouteIsTrip);
+                }
+            }
+        }
+    }
+
     render() {
         const inputForm = (
             <ErrorBoundary>
@@ -159,13 +177,15 @@ class RouteWeatherUI extends Component {
 
 const mapDispatchToProps = {
     setStravaToken, setActionUrl, setRwgpsRoute, setApiKeys, setStravaError, setStart, setPace, setInterval, setMetric,
-    setStravaActivity, updateControls:updateUserControls, showForm, setFetchAfterLoad, toggleStravaAnalysis
+    setStravaActivity, updateControls:updateUserControls, showForm, setFetchAfterLoad, toggleStravaAnalysis,
+    loadFromRideWithGps, reset
 };
 
 const mapStateToProps = (state) =>
     ({
         formVisible: state.uiInfo.dialogParams.formVisible,
-        showPacePerTme:state.controls.stravaAnalysis && state.strava.calculatedPaces !== null
+        showPacePerTme:state.controls.stravaAnalysis && state.strava.calculatedPaces !== null,
+        rwgpsRouteIsTrip: state.uiInfo.routeParams.rwgpsRouteIsTrip
     });
 
 export default connect(mapStateToProps, mapDispatchToProps)(RouteWeatherUI);

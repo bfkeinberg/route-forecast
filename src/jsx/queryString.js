@@ -24,22 +24,28 @@ const dateToShortDate = function(date) {
 };
 
 const QueryStringUpdater = ({routeNumber,start,pace,interval,metric,controls,/*setQueryString,*/
-                         shortenUrl,shortUrl,strava_activity}) => {
+                         shortenUrl,urlIsShortened,strava_activity}) => {
     let url = location.origin;
+    let query = null;
     if (routeNumber !== '') {
-        let query = {start:dateToShortDate(start),pace:pace,interval:interval,metric:metric,
+        query = {start:dateToShortDate(start),pace:pace,interval:interval,metric:metric,
             rwgpsRoute:routeNumber,controlPoints:formatControlsForUrl(controls),
             strava_activity:strava_activity};
         url += `/?${queryString.stringify(query)}`;
-        if (url !== location.href || shortUrl === ' ') {
+        if (url !== location.href || !urlIsShortened) {
             shortenUrl(url);
         }
     }
     else {
         setShortUrl('');
     }
-    if (window.chrome !== undefined) {
-        history.pushState(null, 'nothing', url);
+    if (window.chrome !== undefined && query !== null) {
+        let oldState = history.state;
+        if (oldState !== null && oldState.rwgpsRoute === query.rwgpsRoute) {
+            history.replaceState(query, 'nothing', url);
+        } else {
+            history.pushState(query, 'nothing', url);
+        }
     }
     // setQueryString(url);
     return null;
@@ -61,7 +67,7 @@ QueryStringUpdater.propTypes = {
     shortenUrl:PropTypes.func.isRequired,
     setShortUrl:PropTypes.func.isRequired,
     controls:PropTypes.arrayOf(PropTypes.object).isRequired,
-    shortUrl: PropTypes.string
+    urlIsShortened: PropTypes.bool.isRequired
 };
 
 const mapStateToProps = (state) =>
@@ -72,7 +78,7 @@ const mapStateToProps = (state) =>
         interval: state.uiInfo.routeParams.interval,
         metric: state.controls.metric,
         controls: state.controls.userControlPoints,
-        shortUrl: state.uiInfo.dialogParams.shortUrl,
+        urlIsShortened: state.uiInfo.dialogParams.shortUrl !== ' ',
         strava_activity: state.strava.activity
     });
 
