@@ -172,7 +172,7 @@ loadingSource:null,fetchingForecast:false}, action) {
 };
 
 const routeInfo = function(state = {finishTime:'',weatherCorrectionMinutes:null,forecastRequest:null,points:[],
-fetchAfterLoad:false,bounds:null}, action) {
+fetchAfterLoad:false,bounds:null,name:'',rwgpsRouteData:null,gpxRouteData:null}, action) {
     switch (action.type) {
         case Actions.SET_TIME_ZONE:
             return {...state,timeZoneOffset:action.offset,timeZoneId:action.id};
@@ -323,7 +323,15 @@ const params = function(state = {}, action) {
     }
 };
 
-const rootReducer = combineReducers({uiInfo:combineReducers({routeParams,dialogParams}),
+const appReducer = combineReducers({uiInfo:combineReducers({routeParams,dialogParams}),
     routeInfo, controls, strava, forecast, params});
+
+const rootReducer = (state, action) => {
+    if (action.type === 'RESET') {
+        state = {params:state.params};
+    }
+
+    return appReducer(state, action)
+};
 
 export default rootReducer;
