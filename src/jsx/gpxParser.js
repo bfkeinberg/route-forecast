@@ -313,19 +313,19 @@ class AnalyzeRoute {
                 adjustedWindSpeed = windSpeed * 0.6;
                 break;
             case 1:
-                adjustedWindSpeed = windSpeed * 0.5;
+                adjustedWindSpeed = windSpeed * 0.55;
                 break;
             case 2:
-                adjustedWindSpeed = windSpeed * 0.45;
+                adjustedWindSpeed = windSpeed * 0.5;
                 break;
             case 3:
-                adjustedWindSpeed = windSpeed * 0.4;
+                adjustedWindSpeed = windSpeed * 0.5;
                 break;
             case 4:
-                adjustedWindSpeed = windSpeed * 0.4;
+                adjustedWindSpeed = windSpeed * 0.5;
                 break;
             default:
-                adjustedWindSpeed = windSpeed * 0.4;
+                adjustedWindSpeed = windSpeed * 0.45;
         }
         let effectiveSpeed = initialSpeed - adjustedWindSpeed;
         // will be negative for a tailwind
