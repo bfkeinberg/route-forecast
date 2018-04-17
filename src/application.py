@@ -41,6 +41,7 @@ Compress(application)
 session = requests.Session()
 strava_api_key = os.environ.get("STRAVA_API_KEY")
 strava_activity = StravaActivity(strava_api_key, session)
+MAX_API_CALLS_PER_DAY = 2000
 
 def clear_globals():
     g.extension = None
@@ -231,18 +232,11 @@ def forecast():
                 request.headers.get('X-Forwarded-For', request.remote_addr), len(forecast_points))
     if len(forecast_points) > 50:
         return jsonify({'details': 'Invalid request, increase forecast time interval'}), 400
-    today = datetime.now().date()
-    if today != application.last_request_day:
-        application.last_request_day = today
-        application.weather_request_count = len(forecast_points)
-    elif len(forecast_points) + application.weather_request_count > 910:
-        return jsonify({'details': 'Daily count exceeded'}), 400
-    else:
-        application.weather_request_count += len(forecast_points)
     wcalc = WeatherCalculator(session)
+    if len(forecast_points) + wcalc.get_api_calls() > MAX_API_CALLS_PER_DAY:
+        return jsonify({'details': 'Daily count exceeded'}), 400
     zone = request.form['timezone']
     req_tzinfo = dateutil.tz.tzoffset('local', long(zone))
-    # logger.info("Zone: %d Zone info : %s offset:%s", long(zone), req_tzinfo, req_tzinfo.utcoffset(10))
     results = []
     for point in forecast_points:
         try:

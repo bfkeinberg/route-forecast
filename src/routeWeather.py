@@ -32,6 +32,7 @@ class WeatherCalculator:
         self.controls = None
         self.next_control = None
         self.pointsInRoute = None
+        self.api_calls = 0
         self.logger = logging.getLogger('WeatherCalculator')
         self.session = session
         logging.basicConfig(level=logging.INFO)
@@ -50,6 +51,9 @@ class WeatherCalculator:
 
     def get_controls(self):
         return self.controls
+
+    def get_api_calls(self):
+        return self.api_calls
 
     def get_bearing_difference(self,bearing,windBearing):
         if (bearing - windBearing) < 0:
@@ -78,6 +82,7 @@ class WeatherCalculator:
                 self.logger.error('Error in DarkSky response - %s %s', ve, response.content)
                 ve.args += (response.content,)
                 raise
+            self.api_calls = response.headers['x-forecast-api-calls']
             current_forecast = json_response['currently']
             now = datetime.fromtimestamp(current_forecast['time'], zone)
             has_wind = 'windSpeed' in current_forecast
