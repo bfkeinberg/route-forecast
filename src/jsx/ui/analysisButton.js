@@ -13,7 +13,7 @@ const AnalysisButton = ({stravaAnalysis,toggleStravaAnalysis}) => {
     }
     return (
         <Container>
-            <Button className={classes} tabIndex='-1' id='enableAnalysis'
+            <Button className={classes} tabIndex='-1' id={'enableAnalysis'}
                     onClick={toggleStravaAnalysis}><img id='stravaImage' src={Strava}/></Button>
         </Container>
         );
