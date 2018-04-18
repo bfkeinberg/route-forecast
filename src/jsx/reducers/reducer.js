@@ -108,7 +108,7 @@ const routeParams = function(state = {interval:defaultIntervalInHours,pace:defau
             }
             return state;
         case Actions.SET_START:
-            if (action.start !== undefined) {
+            if (action.start !== undefined && action.start !== null) {
                 return {...state, start: new Date(action.start)};
             } else {
                 return state;

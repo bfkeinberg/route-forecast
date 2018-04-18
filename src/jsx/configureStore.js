@@ -28,7 +28,6 @@ export default function configureStore(preloadedState) {
         preloadedState,
         applyMiddleware(
             thunkMiddleware,
-            loggerMiddleware,
             createRavenMiddleware(Raven, {
                 stateTransformer: state => {Object.assign(...Object.keys(state)
                     .filter(key => (key !== 'routeInfo' && key !== 'forecast'))
@@ -38,7 +37,8 @@ export default function configureStore(preloadedState) {
                         .filter(key => (!bannedActionKeys.includes(key)))
                         .map( key => ({ [key]: action[key] }) ) )
                 }
-            })
+            }),
+            loggerMiddleware
         )
     );
 }
