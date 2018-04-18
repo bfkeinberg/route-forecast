@@ -17,7 +17,7 @@ class StravaRouteParser {
     fetchStravaActivity(activityId, token) {
         if (token === null) {
             StravaRouteParser.authenticate(activityId);
-            return;
+            return new Promise((resolve, reject) => reject('fetching authentication token'));
         }
         let activityPromise = this.fetchActivity(activityId, token);
         return new Promise((resolve, reject) => {

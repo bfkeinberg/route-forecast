@@ -13,7 +13,8 @@ class StravaDialog extends Component {
         super(props);
         this.toggle = this.toggle.bind(this);
         this.state = {
-            stravaAlertVisible: false
+            stravaAlertVisible: false,
+            mounted: false
         };
     }
 
@@ -34,6 +35,10 @@ class StravaDialog extends Component {
         }
     }
 
+    componentDidMount() {
+        this.setState({mounted:true});
+    }
+
     componentWillReceiveProps(newProps) {
         if (newProps.strava_error !== null) {
             this.setState({stravaAlertVisible:true});
@@ -49,8 +54,8 @@ class StravaDialog extends Component {
     render() {
         return (
             <ErrorBoundary>
-                <Popover id='analysisControls' target='enableAnalysis' /*onClick={this.props.toggleStravaAnalysis}*/
-                         size="sm" isOpen={this.props.stravaAnalysis} placement='auto-end' hideArrow={true}
+                <Popover id='analysisControls' target={'enableAnalysis'} /*onClick={this.props.toggleStravaAnalysis}*/
+                         size="sm" isOpen={this.props.stravaAnalysis && this.state.mounted} placement='auto-end' hideArrow={true}
                          delay={{show:0,hide:2}}>
                     <PopoverHeader className={'stravaDialogTitle'}>Analyze with Strava</PopoverHeader>
                     <PopoverBody>
