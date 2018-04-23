@@ -303,7 +303,7 @@ export const recalcRoute = function() {
 export const loadFromRideWithGps = function(routeNumber, isTrip) {
     return async function(dispatch) {
         dispatch(beginLoadingRoute('rwgps'));
-        const parser = await getRouteParser();
+        const parser = await getRouteParser().catch((err) => dispatch(rwgpsRouteLoadingFailure(err)));
         parser.loadRwgpsRoute(routeNumber, isTrip).then( (routeData) => {
                 dispatch(rwgpsRouteLoadingSuccess(routeData));
                 dispatch(loadControlsFromCookie(routeData));
