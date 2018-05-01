@@ -79,9 +79,9 @@ module.exports = {
     ],
     output: {
         path: STATIC_DIR,
-        filename: "[name].bundle.js",
+        filename: "[name].[chunkhash].bundle.js",
         chunkFilename: '[name].bundle.js',
-        sourceMapFilename: "[name].bundle.js.map",
+        sourceMapFilename: "[name].[chunkhash].bundle.js.map",
         publicPath: "static/"
     },
     resolve: {
