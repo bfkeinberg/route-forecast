@@ -230,7 +230,7 @@ def forecast():
         return jsonify('No forecast points provided',400)
     logger.info('Request from %s(%s) for %d forecast points', request.remote_addr,
                 request.headers.get('X-Forwarded-For', request.remote_addr), len(forecast_points))
-    if len(forecast_points) > 50:
+    if len(forecast_points) > 75:
         return jsonify({'details': 'Invalid request, increase forecast time interval'}), 400
     wcalc = WeatherCalculator(session)
     if len(forecast_points) + wcalc.get_api_calls() > MAX_API_CALLS_PER_DAY:

@@ -108,6 +108,7 @@ class WeatherCalculator:
                 "relBearing":relative_bearing,
                 "rainy":rainy,
                 "windBearing":wind_bearing,
+                "vectorBearing":bearing,
                 "gust":str(int(round(current_forecast['windGust'])))  + ' mph' if "windGust" in current_forecast else '<unavailable>'
             }
         else:
