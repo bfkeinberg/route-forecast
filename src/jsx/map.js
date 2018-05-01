@@ -1,20 +1,14 @@
 import React, {Component} from 'react';
 import loadGoogleMapsAPI from 'load-google-maps-api';
 import PropTypes from 'prop-types';
-import se_arrow from 'Images/arrow_down_right.png';
-import north_arrow from "Images/arrow_up.png";
-import ne_arrow from "Images/arrow_up_right.png";
-import south_arrow from "Images/arrow_down.png";
-import sw_arrow from "Images/arrow_down_left.png";
-import west_arrow from "Images/arrow_left.png";
-import nw_arrow from "Images/arrow_up_left.png";
-import east_arrow from "Images/arrow_right.png";
 import rainCloud from "Images/rainCloud.png";
 import {connect} from 'react-redux';
 import ErrorBoundary from "./errorBoundary";
 import circus_tent from 'Images/circus tent.png';
 
 /*global google*/
+const arrow = "M16.317,32.634c-0.276,0-0.5-0.224-0.5-0.5V0.5c0-0.276,0.224-0.5,0.5-0.5s0.5,0.224,0.5,0.5v31.634\n" +
+    "\t\tC16.817,32.41,16.594,32.634,16.317,32.634z,M28.852,13.536c-0.128,0-0.256-0.049-0.354-0.146L16.319,1.207L4.135,13.39c-0.195,0.195-0.512,0.195-0.707,0 s-0.195-0.512,0-0.707L15.966,0.146C16.059,0.053,16.186,0,16.319,0l0,0c0.133,0,0.26,0.053,0.354,0.146l12.533,12.536 c0.195,0.195,0.195,0.512,0,0.707C29.108,13.487,28.98,13.536,28.852,13.536z";
 
 class RouteForecastMap extends Component {
     static propTypes = {
@@ -43,82 +37,7 @@ class RouteForecastMap extends Component {
         this.state = {map:null};
     }
 
-    static selectWindIcon(bearing) {
-        if (bearing < 22 || bearing >= 338) {
-            return {
-                url:south_arrow,
-                size: new google.maps.Size(40,40),
-                labelOrigin: new google.maps.Point(-5,0),
-                origin: new google.maps.Point(0,0),
-                anchor: new google.maps.Point(0, 0)
-            };
-        }
-        if (bearing >= 22 && bearing < 67) {
-            return {
-                url:sw_arrow,
-                size: new google.maps.Size(55,55),
-                labelOrigin: new google.maps.Point(-5,-15),
-                origin: new google.maps.Point(0,0),
-                anchor: new google.maps.Point(0,0)
-            };
-        }
-        if (bearing >= 67 && bearing <112) {
-            return {
-                url:west_arrow,
-                size: new google.maps.Size(40, 40),
-                origin: new google.maps.Point(0,0),
-                labelOrigin: new google.maps.Point(-5,-15),
-                anchor: new google.maps.Point(0, 0)
-            };
-        }
-        if (bearing >=112 && bearing < 157) {
-            return {
-                url:nw_arrow,
-                size: new google.maps.Size(45, 45),
-                origin: new google.maps.Point(0,0),
-                labelOrigin: new google.maps.Point(-5,-15),
-                anchor: new google.maps.Point(0, 0)
-            };
-        }
-        if (bearing >=157 && bearing < 202) {
-            return {
-                url:north_arrow,
-                size: new google.maps.Size(50, 50),
-                origin: new google.maps.Point(0,0),
-                labelOrigin: new google.maps.Point(-5,-15),
-                anchor: new google.maps.Point(0, 0)
-            };
-        }
-        if (bearing >= 202 && bearing < 247) {
-            return {
-                url:ne_arrow,
-                size: new google.maps.Size(52, 52),
-                origin: new google.maps.Point(0,0),
-                labelOrigin: new google.maps.Point(-5,-5),
-                anchor: new google.maps.Point(0, 0)
-            };
-
-        }
-        if (bearing >= 247 && bearing < 302) {
-            return {
-                url:east_arrow,
-                size: new google.maps.Size(45, 45),
-                origin: new google.maps.Point(0,0),
-                labelOrigin: new google.maps.Point(-5,2),
-                anchor: new google.maps.Point(0, 0)
-            };
-
-        }
-        return {
-            url:se_arrow,
-            size: new google.maps.Size(42,42),
-            origin: new google.maps.Point(0,0),
-            labelOrigin: new google.maps.Point(-3,15),
-            anchor: new google.maps.Point(0, 0)
-        };
-    }
-
-    static addMarker(latitude, longitude, map, value, title, isRainy, bearing, windSpeed) {
+    static addMarker(latitude, longitude, map, value, title, isRainy, bearing, windSpeed, vector) {
     // Add the marker at the specified location
         const markerIcon = {
                 url: rainCloud,
@@ -138,13 +57,23 @@ class RouteForecastMap extends Component {
             }));
         }
         if (parseInt(windSpeed) > 3) {
+            // const anchor = new google.maps.Point(16.317-19*Math.cos((Math.PI / 180)*bearing),16.317+(25*Math.sin((Math.PI / 180)*bearing)));
+            const anchor = new google.maps.Point(16.317,16.317);
             markers.push(new google.maps.Marker({
                 position: {lat:latitude,lng:longitude},
                 label: value.toString(),
                 map: map,
-                icon: RouteForecastMap.selectWindIcon(bearing),
+                icon: {path:arrow,rotation:bearing,labelOrigin:new google.maps.Point(0,32),anchor:anchor,strokeColor:'blue',strokeOpacity:0.9},
                 title: title
             }));
+/*
+            markers.push(new google.maps.Marker({
+                position: {lat:latitude,lng:longitude},
+                // label: value.toString(),
+                map: map,
+                icon: {path:google.maps.SymbolPath.CIRCLE, scale:5}
+            }));
+*/
         }
         else markers.push(new google.maps.Marker({
             position: {lat:latitude,lng:longitude},
@@ -209,11 +138,14 @@ class RouteForecastMap extends Component {
         // marker title now contains both temperature and mileage
         return (
             forecast.map((point) =>
-                RouteForecastMap.addMarker(point.lat, point.lon, map, point.distance, point.fullTime + '\n' + point.tempStr,
-                    point.rainy, point.windBearing, point.windSpeed)
+                RouteForecastMap.addMarker(point.lat, point.lon, map, point.distance, `${point.fullTime}\n${point.tempStr}`,
+                    point.rainy, point.windBearing, point.windSpeed, point.vectorBearing)
             ).reduce((acc, cur) => acc.concat(cur)).concat(
                 controls.map((control,index) => RouteForecastMap.addControlMarker(control.lat, control.lon, map, controlNames[index]))));
     }
+
+    clearRoutePath = (routePath) => {if (routePath !== null) {routePath.setMap(null); this.routePath = null}};
+    clearHighlight = (highlightPath) => {if (highlightPath !== null) {highlightPath.setMap(null); this.highlightPath = null}};
 
     initMap(forecast, bounds,points) {
         if (this.state.map === null) {
@@ -227,14 +159,8 @@ class RouteForecastMap extends Component {
         this.markers = RouteForecastMap.addMarkers(forecast, this.props.controls, this.props.controlNames, this.state.map);
         let routePoints = points.filter(point => point.lat !== undefined && point.lon !== undefined).map((point) => {return {lat:point.lat, lng: point.lon, dist:point.dist}});
         // clear out old route path line if any
-        if (this.routePath !== null) {
-            this.routePath.setMap(null);
-            this.routePath = null;
-        }
-        if (this.highlightPath !== null) {
-            this.highlightPath.setMap(null);
-            this.highlightPath = null;
-        }
+        this.clearRoutePath(this.routePath);
+        this.clearHighlight(this.highlightPath);
         this.routePath = RouteForecastMap.drawRoute(routePoints,this.state.map);
         this.highlightPath = RouteForecastMap.drawHighlight(routePoints,this.props.subrange,this.state.map);
     }
@@ -269,6 +195,9 @@ class RouteForecastMap extends Component {
                     .catch((err) => {console.error(err);
                 });
             }
+        } else {
+            this.clearRoutePath(this.routePath);
+            this.clearHighlight(this.highlightPath);
         }
     }
 
