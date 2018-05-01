@@ -190,7 +190,7 @@ fetchAfterLoad:false,bounds:null,name:'',rwgpsRouteData:null,gpxRouteData:null},
             return {...state,rwgpsRouteData:null,gpxRouteData:null,points:[],bounds:null,name:'',forecastRequest:null};
         // clear when the route is changed
         case Actions.SET_RWGPS_ROUTE:
-            return {...state,rwgpsRouteData:null,gpxRouteData:null,points:[],name:'',forecastRequest:null};
+            return {...state,rwgpsRouteData:null,gpxRouteData:null,points:[],bounds:null,name:'',forecastRequest:null};
         case Actions.ADD_WEATHER_CORRECTION:
             return {...state,weatherCorrectionMinutes:action.weatherCorrectionMinutes,
                 finishTime:moment(state.finishTime,finishTimeFormat).add(action.weatherCorrectionMinutes,'minutes').format(finishTimeFormat)};
@@ -238,6 +238,13 @@ const controls = function(state = {metric:false,displayBanked:false,stravaAnalys
             return {...state, queryString:action.queryString};
         case Actions.CLEAR_QUERY:
             return {...state, queryString:null};
+        case Actions.NEW_USER_MODE:
+        {
+            if (action.value === false) {
+                return {...state,userControlPoints:[],count:0};
+            }
+            return state;
+        }
         default:
             return state;
     }
@@ -312,12 +319,14 @@ const forecast = function(state = {forecast:[],valid:false,range:[]}, action) {
     }
 };
 
-const params = function(state = {}, action) {
+const params = function(state = {newUserMode:false}, action) {
     switch (action.type) {
         case Actions.SET_ACTION_URL:
             return {...state, action: action.action};
         case Actions.SET_API_KEYS:
             return {...state, maps_api_key: action.mapsKey, timezone_api_key:action.timezoneKey};
+        case Actions.NEW_USER_MODE:
+            return {...state, newUserMode:action.value};
         default:
             return state;
     }

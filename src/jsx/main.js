@@ -18,6 +18,7 @@ import queryString from 'query-string';
 import ErrorBoundary from './errorBoundary';
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
+import cookie from 'react-cookies';
 import {
     setActionUrl,
     setApiKeys,
@@ -36,17 +37,33 @@ import {
     saveCookie,
     toggleStravaAnalysis,
     loadFromRideWithGps,
-    reset
+    reset,
+    newUserMode
 } from "./actions/actions";
 import QueryString from './queryString';
 import PaceTable from './paceTable';
 
-/*
-TODO:
-immutable.js
-
- */
-
+const demoRoute = 1797453;
+const demoControls = [
+    {
+        "name": "Petaluma",
+        "distance": 43.7,
+        "duration": 20,
+        "id": 0
+    },
+    {
+        "name": "Valley Ford",
+        "distance": 62.2,
+        "duration": 20,
+        "id": 1
+    },
+    {
+        "name": "Point Reyes Station",
+        "distance": 87.8,
+        "duration": 20,
+        "id": 2
+    }
+];
 class RouteWeatherUI extends Component {
     static propTypes = {
         setActionUrl:PropTypes.func.isRequired,
@@ -59,19 +76,26 @@ class RouteWeatherUI extends Component {
         toggleStravaAnalysis: PropTypes.func.isRequired,
         loadFromRideWithGps: PropTypes.func.isRequired,
         rwgpsRouteIsTrip: PropTypes.bool.isRequired,
-        reset: PropTypes.func.isRequired
+        reset: PropTypes.func.isRequired,
+        firstUse: PropTypes.bool.isRequired,
+        newUserMode: PropTypes.func.isRequired
     };
 
     constructor(props) {
         super(props);
         this.formatControlsForUrl = this.formatControlsForUrl.bind(this);
+
+        const newUserMode = RouteWeatherUI.isNewUserMode();
+        this.props.newUserMode(newUserMode);
         let queryParams = queryString.parse(location.search);
         RouteWeatherUI.updateFromQueryParams(this.props, queryParams);
         let script = document.getElementById( "routeui" );
         props.setActionUrl(script.getAttribute('action'));
         props.setApiKeys(script.getAttribute('maps_api_key'),script.getAttribute('timezone_api_key'));
         this.props.updateControls(queryParams.controlPoints===undefined?[]:this.parseControls(queryParams.controlPoints));
-        // new control point url format - <name>,<distance>,<time-in-minutes>:<name>,<distance>,<time-in-minutes>:etc
+        if (newUserMode) {
+            RouteWeatherUI.loadCannedData(this.props);
+        }
         this.state = {};
     }
 
@@ -93,6 +117,16 @@ class RouteWeatherUI extends Component {
 
     formatControlsForUrl(controlPoints) {
         return controlPoints.reduce((queryParam,point) => {return RouteWeatherUI.formatOneControl(queryParam) + ':' + RouteWeatherUI.formatOneControl(point)},'');
+    }
+
+    static isNewUserMode() {
+        return (location.search === '' && cookie.load('initialized') === undefined);
+    }
+
+    static loadCannedData(props) {
+        props.setRwgpsRoute(demoRoute);
+        props.setFetchAfterLoad(true);
+        props.updateControls(demoControls);
     }
 
     parseControls(controlPointString) {
@@ -178,14 +212,15 @@ class RouteWeatherUI extends Component {
 const mapDispatchToProps = {
     setStravaToken, setActionUrl, setRwgpsRoute, setApiKeys, setStravaError, setStart, setPace, setInterval, setMetric,
     setStravaActivity, updateControls:updateUserControls, showForm, setFetchAfterLoad, toggleStravaAnalysis,
-    loadFromRideWithGps, reset
+    loadFromRideWithGps, reset, newUserMode
 };
 
 const mapStateToProps = (state) =>
     ({
         formVisible: state.uiInfo.dialogParams.formVisible,
         showPacePerTme:state.controls.stravaAnalysis && state.strava.calculatedPaces !== null,
-        rwgpsRouteIsTrip: state.uiInfo.routeParams.rwgpsRouteIsTrip
+        rwgpsRouteIsTrip: state.uiInfo.routeParams.rwgpsRouteIsTrip,
+        firstUse: state.params.newUserMode
     });
 
 export default connect(mapStateToProps, mapDispatchToProps)(RouteWeatherUI);

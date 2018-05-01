@@ -3,9 +3,11 @@ import PropTypes from 'prop-types';
 import {Label, Input, FormGroup, UncontrolledTooltip} from 'reactstrap';
 import RouteInfoForm from "../routeInfoEntry";
 import {connect} from 'react-redux';
-import {loadFromRideWithGps, setRwgpsRoute} from "../actions/actions";
+import {loadFromRideWithGps, setRwgpsRoute, newUserMode, updateUserControls} from "../actions/actions";
+import cookie from 'react-cookies';
 
-const RideWithGpsId = ({setRwgpsRoute,loadingSource,loadingSuccess,rwgpsRoute,rwgpsRouteIsTrip,loadFromRideWithGps}) => {
+const RideWithGpsId = ({setRwgpsRoute,loadingSource,loadingSuccess,rwgpsRoute,rwgpsRouteIsTrip,loadFromRideWithGps,
+                       newUserMode,firstUse}) => {
     const handleRwgpsRoute = function(value) {
         let route = RouteInfoForm.getRouteNumberFromValue(value);
         if (route !== '') {
@@ -25,16 +27,23 @@ const RideWithGpsId = ({setRwgpsRoute,loadingSource,loadingSuccess,rwgpsRoute,rw
 
         return charCode;
     };
+
+    const settingRoute = (route) => {
+        setRwgpsRoute(route);
+        cookie.save('initialized', true);
+        newUserMode(false);
+    };
+
     return (
         <FormGroup inline>
             <Label for='rwgps_route' size='sm' tag='b'>RideWithGps route</Label>
-            <UncontrolledTooltip placement="bottom" target='rwgps_route'>The number for a route on ridewithgps</UncontrolledTooltip>
-            <Input id='rwgps_route'
+            <UncontrolledTooltip placement="bottom" target='rwgps_route'>The number for a route on Ride with GPS</UncontrolledTooltip>
+            <Input id={'rwgps_route'} className={firstUse?'ridewithgps_init':''}
                    size="9" bsSize='xsm' tabIndex='5' type="text"
                    {...RouteInfoForm.decideValidationStateFor('rwgps',loadingSource,loadingSuccess)}
                  onBlur={event => {handleRwgpsRoute(event.target.value)}}
                  onKeyPress={isNumberKey}
-                 onChange={event => {setRwgpsRoute(event.target.value)}}
+                 onChange={event => {settingRoute(event.target.value)}}
                  onDrop={event => {
                      let dt = event.dataTransfer;
                      if (dt.items) {
@@ -42,7 +51,7 @@ const RideWithGpsId = ({setRwgpsRoute,loadingSource,loadingSuccess,rwgpsRoute,rw
                              if (dt.items[i].kind === 'string') {
                                  event.preventDefault();
                                  dt.items[i].getAsString(value => {
-                                     setRwgpsRoute(value);
+                                     settingRoute(value);
                                      handleRwgpsRoute(value);
                                  });
                              } else {
@@ -80,7 +89,9 @@ RideWithGpsId.propTypes = {
         PropTypes.number,
         PropTypes.oneOf([''])
     ]),
-    rwgpsRouteIsTrip:PropTypes.bool.isRequired
+    rwgpsRouteIsTrip:PropTypes.bool.isRequired,
+    firstUse:PropTypes.bool.isRequired,
+    newUserMode:PropTypes.func.isRequired
 };
 
 const mapStateToProps = (state) =>
@@ -88,11 +99,12 @@ const mapStateToProps = (state) =>
         loadingSource: state.uiInfo.dialogParams.loadingSource,
         loadingSuccess: state.uiInfo.dialogParams.succeeded,
         rwgpsRoute:state.uiInfo.routeParams.rwgpsRoute,
-        rwgpsRouteIsTrip:state.uiInfo.routeParams.rwgpsRouteIsTrip
+        rwgpsRouteIsTrip:state.uiInfo.routeParams.rwgpsRouteIsTrip,
+        firstUse: state.params.newUserMode
     });
 
 const mapDispatchToProps = {
-    setRwgpsRoute,loadFromRideWithGps
+    setRwgpsRoute,loadFromRideWithGps,newUserMode
 };
 
 export default connect(mapStateToProps,mapDispatchToProps)(RideWithGpsId);

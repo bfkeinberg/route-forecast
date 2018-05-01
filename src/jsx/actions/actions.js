@@ -627,3 +627,5 @@ export const setWeatherRange = function(start,finish) {
 export const RESET = 'RESET';
 export const reset = () => {return {type:RESET}};
 
+export const NEW_USER_MODE = 'NEW_USER_MODE';
+export const newUserMode = (value) => {return {type:NEW_USER_MODE,value:value}};
