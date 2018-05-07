@@ -51,7 +51,7 @@ class ForecastTable extends Component {
                         start={point.distance*milesToKm}
                         end={index!==forecast.length-1?forecast[index+1].distance*milesToKm:null}
                         className={this.state.selectedRow===parseInt(point.distance*milesToKm)?'highlighted':null}
-                        onClick={this.updateWeatherRange} onMouseOver={this.updateWeatherRange}>
+                        onClick={this.updateWeatherRange} onMouseEnter={this.updateWeatherRange}>
                         <td>{point.time}</td>
                         <td>{point.distance}</td>
                         <td>{point.summary}</td>

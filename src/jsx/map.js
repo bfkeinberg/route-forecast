@@ -57,13 +57,14 @@ class RouteForecastMap extends Component {
             }));
         }
         if (parseInt(windSpeed) > 3) {
+            const flippedBearing = (bearing > 180) ? bearing - 180 : bearing + 180;
             // const anchor = new google.maps.Point(16.317-19*Math.cos((Math.PI / 180)*bearing),16.317+(25*Math.sin((Math.PI / 180)*bearing)));
             const anchor = new google.maps.Point(16.317,16.317);
             markers.push(new google.maps.Marker({
                 position: {lat:latitude,lng:longitude},
                 label: value.toString(),
                 map: map,
-                icon: {path:arrow,rotation:bearing,labelOrigin:new google.maps.Point(0,32),anchor:anchor,strokeColor:'blue',strokeOpacity:0.9},
+                icon: {path:arrow,rotation:flippedBearing,labelOrigin:new google.maps.Point(0,32),anchor:anchor,strokeColor:'blue',strokeOpacity:0.9},
                 title: title
             }));
 /*
@@ -155,14 +156,14 @@ class RouteForecastMap extends Component {
         let northEast = { lat:bounds.max_latitude, lng:bounds.max_longitude };
         let mapBounds = new google.maps.LatLngBounds(southWest,northEast);
         this.state.map.fitBounds(mapBounds);
-        RouteForecastMap.clearMarkers(this.markers);
-        this.markers = RouteForecastMap.addMarkers(forecast, this.props.controls, this.props.controlNames, this.state.map);
         let routePoints = points.filter(point => point.lat !== undefined && point.lon !== undefined).map((point) => {return {lat:point.lat, lng: point.lon, dist:point.dist}});
         // clear out old route path line if any
         this.clearRoutePath(this.routePath);
         this.clearHighlight(this.highlightPath);
         this.routePath = RouteForecastMap.drawRoute(routePoints,this.state.map);
         this.highlightPath = RouteForecastMap.drawHighlight(routePoints,this.props.subrange,this.state.map);
+        RouteForecastMap.clearMarkers(this.markers);
+        this.markers = RouteForecastMap.addMarkers(forecast, this.props.controls, this.props.controlNames, this.state.map);
     }
 
     drawTheMap(gmaps,forecast,bounds, points) {
