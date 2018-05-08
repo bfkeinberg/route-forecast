@@ -37,7 +37,7 @@ class RouteForecastMap extends Component {
         this.state = {map:null};
     }
 
-    static addMarker(latitude, longitude, map, value, title, isRainy, bearing, windSpeed, vector) {
+    static addMarker(latitude, longitude, map, value, title, isRainy, bearing, windSpeed) {
     // Add the marker at the specified location
         const markerIcon = {
                 url: rainCloud,
@@ -142,11 +142,12 @@ class RouteForecastMap extends Component {
                 RouteForecastMap.addMarker(point.lat, point.lon, map, point.distance, `${point.fullTime}\n${point.tempStr}`,
                     point.rainy, point.windBearing, point.windSpeed, point.vectorBearing)
             ).reduce((acc, cur) => acc.concat(cur)).concat(
-                controls.map((control,index) => RouteForecastMap.addControlMarker(control.lat, control.lon, map, controlNames[index]))));
+                controls.map((control,index) => RouteForecastMap.addControlMarker(control.lat, control.lon, map, controlNames[index]))))
     }
 
-    clearRoutePath = (routePath) => {if (routePath !== null) {routePath.setMap(null); this.routePath = null}};
-    clearHighlight = (highlightPath) => {if (highlightPath !== null) {highlightPath.setMap(null); this.highlightPath = null}};
+    clearRoutePath = (routePath) => {if (routePath !== null) {routePath.setMap(null);this.routePath = null}};
+
+    clearHighlight = (highlightPath) => {if (highlightPath !== null) {highlightPath.setMap(null);this.highlightPath = null}};
 
     initMap(forecast, bounds,points) {
         if (this.state.map === null) {
