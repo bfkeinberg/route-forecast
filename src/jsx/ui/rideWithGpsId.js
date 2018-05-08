@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import {Label, Input, FormGroup, UncontrolledTooltip} from 'reactstrap';
 import RouteInfoForm from "../routeInfoEntry";
 import {connect} from 'react-redux';
-import {loadFromRideWithGps, setRwgpsRoute, newUserMode, updateUserControls} from "../actions/actions";
+import {loadFromRideWithGps, setRwgpsRoute, newUserMode} from "../actions/actions";
 import cookie from 'react-cookies';
 
 const RideWithGpsId = ({setRwgpsRoute,loadingSource,loadingSuccess,rwgpsRoute,rwgpsRouteIsTrip,loadFromRideWithGps,
