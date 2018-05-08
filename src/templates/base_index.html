@@ -12,6 +12,9 @@
         <meta charset="UTF-8">
         <title><%= htmlWebpackPlugin.options.title %></title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="keywords" content="bicycling, randonneuring, planning, bicycle routes, weather, elevation, hill climbing">
+        <meta name="description" content="CycleRouteForecast gives time estimates and weather forecasts for a cycling route, taking into account the terrain and the forecasted wind.
+        It also gives time estimates for any intermediate stops. Afterwards it can compare results with the actual completed ride using data from Strava.">
         <link rel="shortcut icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
         <link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename='favicon-32x32.png') }}">
         <link rel="icon" type="image/png" sizes="96x96" href="{{ url_for('static', filename='favicon-96x96.png') }}">
@@ -20,7 +23,7 @@
         <% } %>
         <script src="https://cdn.ravenjs.com/3.23.1/raven.min.js" crossorigin="anonymous"></script>
         <script>Raven.config('https://ea4c472ff9054dab8c18d594b95d8da2@sentry.io/298059',
-            {release:'309670d3b6f2e1f7dd515820c4036829dce4f36d', environment:'production',
+            {release:'<%= htmlWebpackPlugin.options.sentryRelease %>', environment:'production',
             breadcrumbCallback:function(crumb){if (crumb.type==='console') {return false} return crumb}}).install();</script>
         <script>
           function measureCRP() {
