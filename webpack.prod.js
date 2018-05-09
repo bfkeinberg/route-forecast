@@ -35,7 +35,9 @@ module.exports = env => merge(common(env), {
             ignore: ['node_modules', 'webpack.config.js', 'webpack.common.js', 'webpack.dev.js'],
             configFile: 'sentry.properties',
             stripCommonPrefix:true,
-            rewrite:true
+            rewrite:true,
+            urlPrefix: '/static',
+            debug: true
         }),
         new CompressionPlugin({
             minRatio:0.85, cache:true,
@@ -50,5 +52,5 @@ module.exports = env => merge(common(env), {
         }),
         // new BundleAnalyzerPlugin()
     ],
-    devtool: 'hidden-source-map'
+    devtool: 'source-map'
 });

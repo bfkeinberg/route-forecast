@@ -8,7 +8,7 @@ const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPl
 const CompressionPlugin = require("compression-webpack-plugin");
 const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 
-module.exports = merge(common, {
+module.exports = env => merge(common(env), {
     plugins: [
         new UglifyJsPlugin({sourceMap:true}),
         new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
@@ -41,5 +41,5 @@ module.exports = merge(common, {
         }),
         // new BundleAnalyzerPlugin()
     ],
-    devtool: 'hidden-source-map'
+    devtool: 'source-map'
 });
