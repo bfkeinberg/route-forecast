@@ -120,7 +120,8 @@ class RouteWeatherUI extends Component {
     }
 
     static isNewUserMode() {
-        return (location.search === '' && cookie.load('initialized') === undefined);
+        return false;
+        // return (location.search === '' && cookie.load('initialized') === undefined);
     }
 
     static loadCannedData(props) {
@@ -179,7 +180,7 @@ class RouteWeatherUI extends Component {
             </ErrorBoundary>
         );
         const formButton = (
-            <Button color="primary" onClick={this.props.showForm}>Show input</Button>
+            <Button color="primary" onClick={this.props.showForm}>Modify...</Button>
         );
         return (
         <div>
