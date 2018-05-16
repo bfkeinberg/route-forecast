@@ -85,7 +85,7 @@ class ForecastTable extends Component {
                     <ErrorBoundary>
                     <a tabIndex='-1' href="https://darksky.net/poweredby/"><img src={darkSky}/></a>
                         {weatherCorrections}
-                    <Table size='sm' hover bordered responsive>
+                    <Table size='sm' hover bordered>
                         <thead>
                         <tr>
                             <th className={'headerCell'}>Time</th>
