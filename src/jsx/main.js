@@ -18,7 +18,7 @@ import queryString from 'query-string';
 import ErrorBoundary from './errorBoundary';
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
-import cookie from 'react-cookies';
+// import cookie from 'react-cookies';
 import {
     setActionUrl,
     setApiKeys,
