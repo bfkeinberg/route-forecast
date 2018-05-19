@@ -31,7 +31,8 @@ class RouteInfoForm extends Component {
         fetchingRoute:PropTypes.bool,
         errorDetails:PropTypes.string,
         routeInfo:PropTypes.shape({name:PropTypes.string}),
-        loadFromRideWithGps:PropTypes.func.isRequired
+        loadFromRideWithGps:PropTypes.func.isRequired,
+        firstUse:PropTypes.bool.isRequired
     };
 
     constructor(props) {
@@ -45,10 +46,14 @@ class RouteInfoForm extends Component {
         }
     }
 
-    componentWillReceiveProps(nextProps) {
+    static getDerivedStateFromProps(nextProps) {
         if (nextProps.routeInfo.name !== '') {
-            saveCookie(nextProps.routeInfo.name,this.props.formatControlsForUrl(nextProps.controlPoints));
+            document.title = `Forecast for ${nextProps.routeInfo.name}`;
+            if (!nextProps.firstUse) {
+                saveCookie(nextProps.routeInfo.name, nextProps.formatControlsForUrl(nextProps.controlPoints));
+            }
         }
+        return null;
     }
 
     static showErrorDetails(errorState) {
@@ -170,7 +175,8 @@ const mapStateToProps = (state) =>
         fetchingRoute: state.uiInfo.dialogParams.fetchingRoute,
         errorDetails:state.uiInfo.dialogParams.errorDetails,
         routeInfo:state.routeInfo,
-        controlPoints:state.controls.userControlPoints
+        controlPoints:state.controls.userControlPoints,
+        firstUse: state.params.newUserMode
     });
 
 const mapDispatchToProps = {
