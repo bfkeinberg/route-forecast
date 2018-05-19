@@ -59,6 +59,7 @@ class ForecastTable extends Component {
                         <td>{point.precip}</td>
                         <td>{point.cloudCover}</td>
                         <td className={ForecastTable.windStyle(point)}>{this.state.showGusts?<i>{point.gust}</i>:point.windSpeed}</td>
+                        <td>{point.windBearing}</td>
                     </tr>
                 )}
                 </tbody>
@@ -95,6 +96,7 @@ class ForecastTable extends Component {
                             <th className={'headerCell'}>Chance of rain</th>
                             <th className={'headerCell'}>Cloud cover</th>
                             <th className={'headerCell'} onClick={this.toggleGustDisplay}>{windHeader}</th>
+                            <th className={'headerCell'}>Wind bearing</th>
                         </tr>
                         </thead>
                         {this.expandTable(this.props.forecast)}
