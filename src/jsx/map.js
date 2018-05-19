@@ -173,7 +173,7 @@ class RouteForecastMap extends Component {
         }
     }
 
-    componentWillReceiveProps(newProps) {
+    UNSAFE_componentWillReceiveProps(newProps) {
         if (newProps.forecast.length > 0) {
             if (this.googleMapsPromise === null) {
                 this.googleMapsPromise = loadGoogleMapsAPI({key:this.props.maps_api_key});
@@ -193,6 +193,7 @@ class RouteForecastMap extends Component {
                         return;
                     }
                     this.setState({map : map});
+                    // return {...prevState, map : map};
                 },error => {console.log(error)})
                     .catch((err) => {console.error(err);
                 });
