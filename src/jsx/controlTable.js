@@ -142,7 +142,7 @@ class ControlTable extends Component {
         }
     }
 
-    componentWillReceiveProps(newProps) {
+    UNSAFE_componentWillReceiveProps(newProps) {
         if (this.api===undefined || newProps===undefined) {
             return;
         }
