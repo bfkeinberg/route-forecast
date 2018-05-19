@@ -39,7 +39,7 @@ const QueryStringUpdater = ({routeNumber,start,pace,interval,metric,controls,/*s
     else {
         setShortUrl('');
     }
-    if (window.chrome !== undefined && query !== null) {
+    if (!(/HeadlessChrome/).test(window.navigator.userAgent) && query !== null) {
         let oldState = history.state;
         if (oldState !== null && oldState.rwgpsRoute === query.rwgpsRoute) {
             history.replaceState(query, 'nothing', url);
