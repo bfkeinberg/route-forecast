@@ -39,10 +39,11 @@ class StravaDialog extends Component {
         this.setState({mounted:true});
     }
 
-    componentWillReceiveProps(newProps) {
+    static getDerivedStateFromProps(newProps, prevState) {
         if (newProps.strava_error !== null) {
-            this.setState({stravaAlertVisible:true});
+            return {...prevState, stravaAlertVisible:true};
         }
+        return null;
     }
 
     toggle() {
