@@ -86,8 +86,9 @@ class WeatherCalculator:
             current_forecast = json_response['currently']
             now = datetime.fromtimestamp(current_forecast['time'], zone)
             has_wind = 'windSpeed' in current_forecast
-            wind_bearing = current_forecast['windBearing'] if has_wind else None
-            relative_bearing = self.get_bearing_difference(bearing, current_forecast['windBearing']) if has_wind and bearing != None else None
+            wind_bearing = current_forecast['windBearing'] if 'windBearing' in current_forecast else None
+            relative_bearing = self.get_bearing_difference(bearing, wind_bearing) \
+                if has_wind and bearing != None and wind_bearing != None else None
             rainy = 'icon' in current_forecast and current_forecast['icon'] == 'rain'
             self.logger.info('%s %f,%f %s %d %d', now, lat, lon, current_forecast,bearing if bearing!=None else 0,relative_bearing if relative_bearing!=None else 0)
             return {
