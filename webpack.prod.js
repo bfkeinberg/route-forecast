@@ -37,7 +37,6 @@ module.exports = env => merge(common(env), {
             stripPrefix: ['/dist'],
             stripCommonPrefix:true,
             rewrite:true,
-            urlPrefix: '/static',
             debug: true
         }),
         new CompressionPlugin({
