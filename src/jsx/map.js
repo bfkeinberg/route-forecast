@@ -9,6 +9,7 @@ import circus_tent from 'Images/circus tent.png';
 /*global google*/
 const arrow = "M16.317,32.634c-0.276,0-0.5-0.224-0.5-0.5V0.5c0-0.276,0.224-0.5,0.5-0.5s0.5,0.224,0.5,0.5v31.634\n" +
     "\t\tC16.817,32.41,16.594,32.634,16.317,32.634z,M28.852,13.536c-0.128,0-0.256-0.049-0.354-0.146L16.319,1.207L4.135,13.39c-0.195,0.195-0.512,0.195-0.707,0 s-0.195-0.512,0-0.707L15.966,0.146C16.059,0.053,16.186,0,16.319,0l0,0c0.133,0,0.26,0.053,0.354,0.146l12.533,12.536 c0.195,0.195,0.195,0.512,0,0.707C29.108,13.487,28.98,13.536,28.852,13.536z";
+const milesToMeters = 1609.34;
 
 class RouteForecastMap extends Component {
     static propTypes = {
@@ -37,7 +38,15 @@ class RouteForecastMap extends Component {
         this.state = {map:null};
     }
 
-    static addMarker(latitude, longitude, map, value, title, isRainy, bearing, windSpeed) {
+    static pickArrowColor(distance, subrange) {
+        if (subrange.length!==2) {
+            return 'blue';
+        }
+        const distanceInMeters = distance * milesToMeters;
+        return (distanceInMeters >= subrange[0] && distanceInMeters <= subrange[1]) ? 'deeppink' : 'blue';
+    }
+
+    static addMarker(latitude, longitude, map, value, title, isRainy, bearing, windSpeed, subrange) {
     // Add the marker at the specified location
         const markerIcon = {
                 url: rainCloud,
@@ -64,7 +73,8 @@ class RouteForecastMap extends Component {
                 position: {lat:latitude,lng:longitude},
                 label: value.toString(),
                 map: map,
-                icon: {path:arrow,rotation:flippedBearing,labelOrigin:new google.maps.Point(0,32),anchor:anchor,strokeColor:'blue',strokeOpacity:0.9},
+                icon: {path:arrow,rotation:flippedBearing,labelOrigin:new google.maps.Point(0,32),anchor:anchor,
+                    strokeColor:RouteForecastMap.pickArrowColor(value, subrange),strokeOpacity:0.9},
                 title: title
             }));
 /*
@@ -135,12 +145,12 @@ class RouteForecastMap extends Component {
         markers.length = 0;
     }
 
-    static addMarkers(forecast, controls, controlNames, map) {
+    static addMarkers(forecast, controls, controlNames, map, subrange) {
         // marker title now contains both temperature and mileage
         return (
             forecast.map((point) =>
                 RouteForecastMap.addMarker(point.lat, point.lon, map, point.distance, `${point.fullTime}\n${point.tempStr}`,
-                    point.rainy, point.windBearing, point.windSpeed, point.vectorBearing)
+                    point.rainy, point.windBearing, point.windSpeed, subrange)
             ).reduce((acc, cur) => acc.concat(cur)).concat(
                 controls.map((control,index) => RouteForecastMap.addControlMarker(control.lat, control.lon, map, controlNames[index]))))
     }
@@ -164,7 +174,7 @@ class RouteForecastMap extends Component {
         this.routePath = RouteForecastMap.drawRoute(routePoints,this.state.map);
         this.highlightPath = RouteForecastMap.drawHighlight(routePoints,this.props.subrange,this.state.map);
         RouteForecastMap.clearMarkers(this.markers);
-        this.markers = RouteForecastMap.addMarkers(forecast, this.props.controls, this.props.controlNames, this.state.map);
+        this.markers = RouteForecastMap.addMarkers(forecast, this.props.controls, this.props.controlNames, this.state.map, this.props.subrange);
     }
 
     drawTheMap(gmaps,forecast,bounds, points) {
