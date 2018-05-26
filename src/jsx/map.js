@@ -33,8 +33,6 @@ class RouteForecastMap extends Component {
         this.markers = [];
         this.routePath = null;
         this.highlightPath = null;
-        this.googleMapsApi = null;
-        this.googleMapsPromise = null;
         this.state = {map:null};
     }
 
@@ -177,37 +175,50 @@ class RouteForecastMap extends Component {
         this.markers = RouteForecastMap.addMarkers(forecast, this.props.controls, this.props.controlNames, this.state.map, this.props.subrange);
     }
 
-    drawTheMap(gmaps,forecast,bounds, points) {
+    drawTheMap(forecast,bounds, points) {
         if (forecast.length > 0 && bounds !== null) {
             this.initMap(forecast, bounds, points);
         }
     }
 
+/*    static getDerivedStateFromProps(nextProps, prevState) {
+        if (nextProps.forecast.length > 0) {
+            loadGoogleMapsAPI({key: nextProps.maps_api_key}).then(googleMaps => {
+                const mapRef = prevState.mapDiv;
+                if (mapRef === null) {
+                    reject("No map div");
+                    return null;
+                }
+                let map = new googleMaps.Map(mapRef, {mapTypeId: google.maps.MapTypeId.ROADMAP, scaleControl: true});
+                if (map === null) {
+                    reject('Cannot create map');
+                    return null;
+                }
+                return {...prevState, map: map};
+            }, error => {
+                console.log(error)
+            }).catch((err) => {
+                    console.error(err);
+            });
+        }
+        return null;
+    }*/
+
     UNSAFE_componentWillReceiveProps(newProps) {
         if (newProps.forecast.length > 0) {
-            if (this.googleMapsPromise === null) {
-                this.googleMapsPromise = loadGoogleMapsAPI({key:this.props.maps_api_key});
-            }
-            if (this.googleMapsApi === null) {
-                this.googleMapsPromise.then((googleMaps) => {
-                    this.googleMapsApi = googleMaps;
-                    const mapRef = this.mapDiv;
-                    if (mapRef === null) {
-                        return;
-                    }
-                    if (this.googleMapsApi === null) {
-                        return;
-                    }
-                    let map = new this.googleMapsApi.Map(mapRef, {mapTypeId: google.maps.MapTypeId.ROADMAP});
-                    if (map === null) {
-                        return;
-                    }
-                    this.setState({map : map});
-                    // return {...prevState, map : map};
-                },error => {console.log(error)})
-                    .catch((err) => {console.error(err);
-                });
-            }
+            loadGoogleMapsAPI({key:this.props.maps_api_key}).then((googleMaps) => {
+                const mapRef = this.mapDiv;
+                if (mapRef === null) {
+                    return;
+                }
+                let map = new googleMaps.Map(mapRef, {mapTypeId: google.maps.MapTypeId.ROADMAP, scaleControl:true});
+                if (map === null) {
+                    return;
+                }
+                this.setState({map : map});
+            },error => {console.log(error)})
+                .catch((err) => {console.error(err);
+            });
         } else {
             this.clearRoutePath(this.routePath);
             this.clearHighlight(this.highlightPath);
@@ -217,7 +228,7 @@ class RouteForecastMap extends Component {
     render() {
         return (
             <ErrorBoundary>
-                <div id="map" ref={mapDiv => this.mapDiv = mapDiv} style={{'height':'100%'}}>
+                <div id="map" ref={mapDiv => this.mapDiv = mapDiv} style={{'height':'95%'}}>
                     <h2 style={{padding:'18px', textAlign:"center"}}>Forecast map</h2>
                 </div>
             </ErrorBoundary>
@@ -225,7 +236,7 @@ class RouteForecastMap extends Component {
     }
 
     componentDidUpdate() {
-        this.drawTheMap(this.googleMapsApi, this.props.forecast, this.props.bounds, this.props.points);
+        this.drawTheMap(this.props.forecast, this.props.bounds, this.props.points);
     }
 
 }
