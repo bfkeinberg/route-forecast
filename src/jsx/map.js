@@ -72,7 +72,7 @@ class RouteForecastMap extends Component {
                 label: value.toString(),
                 map: map,
                 icon: {path:arrow,rotation:flippedBearing,labelOrigin:new google.maps.Point(0,32),anchor:anchor,
-                    strokeColor:RouteForecastMap.pickArrowColor(value, subrange),strokeOpacity:0.9},
+                    strokeWeight:2, strokeColor:RouteForecastMap.pickArrowColor(value, subrange),strokeOpacity:0.9},
                 title: title
             }));
 /*
