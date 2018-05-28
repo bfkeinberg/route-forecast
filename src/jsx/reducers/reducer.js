@@ -71,7 +71,6 @@ let state = {
 
 import * as Actions from '../actions/actions';
 import {combineReducers} from 'redux';
-import moment from 'moment';
 import RouteInfoForm from "../routeInfoEntry";
 // import Immutable from 'immutable';
 
@@ -192,8 +191,7 @@ fetchAfterLoad:false,bounds:null,name:'',rwgpsRouteData:null,gpxRouteData:null},
         case Actions.SET_RWGPS_ROUTE:
             return {...state,rwgpsRouteData:null,gpxRouteData:null,points:[],bounds:null,name:'',forecastRequest:null};
         case Actions.ADD_WEATHER_CORRECTION:
-            return {...state,weatherCorrectionMinutes:action.weatherCorrectionMinutes,
-                finishTime:moment(state.finishTime,finishTimeFormat).add(action.weatherCorrectionMinutes,'minutes').format(finishTimeFormat)};
+            return {...state,weatherCorrectionMinutes:action.weatherCorrectionMinutes,finishTime:action.finishTime};
         case Actions.SET_FETCH_AFTER_LOAD:
             return {...state, fetchAfterLoad:action.fetchAfterLoad};
         default:
@@ -225,10 +223,11 @@ const controls = function(state = {metric:false,displayBanked:false,stravaAnalys
             state.calculatedControlValues.forEach((item,index) => calculatedValues.push({...item, actual:action.arrivalTimes[index].time}));
             return {...state, calculatedControlValues:calculatedValues};
         }
-        case Actions.SET_ROUTE_INFO: {
+        case Actions.SET_ROUTE_INFO:
             return {...state, calculatedControlValues: action.routeInfo.values,
                 displayedFinishTime:action.routeInfo.finishTime};
-        }
+        case Actions.ADD_WEATHER_CORRECTION:
+            return {...state,displayedFinishTime:action.finishTime};
         case Actions.ADD_CONTROL:
             return {...state, count:state.count+1};
         case Actions.SET_DISPLAYED_FINISH_TIME:

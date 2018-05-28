@@ -150,7 +150,8 @@ class RouteForecastMap extends Component {
                 RouteForecastMap.addMarker(point.lat, point.lon, map, point.distance, `${point.fullTime}\n${point.tempStr}`,
                     point.rainy, point.windBearing, point.windSpeed, subrange)
             ).reduce((acc, cur) => acc.concat(cur)).concat(
-                controls.map((control,index) => RouteForecastMap.addControlMarker(control.lat, control.lon, map, controlNames[index]))))
+                controls.filter(control => control.lat!==undefined && control.lon!==undefined)
+                    .map((control,index) => RouteForecastMap.addControlMarker(control.lat, control.lon, map, controlNames[index]))))
     }
 
     clearRoutePath = (routePath) => {if (routePath !== null) {routePath.setMap(null);this.routePath = null}};

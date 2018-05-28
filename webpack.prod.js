@@ -34,8 +34,10 @@ module.exports = env => merge(common(env), {
             ignoreFile: '.sentrycliignore',
             ignore: ['node_modules', 'webpack.config.js', 'webpack.common.js', 'webpack.dev.js'],
             configFile: 'sentry.properties',
-            stripPrefix: ['~/dist'],
             rewrite:true,
+            stripPrefix: ['/dist'],
+            stripCommonPrefix: true,
+            urlPrefix: '/static',
             debug: true
         }),
         new CompressionPlugin({

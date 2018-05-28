@@ -138,10 +138,11 @@ export const setFetchAfterLoad = (fetchAfterLoad) => {return {
 }};
 
 export const ADD_WEATHER_CORRECTION = 'ADD_WEATHER_CORRECTION';
-export const addWeatherCorrection = function(weatherCorrection) {
+export const addWeatherCorrection = function(weatherCorrection,updatedFinishTime) {
     return {
         type: ADD_WEATHER_CORRECTION,
-        weatherCorrectionMinutes: weatherCorrection
+        weatherCorrectionMinutes: weatherCorrection,
+        finishTime:updatedFinishTime
     };
 };
 
@@ -204,14 +205,15 @@ export const requestForecast = function(routeInfo) {
                 let userControls = getState().controls.userControlPoints;
                 let calculatedValues = getState().controls.calculatedControlValues;
                 const parser = await getRouteParser();
-                let {time:weatherCorrectionMinutes,values:recalculatedValues} = parser.adjustForWind(
+                let {time:weatherCorrectionMinutes,values:recalculatedValues,finishTime} = parser.adjustForWind(
                     getState().forecast.forecast,
                     getState().routeInfo.points,
                     getState().uiInfo.routeParams.pace,
                     userControls, calculatedValues,
                     getState().uiInfo.routeParams.start,
-                    getState().controls.metric);
-                dispatch(addWeatherCorrection(weatherCorrectionMinutes));
+                    getState().controls.metric,
+                    getState().routeInfo.finishTime);
+                dispatch(addWeatherCorrection(weatherCorrectionMinutes,finishTime));
                 dispatch(updateCalculatedValues(recalculatedValues));
             }).catch (error => {
                 let errorMessage = error.message !== undefined ? error.message : error;
