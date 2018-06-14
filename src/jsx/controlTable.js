@@ -142,7 +142,7 @@ class ControlTable extends Component {
         }
     }
 
-    UNSAFE_componentWillReceiveProps(newProps) {
+    componentDidUpdate(newProps) {
         if (this.api===undefined || newProps===undefined) {
             return;
         }
@@ -165,6 +165,19 @@ class ControlTable extends Component {
         if (newProps.displayBanked !== this.props.displayBanked || newProps.compare !== this.props.compare) {
             this.columnApi.autoSizeAllColumns();
             // this.api.sizeColumnsToFit();
+        }
+        if (this.api !== undefined/* && window.outerWidth < smallScreenWidth*/) {
+            // this.api.sizeColumnsToFit();
+            this.columnApi.autoSizeAllColumns();
+        }
+        if (this.columnApi !== undefined) {
+            this.columnApi.setColumnWidth(this.columnApi.getColumn('delete'),deleteColumnWidth);
+        }
+        // focus on new control if one has been added
+        if (this.api !== undefined && this.props.controls.length > 0 && this.props.controls[this.props.controls.length-1].name==='') {
+            console.log('setting focused cell');
+            this.api.setFocusedCell(this.props.controls.length-1,'name');
+            this.api.startEditingCell({colKey:'name',rowIndex:this.props.controls.length-1});
         }
     }
 
@@ -205,22 +218,6 @@ class ControlTable extends Component {
             const userValues = (({ name, distance, duration, id }) => ({ name, distance, duration, id }))(node.data);
             modifiedControls.push(userValues)});
         this.props.updateControls(modifiedControls);
-    }
-
-    componentDidUpdate() {
-        if (this.api !== undefined/* && window.outerWidth < smallScreenWidth*/) {
-            // this.api.sizeColumnsToFit();
-            this.columnApi.autoSizeAllColumns();
-        }
-        if (this.columnApi !== undefined) {
-            this.columnApi.setColumnWidth(this.columnApi.getColumn('delete'),deleteColumnWidth);
-        }
-        // focus on new control if one has been added
-        if (this.api !== undefined && this.props.controls.length > 0 && this.props.controls[this.props.controls.length-1].name==='') {
-            console.log('setting focused cell');
-            this.api.setFocusedCell(this.props.controls.length-1,'name');
-            this.api.startEditingCell({colKey:'name',rowIndex:this.props.controls.length-1});
-        }
     }
 
     render() {

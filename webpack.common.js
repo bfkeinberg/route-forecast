@@ -15,7 +15,6 @@ const GPX_DIR = path.resolve(__dirname, 'node_modules/gpx-parse/dist');
 module.exports = env => {
     return {
         entry: [
-            'babel-polyfill',
             path.resolve(APP_DIR, 'index.js')
         ],
         module: {
