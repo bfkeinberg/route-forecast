@@ -89,7 +89,7 @@ class WeatherCalculator:
             wind_bearing = current_forecast['windBearing'] if 'windBearing' in current_forecast else None
             relative_bearing = self.get_bearing_difference(bearing, wind_bearing) \
                 if has_wind and bearing != None and wind_bearing != None else None
-            rainy = 'icon' in current_forecast and current_forecast['icon'] == 'rain'
+            rainy = 'icon' in current_forecast and current_forecast['icon'] == 'rain' and (current_forecast['precipProbability'] in current_forecast and current_forecast['precipProbability'] > 0.5)
             self.logger.info('%s %f,%f %s %d %d', now, lat, lon, current_forecast,bearing if bearing!=None else 0,relative_bearing if relative_bearing!=None else 0)
             return {
                 "time":now.strftime("%-I:%M%p"),
