@@ -19,7 +19,7 @@ class RouteForecastMap extends Component {
             min_latitude:PropTypes.number.isRequired, max_latitude:PropTypes.number.isRequired,
             min_longitude:PropTypes.number.isRequired, max_longitude:PropTypes.number.isRequired}),
         points:PropTypes.arrayOf(PropTypes.shape({
-            lat:PropTypes.number.isRequired, lon:PropTypes.number.isRequired,elevation:PropTypes.number.isRequired,
+            lat:PropTypes.number.isRequired, lon:PropTypes.number,elevation:PropTypes.number,
             dist:PropTypes.number.isRequired})),
         maps_api_key:PropTypes.string.isRequired,
         controls:PropTypes.arrayOf(PropTypes.shape({lat:PropTypes.number,lon:PropTypes.number})),
@@ -51,7 +51,7 @@ class RouteForecastMap extends Component {
             anchor: new google.maps.Point(-15, -15)
         };
         if (isRainy) {
-            return <Marker position={{lat:latitude,lng:longitude}} label={value.toString()} icon={markerIcon} title={title}/>;
+            return <Marker key={latitude+longitude+Math.random()} position={{lat:latitude,lng:longitude}} label={value.toString()} icon={markerIcon} title={title}/>;
         }
         return null;
     }
@@ -62,7 +62,7 @@ class RouteForecastMap extends Component {
             const flippedBearing = (bearing > 180) ? bearing - 180 : bearing + 180;
             // const anchor = new google.maps.Point(16.317-19*Math.cos((Math.PI / 180)*bearing),16.317+(25*Math.sin((Math.PI / 180)*bearing)));
             const anchor = new google.maps.Point(16.317,16.317);
-            return <Marker position={{lat:latitude,lng:longitude}} label={value.toString()}
+            return <Marker key={latitude+longitude+Math.random().toString(10)} position={{lat:latitude,lng:longitude}} label={value.toString()}
                            icon={{path:arrow,rotation:flippedBearing,labelOrigin:new google.maps.Point(0,32),anchor:anchor,
                 strokeWeight:2, strokeColor:RouteForecastMap.pickArrowColor(value, subrange),strokeOpacity:0.9}} title={title}/>;
 /*
@@ -75,7 +75,7 @@ class RouteForecastMap extends Component {
 */
         }
         else {
-            return <Marker position={{lat:latitude,lng:longitude}} label={value.toString()} title={title}/>
+            return <Marker key={latitude+longitude+Math.random().toString(10)} position={{lat:latitude,lng:longitude}} label={value.toString()} title={title}/>
         }
     }
 
@@ -94,7 +94,7 @@ class RouteForecastMap extends Component {
             labelOrigin: new google.maps.Point(22,15),
             anchor: new google.maps.Point(0, 0)
         };
-        return <Marker position={{lat: latitude, lng: longitude}} title={value} icon={controlIcon}/>;
+        return <Marker key={latitude+longitude} position={{lat: latitude, lng: longitude}} title={value} icon={controlIcon}/>;
     }
 
     getMapBounds(bounds) {
@@ -143,7 +143,7 @@ class RouteForecastMap extends Component {
         }
         return (
             <ErrorBoundary>
-                <div id="map" ref={mapDiv => this.mapDiv = mapDiv} style={{'height':'95%'}}>
+                <div id="map" style={{'height':'95%'}}>
                     {this.props.forecast.length > 0 && this.props.bounds !== null ?
                         <Map google={this.props.google}
                              mapType={'ROADMAP'} scaleControl={true} bounds={this.getMapBounds(this.props.bounds)}>
@@ -151,7 +151,7 @@ class RouteForecastMap extends Component {
                             {highlight}
                             {this.buildMarkers(this.props.forecast, this.props.controls, this.props.controlNames, this.props.subrange)}
                             <InfoWindow position={infoPosition} visible={infoVisible}>
-                                {infoContents}
+                                <div>{infoContents}</div>
                             </InfoWindow>
                         </Map> :
                         <h2 style={{padding:'18px', textAlign:"center"}}>Forecast map</h2>
