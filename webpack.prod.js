@@ -22,7 +22,7 @@ module.exports = env => merge(common(env), {
             extract: false,
             width: 1400,
             height: 1200,
-            inlineImages: true,
+            inlineImages: false,
             assetPaths: ['dist/static'],
             penthouse: {
                 renderWaitTime: 3000,
