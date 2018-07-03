@@ -142,7 +142,7 @@ class ControlTable extends Component {
         }
     }
 
-    componentDidUpdate(newProps) {
+    UNSAFE_componentWillReceiveProps(newProps) {
         if (this.api===undefined || newProps===undefined) {
             return;
         }
@@ -166,6 +166,9 @@ class ControlTable extends Component {
             this.columnApi.autoSizeAllColumns();
             // this.api.sizeColumnsToFit();
         }
+    }
+
+    componentDidUpdate() {
         if (this.api !== undefined/* && window.outerWidth < smallScreenWidth*/) {
             // this.api.sizeColumnsToFit();
             this.columnApi.autoSizeAllColumns();
@@ -222,6 +225,7 @@ class ControlTable extends Component {
 
     render() {
         let rowData = [];
+        let newColDefs = this.state.columnDefs.slice();
         this.props.controls.forEach((item,index) => rowData.push({...item, ...this.props.calculatedValues[index], id:index}));
         return (<div className="ag-theme-fresh">
             <AgGridReact enableCellChangeFlash={true} enableColResize enableSorting animateRows
@@ -229,7 +233,7 @@ class ControlTable extends Component {
                          context={this.state.context} frameworkComponents={this.state.frameworkComponents}
              onGridReady={this.onGridReady} onSortChanged={this.sortChanged} singleClickEdit editType={'fullRow'}
             onCellValueChanged={this.cellUpdated} tabToNextCell={ControlTable.tabHandler} getRowNodeId={data => data.id}
-            columnDefs={this.state.columnDefs}/>
+            columnDefs={newColDefs}/>
         </div>);
     }
 }
