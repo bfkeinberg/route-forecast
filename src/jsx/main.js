@@ -64,7 +64,7 @@ const demoControls = [
         "id": 2
     }
 ];
-class RouteWeatherUI extends Component {
+export class RouteWeatherUI extends Component {
     static propTypes = {
         setActionUrl:PropTypes.func.isRequired,
         setApiKeys:PropTypes.func.isRequired,

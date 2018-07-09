@@ -183,7 +183,7 @@ export const requestForecast = function(routeInfo) {
         let formdata = new FormData();
         formdata.append('locations', JSON.stringify(routeInfo.forecastRequest));
         formdata.append('timezone', getState().routeInfo.timeZoneOffset);
-        fetch(getState().params.action,
+        return fetch(getState().params.action,
             {
                 method:'POST',
                 body:formdata
@@ -203,16 +203,16 @@ export const requestForecast = function(routeInfo) {
             .then(async response => {
                 dispatch(forecastFetchSuccess(response));
                 let userControls = getState().controls.userControlPoints;
-                let calculatedValues = getState().controls.calculatedControlValues;
+                let calculatedValues = getState().controls.initialControlValues;
                 const parser = await getRouteParser();
                 let {time:weatherCorrectionMinutes,values:recalculatedValues,finishTime} = parser.adjustForWind(
-                    getState().forecast.forecast,
+                    response.forecast,
                     getState().routeInfo.points,
                     getState().uiInfo.routeParams.pace,
                     userControls, calculatedValues,
                     getState().uiInfo.routeParams.start,
                     getState().controls.metric,
-                    getState().routeInfo.finishTime);
+                    getState().routeInfo.initialFinishTime);
                 dispatch(addWeatherCorrection(weatherCorrectionMinutes,finishTime));
                 dispatch(updateCalculatedValues(recalculatedValues));
             }).catch (error => {

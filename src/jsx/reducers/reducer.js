@@ -170,8 +170,9 @@ loadingSource:null,fetchingForecast:false}, action) {
     }
 };
 
-const routeInfo = function(state = {finishTime:'',weatherCorrectionMinutes:null,forecastRequest:null,points:[],
-fetchAfterLoad:false,bounds:null,name:'',rwgpsRouteData:null,gpxRouteData:null}, action) {
+const routeInfo = function(state = {finishTime:'',initialFinishTime:'',weatherCorrectionMinutes:null,
+    forecastRequest:null,points:[], fetchAfterLoad:false,bounds:null,name:'',rwgpsRouteData:null,
+    gpxRouteData:null}, action) {
     switch (action.type) {
         case Actions.SET_TIME_ZONE:
             return {...state,timeZoneOffset:action.offset,timeZoneId:action.id};
@@ -184,7 +185,8 @@ fetchAfterLoad:false,bounds:null,name:'',rwgpsRouteData:null,gpxRouteData:null},
                 return {...state,rwgpsRouteData:null,gpxRouteData:null,points:[],bounds:null,name:'',forecastRequest:null};
             }
             return {...state, points:action.routeInfo.points,name:action.routeInfo.name,bounds:action.routeInfo.bounds,
-                finishTime:action.routeInfo.finishTime,forecastRequest:action.routeInfo.forecastRequest};
+                finishTime:action.routeInfo.finishTime,initialFinishTime:action.routeInfo.finishTime,
+                forecastRequest:action.routeInfo.forecastRequest};
         case Actions.CLEAR_ROUTE_DATA:
             return {...state,rwgpsRouteData:null,gpxRouteData:null,points:[],bounds:null,name:'',forecastRequest:null};
         // clear when the route is changed
@@ -199,8 +201,9 @@ fetchAfterLoad:false,bounds:null,name:'',rwgpsRouteData:null,gpxRouteData:null},
     }
 };
 
-const controls = function(state = {metric:false,displayBanked:false,stravaAnalysis:false,
-    userControlPoints:[],calculatedControlValues:[],count:0,displayedFinishTime:'',queryString:null}, action) {
+export const controls = function(state = {metric:false,displayBanked:false,stravaAnalysis:false,
+    userControlPoints:[],calculatedControlValues:[],initialControlValues:[], count:0,displayedFinishTime:'',
+    queryString:null}, action) {
     switch (action.type) {
         case Actions.SET_METRIC:
             if (action.metric !== undefined) {
@@ -225,6 +228,7 @@ const controls = function(state = {metric:false,displayBanked:false,stravaAnalys
         }
         case Actions.SET_ROUTE_INFO:
             return {...state, calculatedControlValues: action.routeInfo.values,
+                initialControlValues: action.routeInfo.values,
                 displayedFinishTime:action.routeInfo.finishTime};
         case Actions.ADD_WEATHER_CORRECTION:
             return {...state,displayedFinishTime:action.finishTime};

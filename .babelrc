@@ -1,7 +1,14 @@
 {
-  "presets": ["es2015","react","stage-0"],
+  "presets": ["env","react","stage-0"],
   "plugins": [
+    "transform-runtime",
     "react-html-attrs",
-    "transform-class-properties"
-  ]
+    "transform-class-properties",
+    "syntax-dynamic-import"
+  ],
+  "env": {
+    "test": {
+      "plugins": ["dynamic-import-node"]
+    }
+  }
 }
