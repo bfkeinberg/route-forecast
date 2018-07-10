@@ -601,9 +601,8 @@ describe('request forecast', () => {
 
         await(store.dispatch(actions.requestForecast(routeInfo)));
         expect(store.getActions()).toEqual(expectedActions);
-        let newState = rootReducer(initialState,{ type: actions.FORECAST_FETCH_SUCCESS, forecastInfo: {forecast:forecast}});
-        newState = rootReducer(newState, { type: actions.ADD_WEATHER_CORRECTION, finishTime: "Sat, Jul 14 2018 8:12pm", weatherCorrectionMinutes: -0.7707451611248307 });
-        newState = rootReducer(newState, { type: actions.UPDATE_CALCULATED_VALUES, values:nextControlValues });
+
+        let newState = expectedActions.reduce((previousValue, currentValue) => rootReducer(previousValue,currentValue),initialState);
         expect(newState.controls.calculatedControlValues).toEqual(nextControlValues);
 
         store = mockStore(newState);
