@@ -185,7 +185,6 @@ export class RouteWeatherUI extends Component {
         return (
         <div>
             <QueryString/>
-            <MediaQuery minDeviceWidth={1000}>
                 <SplitPane defaultSize={300} minSize={150} maxSize={530} split="horizontal">
                     <SplitPane defaultSize={550} minSize={150} split='vertical' pane2Style={{'overflow':'scroll'}}>
                         {inputForm}
@@ -198,13 +197,6 @@ export class RouteWeatherUI extends Component {
                             <RouteForecastMap/>
                         </SplitPane>
                 </SplitPane>
-            </MediaQuery>
-            <MediaQuery maxDeviceWidth={800}>
-                <SplitPane defaultSize={this.props.formVisible?410:50} minSize={this.props.formVisible?120:20} maxSize={600} split="horizontal" pane2Style={{'overflow':'scroll'}}>
-                    {this.props.formVisible ? inputForm : formButton}
-                    {!this.props.formVisible? <ForecastTable/>: <div/>}
-                </SplitPane>
-            </MediaQuery>
         </div>
       );
     }
