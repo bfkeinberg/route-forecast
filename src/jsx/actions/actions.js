@@ -259,17 +259,18 @@ export const recalcRoute = function() {
         const parser = await getRouteParser();
         // need to get the time zone here, once we know our chose start time
         // this may be called before we have chosen a route, in which case it's a noop
-        if (getState().routeInfo.rwgpsRouteData !== null) {
-            let type = getState().routeInfo.rwgpsRouteData['trip'] === undefined ? 'route' : 'trip';
-            let rwgpsRouteDatum = getState().routeInfo.rwgpsRouteData[type];
+        let rwgpsRouteData = getState().routeInfo.rwgpsRouteData;
+        if (rwgpsRouteData !== null) {
+            let type = rwgpsRouteData.trip === undefined ? 'route' : 'trip';
+            let rwgpsRouteDatum = rwgpsRouteData[type];
             let point = rwgpsRouteDatum['track_points'][0];
             let timeZonePromise = parser.findTimezoneForPoint(point.y, point.x,
                 moment(getState().uiInfo.routeParams.start), getState().params.timezone_api_key);
-            timeZonePromise.then(timeZoneResult => {
+            return timeZonePromise.then(timeZoneResult => {
                 dispatch(setTimeZone(timeZoneResult.zoneId,timeZoneResult.offset));
                 dispatch(setRouteInfo(
                     parser.walkRwgpsRoute(
-                        getState().routeInfo.rwgpsRouteData,
+                        rwgpsRouteData,
                         moment(getState().uiInfo.routeParams.start),
                         getState().uiInfo.routeParams.pace,
                         getState().uiInfo.routeParams.interval,
@@ -284,7 +285,7 @@ export const recalcRoute = function() {
             let point = getState().routeInfo.gpxRouteData.tracks[0].segments[0][0];
             let timeZonePromise = parser.findTimezoneForPoint(point.lat, point.lon,
                 moment(getState().uiInfo.routeParams.start), getState().params.timezone_api_key);
-            timeZonePromise.then(timeZoneResult => {
+            return timeZonePromise.then(timeZoneResult => {
                 dispatch(setTimeZone(timeZoneResult.zoneId,timeZoneResult.offset));
                 dispatch(setRouteInfo(
                     parser.walkGpxRoute(

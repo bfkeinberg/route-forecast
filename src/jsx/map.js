@@ -20,7 +20,7 @@ class RouteForecastMap extends Component {
             min_longitude:PropTypes.number.isRequired, max_longitude:PropTypes.number.isRequired}),
         points:PropTypes.arrayOf(PropTypes.shape({
             lat:PropTypes.number.isRequired, lon:PropTypes.number,elevation:PropTypes.number,
-            dist:PropTypes.number.isRequired})),
+            dist:PropTypes.number})),
         maps_api_key:PropTypes.string.isRequired,
         controls:PropTypes.arrayOf(PropTypes.shape({lat:PropTypes.number,lon:PropTypes.number})),
         controlNames:PropTypes.arrayOf(PropTypes.string),
