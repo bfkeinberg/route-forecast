@@ -19,8 +19,14 @@ const formatControlsForUrl = function(controlPoints) {
 
 // this function exists to let us preserve the user's specified start time and share the url for this route
 // with someone in another time zone
-const dateToShortDate = function(date) {
+export const dateToShortDate = function(date) {
     return moment(date).format("ddd MMM D YYYY HH:mm:ss");
+};
+
+export const makeQuery = (routeNumber, pace,interval,metric,controls, strava_activity) => {
+    return {pace:pace,interval:interval,metric:metric,
+        rwgpsRoute:routeNumber,controlPoints:formatControlsForUrl(controls),
+        strava_activity:strava_activity};
 };
 
 const QueryStringUpdater = ({routeNumber,start,pace,interval,metric,controls,/*setQueryString,*/
@@ -28,9 +34,11 @@ const QueryStringUpdater = ({routeNumber,start,pace,interval,metric,controls,/*s
     let url = location.origin;
     let query = null;
     if (routeNumber !== '') {
-        query = {start:dateToShortDate(start),pace:pace,interval:interval,metric:metric,
-            rwgpsRoute:routeNumber,controlPoints:formatControlsForUrl(controls),
-            strava_activity:strava_activity};
+        const shortDate = dateToShortDate(start);
+        query = makeQuery(routeNumber, pace, interval, metric, controls, strava_activity);
+        if (shortDate !== 'Invalid date') {
+            query.start = shortDate;
+        }
         url += `/?${queryString.stringify(query)}`;
         if (url !== location.href || !urlIsShortened) {
             shortenUrl(url);

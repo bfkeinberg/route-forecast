@@ -1,5 +1,5 @@
 import React from 'react'
-import { configure, shallow, mount } from 'enzyme'
+import { configure } from 'enzyme'
 import Adapter from 'enzyme-adapter-react-16';
 import {controls} from '../src/jsx/reducers/reducer.js';
 import {SET_ROUTE_INFO, UPDATE_CALCULATED_VALUES} from '../src/jsx/actions/actions';
