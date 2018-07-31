@@ -97,6 +97,16 @@ export class RouteWeatherUI extends Component {
             RouteWeatherUI.loadCannedData(this.props);
         }
         this.state = {};
+        window.onpopstate = (event) => {
+            if (event.state === null) {
+                this.props.reset();
+            } else {
+                RouteWeatherUI.updateFromQueryParams(this.props, event.state);
+                if (event.state.rwgpsRoute !== undefined) {
+                    this.props.loadFromRideWithGps(event.state.rwgpsRoute,this.props.rwgpsRouteIsTrip);
+                }
+            }
+        }
     }
 
     static getStravaToken(queryParams) {
@@ -157,19 +167,6 @@ export class RouteWeatherUI extends Component {
         props.setStravaError(queryParams.strava_error);
         if (queryParams.strava_analysis !== undefined) {
             props.toggleStravaAnalysis();
-        }
-    }
-
-    componentDidMount() {
-        window.onpopstate = (event) => {
-            if (event.state === null) {
-                this.props.reset();
-            } else {
-                RouteWeatherUI.updateFromQueryParams(this.props, event.state);
-                if (event.state.rwgpsRoute !== undefined) {
-                    this.props.loadFromRideWithGps(event.state.rwgpsRoute,this.props.rwgpsRouteIsTrip);
-                }
-            }
         }
     }
 
