@@ -31,7 +31,7 @@
         <script src="https://cdn.ravenjs.com/3.23.1/raven.min.js" crossorigin="anonymous"></script>
         <script>Raven.config('https://ea4c472ff9054dab8c18d594b95d8da2@sentry.io/298059',
             {release:'<%= htmlWebpackPlugin.options.sentryRelease %>', environment:'production',
-            breadcrumbCallback:function(crumb){if (crumb.type==='console') {return false} return crumb}}).install();</script>
+            breadcrumbCallback:function(crumb){if (crumb.type==='console') {return false} else {return crumb}}}).install();</script>
         <script>
           function measureCRP() {
             var t = window.performance.timing,
