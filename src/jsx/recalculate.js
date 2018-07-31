@@ -2,8 +2,11 @@ import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 import {recalcRoute} from "./actions/actions";
 
-const Recalculate = ({rwgpsRoute,gpxRouteData,recalcRoute}) => {
+export const Recalculate = ({rwgpsRoute,gpxRouteData,start,recalcRoute}) => {
     if (rwgpsRoute === '' && gpxRouteData===null) {
+        return null;
+    }
+    if (start === null) {
         return null;
     }
     recalcRoute();
