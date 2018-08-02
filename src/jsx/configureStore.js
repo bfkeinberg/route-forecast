@@ -46,6 +46,6 @@ export default function configureStore(preloadedState,mode) {
     return createStore(
         rootReducer,
         preloadedState,
-        applyMiddleware(selectMiddleware(mode))
+        applyMiddleware(...selectMiddleware(mode))
     );
 }
