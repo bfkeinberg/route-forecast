@@ -9,7 +9,7 @@ const CompressionPlugin = require("compression-webpack-plugin");
 const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 const SentryCliPlugin = require('@sentry/webpack-plugin');
 
-module.exports = env => merge(common(env), {
+module.exports = (env,argv) => merge(common(env,argv), {
     plugins: [
         new UglifyJsPlugin({sourceMap:true}),
         new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),

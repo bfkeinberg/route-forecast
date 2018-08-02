@@ -4,7 +4,7 @@ import {createLogger} from 'redux-logger';
 import rootReducer from './reducers/reducer';
 import createRavenMiddleware from "raven-for-redux";
 
-const loggerMiddleware = createLogger();
+export const loggerMiddleware = createLogger();
 /*global Raven*/
 
 const bannedActionKeys = [
@@ -17,28 +17,35 @@ const bannedActionKeys = [
     'arrivalTimes',
     'calculatedPaces'
 ];
+
+export const selectMiddleware = mode => {
+    return [
+        thunkMiddleware,
+        mode === 'development' ? loggerMiddleware :
+        createRavenMiddleware(Raven, {
+            stateTransformer: state => {Object.assign(...Object.keys(state)
+                .filter(key => (key !== 'routeInfo' && key !== 'forecast'))
+                .map( key => ({ [key]: state[key] }) ) )},
+            breadcrumbDataFromAction: action => {
+                return Object.assign(...Object.keys(action)
+                    .filter(key => (!bannedActionKeys.includes(key)))
+                    .map( key => ({ [key]: action[key] }) ) )
+            }
+        })
+    ]
+};
+
 /**
  *
  * @param {Object} preloadedState from server?
+ * @param mode - development vs production
  * @returns {Object} The Redux store
+ *
  */
-export default function configureStore(preloadedState) {
+export default function configureStore(preloadedState,mode) {
     return createStore(
         rootReducer,
         preloadedState,
-        applyMiddleware(
-            thunkMiddleware,
-            loggerMiddleware,
-            createRavenMiddleware(Raven, {
-                stateTransformer: state => {Object.assign(...Object.keys(state)
-                    .filter(key => (key !== 'routeInfo' && key !== 'forecast'))
-                    .map( key => ({ [key]: state[key] }) ) )},
-                breadcrumbDataFromAction: action => {
-                    return Object.assign(...Object.keys(action)
-                        .filter(key => (!bannedActionKeys.includes(key)))
-                        .map( key => ({ [key]: action[key] }) ) )
-                }
-            })
-        )
+        applyMiddleware(selectMiddleware(mode))
     );
 }

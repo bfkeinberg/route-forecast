@@ -63,6 +63,7 @@
                     element.setAttribute('timezone_api_key', '{{ timezone_api_key }}');
                     element.setAttribute('maps_api_key', '{{ maps_key }}');
                     element.setAttribute('action', '{{ url_for("forecast") }}');
+                    element.setAttribute('mode', '<%= htmlWebpackPlugin.options.mode %>');
                     element.setAttribute('src', '<%= htmlWebpackPlugin.files.js %>');
                     document.body.appendChild(element);
                 } else {
