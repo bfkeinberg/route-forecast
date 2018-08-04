@@ -306,8 +306,12 @@ export const recalcRoute = function() {
 export const loadFromRideWithGps = function(routeNumber, isTrip) {
     return async function(dispatch) {
         dispatch(beginLoadingRoute('rwgps'));
-        const parser = await getRouteParser().catch((err) => dispatch(rwgpsRouteLoadingFailure(err)));
-        parser.loadRwgpsRoute(routeNumber, isTrip).then( (routeData) => {
+        const parser = await getRouteParser().catch((err) => {dispatch(rwgpsRouteLoadingFailure(err));return null});
+        // handle failed load, error has already been dispatched
+        if (parser === null) {
+            return Promise.resolve(Error('Cannot load parser'));
+        }
+        return parser.loadRwgpsRoute(routeNumber, isTrip).then( (routeData) => {
                 dispatch(rwgpsRouteLoadingSuccess(routeData));
                 dispatch(loadControlsFromCookie(routeData));
                 dispatch(recalcRoute());
@@ -351,7 +355,11 @@ export const loadGpxRoute = function(event) {
         let gpxFiles = event.target.files;
         if (gpxFiles.length > 0) {
             dispatch(beginLoadingRoute('gpx'));
-            const parser = await getRouteParser();
+            const parser = await getRouteParser().catch((err) => {dispatch(gpxRouteLoadingFailure(err));return null});
+            // handle failed load, error has already been dispatched
+            if (parser === null) {
+                return Promise.resolve(Error('Cannot load parser'));
+            }
             parser.loadGpxFile(gpxFiles[0]).then( gpxData => {
                     dispatch(gpxRouteLoadingSuccess(gpxData));
                     dispatch(recalcRoute());
@@ -566,7 +574,11 @@ export const loadStravaActivity = function(activity) {
                 });
             });
         }
-        const parser = await getStravaParser();
+        const parser = await getStravaParser().catch((err) => {dispatch(stravaFetchFailure(err));return null});
+        // handle failed load, error has already been dispatched
+        if (parser === null) {
+            return Promise.resolve(Error('Cannot load parser'));
+        }
         dispatch(beginStravaFetch());
         return parser.fetchStravaActivity(activity, getState().strava.token);
     }
@@ -585,7 +597,11 @@ export const getPaceOverTime = function() {
         if (getState().strava.activityData===null) {
             return;
         }
-        const parser = await getStravaParser();
+        const parser = await getStravaParser().catch((err) => {dispatch(stravaFetchFailure(err));return null});
+        // handle failed load, error has already been dispatched
+        if (parser === null) {
+            return Promise.resolve(Error('Cannot load parser'));
+        }
         return dispatch(setPaceOverTime(parser.findMovingAverages(getState().strava.activityData,
             getState().strava.activityStream, getState().strava.analysisInterval)));
     }
@@ -595,7 +611,11 @@ export const updateExpectedTimes = function(activity) {
     return function (dispatch,getState) {
         dispatch(loadStravaActivity(activity)).then( async result => {
             dispatch(stravaFetchSuccess(result));
-            const parser = await getStravaParser();
+            const parser = await getStravaParser().catch((err) => {dispatch(stravaFetchFailure(err));return null});
+            // handle failed load, error has already been dispatched
+            if (parser === null) {
+                return Promise.resolve(Error('Cannot load parser'));
+            }
             let timesFromData = parser.computeTimesFromData(getState().controls.userControlPoints,
                 result.activity, result.stream);
             dispatch(updateActualArrivalTimes(timesFromData.controls));

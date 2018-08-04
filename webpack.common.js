@@ -12,7 +12,7 @@ const BUILD_DIR = path.resolve(__dirname, 'dist');
 const STATIC_DIR = path.resolve(__dirname, 'dist/static');
 const GPX_DIR = path.resolve(__dirname, 'node_modules/gpx-parse/dist');
 
-module.exports = env => {
+module.exports = (env,argv) => {
     return {
         entry: [
             path.resolve(APP_DIR, 'index.js')
@@ -77,7 +77,8 @@ module.exports = env => {
                 inject: false,
                 minify: {minifyURLs: true, removeComments: true},
                 chunksSortMode: 'none',
-                sentryRelease: env.sentryRelease
+                sentryRelease: env.sentryRelease,
+                mode: argv.mode
                 // favicon:'src/static/favicon.ico'
             }),
             new ScriptExtHtmlWebpackPlugin({
