@@ -16,6 +16,7 @@ from datetime import *
 from flask import Flask, render_template, request, redirect, url_for, jsonify, g
 from flask import current_app, safe_join
 from flask_compress import Compress
+from urlparse import urlparse, urlunparse
 
 from routeWeather import WeatherCalculator, WeatherError
 from stravaActivity import StravaActivity
@@ -77,6 +78,19 @@ def setup_app():
     application.last_request_day = datetime.now().date()
     logging.basicConfig(level=logging.INFO)
 
+
+@application.before_request
+def redirect_nonwww():
+    """Redirect requests from naked to www subdomain."""
+    DOMAIN_NAME = "cyclerouteforecast.com"
+    url = request.url
+    urlparts = urlparse(url)
+    if urlparts.netloc == DOMAIN_NAME:
+        urlparts_list = list(urlparts)
+        urlparts_list[1] = 'www.' + DOMAIN_NAME
+        new_url = urlunparse(urlparts_list)
+        logging.debug("redirecting from {} to {}".format(url, new_url))
+        return redirect(new_url, code=301)
 
 @application.after_request
 def add_header(r):
