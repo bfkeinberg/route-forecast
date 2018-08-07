@@ -78,7 +78,15 @@ export class RouteWeatherUI extends Component {
         rwgpsRouteIsTrip: PropTypes.bool.isRequired,
         reset: PropTypes.func.isRequired,
         firstUse: PropTypes.bool.isRequired,
-        newUserMode: PropTypes.func.isRequired
+        newUserMode: PropTypes.func.isRequired,
+        setRwgpsRoute: PropTypes.func.isRequired,
+        setStravaToken: PropTypes.func.isRequired,
+        setStart: PropTypes.func.isRequired,
+        setPace: PropTypes.func.isRequired,
+        setInterval: PropTypes.func.isRequired,
+        setMetric: PropTypes.func.isRequired,
+        setStravaActivity: PropTypes.func.isRequired,
+        setStravaError: PropTypes.func.isRequired
     };
 
     constructor(props) {
@@ -89,7 +97,7 @@ export class RouteWeatherUI extends Component {
         this.props.newUserMode(newUserMode);
         let queryParams = queryString.parse(location.search);
         RouteWeatherUI.updateFromQueryParams(this.props, queryParams);
-        let script = document.getElementById( "routeui" );
+        let script = document.currentScript;
         props.setActionUrl(script.getAttribute('action'));
         props.setApiKeys(script.getAttribute('maps_api_key'),script.getAttribute('timezone_api_key'));
         this.props.updateControls(queryParams.controlPoints===undefined?[]:this.parseControls(queryParams.controlPoints));
