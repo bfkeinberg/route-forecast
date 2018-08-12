@@ -87,6 +87,7 @@ def redirect_nonwww():
     urlparts = urlparse(url)
     if urlparts.netloc == DOMAIN_NAME:
         urlparts_list = list(urlparts)
+
         urlparts_list[1] = 'www.' + DOMAIN_NAME
         new_url = urlunparse(urlparts_list)
         logging.debug("redirecting from {} to {}".format(url, new_url))

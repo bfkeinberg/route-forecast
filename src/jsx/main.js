@@ -19,6 +19,7 @@ import ErrorBoundary from './errorBoundary';
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 // import cookie from 'react-cookies';
+
 import {
     setActionUrl,
     setApiKeys,
@@ -64,6 +65,7 @@ const demoControls = [
         "id": 2
     }
 ];
+
 export class RouteWeatherUI extends Component {
     static propTypes = {
         setActionUrl:PropTypes.func.isRequired,
@@ -97,7 +99,7 @@ export class RouteWeatherUI extends Component {
         this.props.newUserMode(newUserMode);
         let queryParams = queryString.parse(location.search);
         RouteWeatherUI.updateFromQueryParams(this.props, queryParams);
-        let script = document.currentScript;
+        let script = document.scripts.namedItem('routeui');
         props.setActionUrl(script.getAttribute('action'));
         props.setApiKeys(script.getAttribute('maps_api_key'),script.getAttribute('timezone_api_key'));
         this.props.updateControls(queryParams.controlPoints===undefined?[]:this.parseControls(queryParams.controlPoints));

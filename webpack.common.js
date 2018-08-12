@@ -1,4 +1,5 @@
 const path = require('path');
+const webpack = require('webpack');
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
@@ -13,7 +14,9 @@ const STATIC_DIR = path.resolve(__dirname, 'dist/static');
 const GPX_DIR = path.resolve(__dirname, 'node_modules/gpx-parse/dist');
 
 module.exports = (env,argv) => {
+    const mode = argv === undefined ? 'development' : argv.mode;
     return {
+        mode:mode,
         entry: [
             path.resolve(APP_DIR, 'index.js')
         ],
@@ -32,7 +35,7 @@ module.exports = (env,argv) => {
                         presets: ["babel-preset-env", "babel-preset-react", "babel-preset-stage-0"],
                         // how to target specific browsers
                         // presets: [["babel-preset-env",{targets:{browsers:["last 3 versions","Explorer 11"]}}],"babel-preset-react","babel-preset-stage-0"],
-                        plugins: ['babel-plugin-transform-runtime', "react-html-attrs", "transform-class-properties"],
+                        plugins: ['babel-plugin-transform-runtime', "react-html-attrs", "transform-class-properties","react-hot-loader/babel"],
                         // if we want to remove arrow functions as well
                         // plugins: ['babel-plugin-transform-runtime',"react-html-attrs", "transform-class-properties","transform-es2015-arrow-functions"],
                         comments: true
@@ -86,7 +89,7 @@ module.exports = (env,argv) => {
                 minify: {minifyURLs: true, removeComments: true},
                 chunksSortMode: 'none',
                 sentryRelease: env.sentryRelease,
-                mode: argv.mode
+                mode: mode
                 // favicon:'src/static/favicon.ico'
             }),
             new ScriptExtHtmlWebpackPlugin({

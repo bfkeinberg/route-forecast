@@ -43,9 +43,19 @@ export const selectMiddleware = mode => {
  *
  */
 export default function configureStore(preloadedState,mode) {
-    return createStore(
+    const store = createStore(
         rootReducer,
         preloadedState,
         applyMiddleware(...selectMiddleware(mode))
     );
+
+    if (module.hot) {
+        // Enable Webpack hot module replacement for reducers
+        module.hot.accept('./reducers/reducer', () => {
+            const nextRootReducer = require('./reducers/reducer').default;
+            store.replaceReducer(nextRootReducer);
+        });
+    }
+
+    return store;
 }
