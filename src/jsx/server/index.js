@@ -10,6 +10,8 @@ const upload = multer(); // for parsing multipart/form-data
 import callWeatherService from './weatherCalculator';
 const url = require('url');
 var strava = require('strava-v3');
+const querystring = require('querystring');
+
 
 const winston = require('winston');
 const expressWinston = require('express-winston');
@@ -82,7 +84,6 @@ app.get('/rwgps_route', (req, res) => {
     }
 
     const rwgpsUrl = `https://ridewithgps.com/${routeType}/${routeNumber}.json?apikey=${rwgpsApiKey}`;
-    console.log(rwgpsUrl);
     // check status below and retry with opposite route type if it failed, as python version does
     fetch(rwgpsUrl).then(fetchResult => {if (!fetchResult.ok) {throw Error(fetchResult.size)} return fetchResult.json()})
         .then(body => res.status(200).json(body))
@@ -121,11 +122,17 @@ app.post('/forecast', upload.none(), (req, res) => {
 
 const getStravaAuthUrl = (baseUrl,state) => {
     process.env.STRAVA_REDIRECT_URI = baseUrl + '/stravaAuthReply';
-    return strava.oauth.getRequestAccessURL(state);
+    return strava.oauth.getRequestAccessURL({state:encodeURIComponent(state)});
 };
 
-app.get('/stravaAuthRequest', (req,res) => {
-    console.info('Authenticating with Strava');
+const getStravaToken = (code) => {
+    process.env.STRAVA_ACCESS_TOKEN = 'fake';
+    return new Promise((resolve, reject) => {
+        strava.oauth.getToken(code, (err,payload,limits) => {if (err !== null) {reject(err.msg)} else {resolve(payload)}});
+    });
+};
+
+app.get('/stravaAuthReq', (req,res) => {
     const state = req.query.state;
     if (state === undefined) {
         res.status(400).json({'status': 'Missing keys'});
@@ -134,25 +141,34 @@ app.get('/stravaAuthRequest', (req,res) => {
     const baseUrl = url.format({
         protocol: req.protocol,
         host: req.get('host')});
-    const authUri = getStravaAuthUrl(baseUrl, state);
-    console.info('Strava auth uri',authUri);
-    res.redirect(authUri);
+    console.info('redirect to',getStravaAuthUrl(baseUrl, state));
+    res.redirect(getStravaAuthUrl(baseUrl, state));
 
 });
 
-app.get('/stravaAuthReply', (req,res) => {
-    console.info('incoming authentication reply');
+app.get('/stravaAuthReply', async (req,res) => {
     const code = req.query.code;
+    if (code === undefined) {
+        res.status(400).json({'status':'Bad Strava auth reply'});
+        return;
+    }
+    console.log('code',code);
     const error = req.query.error;
     const state = req.query.state;
     let restoredState = {};
-    if (state !== undefined) {
-        restoredState = JSON.parse(state);
+    if (state !== undefined && state !== '') {
+        restoredState = JSON.parse(decodeURIComponent(state));
     }
     if (error !== undefined) {
         console.error(`Strava authentication error ${error}`);
     }
     process.env.STRAVA_CLIENT_SECRET = process.env.STRAVA_API_KEY;
+    const token = await getStravaToken(code)
+        .catch(error => {res.status(400).json({'status':`Bad Strava auth reply ${error}`})});
+    process.env.STRAVA_ACCESS_TOKEN = token.access_token;
+    restoredState.strava_token = process.env.STRAVA_ACCESS_TOKEN;
+    restoredState.strava_error = error;
+    res.redirect(url.format('/?') + querystring.stringify(restoredState));
 });
 
 app.get('/', (req, res) => {
