@@ -1,17 +1,20 @@
 const path = require('path');
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
-const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
-const ScriptExtHtmlWebpackPlugin = require('script-ext-html-webpack-plugin');
-const CopyWebpackPlugin = require('copy-webpack-plugin');
+const webpack = require('webpack');
 
-const APP_DIR = path.resolve(__dirname, 'src/jsx');
-const TEMPLATE_DIR = path.resolve(__dirname, 'src/templates');
-const SRC_STATIC_DIR = path.resolve(__dirname, 'src/static');
-const BUILD_DIR = path.resolve(__dirname, 'dist');
-const STATIC_DIR = path.resolve(__dirname, 'dist/static');
-const GPX_DIR = path.resolve(__dirname, 'node_modules/gpx-parse/dist');
-const SERVER_DIR = path.resolve(__dirname, 'dist/server');
+// const APP_DIR = path.resolve(__dirname, 'src/jsx');
+const APP_DIR = path.resolve(process.cwd(), 'src/jsx');
+const SRC_STATIC_DIR = path.resolve(process.cwd(), 'src/static');
+// const SRC_STATIC_DIR = path.resolve(__dirname, 'src/static');
+const BUILD_DIR = path.resolve(process.cwd(), 'dist');
+// const BUILD_DIR = path.resolve(__dirname, 'dist');
+const STATIC_DIR = path.resolve(process.cwd(), 'dist/static');
+// const STATIC_DIR = path.resolve(__dirname, 'dist/static');
+const GPX_DIR = path.resolve(process.cwd(), 'node_modules/gpx-parse/dist');
+// const GPX_DIR = path.resolve(__dirname, 'node_modules/gpx-parse/dist');
+const SERVER_DIR = path.resolve(process.cwd(), 'dist/server');
+// const SERVER_DIR = path.resolve(__dirname, 'dist/server');
 const VIEWS_DIR = path.resolve(SERVER_DIR, 'views');
 
 module.exports = (env,argv) => {
@@ -19,7 +22,7 @@ module.exports = (env,argv) => {
     return {
         mode:mode,
         entry: [
-            path.resolve(APP_DIR, 'app/app.jsx')
+            'react-hot-loader/patch',path.resolve(APP_DIR, 'app/app.jsx'),'webpack-hot-middleware/client'
         ],
         module: {
             rules: [
@@ -82,33 +85,14 @@ module.exports = (env,argv) => {
                 filename: "[name].css",
                 chunkFilename: "[id].css"
             }),
-            new HtmlWebpackPlugin({
-                title: 'Plan and forecast bicycle ride',
-                filename: path.resolve(VIEWS_DIR, 'index.ejs'),
-                template: path.resolve(TEMPLATE_DIR, 'base_index.html'),
-                inject: false,
-                minify: {minifyURLs: true, removeComments: true},
-                chunksSortMode: 'none',
-                sentryRelease: env.sentryRelease,
-                mode: mode
-                // favicon:'src/static/favicon.ico'
-            }),
-            new ScriptExtHtmlWebpackPlugin({
-                custom: [
-                    {
-                        test: 'main', attribute: 'id', value: 'routeui'
-                    },
-                    {test: 'main', attribute: 'timezone_api_key', value: '{{ timezone_api_key }}'},
-                    {test: 'main', attribute: 'maps_api_key', value: '{{ maps_key }}'},
-                ]
-            }),
-            new CopyWebpackPlugin([{from: SRC_STATIC_DIR + '/favicon*.*', to: STATIC_DIR, flatten: true},
-                {from: SRC_STATIC_DIR + '/apple-*.*', to: STATIC_DIR, flatten: true}]),
+            new webpack.HotModuleReplacementPlugin(),
+            new webpack.NoEmitOnErrorsPlugin()
         ],
         output:
         {
             path: STATIC_DIR,
-            filename: "[name].[contenthash].bundle.js",
+            pathinfo: true,
+            filename: "[name].[hash].bundle.js",
             chunkFilename: '[name].bundle.js',
             sourceMapFilename: "[name].bundle.js.map",
             publicPath: "static/"
@@ -133,6 +117,7 @@ module.exports = (env,argv) => {
         },
         node: {
             fs: 'empty'
-        }
+        },
+        devtool: 'source-map',
     }
 };

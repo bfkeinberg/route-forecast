@@ -4,7 +4,7 @@ import {Input, Label, FormGroup, UncontrolledTooltip} from 'reactstrap';
 import {connect} from 'react-redux';
 import {toggleRouteIsTrip} from "../actions/actions";
 
-const RwGpsTypeSelector = (rwgpsRouteIsTrip,toggleRouteIsTrip,visible) => {
+const RwGpsTypeSelector = ({rwgpsRouteIsTrip,toggleRouteIsTrip,visible}) => {
     const isVisible = visible ? 'inline-flex' : 'none';
     return (
         <FormGroup check style={{display:isVisible}}>

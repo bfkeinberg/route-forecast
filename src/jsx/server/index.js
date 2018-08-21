@@ -3,7 +3,7 @@ const app = express();
 const path = require('path');
 import fetch from 'node-fetch';
 import { renderToString } from 'react-dom/server';
-import ejs from 'ejs';
+import React from 'react';
 import bodyParser from 'body-parser';
 const multer = require('multer'); // v1.0.5
 const upload = multer(); // for parsing multipart/form-data
@@ -11,16 +11,21 @@ import callWeatherService from './weatherCalculator';
 const url = require('url');
 var strava = require('strava-v3');
 const querystring = require('querystring');
-
-
 const winston = require('winston');
 const expressWinston = require('express-winston');
 const StackdriverTransport = require('@google-cloud/logging-winston').LoggingWinston;
+import Prefixer from 'inline-style-prefixer';
+import reducer from '../reducers/reducer';
+import {createStore} from 'redux';
+
+import TopLevel from '../app/topLevel';
+import LocationContext from '../locationContext';
+import { AppContainer } from 'react-hot-loader';
 
 // for hot reloading
 import webpack from 'webpack';
 import webpackDevMiddleware from 'webpack-dev-middleware';
-const config = require('../../webpack.dev.js');
+const config = require('webpack.hot.dev.js');
 
 // Activate Google Cloud Trace and Debug when in production
 if (process.env.NODE_ENV === 'production') {
@@ -65,9 +70,12 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 // redirect bare domain
 app.use(require('express-naked-redirect')());
-
-const publicPath = express.static(path.join(__dirname + '/../static'),{fallthrough:false,index:false});
+const publicPath = express.static('dist/static',{fallthrough:false,index:false});
 app.use('/static',publicPath);
+
+// ejs
+app.set('views', 'dist/server/views');
+app.set('view engine', 'ejs');
 
 app.get('/rwgps_route', (req, res) => {
     const routeNumber = req.query.route;
@@ -172,29 +180,39 @@ app.get('/stravaAuthReply', async (req,res) => {
 });
 
 app.get('/', (req, res) => {
-    const indexPath = path.join(__dirname + '/../index.html');
+    const action = '/forecast';     // TODO: use common variable between express and browser sideif (typeof window === 'undefined') {
+
+    const search = req.url.substring(req.url.indexOf('?'));
+    const href = url.format({
+        protocol: req.protocol,
+        host: req.get('host'),
+        path: req.originalUrl,
+        search:search});
+    const origin = url.format({
+        protocol: req.protocol,
+        host: req.get('host')});
+    const prefixer = new Prefixer({ userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3440.106 Safari/537.36' });
+    const store = createStore(reducer);
+
+    const reactDom = renderToString(
+        <LocationContext.Provider value={{href:href,search:search,origin:origin, prefixer:prefixer}}>
+            <TopLevel serverStore={store} action={action} maps_api_key={process.env.MAPS_KEY} timezone_api_key={process.env.TIMEZONE_API_KEY}/>
+        </LocationContext.Provider>
+    );
     const ejsVariables = {
         'maps_key':process.env.MAPS_KEY,
-        'timezone_api_key':process.env.TIMEZONE_API_KEY
+        'timezone_api_key':process.env.TIMEZONE_API_KEY,
+        'reactDom':reactDom,
+        'preloaded_state':JSON.stringify(store.getState()).replace(/</g, '\\u003c'),
+        delimiter: '?'
     };
-    ejs.renderFile(indexPath,
-        ejsVariables, {delimiter:'?'},
-        (err, str) => {
-            if (err != null) {
-                res.status(500).json({'details':err});
-                return;
-            }
-            res.send(str);
-            // res.send(renderToString(str));
-        }
-    );
+    res.render('index', ejsVariables);
 });
 
 if (process.env.NODE_ENV !== 'production') {
-    const compiler = webpack(config({},{mode:'development'}));
-
-    app.use(webpackDevMiddleware(compiler, {writeToDisk: true, publicPath: config({}, undefined).output.publicPath}));
-    app.use(require("webpack-hot-middleware")(compiler));
+    // const compiler = webpack(config({},{mode:'development'}));
+    // app.use(webpackDevMiddleware(compiler, {writeToDisk: true, publicPath: config({}, undefined).output.publicPath}));
+    // app.use(require("webpack-hot-middleware")(compiler));
 }
 app.use(errorLogger);
 

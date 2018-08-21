@@ -19,6 +19,7 @@ import ErrorBoundary from './errorBoundary';
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 // import cookie from 'react-cookies';
+import LocationContext from './locationContext';
 
 import {
     setActionUrl,
@@ -88,32 +89,34 @@ export class RouteWeatherUI extends Component {
         setInterval: PropTypes.func.isRequired,
         setMetric: PropTypes.func.isRequired,
         setStravaActivity: PropTypes.func.isRequired,
-        setStravaError: PropTypes.func.isRequired
+        setStravaError: PropTypes.func.isRequired,
+        prefixer: PropTypes.object
     };
 
     constructor(props) {
         super(props);
         this.formatControlsForUrl = this.formatControlsForUrl.bind(this);
 
-        const newUserMode = RouteWeatherUI.isNewUserMode();
+        const newUserMode = RouteWeatherUI.isNewUserMode(props.search);
         this.props.newUserMode(newUserMode);
-        let queryParams = queryString.parse(location.search);
+        let queryParams = queryString.parse(props.search);
         RouteWeatherUI.updateFromQueryParams(this.props, queryParams);
-        let script = document.scripts.namedItem('routeui');
-        props.setActionUrl(script.getAttribute('action'));
-        props.setApiKeys(script.getAttribute('maps_api_key'),script.getAttribute('timezone_api_key'));
+        props.setActionUrl(props.action);
+        props.setApiKeys(props.maps_api_key,props.timezone_api_key);
         this.props.updateControls(queryParams.controlPoints===undefined?[]:this.parseControls(queryParams.controlPoints));
         if (newUserMode) {
             RouteWeatherUI.loadCannedData(this.props);
         }
         this.state = {};
-        window.onpopstate = (event) => {
-            if (event.state === null) {
-                this.props.reset();
-            } else {
-                RouteWeatherUI.updateFromQueryParams(this.props, event.state);
-                if (event.state.rwgpsRoute !== undefined) {
-                    this.props.loadFromRideWithGps(event.state.rwgpsRoute,this.props.rwgpsRouteIsTrip);
+        if (typeof window !== 'undefined') {
+            window.onpopstate = (event) => {
+                if (event.state === null) {
+                    this.props.reset();
+                } else {
+                    RouteWeatherUI.updateFromQueryParams(this.props, event.state);
+                    if (event.state.rwgpsRoute !== undefined) {
+                        this.props.loadFromRideWithGps(event.state.rwgpsRoute,this.props.rwgpsRouteIsTrip);
+                    }
                 }
             }
         }
@@ -139,9 +142,9 @@ export class RouteWeatherUI extends Component {
         return controlPoints.reduce((queryParam,point) => {return RouteWeatherUI.formatOneControl(queryParam) + ':' + RouteWeatherUI.formatOneControl(point)},'');
     }
 
-    static isNewUserMode() {
+    static isNewUserMode(search) {
         return false;
-        // return (location.search === '' && cookie.load('initialized') === undefined);
+        // return (search === '' && cookie.load('initialized') === undefined);
     }
 
     static loadCannedData(props) {
@@ -191,15 +194,17 @@ export class RouteWeatherUI extends Component {
         );
         return (
         <div>
-            <QueryString/>
-                <SplitPane defaultSize={300} minSize={150} maxSize={530} split="horizontal">
-                    <SplitPane defaultSize={550} minSize={150} split='vertical' pane2Style={{'overflow':'scroll'}}>
+            <LocationContext.Consumer>
+                {value => <QueryString href={value.href} origin={value.origin}/>}
+            </LocationContext.Consumer>
+                <SplitPane prefixer={this.props.prefixer} defaultSize={300} minSize={150} maxSize={530} split="horizontal">
+                    <SplitPane prefixer={this.props.prefixer} defaultSize={550} minSize={150} split='vertical' pane2Style={{'overflow':'scroll'}}>
                         {inputForm}
                         <ErrorBoundary>
                             <ControlPoints/>
                         </ErrorBoundary>
                     </SplitPane>
-                        <SplitPane defaultSize={545} minSize={150} split="vertical" paneStyle={{'overflow':'scroll'}}>
+                        <SplitPane prefixer={this.props.prefixer} defaultSize={545} minSize={150} split="vertical" paneStyle={{'overflow':'scroll'}}>
                             {this.props.showPacePerTme?<PaceTable/>:<ForecastTable/>}
                             <RouteForecastMap/>
                         </SplitPane>

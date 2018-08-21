@@ -18,6 +18,11 @@ const bannedActionKeys = [
     'calculatedPaces'
 ];
 
+if (typeof Raven === 'undefined') {
+    var Raven = require('raven-js');
+    Raven.config('https://ea4c472ff9054dab8c18d594b95d8da2@sentry.io/298059').install();
+}
+
 export const selectMiddleware = mode => {
     return [
         thunkMiddleware,
