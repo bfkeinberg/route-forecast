@@ -1,16 +1,15 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {Label, Input, FormGroup, UncontrolledTooltip} from 'reactstrap';
-import RouteInfoForm from "../routeInfoEntry";
 import {connect} from 'react-redux';
 import {loadFromRideWithGps, setRwgpsRoute, newUserMode} from "../actions/actions";
 import cookie from 'react-cookies';
-import {decideValidationStateFor} from "../routeInfoEntry";
+import {getRouteNumberFromValue, decideValidationStateFor} from "../routeInfoEntry";
 
 const RideWithGpsId = ({setRwgpsRoute,loadingSource,loadingSuccess,rwgpsRoute,rwgpsRouteIsTrip,loadFromRideWithGps,
                        newUserMode,firstUse}) => {
     const handleRwgpsRoute = function(value) {
-        let route = RouteInfoForm.getRouteNumberFromValue(value);
+        let route = getRouteNumberFromValue(value);
         if (route !== '') {
             if (isNaN(route)) {
                 return;
