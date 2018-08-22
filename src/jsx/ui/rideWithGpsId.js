@@ -5,6 +5,7 @@ import RouteInfoForm from "../routeInfoEntry";
 import {connect} from 'react-redux';
 import {loadFromRideWithGps, setRwgpsRoute, newUserMode} from "../actions/actions";
 import cookie from 'react-cookies';
+import {decideValidationStateFor} from "../routeInfoEntry";
 
 const RideWithGpsId = ({setRwgpsRoute,loadingSource,loadingSuccess,rwgpsRoute,rwgpsRouteIsTrip,loadFromRideWithGps,
                        newUserMode,firstUse}) => {
@@ -40,7 +41,7 @@ const RideWithGpsId = ({setRwgpsRoute,loadingSource,loadingSuccess,rwgpsRoute,rw
             <UncontrolledTooltip placement="bottom" target='rwgps_route'>The number for a route on Ride with GPS</UncontrolledTooltip>
             <Input id={'rwgps_route'} className={firstUse?'ridewithgps_init':''}
                    size="9" bsSize='xsm' tabIndex='5' type="text"
-                   {...RouteInfoForm.decideValidationStateFor('rwgps',loadingSource,loadingSuccess)}
+                   {...decideValidationStateFor('rwgps',loadingSource,loadingSuccess)}
                  onBlur={event => {handleRwgpsRoute(event.target.value)}}
                  onKeyPress={isNumberKey}
                  onChange={event => {settingRoute(event.target.value)}}
