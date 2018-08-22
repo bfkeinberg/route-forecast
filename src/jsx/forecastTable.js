@@ -8,7 +8,7 @@ import {setWeatherRange} from './actions/actions';
 
 const milesToKm = 1609.34;
 
-class ForecastTable extends Component {
+export class ForecastTable extends Component {
     static propTypes = {
         weatherCorrectionMinutes:PropTypes.number,
         forecast:PropTypes.arrayOf(PropTypes.object).isRequired,

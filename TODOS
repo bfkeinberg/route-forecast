@@ -1,5 +1,8 @@
-node.js backend
+fix all tests
+complete redux SSR support
+create prod build for backend
+fix hot module loading
+track down crashes reported by Sentry
 bitly instead of goo.gl
-enable google billing for maps
 immutable.js/mori
 place wind arrow in consistent location relative to track

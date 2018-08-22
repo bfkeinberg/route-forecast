@@ -90,7 +90,11 @@ export class RouteWeatherUI extends Component {
         setMetric: PropTypes.func.isRequired,
         setStravaActivity: PropTypes.func.isRequired,
         setStravaError: PropTypes.func.isRequired,
-        prefixer: PropTypes.object
+        prefixer: PropTypes.object,
+        search: PropTypes.string.isRequired,
+        action: PropTypes.string.isRequired,
+        maps_api_key: PropTypes.string.isRequired,
+        timezone_api_key: PropTypes.string.isRequired
     };
 
     constructor(props) {

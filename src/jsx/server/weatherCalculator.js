@@ -1,12 +1,12 @@
 import moment from 'moment-timezone';
 import fetch from 'node-fetch';
 
-function getBearingDifference(bearing,windBearing) {
-    return Math.min((bearing - windBearing < 0) ? (bearing - windBearing + 360) : (bearing - windBearing),
-        (windBearing - bearing < 0) ? (windBearing - bearing + 360) : (windBearing - bearing));
+function getBearingDifference (bearing,windBearing) {
+    return Math.min(bearing - windBearing < 0 ? bearing - windBearing + 360 : bearing - windBearing,
+        windBearing - bearing < 0 ? windBearing - bearing + 360 : windBearing - bearing);
 }
 
-export default function callWeatherService(lat, lon, currentTime, distance, zone, bearing) {
+export default function callWeatherService (lat, lon, currentTime, distance, zone, bearing) {
     const MAX_API_CALLS_PER_DAY = 2000;
 
     const darkSkyKey = process.env.DARKSKY_API_KEY;
@@ -15,8 +15,8 @@ export default function callWeatherService(lat, lon, currentTime, distance, zone
         if (!response.ok) {throw response.errorText}
         else {
             const result = response.json();
-        result.apiCalls = response.headers.get('x-forecast-api-calls');
-        return result;}}).
+            result.apiCalls = response.headers.get('x-forecast-api-calls');
+            return result;}}).
     then(forecast => {
         if (forecast.apiCalls > MAX_API_CALLS_PER_DAY) {
             throw Error({'details':'Daily count exceeded'});
@@ -25,7 +25,7 @@ export default function callWeatherService(lat, lon, currentTime, distance, zone
         const now = moment.unix(current.time).tz(zone);
         const hasWind = current.windSpeed !== undefined;
         const windBearing = current.windBearing;
-        const relativeBearing = (hasWind && windBearing !== undefined) ? getBearingDifference(bearing, windBearing) : null;
+        const relativeBearing = hasWind && windBearing !== undefined ? getBearingDifference(bearing, windBearing) : null;
         const rainy = current.icon !== undefined && current.icon === 'rain';
         console.info(now.format(),lat,lon,bearing,relativeBearing,rainy);
 

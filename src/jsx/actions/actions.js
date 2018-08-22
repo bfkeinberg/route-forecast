@@ -254,8 +254,8 @@ export const setErrorDetails = function(details) {
     };
 };
 
-export const fetchTimeZone = (point) => {
-  return async (dispatch, getState) => {
+export const fetchTimeZone = (point, parser, rwgpsRouteData) => {
+  return (dispatch, getState) => {
       let timeZonePromise = parser.findTimezoneForPoint(point.y, point.x,
           moment(getState().uiInfo.routeParams.start), getState().params.timezone_api_key);
       return timeZonePromise.then(timeZoneResult => {

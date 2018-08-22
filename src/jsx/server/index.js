@@ -20,7 +20,6 @@ import {createStore} from 'redux';
 
 import TopLevel from '../app/topLevel';
 import LocationContext from '../locationContext';
-import { AppContainer } from 'react-hot-loader';
 
 // for hot reloading
 import webpack from 'webpack';
