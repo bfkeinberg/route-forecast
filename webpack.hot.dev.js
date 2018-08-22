@@ -92,7 +92,7 @@ module.exports = (env,argv) => {
         {
             path: STATIC_DIR,
             pathinfo: true,
-            filename: "[name].[hash].bundle.js",
+            filename: "[name].bundle.js",
             chunkFilename: '[name].bundle.js',
             sourceMapFilename: "[name].bundle.js.map",
             publicPath: "static/"

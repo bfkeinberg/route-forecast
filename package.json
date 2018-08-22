@@ -6,7 +6,9 @@
   "dependencies": {
     "@blueprintjs/core": "^3.0.1",
     "@blueprintjs/icons": "^3.0.0",
+    "@google-cloud/debug-agent": "^2.6.0",
     "@google-cloud/logging-winston": "^0.9.0",
+    "@google-cloud/trace-agent": "^3.1.1",
     "@sentry/node": "^4.0.0-beta.12",
     "@types/pure-render-decorator": "^0.2.27",
     "ag-grid": "^18.1.2",
@@ -141,6 +143,7 @@
     "dev": "./node_modules/.bin/webpack --mode development --progress --colors --display-error-details --config webpack.dev.js --env.sentryRelease",
     "dev:server": "./node_modules/.bin/webpack --mode development --progress --colors --display-error-details --config webpack.server.dev.js --env.sentryRelease",
     "dev:watch": "./node_modules/.bin/webpack --mode development --progress --colors --display-error-details --config webpack.dev.js --env.sentryRelease --watch",
+    "prod:server": "./node_modules/.bin/webpack --mode production --progress --colors --display-error-details --config webpack.server.prod.js --env.sentryRelease",
     "deploy": "./buildRelease.sh",
     "lint": "eslint src",
     "test": "jest",

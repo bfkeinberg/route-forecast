@@ -1,5 +1,13 @@
 const express = require('express');
 const app = express();
+
+console.log('ip',app.get('ip'));
+// Activate Google Cloud Trace and Debug when in production
+if (process.env.NODE_ENV === 'production') {
+    require('@google-cloud/trace-agent').start();
+    require('@google-cloud/debug-agent').start();
+}
+
 const path = require('path');
 import fetch from 'node-fetch';
 import { renderToString } from 'react-dom/server';
@@ -25,12 +33,6 @@ import LocationContext from '../locationContext';
 import webpack from 'webpack';
 import webpackDevMiddleware from 'webpack-dev-middleware';
 const config = require('webpack.hot.dev.js');
-
-// Activate Google Cloud Trace and Debug when in production
-if (process.env.NODE_ENV === 'production') {
-    require('@google-cloud/trace-agent').start();
-    require('@google-cloud/debug-agent').start();
-}
 
 const colorize = process.env.NODE_ENV !== 'production';
 
@@ -209,9 +211,9 @@ app.get('/', (req, res) => {
 });
 
 if (process.env.NODE_ENV !== 'production') {
-    // const compiler = webpack(config({},{mode:'development'}));
-    // app.use(webpackDevMiddleware(compiler, {writeToDisk: true, publicPath: config({}, undefined).output.publicPath}));
-    // app.use(require("webpack-hot-middleware")(compiler));
+    const compiler = webpack(config({},{mode:'development'}));
+    app.use(webpackDevMiddleware(compiler, {writeToDisk: true, publicPath: config({}, undefined).output.publicPath}));
+    app.use(require("webpack-hot-middleware")(compiler));
 }
 app.use(errorLogger);
 

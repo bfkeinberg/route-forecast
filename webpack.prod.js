@@ -14,9 +14,9 @@ module.exports = (env,argv) => merge(common(env,argv), {
         new UglifyJsPlugin({sourceMap:true}),
         new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
         new HtmlCriticalPlugin({
-            base: path.resolve(__dirname, 'dist/'),
-            src: 'index.html',
-            dest: 'index.html',
+            base: path.resolve(__dirname, 'dist/server/views'),
+            src: 'index.ejs',
+            dest: 'index.ejs',
             inline: true,
             minify: true,
             extract: false,
