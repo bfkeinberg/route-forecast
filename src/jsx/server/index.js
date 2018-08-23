@@ -1,7 +1,6 @@
 const express = require('express');
 const app = express();
 
-console.log('ip',app.get('ip'));
 // Activate Google Cloud Trace and Debug when in production
 if (process.env.NODE_ENV === 'production') {
     require('@google-cloud/trace-agent').start();
@@ -96,7 +95,7 @@ app.get('/rwgps_route', (req, res) => {
     // check status below and retry with opposite route type if it failed, as python version does
     fetch(rwgpsUrl).then(fetchResult => {if (!fetchResult.ok) {throw Error(fetchResult.size)} return fetchResult.json()})
         .then(body => res.status(200).json(body))
-        .catch(err => {fetch(`https://ridewithgps.com/${routeType==='trips'?'routes':'trips'}/${routeNumber}.json?apikey=${rwgpsApiKey}`).
+        .catch(err => {console.log(err);fetch(`https://ridewithgps.com/${routeType==='trips'?'routes':'trips'}/${routeNumber}.json?apikey=${rwgpsApiKey}`).
                 then(retryResult => {if (!retryResult.ok) {throw Error('No such route')} return retryResult.json()}).
                 then(body => res.status(200).json(body)).
                 catch(err => res.status(500).json({'status':err}))});
@@ -137,7 +136,7 @@ const getStravaAuthUrl = (baseUrl,state) => {
 const getStravaToken = (code) => {
     process.env.STRAVA_ACCESS_TOKEN = 'fake';
     return new Promise((resolve, reject) => {
-        strava.oauth.getToken(code, (err,payload,limits) => {if (err !== null) {reject(err.msg)} else {resolve(payload)}});
+        strava.oauth.getToken(code, (err,payload) => {if (err !== null) {reject(err.msg)} else {resolve(payload)}});
     });
 };
 
