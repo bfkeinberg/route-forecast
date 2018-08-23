@@ -1,6 +1,4 @@
 complete redux SSR support
-create prod build for backend
-fix hot module loading
 bitly instead of goo.gl
 immutable.js/mori
 place wind arrow in consistent location relative to track
