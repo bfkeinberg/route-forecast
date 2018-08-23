@@ -5,11 +5,9 @@ const CleanWebpackPlugin = require('clean-webpack-plugin');
 const ScriptExtHtmlWebpackPlugin = require('script-ext-html-webpack-plugin');
 
 const APP_DIR = path.resolve(__dirname, 'src/jsx');
-const TEMPLATE_DIR = path.resolve(__dirname, 'src/templates');
 const SRC_STATIC_DIR = path.resolve(__dirname, 'src/static');
 const BUILD_DIR = path.resolve(__dirname, 'dist');
 const SERVER_DIR = path.resolve(__dirname, 'dist/server');
-const VIEWS_DIR = path.resolve(SERVER_DIR, 'views');
 const GPX_DIR = path.resolve(__dirname, 'node_modules/gpx-parse/dist');
 const nodeExternals = require('webpack-node-externals');
 
@@ -114,7 +112,9 @@ module.exports = (env,argv) => {
             }
         },
         node: {
-            fs: 'empty'
+            fs: 'empty',
+            __dirname: false,
+            __filename: false
         }
     }
 };
