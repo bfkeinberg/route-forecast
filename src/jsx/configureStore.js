@@ -6,7 +6,7 @@ import createRavenMiddleware from "raven-for-redux";
 
 export const loggerMiddleware = createLogger();
 /* eslint-disable global-require */
-/*global Raven, module*/
+/*global module*/
 
 const bannedActionKeys = [
     'routeData',

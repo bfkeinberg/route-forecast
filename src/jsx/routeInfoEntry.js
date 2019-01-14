@@ -184,4 +184,5 @@ const mapDispatchToProps = {
 };
 
 export const decideValidationStateFor = RouteInfoForm.decideValidationStateFor;
+export const getRouteNumberFromValue = RouteInfoForm.getRouteNumberFromValue;
 export default connect(mapStateToProps, mapDispatchToProps, null, {pure:true})(RouteInfoForm);

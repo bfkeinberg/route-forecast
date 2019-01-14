@@ -330,7 +330,7 @@ export const loadFromRideWithGps = function(routeNumber, isTrip) {
         dispatch(beginLoadingRoute('rwgps'));
         const parser = await getRouteParser().catch((err) => {dispatch(rwgpsRouteLoadingFailure(err));return null});
         // handle failed load, error has already been dispatched
-        if (parser === null) {
+        if (parser == null) {
             return Promise.resolve(Error('Cannot load parser'));
         }
         return parser.loadRwgpsRoute(routeNumber, isTrip).then( (routeData) => {
@@ -379,7 +379,7 @@ export const loadGpxRoute = function(event) {
             dispatch(beginLoadingRoute('gpx'));
             const parser = await getRouteParser().catch((err) => {dispatch(gpxRouteLoadingFailure(err));return null});
             // handle failed load, error has already been dispatched
-            if (parser === null) {
+            if (parser == null) {
                 return Promise.resolve(Error('Cannot load parser'));
             }
             parser.loadGpxFile(gpxFiles[0]).then( gpxData => {
@@ -598,7 +598,7 @@ export const loadStravaActivity = function(activity) {
         }
         const parser = await getStravaParser().catch((err) => {dispatch(stravaFetchFailure(err));return null});
         // handle failed load, error has already been dispatched
-        if (parser === null) {
+        if (parser == null) {
             return Promise.resolve(Error('Cannot load parser'));
         }
         dispatch(beginStravaFetch());

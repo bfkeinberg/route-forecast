@@ -6,12 +6,18 @@ const HtmlCriticalPlugin = require("html-critical-webpack-plugin");
 const BrotliPlugin = require('brotli-webpack-plugin');
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 const CompressionPlugin = require("compression-webpack-plugin");
-const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
+const TerserPlugin = require('terser-webpack-plugin');
 const SentryCliPlugin = require('@sentry/webpack-plugin');
 
 module.exports = (env,argv) => merge(common(env,argv), {
     plugins: [
-        new UglifyJsPlugin({sourceMap:true}),
+        new TerserPlugin({
+            parallel: true,
+            sourceMap: true,
+            terserOptions: {
+                ecma: 6,
+            },
+        }),
         new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
         new HtmlCriticalPlugin({
             base: path.resolve(__dirname, 'dist/server/views'),

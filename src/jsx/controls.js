@@ -73,14 +73,14 @@ class ControlPoints extends Component {
                             <Label size='sm' for='metric' check>metric</Label>
                         </Col>
                         <Col sm={{size:"auto"}}>
-                            <Input size='1' id='metric' type='checkbox' tabIndex='12' checked={this.props.metric} onClick={this.props.toggleMetric}/>
+                            <Input size='1' id='metric' type='checkbox' tabIndex='12' checked={this.props.metric} onChange={this.props.toggleMetric}/>
                         </Col>
                         <Col sm={{size:"auto"}}>
                             <Label for='banked' size="sm">Display banked time</Label>
                         </Col>
                         <Col sm={{size:"auto"}}>
                             <Input id='banked' type='checkbox' tabIndex='11' checked={this.props.displayBanked}
-                                      onClick={this.props.toggleDisplayBanked}/>
+                                      onChange={this.props.toggleDisplayBanked}/>
                         </Col>
                     </Row>
                 </Container>

@@ -4,16 +4,16 @@ import RouteInfoForm from './routeInfoEntry';
 import RouteForecastMap from './map';
 import ForecastTable from './forecastTable';
 import SplitPane from 'react-split-pane';
-import MediaQuery from 'react-responsive';
+// import MediaQuery from 'react-responsive';
 // for react-splitter
 import 'normalize.css/normalize.css';
 import '@blueprintjs/core/lib/css/blueprint.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import 'ag-grid/dist/styles/ag-grid.css';
-import 'ag-grid/dist/styles/ag-theme-fresh.css';
+import 'ag-grid-community/dist/styles/ag-grid.css';
+import 'ag-grid-community/dist/styles/ag-theme-fresh.css';
 import 'flatpickr/dist/themes/confetti.css';
 import 'Images/style.css';
-import {Button} from 'reactstrap';
+// import {Button} from 'reactstrap';
 import queryString from 'query-string';
 import ErrorBoundary from './errorBoundary';
 import PropTypes from 'prop-types';
@@ -90,7 +90,6 @@ export class RouteWeatherUI extends Component {
         setMetric: PropTypes.func.isRequired,
         setStravaActivity: PropTypes.func.isRequired,
         setStravaError: PropTypes.func.isRequired,
-        prefixer: PropTypes.object,
         search: PropTypes.string.isRequired,
         action: PropTypes.string.isRequired,
         maps_api_key: PropTypes.string.isRequired,
@@ -146,7 +145,7 @@ export class RouteWeatherUI extends Component {
         return controlPoints.reduce((queryParam,point) => {return RouteWeatherUI.formatOneControl(queryParam) + ':' + RouteWeatherUI.formatOneControl(point)},'');
     }
 
-    static isNewUserMode(search) {
+    static isNewUserMode(/*search*/) {
         return false;
         // return (search === '' && cookie.load('initialized') === undefined);
     }
@@ -193,22 +192,24 @@ export class RouteWeatherUI extends Component {
                 <RouteInfoForm formatControlsForUrl={this.formatControlsForUrl}/>
             </ErrorBoundary>
         );
+/*
         const formButton = (
             <Button color="primary" onClick={this.props.showForm}>Modify...</Button>
         );
+*/
         return (
         <div>
             <LocationContext.Consumer>
                 {value => <QueryString href={value.href} origin={value.origin}/>}
             </LocationContext.Consumer>
-                <SplitPane prefixer={this.props.prefixer} defaultSize={300} minSize={150} maxSize={530} split="horizontal">
-                    <SplitPane prefixer={this.props.prefixer} defaultSize={550} minSize={150} split='vertical' pane2Style={{'overflow':'scroll'}}>
+                <SplitPane defaultSize={300} minSize={150} maxSize={530} split="horizontal">
+                    <SplitPane defaultSize={550} minSize={150} split='vertical' pane2Style={{'overflow':'scroll'}}>
                         {inputForm}
                         <ErrorBoundary>
                             <ControlPoints/>
                         </ErrorBoundary>
                     </SplitPane>
-                        <SplitPane prefixer={this.props.prefixer} defaultSize={545} minSize={150} split="vertical" paneStyle={{'overflow':'scroll'}}>
+                        <SplitPane defaultSize={545} minSize={150} split="vertical" paneStyle={{'overflow':'scroll'}}>
                             {this.props.showPacePerTme?<PaceTable/>:<ForecastTable/>}
                             <RouteForecastMap/>
                         </SplitPane>

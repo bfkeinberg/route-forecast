@@ -1,6 +1,11 @@
-let gpxParse = require("gpx-parse-browser");
+let gpxParse = null;
+if (typeof window === 'undefined') {
+    gpxParse = require("gpx-parse-local");
+} else {
+    gpxParse = require("gpx-parse-browser");
+}
 import moment from 'moment-timezone';
-import 'whatwg-fetch';
+// import 'whatwg-fetch';
 import {finishTimeFormat} from './reducers/reducer';
 
 import {paceToSpeed} from "./ui/ridingPace";

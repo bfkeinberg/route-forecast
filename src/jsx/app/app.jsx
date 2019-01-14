@@ -17,7 +17,7 @@ const timezone_api_key = script.getAttribute('timezone_api_key');
 const preloadedState = window.__PRELOADED_STATE__;
 
 // Allow the passed state to be garbage-collected
-delete window.__PRELOADED_STATE__;
+delete window.__PRELOADED_STLoadableComponentATE__;
 
 const render = Component => {
     ReactDOM.hydrate(

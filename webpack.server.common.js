@@ -1,8 +1,6 @@
 const path = require('path');
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
-const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
-const ScriptExtHtmlWebpackPlugin = require('script-ext-html-webpack-plugin');
 
 const APP_DIR = path.resolve(__dirname, 'src/jsx');
 const SRC_STATIC_DIR = path.resolve(__dirname, 'src/static');
@@ -35,10 +33,10 @@ module.exports = (env,argv) => {
                     options: {
                         cacheDirectory: true,
                         babelrc: false,
-                        presets: ["babel-preset-env", "babel-preset-react", "babel-preset-stage-0"],
+                        presets: ["@babel/env", "@babel/preset-react"],
                         // how to target specific browsers
                         // presets: [["babel-preset-env",{targets:{browsers:["last 3 versions","Explorer 11"]}}],"babel-preset-react","babel-preset-stage-0"],
-                        plugins: ['babel-plugin-transform-runtime', "react-html-attrs", "transform-class-properties"],
+                        plugins: ['@babel/transform-runtime', "react-html-attrs", "transform-class-properties","@babel/plugin-syntax-dynamic-import"],
                         // if we want to remove arrow functions as well
                         // plugins: ['babel-plugin-transform-runtime',"react-html-attrs", "transform-class-properties","transform-es2015-arrow-functions"],
                         comments: true

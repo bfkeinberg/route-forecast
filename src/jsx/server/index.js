@@ -1,11 +1,8 @@
 const express = require('express');
 const app = express();
-
-// Activate Google Cloud Trace and Debug when in production
-if (process.env.NODE_ENV === 'production') {
-    require('@google-cloud/trace-agent').start();
-    require('@google-cloud/debug-agent').start();
-}
+import 'source-map-support/register';
+const expressStaticGzip = require("express-static-gzip");
+import thunkMiddleware from 'redux-thunk';
 
 const path = require('path');
 import fetch from 'node-fetch';
@@ -20,26 +17,48 @@ var strava = require('strava-v3');
 const querystring = require('querystring');
 const winston = require('winston');
 const expressWinston = require('express-winston');
-const StackdriverTransport = require('@google-cloud/logging-winston').LoggingWinston;
-import Prefixer from 'inline-style-prefixer';
-import reducer from '../reducers/reducer';
-import {createStore} from 'redux';
+const {LoggingWinston} = require('@google-cloud/logging-winston');
+const loggingWinston = new LoggingWinston({projectId: 'route-forecast'});
 
+const logger = winston.createLogger({
+    level: 'info',
+    transports: [
+        new winston.transports.Console(),
+        // Add Stackdriver Logging
+        loggingWinston,
+    ]
+});
+const StackdriverTransport = new LoggingWinston({
+    projectId: 'route-forecast',
+/*
+    keyFilename: 'gcp_key.json',
+    prefix: 'myservice',
+    serviceContext: {
+        service: 'myservice',
+        version: 'dev'
+    }
+*/
+});
+
+import reducer from '../reducers/reducer';
+import {applyMiddleware, createStore} from 'redux';
+var compression = require('compression');
 import TopLevel from '../app/topLevel';
 import LocationContext from '../locationContext';
 
 // for hot reloading
 import webpack from 'webpack';
 import webpackDevMiddleware from 'webpack-dev-middleware';
-const config = require('webpack.hot.dev.js');
 
 const colorize = process.env.NODE_ENV !== 'production';
+
+app.use(compression());
 
 // Logger to capture all requests and output them to the console.
 // [START requests]
 const requestLogger = expressWinston.logger({
     transports: [
-        new StackdriverTransport(),
+        StackdriverTransport,
         new winston.transports.Console({
             json: false,
             colorize: colorize
@@ -54,7 +73,7 @@ const requestLogger = expressWinston.logger({
 // [START errors]
 const errorLogger = expressWinston.errorLogger({
     transports: [
-        new StackdriverTransport(),
+        StackdriverTransport,
         new winston.transports.Console({
             json: true,
             colorize: colorize
@@ -70,11 +89,18 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 // redirect bare domain
 app.use(require('express-naked-redirect')());
-const publicPath = express.static('dist/static',{fallthrough:false,index:false});
+const publicPath = express.static(path.resolve(__dirname, '../static'),{fallthrough:false,index:false});
+app.use('/static', expressStaticGzip(path.resolve(__dirname,'../'), {
+    enableBrotli: true,
+    orderPreference: [
+        'br',
+        'gz'
+    ]
+}));
 app.use('/static',publicPath);
 
 // ejs
-app.set('views', 'dist/server/views');
+app.set('views', path.resolve(__dirname,'views'));
 app.set('view engine', 'ejs');
 
 app.get('/rwgps_route', (req, res) => {
@@ -111,7 +137,7 @@ app.post('/forecast', upload.none(), (req, res) => {
         return;
     }
     const forecastPoints = JSON.parse(req.body.locations);
-    console.info(`Request from ${req.ip} for ${forecastPoints.length} forecast points`);
+    logger.info(`Request from ${req.ip} for ${forecastPoints.length} forecast points`);
     if (forecastPoints.length > 75) {
         res.status(400).json({'details': 'Invalid request, increase forecast time interval'});
         return;
@@ -180,7 +206,8 @@ app.get('/stravaAuthReply', async (req,res) => {
 });
 
 app.get('/', (req, res) => {
-    const action = '/forecast';     // TODO: use common variable between express and browser sideif (typeof window === 'undefined') {
+    console.log('in / handler');
+    const action = '/forecast';     // TODO: use common variable between express and browser side
 
     const search = req.url.substring(req.url.indexOf('?'));
     const href = url.format({
@@ -191,32 +218,46 @@ app.get('/', (req, res) => {
     const origin = url.format({
         protocol: req.protocol,
         host: req.get('host')});
-    const prefixer = new Prefixer({ userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3440.106 Safari/537.36' });
-    const store = createStore(reducer);
+    if (!process.env.ENABLE_SSR) {
+        console.warn(`SSR disabled`);
+        const ejsVariables = {
+            'maps_key': process.env.MAPS_KEY,
+            'timezone_api_key': process.env.TIMEZONE_API_KEY,
+            'preloaded_state':'',
+            'reactDom': '',
+            delimiter: '?'
+        };
+        res.render('index', ejsVariables)
+    } else {
+        logger.warn('SSR enabled');
+        const store = createStore(reducer, undefined, applyMiddleware(thunkMiddleware));
 
-    const reactDom = renderToString(
-        <LocationContext.Provider value={{href:href,search:search,origin:origin, prefixer:prefixer}}>
-            <TopLevel serverStore={store} action={action} maps_api_key={process.env.MAPS_KEY} timezone_api_key={process.env.TIMEZONE_API_KEY}/>
-        </LocationContext.Provider>
-    );
-    const ejsVariables = {
-        'maps_key':process.env.MAPS_KEY,
-        'timezone_api_key':process.env.TIMEZONE_API_KEY,
-        'reactDom':reactDom,
-        'preloaded_state':JSON.stringify(store.getState()).replace(/</g, '\\u003c'),
-        delimiter: '?'
-    };
-    res.render('index', ejsVariables);
+        const reactDom = renderToString(
+            <LocationContext.Provider value={{href:href,search:search,origin:origin}}>
+                <TopLevel serverStore={store} action={action} maps_api_key={process.env.MAPS_KEY} timezone_api_key={process.env.TIMEZONE_API_KEY}/>
+            </LocationContext.Provider>
+        );
+        const ejsVariables = {
+            'maps_key':process.env.MAPS_KEY,
+            'timezone_api_key':process.env.TIMEZONE_API_KEY,
+            'reactDom':reactDom,
+            'preloaded_state':JSON.stringify(store.getState()).replace(/</g, '\\u003c'),
+            delimiter: '?'
+        };
+        res.render('index', ejsVariables);
+    }
 });
 
 if (process.env.NODE_ENV !== 'production') {
+    console.info('Debug mode, enabling hot reloading');
+    const config = require('webpack.hot.dev.js');
     const compiler = webpack(config({},{mode:'development'}));
     app.use(webpackDevMiddleware(compiler, {writeToDisk: true, publicPath: config({}, undefined).output.publicPath}));
     app.use(require("webpack-hot-middleware")(compiler));
 }
 app.use(errorLogger);
 
-const port = process.env.port || 8080;
+const port = process.env.PORT || 8080;
 app.listen(port, () =>
-    console.log(`Route forecast server listening on http://localhost:${port}!`)
+    console.info(`Route forecast server listening on port ${port}!`)
 );
