@@ -211,7 +211,7 @@ export class RouteWeatherUI extends Component {
                     </SplitPane>
                         <SplitPane defaultSize={545} minSize={150} split="vertical" paneStyle={{'overflow':'scroll'}}>
                             {this.props.showPacePerTme?<PaceTable/>:<ForecastTable/>}
-                            <RouteForecastMap/>
+                            <RouteForecastMap maps_api_key={this.props.maps_api_key} />
                         </SplitPane>
                 </SplitPane>
         </div>
