@@ -73,7 +73,7 @@ class RouteInfoForm extends Component {
     }
 
     static getRouteNumberFromValue(value) {
-        if (value !== '') {
+        if (value !== '' && value !== null) {
             // is this just a number or a full url?
             let route = parseInt(value);
             if (isNaN(route)) {
