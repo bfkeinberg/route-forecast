@@ -32,7 +32,8 @@ class RouteInfoForm extends Component {
         errorDetails:PropTypes.string,
         routeInfo:PropTypes.shape({name:PropTypes.string}),
         loadFromRideWithGps:PropTypes.func.isRequired,
-        firstUse:PropTypes.bool.isRequired
+        firstUse:PropTypes.bool.isRequired,
+        routeSelected:PropTypes.bool.isRequired
     };
 
     constructor(props) {
@@ -42,6 +43,12 @@ class RouteInfoForm extends Component {
 
     componentDidMount() {
         if (this.props.rwgpsRoute !== '') {
+            this.props.loadFromRideWithGps(this.props.rwgpsRoute,this.props.rwgpsRouteIsTrip);
+        }
+    }
+
+    componentDidUpdate() {
+        if (this.props.rwgpsRoute !== '' && !this.props.routeSelected) {
             this.props.loadFromRideWithGps(this.props.rwgpsRoute,this.props.rwgpsRouteIsTrip);
         }
     }
@@ -176,7 +183,8 @@ const mapStateToProps = (state) =>
         errorDetails:state.uiInfo.dialogParams.errorDetails,
         routeInfo:state.routeInfo,
         controlPoints:state.controls.userControlPoints,
-        firstUse: state.params.newUserMode
+        firstUse: state.params.newUserMode,
+        routeSelected: state.uiInfo.dialogParams.loadingSource !== null
     });
 
 const mapDispatchToProps = {
