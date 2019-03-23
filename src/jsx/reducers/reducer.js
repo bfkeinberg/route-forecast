@@ -137,7 +137,7 @@ export const routeParams = function(state = {interval:defaultIntervalInHours,pac
 };
 
 const dialogParams = function(state = {formVisible:true, errorDetails:null, succeeded:true, shortUrl:' ',
-loadingSource:null,fetchingForecast:false}, action) {
+loadingSource:null,fetchingForecast:false,fetchingRoute:false}, action) {
     switch (action.type) {
         case Actions.CLEAR_ROUTE_DATA:
             return {...state, loadingSource: null, succeeded: null};

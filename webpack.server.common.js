@@ -1,25 +1,25 @@
 const path = require('path');
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
-const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
-const ScriptExtHtmlWebpackPlugin = require('script-ext-html-webpack-plugin');
-const CopyWebpackPlugin = require('copy-webpack-plugin');
 
 const APP_DIR = path.resolve(__dirname, 'src/jsx');
-const TEMPLATE_DIR = path.resolve(__dirname, 'src/templates');
 const SRC_STATIC_DIR = path.resolve(__dirname, 'src/static');
 const BUILD_DIR = path.resolve(__dirname, 'dist');
-const STATIC_DIR = path.resolve(__dirname, 'dist/static');
-const GPX_DIR = path.resolve(__dirname, 'node_modules/gpx-parse/dist');
 const SERVER_DIR = path.resolve(__dirname, 'dist/server');
-const VIEWS_DIR = path.resolve(SERVER_DIR, 'views');
+const GPX_DIR = path.resolve(__dirname, 'node_modules/gpx-parse/dist');
+const nodeExternals = require('webpack-node-externals');
 
 module.exports = (env,argv) => {
     const mode = argv === undefined ? 'development' : argv.mode;
     return {
+        target: "node",
         mode:mode,
+        externals: [nodeExternals({
+            // load non-javascript files with extensions, presumably via loaders
+            whitelist: [/\.(?!(?:jsx?|json)$).{1,5}$/i],
+        })],
         entry: [
-            path.resolve(APP_DIR, 'app/app.jsx')
+            path.resolve(APP_DIR, 'server/index.js')
         ],
         module: {
             rules: [
@@ -36,7 +36,7 @@ module.exports = (env,argv) => {
                         presets: ["@babel/env", "@babel/preset-react"],
                         // how to target specific browsers
                         // presets: [["babel-preset-env",{targets:{browsers:["last 3 versions","Explorer 11"]}}],"babel-preset-react","babel-preset-stage-0"],
-                        plugins: ['@babel/transform-runtime', "react-html-attrs", "transform-class-properties","react-hot-loader/babel","@babel/plugin-syntax-dynamic-import"],
+                        plugins: ['@babel/transform-runtime', "react-html-attrs", "transform-class-properties","@babel/plugin-syntax-dynamic-import"],
                         // if we want to remove arrow functions as well
                         // plugins: ['babel-plugin-transform-runtime',"react-html-attrs", "transform-class-properties","transform-es2015-arrow-functions"],
                         comments: true
@@ -74,44 +74,21 @@ module.exports = (env,argv) => {
         plugins: [
             new CleanWebpackPlugin([
                 BUILD_DIR + '/*.*',
-                STATIC_DIR + '/*.*'
+                SERVER_DIR + '/*.*'
             ], {watch: true, verbose: false}),
             new MiniCssExtractPlugin({
                 // Options similar to the same options in webpackOptions.output
                 // both options are optional
                 filename: "[name].css",
                 chunkFilename: "[id].css"
-            }),
-            new HtmlWebpackPlugin({
-                title: 'Plan and forecast bicycle ride',
-                filename: path.resolve(VIEWS_DIR, 'index.ejs'),
-                template: path.resolve(TEMPLATE_DIR, 'base_index.html'),
-                inject: false,
-                minify: {minifyURLs: true, removeComments: true},
-                chunksSortMode: 'none',
-                sentryRelease: env.sentryRelease,
-                mode: mode
-                // favicon:'src/static/favicon.ico'
-            }),
-            new ScriptExtHtmlWebpackPlugin({
-                custom: [
-                    {
-                        test: 'main', attribute: 'id', value: 'routeui'
-                    },
-                    {test: 'main', attribute: 'timezone_api_key', value: '{{ timezone_api_key }}'},
-                    {test: 'main', attribute: 'maps_api_key', value: '{{ maps_key }}'},
-                ]
-            }),
-            new CopyWebpackPlugin([{from: SRC_STATIC_DIR + '/favicon*.*', to: STATIC_DIR, flatten: true},
-                {from: SRC_STATIC_DIR + '/apple-*.*', to: STATIC_DIR, flatten: true}]),
+            })
         ],
-        output:
+            output:
         {
-            path: STATIC_DIR,
-            filename: "[name].bundle.js",
-            chunkFilename: '[name].bundle.js',
-            sourceMapFilename: "[name].bundle.js.map",
-            publicPath: "static/"
+            path: SERVER_DIR,
+                filename: "[name].bundle.js",
+                sourceMapFilename: "[name].bundle.js.map",
+                publicPath: "static/"
         },
         resolve: {
             extensions: [
@@ -124,7 +101,8 @@ module.exports = (env,argv) => {
                 modules:
             [
                 "node_modules",
-                GPX_DIR
+                GPX_DIR,
+                '.'
             ],
                 alias:
             {
@@ -132,7 +110,9 @@ module.exports = (env,argv) => {
             }
         },
         node: {
-            fs: 'empty'
+            fs: 'empty',
+            __dirname: false,
+            __filename: false
         }
     }
 };

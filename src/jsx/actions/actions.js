@@ -182,7 +182,7 @@ export const requestForecast = function(routeInfo) {
         dispatch(hideForm());
         let formdata = new FormData();
         formdata.append('locations', JSON.stringify(routeInfo.forecastRequest));
-        formdata.append('timezone', getState().routeInfo.timeZoneOffset);
+        formdata.append('timezone', getState().routeInfo.timeZoneId);
         return fetch(getState().params.action,
             {
                 method:'POST',
@@ -254,16 +254,38 @@ export const setErrorDetails = function(details) {
     };
 };
 
+export const fetchTimeZone = (point, parser, rwgpsRouteData) => {
+  return (dispatch, getState) => {
+      let timeZonePromise = parser.findTimezoneForPoint(point.y, point.x,
+          moment(getState().uiInfo.routeParams.start), getState().params.timezone_api_key);
+      return timeZonePromise.then(timeZoneResult => {
+          dispatch(setTimeZone(timeZoneResult.zoneId,timeZoneResult.offset));
+          dispatch(setRouteInfo(
+              parser.walkRwgpsRoute(
+                  rwgpsRouteData,
+                  moment(getState().uiInfo.routeParams.start),
+                  getState().uiInfo.routeParams.pace,
+                  getState().uiInfo.routeParams.interval,
+                  getState().controls.userControlPoints,
+                  getState().controls.metric,
+                  timeZoneResult.zoneId)));
+      }, error => {
+          dispatch(setErrorDetails(error));
+      });
+  }
+};
+
 export const recalcRoute = function() {
     return async function(dispatch, getState) {
         const parser = await getRouteParser();
-        // need to get the time zone here, once we know our chose start time
+        // need to get the time zone here, once we know our chosen start time
         // this may be called before we have chosen a route, in which case it's a noop
         let rwgpsRouteData = getState().routeInfo.rwgpsRouteData;
         if (rwgpsRouteData !== null) {
             let type = rwgpsRouteData.trip === undefined ? 'route' : 'trip';
             let rwgpsRouteDatum = rwgpsRouteData[type];
             let point = rwgpsRouteDatum['track_points'][0];
+            //TODO: create another action for this section
             let timeZonePromise = parser.findTimezoneForPoint(point.y, point.x,
                 moment(getState().uiInfo.routeParams.start), getState().params.timezone_api_key);
             return timeZonePromise.then(timeZoneResult => {
@@ -308,7 +330,7 @@ export const loadFromRideWithGps = function(routeNumber, isTrip) {
         dispatch(beginLoadingRoute('rwgps'));
         const parser = await getRouteParser().catch((err) => {dispatch(rwgpsRouteLoadingFailure(err));return null});
         // handle failed load, error has already been dispatched
-        if (parser === null) {
+        if (parser == null) {
             return Promise.resolve(Error('Cannot load parser'));
         }
         return parser.loadRwgpsRoute(routeNumber, isTrip).then( (routeData) => {
@@ -357,7 +379,7 @@ export const loadGpxRoute = function(event) {
             dispatch(beginLoadingRoute('gpx'));
             const parser = await getRouteParser().catch((err) => {dispatch(gpxRouteLoadingFailure(err));return null});
             // handle failed load, error has already been dispatched
-            if (parser === null) {
+            if (parser == null) {
                 return Promise.resolve(Error('Cannot load parser'));
             }
             parser.loadGpxFile(gpxFiles[0]).then( gpxData => {
@@ -576,7 +598,7 @@ export const loadStravaActivity = function(activity) {
         }
         const parser = await getStravaParser().catch((err) => {dispatch(stravaFetchFailure(err));return null});
         // handle failed load, error has already been dispatched
-        if (parser === null) {
+        if (parser == null) {
             return Promise.resolve(Error('Cannot load parser'));
         }
         dispatch(beginStravaFetch());

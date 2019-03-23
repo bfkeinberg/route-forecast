@@ -176,7 +176,7 @@ const mapStateToProps = (state) =>
         forecast: state.forecast.forecast,
         bounds:state.routeInfo.bounds,
         points:getPointsState(state),
-        maps_api_key: state.params.maps_api_key,
+        // maps_api_key: state.params.maps_api_key,
         controls: state.controls.calculatedControlValues,
         controlNames: state.controls.userControlPoints.map(control => control.name),
         subrange: state.strava.subrange.length > 0 ? state.strava.subrange : state.forecast.range

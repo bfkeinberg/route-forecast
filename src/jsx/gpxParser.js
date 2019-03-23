@@ -1,6 +1,11 @@
-let gpxParse = require("gpx-parse-browser");
+let gpxParse = null;
+if (typeof window === 'undefined') {
+    gpxParse = require("gpx-parse-local");
+} else {
+    gpxParse = require("gpx-parse-browser");
+}
 import moment from 'moment-timezone';
-import 'whatwg-fetch';
+// import 'whatwg-fetch';
 import {finishTimeFormat} from './reducers/reducer';
 
 import {paceToSpeed} from "./ui/ridingPace";
@@ -221,26 +226,16 @@ class AnalyzeRoute {
     }
 
     findTimezoneForPoint(lat, lon, time, maps_api_key) {
-        return new Promise((resolve, reject) =>
-            {
-                let xmlhttp = new XMLHttpRequest();
-                xmlhttp.responseType = 'json';
-                xmlhttp.addEventListener('load', event => {
-                    if (event.currentTarget.response.status==='OK') {
-                        // determine total timezone offset in seconds
-                        let tzOffset = (event.currentTarget.response['dstOffset'] + event.currentTarget.response['rawOffset']);
-                        resolve({offset:tzOffset,zoneId:event.currentTarget.response['timeZoneId']});
-                    }
-                    else {
-                        reject(event.currentTarget.response['error_message']);
-                    }
-                });
-                let reqUrl = "https://maps.googleapis.com/maps/api/timezone/json?location=" + lat + "," + lon;
-                reqUrl += "&timestamp=" + time.format("X") + "&key=" + maps_api_key;
-                xmlhttp.open('GET',reqUrl,true);
-                xmlhttp.send();
+        return fetch(`https://maps.googleapis.com/maps/api/timezone/json?location=${lat},${lon}&timestamp=${time.format("X")}&key=${maps_api_key}`).then( response => {
+            if (response.ok) {
+                return response.json();
             }
-        );
+            throw Error(response.error());
+        }).then (body => {
+            // determine total timezone offset in seconds
+            let tzOffset = body.dstOffset + body.rawOffset;
+            return ({offset:tzOffset,zoneId:body.timeZoneId});
+        });
     }
 
     static rusa_time(accumulatedDistanceInKm, elapsedTimeInHours) {

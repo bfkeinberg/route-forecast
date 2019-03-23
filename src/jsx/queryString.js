@@ -2,7 +2,7 @@ import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 import {setShortUrl, shortenUrl} from "./actions/actions";
 import moment from 'moment';
-
+require('isomorphic-fetch');
 import queryString from 'query-string';
 
 const formatOneControl = function(controlPoint) {
@@ -30,8 +30,8 @@ export const makeQuery = (routeNumber, pace,interval,metric,controls, strava_act
 };
 
 const QueryStringUpdater = ({routeNumber,start,pace,interval,metric,controls,/*setQueryString,*/
-                         shortenUrl,urlIsShortened,strava_activity}) => {
-    let url = location.origin;
+                         shortenUrl,urlIsShortened,strava_activity,origin, href}) => {
+    let url = origin;
     let query = null;
     if (routeNumber !== '') {
         const shortDate = dateToShortDate(start);
@@ -40,14 +40,14 @@ const QueryStringUpdater = ({routeNumber,start,pace,interval,metric,controls,/*s
             query.start = shortDate;
         }
         url += `/?${queryString.stringify(query)}`;
-        if (url !== location.href || !urlIsShortened) {
+        if (url !== href || !urlIsShortened) {
             shortenUrl(url);
         }
     }
     else {
         setShortUrl('');
     }
-    if (!(/HeadlessChrome/).test(window.navigator.userAgent) && query !== null) {
+    if (typeof window !== 'undefined' && !(/HeadlessChrome/).test(window.navigator.userAgent) && query !== null) {
         let oldState = history.state;
         if (oldState !== null && oldState.rwgpsRoute === query.rwgpsRoute) {
             history.replaceState(query, 'nothing', url);
@@ -75,7 +75,9 @@ QueryStringUpdater.propTypes = {
     shortenUrl:PropTypes.func.isRequired,
     setShortUrl:PropTypes.func.isRequired,
     controls:PropTypes.arrayOf(PropTypes.object).isRequired,
-    urlIsShortened: PropTypes.bool.isRequired
+    urlIsShortened: PropTypes.bool.isRequired,
+    origin: PropTypes.string.isRequired,
+    href: PropTypes.string.isRequired
 };
 
 const mapStateToProps = (state) =>

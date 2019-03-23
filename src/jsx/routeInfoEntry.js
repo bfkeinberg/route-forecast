@@ -32,7 +32,8 @@ class RouteInfoForm extends Component {
         errorDetails:PropTypes.string,
         routeInfo:PropTypes.shape({name:PropTypes.string}),
         loadFromRideWithGps:PropTypes.func.isRequired,
-        firstUse:PropTypes.bool.isRequired
+        firstUse:PropTypes.bool.isRequired,
+        routeSelected:PropTypes.bool.isRequired
     };
 
     constructor(props) {
@@ -42,6 +43,12 @@ class RouteInfoForm extends Component {
 
     componentDidMount() {
         if (this.props.rwgpsRoute !== '') {
+            this.props.loadFromRideWithGps(this.props.rwgpsRoute,this.props.rwgpsRouteIsTrip);
+        }
+    }
+
+    componentDidUpdate() {
+        if (this.props.rwgpsRoute !== '' && !this.props.routeSelected) {
             this.props.loadFromRideWithGps(this.props.rwgpsRoute,this.props.rwgpsRouteIsTrip);
         }
     }
@@ -73,7 +80,7 @@ class RouteInfoForm extends Component {
     }
 
     static getRouteNumberFromValue(value) {
-        if (value !== '') {
+        if (value !== '' && value !== null) {
             // is this just a number or a full url?
             let route = parseInt(value);
             if (isNaN(route)) {
@@ -117,7 +124,7 @@ class RouteInfoForm extends Component {
                             <Col sm="4">
                                 <RidingPace/>
                             </Col>
-                            <MediaQuery minDeviceWidth={1000}>
+                            <MediaQuery minDeviceWidth={1000} values={{deviceWidth:1400}}>
                                 <Col sm="1">
                                     <PaceExplanation/>
                                 </Col>
@@ -142,12 +149,12 @@ class RouteInfoForm extends Component {
                         {RouteInfoForm.showErrorDetails(this.props.errorDetails)}
                         {RouteInfoForm.showProgressSpinner(this.props.fetchingRoute)}
                     </Form>
-                    <MediaQuery maxDeviceWidth={800}>
+                    <MediaQuery maxDeviceWidth={800} values={{deviceWidth:1400}}>
                         <ShortUrl/>
                     </MediaQuery>
                     </CardBody>
                 </Card>
-            <MediaQuery minDeviceWidth={1000}>
+            <MediaQuery minDeviceWidth={1000} values={{deviceWidth:1400}}>
                 <Container fluid={true}>
                     <Row className="justify-content-sm-between">
                         <Col sm={{size:"auto"}}>
@@ -176,7 +183,8 @@ const mapStateToProps = (state) =>
         errorDetails:state.uiInfo.dialogParams.errorDetails,
         routeInfo:state.routeInfo,
         controlPoints:state.controls.userControlPoints,
-        firstUse: state.params.newUserMode
+        firstUse: state.params.newUserMode,
+        routeSelected: state.uiInfo.dialogParams.loadingSource !== null
     });
 
 const mapDispatchToProps = {
@@ -184,4 +192,5 @@ const mapDispatchToProps = {
 };
 
 export const decideValidationStateFor = RouteInfoForm.decideValidationStateFor;
+export const getRouteNumberFromValue = RouteInfoForm.getRouteNumberFromValue;
 export default connect(mapStateToProps, mapDispatchToProps, null, {pure:true})(RouteInfoForm);

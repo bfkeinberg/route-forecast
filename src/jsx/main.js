@@ -4,21 +4,23 @@ import RouteInfoForm from './routeInfoEntry';
 import RouteForecastMap from './map';
 import ForecastTable from './forecastTable';
 import SplitPane from 'react-split-pane';
-import MediaQuery from 'react-responsive';
+// import MediaQuery from 'react-responsive';
 // for react-splitter
 import 'normalize.css/normalize.css';
 import '@blueprintjs/core/lib/css/blueprint.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import 'ag-grid/dist/styles/ag-grid.css';
-import 'ag-grid/dist/styles/ag-theme-fresh.css';
+import 'ag-grid-community/dist/styles/ag-grid.css';
+import 'ag-grid-community/dist/styles/ag-theme-fresh.css';
 import 'flatpickr/dist/themes/confetti.css';
 import 'Images/style.css';
-import {Button} from 'reactstrap';
+// import {Button} from 'reactstrap';
 import queryString from 'query-string';
 import ErrorBoundary from './errorBoundary';
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 // import cookie from 'react-cookies';
+import LocationContext from './locationContext';
+
 import {
     setActionUrl,
     setApiKeys,
@@ -64,6 +66,7 @@ const demoControls = [
         "id": 2
     }
 ];
+
 export class RouteWeatherUI extends Component {
     static propTypes = {
         setActionUrl:PropTypes.func.isRequired,
@@ -78,32 +81,45 @@ export class RouteWeatherUI extends Component {
         rwgpsRouteIsTrip: PropTypes.bool.isRequired,
         reset: PropTypes.func.isRequired,
         firstUse: PropTypes.bool.isRequired,
-        newUserMode: PropTypes.func.isRequired
+        newUserMode: PropTypes.func.isRequired,
+        setRwgpsRoute: PropTypes.func.isRequired,
+        setStravaToken: PropTypes.func.isRequired,
+        setStart: PropTypes.func.isRequired,
+        setPace: PropTypes.func.isRequired,
+        setInterval: PropTypes.func.isRequired,
+        setMetric: PropTypes.func.isRequired,
+        setStravaActivity: PropTypes.func.isRequired,
+        setStravaError: PropTypes.func.isRequired,
+        search: PropTypes.string.isRequired,
+        action: PropTypes.string.isRequired,
+        maps_api_key: PropTypes.string.isRequired,
+        timezone_api_key: PropTypes.string.isRequired
     };
 
     constructor(props) {
         super(props);
         this.formatControlsForUrl = this.formatControlsForUrl.bind(this);
 
-        const newUserMode = RouteWeatherUI.isNewUserMode();
+        const newUserMode = RouteWeatherUI.isNewUserMode(props.search);
         this.props.newUserMode(newUserMode);
-        let queryParams = queryString.parse(location.search);
+        let queryParams = queryString.parse(props.search);
         RouteWeatherUI.updateFromQueryParams(this.props, queryParams);
-        let script = document.getElementById( "routeui" );
-        props.setActionUrl(script.getAttribute('action'));
-        props.setApiKeys(script.getAttribute('maps_api_key'),script.getAttribute('timezone_api_key'));
-        this.props.updateControls(queryParams.controlPoints===undefined?[]:this.parseControls(queryParams.controlPoints));
+        props.setActionUrl(props.action);
+        props.setApiKeys(props.maps_api_key,props.timezone_api_key);
+        this.props.updateControls(queryParams.controlPoints==undefined?[]:this.parseControls(queryParams.controlPoints));
         if (newUserMode) {
             RouteWeatherUI.loadCannedData(this.props);
         }
         this.state = {};
-        window.onpopstate = (event) => {
-            if (event.state === null) {
-                this.props.reset();
-            } else {
-                RouteWeatherUI.updateFromQueryParams(this.props, event.state);
-                if (event.state.rwgpsRoute !== undefined) {
-                    this.props.loadFromRideWithGps(event.state.rwgpsRoute,this.props.rwgpsRouteIsTrip);
+        if (typeof window !== 'undefined') {
+            window.onpopstate = (event) => {
+                if (event.state === null) {
+                    this.props.reset();
+                } else {
+                    RouteWeatherUI.updateFromQueryParams(this.props, event.state);
+                    if (event.state.rwgpsRoute !== undefined) {
+                        this.props.loadFromRideWithGps(event.state.rwgpsRoute,this.props.rwgpsRouteIsTrip);
+                    }
                 }
             }
         }
@@ -129,9 +145,9 @@ export class RouteWeatherUI extends Component {
         return controlPoints.reduce((queryParam,point) => {return RouteWeatherUI.formatOneControl(queryParam) + ':' + RouteWeatherUI.formatOneControl(point)},'');
     }
 
-    static isNewUserMode() {
+    static isNewUserMode(/*search*/) {
         return false;
-        // return (location.search === '' && cookie.load('initialized') === undefined);
+        // return (search === '' && cookie.load('initialized') === undefined);
     }
 
     static loadCannedData(props) {
@@ -176,12 +192,16 @@ export class RouteWeatherUI extends Component {
                 <RouteInfoForm formatControlsForUrl={this.formatControlsForUrl}/>
             </ErrorBoundary>
         );
+/*
         const formButton = (
             <Button color="primary" onClick={this.props.showForm}>Modify...</Button>
         );
+*/
         return (
         <div>
-            <QueryString/>
+            <LocationContext.Consumer>
+                {value => <QueryString href={value.href} origin={value.origin}/>}
+            </LocationContext.Consumer>
                 <SplitPane defaultSize={300} minSize={150} maxSize={530} split="horizontal">
                     <SplitPane defaultSize={550} minSize={150} split='vertical' pane2Style={{'overflow':'scroll'}}>
                         {inputForm}
@@ -191,7 +211,7 @@ export class RouteWeatherUI extends Component {
                     </SplitPane>
                         <SplitPane defaultSize={545} minSize={150} split="vertical" paneStyle={{'overflow':'scroll'}}>
                             {this.props.showPacePerTme?<PaceTable/>:<ForecastTable/>}
-                            <RouteForecastMap/>
+                            <RouteForecastMap maps_api_key={this.props.maps_api_key} />
                         </SplitPane>
                 </SplitPane>
         </div>
