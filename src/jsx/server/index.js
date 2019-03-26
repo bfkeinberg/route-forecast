@@ -25,11 +25,11 @@ const logger = winston.createLogger({
     transports: [
         new winston.transports.Console(),
         // Add Stackdriver Logging
-        loggingWinston,
+        loggingWinston
     ]
 });
 const StackdriverTransport = new LoggingWinston({
-    projectId: 'route-forecast',
+    projectId: 'route-forecast'
 /*
     keyFilename: 'gcp_key.json',
     prefix: 'myservice',

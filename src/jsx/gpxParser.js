@@ -372,9 +372,9 @@ class AnalyzeRoute {
                 // adjust speed
                 const averageWindSpeed = parseInt(currentForecast.windSpeed);
                 const gustWindSpeed = currentForecast.gust !== undefined ? parseInt(currentForecast.gust) : 0;
-                // if the wind gusts are stronger than the average, add in half the difference between them
+                // if the wind gusts are stronger than the average, add in one fifth the difference between them
                 const actingWindSpeed = gustWindSpeed > averageWindSpeed ?
-                    averageWindSpeed + (gustWindSpeed - averageWindSpeed)/2 :
+                    averageWindSpeed + (gustWindSpeed - averageWindSpeed)/8 :
                     averageWindSpeed;
                 let effectiveWindSpeed = Math.cos((Math.PI / 180)*relativeBearing)*actingWindSpeed;
                 totalMinutesLost += AnalyzeRoute.windToTimeInMinutes(baseSpeed, distanceInMiles, hilliness, effectiveWindSpeed);

@@ -6,6 +6,7 @@ import ErrorBoundary from "./errorBoundary";
 import circus_tent from 'Images/circus tent.png';
 import {Map, InfoWindow, Marker, GoogleApiWrapper, Polyline} from 'google-maps-react';
 import { createSelector } from 'reselect';
+import {formatTemperature} from "./forecastTable";
 
 /*global google*/
 const arrow = "M16.317,32.634c-0.276,0-0.5-0.224-0.5-0.5V0.5c0-0.276,0.224-0.5,0.5-0.5s0.5,0.224,0.5,0.5v31.634\n" +
@@ -25,7 +26,8 @@ class RouteForecastMap extends Component {
         controls:PropTypes.arrayOf(PropTypes.shape({lat:PropTypes.number,lon:PropTypes.number})),
         controlNames:PropTypes.arrayOf(PropTypes.string),
         subrange:PropTypes.arrayOf(PropTypes.number),
-        google:PropTypes.object
+        google:PropTypes.object,
+        metric:PropTypes.bool.isRequired
     };
 
     constructor(props) {
@@ -116,13 +118,17 @@ class RouteForecastMap extends Component {
         return <Polyline path={highlightPoints} strokeColor={'#67ff99'} strokeOpacity={0.9} strokeWeight={3}/>;
     }
 
+    cvtDistance = (distance) => {
+            return (this.props.metric ? ((distance * milesToMeters)/1000).toFixed(0) : distance);
+    };
+
     buildMarkers(forecast, controls, controlNames, subrange) {
         // marker title now contains both temperature and mileage
         return forecast.map((point) =>
-            this.addRainIcon(point.lat, point.lon, point.distance, `${point.fullTime}\n${point.tempStr}`,
+            this.addRainIcon(point.lat, point.lon, this.cvtDistance(point.distance), `${point.fullTime}\n${formatTemperature(point.temp,this.props.metric)}`,
                 point.rainy)).concat(
             forecast.map((point) =>
-                RouteForecastMap.addTempMarker(point.lat, point.lon, point.distance, `${point.fullTime}\n${point.tempStr}`,
+                RouteForecastMap.addTempMarker(point.lat, point.lon, this.cvtDistance(point.distance), `${point.fullTime}\n${formatTemperature(point.temp,this.props.metric)}`,
                     point.windBearing, point.windSpeed, subrange))
         ).concat(
             controls.filter(control => control.lat!==undefined && control.lon!==undefined)
@@ -179,7 +185,8 @@ const mapStateToProps = (state) =>
         // maps_api_key: state.params.maps_api_key,
         controls: state.controls.calculatedControlValues,
         controlNames: state.controls.userControlPoints.map(control => control.name),
-        subrange: state.strava.subrange.length > 0 ? state.strava.subrange : state.forecast.range
+        subrange: state.strava.subrange.length > 0 ? state.strava.subrange : state.forecast.range,
+        metric: state.controls.metric
     });
 
 // eslint-disable-next-line new-cap
