@@ -46,24 +46,24 @@ export class ControlTable extends Component {
             context: { componentParent: this },
             frameworkComponents: { deleteRenderer: DeleteRenderer },
             columnDefs:[
-                {colId:'name', field:'name', sortable:false, editable:true, menuTabs:[
+                {colId:'name', field:'name', sortable:false, resizable:true, editable:true, menuTabs:[
                     'generalMenuTab',
                     'columnsMenuTab'
                 ], headerName:'Name'},
                 {field:'distance', headerTooltip:`In ${props.metric?'km':'miles'}`,
-                    type:'numericColumn', unSortIcon:true, sortable:true, editable:true, valueParser:ControlTable.setData, valueSetter:ControlTable.validateData, headerName:'Distance'},
+                    type:'numericColumn', unSortIcon:true, sortable:true, resizable:true, editable:true, valueParser:ControlTable.setData, valueSetter:ControlTable.validateData, headerName:`${props.metric?'Kilometers':'Miles'}`},
                 {field:'duration', headerTooltip:'How many minutes you expect to spend at this control',
-                    sortable:false, type:'numericColumn', editable:true, valueParser:params=>{return Number(params.newValue)},
+                    sortable:false, type:'numericColumn', resizable:true, editable:true, valueParser:params=>{return Number(params.newValue)},
                     valueSetter:ControlTable.validateData, valueFormatter:ControlTable.appendUnit, headerName:'Expected time spent'},
                 {field:'arrival', headerTooltip:'When you are predicted to arrive here',
                     cellRenderer:"agAnimateShowChangeCellRenderer", type:'numericColumn',
-                    suppressNavigable:true, sortable:false, enableCellChangeFlash:true, headerName:'Est. arrival time'},
-                {colId:'actual', field:'actual', enableSorting:false, enableCellChangeFlash:true, cellRenderer:"agAnimateShowChangeCellRenderer",
+                    suppressNavigable:true, sortable:false, resizable:true, enableCellChangeFlash:true, headerName:'Est. arrival time'},
+                {colId:'actual', field:'actual', sortable:false, resizable:true, enableCellChangeFlash:true, cellRenderer:"agAnimateShowChangeCellRenderer",
                     headerTooltip:'When you actually arrived here', suppressNavigable:true, hide:!this.props.compare, headerName:'Actual arrival time'},
                 {colId:'banked', field:'banked', headerTooltip:'Time remaining at brevet pace',
                     cellRenderer:"agAnimateShowChangeCellRenderer",
-                    suppressNavigable:true, enableSorting:false, type:'numericColumn', valueFormatter:ControlTable.appendUnit, hide:!displayBanked, headerName:'Banked time'},
-                {colId:'delete', suppressNavigable:true, suppressSorting:true, suppressSizeToFit: true,
+                    suppressNavigable:true, sortable:false, resizable:true, type:'numericColumn', valueFormatter:ControlTable.appendUnit, hide:!displayBanked, headerName:'Banked time'},
+                {colId:'delete', suppressNavigable:true, suppressSizeToFit: true,
                     pinned:'right', cellRenderer:'deleteRenderer'}
             ]};
         this.addRow = this.addRow.bind(this);
@@ -152,6 +152,7 @@ export class ControlTable extends Component {
         let col = this.columnApi.getColumn("distance");
         let colDef = col.getColDef();
         colDef.headerTooltip = `In ${newProps.metric?'km':'miles'}`;
+        colDef.headerName = `${newProps.metric?'Kilometers':'Miles'}`;
 
         // the column is now updated. to reflect the header change, get the grid refresh the header
         this.api.refreshHeader();
@@ -228,7 +229,7 @@ export class ControlTable extends Component {
         let newColDefs = this.state.columnDefs.slice();
         this.props.controls.forEach((item,index) => rowData.push({...item, ...this.props.calculatedValues[index], id:index}));
         return (<div id={'controlTable'} className="ag-theme-fresh">
-            <AgGridReact enableCellChangeFlash={true} enableColResize animateRows
+            <AgGridReact enableCellChangeFlash={true} animateRows
                          sortingOrder={['asc']} unSortIcon rowData={rowData}
                          context={this.state.context} frameworkComponents={this.state.frameworkComponents}
              onGridReady={this.onGridReady} onSortChanged={this.sortChanged} singleClickEdit editType={'fullRow'}

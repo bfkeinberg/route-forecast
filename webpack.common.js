@@ -72,10 +72,7 @@ module.exports = (env,argv) => {
             ]
         },
         plugins: [
-            new CleanWebpackPlugin([
-                BUILD_DIR + '/*.*',
-                STATIC_DIR + '/*.*'
-            ], {watch: true, verbose: false}),
+            new CleanWebpackPlugin({verbose: true}),
             new MiniCssExtractPlugin({
                 // Options similar to the same options in webpackOptions.output
                 // both options are optional

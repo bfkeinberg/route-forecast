@@ -1,4 +1,4 @@
-import {Row, Col, Container, Input, Label, Card, CardBody, CardTitle} from 'reactstrap';
+import {Row, Col, Container, Input, Label, Card, CardBody, CardTitle, UncontrolledTooltip} from 'reactstrap';
 import {Button} from '@blueprintjs/core';
 import React, {Component} from 'react';
 import ErrorBoundary from './errorBoundary';
@@ -70,10 +70,11 @@ class ControlPoints extends Component {
                             <FinishTime/>
                         </Col>
                         <Col sm={{size:"auto"}}>
-                            <Label size='sm' for='metric' check>metric</Label>
+                            <Label size='sm' for='metric' check>Metric</Label>
                         </Col>
                         <Col sm={{size:"auto"}}>
                             <Input size='1' id='metric' type='checkbox' tabIndex='12' checked={this.props.metric} onChange={this.props.toggleMetric}/>
+                            <UncontrolledTooltip target={'metric'}>Control distances in km, other units displayed in km or degrees C</UncontrolledTooltip>
                         </Col>
                         <Col sm={{size:"auto"}}>
                             <Label for='banked' size="sm">Display banked time</Label>
@@ -81,6 +82,7 @@ class ControlPoints extends Component {
                         <Col sm={{size:"auto"}}>
                             <Input id='banked' type='checkbox' tabIndex='11' checked={this.props.displayBanked}
                                       onChange={this.props.toggleDisplayBanked}/>
+                            <UncontrolledTooltip target={'banked'}>Show how many minutes remain to be within ACP/RUSA brevet finishing times</UncontrolledTooltip>
                         </Col>
                     </Row>
                 </Container>

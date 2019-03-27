@@ -26,7 +26,7 @@ const RidingPace = ({pace,actualPace,setPace}) => {
     let pace_text;
     let pace_tooltip_class = 'pace_tooltip';
     if (actualPace === undefined) {
-        pace_text = `Represents climb-adjusted pace - current is ${pace_mph}`;
+        pace_text = `Speed on flat ground, which will be adjusted for climbing`;
     } else {
         pace_tooltip_class = getPaceTooltipId(actualPace,pace_mph);
         pace_text = `Actual riding pace was ${getAlphaPace(actualPace)}`;
@@ -37,16 +37,14 @@ const RidingPace = ({pace,actualPace,setPace}) => {
             <UncontrolledTooltip innerClassName={pace_tooltip_class} target='paceInput' placement="bottom">{pace_text}</UncontrolledTooltip>
             <Input tabIndex='3' type="select" value={pace} name="pace"
                    id='paceInput' onChange={event => {setPace(event.target.value)}}>
-                <option value="A">A/10</option>
-                <option value="B">B/12</option>
-                <option value="C-">C-/13</option>
-                <option value="C">C/14</option>
-                <option value="C+">C+/15</option>
-                <option value="D-">D-/15-</option>
-                <option value="D">D/16</option>
-                <option value="D+">D+/17</option>
-                <option value="E-">E-/17-</option>
-                <option value="E">E/18</option>
+                <option value="A">10 mph</option>
+                <option value="B">12 mph</option>
+                <option value="C-">13 mph</option>
+                <option value="C">14 mph</option>
+                <option value="D-">15 mph</option>
+                <option value="D">16 mph</option>
+                <option value="D+">17 mph</option>
+                <option value="E">18 mph</option>
             </Input>
         </FormGroup>
     );

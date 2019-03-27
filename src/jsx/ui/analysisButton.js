@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {Container} from 'reactstrap';
+import {Container, UncontrolledTooltip} from 'reactstrap';
 import {connect} from 'react-redux';
 import {toggleStravaAnalysis} from "../actions/actions";
 import Strava from 'Images/api_logo_pwrdBy_strava_stack_light.png';
@@ -15,6 +15,7 @@ const AnalysisButton = ({stravaAnalysis,toggleStravaAnalysis}) => {
         <Container>
             <Button className={classes} tabIndex='-1' id={'enableAnalysis'}
                     onClick={toggleStravaAnalysis}><img id='stravaImage' src={Strava}/></Button>
+            <UncontrolledTooltip target={'enableAnalysis'}>Analyze results with Strava</UncontrolledTooltip>
         </Container>
         );
 };
