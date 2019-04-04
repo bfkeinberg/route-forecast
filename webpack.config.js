@@ -3,7 +3,6 @@ var path = require('path');
 
 var BUILD_DIR = path.resolve(__dirname, 'src/static/scripts/js');
 var APP_DIR = path.resolve(__dirname, 'src/static/scripts/jsx');
-var GPX_DIR = path.resolve(__dirname, 'node_modules/gpx-parse/dist');
 
 module.exports = {
     plugins: [
@@ -54,7 +53,7 @@ module.exports = {
             "ag-grid-root": path.resolve('./node_modules/ag-grid/dist')
         },
         extensions: ['*', '.js', '.jsx', '.ts', '.tsx'],
-        modules: ["web_modules", "node_modules",'node_modules/gpx-parse/dist']
+        modules: ["web_modules", "node_modules"]
     },
     externals: {
         jquery: 'jQuery'

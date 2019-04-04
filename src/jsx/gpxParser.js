@@ -1,9 +1,4 @@
-let gpxParse = null;
-if (typeof window === 'undefined') {
-    gpxParse = require("gpx-parse-local");
-} else {
-    gpxParse = require("gpx-parse-browser");
-}
+const gpxParse = require("gpx-parse-alpaca");
 import moment from 'moment-timezone';
 // import 'whatwg-fetch';
 import {finishTimeFormat} from './reducers/reducer';
@@ -373,11 +368,11 @@ class AnalyzeRoute {
                 const averageWindSpeed = parseInt(currentForecast.windSpeed);
                 const gustWindSpeed = currentForecast.gust !== undefined ? parseInt(currentForecast.gust) : 0;
                 // if the wind gusts are stronger than the average, add in one fifth the difference between them
-                const actingWindSpeed = gustWindSpeed > averageWindSpeed ?
-                    averageWindSpeed + (gustWindSpeed - averageWindSpeed)/8 :
+                const actingWindSpeed = /*gustWindSpeed > averageWindSpeed ?
+                    averageWindSpeed + (gustWindSpeed - averageWindSpeed)/8 :*/
                     averageWindSpeed;
                 let effectiveWindSpeed = Math.cos((Math.PI / 180)*relativeBearing)*actingWindSpeed;
-                totalMinutesLost += AnalyzeRoute.windToTimeInMinutes(baseSpeed, distanceInMiles, hilliness, effectiveWindSpeed);
+                totalMinutesLost += 0;//AnalyzeRoute.windToTimeInMinutes(baseSpeed, distanceInMiles, hilliness, effectiveWindSpeed);
 
                 currentControl = AnalyzeRoute.calculateValuesForWind(controls, previouslyCalculatedValues,
                     calculatedValues, currentControl,

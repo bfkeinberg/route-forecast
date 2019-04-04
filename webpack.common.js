@@ -10,7 +10,6 @@ const TEMPLATE_DIR = path.resolve(__dirname, 'src/templates');
 const SRC_STATIC_DIR = path.resolve(__dirname, 'src/static');
 const BUILD_DIR = path.resolve(__dirname, 'dist');
 const STATIC_DIR = path.resolve(__dirname, 'dist/static');
-const GPX_DIR = path.resolve(__dirname, 'node_modules/gpx-parse/dist');
 const SERVER_DIR = path.resolve(__dirname, 'dist/server');
 const VIEWS_DIR = path.resolve(SERVER_DIR, 'views');
 
@@ -120,8 +119,7 @@ module.exports = (env,argv) => {
             ],
                 modules:
             [
-                "node_modules",
-                GPX_DIR
+                "node_modules"
             ],
                 alias:
             {
