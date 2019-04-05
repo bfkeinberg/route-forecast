@@ -12,6 +12,7 @@ const mode = script.getAttribute('mode');
 const action = script.getAttribute('action');
 const maps_api_key = script.getAttribute('maps_api_key');
 const timezone_api_key = script.getAttribute('timezone_api_key');
+const bitly_token = script.getAttribute('bitly_token');
 
 // Grab the state from a global variable injected into the server-generated HTML
 const preloadedState = window.__PRELOADED_STATE__;
@@ -23,7 +24,7 @@ const render = Component => {
     ReactDOM.hydrate(
         <AppContainer>
             <LocationContext.Provider value={{href:location.href, search:location.search, origin:location.origin}}>
-                <Component state={preloadedState} mode={mode} action={action} maps_api_key={maps_api_key} timezone_api_key={timezone_api_key}/>
+                <Component state={preloadedState} mode={mode} action={action} maps_api_key={maps_api_key} timezone_api_key={timezone_api_key} bitly_token={bitly_token}/>
             </LocationContext.Provider>
         </AppContainer>,
     document.getElementById('content'));
