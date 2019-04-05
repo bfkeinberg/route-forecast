@@ -71,7 +71,7 @@ module.exports = (env,argv) => {
             ]
         },
         plugins: [
-            new CleanWebpackPlugin({verbose: true}),
+            new CleanWebpackPlugin({}),
             new MiniCssExtractPlugin({
                 // Options similar to the same options in webpackOptions.output
                 // both options are optional

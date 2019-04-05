@@ -115,8 +115,8 @@ export class ForecastTable extends Component {
                         {this.expandTable(this.props.forecast, this.props.metric)}
                     </Table>
                     </ErrorBoundary>
-                    <UncontrolledTooltip placement={'top'} flip={false} target={'temp'}>Click to toggle between temperature and apparent temperature</UncontrolledTooltip>
-                    <UncontrolledTooltip placement={'top'} flip={false} target={'wind'}>Click to toggle between average wind speed and wind gusts</UncontrolledTooltip>
+                    <UncontrolledTooltip placement={'top'} target={'temp'}>Click to toggle between temperature and apparent temperature</UncontrolledTooltip>
+                    <UncontrolledTooltip placement={'top'} target={'wind'}>Click to toggle between average wind speed and wind gusts</UncontrolledTooltip>
                 </div>
         );
     }

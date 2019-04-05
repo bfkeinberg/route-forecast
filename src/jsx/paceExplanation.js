@@ -1,5 +1,5 @@
 import {Button, Popover, PopoverHeader, PopoverBody} from 'reactstrap';
-import rideRatingText from './rideRating.htm';
+import rideRatingText from './cyclerouteplanner.htm';
 import React, {Component} from 'react';
 
 class PaceExplanation extends Component {
@@ -20,10 +20,10 @@ class PaceExplanation extends Component {
     render() {
         return (
             <div>
-                <Button id='rideRatingPopup' onClick={this.toggle} color='info' size="sm">Pace explanation</Button>
+                <Button id='rideRatingPopup' onClick={this.toggle} color='info' size="sm">Info</Button>
                 <Popover innerClassName='rideRatingPopup' isOpen={this.state.isOpen} placement='right'
                          toggle={this.toggle} style={{width:450, maxWidth:500}} target='rideRatingPopup'>
-                    <PopoverHeader>Ride rating system</PopoverHeader>
+                    <PopoverHeader>Route forecast tool info</PopoverHeader>
                     <PopoverBody>
                         <div dangerouslySetInnerHTML={{__html: rideRatingText}}/>
                     </PopoverBody>
