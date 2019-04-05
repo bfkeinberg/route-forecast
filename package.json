@@ -26,7 +26,7 @@
     "@google-cloud/debug-agent": "^3.0.1",
     "@google-cloud/logging-winston": "^0.11.0",
     "@google-cloud/trace-agent": "^3.5.0",
-    "@sentry/node": "^4.0.0-beta.12",
+    "@sentry/node": "^5.0.5",
     "@types/pure-render-decorator": "^0.2.27",
     "ag-grid-community": "^20.0.0",
     "ag-grid-react": "^20.0.0",
@@ -73,7 +73,7 @@
     "react-split-pane": "^0.1.82",
     "react-toastr": "^3.0.0",
     "react-transition-group": "^2.4.0",
-    "reactstrap": "^7.0.2",
+    "reactstrap": "^8.0.0",
     "redux": "^4.0.0",
     "redux-logger": "^3.0.6",
     "redux-thunk": "^2.3.0",
@@ -216,7 +216,9 @@
       "\\.(css|less)$": "<rootDir>/__mocks__/styleMock.js"
     },
     "testURL": "http://localhost/",
-    "setupTestFrameworkScriptFile": "./node_modules/jest-enzyme/lib/index.js",
+    "setupFilesAfterEnv": [
+      "./node_modules/jest-enzyme/lib/index.js"
+    ],
     "setupFiles": [
       "<rootDir>/setupFile.js"
     ]

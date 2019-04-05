@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {Table} from 'reactstrap';
+import {Table, UncontrolledTooltip} from 'reactstrap';
 import ErrorBoundary from "./errorBoundary";
 import darkSky from 'Images/darkSkySmall.png';
 import PropTypes from 'prop-types';
@@ -105,16 +105,18 @@ export class ForecastTable extends Component {
                             <th className={'headerCell'}>Time</th>
                             <th className={'headerCell'}>{distHeader}</th>
                             <th className={'headerCell'}>Summary</th>
-                            <th className={'headerCell'} onClick={this.toggleApparentDisplay}>{temperatureHeader}</th>
+                            <th id={'temp'} className={'headerCell'} onClick={this.toggleApparentDisplay}>{temperatureHeader}</th>
                             <th className={'headerCell'}>Chance of rain</th>
                             <th className={'headerCell'}>Cloud cover</th>
-                            <th className={'headerCell'} onClick={this.toggleGustDisplay}>{windHeader}</th>
+                            <th id={'wind'} className={'headerCell'} onClick={this.toggleGustDisplay}>{windHeader}</th>
                             <th className={'headerCell'}>Wind bearing</th>
                         </tr>
                         </thead>
                         {this.expandTable(this.props.forecast, this.props.metric)}
                     </Table>
                     </ErrorBoundary>
+                    <UncontrolledTooltip placement={'top'} target={'temp'}>Click to toggle between temperature and apparent temperature</UncontrolledTooltip>
+                    <UncontrolledTooltip placement={'top'} target={'wind'}>Click to toggle between average wind speed and wind gusts</UncontrolledTooltip>
                 </div>
         );
     }
