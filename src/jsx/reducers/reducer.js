@@ -332,7 +332,7 @@ const params = function(state = {newUserMode:false}, action) {
         case Actions.SET_ACTION_URL:
             return {...state, action: action.action};
         case Actions.SET_API_KEYS:
-            return {...state, maps_api_key: action.mapsKey, timezone_api_key:action.timezoneKey, bitly_token: action.bitly_token};
+            return {...state, maps_api_key: action.mapsKey, timezone_api_key:action.timezoneKey, bitly_token: action.bitlyToken};
         case Actions.NEW_USER_MODE:
             return {...state, newUserMode:action.value};
         default:

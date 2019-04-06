@@ -411,7 +411,8 @@ export const setShortUrl = function(url) {
 
 export const shortenUrl = function(url) {
     return async function (dispatch,getState) {
-        const bitlyAccessToken = getState().params.bitlyToken
+        const bitlyAccessToken = getState().params.bitly_token
+
         const groupsResponse = await fetch(`https://api-ssl.bitly.com/v4/groups`,
             {
                 headers: {

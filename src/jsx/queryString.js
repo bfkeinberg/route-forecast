@@ -31,7 +31,6 @@ export const makeQuery = (routeNumber, pace,interval,metric,controls, strava_act
 
 const QueryStringUpdater = ({routeNumber,start,pace,interval,metric,controls,/*setQueryString,*/
                          shortenUrl,urlIsShortened,strava_activity,origin, href}) => {
-    console.log(pace, url, href, urlIsShortened, routeNumber)
     let url = origin;
     let query = null;
     if (routeNumber !== '') {
