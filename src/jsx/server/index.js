@@ -15,30 +15,32 @@ import callWeatherService from './weatherCalculator';
 const url = require('url');
 var strava = require('strava-v3');
 const querystring = require('querystring');
-const winston = require('winston');
-const expressWinston = require('express-winston');
-const {LoggingWinston} = require('@google-cloud/logging-winston');
-const loggingWinston = new LoggingWinston({projectId: 'route-forecast'});
+if (!process.env.NO_LOGGING) {
+    const winston = require('winston');
+    const expressWinston = require('express-winston');
+    const {LoggingWinston} = require('@google-cloud/logging-winston');
+    const loggingWinston = new LoggingWinston({projectId: 'route-forecast'});
 
-const logger = winston.createLogger({
-    level: 'info',
-    transports: [
-        new winston.transports.Console(),
-        // Add Stackdriver Logging
-        loggingWinston
-    ]
-});
-const StackdriverTransport = new LoggingWinston({
-    projectId: 'route-forecast'
-/*
-    keyFilename: 'gcp_key.json',
-    prefix: 'myservice',
-    serviceContext: {
-        service: 'myservice',
-        version: 'dev'
-    }
-*/
-});
+    const logger = winston.createLogger({
+        level: 'info',
+        transports: [
+            new winston.transports.Console(),
+            // Add Stackdriver Logging
+            loggingWinston
+        ]
+    });
+    const StackdriverTransport = new LoggingWinston({
+        projectId: 'route-forecast'
+    /*
+        keyFilename: 'gcp_key.json',
+        prefix: 'myservice',
+        serviceContext: {
+            service: 'myservice',
+            version: 'dev'
+        }
+    */
+    });
+}
 
 import reducer from '../reducers/reducer';
 import {applyMiddleware, createStore} from 'redux';
@@ -54,35 +56,38 @@ const colorize = process.env.NODE_ENV !== 'production';
 
 app.use(compression());
 
-// Logger to capture all requests and output them to the console.
-// [START requests]
-const requestLogger = expressWinston.logger({
-    transports: [
-        StackdriverTransport,
-        new winston.transports.Console({
-            json: false,
-            colorize: colorize
-        })
-    ],
-    expressFormat: true,
-    meta: false
-});
-// [END requests]
+if (!process.env.NO_LOGGING) {
+    // Logger to capture all requests and output them to the console.
+    // [START requests]
 
-// Logger to capture any top-level errors and output json diagnostic info.
-// [START errors]
-const errorLogger = expressWinston.errorLogger({
-    transports: [
-        StackdriverTransport,
-        new winston.transports.Console({
-            json: true,
-            colorize: colorize
-        })
-    ]
-});
-// [END errors]
+    const requestLogger = expressWinston.logger({
+        transports: [
+            StackdriverTransport,
+            new winston.transports.Console({
+                json: false,
+                colorize: colorize
+            })
+        ],
+        expressFormat: true,
+        meta: false
+    });
+    // [END requests]
 
-app.use(requestLogger);
+    // Logger to capture any top-level errors and output json diagnostic info.
+    // [START errors]
+    const errorLogger = expressWinston.errorLogger({
+        transports: [
+            StackdriverTransport,
+            new winston.transports.Console({
+                json: true,
+                colorize: colorize
+            })
+        ]
+    });
+    // [END errors]
+
+    app.use(requestLogger);
+}
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -137,7 +142,9 @@ app.post('/forecast', upload.none(), (req, res) => {
         return;
     }
     const forecastPoints = JSON.parse(req.body.locations);
-    logger.info(`Request from ${req.ip} for ${forecastPoints.length} forecast points`);
+    if (!process.env.NO_LOGGING) {
+        logger.info(`Request from ${req.ip} for ${forecastPoints.length} forecast points`);
+    }
     if (forecastPoints.length > 75) {
         res.status(400).json({'details': 'Invalid request, increase forecast time interval'});
         return;
@@ -223,13 +230,14 @@ app.get('/', (req, res) => {
         const ejsVariables = {
             'maps_key': process.env.MAPS_KEY,
             'timezone_api_key': process.env.TIMEZONE_API_KEY,
+            'bitly_token':process.env.BITLY_TOKEN,
             'preloaded_state':'',
             'reactDom': '',
             delimiter: '?'
         };
         res.render('index', ejsVariables)
     } else {
-        logger.warn('SSR enabled');
+        // logger.warn('SSR enabled');
         const store = createStore(reducer, undefined, applyMiddleware(thunkMiddleware));
 
         const reactDom = renderToString(
@@ -240,6 +248,7 @@ app.get('/', (req, res) => {
         const ejsVariables = {
             'maps_key':process.env.MAPS_KEY,
             'timezone_api_key':process.env.TIMEZONE_API_KEY,
+            'bitly_token':process.env.BITLY_TOKEN,
             'reactDom':reactDom,
             'preloaded_state':JSON.stringify(store.getState()).replace(/</g, '\\u003c'),
             delimiter: '?'
@@ -255,7 +264,9 @@ if (process.env.NODE_ENV !== 'production') {
     app.use(webpackDevMiddleware(compiler, {writeToDisk: true, publicPath: config({}, undefined).output.publicPath}));
     app.use(require("webpack-hot-middleware")(compiler));
 }
-app.use(errorLogger);
+if (!process.env.NO_LOGGING) {
+    app.use(errorLogger);
+}
 
 const port = process.env.PORT || 8080;
 app.listen(port, () =>

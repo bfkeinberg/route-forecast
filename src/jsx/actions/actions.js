@@ -402,27 +402,53 @@ export const setShortUrl = function(url) {
     }
 };
 
+
+// .then(responseJson => {
+//     if (responseJson['id'] !== undefined) {
+//         dispatch(setShortUrl(responseJson['id']));
+//     }
+// }).catch(error => dispatch(setErrorDetails(error)))
+
 export const shortenUrl = function(url) {
-    return function (dispatch,getState) {
-        fetch(`https://www.googleapis.com/urlshortener/v1/url?key=${getState().params.maps_api_key}`,
+    return async function (dispatch,getState) {
+        const bitlyAccessToken = getState().params.bitly_token
+
+        const groupsResponse = await fetch(`https://api-ssl.bitly.com/v4/groups`,
             {
-                method:"POST",
                 headers: {
                     Accept: 'application/json',
                     'Content-Type': 'application/json',
-                },
-                body:JSON.stringify({'longUrl':url})})
-            .then(response => {
-                if (response.ok) {
-                    return response.json();
-                } else {
-                    throw Error(`URL shortener failed with ${response.status} ${response.statusText}`);
-                }})
-            .then(responseJson => {
-                if (responseJson['id'] !== undefined) {
-                    dispatch(setShortUrl(responseJson['id']));
+                    Authorization: `Bearer ${bitlyAccessToken}`
                 }
-            }).catch(error => dispatch(setErrorDetails(error)))
+            })
+        if (!groupsResponse.ok) {
+            throw Error(`Bitly groupid fetch failed with ${response.status} ${response.statusText}`);
+        }
+        const groupsJson = await groupsResponse.json()
+        if (!groupsJson.groups) {
+            throw Error(`Bitly is probably mad at authentication for some reason; failed with message ${groupsJson.message}`);
+        }
+        const groupID = groupsJson.groups[0].guid
+
+        const bitlinkResponse = await fetch('https://api-ssl.bitly.com/v4/shorten', {
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${bitlyAccessToken}`,
+            },
+            body: JSON.stringify({
+                "long_url": url,
+                "group_guid": groupID
+            })
+        })
+        if (!bitlinkResponse.ok) {
+            throw Error(`Bitly link creation failed with ${bitlinkResponse.status} ${bitlinkResponse.statusText}`);
+        }
+        const bitlinkJson = await bitlinkResponse.json()
+        if (!bitlinkJson.link) {
+            throw Error(`Bitly is mad for some reason: ${groupsJson.message}`);
+        }
+        dispatch(setShortUrl(bitlinkJson.link));
     };
 };
 
@@ -565,11 +591,12 @@ export const setActionUrl = function(action) {
 };
 
 export const SET_API_KEYS = 'SET_API_KEYS';
-export const setApiKeys = function(mapsKey,timezoneKey) {
+export const setApiKeys = function(mapsKey,timezoneKey, bitlyToken) {
     return {
         type: SET_API_KEYS,
         mapsKey: mapsKey,
-        timezoneKey: timezoneKey
+        timezoneKey: timezoneKey,
+        bitlyToken: bitlyToken
     };
 };
 

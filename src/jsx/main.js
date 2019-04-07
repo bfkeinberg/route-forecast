@@ -93,7 +93,8 @@ export class RouteWeatherUI extends Component {
         search: PropTypes.string.isRequired,
         action: PropTypes.string.isRequired,
         maps_api_key: PropTypes.string.isRequired,
-        timezone_api_key: PropTypes.string.isRequired
+        timezone_api_key: PropTypes.string.isRequired,
+        bitly_token: PropTypes.string.isRequired
     };
 
     constructor(props) {
@@ -105,7 +106,7 @@ export class RouteWeatherUI extends Component {
         let queryParams = queryString.parse(props.search);
         RouteWeatherUI.updateFromQueryParams(this.props, queryParams);
         props.setActionUrl(props.action);
-        props.setApiKeys(props.maps_api_key,props.timezone_api_key);
+        props.setApiKeys(props.maps_api_key,props.timezone_api_key, props.bitly_token);
         this.props.updateControls(queryParams.controlPoints==undefined?[]:this.parseControls(queryParams.controlPoints));
         if (newUserMode) {
             RouteWeatherUI.loadCannedData(this.props);
