@@ -402,54 +402,53 @@ export const setShortUrl = function(url) {
     }
 };
 
-
-// .then(responseJson => {
-//     if (responseJson['id'] !== undefined) {
-//         dispatch(setShortUrl(responseJson['id']));
-//     }
-// }).catch(error => dispatch(setErrorDetails(error)))
-
 export const shortenUrl = function(url) {
     return async function (dispatch,getState) {
-        const bitlyAccessToken = getState().params.bitly_token
+        const bitlyAccessToken = getState().params.bitly_token;
 
-        const groupsResponse = await fetch(`https://api-ssl.bitly.com/v4/groups`,
+        fetch(`https://api-ssl.bitly.com/v4/groups`,
             {
                 headers: {
                     Accept: 'application/json',
                     'Content-Type': 'application/json',
                     Authorization: `Bearer ${bitlyAccessToken}`
                 }
-            })
-        if (!groupsResponse.ok) {
-            throw Error(`Bitly groupid fetch failed with ${response.status} ${response.statusText}`);
-        }
-        const groupsJson = await groupsResponse.json()
-        if (!groupsJson.groups) {
-            throw Error(`Bitly is probably mad at authentication for some reason; failed with message ${groupsJson.message}`);
-        }
-        const groupID = groupsJson.groups[0].guid
+            }).then( response => {
+                if (response.ok) {
+                    return response.json();
+                }
+                throw Error(`Bitly groupid fetch failed with ${response.status} ${response.statusText}`);
+            }
+        ).then (responseJson => {
+            if (!responseJson.groups) {
+                throw Error(`Bitly is probably mad at authentication for some reason; failed with message ${responseJson.message}`);
+            }
+            const groupID = responseJson.groups[0].guid;
 
-        const bitlinkResponse = await fetch('https://api-ssl.bitly.com/v4/shorten', {
-            method: "POST",
-            headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${bitlyAccessToken}`,
-            },
-            body: JSON.stringify({
-                "long_url": url,
-                "group_guid": groupID
+            fetch('https://api-ssl.bitly.com/v4/shorten', {
+                method: "POST",
+                headers: {
+                    Accept: 'application/json',
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${bitlyAccessToken}`,
+                },
+                body: JSON.stringify({
+                    "long_url": url,
+                    "group_guid": groupID
+                })
+            }).then ( response => {
+                if (response.ok) {
+                    return response.json();
+                }
+                throw Error(`Bitly link creation failed with ${response.status} ${response.statusText}`);
+            }).then( responseJson => {
+                if (responseJson.link) {
+                    dispatch(setShortUrl(responseJson.link));
+                }
+                throw Error(`Bitly is mad for some reason: ${groupsJson.message}`);
             })
-        })
-        if (!bitlinkResponse.ok) {
-            throw Error(`Bitly link creation failed with ${bitlinkResponse.status} ${bitlinkResponse.statusText}`);
-        }
-        const bitlinkJson = await bitlinkResponse.json()
-        if (!bitlinkJson.link) {
-            throw Error(`Bitly is mad for some reason: ${groupsJson.message}`);
-        }
-        dispatch(setShortUrl(bitlinkJson.link));
-    };
+        }).catch( error => dispatch(setErrorDetails(error)));
+    }
 };
 
 export const SET_QUERY = 'SET_QUERY';

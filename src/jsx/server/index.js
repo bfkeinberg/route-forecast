@@ -15,13 +15,17 @@ import callWeatherService from './weatherCalculator';
 const url = require('url');
 var strava = require('strava-v3');
 const querystring = require('querystring');
+let winston;
+let expressWinston;
+let logger;
+let StackdriverTransport;
 if (!process.env.NO_LOGGING) {
-    const winston = require('winston');
-    const expressWinston = require('express-winston');
+    winston = require('winston');
+    expressWinston = require('express-winston');
     const {LoggingWinston} = require('@google-cloud/logging-winston');
     const loggingWinston = new LoggingWinston({projectId: 'route-forecast'});
 
-    const logger = winston.createLogger({
+    logger = winston.createLogger({
         level: 'info',
         transports: [
             new winston.transports.Console(),
@@ -29,7 +33,7 @@ if (!process.env.NO_LOGGING) {
             loggingWinston
         ]
     });
-    const StackdriverTransport = new LoggingWinston({
+    StackdriverTransport = new LoggingWinston({
         projectId: 'route-forecast'
     /*
         keyFilename: 'gcp_key.json',
@@ -56,11 +60,13 @@ const colorize = process.env.NODE_ENV !== 'production';
 
 app.use(compression());
 
+let requestLogger;
+let errorLogger;
 if (!process.env.NO_LOGGING) {
     // Logger to capture all requests and output them to the console.
     // [START requests]
 
-    const requestLogger = expressWinston.logger({
+    requestLogger = expressWinston.logger({
         transports: [
             StackdriverTransport,
             new winston.transports.Console({
@@ -75,7 +81,7 @@ if (!process.env.NO_LOGGING) {
 
     // Logger to capture any top-level errors and output json diagnostic info.
     // [START errors]
-    const errorLogger = expressWinston.errorLogger({
+    errorLogger = expressWinston.errorLogger({
         transports: [
             StackdriverTransport,
             new winston.transports.Console({

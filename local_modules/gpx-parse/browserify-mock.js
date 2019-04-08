@@ -1,1 +1,0 @@
-exports.empty = null;
