@@ -86,9 +86,9 @@ describe('Call URL shortener', () => {
             "params": {
                 "newUserMode": false,
                 "action": "/forecast",
-                "maps_api_key": "AIzaSyDLmXz6JFen9Y9ZfwFcuJWdrRmq-kBjnKs",
-                "timezone_api_key": "AIzaSyBS_wyxfIuLDEJWNOKs4w1NqbmwSDjLqCE",
-                "bitly_token": "2404bc27371060258248c4782ad4d242cbca258d"
+                "maps_api_key": process.env.MAPS_KEY,
+                "timezone_api_key": process.env.TIMEZONE_API_KEY,
+                "bitly_token": process.env.BITLY_TOKEN
             }
         };
         let store = mockStore(initialState);
