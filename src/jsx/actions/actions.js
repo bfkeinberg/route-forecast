@@ -403,51 +403,24 @@ export const setShortUrl = function(url) {
 };
 
 export const shortenUrl = function(url) {
-    return async function (dispatch,getState) {
-        const bitlyAccessToken = getState().params.bitly_token;
-
-        return fetch(`https://api-ssl.bitly.com/v4/groups`,
+    return async function (dispatch) {
+        fetch("/bitly",
             {
                 headers: {
                     Accept: 'application/json',
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${bitlyAccessToken}`
-                }
-            }).then( response => {
-                if (response.ok) {
-                    return response.json();
-                }
-                throw Error(`Bitly groupid fetch failed with ${response.status} ${response.statusText}`);
-            }
-        ).then (responseJson => {
-            if (!responseJson.groups) {
-                throw Error(`Bitly is probably mad at authentication for some reason; failed with message ${responseJson.message}`);
-            }
-            const groupID = responseJson.groups[0].guid;
-
-            return fetch('https://api-ssl.bitly.com/v4/shorten', {
-                method: "POST",
-                headers: {
-                    Accept: 'application/json',
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${bitlyAccessToken}`,
+                    'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({
-                    "long_url": url,
-                    "group_guid": groupID
-                })
-            }).then ( response => {
-                if (response.ok) {
-                    return response.json();
-                }
-                throw Error(`Bitly link creation failed with ${response.status} ${response.statusText}`);
-            }).then( responseJson => {
-                if (responseJson.link) {
-                    return dispatch(setShortUrl(responseJson.link));
-                }
-                throw Error(`Bitly is mad for some reason: ${groupsJson.message}`);
+                method: 'POST',
+                body: JSON.stringify({longUrl: url})
             })
-        }).catch( error => dispatch(setErrorDetails(error)));
+            .then(response => response.json())
+            .then(responseJson => {
+                if (responseJson.error === null) {
+                    dispatch(setShortUrl(responseJson.url));
+                } else {
+                    dispatch(setErrorDetails(responseJson.error));
+                }
+            })
     }
 };
 
