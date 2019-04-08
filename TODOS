@@ -1,6 +1,6 @@
+metric support for pace selection
 support pre-compressed and on-the-fly compression
 expand redux SSR support to other query parameters
 service worker
-bitly instead of goo.gl
 immutable.js/mori
 place wind arrow in consistent location relative to track
