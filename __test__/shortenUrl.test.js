@@ -20,7 +20,7 @@ describe('Call URL shortener', () => {
 */
 
         const expectedActions = [
-            { type: actions.SET_SHORT_URL, url:"foo" },
+            { type: actions.SET_SHORT_URL, url:"http://bit.ly/2D3VYkz" },
             ];
 
         const initialState = {
@@ -96,8 +96,7 @@ describe('Call URL shortener', () => {
         let url = 'https://www.cyclerouteforecast.com/?controlPoints=%3AWicomico%20Shores%2C13.9%2C15%3AChaptico%20Market%2C26.4%2C15&interval=1&metric=false&pace=D&rwgpsRoute=18408464&start=Fri%20Apr%205%202019%2007%3A00%3A00&strava_activity=;';
 
         await(store.dispatch(shortenUrl(url)));
-
-        // expect(store.getActions()).toEqual(expectedActions);
+        expect(store.getActions()).toEqual(expectedActions);
 
         //let newState = expectedActions.reduce((previousValue, currentValue) => rootReducer(previousValue,currentValue),initialState);
         // expect(newState.controls.calculatedControlValues).toEqual(nextControlValues);

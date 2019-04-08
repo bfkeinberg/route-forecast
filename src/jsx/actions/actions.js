@@ -406,7 +406,7 @@ export const shortenUrl = function(url) {
     return async function (dispatch,getState) {
         const bitlyAccessToken = getState().params.bitly_token;
 
-        fetch(`https://api-ssl.bitly.com/v4/groups`,
+        return fetch(`https://api-ssl.bitly.com/v4/groups`,
             {
                 headers: {
                     Accept: 'application/json',
@@ -425,7 +425,7 @@ export const shortenUrl = function(url) {
             }
             const groupID = responseJson.groups[0].guid;
 
-            fetch('https://api-ssl.bitly.com/v4/shorten', {
+            return fetch('https://api-ssl.bitly.com/v4/shorten', {
                 method: "POST",
                 headers: {
                     Accept: 'application/json',
@@ -443,7 +443,7 @@ export const shortenUrl = function(url) {
                 throw Error(`Bitly link creation failed with ${response.status} ${response.statusText}`);
             }).then( responseJson => {
                 if (responseJson.link) {
-                    dispatch(setShortUrl(responseJson.link));
+                    return dispatch(setShortUrl(responseJson.link));
                 }
                 throw Error(`Bitly is mad for some reason: ${groupsJson.message}`);
             })
