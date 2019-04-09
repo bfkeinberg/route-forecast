@@ -402,8 +402,12 @@ export const setShortUrl = function(url) {
     }
 };
 
+/*
+ * @param {String} url the URL to shortern
+ * @returns {function(*=, *): Promise<T | never>} return value
+ */
 export const shortenUrl = function(url) {
-    return async function (dispatch) {
+    return function (dispatch) {
         fetch("/bitly",
             {
                 headers: {
