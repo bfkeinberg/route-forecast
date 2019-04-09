@@ -6,6 +6,8 @@ const getBearingDifference = function (bearing,windBearing) {
         windBearing - bearing < 0 ? windBearing - bearing + 360 : windBearing - bearing);
 };
 
+/* eslint-disable max-params*/
+
 /**
  *
  * @param {number} lat latitude

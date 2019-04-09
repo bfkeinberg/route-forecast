@@ -15,10 +15,10 @@ import callWeatherService from './weatherCalculator';
 const url = require('url');
 var strava = require('strava-v3');
 const querystring = require('querystring');
-let winston;
-let expressWinston;
-let logger;
-let StackdriverTransport;
+let winston = null;
+let expressWinston = null;
+let logger = null;
+let StackdriverTransport = null;
 if (!process.env.NO_LOGGING) {
     winston = require('winston');
     expressWinston = require('express-winston');
@@ -35,6 +35,7 @@ if (!process.env.NO_LOGGING) {
     });
     StackdriverTransport = new LoggingWinston({
         projectId: 'route-forecast'
+
     /*
         keyFilename: 'gcp_key.json',
         prefix: 'myservice',
@@ -60,8 +61,8 @@ const colorize = process.env.NODE_ENV !== 'production';
 
 app.use(compression());
 
-let requestLogger;
-let errorLogger;
+let requestLogger = null;
+let errorLogger = null;
 if (!process.env.NO_LOGGING) {
     // Logger to capture all requests and output them to the console.
     // [START requests]

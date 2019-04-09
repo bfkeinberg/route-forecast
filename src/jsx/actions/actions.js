@@ -402,8 +402,12 @@ export const setShortUrl = function(url) {
     }
 };
 
+/*
+ * @param {String} url the URL to shortern
+ * @returns {function(*=, *): Promise<T | never>} return value
+ */
 export const shortenUrl = function(url) {
-    return async function (dispatch,getState) {
+    return function (dispatch,getState) {
         const bitlyAccessToken = getState().params.bitly_token;
 
         return fetch(`https://api-ssl.bitly.com/v4/groups`,
@@ -445,7 +449,7 @@ export const shortenUrl = function(url) {
                 if (responseJson.link) {
                     return dispatch(setShortUrl(responseJson.link));
                 }
-                throw Error(`Bitly is mad for some reason: ${groupsJson.message}`);
+                throw Error(`Bitly is mad for some reason: ${responseJson.message}`);
             })
         }).catch( error => dispatch(setErrorDetails(error)));
     }
