@@ -168,7 +168,7 @@ app.post('/forecast', upload.none(), (req, res) => {
     }
 });
 
-app.post('/bitly', async (req, res) => { 
+app.post('/bitly', async (req, res) => {
     const longUrl = req.body.longUrl
     const {error, url} = await getBitlyShortenedUrl(process.env.BITLY_TOKEN, longUrl)
     res.json({error, url})
@@ -217,7 +217,7 @@ const getBitlyShortenedUrl = (accessToken, longUrl) => {
             throw Error(`Bitly is mad for some reason: ${responseJson.message}`);
         })
     }).catch( error => ({error: error.toString(), url: null}));
-}
+};
 
 const getStravaAuthUrl = (baseUrl,state) => {
     process.env.STRAVA_REDIRECT_URI = baseUrl + '/stravaAuthReply';
