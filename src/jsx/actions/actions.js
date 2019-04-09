@@ -408,7 +408,7 @@ export const setShortUrl = function(url) {
  */
 export const shortenUrl = function(url) {
     return function (dispatch) {
-        fetch("/bitly",
+        return fetch("/bitly",
             {
                 headers: {
                     Accept: 'application/json',
@@ -420,9 +420,9 @@ export const shortenUrl = function(url) {
             .then(response => response.json())
             .then(responseJson => {
                 if (responseJson.error === null) {
-                    dispatch(setShortUrl(responseJson.url));
+                    return dispatch(setShortUrl(responseJson.url));
                 } else {
-                    dispatch(setErrorDetails(responseJson.error));
+                    return dispatch(setErrorDetails(responseJson.error));
                 }
             })
     }

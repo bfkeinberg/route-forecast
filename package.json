@@ -68,7 +68,7 @@
     "react-flatpickr": "^3.6.4",
     "react-hot-loader": "^4.6.3",
     "react-loadable": "^5.4.0",
-    "react-redux": "^6.0.0",
+    "react-redux": "^7.0.1",
     "react-responsive": "^6.0.1",
     "react-split-pane": "^0.1.82",
     "react-toastr": "^3.0.0",
