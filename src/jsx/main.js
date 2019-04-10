@@ -203,7 +203,7 @@ export class RouteWeatherUI extends Component {
             <LocationContext.Consumer>
                 {value => <QueryString href={value.href} origin={value.origin}/>}
             </LocationContext.Consumer>
-                <SplitPane defaultSize={300} minSize={150} maxSize={530} split="horizontal">
+                <SplitPane defaultSize={320} minSize={150} maxSize={530} split="horizontal">
                     <SplitPane defaultSize={550} minSize={150} split='vertical' pane2Style={{'overflow':'scroll'}}>
                         {inputForm}
                         <ErrorBoundary>

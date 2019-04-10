@@ -1013,14 +1013,15 @@
     teeny-request "^3.11.1"
 
 "@google-cloud/logging-winston@^0.11.0":
-  version "0.11.0"
-  resolved "https://registry.yarnpkg.com/@google-cloud/logging-winston/-/logging-winston-0.11.0.tgz#77786eb152b69f11c90325ba05bc898e823f76b7"
-  integrity sha512-Z1G4YJ2pjS3DvMvUradBWfOZxoE6DUnY5Ex9Rbe9qyWSc+KoC87KQrWN2WKrvtsWAY3sXGbn7gLuamRz8gUs/A==
+  version "0.11.1"
+  resolved "https://registry.yarnpkg.com/@google-cloud/logging-winston/-/logging-winston-0.11.1.tgz#9e6a4259c08e9bd504064e34b7118e3d5ebedbb3"
+  integrity sha512-exTIriar6Ixuk65nveMlOoFRyTfgXltW7zc+VBSa7J1cD4X+8SHas/On3YtwvSzaynVHZAZX9ATelT5leitTyQ==
   dependencies:
     "@google-cloud/logging" "^4.4.0"
+    google-auth-library "^3.1.0"
     lodash.mapvalues "^4.6.0"
     logform "^2.0.0"
-    semver "^5.5.1"
+    semver "^6.0.0"
     winston-transport "^4.2.0"
 
 "@google-cloud/logging@^4.4.0":
@@ -1408,9 +1409,9 @@
   integrity sha512-ONhaKPIufzzrlNbqtWFFd+jlnemX6lJAgq9ZeiZtS7I1PIf/la7CW4m83rTXRnVnsMbW2k56pGYu7AUFJD9Pow==
 
 "@types/babel__core@^7.1.0":
-  version "7.1.0"
-  resolved "https://registry.yarnpkg.com/@types/babel__core/-/babel__core-7.1.0.tgz#710f2487dda4dcfd010ca6abb2b4dc7394365c51"
-  integrity sha512-wJTeJRt7BToFx3USrCDs2BhEi4ijBInTQjOIukj6a/5tEkwpFMVZ+1ppgmE+Q/FQyc5P/VWUbx7I9NELrKruHA==
+  version "7.1.1"
+  resolved "https://registry.yarnpkg.com/@types/babel__core/-/babel__core-7.1.1.tgz#ce9a9e5d92b7031421e1d0d74ae59f572ba48be6"
+  integrity sha512-+hjBtgcFPYyCTo0A15+nxrCVJL7aC6Acg87TXd5OW3QhHswdrOLoles+ldL2Uk8q++7yIfl4tURtztccdeeyOw==
   dependencies:
     "@babel/parser" "^7.1.0"
     "@babel/types" "^7.0.0"
@@ -1495,9 +1496,9 @@
   integrity sha1-fyrX7FX5FEgvybHsS7GuYCjUYGY=
 
 "@types/node@*":
-  version "11.13.2"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-11.13.2.tgz#dc85dde46aa8740bb4aed54b8104250f8f849503"
-  integrity sha512-HOtU5KqROKT7qX/itKHuTtt5fV0iXbheQvrgbLNXFJQBY/eh+VS5vmmTAVlo3qIGMsypm0G4N1t2AXjy1ZicaQ==
+  version "11.13.4"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-11.13.4.tgz#f83ec3c3e05b174b7241fadeb6688267fe5b22ca"
+  integrity sha512-+rabAZZ3Yn7tF/XPGHupKIL5EcAbrLxnTr/hgQICxbeuAfWtT0UZSfULE+ndusckBItcv4o6ZeOJplQikVcLvQ==
 
 "@types/node@^10.1.0":
   version "10.14.4"
@@ -4135,9 +4136,9 @@ css@^2.1.0, css@^2.2.0, css@^2.2.1, css@^2.2.4:
     source-map-resolve "^0.5.2"
     urix "^0.1.0"
 
-"css@git+https://github.com/pocketjoso/css.git":
+"css@https://github.com/pocketjoso/css.git":
   version "2.2.1"
-  resolved "git+https://github.com/pocketjoso/css.git#8ddea7e3cbc0a183ecf694a7a5fbc84326893893"
+  resolved "https://github.com/pocketjoso/css.git#8ddea7e3cbc0a183ecf694a7a5fbc84326893893"
   dependencies:
     inherits "^2.0.1"
     source-map "^0.1.38"
@@ -6013,7 +6014,7 @@ glogg@^1.0.0:
   dependencies:
     sparkles "^1.0.0"
 
-google-auth-library@^3.0.0:
+google-auth-library@^3.0.0, google-auth-library@^3.1.0:
   version "3.1.2"
   resolved "https://registry.yarnpkg.com/google-auth-library/-/google-auth-library-3.1.2.tgz#ff2f88cd5cd2118a57bd3d5ad3c093c8837fc350"
   integrity sha512-cDQMzTotwyWMrg5jRO7q0A4TL/3GWBgO7I7q5xGKNiiFf9SmGY/OJ1YsLMgI2MVHHsEGyrqYnbnmV1AE+Z6DnQ==
@@ -7661,10 +7662,10 @@ jest@^24.5.0:
     import-local "^2.0.0"
     jest-cli "^24.7.1"
 
-jquery@^3.3.1:
-  version "3.3.1"
-  resolved "https://registry.yarnpkg.com/jquery/-/jquery-3.3.1.tgz#958ce29e81c9790f31be7792df5d4d95fc57fbca"
-  integrity sha512-Ubldcmxp5np52/ENotGxlLe6aGMvmF4R8S6tZjsP6Knsaxd/xp3Zrh50cG93lR6nPXyUFwzN3ZSOQI0wRJNdGg==
+jquery@^3.4.0:
+  version "3.4.0"
+  resolved "https://registry.yarnpkg.com/jquery/-/jquery-3.4.0.tgz#8de513fa0fa4b2c7d2e48a530e26f0596936efdf"
+  integrity sha512-ggRCXln9zEqv6OqAGXFEcshF5dSBvCkzj6Gm2gzuR5fWawaX8t7cxKVkkygKODrDAzKdoYw3l/e3pm3vlT4IbQ==
 
 js-base64@^2.1.9:
   version "2.5.1"
