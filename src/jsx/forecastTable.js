@@ -52,6 +52,10 @@ export class ForecastTable extends Component {
 
     toggleApparentDisplay = () => this.setState({showApparentTemp:!this.state.showApparentTemp});
 
+    static formatSpeed = (speed, isMetric) => {
+        return isMetric ? `${((speed*milesToKm)/1000).toFixed(0)} kph` : `${speed} mph`;
+    };
+
     expandTable(forecast, metric) {
         if (forecast.length > 0) {
             return (
@@ -69,7 +73,9 @@ export class ForecastTable extends Component {
                         <td>{ForecastTable.formatTemperature(this.state.showApparentTemp?point.feel : point.temp, this.props.metric)}</td>
                         <td>{point.precip}</td>
                         <td>{point.cloudCover}</td>
-                        <td className={ForecastTable.windStyle(point)}>{this.state.showGusts?<i>{point.gust}</i>:point.windSpeed}</td>
+                        <td className={ForecastTable.windStyle(point)}>{this.state.showGusts?<i>{
+                            ForecastTable.formatSpeed(point.gust, this.props.metric)}</i>:
+                            ForecastTable.formatSpeed(point.windSpeed, this.props.metric)}</td>
                         <td>{point.windBearing}</td>
                     </tr>
                 )}

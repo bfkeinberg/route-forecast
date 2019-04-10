@@ -49,7 +49,7 @@ export default function callWeatherService (lat, lon, currentTime, distance, zon
             'tempStr':`${Math.round(current.temperature)}F`,
             'precip':current.precipProbability===undefined?'<unavailable>':`${(current.precipProbability*100).toFixed(1)}%`,
             'cloudCover':current.cloudCover===undefined?'<unavailable>':`${(current.cloudCover*100).toFixed(1)}%`,
-            'windSpeed':!hasWind?'<unavailable>':`${Math.round(current.windSpeed)} mph`,
+            'windSpeed':!hasWind?'<unavailable>':`${Math.round(current.windSpeed)}`,
             'lat':lat,
             'lon':lon,
             'temp':`${Math.round(current.temperature)}`,
@@ -58,7 +58,7 @@ export default function callWeatherService (lat, lon, currentTime, distance, zon
             'rainy':rainy,
             'windBearing':windBearing,
             'vectorBearing':bearing,
-            'gust':current.windGust===undefined?'<unavailable>':`${Math.round(current.windGust)} mph`,
+            'gust':current.windGust===undefined?'<unavailable>':`${Math.round(current.windGust)}`,
             'feel':current.apparentTemperature===undefined?Math.round(current.temperature):Math.round(current.apparentTemperature)
         }
     }).
