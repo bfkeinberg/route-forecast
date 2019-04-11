@@ -28,9 +28,7 @@ const DateSelect = ({start,setStart}) => {
             <UncontrolledTooltip placement='bottom' target="startingTime">When you plan to begin riding</UncontrolledTooltip>
             <Icon icon="calendar"/>
             <Label for='calendar' size='sm' tag='b' id='startingTime'>Starting time</Label>
-            <Flatpickr key={start.getTime()} id='calendar' onChange={(dates) => {
-                console.log(`should set date to ${dates[0]}`); /*setStart(new Date(dates[0]));*/
-            }} onClose={(dates) => {setStart(new Date(dates[0]))}}
+            <Flatpickr key={start.getTime()} id='calendar' onClose={(dates) => {setStart(new Date(dates[0]))}}
                        options={{enableTime: true,
                            altInput: true, altFormat: 'F j, Y h:i K',
                            altInputClass: 'dateDisplay',
