@@ -29,7 +29,7 @@ import {
     setMetric,
     setPace,
     setRwgpsRoute,
-    setStart,
+    setInitialStart,
     setStravaActivity,
     setStravaError,
     setStravaToken,
@@ -84,7 +84,7 @@ export class RouteWeatherUI extends Component {
         newUserMode: PropTypes.func.isRequired,
         setRwgpsRoute: PropTypes.func.isRequired,
         setStravaToken: PropTypes.func.isRequired,
-        setStart: PropTypes.func.isRequired,
+        setInitialStart: PropTypes.func.isRequired,
         setPace: PropTypes.func.isRequired,
         setInterval: PropTypes.func.isRequired,
         setMetric: PropTypes.func.isRequired,
@@ -176,7 +176,7 @@ export class RouteWeatherUI extends Component {
             props.setFetchAfterLoad(true);
         }
         props.setStravaToken(RouteWeatherUI.getStravaToken(queryParams));
-        props.setStart(queryParams.start);
+        props.setInitialStart(queryParams.start);
         props.setPace(queryParams.pace);
         props.setInterval(queryParams.interval);
         props.setMetric(queryParams.metric==="true");
@@ -221,7 +221,7 @@ export class RouteWeatherUI extends Component {
 }
 
 const mapDispatchToProps = {
-    setStravaToken, setActionUrl, setRwgpsRoute, setApiKeys, setStravaError, setStart, setPace, setInterval, setMetric,
+    setStravaToken, setActionUrl, setRwgpsRoute, setApiKeys, setStravaError, setInitialStart, setPace, setInterval, setMetric,
     setStravaActivity, updateControls:updateUserControls, showForm, setFetchAfterLoad, toggleStravaAnalysis,
     loadFromRideWithGps, reset, newUserMode
 };

@@ -93,7 +93,7 @@ const initialStartTime = function() {
 };
 
 export const routeParams = function(state = {interval:defaultIntervalInHours,pace:defaultPace,rwgpsRoute:'',
-    rwgpsRouteIsTrip:false, start:initialStartTime()}, action) {
+    rwgpsRouteIsTrip:false, start:initialStartTime(), initialStart:initialStartTime()}, action) {
     switch (action.type) {
         case Actions.SET_RWGPS_ROUTE:
             if (action.route !== undefined) {
@@ -113,6 +113,17 @@ export const routeParams = function(state = {interval:defaultIntervalInHours,pac
                     return state;
                 } else {
                     return {...state, start: start};
+                }
+            } else {
+                return state;
+            }
+        case Actions.SET_INITIAL_START:
+            if (action.start !== undefined && action.start !== null) {
+                const start =  new Date(action.start);
+                if (isNaN(start.getTime())) {
+                    return state;
+                } else {
+                    return {...state, start: start, initialStart: start};
                 }
             } else {
                 return state;

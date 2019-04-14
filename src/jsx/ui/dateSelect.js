@@ -28,14 +28,16 @@ const DateSelect = ({start,setStart}) => {
             <UncontrolledTooltip placement='bottom' target="startingTime">When you plan to begin riding</UncontrolledTooltip>
             <Icon icon="calendar"/>
             <Label for='calendar' size='sm' tag='b' id='startingTime'>Starting time</Label>
-            <Flatpickr key={start.getTime()} id='calendar' onClose={(dates) => {setStart(new Date(dates[0]))}}
+            <Flatpickr key={start.getTime()} id='calendar'
                        options={{enableTime: true,
                            altInput: true, altFormat: 'F j, Y h:i K',
                            altInputClass: 'dateDisplay',
                            minDate: firstDate,
                            maxDate: later,
                            defaultDate: start,
-                           dateFormat: 'Y-m-d H:i'
+                           dateFormat: 'Y-m-d H:i',
+                           // onClose:(dates,datestr,instance)=>{setStart(new Date(dates[0]))}
+                           onParseConfig:(dates,datestr,instance) => instance.config.onClose.push((dates) => {setStart(new Date(dates[0]))})
                        }}/>
         </FormGroup>
     );
@@ -48,7 +50,7 @@ DateSelect.propTypes = {
 
 const mapStateToProps = (state) =>
     ({
-        start: state.uiInfo.routeParams.start
+        start: state.uiInfo.routeParams.initialStart
     });
 
 const mapDispatchToProps = {

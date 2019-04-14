@@ -29,6 +29,14 @@ export const setStart = function (start) {
     }
 };
 
+export const SET_INITIAL_START = 'SET_INITIAL_START';
+export const setInitialStart = function (start) {
+    return {
+        type: SET_INITIAL_START,
+        start: start
+    }
+};
+
 export const SET_PACE = 'SET_PACE';
 export const setPace = function(pace) {
     return {
