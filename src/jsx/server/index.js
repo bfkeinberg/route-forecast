@@ -17,7 +17,7 @@ var strava = require('strava-v3');
 const querystring = require('querystring');
 let winston = null;
 let expressWinston = null;
-let logger = null;
+let logger = console;
 let StackdriverTransport = null;
 if (!process.env.NO_LOGGING) {
     winston = require('winston');
@@ -295,7 +295,7 @@ app.get('/', (req, res) => {
         };
         res.render('index', ejsVariables)
     } else {
-        // logger.warn('SSR enabled');
+        logger.warn('SSR enabled');
         const store = createStore(reducer, undefined, applyMiddleware(thunkMiddleware));
 
         const reactDom = renderToString(

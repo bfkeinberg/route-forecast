@@ -3157,9 +3157,9 @@ camelcase@^5.0.0, camelcase@^5.2.0:
   integrity sha512-L28STB170nwWS63UjtlEOE3dldQApaJXZkOI1uMFfzf3rRuPegHaHesyee+YxQ+W6SvRDQV6UrdOdRiR153wJg==
 
 caniuse-lite@^1.0.30000955:
-  version "1.0.30000957"
-  resolved "https://registry.yarnpkg.com/caniuse-lite/-/caniuse-lite-1.0.30000957.tgz#fb1026bf184d7d62c685205358c3b24b9e29f7b3"
-  integrity sha512-8wxNrjAzyiHcLXN/iunskqQnJquQQ6VX8JHfW5kLgAPRSiSuKZiNfmIkP5j7jgyXqAQBSoXyJxfnbCFS0ThSiQ==
+  version "1.0.30000959"
+  resolved "https://registry.yarnpkg.com/caniuse-lite/-/caniuse-lite-1.0.30000959.tgz#215d3455866da874179c6170202f0cc64f961cfd"
+  integrity sha512-6BvqmS0VLmY4sJCz6AbIJRQfcns8McDxi424y+3kmtisJeA9/5qslP+K8sqremDau7UU4WSsqdRP032JrqZY8Q==
 
 capture-exit@^2.0.0:
   version "2.0.0"
@@ -3884,6 +3884,14 @@ create-react-context@<=0.2.2:
     fbjs "^0.8.0"
     gud "^1.0.0"
 
+create-react-context@^0.2.3:
+  version "0.2.3"
+  resolved "https://registry.yarnpkg.com/create-react-context/-/create-react-context-0.2.3.tgz#9ec140a6914a22ef04b8b09b7771de89567cb6f3"
+  integrity sha512-CQBmD0+QGgTaxDL3OX1IDXYqjkp2It4RIbcb99jS6AEg27Ga+a9G3JtK6SIu0HBwPLZlmwt9F7UwWA4Bn92Rag==
+  dependencies:
+    fbjs "^0.8.0"
+    gud "^1.0.0"
+
 critical@^0.8.1:
   version "0.8.4"
   resolved "https://registry.yarnpkg.com/critical/-/critical-0.8.4.tgz#beb716afa221a84c4ed216719c18e25a8ac8a3c2"
@@ -4154,9 +4162,9 @@ css@^2.1.0, css@^2.2.0, css@^2.2.1, css@^2.2.4:
     source-map-resolve "^0.5.2"
     urix "^0.1.0"
 
-"css@git+https://github.com/pocketjoso/css.git":
+"css@https://github.com/pocketjoso/css.git":
   version "2.2.1"
-  resolved "git+https://github.com/pocketjoso/css.git#8ddea7e3cbc0a183ecf694a7a5fbc84326893893"
+  resolved "https://github.com/pocketjoso/css.git#8ddea7e3cbc0a183ecf694a7a5fbc84326893893"
   dependencies:
     inherits "^2.0.1"
     source-map "^0.1.38"
@@ -6248,12 +6256,12 @@ gulplog@^1.0.0:
     glogg "^1.0.0"
 
 gzip-size@^5.0.0:
-  version "5.0.0"
-  resolved "https://registry.yarnpkg.com/gzip-size/-/gzip-size-5.0.0.tgz#a55ecd99222f4c48fd8c01c625ce3b349d0a0e80"
-  integrity sha512-5iI7omclyqrnWw4XbXAmGhPsABkSIDQonv2K0h61lybgofWa6iZyvrI3r2zsJH4P8Nb64fFVzlvfhs0g7BBxAA==
+  version "5.1.0"
+  resolved "https://registry.yarnpkg.com/gzip-size/-/gzip-size-5.1.0.tgz#2db0396c71f5c902d5cf6b52add5030b93c99bd2"
+  integrity sha512-wfSnvypBDRW94v5W3ckvvz/zFUNdJ81VgOP6tE4bPpRUcc0wGqU+y0eZjJEvKxwubJFix6P84sE8M51YWLT7rQ==
   dependencies:
     duplexer "^0.1.1"
-    pify "^3.0.0"
+    pify "^4.0.1"
 
 handlebars@^4.1.0:
   version "4.1.2"
@@ -6828,9 +6836,9 @@ inline-critical@^4.0.4:
     uglify-js "^3.4.9"
 
 inquirer@^6.2.2:
-  version "6.2.2"
-  resolved "https://registry.yarnpkg.com/inquirer/-/inquirer-6.2.2.tgz#46941176f65c9eb20804627149b743a218f25406"
-  integrity sha512-Z2rREiXA6cHRR9KBOarR3WuLlFzlIfAEIiB45ll5SSadMg7WqOh1MKEjjndfuH5ewXdixWCxqnVfGOQzPeiztA==
+  version "6.3.1"
+  resolved "https://registry.yarnpkg.com/inquirer/-/inquirer-6.3.1.tgz#7a413b5e7950811013a3db491c61d1f3b776e8e7"
+  integrity sha512-MmL624rfkFt4TG9y/Jvmt8vdmOo836U7Y0Hxr2aFk3RelZEGX4Igk0KabWrcaaZaTv9uzglOqWh1Vly+FAWAXA==
   dependencies:
     ansi-escapes "^3.2.0"
     chalk "^2.4.2"
@@ -6843,7 +6851,7 @@ inquirer@^6.2.2:
     run-async "^2.2.0"
     rxjs "^6.4.0"
     string-width "^2.1.0"
-    strip-ansi "^5.0.0"
+    strip-ansi "^5.1.0"
     through "^2.3.6"
 
 interpret@^1.1.0:
@@ -10646,9 +10654,9 @@ react-flatpickr@^3.6.4:
     prop-types "^15.5.10"
 
 react-hot-loader@^4.6.3:
-  version "4.8.3"
-  resolved "https://registry.yarnpkg.com/react-hot-loader/-/react-hot-loader-4.8.3.tgz#14f018777a60ea9cfa60496c7341c2f967311253"
-  integrity sha512-Is8bKbSxuDLTqsWu1yjr+o1yA6yGDGjEQ2i1E8t/Nj1xJYC6QBRbyoofTn1xkMoKpcgXHuTJTqBhK0RY6moFJA==
+  version "4.8.4"
+  resolved "https://registry.yarnpkg.com/react-hot-loader/-/react-hot-loader-4.8.4.tgz#357ba342e367fd42d6a870a9c0601c23fa0730c6"
+  integrity sha512-O98btZXcm24ZgP+aPBD0W9N+GEnkOg6vlLEy/IMZ53u3K/dGqO0I/RU4qrmQzE+wMDLpwNo5TwxaAjVw9Y+IBA==
   dependencies:
     fast-levenshtein "^2.0.6"
     global "^4.3.0"

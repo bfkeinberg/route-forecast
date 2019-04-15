@@ -36,7 +36,6 @@ const DateSelect = ({start,setStart}) => {
                            maxDate: later,
                            defaultDate: start,
                            dateFormat: 'Y-m-d H:i',
-                           // onClose:(dates,datestr,instance)=>{setStart(new Date(dates[0]))}
                            onParseConfig:(dates,datestr,instance) => instance.config.onClose.push((dates) => {setStart(new Date(dates[0]))})
                        }}/>
         </FormGroup>
