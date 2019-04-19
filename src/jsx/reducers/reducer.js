@@ -46,7 +46,6 @@ let state = {
         rwgpsRouteIsTrip,
         fetchingRoute:false,
         fetchingForecast:false,
-        formVisible:true,
         errorDetails,
         errorSource,
         shortUrl,
@@ -147,7 +146,7 @@ export const routeParams = function(state = {interval:defaultIntervalInHours,pac
     }
 };
 
-const dialogParams = function(state = {formVisible:true, errorDetails:null, succeeded:true, shortUrl:' ',
+const dialogParams = function(state = {errorDetails:null, succeeded:true, shortUrl:' ',
 loadingSource:null,fetchingForecast:false,fetchingRoute:false}, action) {
     switch (action.type) {
         case Actions.CLEAR_ROUTE_DATA:
@@ -170,10 +169,6 @@ loadingSource:null,fetchingForecast:false,fetchingRoute:false}, action) {
         case Actions.GPX_ROUTE_LOADING_FAILURE:
             return {...state, fetchingRoute: false, succeeded: false,
                 errorDetails: (typeof action.status === 'object' ? action.status.message : action.status)};
-        case Actions.SHOW_FORM:
-            return {...state, formVisible: true};
-        case Actions.HIDE_FORM:
-            return {...state, formVisible: false};
         case Actions.SET_ERROR_DETAILS:
             if (action.details instanceof Error) {
                 return {...state, errorDetails: action.details.toString()};

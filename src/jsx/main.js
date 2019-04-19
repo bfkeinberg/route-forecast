@@ -1,10 +1,5 @@
 import React, {Component} from 'react';
-import ControlPoints from './controls';
-import RouteInfoForm from './routeInfoEntry';
-import RouteForecastMap from './map';
-import ForecastTable from './forecastTable';
-import SplitPane from 'react-split-pane';
-// import MediaQuery from 'react-responsive';
+import MediaQuery from 'react-responsive';
 // for react-splitter
 import 'normalize.css/normalize.css';
 import '@blueprintjs/core/lib/css/blueprint.css';
@@ -13,37 +8,35 @@ import 'ag-grid-community/dist/styles/ag-grid.css';
 import 'ag-grid-community/dist/styles/ag-theme-fresh.css';
 import 'flatpickr/dist/themes/confetti.css';
 import 'Images/style.css';
-// import {Button} from 'reactstrap';
 import queryString from 'query-string';
-import ErrorBoundary from './errorBoundary';
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 // import cookie from 'react-cookies';
 import LocationContext from './locationContext';
+import DesktopUI from './DesktopUI';
+import MobileUI from './MobileUI';
 
 import {
+    loadCookie,
+    loadFromRideWithGps,
+    newUserMode,
+    reset,
+    saveCookie,
     setActionUrl,
     setApiKeys,
     setFetchAfterLoad,
+    setInitialStart,
     setInterval,
     setMetric,
     setPace,
     setRwgpsRoute,
-    setInitialStart,
     setStravaActivity,
     setStravaError,
     setStravaToken,
-    showForm,
-    updateUserControls,
-    loadCookie,
-    saveCookie,
     toggleStravaAnalysis,
-    loadFromRideWithGps,
-    reset,
-    newUserMode
+    updateUserControls
 } from "./actions/actions";
 import QueryString from './queryString';
-import PaceTable from './paceTable';
 
 const demoRoute = 1797453;
 const demoControls = [
@@ -72,8 +65,6 @@ export class RouteWeatherUI extends Component {
         setActionUrl:PropTypes.func.isRequired,
         setApiKeys:PropTypes.func.isRequired,
         updateControls:PropTypes.func.isRequired,
-        formVisible:PropTypes.bool.isRequired,
-        showForm:PropTypes.func.isRequired,
         showPacePerTme:PropTypes.bool.isRequired,
         setFetchAfterLoad:PropTypes.func.isRequired,
         toggleStravaAnalysis: PropTypes.func.isRequired,
@@ -99,7 +90,6 @@ export class RouteWeatherUI extends Component {
 
     constructor(props) {
         super(props);
-        this.formatControlsForUrl = this.formatControlsForUrl.bind(this);
 
         const newUserMode = RouteWeatherUI.isNewUserMode(props.search);
         this.props.newUserMode(newUserMode);
@@ -142,9 +132,9 @@ export class RouteWeatherUI extends Component {
         return controlPoint.name + "," + controlPoint.distance + "," + controlPoint.duration;
     }
 
-    formatControlsForUrl(controlPoints) {
+    formatControlsForUrl = (controlPoints) => {
         return controlPoints.reduce((queryParam,point) => {return RouteWeatherUI.formatOneControl(queryParam) + ':' + RouteWeatherUI.formatOneControl(point)},'');
-    }
+    };
 
     static isNewUserMode(/*search*/) {
         return false;
@@ -188,33 +178,19 @@ export class RouteWeatherUI extends Component {
     }
 
     render() {
-        const inputForm = (
-            <ErrorBoundary>
-                <RouteInfoForm formatControlsForUrl={this.formatControlsForUrl}/>
-            </ErrorBoundary>
-        );
-/*
-        const formButton = (
-            <Button color="primary" onClick={this.props.showForm}>Modify...</Button>
-        );
-*/
         return (
         <div>
             <LocationContext.Consumer>
                 {value => <QueryString href={value.href} origin={value.origin}/>}
             </LocationContext.Consumer>
-                <SplitPane defaultSize={320} minSize={150} maxSize={530} split="horizontal">
-                    <SplitPane defaultSize={550} minSize={150} split='vertical' pane2Style={{'overflow':'scroll'}}>
-                        {inputForm}
-                        <ErrorBoundary>
-                            <ControlPoints/>
-                        </ErrorBoundary>
-                    </SplitPane>
-                        <SplitPane defaultSize={545} minSize={150} split="vertical" paneStyle={{'overflow':'scroll'}}>
-                            {this.props.showPacePerTme?<PaceTable/>:<ForecastTable/>}
-                            <RouteForecastMap maps_api_key={this.props.maps_api_key} />
-                        </SplitPane>
-                </SplitPane>
+
+            <MediaQuery minDeviceWidth={1000} values={{deviceWidth:1400}}>
+                <DesktopUI formatControlsForUrl={this.formatControlsForUrl} showPacePerTme={this.props.showPacePerTme}
+                           mapsApiKey={this.props.maps_api_key}/>
+            </MediaQuery>
+            <MediaQuery maxDeviceWidth={800} values={{deviceWidth:1400}}>
+                <MobileUI formatControlsForUrl={this.formatControlsForUrl} mapsApiKey={this.props.maps_api_key}/>
+            </MediaQuery>
         </div>
       );
     }
@@ -222,13 +198,12 @@ export class RouteWeatherUI extends Component {
 
 const mapDispatchToProps = {
     setStravaToken, setActionUrl, setRwgpsRoute, setApiKeys, setStravaError, setInitialStart, setPace, setInterval, setMetric,
-    setStravaActivity, updateControls:updateUserControls, showForm, setFetchAfterLoad, toggleStravaAnalysis,
+    setStravaActivity, updateControls:updateUserControls, setFetchAfterLoad, toggleStravaAnalysis,
     loadFromRideWithGps, reset, newUserMode
 };
 
 const mapStateToProps = (state) =>
     ({
-        formVisible: state.uiInfo.dialogParams.formVisible,
         showPacePerTme:state.controls.stravaAnalysis && state.strava.calculatedPaces !== null,
         rwgpsRouteIsTrip: state.uiInfo.routeParams.rwgpsRouteIsTrip,
         firstUse: state.params.newUserMode
