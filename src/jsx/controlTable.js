@@ -40,16 +40,10 @@ export class ControlTable extends Component {
     constructor(props) {
         super(props);
         let displayBanked = this.props.displayBanked;
-        this.deleteRenderer = this.deleteRenderer.bind(this);
-        this.removeRow = this.removeRow.bind(this);
         this.state = {
             context: { componentParent: this },
             frameworkComponents: { deleteRenderer: DeleteRenderer },
             columnDefs:[
-                {colId:'name', field:'name', sortable:false, resizable:true, editable:true, menuTabs:[
-                    'generalMenuTab',
-                    'columnsMenuTab'
-                ], headerName:'Name'},
                 {field:'distance', headerTooltip:`In ${props.metric?'km':'miles'}`,
                     type:'numericColumn', unSortIcon:true, sortable:true, resizable:true, editable:true, valueParser:ControlTable.setData, valueSetter:ControlTable.validateData, headerName:`${props.metric?'Kilometers':'Miles'}`},
                 {field:'duration', headerTooltip:'How many minutes you expect to spend at this control',
@@ -66,31 +60,45 @@ export class ControlTable extends Component {
                 {colId:'delete', suppressNavigable:true, suppressSizeToFit: true,
                     pinned:'right', cellRenderer:'deleteRenderer'}
             ]};
-        this.addRow = this.addRow.bind(this);
-        this.onGridReady = this.onGridReady.bind(this);
-        this.cellUpdated = this.cellUpdated.bind(this);
-        this.sortChanged = this.sortChanged.bind(this);
-        this.updateFromGrid = this.updateFromGrid.bind(this);
+        // no name field on mobile
+        this.desktop = window.matchMedia("(min-width: 1000px)").matches;
+        if (this.desktop) {
+            this.state.columnDefs.unshift({colId:'name', field:'name', sortable:false, resizable:true, editable:true, menuTabs:[
+                    'generalMenuTab',
+                    'columnsMenuTab'
+                ], headerName:'Name'});
+        } else {
+            this.state.columnDefs[1].headerName = 'Elapsed';
+            this.state.columnDefs[2].headerName = 'Arrival';
+        }
     }
 
-    onGridReady(params) {
+    onGridReady = (params) => {
         this.api = params.api;
         this.columnApi = params.columnApi;
+        if (this.props.count === 1) {
+            this.addRow();
+        }
         if (window.outerWidth < smallScreenWidth) {
             this.api.sizeColumnsToFit();
         }
-    }
+    };
 
-    addRow() {
+    addRow = () => {
         if (this.api===undefined) {
             return;
         }
-        let row = {name:'',duration:'',distance:'',id:this.props.controls.length};
-        this.api.updateRowData({add:[row], addIndex:row.id});
+        if (this.desktop) {
+            let row = {name:'',duration:'',distance:'',id:this.props.controls.length};
+            this.api.updateRowData({add:[row], addIndex:row.id});
+        } else {
+            let row = {duration:'',distance:'',id:this.props.controls.length};
+            this.api.updateRowData({add:[row], addIndex:row.id});
+        }
         this.updateFromGrid();
-    }
+    };
 
-    removeRow(row) {
+    removeRow = (row) => {
         let rowNode = this.api.getRowNode(row);
         if (rowNode === undefined) {
             return;
@@ -98,7 +106,7 @@ export class ControlTable extends Component {
         let transaction = {remove:[rowNode]};
         this.api.updateRowData(transaction);
         this.updateFromGrid();
-    }
+    };
 
     static appendUnit(cell) {
         return cell.value + ' min';
@@ -115,13 +123,12 @@ export class ControlTable extends Component {
     }
 
     // create a DOM object
-    deleteRenderer(params) {
+    deleteRenderer = (params) => {
         const deleteButton = <Button onClick={() => {this.removeRow(params.node.id)}} class={'pt-minimal'} icon={'delete'}/>;
         let eDiv = document.createElement('div');
         ReactDOM.render(deleteButton, eDiv);
-        console.log(`making a new delete button DOM object for ${params.node.id}`);
         return eDiv;
-    }
+    };
 
     static tabHandler(params) {
         let nextCell = params.nextCellDef;
@@ -178,10 +185,16 @@ export class ControlTable extends Component {
             this.columnApi.setColumnWidth(this.columnApi.getColumn('delete'),deleteColumnWidth);
         }
         // focus on new control if one has been added
-        if (this.api !== undefined && this.props.controls.length > 0 && this.props.controls[this.props.controls.length-1].name==='') {
-            console.log('setting focused cell');
-            this.api.setFocusedCell(this.props.controls.length-1,'name');
-            this.api.startEditingCell({colKey:'name',rowIndex:this.props.controls.length-1});
+        if (this.desktop) {
+            if (this.api !== undefined && this.props.controls.length > 0 && this.props.controls[this.props.controls.length-1].name==='') {
+                this.api.setFocusedCell(this.props.controls.length-1,'name');
+                this.api.startEditingCell({colKey:'name',rowIndex:this.props.controls.length-1});
+            }
+        } else {
+            if (this.api !== undefined && this.props.controls.length > 0 && this.props.controls[this.props.controls.length-1].distance==='') {
+                this.api.setFocusedCell(this.props.controls.length-1,'distance');
+                this.api.startEditingCell({colKey:'distance',rowIndex:this.props.controls.length-1});
+            }
         }
     }
 
@@ -189,7 +202,7 @@ export class ControlTable extends Component {
         return Number(params.newValue);
     }
 
-    cellUpdated(params) {
+    cellUpdated = (params) => {
         if (params.colDef.field==="name") {
             if (params.newValue===params.oldValue) {
                 return;
@@ -200,29 +213,29 @@ export class ControlTable extends Component {
             }
         }
         let rowData = params.node.data;
-        if (ControlTable.isValidRow(rowData)) {
+        if (ControlTable.isValidRow(rowData, this.desktop)) {
             // update
             this.updateFromGrid();
         }
-    }
+    };
 
-    static isValidRow(rowData) {
-        return (rowData.name!==undefined && rowData.distance!==undefined && rowData.duration!==undefined &&
+    static isValidRow(rowData, isDesktop) {
+        return ((isDesktop ? rowData.name!==undefined : true) && rowData.distance!==undefined && rowData.duration!==undefined &&
             rowData.name!=="" && rowData.distance!=="" && rowData.duration!=="");
     }
 
-    sortChanged() {
+    sortChanged = () => {
         this.setState({rowCount:this.api.getModel().getRowCount()});
         this.updateFromGrid();
-    }
+    };
 
-    updateFromGrid() {
+    updateFromGrid = () => {
         let modifiedControls = [];
         this.api.forEachNodeAfterFilterAndSort(node => {
             const userValues = (({ name, distance, duration, id }) => ({ name, distance, duration, id }))(node.data);
             modifiedControls.push(userValues)});
         this.props.updateControls(modifiedControls);
-    }
+    };
 
     render() {
         let rowData = [];

@@ -315,7 +315,7 @@ app.get('/', (req, res) => {
     }
 });
 
-if (process.env.NODE_ENV !== 'production') {
+if (process.env.NODE_ENV !== 'production' && !process.env.NO_HOT) {
     console.info('Debug mode, enabling hot reloading');
     const config = require('webpack.hot.dev.js');
     const compiler = webpack(config({},{mode:'development'}));

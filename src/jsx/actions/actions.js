@@ -366,13 +366,6 @@ const gpxRouteLoadingFailure = function(status) {
     }
 };
 
-export const SHOW_FORM = 'SHOW_FORM';
-export const showForm = function() {
-    return {
-        type: SHOW_FORM
-    }
-};
-
 export const CLEAR_ROUTE_DATA = 'CLEAR_ROUTE_DATA';
 export const clearRouteData = function() {
     return {

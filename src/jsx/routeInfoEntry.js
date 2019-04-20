@@ -130,11 +130,13 @@ class RouteInfoForm extends Component {
                                 </Col>
                             </MediaQuery>
                         </Row>
-                        <Row noGutters>
-                            <Col sm={{size:"auto"}}>
-                                <FileInput/>
-                            </Col>
-                        </Row>
+                        <MediaQuery minDeviceWidth={1000} values={{deviceWidth:1400}}>
+                            <Row noGutters>
+                                <Col sm={{size:"auto"}}>
+                                    <FileInput/>
+                                </Col>
+                            </Row>
+                        </MediaQuery>
                         <Row noGutters>
                             <Col sm={{size:"auto"}}>
                                 <RideWithGpsId/>
