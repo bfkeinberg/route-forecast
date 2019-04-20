@@ -3,12 +3,13 @@ import PropTypes from 'prop-types';
 import {Label, Input, FormGroup} from 'reactstrap';
 import {connect} from 'react-redux';
 import {setDisplayedFinishTime} from "../actions/actions";
+import '../../static/controlsStyles.css';
 
 const FinishTime = ({finishTime,actualFinishTime,displayedFinishTime,setDisplayedFinishTime}) => {
     return (
-        <FormGroup>
-            <Label for="finishTime" size='sm' tag='b'>Finish time</Label>
-            <Input disabled style={{width:'14em',height:'28px'}}
+        <div className="controls-item-contents">
+            <span className="controls-textinput-label">Finish time</span>
+            <Input disabled style={{width:'14em',height:'28px', margin: '0px 0px 0px 5px', flex: 1.75}}
                 size="8" bsSize='sm' tabIndex='-1' type="text" id="finishTime"
                          onMouseEnter={() => {
                 if (actualFinishTime !== undefined) {
@@ -16,7 +17,7 @@ const FinishTime = ({finishTime,actualFinishTime,displayedFinishTime,setDisplaye
                 }}}
                          onMouseLeave={() => setDisplayedFinishTime(finishTime)}
                          value={displayedFinishTime}/>
-        </FormGroup>
+        </div>
         );
 };
 

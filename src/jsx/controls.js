@@ -7,6 +7,7 @@ import {addControl, toggleDisplayBanked, toggleMetric} from './actions/actions';
 import {connect} from 'react-redux';
 import FinishTime from './ui/finishTime';
 import loadable from 'react-loadable';
+import '../static/controlsStyles.css';
 
 const LoadableControlTable = loadable({
     loader: () => import(/* webpackChunkName: "ControlTable" */'./controlTable'),
@@ -59,33 +60,28 @@ class ControlPoints extends Component {
         }
         return (
             <div className="controlPoints">
-                <Container fluid={true}>
-                    <Row noGutters className="justify-content-sm-around">
-                        <Col sm={{size:'auto'}}>
-                            {/*<button type='button' class='pt-button pt-small pt-minimal pt-icon-add' tabIndex='10' onClick={this.addControl} id='addButton'><Icon icon="add"/>Add control point</button>*/}
-                            <Button class={'pt-minimal'} tabIndex='10' onClick={this.addControl} id='addButton' icon={"add"}>Add control point</Button>
-                            {/*<Button size='sm' tabIndex='10' onClick={this.addControl} id='addButton'><Icon icon="add"/>Add control point</Button>*/}
-                        </Col>
-                        <Col sm={{size:"auto"}}>
-                            <FinishTime/>
-                        </Col>
-                        <Col sm={{size:"auto"}}>
-                            <Label size='sm' for='metric' check>Metric</Label>
-                        </Col>
-                        <Col sm={{size:"auto"}}>
-                            <Input size='1' id='metric' type='checkbox' tabIndex='12' checked={this.props.metric} onChange={this.props.toggleMetric}/>
+                <div className="controls-container">
+                    <div className="controls-item">
+                        <Button class={'pt-minimal'} tabIndex='10' onClick={this.addControl} id='addButton' icon={"add"}>Add control point</Button>
+                    </div>
+                    <div className="controls-item">
+                        <FinishTime/>
+                    </div>
+                    <div className="controls-item">
+                        <div id="metric" className="controls-item-contents">
+                            <span className="controls-checkbox-label">Metric</span>
+                            <input type='checkbox' checked={this.props.metric} onChange={this.props.toggleMetric}/>
                             <UncontrolledTooltip target={'metric'}>Control distances in km, other units displayed in km or degrees C</UncontrolledTooltip>
-                        </Col>
-                        <Col sm={{size:"auto"}}>
-                            <Label for='banked' size="sm">Display banked time</Label>
-                        </Col>
-                        <Col sm={{size:"auto"}}>
-                            <Input id='banked' type='checkbox' tabIndex='11' checked={this.props.displayBanked}
-                                      onChange={this.props.toggleDisplayBanked}/>
+                        </div>
+                    </div>
+                    <div id="banked" className="controls-item">
+                        <div id="metric" className="controls-item-contents">
+                            <span className="controls-checkbox-label">Display banked time</span>
+                            <input type='checkbox' checked={this.props.displayBanked} onChange={this.props.toggleDisplayBanked}/>
                             <UncontrolledTooltip target={'banked'}>Show how many minutes remain to be within ACP/RUSA brevet finishing times</UncontrolledTooltip>
-                        </Col>
-                    </Row>
-                </Container>
+                        </div>
+                    </div>
+                </div>
                 <ErrorBoundary>
                     <Card style={{margin:'10px'}}>
                         <CardBody>
