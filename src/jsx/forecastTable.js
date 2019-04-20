@@ -5,6 +5,7 @@ import darkSky from 'Images/darkSkySmall.png';
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 import {setWeatherRange} from './actions/actions';
+import MediaQuery from 'react-responsive';
 
 const milesToKm = 1609.34;
 
@@ -69,14 +70,20 @@ export class ForecastTable extends Component {
                         onClick={this.updateWeatherRange} onMouseEnter={this.updateWeatherRange}>
                         <td>{point.time}</td>
                         <td>{metric ? ((point.distance*milesToKm)/1000).toFixed(0) : point.distance}</td>
-                        <td>{point.summary}</td>
+                        <MediaQuery minWidth={1000}>
+                            <td>{point.summary}</td>
+                        </MediaQuery>
                         <td>{ForecastTable.formatTemperature(this.state.showApparentTemp?point.feel : point.temp, this.props.metric)}</td>
                         <td>{point.precip}</td>
-                        <td>{point.cloudCover}</td>
+                        <MediaQuery minWidth={1000}>
+                            <td>{point.cloudCover}</td>
+                        </MediaQuery>
                         <td className={ForecastTable.windStyle(point)}>{this.state.showGusts?<i>{
                             ForecastTable.formatSpeed(point.gust, this.props.metric)}</i>:
                             ForecastTable.formatSpeed(point.windSpeed, this.props.metric)}</td>
-                        <td>{point.windBearing}</td>
+                        <MediaQuery minWidth={1000}>
+                            <td>{point.windBearing}</td>
+                        </MediaQuery>
                     </tr>
                 )}
                 </tbody>
@@ -110,12 +117,18 @@ export class ForecastTable extends Component {
                         <tr>
                             <th className={'headerCell'}>Time</th>
                             <th className={'headerCell'}>{distHeader}</th>
-                            <th className={'headerCell'}>Summary</th>
+                            <MediaQuery minWidth={1000}>
+                                <th className={'headerCell'}>Summary</th>
+                            </MediaQuery>
                             <th id={'temp'} className={'headerCell'} onClick={this.toggleApparentDisplay}>{temperatureHeader}</th>
                             <th className={'headerCell'}>Chance of rain</th>
-                            <th className={'headerCell'}>Cloud cover</th>
+                            <MediaQuery minWidth={1000}>
+                                <th className={'headerCell'}>Cloud cover</th>
+                            </MediaQuery>
                             <th id={'wind'} className={'headerCell'} onClick={this.toggleGustDisplay}>{windHeader}</th>
-                            <th className={'headerCell'}>Wind bearing</th>
+                            <MediaQuery minWidth={1000}>
+                                <th className={'headerCell'}>Wind bearing</th>
+                            </MediaQuery>
                         </tr>
                         </thead>
                         {this.expandTable(this.props.forecast, this.props.metric)}
