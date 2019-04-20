@@ -8,7 +8,7 @@ import PropTypes from "prop-types";
 import React from "react";
 import { Router, Route, Link } from "react-router-dom";
 import {createMemoryHistory} from 'history';
-import {Nav, NavItem} from "reactstrap";
+import {Nav, NavItem, NavbarBrand} from "reactstrap";
 import { Icon, Intent } from "@blueprintjs/core";
 import {IconNames} from "@blueprintjs/icons";
 import {connect} from 'react-redux';
@@ -21,9 +21,10 @@ const MobileUI = (props) => {
     const memoryHistory = createMemoryHistory();
     return <Router history={memoryHistory} >
         <Nav tabs>
+            <NavbarBrand>Route plan</NavbarBrand>
             <NavItem>
                 <ErrorBoundary>
-                    <Link to={"/parameterForm/"} class={'nav-link'}>
+                    <Link to={"/"} class={'nav-link'}>
                         <Icon icon={IconNames.HOME} iconSize={Icon.SIZE_STANDARD} intent={Intent.NONE} />
                     </Link>
                 </ErrorBoundary>
@@ -47,7 +48,7 @@ const MobileUI = (props) => {
             </NavItem>
         </Nav>
 
-        <Route path="/parameterForm/" exact render={(routeProps) => <RouteInfoForm formatControlsForUrl={props.formatControlsForUrl}/>}/>
+        <Route path="/" exact render={(routeProps) => <RouteInfoForm formatControlsForUrl={props.formatControlsForUrl}/>}/>
         <Route path="/controlPoints/" exact component={ControlPoints} />
         <Route path="/map/" exact render={(routeProps) => <RouteForecastMap maps_api_key={props.mapsApiKey} />} />
         <Route path="/table/" exact component={DataTable} />
