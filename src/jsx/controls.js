@@ -1,5 +1,5 @@
-import {Row, Col, Container, Input, Label, Card, CardBody, CardTitle, UncontrolledTooltip} from 'reactstrap';
-import {Button} from '@blueprintjs/core';
+import {Card, CardBody, CardTitle, UncontrolledTooltip} from 'reactstrap';
+import {Button, Checkbox} from '@blueprintjs/core';
 import React, {Component} from 'react';
 import ErrorBoundary from './errorBoundary';
 import PropTypes from 'prop-types';
@@ -62,7 +62,8 @@ class ControlPoints extends Component {
             <div className="controlPoints">
                 <div className="controls-container">
                     <div className="controls-item">
-                        <Button class={'pt-minimal'} tabIndex='10' onClick={this.addControl} id='addButton' icon={"add"}>Add control point</Button>
+                        <Button class={'pt-minimal'} tabIndex='10' onClick={this.addControl} id='addButton' icon={"add"}>Add</Button>
+                        <UncontrolledTooltip target={'addButton'}>Add a control point</UncontrolledTooltip>
                     </div>
                     <div className="controls-item">
                         <FinishTime/>
