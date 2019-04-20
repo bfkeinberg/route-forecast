@@ -113,7 +113,7 @@ img#bugImage {
 
 input#finishTime.form-control {
     display: inline-flex;
-    width: 14em;
+    width: 15em;
     margin-top: 3px;
     margin-bottom: 0px;
 }
