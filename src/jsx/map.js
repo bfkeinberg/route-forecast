@@ -147,12 +147,14 @@ class RouteForecastMap extends Component {
             infoContents = `Temperature ${markedInfo[0].tempStr} Wind speed ${markedInfo[0].windSpeed} Wind bearing ${markedInfo[0].windBearing}`;
             infoVisible = true;
         }
+        const mapBounds = this.props.bounds !== null ? this.getMapBounds(this.props.bounds) : null;
         return (
             <ErrorBoundary>
                 <div id="map" style={{'height':'95%'}}>
                     {this.props.forecast.length > 0 && this.props.bounds !== null ?
                         <Map google={this.props.google}
-                             mapType={'ROADMAP'} scaleControl={true} bounds={this.getMapBounds(this.props.bounds)}>
+                             mapType={'ROADMAP'} scaleControl={true} bounds={mapBounds} initialCenter={mapBounds.getCenter().toJSON()}
+                             onReady={(mapProps, map) => {map.fitBounds(mapBounds)}}>
                             <Polyline path={this.getRoutePoints(this.props.points)} strokeColor={'#ff0000'} strokeWeight={2} strokeOpacity={1.0}/>
                             {highlight}
                             {this.buildMarkers(this.props.forecast, this.props.controls, this.props.controlNames, this.props.subrange)}
