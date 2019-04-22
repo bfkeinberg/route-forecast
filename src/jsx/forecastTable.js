@@ -4,7 +4,7 @@ import ErrorBoundary from "./errorBoundary";
 import darkSky from 'Images/darkSkySmall.png';
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
-import {setWeatherRange} from './actions/actions';
+import {setWeatherRange, setTableViewed} from './actions/actions';
 import MediaQuery from 'react-responsive';
 
 const milesToKm = 1609.34;
@@ -14,6 +14,7 @@ export class ForecastTable extends Component {
         weatherCorrectionMinutes:PropTypes.number,
         forecast:PropTypes.arrayOf(PropTypes.object).isRequired,
         setWeatherRange:PropTypes.func.isRequired,
+        setTableViewed:PropTypes.func.isRequired,
         metric:PropTypes.bool.isRequired
     };
 
@@ -21,6 +22,7 @@ export class ForecastTable extends Component {
         super(props);
         this.expandTable = this.expandTable.bind(this);
         this.state = {showGusts:false, showApparentTemp:false};
+        props.setTableViewed();
     }
 
     updateWeatherRange = (event) => {
@@ -149,7 +151,7 @@ const mapStateToProps = (state) =>
     });
 
 const mapDispatchToProps = {
-    setWeatherRange
+    setWeatherRange, setTableViewed
 };
 
 export const formatTemperature = ForecastTable.formatTemperature;

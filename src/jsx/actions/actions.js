@@ -177,17 +177,9 @@ const forecastFetchFailure = function(error) {
     }
 };
 
-export const HIDE_FORM = 'HIDE_FORM';
-const hideForm = function() {
-    return {
-        type: HIDE_FORM
-    }
-};
-
 export const requestForecast = function(routeInfo) {
     return function(dispatch,getState) {
         dispatch(beginFetchingForecast());
-        dispatch(hideForm());
         let formdata = new FormData();
         formdata.append('locations', JSON.stringify(routeInfo.forecastRequest));
         formdata.append('timezone', getState().routeInfo.timeZoneId);
@@ -678,3 +670,9 @@ export const reset = () => {return {type:RESET}};
 
 export const NEW_USER_MODE = 'NEW_USER_MODE';
 export const newUserMode = (value) => {return {type:NEW_USER_MODE,value:value}};
+
+export const SET_TABLE_VIEWED = 'SET_TABLE_VIEWED';
+export const setTableViewed = () => {return {type:SET_TABLE_VIEWED}};
+
+export const SET_MAP_VIEWED = 'SET_MAP_VIEWED';
+export const setMapViewed = () => {return {type:SET_MAP_VIEWED}};
