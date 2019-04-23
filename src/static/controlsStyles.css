@@ -5,6 +5,17 @@
   align-items: center;
 }
 
+.mobile-controls-container {
+  display: flex;
+  flex-flow: wrap;
+  padding:8px;
+  align-items: center;
+}
+
+#finish-time-label {
+  justify-content: flex-start;
+}
+
 .controls-item {
   margin: 5px;
   flex: 1;

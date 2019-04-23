@@ -80,6 +80,7 @@ export class ControlTable extends Component {
             this.addRow();
         }
         if (window.outerWidth < smallScreenWidth) {
+            this.columnApi.autoSizeAllColumns();
             this.api.sizeColumnsToFit();
         }
     };
