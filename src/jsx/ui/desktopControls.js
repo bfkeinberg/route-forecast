@@ -12,7 +12,7 @@ function DesktopControls(props) {
             <Button class={"pt-minimal"} tabIndex='10' onClick={props.addControl} id='addButton' icon={"add"}>Add</Button>
             <UncontrolledTooltip target={"addButton"}>Add a control point</UncontrolledTooltip>
         </div>
-        <div className="controls-item">
+        <div className="controls-item controls-item-finish-time">
             <FinishTime/>
         </div>
         <div className="controls-item">

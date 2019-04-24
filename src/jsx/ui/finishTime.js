@@ -20,14 +20,13 @@ const FinishTime = ({finishTime,actualFinishTime,displayedFinishTime,setDisplaye
     return (
         <div className="controls-item-contents">
             <span id={'finish-time-label'} className="controls-textinput-label">Finish time</span>
-            <input className={'finish-time'} disabled={true}
-                   tabIndex='-1' type="text" id="finishTime"
-                   onMouseEnter={() => {
-                if (actualFinishTime !== undefined) {
-                    setDisplayedFinishTime(actualFinishTime);
-                }}}
-                         onMouseLeave={() => setDisplayedFinishTime(finishTime)}
-                         value={displayedFinishTime}/>
+            <span className="finish-time-value"
+                  onMouseEnter={() => {
+                      if (actualFinishTime !== undefined) {
+                          setDisplayedFinishTime(actualFinishTime);
+                      }}}
+                  onMouseLeave={() => setDisplayedFinishTime(finishTime)}
+            >{displayedFinishTime}</span>
         </div>
         );
 };

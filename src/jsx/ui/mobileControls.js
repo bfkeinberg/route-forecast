@@ -9,10 +9,6 @@ import {addControl, toggleDisplayBanked, toggleMetric} from "../actions/actions"
 function MobileControls(props) {
     return <div className="mobile-controls-container">
         <div className="controls-item">
-            <Button class={"pt-minimal"} tabIndex='10' onClick={props.addControl} id='addButton' icon={"add"}>Add</Button>
-            <UncontrolledTooltip target={"addButton"}>Add a control point</UncontrolledTooltip>
-        </div>
-        <div className="controls-item">
             <FinishTime/>
         </div>
         <div className="controls-item">
@@ -34,6 +30,10 @@ function MobileControls(props) {
                     finishing times</UncontrolledTooltip>
             </div>
 
+        </div>
+        <div className="controls-item">
+            <Button class={"pt-minimal"} tabIndex='10' onClick={props.addControl} id='addButton' icon={"add"}>Add</Button>
+            <UncontrolledTooltip target={"addButton"}>Add a control point</UncontrolledTooltip>
         </div>
     </div>;
 }

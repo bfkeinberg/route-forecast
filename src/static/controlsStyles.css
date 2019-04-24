@@ -1,13 +1,13 @@
 .controls-container {
   display: flex;
-  flex-flow: row;
+  flex-flow: row wrap;
   padding: 10px;
   align-items: center;
 }
 
 .mobile-controls-container {
   display: flex;
-  flex-flow: wrap;
+  flex-flow: column;
   padding:8px;
   align-items: center;
 }
@@ -21,9 +21,13 @@
   flex: 1;
 }
 
+.controls-item.controls-item-finish-time {
+  flex: 2;
+}
+
 .controls-item-contents {
-  display: flex;
-  flex-flow: row;
+  /*display: flex;*/
+  /*flex-flow: row;*/
   align-items: center;
   justify-content: center;
 }
@@ -32,8 +36,18 @@
   margin-right: 5px;
   font-size: .875rem;
   font-weight: bold;
+  white-space: nowrap;
 }
 
 .controls-textinput-label {
   flex: 1;
+}
+
+.finish-time-value {
+  font-size: 14px;
+  border: 1px dotted #00000050;
+  padding: 4px;
+  border-radius: 10%;
+  background-color: #e9ecef;
+  white-space: nowrap
 }
