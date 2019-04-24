@@ -72,18 +72,18 @@ export class ForecastTable extends Component {
                         onClick={this.updateWeatherRange} onMouseEnter={this.updateWeatherRange}>
                         <td>{point.time}</td>
                         <td>{metric ? ((point.distance*milesToKm)/1000).toFixed(0) : point.distance}</td>
-                        <MediaQuery minWidth={1000}>
+                        <MediaQuery minWidth={501}>
                             <td>{point.summary}</td>
                         </MediaQuery>
                         <td>{ForecastTable.formatTemperature(this.state.showApparentTemp?point.feel : point.temp, this.props.metric)}</td>
                         <td>{point.precip}</td>
-                        <MediaQuery minWidth={1000}>
+                        <MediaQuery minWidth={501}>
                             <td>{point.cloudCover}</td>
                         </MediaQuery>
                         <td className={ForecastTable.windStyle(point)}>{this.state.showGusts?<i>{
                             ForecastTable.formatSpeed(point.gust, this.props.metric)}</i>:
                             ForecastTable.formatSpeed(point.windSpeed, this.props.metric)}</td>
-                        <MediaQuery minWidth={1000}>
+                        <MediaQuery minWidth={501}>
                             <td>{point.windBearing}</td>
                         </MediaQuery>
                     </tr>

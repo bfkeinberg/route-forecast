@@ -61,7 +61,7 @@ export class ControlTable extends Component {
                     pinned:'right', cellRenderer:'deleteRenderer'}
             ]};
         // no name field on mobile
-        this.desktop = window.matchMedia("(min-width: 1000px)").matches;
+        this.desktop = window.matchMedia("(min-width: 800px)").matches;
         if (this.desktop) {
             this.state.columnDefs.unshift({colId:'name', field:'name', sortable:false, resizable:true, editable:true, menuTabs:[
                     'generalMenuTab',

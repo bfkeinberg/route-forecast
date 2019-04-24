@@ -5,17 +5,6 @@ import {connect} from 'react-redux';
 import {setDisplayedFinishTime} from "../actions/actions";
 import '../../static/controlsStyles.css';
 
-/*
-           <input className={'finish-time'} disabled={true}
-                tabIndex='-1' type="text" id="finishTime"
-                         onMouseEnter={() => {
-
-/*
-            <Input disabled style={{width:'14em',height:'28px', margin: '0px 0px 0px 5px', flex: 1.75}}
-                size="8" bsSize='sm' tabIndex='-1' type="text" id="finishTime"
-                         onMouseEnter={() => {
-
- */
 const FinishTime = ({finishTime,actualFinishTime,displayedFinishTime,setDisplayedFinishTime}) => {
     return (
         <div className="controls-item-contents">
