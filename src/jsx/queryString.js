@@ -40,7 +40,8 @@ const QueryStringUpdater = ({routeNumber,start,pace,interval,metric,controls,/*s
             query.start = shortDate;
         }
         url += `/?${queryString.stringify(query)}`;
-        if (url !== href || !urlIsShortened) {
+        // don't shorten localhost with bitly
+        if ((origin !== 'http://localhost:8080' && url !== href) || !urlIsShortened) {
             shortenUrl(url);
         }
     }
