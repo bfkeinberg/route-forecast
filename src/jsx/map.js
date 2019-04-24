@@ -7,6 +7,8 @@ import circus_tent from 'Images/circus tent.png';
 import {Map, InfoWindow, Marker, GoogleApiWrapper, Polyline} from 'google-maps-react';
 import { createSelector } from 'reselect';
 import {formatTemperature} from "./forecastTable";
+import {withRouter} from 'react-router-dom';
+import {setMapViewed} from "./actions/actions";
 
 /*global google*/
 const arrow = "M16.317,32.634c-0.276,0-0.5-0.224-0.5-0.5V0.5c0-0.276,0.224-0.5,0.5-0.5s0.5,0.224,0.5,0.5v31.634\n" +
@@ -27,13 +29,16 @@ class RouteForecastMap extends Component {
         controlNames:PropTypes.arrayOf(PropTypes.string),
         subrange:PropTypes.arrayOf(PropTypes.number),
         google:PropTypes.object,
-        metric:PropTypes.bool.isRequired
+        metric:PropTypes.bool.isRequired,
+        setMapViewed:PropTypes.func.isRequired
     };
 
     constructor(props) {
         super(props);
         this.map = null;
         this.markers = [];
+        // this.onDesktop = window.matchMedia("(min-width: 1000px)").matches;
+        props.setMapViewed();
     }
 
     static pickArrowColor(distance, subrange) {
@@ -147,12 +152,14 @@ class RouteForecastMap extends Component {
             infoContents = `Temperature ${markedInfo[0].tempStr} Wind speed ${markedInfo[0].windSpeed} Wind bearing ${markedInfo[0].windBearing}`;
             infoVisible = true;
         }
+        const mapBounds = this.props.bounds !== null ? this.getMapBounds(this.props.bounds) : null;
         return (
             <ErrorBoundary>
                 <div id="map" style={{'height':'95%'}}>
                     {this.props.forecast.length > 0 && this.props.bounds !== null ?
                         <Map google={this.props.google}
-                             mapType={'ROADMAP'} scaleControl={true} bounds={this.getMapBounds(this.props.bounds)}>
+                             mapType={'ROADMAP'} scaleControl={true} bounds={mapBounds} initialCenter={mapBounds.getCenter().toJSON()}
+                             onReady={(mapProps, map) => {map.fitBounds(mapBounds)}}>
                             <Polyline path={this.getRoutePoints(this.props.points)} strokeColor={'#ff0000'} strokeWeight={2} strokeOpacity={1.0}/>
                             {highlight}
                             {this.buildMarkers(this.props.forecast, this.props.controls, this.props.controlNames, this.props.subrange)}
@@ -189,7 +196,19 @@ const mapStateToProps = (state) =>
         metric: state.controls.metric
     });
 
+const mapDispatchToProps = {
+    setMapViewed
+};
+
 // eslint-disable-next-line new-cap
-export default connect(mapStateToProps)(GoogleApiWrapper((props) => (
+/*
+export default RouteForecastMap.onDesktop ? connect(mapStateToProps)(GoogleApiWrapper((props) => (
+    {apiKey: props.maps_api_key}
+))(RouteForecastMap)) :
+    withRouter(connect(mapStateToProps)(GoogleApiWrapper((props) => (
+        {apiKey: props.maps_api_key}
+    ))(RouteForecastMap)));
+*/
+export default connect(mapStateToProps, mapDispatchToProps)(GoogleApiWrapper((props) => (
     {apiKey: props.maps_api_key}
 ))(RouteForecastMap));

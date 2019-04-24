@@ -311,12 +311,12 @@ const strava = function(state = {analysisInterval:defaultAnalysisIntervalInHours
     }
 };
 
-const forecast = function(state = {forecast:[],valid:false,range:[]}, action) {
+const forecast = function(state = {forecast:[],valid:false,range:[], tableViewed:false, mapViewed:false}, action) {
     switch (action.type) {
         case Actions.FORECAST_FETCH_SUCCESS:
-            return {...state,forecast:action.forecastInfo.forecast,valid:true,range:[]};
+            return {...state,forecast:action.forecastInfo.forecast,valid:true,tableViewed:false,mapViewed:false,range:[]};
         case Actions.SET_RWGPS_ROUTE:
-            return {...state,valid:false,range:[],forecast:[]};
+            return {...state,valid:false,tableViewed:false,mapViewed:false,range:[],forecast:[]};
         case Actions.GPX_ROUTE_LOADING_SUCCESS:
             return {...state,valid:false};
         case Actions.GPX_ROUTE_LOADING_FAILURE:
@@ -328,6 +328,10 @@ const forecast = function(state = {forecast:[],valid:false,range:[]}, action) {
                     parseFloat(action.finish)
                 ]
             };
+        case Actions.SET_TABLE_VIEWED:
+            return {...state, tableViewed: true};
+        case Actions.SET_MAP_VIEWED:
+            return {...state, mapViewed: true};
         default:
             return state;
     }

@@ -1,13 +1,14 @@
-import {Row, Col, Container, Input, Label, Card, CardBody, CardTitle, UncontrolledTooltip} from 'reactstrap';
-import {Button} from '@blueprintjs/core';
+import {Card, CardBody, CardTitle} from 'reactstrap';
 import React, {Component} from 'react';
 import ErrorBoundary from './errorBoundary';
 import PropTypes from 'prop-types';
 import {addControl, toggleDisplayBanked, toggleMetric} from './actions/actions';
 import {connect} from 'react-redux';
-import FinishTime from './ui/finishTime';
 import loadable from 'react-loadable';
 import '../static/controlsStyles.css';
+import MediaQuery from 'react-responsive';
+import DesktopControls from "./ui/desktopControls";
+import MobileControls from "./ui/mobileControls";
 
 const LoadableControlTable = loadable({
     loader: () => import(/* webpackChunkName: "ControlTable" */'./controlTable'),
@@ -39,12 +40,7 @@ class ControlPoints extends Component {
 
     constructor(props) {
         super(props);
-        this.addControl = this.addControl.bind(this);
         this.state = {};
-    }
-
-    addControl( ) {
-        this.props.addControl();
     }
 
     render () {
@@ -60,30 +56,14 @@ class ControlPoints extends Component {
         }
         return (
             <div className="controlPoints">
-                <div className="controls-container">
-                    <div className="controls-item">
-                        <Button class={'pt-minimal'} tabIndex='10' onClick={this.addControl} id='addButton' icon={"add"}>Add control point</Button>
-                    </div>
-                    <div className="controls-item">
-                        <FinishTime/>
-                    </div>
-                    <div className="controls-item">
-                        <div id="metric" className="controls-item-contents">
-                            <span className="controls-checkbox-label">Metric</span>
-                            <input type='checkbox' checked={this.props.metric} onChange={this.props.toggleMetric}/>
-                            <UncontrolledTooltip target={'metric'}>Control distances in km, other units displayed in km or degrees C</UncontrolledTooltip>
-                        </div>
-                    </div>
-                    <div id="banked" className="controls-item">
-                        <div id="metric" className="controls-item-contents">
-                            <span className="controls-checkbox-label">Display banked time</span>
-                            <input type='checkbox' checked={this.props.displayBanked} onChange={this.props.toggleDisplayBanked}/>
-                            <UncontrolledTooltip target={'banked'}>Show how many minutes remain to be within ACP/RUSA brevet finishing times</UncontrolledTooltip>
-                        </div>
-                    </div>
-                </div>
+                <MediaQuery minDeviceWidth={1000}>
+                    <DesktopControls/>
+                </MediaQuery>
+                <MediaQuery maxDeviceWidth={800}>
+                    <MobileControls/>
+                </MediaQuery>
                 <ErrorBoundary>
-                    <Card style={{margin:'10px'}}>
+                    <Card style={{margin: '10px'}}>
                         <CardBody>
                             <CardTitle className="cpListTitle" tag='h6'>{title}</CardTitle>
                             <ErrorBoundary>
@@ -92,7 +72,9 @@ class ControlPoints extends Component {
                         </CardBody>
                     </Card>
                 </ErrorBoundary>
-                <div tabIndex="98" onFocus={() => {document.getElementById('addButton').focus()}}/>
+                <div tabIndex="98" onFocus={() => {
+                    document.getElementById('addButton').focus()
+                }}/>
             </div>
         );
     }

@@ -113,10 +113,38 @@ img#bugImage {
 
 input#finishTime.form-control {
     display: inline-flex;
-    width: 14em;
+    width: 17em;
     margin-top: 3px;
     margin-bottom: 0px;
+    height: 28px;
+    flex: 1.75;
+    padding-top: 5px;
+    margin-right: 5px;
+    background-color: #e9ecef;
 }
+input#finishTime.finish-time {
+    display: inline-flex;
+    width: 16em;
+    margin-top: 3px;
+    margin-bottom: 0px;
+    flex: 0;
+    font-size: .875rem;
+    background-color: #e9ecef;
+}
+/*
+input#finishTime.finish-time {
+    display: inline-flex;
+    width: 15em;
+    margin-top: 3px;
+    margin-bottom: 0px;
+    height: 28px;
+    flex: 1;
+    padding-top: 5px;
+    !*margin-right: 5px;*!
+    font-size: .875rem;
+    background-color: #e9ecef;
+}
+*/
 input#interval.form-control {
     padding-top: 5px;
     display: inline-flex;

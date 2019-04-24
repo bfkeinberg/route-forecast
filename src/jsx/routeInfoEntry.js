@@ -33,7 +33,8 @@ class RouteInfoForm extends Component {
         routeInfo:PropTypes.shape({name:PropTypes.string}),
         loadFromRideWithGps:PropTypes.func.isRequired,
         firstUse:PropTypes.bool.isRequired,
-        routeSelected:PropTypes.bool.isRequired
+        routeSelected:PropTypes.bool.isRequired,
+        needToViewTable: PropTypes.bool.isRequired
     };
 
     constructor(props) {
@@ -50,6 +51,9 @@ class RouteInfoForm extends Component {
     componentDidUpdate() {
         if (this.props.rwgpsRoute !== '' && !this.props.routeSelected) {
             this.props.loadFromRideWithGps(this.props.rwgpsRoute,this.props.rwgpsRouteIsTrip);
+        }
+        if (this.props.routeProps !== undefined && this.props.needToViewTable) {
+            this.props.routeProps.history.replace('/table/')
         }
     }
 
@@ -186,7 +190,8 @@ const mapStateToProps = (state) =>
         routeInfo:state.routeInfo,
         controlPoints:state.controls.userControlPoints,
         firstUse: state.params.newUserMode,
-        routeSelected: state.uiInfo.dialogParams.loadingSource !== null
+        routeSelected: state.uiInfo.dialogParams.loadingSource !== null,
+        needToViewTable:state.forecast.valid && !state.forecast.tableViewed
     });
 
 const mapDispatchToProps = {

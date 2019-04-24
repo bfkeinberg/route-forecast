@@ -186,12 +186,12 @@ export class RouteWeatherUI extends Component {
 
             {/*TODO: values is needed for SSR, but messes up real device detection, seemingly*/}
             {/*<MediaQuery minDeviceWidth={1000} values={{deviceWidth:1400}}>*/}
-            <MediaQuery minWidth={1000}>
+            <MediaQuery minWidth={501}>
                 <DesktopUI formatControlsForUrl={this.formatControlsForUrl} showPacePerTme={this.props.showPacePerTme}
                            mapsApiKey={this.props.maps_api_key}/>
             </MediaQuery>
             {/*<MediaQuery maxDeviceWidth={800} values={{deviceWidth:1400}}>*/}
-            <MediaQuery maxWidth={800}>
+            <MediaQuery maxWidth={500}>
                 <MobileUI formatControlsForUrl={this.formatControlsForUrl} mapsApiKey={this.props.maps_api_key}/>
             </MediaQuery>
         </div>
