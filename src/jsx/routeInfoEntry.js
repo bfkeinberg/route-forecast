@@ -128,13 +128,13 @@ class RouteInfoForm extends Component {
                             <Col sm="4">
                                 <RidingPace/>
                             </Col>
-                            <MediaQuery minDeviceWidth={1000} values={{deviceWidth:1400}}>
+                            <MediaQuery minDeviceWidth={501}>
                                 <Col sm="1">
                                     <PaceExplanation/>
                                 </Col>
                             </MediaQuery>
                         </Row>
-                        <MediaQuery minDeviceWidth={1000} values={{deviceWidth:1400}}>
+                        <MediaQuery minDeviceWidth={501}>
                             <Row noGutters>
                                 <Col sm={{size:"auto"}}>
                                     <FileInput/>
@@ -155,12 +155,12 @@ class RouteInfoForm extends Component {
                         {RouteInfoForm.showErrorDetails(this.props.errorDetails)}
                         {RouteInfoForm.showProgressSpinner(this.props.fetchingRoute)}
                     </Form>
-                    <MediaQuery maxDeviceWidth={800} values={{deviceWidth:1400}}>
+                    <MediaQuery maxDeviceWidth={500}>
                         <ShortUrl/>
                     </MediaQuery>
                     </CardBody>
                 </Card>
-            <MediaQuery minDeviceWidth={1000} values={{deviceWidth:1400}}>
+            <MediaQuery minDeviceWidth={501}>
                 <Container fluid={true}>
                     <Row className="justify-content-sm-between">
                         <Col sm={{size:"auto"}}>
