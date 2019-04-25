@@ -72,9 +72,7 @@ export class ForecastTable extends Component {
                         onClick={this.updateWeatherRange} onMouseEnter={this.updateWeatherRange}>
                         <td>{point.time}</td>
                         <td>{metric ? ((point.distance*milesToKm)/1000).toFixed(0) : point.distance}</td>
-                        <MediaQuery minWidth={501}>
-                            <td>{point.summary}</td>
-                        </MediaQuery>
+                        <td>{point.summary}</td>
                         <td>{ForecastTable.formatTemperature(this.state.showApparentTemp?point.feel : point.temp, this.props.metric)}</td>
                         <td>{point.precip}</td>
                         <MediaQuery minWidth={501}>
@@ -119,16 +117,14 @@ export class ForecastTable extends Component {
                         <tr>
                             <th className={'headerCell'}>Time</th>
                             <th className={'headerCell'}>{distHeader}</th>
-                            <MediaQuery minWidth={1000}>
                                 <th className={'headerCell'}>Summary</th>
-                            </MediaQuery>
                             <th id={'temp'} className={'headerCell'} onClick={this.toggleApparentDisplay}>{temperatureHeader}</th>
                             <th className={'headerCell'}>Chance of rain</th>
-                            <MediaQuery minWidth={1000}>
+                            <MediaQuery minWidth={501}>
                                 <th className={'headerCell'}>Cloud cover</th>
                             </MediaQuery>
                             <th id={'wind'} className={'headerCell'} onClick={this.toggleGustDisplay}>{windHeader}</th>
-                            <MediaQuery minWidth={1000}>
+                            <MediaQuery minWidth={501}>
                                 <th className={'headerCell'}>Wind bearing</th>
                             </MediaQuery>
                         </tr>
