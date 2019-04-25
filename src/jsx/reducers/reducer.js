@@ -153,6 +153,7 @@ loadingSource:null,fetchingForecast:false,fetchingRoute:false}, action) {
             return {...state, loadingSource: null, succeeded: null};
         case Actions.BEGIN_LOADING_ROUTE:
             return {...state, fetchingRoute: true, loadingSource: action.source};
+            return {...state, fetchingRoute: true, loadingSource: action.source};
         case Actions.BEGIN_FETCHING_FORECAST:
             return {...state, fetchingForecast: true};
         case Actions.FORECAST_FETCH_SUCCESS:
@@ -183,7 +184,7 @@ loadingSource:null,fetchingForecast:false,fetchingRoute:false}, action) {
 
 const routeInfo = function(state = {finishTime:'',initialFinishTime:'',weatherCorrectionMinutes:null,
     forecastRequest:null,points:[], fetchAfterLoad:false,bounds:null,name:'',rwgpsRouteData:null,
-    gpxRouteData:null}, action) {
+    gpxRouteData:null, maxGustSpeed:0}, action) {
     switch (action.type) {
         case Actions.SET_TIME_ZONE:
             return {...state,timeZoneOffset:action.offset,timeZoneId:action.id};
@@ -202,9 +203,9 @@ const routeInfo = function(state = {finishTime:'',initialFinishTime:'',weatherCo
             return {...state,rwgpsRouteData:null,gpxRouteData:null,points:[],bounds:null,name:'',forecastRequest:null};
         // clear when the route is changed
         case Actions.SET_RWGPS_ROUTE:
-            return {...state,rwgpsRouteData:null,gpxRouteData:null,points:[],bounds:null,name:'',forecastRequest:null};
+            return {...state,rwgpsRouteData:null,gpxRouteData:null,points:[],bounds:null,name:'',forecastRequest:null,maxGustSpeed: 0};
         case Actions.ADD_WEATHER_CORRECTION:
-            return {...state,weatherCorrectionMinutes:action.weatherCorrectionMinutes,finishTime:action.finishTime};
+            return {...state,weatherCorrectionMinutes:action.weatherCorrectionMinutes,finishTime:action.finishTime,maxGustSpeed:action.maxGustSpeed};
         case Actions.SET_FETCH_AFTER_LOAD:
             return {...state, fetchAfterLoad:action.fetchAfterLoad};
         default:

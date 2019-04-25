@@ -8,6 +8,7 @@ import {setWeatherRange, setTableViewed} from './actions/actions';
 import MediaQuery from 'react-responsive';
 
 const milesToKm = 1609.34;
+const gustySpeed = 25;
 
 export class ForecastTable extends Component {
     static propTypes = {
@@ -15,7 +16,8 @@ export class ForecastTable extends Component {
         forecast:PropTypes.arrayOf(PropTypes.object).isRequired,
         setWeatherRange:PropTypes.func.isRequired,
         setTableViewed:PropTypes.func.isRequired,
-        metric:PropTypes.bool.isRequired
+        metric:PropTypes.bool.isRequired,
+        gustSpeed: PropTypes.number
     };
 
     constructor(props) {
@@ -107,11 +109,12 @@ export class ForecastTable extends Component {
         const windHeader = this.state.showGusts ? 'Wind gust' : 'Wind speed';
         const distHeader = this.props.metric ? 'Kilometer' : 'Mile';
         const temperatureHeader = this.state.showApparentTemp ? 'Apparent temp' : 'Temperature';
+        const weatherId = (this.props.gustSpeed > gustySpeed) ? 'gustyWeather' : 'weatherCorrections';
         return (
                 <div className="animated slideInLeft">
                     <ErrorBoundary>
                     <a tabIndex='-1' href="https://darksky.net/poweredby/"><img src={darkSky}/></a>
-                        {weatherCorrections}
+                    <span id={weatherId}>{weatherCorrections}</span>
                     <Table size='sm' hover bordered>
                         <thead>
                         <tr>
@@ -143,6 +146,7 @@ const mapStateToProps = (state) =>
     ({
         forecast: state.forecast.forecast,
         weatherCorrectionMinutes: state.routeInfo.weatherCorrectionMinutes,
+        gustSpeed: state.routeInfo.maxGustSpeed,
         metric: state.controls.metric
     });
 

@@ -14,7 +14,6 @@ class AnalyzeRoute {
         this.loadRwgpsRoute = this.loadRwgpsRoute.bind(this);
         this.loadGpxFile = this.loadGpxFile.bind(this);
         this.analyzeRoute = this.analyzeRoute.bind(this);
-        this.adjustForWind = this.adjustForWind.bind(this);
     }
 
     loadGpxFile(gpxFile) {
@@ -322,7 +321,7 @@ class AnalyzeRoute {
         return (distance*60)/(baseSpeed - windSpeed*0.5)-(distance*60)/baseSpeed;
     }
 
-    adjustForWind(forecastInfo,stream,pace,controls,previouslyCalculatedValues,start,metric,finishTime) {
+    adjustForWind = (forecastInfo,stream,pace,controls,previouslyCalculatedValues,start,metric,finishTime) => {
         let climbInMeters;
         if (forecastInfo.length===0) {
             return {time:0,values:[],finishTime:finishTime};
@@ -336,6 +335,7 @@ class AnalyzeRoute {
         let totalDistanceInKm = 0;
         let hilliness;
         let calculatedValues = [];
+        let maxGustSpeed = 0;
 
         stream.filter(point => point.lat !== undefined && point.lon !== undefined).forEach(currentPoint => {
             if (previousPoint !== null) {
@@ -366,12 +366,13 @@ class AnalyzeRoute {
                 let relativeBearing = AnalyzeRoute.getBearingBetween(trackBearing,currentForecast.windBearing);
                 // adjust speed
                 const averageWindSpeed = parseInt(currentForecast.windSpeed);
-                const gustWindSpeed = currentForecast.gust !== undefined ? parseInt(currentForecast.gust) : 0;
-                // if the wind gusts are stronger than the average, add in one fifth the difference between them
-                const actingWindSpeed = gustWindSpeed > averageWindSpeed ?
-                    averageWindSpeed + (gustWindSpeed - averageWindSpeed)/2 :
-                    averageWindSpeed;
-                let effectiveWindSpeed = Math.cos((Math.PI / 180)*relativeBearing)*actingWindSpeed;
+                if (currentForecast.gust !== undefined) {
+                    let gustSpeed = parseInt(currentForecast.gust);
+                    if (gustSpeed > maxGustSpeed) {
+                        maxGustSpeed = gustSpeed;
+                    }
+                }
+                let effectiveWindSpeed = Math.cos((Math.PI / 180)*relativeBearing)*averageWindSpeed;
                 totalMinutesLost += AnalyzeRoute.windToTimeInMinutes(baseSpeed, distanceInMiles, hilliness, effectiveWindSpeed);
 
                 currentControl = AnalyzeRoute.calculateValuesForWind(controls, previouslyCalculatedValues,
@@ -381,9 +382,9 @@ class AnalyzeRoute {
             previousPoint = currentPoint;
         });
 
-        return {time:totalMinutesLost,values:calculatedValues,
+        return {time:totalMinutesLost,values:calculatedValues, gustSpeed:maxGustSpeed,
             finishTime:moment(finishTime,finishTimeFormat).add(totalMinutesLost,'minutes').format(finishTimeFormat)};
-    }
+    };
 
     static calculateValuesForWind(controls, previouslyCalculatedValues,
                                   calculatedValues, currentControl, desiredDistance,

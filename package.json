@@ -26,6 +26,7 @@
     "@google-cloud/debug-agent": "^3.0.1",
     "@google-cloud/logging-winston": "^0.11.0",
     "@google-cloud/trace-agent": "^3.5.0",
+    "@sentry/browser": "^5.1.1",
     "@sentry/node": "^5.0.5",
     "@types/pure-render-decorator": "^0.2.27",
     "ag-grid-community": "^20.0.0",
