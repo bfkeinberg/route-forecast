@@ -8,6 +8,7 @@ const BUILD_DIR = path.resolve(__dirname, 'dist');
 const SERVER_DIR = path.resolve(__dirname, 'dist/server');
 const GPX_DIR = path.resolve(__dirname, 'node_modules/gpx-parse/dist');
 const nodeExternals = require('webpack-node-externals');
+var webpack = require('webpack');
 
 module.exports = (env,argv) => {
     const mode = argv === undefined ? 'development' : argv.mode;
@@ -73,6 +74,7 @@ module.exports = (env,argv) => {
         },
         plugins: [
             new CleanWebpackPlugin({verbose: true, dry:true}),
+            new webpack.DefinePlugin({sentryRelease: env.sentryRelease}),
             new MiniCssExtractPlugin({
                 // Options similar to the same options in webpackOptions.output
                 // both options are optional

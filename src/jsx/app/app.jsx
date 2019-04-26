@@ -3,10 +3,16 @@ import ReactDOM from 'react-dom';
 import TopLevel from './topLevel';
 import { AppContainer } from 'react-hot-loader';
 import LocationContext from '../locationContext';
+import * as Sentry from '@sentry/browser';
 
-/*global Raven*/
-Raven.config('https://ea4c472ff9054dab8c18d594b95d8da2@sentry.io/298059').install();
-
+console.log(window.origin);
+Sentry.init({ dsn: 'https://ea4c472ff9054dab8c18d594b95d8da2@sentry.io/298059',
+                        release:sentryRelease, environment:'production',
+                        beforeBreadcrumb(breadcrumb, hint) {
+                            console.log(breadcrumb,hint);
+                            if (crumb.type==='console') {return false} else {return crumb}
+                        }
+});
 let script = document.scripts.namedItem('routeui');
 const mode = script.getAttribute('mode');
 const action = script.getAttribute('action');
