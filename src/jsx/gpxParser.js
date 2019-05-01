@@ -4,6 +4,7 @@ import moment from 'moment-timezone';
 import {finishTimeFormat} from './reducers/reducer';
 
 import {paceToSpeed} from "./ui/ridingPace";
+import {getPowerOrVelocity} from "./windUtils";
 
 const kmToMiles = 0.62137;
 
@@ -191,9 +192,6 @@ class AnalyzeRoute {
         while (nextControl < controls.length)   {
             // update banked time also, supplying final distance in km and total time taken
             let banked = Math.round(AnalyzeRoute.rusa_time(totalDistanceInKm, totalTime));
-            if (isNaN(banked)) {
-                console.error("Banked time is NaN in fillLastControlPoint");
-            }
             calculatedValues.push({arrival:finishTime,banked:banked,val:controls[nextControl].distance});
             ++nextControl;
         }
@@ -294,37 +292,15 @@ class AnalyzeRoute {
         return Math.min(relative_bearing1,relative_bearing2);
     }
 
-    static windToTimeInMinutes(baseSpeed,distance,hilliness,windSpeed) {
-/*        let adjustedWindSpeed;
-        let initialSpeed = baseSpeed - hilliness;
-        switch (hilliness) {
-            case 0:
-                adjustedWindSpeed = windSpeed * 0.6;
-                break;
-            case 1:
-                adjustedWindSpeed = windSpeed * 0.55;
-                break;
-            case 2:
-                adjustedWindSpeed = windSpeed * 0.5;
-                break;
-            case 3:
-                adjustedWindSpeed = windSpeed * 0.5;
-                break;
-            case 4:
-                adjustedWindSpeed = windSpeed * 0.5;
-                break;
-            default:
-                adjustedWindSpeed = windSpeed * 0.45;
-        }
-        let effectiveSpeed = initialSpeed - adjustedWindSpeed;*/
+    static windToTimeInMinutes(baseSpeed,distance,modifiedVelocity) {
         // will be negative for a tailwind
-        return (distance*60)/(baseSpeed - windSpeed*0.5)-(distance*60)/baseSpeed;
+        return (distance*60)/modifiedVelocity-(distance*60)/baseSpeed;
     }
 
     adjustForWind = (forecastInfo,stream,pace,controls,previouslyCalculatedValues,start,metric,finishTime) => {
         let climbInMeters;
         if (forecastInfo.length===0) {
-            return {time:0,values:[],finishTime:finishTime};
+            return {time:0,values:[],gustSpeed:0,finishTime:finishTime};
         }
         let baseSpeed = paceToSpeed[pace];
         let forecast = forecastInfo.slice().reverse();
@@ -348,17 +324,15 @@ class AnalyzeRoute {
                 else {
                     climbInMeters = 0;
                 }
-                let climbInFeet = (climbInMeters * 3.2808);
+                // calculate the grade
+                const grade = climbInMeters/(distanceInKm*1000);
+
                 let distanceInMiles = distanceInKm*kmToMiles;
-                if (distanceInMiles !== 0) {
-                    hilliness = Math.floor(Math.min((climbInFeet / distanceInMiles) / 25, 5));
-                }
-                else {
+                if (distanceInMiles === 0) {
                     return;
                 }
                 // get current forecast
-                let desiredDistance = metric ? totalDistanceInKm: totalDistanceInKm*kmToMiles;
-                if (forecast.length > 0 && desiredDistance>forecast[forecast.length-1].distance) {
+                if (forecast.length > 0 && (totalDistanceInKm*kmToMiles)>forecast[forecast.length-1].distance) {
                     currentForecast = forecast.pop();
                 }
                 // get bearing between the two points
@@ -373,8 +347,14 @@ class AnalyzeRoute {
                     }
                 }
                 let effectiveWindSpeed = Math.cos((Math.PI / 180)*relativeBearing)*averageWindSpeed;
-                totalMinutesLost += AnalyzeRoute.windToTimeInMinutes(baseSpeed, distanceInMiles, hilliness, effectiveWindSpeed);
 
+                const power = getPowerOrVelocity(metric, distanceInKm, Math.abs(previousPoint.elevation-currentPoint.elevation)/2,
+                    0, 0, undefined, baseSpeed);
+                const modifiedVelocity = getPowerOrVelocity(metric, distanceInKm, Math.abs(previousPoint.elevation-currentPoint.elevation)/2,
+			        grade, effectiveWindSpeed, power, baseSpeed);
+                totalMinutesLost += AnalyzeRoute.windToTimeInMinutes(baseSpeed, distanceInMiles, modifiedVelocity);
+
+                let desiredDistance = metric ? totalDistanceInKm: totalDistanceInKm*kmToMiles;
                 currentControl = AnalyzeRoute.calculateValuesForWind(controls, previouslyCalculatedValues,
                     calculatedValues, currentControl,
                     desiredDistance, totalMinutesLost, start, totalDistanceInKm*kmToMiles);
