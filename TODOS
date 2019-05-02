@@ -1,4 +1,5 @@
-metric support for pace selection
+instead of updating the control arrival and finish times based on wind, only modify the displayed values for them based on wind adjustment
+otherwise recalculation due to pace or other parameter changes loses the correction until a forecast is requested again
 support pre-compressed and on-the-fly compression
 expand redux SSR support to other query parameters
 service worker

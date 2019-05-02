@@ -75,12 +75,15 @@ export class ForecastTable extends Component {
                         <td>{point.time}</td>
                         <td>{metric ? ((point.distance*milesToKm)/1000).toFixed(0) : point.distance}</td>
                         <td>{point.summary}</td>
-                        <td>{ForecastTable.formatTemperature(this.state.showApparentTemp?point.feel : point.temp, this.props.metric)}</td>
+                        <td>{this.state.showApparentTemp?
+                            <i>{ForecastTable.formatTemperature(point.feel, this.props.metric)}</i>:
+                            ForecastTable.formatTemperature(point.temp, this.props.metric)}</td>
                         <td>{point.precip}</td>
                         <MediaQuery minWidth={501}>
                             <td>{point.cloudCover}</td>
                         </MediaQuery>
-                        <td className={ForecastTable.windStyle(point)}>{this.state.showGusts?<i>{
+                        <td className={ForecastTable.windStyle(point)}>{this.state.showGusts?
+                            <i>{
                             ForecastTable.formatSpeed(point.gust, this.props.metric)}</i>:
                             ForecastTable.formatSpeed(point.windSpeed, this.props.metric)}</td>
                         <MediaQuery minWidth={501}>

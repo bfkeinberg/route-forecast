@@ -169,8 +169,8 @@ app.post('/forecast', upload.none(), (req, res) => {
 });
 
 app.post('/bitly', async (req, res) => {
-    const longUrl = req.body.longUrl
-    const {error, url} = await getBitlyShortenedUrl(process.env.BITLY_TOKEN, longUrl)
+    const longUrl = req.body.longUrl;
+    const {error, url} = await getBitlyShortenedUrl(process.env.BITLY_TOKEN, longUrl);
     res.json({error, url})
 });
 

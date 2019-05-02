@@ -16,7 +16,10 @@ const RideWithGpsId = ({setRwgpsRoute,loadingSource,loadingSuccess,rwgpsRoute,rw
             }
             loadFromRideWithGps(route,rwgpsRouteIsTrip);
             // clear file input to avoid confusion
-            document.getElementById('routeFile').value = null;
+            const routeFileField = document.getElementById('routeFile');
+            if (routeFileField != null) {
+                routeFileField.value = null;
+            }
         }
     };
 
