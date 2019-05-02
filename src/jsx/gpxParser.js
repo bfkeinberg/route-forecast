@@ -324,8 +324,6 @@ class AnalyzeRoute {
                 else {
                     climbInMeters = 0;
                 }
-                // calculate the grade
-                const grade = climbInMeters/(distanceInKm*1000);
 
                 let distanceInMiles = distanceInKm*kmToMiles;
                 if (distanceInMiles === 0) {
@@ -351,7 +349,7 @@ class AnalyzeRoute {
                 const power = getPowerOrVelocity(metric, distanceInKm, Math.abs(previousPoint.elevation-currentPoint.elevation)/2,
                     0, 0, undefined, baseSpeed);
                 const modifiedVelocity = getPowerOrVelocity(metric, distanceInKm, Math.abs(previousPoint.elevation-currentPoint.elevation)/2,
-			        grade, effectiveWindSpeed, power, baseSpeed);
+			        0, effectiveWindSpeed, power, baseSpeed);
                 totalMinutesLost += AnalyzeRoute.windToTimeInMinutes(baseSpeed, distanceInMiles, modifiedVelocity);
 
                 let desiredDistance = metric ? totalDistanceInKm: totalDistanceInKm*kmToMiles;
