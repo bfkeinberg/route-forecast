@@ -346,9 +346,9 @@ class AnalyzeRoute {
                 }
                 let effectiveWindSpeed = Math.cos((Math.PI / 180)*relativeBearing)*averageWindSpeed;
 
-                const power = getPowerOrVelocity(metric, distanceInKm, Math.abs(previousPoint.elevation-currentPoint.elevation)/2,
+                const power = getPowerOrVelocity(distanceInKm, Math.abs(previousPoint.elevation-currentPoint.elevation)/2,
                     0, 0, undefined, baseSpeed);
-                const modifiedVelocity = getPowerOrVelocity(metric, distanceInKm, Math.abs(previousPoint.elevation-currentPoint.elevation)/2,
+                const modifiedVelocity = getPowerOrVelocity(distanceInKm, Math.abs(previousPoint.elevation-currentPoint.elevation)/2,
 			        0, effectiveWindSpeed, power, baseSpeed);
                 totalMinutesLost += AnalyzeRoute.windToTimeInMinutes(baseSpeed, distanceInMiles, modifiedVelocity);
 

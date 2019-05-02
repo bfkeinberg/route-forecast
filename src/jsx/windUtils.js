@@ -29,7 +29,7 @@ const aeroValues = [
     0.200
 ];
 
-export const getPowerOrVelocity = function(metric, distance, elevation, grade, headwind, power, speed) {
+export const getPowerOrVelocity = function(distance, elevation, grade, headwind, power, speed) {
     // all done in metric units, JIT conversion to/from
     // but velocity returned in mph
 
@@ -38,7 +38,7 @@ export const getPowerOrVelocity = function(metric, distance, elevation, grade, h
         const bweightv = 9; // kg
         const rollingRes = tireValues[0];   // clinchers
         const frontalArea = aeroValues[0];  // on the hoods
-        let headwindv = headwind  * (!metric ? 1.609 : 1.0) / 3.6;  // converted to m/s
+        let headwindv = (headwind  * 1.609) / 3.6;  // converted to m/s
         const temperaturev = 25; // C
         const transv = 0.95; // no one knows what this is, so why bother presenting a choice?
 
@@ -57,7 +57,7 @@ export const getPowerOrVelocity = function(metric, distance, elevation, grade, h
             return (v * 0.6214 );
 
         } else {  // we calculate power from velocity
-            const v = speed / 3.6 * (1.609);  // converted to m/s;
+            const v = speed / 3.6 * 1.609;  // converted to m/s;
             let tv = v + headwindv;
             var A2Eff = (tv > 0.0) ? A2 : -A2; // wind in face, must reverse effect
             let powerv = (v * tres + v * tv * tv * A2Eff) / transv;
