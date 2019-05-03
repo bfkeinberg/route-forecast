@@ -76,6 +76,7 @@ module.exports = (env,argv) => {
         },
         plugins: [
             new CleanWebpackPlugin({verbose: true, dry:true}),
+            new webpack.DefinePlugin({SENTRY_RELEASE: JSON.stringify(env.sentryRelease)}),
             new MiniCssExtractPlugin({
                 // Options similar to the same options in webpackOptions.output
                 // both options are optional

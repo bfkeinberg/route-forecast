@@ -12,6 +12,7 @@ const BUILD_DIR = path.resolve(__dirname, 'dist');
 const STATIC_DIR = path.resolve(__dirname, 'dist/static');
 const SERVER_DIR = path.resolve(__dirname, 'dist/server');
 const VIEWS_DIR = path.resolve(SERVER_DIR, 'views');
+var webpack = require('webpack');
 
 module.exports = (env,argv) => {
     const mode = argv === undefined ? 'development' : argv.mode;
@@ -72,6 +73,7 @@ module.exports = (env,argv) => {
         },
         plugins: [
             new CleanWebpackPlugin({}),
+            new webpack.DefinePlugin({SENTRY_RELEASE: JSON.stringify(env.sentryRelease)}),
             new MiniCssExtractPlugin({
                 // Options similar to the same options in webpackOptions.output
                 // both options are optional
@@ -99,7 +101,7 @@ module.exports = (env,argv) => {
                 ]
             }),
             new CopyWebpackPlugin([{from: SRC_STATIC_DIR + '/favicon*.*', to: STATIC_DIR, flatten: true},
-                {from: SRC_STATIC_DIR + '/apple-*.*', to: STATIC_DIR, flatten: true}]),
+                {from: SRC_STATIC_DIR + '/apple-*.*', to: STATIC_DIR, flatten: true}])
         ],
         output:
         {

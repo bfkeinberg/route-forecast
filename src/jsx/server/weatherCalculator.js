@@ -63,7 +63,7 @@ export default function callWeatherService (lat, lon, currentTime, distance, zon
         }
     }).
     catch(error => {
-        console.error('error',error);
+        console.error('error',JSON.stringify(error));
         throw error;
     });
     return forecastResult;

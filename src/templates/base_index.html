@@ -29,12 +29,8 @@
         <% if (htmlWebpackPlugin.files.favicon) { %>
             <link rel="shortcut icon" href="<%= htmlWebpackPlugin.files.favicon%>">
         <% } %>
-        <script src="https://cdn.ravenjs.com/3.23.1/raven.min.js" crossorigin="anonymous"></script>
-        <script>Raven.config('https://ea4c472ff9054dab8c18d594b95d8da2@sentry.io/298059',
-            {release:'<%= htmlWebpackPlugin.options.sentryRelease %>', environment:'production',
-            breadcrumbCallback:function(crumb){if (crumb.type==='console') {return false} else {return crumb}}}).install();</script>
         <script>
-          function measureCRP() {
+        function measureCRP() {
             var t = window.performance.timing,
               interactive = t.domInteractive - t.domLoading,
               dcl = t.domContentLoadedEventStart - t.domLoading,

@@ -276,6 +276,9 @@ export const fetchTimeZone = (point, parser, rwgpsRouteData) => {
   }
 };
 
+export const INVALIDATE_FORECAST = 'INVALIDATE_FORECAST';
+export const invalidateForecast = () => { return {type:INVALIDATE_FORECAST}};
+
 export const recalcRoute = function() {
     return async function(dispatch, getState) {
         const parser = await getRouteParser();
@@ -301,17 +304,7 @@ export const recalcRoute = function() {
                         getState().controls.metric,
                         timeZoneResult.zoneId)));
                 if (getState().forecast.forecast !== []) {
-                    let {time:weatherCorrectionMinutes,values:recalculatedValues,gustSpeed,finishTime} = parser.adjustForWind(
-                        getState().forecast.forecast,
-                        getState().routeInfo.points,
-                        getState().uiInfo.routeParams.pace,
-                        getState().controls.userControlPoints,
-                        getState().controls.initialControlValues,
-                        getState().uiInfo.routeParams.start,
-                        getState().controls.metric,
-                        getState().routeInfo.initialFinishTime);
-                    dispatch(addWeatherCorrection(weatherCorrectionMinutes,finishTime,gustSpeed));
-                    dispatch(updateCalculatedValues(recalculatedValues));
+                    dispatch(requestForecast(getState().routeInfo));
                 }
             }, error => {
                 dispatch(setErrorDetails(error));

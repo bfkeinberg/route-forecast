@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import PropTypes from 'prop-types';
+import * as Sentry from '@sentry/browser';
 
-/*global Raven*/
 class ErrorBoundary extends Component {
     static propTypes = {
         children:PropTypes.node.isRequired
@@ -19,8 +19,12 @@ class ErrorBoundary extends Component {
             errorInfo: errorInfo
         });
         // You can also log error messages to an error reporting service here
-        Raven.captureException(error, { extra: errorInfo });
-        Raven.showReportDialog();
+        Sentry.withScope(scope => {
+            scope.setExtras(errorInfo);
+            const eventId = Sentry.captureException(error);
+            this.setState({eventId})
+        });
+        Sentry.showReportDialog({ eventId: this.state.eventId });
     }
 
     render() {
