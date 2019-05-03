@@ -160,6 +160,9 @@ export class RouteWeatherUI extends Component {
     }
 
     static updateFromQueryParams(props, queryParams) {
+        if (queryParams === undefined) {
+            return;
+        }
         props.setRwgpsRoute(queryParams.rwgpsRoute);
         // force forecast fetch when our initial url contains a route number
         if (queryParams.rwgpsRoute !== undefined) {

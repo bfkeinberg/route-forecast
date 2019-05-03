@@ -6,12 +6,12 @@ import LocationContext from '../locationContext';
 import * as Sentry from '@sentry/browser';
 
 /* global SENTRY_RELEASE */
+/* global module */
 if (!window.origin.startsWith('http://localhost')) {
     Sentry.init({ dsn: 'https://ea4c472ff9054dab8c18d594b95d8da2@sentry.io/298059',
         release:SENTRY_RELEASE, environment:'production',
-        beforeBreadcrumb(breadcrumb, hint) {
-            console.log(breadcrumb,hint);
-            if (breadcrumb.type==='console') {return false} else {return breadcrumb}
+        beforeBreadcrumb(breadcrumb) {
+            if (breadcrumb.category==='console') {return null} else {return breadcrumb}
         }
     });
 }

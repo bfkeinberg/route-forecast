@@ -2,7 +2,8 @@ import {applyMiddleware, createStore} from 'redux';
 import thunkMiddleware from 'redux-thunk';
 import {createLogger} from 'redux-logger';
 import rootReducer from './reducers/reducer';
-import createRavenMiddleware from "raven-for-redux";
+import * as Sentry from '@sentry/browser';
+import createSentryMiddleware from "redux-sentry-middleware";
 
 export const loggerMiddleware = createLogger();
 /* eslint-disable global-require */
@@ -20,10 +21,12 @@ const bannedActionKeys = [
 ];
 
 // below is for server side rendering
+/*
 if (typeof Raven === 'undefined') {
     var Raven = require('raven-js');
     Raven.config('https://ea4c472ff9054dab8c18d594b95d8da2@sentry.io/298059').install();
 }
+*/
 
 /**
  *
@@ -35,7 +38,7 @@ export const selectMiddleware = mode => {
         thunkMiddleware,
         mode === 'development' ?
             loggerMiddleware :
-        createRavenMiddleware(Raven, {
+            createSentryMiddleware(Sentry, {
             stateTransformer: state => {Object.assign(...Object.keys(state)
                 .filter(key => (key !== 'routeInfo' && key !== 'forecast'))
                 .map( key => ({ [key]: state[key] }) ) )},
