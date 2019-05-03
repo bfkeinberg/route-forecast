@@ -15,7 +15,8 @@ module.exports = (env,argv) => {
     return {
         target: "node",
         mode:mode,
-        externals: [nodeExternals({
+        externals: [
+            nodeExternals({
             // load non-javascript files with extensions, presumably via loaders
             whitelist: [/\.(?!(?:jsx?|json)$).{1,5}$/i],
         })],
@@ -34,10 +35,18 @@ module.exports = (env,argv) => {
                     options: {
                         cacheDirectory: true,
                         babelrc: false,
-                        presets: ["@babel/env", "@babel/preset-react"],
+                        presets: [
+                            "@babel/env",
+                            "@babel/preset-react"
+                        ],
                         // how to target specific browsers
                         // presets: [["babel-preset-env",{targets:{browsers:["last 3 versions","Explorer 11"]}}],"babel-preset-react","babel-preset-stage-0"],
-                        plugins: ['@babel/transform-runtime', "react-html-attrs", "transform-class-properties","@babel/plugin-syntax-dynamic-import"],
+                        plugins: [
+                            '@babel/transform-runtime',
+                            "react-html-attrs",
+                            "transform-class-properties",
+                            "@babel/plugin-syntax-dynamic-import"
+                        ],
                         // if we want to remove arrow functions as well
                         // plugins: ['babel-plugin-transform-runtime',"react-html-attrs", "transform-class-properties","transform-es2015-arrow-functions"],
                         comments: true
@@ -74,7 +83,7 @@ module.exports = (env,argv) => {
         },
         plugins: [
             new CleanWebpackPlugin({verbose: true, dry:true}),
-            new webpack.DefinePlugin({sentryRelease: env.sentryRelease}),
+            new webpack.DefinePlugin({SENTRY_RELEASE: JSON.stringify(env.sentryRelease)}),
             new MiniCssExtractPlugin({
                 // Options similar to the same options in webpackOptions.output
                 // both options are optional

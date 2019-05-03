@@ -320,6 +320,8 @@ const forecast = function(state = {forecast:[],valid:false,range:[], tableViewed
             return {...state,valid:false,tableViewed:false,mapViewed:false,range:[],forecast:[]};
         case Actions.GPX_ROUTE_LOADING_SUCCESS:
             return {...state,valid:false};
+        case Actions.INVALIDATE_FORECAST:
+            return {...state,valid:false, forecast:[]};
         case Actions.GPX_ROUTE_LOADING_FAILURE:
             return {...state,valid:false};
         case Actions.SET_WEATHER_RANGE:

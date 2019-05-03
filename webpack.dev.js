@@ -6,7 +6,10 @@ module.exports = (env, argv) => merge.strategy(
     {
         entry: 'prepend'
     })(clientCommon(env,argv), {
-        entry:['react-hot-loader/patch','webpack-hot-middleware/client'],
+        entry:[
+            'react-hot-loader/patch',
+            'webpack-hot-middleware/client'
+        ],
         output: {
             pathinfo:true,
             filename: "[name].bundle.js",
