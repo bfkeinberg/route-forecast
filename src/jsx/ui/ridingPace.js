@@ -48,8 +48,7 @@ const RidingPace = ({pace,actualPace,setPace,metric}) => {
                     <option value="D">26 kph</option>
                     <option value="D+">27 kph</option>
                     <option value="E">29 kph</option>
-                </Input>
-                :
+                </Input> :
                 <Input tabIndex='3' type="select" value={pace} name="pace"
                        id='paceInput' onChange={event => {setPace(event.target.value)}}>
                     <option value="A">10 mph</option>

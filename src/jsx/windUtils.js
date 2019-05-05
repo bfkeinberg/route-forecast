@@ -51,8 +51,6 @@ export const getPowerOrVelocity = function(distance, elevation, grade, headwind,
         if (power!==undefined) {  // we calculate velocity from power when calcMode = 0
 
             let v = newton(A2, headwindv, tres, transv, power) * 3.6;      // convert to km/h
-            if (v > 0.0) var t = 60.0* distance / v;
-            else var t = 0.0;  // don't want any div by zero errors
 
             return (v * 0.6214 );
 
@@ -60,11 +58,6 @@ export const getPowerOrVelocity = function(distance, elevation, grade, headwind,
             const v = speed / 3.6 * 1.609;  // converted to m/s;
             let tv = v + headwindv;
             var A2Eff = (tv > 0.0) ? A2 : -A2; // wind in face, must reverse effect
-            let powerv = (v * tres + v * tv * tv * A2Eff) / transv;
-
-            if (v > 0.0) t = 16.6667 * distance / v;  // v is m/s here, t is in minutes
-            else t = 0.0;  // don't want any div by zero errors
-
-            return powerv;
+            return (v * tres + v * tv * tv * A2Eff) / transv;
         }
 };

@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {Label, Input, FormGroup} from 'reactstrap';
 import {connect} from 'react-redux';
 import {setDisplayedFinishTime} from "../actions/actions";
 import '../../static/controlsStyles.css';

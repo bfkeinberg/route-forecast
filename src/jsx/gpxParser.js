@@ -298,7 +298,6 @@ class AnalyzeRoute {
     }
 
     adjustForWind = (forecastInfo,stream,pace,controls,previouslyCalculatedValues,start,metric,finishTime) => {
-        let climbInMeters;
         if (forecastInfo.length===0) {
             return {time:0,values:[],gustSpeed:0,finishTime:finishTime};
         }
@@ -309,7 +308,6 @@ class AnalyzeRoute {
         let previousPoint = null;
         let totalMinutesLost = 0;
         let totalDistanceInKm = 0;
-        let hilliness;
         let calculatedValues = [];
         let maxGustSpeed = 0;
 
@@ -318,12 +316,6 @@ class AnalyzeRoute {
                 let distanceInKm = gpxParse.utils.calculateDistance(previousPoint.lat, previousPoint.lon,
                     currentPoint.lat,currentPoint.lon);
                 totalDistanceInKm += distanceInKm;
-                if (currentPoint.elevation > previousPoint.elevation) {
-                    climbInMeters = currentPoint.elevation - previousPoint.elevation;
-                }
-                else {
-                    climbInMeters = 0;
-                }
 
                 let distanceInMiles = distanceInKm*kmToMiles;
                 if (distanceInMiles === 0) {
@@ -349,7 +341,7 @@ class AnalyzeRoute {
                 const power = getPowerOrVelocity(distanceInKm, Math.abs(previousPoint.elevation-currentPoint.elevation)/2,
                     0, 0, undefined, baseSpeed);
                 const modifiedVelocity = getPowerOrVelocity(distanceInKm, Math.abs(previousPoint.elevation-currentPoint.elevation)/2,
-			        0, effectiveWindSpeed, power, baseSpeed);
+                    0, effectiveWindSpeed, power, baseSpeed);
                 totalMinutesLost += AnalyzeRoute.windToTimeInMinutes(baseSpeed, distanceInMiles, modifiedVelocity);
 
                 let desiredDistance = metric ? totalDistanceInKm: totalDistanceInKm*kmToMiles;

@@ -7,7 +7,7 @@ import circus_tent from 'Images/circus tent.png';
 import {Map, InfoWindow, Marker, GoogleApiWrapper, Polyline} from 'google-maps-react';
 import { createSelector } from 'reselect';
 import {formatTemperature} from "./forecastTable";
-import {withRouter} from 'react-router-dom';
+// import {withRouter} from 'react-router-dom';
 import {setMapViewed} from "./actions/actions";
 
 /*global google*/

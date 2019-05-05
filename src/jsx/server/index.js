@@ -168,27 +168,21 @@ app.post('/forecast', upload.none(), (req, res) => {
     }
 });
 
-app.post('/bitly', async (req, res) => {
-    const longUrl = req.body.longUrl;
-    const {error, url} = await getBitlyShortenedUrl(process.env.BITLY_TOKEN, longUrl);
-    res.json({error, url})
-});
-
 const getBitlyShortenedUrl = (accessToken, longUrl) => {
-    return fetch(`https://api-ssl.bitly.com/v4/groups`,
-    {
+    return fetch(`https://api-ssl.bitly.com/v4/groups`, {
         headers: {
             Accept: 'application/json',
             'Content-Type': 'application/json',
             Authorization: `Bearer ${accessToken}`
         }
-    }).then( response => {
+    }).then(response => {
         if (response.ok) {
             return response.json();
         }
         throw Error(`Bitly groupid fetch failed with ${response.status} ${response.statusText}`);
     }
-    ).then (responseJson => {
+    ).
+    then(responseJson => {
         if (!responseJson.groups) {
             throw Error(`Bitly is probably mad at authentication for some reason; failed with message ${responseJson.message}`);
         }
@@ -199,25 +193,33 @@ const getBitlyShortenedUrl = (accessToken, longUrl) => {
             headers: {
                 Accept: 'application/json',
                 'Content-Type': 'application/json',
-                Authorization: `Bearer ${accessToken}`,
+                Authorization: `Bearer ${accessToken}`
             },
             body: JSON.stringify({
                 "long_url": longUrl,
                 "group_guid": groupID
             })
-        }).then ( response => {
+        }).then(response => {
             if (response.ok) {
                 return response.json();
             }
             throw Error(`Bitly link creation failed with ${response.status} ${response.statusText}`);
-        }).then( responseJson => {
+        }).
+        then(responseJson => {
             if (responseJson.link) {
                 return {error: null, url: responseJson.link};
             }
             throw Error(`Bitly is mad for some reason: ${responseJson.message}`);
         })
-    }).catch( error => ({error: error.toString(), url: null}));
+    }).
+    catch(error => ({error: error.toString(), url: null}));
 };
+
+app.post('/bitly', async (req, res) => {
+    const longUrl = req.body.longUrl;
+    const {error, url} = await getBitlyShortenedUrl(process.env.BITLY_TOKEN, longUrl);
+    res.json({error, url})
+});
 
 const getStravaAuthUrl = (baseUrl,state) => {
     process.env.STRAVA_REDIRECT_URI = baseUrl + '/stravaAuthReply';

@@ -6,7 +6,7 @@ import React from "react";
 import {connect} from 'react-redux';
 import {addControl, toggleDisplayBanked, toggleMetric} from "../actions/actions";
 
-function DesktopControls(props) {
+const DesktopControls = (props) => {
     return <div className="controls-container">
         <div className="controls-item">
             <Button class={"pt-minimal"} tabIndex='10' onClick={props.addControl} id='addButton' icon={"add"}>Add</Button>
@@ -32,7 +32,7 @@ function DesktopControls(props) {
             </div>
         </div>
     </div>;
-}
+};
 
 DesktopControls.propTypes = {
     addControl: PropTypes.func.isRequired,

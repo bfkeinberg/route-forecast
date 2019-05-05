@@ -153,7 +153,6 @@ loadingSource:null,fetchingForecast:false,fetchingRoute:false}, action) {
             return {...state, loadingSource: null, succeeded: null};
         case Actions.BEGIN_LOADING_ROUTE:
             return {...state, fetchingRoute: true, loadingSource: action.source};
-            return {...state, fetchingRoute: true, loadingSource: action.source};
         case Actions.BEGIN_FETCHING_FORECAST:
             return {...state, fetchingForecast: true};
         case Actions.FORECAST_FETCH_SUCCESS:

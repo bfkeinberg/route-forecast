@@ -6,7 +6,7 @@ import React from "react";
 import {connect} from 'react-redux';
 import {addControl, toggleDisplayBanked, toggleMetric} from "../actions/actions";
 
-function MobileControls(props) {
+const MobileControls = (props) => {
     return <div className="mobile-controls-container">
         <div className="controls-item">
             <FinishTime/>
@@ -36,7 +36,7 @@ function MobileControls(props) {
             <UncontrolledTooltip target={"addButton"}>Add a control point</UncontrolledTooltip>
         </div>
     </div>;
-}
+};
 
 MobileControls.propTypes = {
     addControl: PropTypes.func,

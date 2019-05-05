@@ -34,7 +34,8 @@ class RouteInfoForm extends Component {
         loadFromRideWithGps:PropTypes.func.isRequired,
         firstUse:PropTypes.bool.isRequired,
         routeSelected:PropTypes.bool.isRequired,
-        needToViewTable: PropTypes.bool.isRequired
+        needToViewTable: PropTypes.bool.isRequired,
+        routeProps:PropTypes.Object
     };
 
     constructor(props) {
