@@ -304,7 +304,17 @@ export const recalcRoute = function() {
                         getState().controls.metric,
                         timeZoneResult.zoneId)));
                 if (getState().forecast.forecast !== []) {
-                    dispatch(requestForecast(getState().routeInfo));
+                    let {time:weatherCorrectionMinutes,values:recalculatedValues,gustSpeed,finishTime} = parser.adjustForWind(
+                        getState().forecast.forecast,
+                        getState().routeInfo.points,
+                        getState().uiInfo.routeParams.pace,
+                        getState().controls.userControlPoints,
+                        getState().controls.initialControlValues,
+                        getState().uiInfo.routeParams.start,
+                        getState().controls.metric,
+                        getState().routeInfo.initialFinishTime);
+                    dispatch(addWeatherCorrection(weatherCorrectionMinutes,finishTime,gustSpeed));
+                    dispatch(updateCalculatedValues(recalculatedValues));
                 }
             }, error => {
                 dispatch(setErrorDetails(error));

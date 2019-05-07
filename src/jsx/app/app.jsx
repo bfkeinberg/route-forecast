@@ -9,10 +9,10 @@ import * as Sentry from '@sentry/browser';
 /* global module */
 if (!window.origin.startsWith('http://localhost')) {
     Sentry.init({ dsn: 'https://ea4c472ff9054dab8c18d594b95d8da2@sentry.io/298059',
-        release:SENTRY_RELEASE, environment:'production',
+        release:SENTRY_RELEASE, environment:'production'/*,
         beforeBreadcrumb(breadcrumb) {
             if (breadcrumb.category==='console') {return null} else {return breadcrumb}
-        }
+        }*/
     });
 }
 let script = document.scripts.namedItem('routeui');
