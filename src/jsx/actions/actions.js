@@ -1,5 +1,6 @@
 import moment from 'moment';
 import cookie from 'react-cookies';
+import * as Sentry from '@sentry/browser';
 
 const sanitizeCookieName = (cookieName) => {
     return cookieName.replace(/[ =/]/,'');
@@ -321,6 +322,10 @@ export const recalcRoute = function() {
             });
 
         } else if (getState().routeInfo.gpxRouteData !== null) {
+            if (getState().routeInfo.gpxRouteData.tracks[0] === undefined) {
+                Sentry.captureMessage(JSON.stringify(getState().routeInfo.gpxRouteData));
+                return dispatch(setErrorDetails("GPX route missing tracks"));
+            }
             let point = getState().routeInfo.gpxRouteData.tracks[0].segments[0][0];
             let timeZonePromise = parser.findTimezoneForPoint(point.lat, point.lon,
                 moment(getState().uiInfo.routeParams.start), getState().params.timezone_api_key);
@@ -336,7 +341,7 @@ export const recalcRoute = function() {
                         getState().controls.metric,
                         timeZoneResult.zoneId)));
             }, error => {
-                dispatch(setErrorDetails(error));
+                return dispatch(setErrorDetails(error));
             });
         }
     }
