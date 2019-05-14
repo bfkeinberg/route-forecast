@@ -359,7 +359,7 @@ export const loadFromRideWithGps = function(routeNumber, isTrip) {
                 dispatch(rwgpsRouteLoadingSuccess(routeData));
                 dispatch(loadControlsFromCookie(routeData));
                 dispatch(recalcRoute());
-            }, error => {dispatch(rwgpsRouteLoadingFailure(error))}
+            }, error => {return dispatch(rwgpsRouteLoadingFailure(error))}
         );
     };
 };
