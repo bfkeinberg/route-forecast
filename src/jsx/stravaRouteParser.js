@@ -10,7 +10,6 @@ const metersToFeet = 3.2808;
 class StravaRouteParser {
     constructor() {
         this.processActivityStream = this.processActivityStream.bind(this);
-        this.computeTimesFromData = this.computeTimesFromData.bind(this);
         this.fetchActivity = this.fetchActivity.bind(this);
     }
 
@@ -46,11 +45,11 @@ class StravaRouteParser {
         });
     }
 
-    computeTimesFromData(controlPoints, activityData, activityStream) {
+    computeTimesFromData = (controlPoints, activityData, activityStream) => {
         return ({controls:this.parseActivity(activityData, activityStream, controlPoints),
             actualFinishTime:StravaRouteParser.computeActualFinishTime(activityData),
             actualPace:StravaRouteParser.wwPaceCalcForActivity(activityData)});
-    }
+    };
 
     static wwPaceCalcForActivity(activity) {
         // all below in meters

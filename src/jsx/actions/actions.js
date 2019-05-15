@@ -654,7 +654,7 @@ export const updateExpectedTimes = function(activity) {
             dispatch(stravaFetchSuccess(result));
             const parser = await getStravaParser().catch((err) => {dispatch(stravaFetchFailure(err));return null});
             // handle failed load, error has already been dispatched
-            if (parser === null) {
+            if (parser == null) {
                 return Promise.resolve(Error('Cannot load parser'));
             }
             let timesFromData = parser.computeTimesFromData(getState().controls.userControlPoints,
