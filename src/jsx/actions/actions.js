@@ -640,7 +640,7 @@ export const getPaceOverTime = function() {
         }
         const parser = await getStravaParser().catch((err) => {dispatch(stravaFetchFailure(err));return null});
         // handle failed load, error has already been dispatched
-        if (parser === null) {
+        if (parser == null) {
             return Promise.resolve(Error('Cannot load parser'));
         }
         return dispatch(setPaceOverTime(parser.findMovingAverages(getState().strava.activityData,
