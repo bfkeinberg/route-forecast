@@ -433,6 +433,7 @@ export const shortenUrl = function(url) {
                 body: JSON.stringify({longUrl: url})
             })
             .then(response => response.json())
+            .catch( error => {return setErrorDetails(error)})
             .then(responseJson => {
                 if (responseJson.error === null) {
                     return dispatch(setShortUrl(responseJson.url));
