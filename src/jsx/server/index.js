@@ -36,14 +36,12 @@ if (!process.env.NO_LOGGING) {
     StackdriverTransport = new LoggingWinston({
         projectId: 'route-forecast'
 
-    /*
-        keyFilename: 'gcp_key.json',
-        prefix: 'myservice',
-        serviceContext: {
-            service: 'myservice',
-            version: 'dev'
-        }
-    */
+    // keyFilename: 'gcp_key.json',
+    // prefix: 'myservice',
+    // serviceContext: {
+    // service: 'myservice',
+    // version: 'dev'
+    // }
     });
 }
 
