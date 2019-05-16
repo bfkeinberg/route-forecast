@@ -158,7 +158,7 @@ class RouteForecastMap extends Component {
                 <div id="map" style={{'height':'95%'}}>
                     {this.props.forecast.length > 0 && this.props.bounds !== null ?
                         <Map google={this.props.google}
-                             mapType={'ROADMAP'} scaleControl={true} bounds={mapBounds} initialCenter={mapBounds.getCenter().toJSON()}
+                             mapType={'ROADMAP'} scaleControl={true} bounds={mapBounds} initialCenter={mapBounds.getCenter()==null?null:mapBounds.getCenter().toJSON()}
                              onReady={(mapProps, map) => {map.fitBounds(mapBounds)}}>
                             <Polyline path={this.getRoutePoints(this.props.points)} strokeColor={'#ff0000'} strokeWeight={2} strokeOpacity={1.0}/>
                             {highlight}
