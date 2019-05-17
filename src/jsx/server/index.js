@@ -128,13 +128,18 @@ app.get('/rwgps_route', (req, res) => {
     }
 
     const rwgpsUrl = `https://ridewithgps.com/${routeType}/${routeNumber}.json?apikey=${rwgpsApiKey}`;
-    // check status below and retry with opposite route type if it failed, as python version does
+    const memoryUsage = process.memoryUsage();
+    console.info(`Memory usage before fetching route: ${JSON.stringify(memoryUsage)}`);
+    // check status below and retry with opposite route type if it failed
     fetch(rwgpsUrl).then(fetchResult => {if (!fetchResult.ok) {throw Error(fetchResult.status)} return fetchResult.text()})
-        .then(body => res.status(200).send(body))
-        .catch(err => {console.log(`first fetch threw ${JSON.stringify(err)}`);fetch(`https://ridewithgps.com/${routeType==='trips'?'routes':'trips'}/${routeNumber}.json?apikey=${rwgpsApiKey}`).
+        .then(body => {console.info(`Route data was ${body.length} long`);res.status(200).send(body)})
+        .catch(err => {
+            console.log(`first fetch threw ${JSON.stringify(err)}`);
+            fetch(`https://ridewithgps.com/${routeType==='trips'?'routes':'trips'}/${routeNumber}.json?apikey=${rwgpsApiKey}`).
                 then(retryResult => {if (!retryResult.ok) {throw Error('No such route')} return retryResult.text()}).
                 then(body => res.status(200).send(body)).
                 catch(err => res.status(500).json({'status':err}))});
+    console.info(`Memory usage after fetching route: ${JSON.stringify(memoryUsage)}`);
 });
 
 app.post('/forecast', upload.none(), (req, res) => {

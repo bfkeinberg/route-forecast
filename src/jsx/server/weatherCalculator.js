@@ -41,7 +41,6 @@ export default function callWeatherService (lat, lon, currentTime, distance, zon
         const windBearing = current.windBearing;
         const relativeBearing = hasWind && windBearing !== undefined ? getBearingDifference(bearing, windBearing) : null;
         const rainy = current.icon !== undefined && current.icon === 'rain';
-        console.info(now.format(),lat,lon,bearing,relativeBearing,rainy);
         return {
             'time':now.format('h:mmA'),
             'distance':distance,
