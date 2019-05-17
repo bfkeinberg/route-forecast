@@ -105,6 +105,13 @@ class RouteForecastMap extends Component {
     }
 
     getMapBounds(bounds) {
+        if (this.props.subrange.length === 2) {
+            let bounds = new google.maps.LatLngBounds();
+            this.props.points.filter(point => point.dist >= this.props.subrange[0] &&
+                (isNaN(this.props.subrange[1]) || point.dist <= this.props.subrange[1])).
+                forEach(point => bounds.extend(point));
+            return bounds;
+        }
         let southWest = { lat:bounds.min_latitude, lng:bounds.min_longitude };
         let northEast = { lat:bounds.max_latitude, lng:bounds.max_longitude };
         return new google.maps.LatLngBounds(southWest,northEast);

@@ -688,6 +688,15 @@ export const setWeatherRange = function(start,finish) {
     };
 };
 
+export const TOGGLE_WEATHER_RANGE = 'TOGGLE_WEATHER_RANGE';
+export const toggleWeatherRange = function(start,finish) {
+    return {
+        type: TOGGLE_WEATHER_RANGE,
+        start: start,
+        finish: finish
+    };
+};
+
 export const RESET = 'RESET';
 export const reset = () => {return {type:RESET}};
 

@@ -4,7 +4,7 @@ import ErrorBoundary from "./errorBoundary";
 import darkSky from 'Images/darkSkySmall.png';
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
-import {setWeatherRange, setTableViewed} from './actions/actions';
+import {setWeatherRange, toggleWeatherRange, setTableViewed} from './actions/actions';
 import MediaQuery from 'react-responsive';
 
 const milesToKm = 1609.34;
@@ -15,6 +15,7 @@ export class ForecastTable extends Component {
         weatherCorrectionMinutes:PropTypes.number,
         forecast:PropTypes.arrayOf(PropTypes.object).isRequired,
         setWeatherRange:PropTypes.func.isRequired,
+        toggleWeatherRange:PropTypes.func.isRequired,
         setTableViewed:PropTypes.func.isRequired,
         metric:PropTypes.bool.isRequired,
         gustSpeed: PropTypes.number
@@ -31,6 +32,16 @@ export class ForecastTable extends Component {
         const start = parseInt(event.currentTarget.getAttribute('start'));
         this.props.setWeatherRange(start, event.currentTarget.getAttribute('end'));
         this.setState({selectedRow:start});
+    };
+
+    toggleRange = (event) => {
+        const start = parseInt(event.currentTarget.getAttribute('start'));
+        this.props.toggleWeatherRange(start, event.currentTarget.getAttribute('end'));
+        if (this.state.selectedRow === start) {
+            this.setState({selectedRow: null});
+        } else {
+            this.setState({selectedRow:start});
+        }
     };
 
     static windStyle(point) {
@@ -71,7 +82,7 @@ export class ForecastTable extends Component {
                         start={point.distance*milesToKm}
                         end={index!==forecast.length-1?forecast[index+1].distance*milesToKm:null}
                         className={this.state.selectedRow===parseInt(point.distance*milesToKm)?'highlighted':null}
-                        onClick={this.updateWeatherRange} onMouseEnter={this.updateWeatherRange}>
+                        onClick={this.toggleRange} onMouseEnter={this.updateWeatherRange}>
                         <td>{point.time}</td>
                         <td>{metric ? ((point.distance*milesToKm)/1000).toFixed(0) : point.distance}</td>
                         <td>{point.summary}</td>
@@ -154,7 +165,7 @@ const mapStateToProps = (state) =>
     });
 
 const mapDispatchToProps = {
-    setWeatherRange, setTableViewed
+    setWeatherRange, setTableViewed, toggleWeatherRange
 };
 
 export const formatTemperature = ForecastTable.formatTemperature;

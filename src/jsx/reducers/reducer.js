@@ -330,6 +330,19 @@ const forecast = function(state = {forecast:[],valid:false,range:[], tableViewed
                     parseFloat(action.finish)
                 ]
             };
+        case Actions.TOGGLE_WEATHER_RANGE:
+                if (state.range[0] === parseFloat(action.start) && state.range[1] === parseFloat(action.finish)) {
+                    return {
+                        ...state,
+                        range: []
+                    }
+                }
+                return {...state, range:
+                    [
+                        parseFloat(action.start),
+                        parseFloat(action.finish)
+                    ]
+                };
         case Actions.SET_TABLE_VIEWED:
             return {...state, tableViewed: true};
         case Actions.SET_MAP_VIEWED:
