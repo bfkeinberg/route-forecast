@@ -12,7 +12,6 @@ class AnalyzeRoute {
     constructor() {
         this.walkRwgpsRoute = this.walkRwgpsRoute.bind(this);
         this.walkGpxRoute = this.walkGpxRoute.bind(this);
-        this.loadRwgpsRoute = this.loadRwgpsRoute.bind(this);
         this.loadGpxFile = this.loadGpxFile.bind(this);
         this.analyzeRoute = this.analyzeRoute.bind(this);
     }
@@ -57,7 +56,7 @@ class AnalyzeRoute {
         }
     }
 
-    loadRwgpsRoute(route, isTrip) {
+    loadRwgpsRoute = (route, isTrip) => {
         return new Promise((resolve, reject) => {
             fetch('/rwgps_route?route=' + route + '&trip=' + isTrip).then(response => {
                     if (response.status === 200) {
@@ -66,7 +65,7 @@ class AnalyzeRoute {
                 }
             ).then(response => {
                 if (response === undefined) {
-                    reject(new Error("Could not get Ride with GPS results"));
+                    reject(new Error("No such Ride with GPS route"));
                     return;
                 }
                 let rwgpsRouteDatum = response[response['trip'] === undefined ? 'route' : 'trip'];
@@ -80,7 +79,7 @@ class AnalyzeRoute {
                 reject(error.message);
             });
         });
-    }
+    };
 
     analyzeRoute(trackName, stream, userStartTime, pace, intervalInHours, controls, metric, timeZoneId) {
 

@@ -133,12 +133,11 @@ app.get('/rwgps_route', (req, res) => {
     // check status below and retry with opposite route type if it failed
     fetch(rwgpsUrl).then(fetchResult => {if (!fetchResult.ok) {throw Error(fetchResult.status)} return fetchResult.text()})
         .then(body => {console.info(`Route data was ${body.length} long`);res.status(200).send(body)})
-        .catch(err => {
-            console.log(`first fetch threw ${JSON.stringify(err)}`);
+        .catch(firstErr => {
             fetch(`https://ridewithgps.com/${routeType==='trips'?'routes':'trips'}/${routeNumber}.json?apikey=${rwgpsApiKey}`).
-                then(retryResult => {if (!retryResult.ok) {throw Error('No such route')} return retryResult.text()}).
+                then(retryResult => {if (!retryResult.ok) {throw Error(retryResult.status)} return retryResult.text()}).
                 then(body => res.status(200).send(body)).
-                catch(err => res.status(500).json({'status':err}))});
+                catch(err => {res.status(firstErr.message).json({'status':err})})});
     console.info(`Memory usage after fetching route: ${JSON.stringify(memoryUsage)}`);
 });
 
