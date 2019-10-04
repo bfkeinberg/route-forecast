@@ -292,6 +292,10 @@ class AnalyzeRoute {
     }
 
     static windToTimeInMinutes(baseSpeed,distance,modifiedVelocity) {
+        if  (modifiedVelocity==0) {
+            console.log(`Zero velocity at distance ${distance}`);
+            let xxx= 7;
+        }
         // will be negative for a tailwind
         return (distance*60)/modifiedVelocity-(distance*60)/baseSpeed;
     }
@@ -337,11 +341,14 @@ class AnalyzeRoute {
                 }
                 let effectiveWindSpeed = Math.cos((Math.PI / 180)*relativeBearing)*averageWindSpeed;
 
-                const power = getPowerOrVelocity(distanceInKm, Math.abs(previousPoint.elevation-currentPoint.elevation)/2,
-                    0, 0, undefined, baseSpeed);
-                const modifiedVelocity = getPowerOrVelocity(distanceInKm, Math.abs(previousPoint.elevation-currentPoint.elevation)/2,
-                    0, effectiveWindSpeed, power, baseSpeed);
-                totalMinutesLost += AnalyzeRoute.windToTimeInMinutes(baseSpeed, distanceInMiles, modifiedVelocity);
+                // sometimes the route data is missing elevation, so don't try to compute with it
+                if (previousPoint.elevation!==undefined && currentPoint.elevation!==undefined) {
+                    const power = getPowerOrVelocity(distanceInKm, Math.abs(previousPoint.elevation-currentPoint.elevation)/2,
+                        0, 0, undefined, baseSpeed);
+                    const modifiedVelocity = getPowerOrVelocity(distanceInKm, Math.abs(previousPoint.elevation-currentPoint.elevation)/2,
+                        0, effectiveWindSpeed, power, baseSpeed);
+                    totalMinutesLost += AnalyzeRoute.windToTimeInMinutes(baseSpeed, distanceInMiles, modifiedVelocity);
+                }
 
                 let desiredDistance = metric ? totalDistanceInKm: totalDistanceInKm*kmToMiles;
                 currentControl = AnalyzeRoute.calculateValuesForWind(controls, previouslyCalculatedValues,
