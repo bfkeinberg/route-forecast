@@ -105,7 +105,7 @@ class RouteForecastMap extends Component {
     }
 
     getMapBounds(bounds) {
-        if (this.props.subrange.length === 2) {
+        if (this.props.subrange.length === 2 && !isNaN(this.props.subrange[1])) {
             let bounds = new google.maps.LatLngBounds();
             this.props.points.filter(point => point.dist >= this.props.subrange[0] &&
                 (isNaN(this.props.subrange[1]) || point.dist <= this.props.subrange[1])).

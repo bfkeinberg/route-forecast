@@ -292,10 +292,6 @@ class AnalyzeRoute {
     }
 
     static windToTimeInMinutes(baseSpeed,distance,modifiedVelocity) {
-        if  (modifiedVelocity==0) {
-            console.log(`Zero velocity at distance ${distance}`);
-            let xxx= 7;
-        }
         // will be negative for a tailwind
         return (distance*60)/modifiedVelocity-(distance*60)/baseSpeed;
     }
