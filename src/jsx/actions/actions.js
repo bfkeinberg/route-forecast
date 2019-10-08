@@ -3,7 +3,7 @@ import cookie from 'react-cookies';
 import * as Sentry from '@sentry/browser';
 
 const sanitizeCookieName = (cookieName) => {
-    return cookieName.replace(/[ =/]/,'');
+    return encodeURIComponent(cookieName.replace(/[ =/]/,''));
 };
 
 export const saveCookie = (name,value) => {
