@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 const express = require('express');
 const app = express();
 import 'source-map-support/register';
@@ -225,7 +226,7 @@ app.post('/bitly', async (req, res) => {
 
 const getStravaAuthUrl = (baseUrl,state) => {
     process.env.STRAVA_REDIRECT_URI = baseUrl + '/stravaAuthReply';
-    return strava.oauth.getRequestAccessURL({state:encodeURIComponent(state)});
+    return strava.oauth.getRequestAccessURL({scope:'activity:read_all', state:encodeURIComponent(state)});
 };
 
 const getStravaToken = (code) => {
@@ -244,7 +245,6 @@ app.get('/stravaAuthReq', (req,res) => {
     const baseUrl = url.format({
         protocol: req.protocol,
         host: req.get('host')});
-    console.info('redirect to',getStravaAuthUrl(baseUrl, state));
     res.redirect(getStravaAuthUrl(baseUrl, state));
 
 });
@@ -255,7 +255,6 @@ app.get('/stravaAuthReply', async (req,res) => {
         res.status(400).json({'status':'Bad Strava auth reply'});
         return;
     }
-    console.log('code',code);
     const error = req.query.error;
     const state = req.query.state;
     let restoredState = {};
@@ -267,11 +266,24 @@ app.get('/stravaAuthReply', async (req,res) => {
     }
     process.env.STRAVA_CLIENT_SECRET = process.env.STRAVA_API_KEY;
     const token = await getStravaToken(code)
-        .catch(error => {res.status(400).json({'status':`Bad Strava auth reply ${error}`})});
-    process.env.STRAVA_ACCESS_TOKEN = token.access_token;
-    restoredState.strava_token = process.env.STRAVA_ACCESS_TOKEN;
+        .catch(error => {console.log('got bad auth reply');res.status(400).json({'status':`Bad Strava auth reply ${error}`})});
+    // process.env.STRAVA_ACCESS_TOKEN = token.body.access_token;
+    restoredState.strava_access_token = token.body.access_token;
     restoredState.strava_error = error;
+    restoredState.strava_refresh_token = token.body.refresh_token;
+    restoredState.strava_token_expires_at = token.body.expires_at;
     res.redirect(url.format('/?') + querystring.stringify(restoredState));
+});
+
+app.get('/refreshStravaToken', async (req,res) => {
+    const refreshToken = req.query.refreshToken;
+    if (refreshToken === undefined) {
+        res.status(400).json({'status':'Bad call to refresh Strava token'});
+        return;
+    }
+    process.env.STRAVA_CLIENT_SECRET = process.env.STRAVA_API_KEY;
+    let refreshResult = await strava.oauth.refreshToken(refreshToken);
+    res.status(200).json(refreshResult);
 });
 
 app.get('/', (req, res) => {

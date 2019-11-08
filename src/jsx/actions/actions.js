@@ -496,10 +496,19 @@ export const toggleStravaAnalysis = function() {
 };
 
 export const SET_STRAVA_TOKEN = 'SET_STRAVA_TOKEN';
-export const setStravaToken = function(token) {
+export const setStravaToken = function(access_token, expires_at) {
     return {
         type: SET_STRAVA_TOKEN,
-        token: token
+        token: access_token,
+        expires_at: expires_at
+    };
+};
+
+export const SET_STRAVA_REFRESH_TOKEN = 'SET_STRAVA_REFRESH_TOKEN';
+export const setStravaRefreshToken = function(refresh_token) {
+    return {
+        type: SET_STRAVA_REFRESH_TOKEN,
+        refresh_token: refresh_token
     };
 };
 
@@ -605,6 +614,33 @@ const getStravaParser = async function() {
     return parser.default;
 };
 
+const stravaTokenTooOld = (getState) => {
+    if (getState().strava.expires_at == null) {
+        return false;
+    }
+    return (getState().strava.expires_at < Math.round(Date.now()/1000));
+};
+
+const refreshOldToken = (dispatch, getState) => {
+    if (stravaTokenTooOld(getState)) {
+        return new Promise((resolve, reject) => {
+            fetch(`/refreshStravaToken?refreshToken=${getState().strava.refresh_token}`).then(response => {
+                if (response.status === 200) {
+                    return response.json();
+                }
+            }).then(response => {
+                dispatch(setStravaToken(response.access_token, response.expires_at));
+                resolve(response.access_token);
+            }, error => {
+                dispatch(setStravaError(error));
+                reject(error);
+            });
+        });
+    } else {
+        return new Promise((resolve) => {resolve(getState().strava.access_token)});
+    }
+};
+
 export const loadStravaActivity = function(activity) {
     return async function (dispatch, getState) {
         if (getState().strava.activityData !== null && getState().strava.activityStream !== null) {
@@ -615,13 +651,18 @@ export const loadStravaActivity = function(activity) {
                 });
             });
         }
-        const parser = await getStravaParser().catch((err) => {dispatch(stravaFetchFailure(err));return null});
+        const parser = await getStravaParser().catch((err) => {
+            dispatch(stravaFetchFailure(err));
+            return null
+        });
         // handle failed load, error has already been dispatched
         if (parser == null) {
             return Promise.resolve(Error('Cannot load parser'));
         }
-        dispatch(beginStravaFetch());
-        return parser.fetchStravaActivity(activity, getState().strava.token);
+        return refreshOldToken(dispatch, getState).then(access_token => {
+            dispatch(beginStravaFetch());
+            return parser.fetchStravaActivity(activity, access_token);
+        });
     }
 };
 
@@ -665,7 +706,7 @@ export const updateExpectedTimes = function(activity) {
             return dispatch(getPaceOverTime());
         }, error => {
             dispatch(stravaFetchFailure(error));
-            dispatch(setStravaToken(null))
+            dispatch(setStravaToken(null, null))
         });
     }
 };

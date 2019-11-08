@@ -34,7 +34,8 @@ import {
     setStravaError,
     setStravaToken,
     toggleStravaAnalysis,
-    updateUserControls
+    updateUserControls,
+    setStravaRefreshToken
 } from "./actions/actions";
 import QueryString from './queryString';
 
@@ -116,12 +117,15 @@ export class RouteWeatherUI extends Component {
         }
     }
 
-    static getStravaToken(queryParams) {
-        if (queryParams.strava_token !== undefined) {
-            saveCookie('strava_token', queryParams.strava_token);
-            return queryParams.strava_token;
+    static getStravaToken(queryParams, props) {
+        if (queryParams.strava_access_token !== undefined) {
+            saveCookie('strava_access_token', queryParams.strava_access_token);
+            saveCookie('strava_refresh_token', queryParams.strava_refresh_token);
+            props.setStravaToken(queryParams.strava_access_token, queryParams.strava_token_expires_at);
+            props.setStravaRefreshToken(queryParams.strava_refresh_token);
+            return queryParams.strava_access_token;
         } else {
-            return loadCookie('strava_token');
+            return loadCookie('strava_access_token');
         }
     }
 
@@ -168,7 +172,7 @@ export class RouteWeatherUI extends Component {
         if (queryParams.rwgpsRoute !== undefined) {
             props.setFetchAfterLoad(true);
         }
-        props.setStravaToken(RouteWeatherUI.getStravaToken(queryParams));
+        RouteWeatherUI.getStravaToken(queryParams,props);
         props.setInitialStart(queryParams.start);
         props.setPace(queryParams.pace);
         props.setInterval(queryParams.interval);
@@ -204,7 +208,7 @@ export class RouteWeatherUI extends Component {
 
 const mapDispatchToProps = {
     setStravaToken, setActionUrl, setRwgpsRoute, setApiKeys, setStravaError, setInitialStart, setPace, setInterval, setMetric,
-    setStravaActivity, updateControls:updateUserControls, setFetchAfterLoad, toggleStravaAnalysis,
+    setStravaActivity, updateControls:updateUserControls, setFetchAfterLoad, toggleStravaAnalysis, setStravaRefreshToken,
     loadFromRideWithGps, reset, newUserMode
 };
 

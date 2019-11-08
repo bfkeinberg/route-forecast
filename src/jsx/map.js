@@ -108,8 +108,8 @@ class RouteForecastMap extends Component {
         if (this.props.subrange.length === 2 && !isNaN(this.props.subrange[1])) {
             let bounds = new google.maps.LatLngBounds();
             this.props.points.filter(point => point.dist >= this.props.subrange[0] &&
-                (isNaN(this.props.subrange[1]) || point.dist <= this.props.subrange[1])).
-                forEach(point => bounds.extend(point));
+                (isNaN(this.props.subrange[1]) || point.dist <= this.props.subrange[1]))
+                .forEach(point => bounds.extend(point));
             return bounds;
         }
         let southWest = { lat:bounds.min_latitude, lng:bounds.min_longitude };
@@ -216,6 +216,7 @@ export default RouteForecastMap.onDesktop ? connect(mapStateToProps)(GoogleApiWr
         {apiKey: props.maps_api_key}
     ))(RouteForecastMap)));
 */
+// eslint-disable-next-line new-cap
 export default connect(mapStateToProps, mapDispatchToProps)(GoogleApiWrapper((props) => (
     {apiKey: props.maps_api_key}
 ))(RouteForecastMap));

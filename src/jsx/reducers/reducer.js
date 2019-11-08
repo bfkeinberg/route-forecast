@@ -264,13 +264,20 @@ export const controls = function(state = {metric:false,displayBanked:false,strav
     }
 };
 
-const strava = function(state = {analysisInterval:defaultAnalysisIntervalInHours,activity:'',token:null,
+const strava = function(state = {analysisInterval:defaultAnalysisIntervalInHours,activity:'',access_token:null,
+    refresh_token:null, expires_at:null,
     fetching:false,activityData:null,calculatedPaces:null,errorDetails:null, subrange:[]},
                         action) {
     switch (action.type) {
         case Actions.SET_STRAVA_TOKEN:
             if (action.token !== undefined) {
-                return {...state, token:action.token};
+                console.log(`Setting strava access token to ${action.token}`);
+                return {...state, access_token:action.token, expires_at: action.expires_at};
+            }
+            else {return state;}
+        case Actions.SET_STRAVA_REFRESH_TOKEN:
+            if (action.refresh_token !== undefined) {
+                return {...state, refresh_token: action.refresh_token};
             }
             else {return state;}
         case Actions.SET_STRAVA_ACTIVITY: {
@@ -294,7 +301,7 @@ const strava = function(state = {analysisInterval:defaultAnalysisIntervalInHours
         case Actions.STRAVA_FETCH_SUCCESS:
             return {...state, fetching:false, activityData:action.data.activity, activityStream:action.data.stream};
         case Actions.STRAVA_FETCH_FAILURE:
-            return {...state, fetching:false, errorDetails:typeof action.error === 'object' ? action.error.message : action.error};
+            return {...state, fetching:false, access_token:null, errorDetails:typeof action.error === 'object' ? action.error.message : action.error};
         case Actions.SET_ANALYSIS_INTERVAL:
             return {...state, analysisInterval:parseInt(action.interval),subrange:[]};
         case Actions.SET_PACE_OVER_TIME:

@@ -100,15 +100,17 @@ module.exports = (env,argv) => {
                     {test: 'main', attribute: 'maps_api_key', value: '{{ maps_key }}'},
                 ]
             }),
-            new CopyWebpackPlugin([{from: SRC_STATIC_DIR + '/favicon*.*', to: STATIC_DIR, flatten: true},
-                {from: SRC_STATIC_DIR + '/apple-*.*', to: STATIC_DIR, flatten: true}])
+            new CopyWebpackPlugin([
+                {from: SRC_STATIC_DIR + '/favicon*.*', to: STATIC_DIR, flatten: true},
+                {from: SRC_STATIC_DIR + '/apple-*.*', to: STATIC_DIR, flatten: true}
+                ])
         ],
         output:
         {
             path: STATIC_DIR,
             filename: "[name].bundle.js",
             chunkFilename: '[name].bundle.js',
-            sourceMapFilename: "[name].bundle.js.map",
+            // sourceMapFilename: "[name].bundle.js.map",
             publicPath: "static/"
         },
         resolve: {

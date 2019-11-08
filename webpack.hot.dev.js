@@ -92,7 +92,7 @@ module.exports = (env,argv) => {
             pathinfo: true,
             filename: "[name].bundle.js",
             chunkFilename: '[name].bundle.js',
-            sourceMapFilename: "[name].bundle.js.map",
+            // sourceMapFilename: "[name].bundle.js.map",
             publicPath: "static/"
         },
         resolve: {

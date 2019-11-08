@@ -19,10 +19,9 @@ module.exports = (env,argv) => {
             nodeExternals({
             // load non-javascript files with extensions, presumably via loaders
             whitelist: [/\.(?!(?:jsx?|json)$).{1,5}$/i],
-        })],
-        entry: [
-            path.resolve(APP_DIR, 'server/index.js')
+        })
         ],
+        entry: [path.resolve(APP_DIR, 'server/index.js')],
         module: {
             rules: [
                 {test: /\.jsx?$/,
@@ -95,7 +94,7 @@ module.exports = (env,argv) => {
         {
             path: SERVER_DIR,
                 filename: "[name].bundle.js",
-                sourceMapFilename: "[name].bundle.js.map",
+                // sourceMapFilename: "[name].bundle.js.map",
                 publicPath: "static/"
         },
         resolve: {

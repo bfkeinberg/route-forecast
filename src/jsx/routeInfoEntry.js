@@ -35,7 +35,7 @@ class RouteInfoForm extends Component {
         firstUse:PropTypes.bool.isRequired,
         routeSelected:PropTypes.bool.isRequired,
         needToViewTable: PropTypes.bool.isRequired,
-        routeProps:PropTypes.Object
+        routeProps:PropTypes.object
     };
 
     constructor(props) {
@@ -53,7 +53,7 @@ class RouteInfoForm extends Component {
         if (this.props.rwgpsRoute !== '' && !this.props.routeSelected) {
             this.props.loadFromRideWithGps(this.props.rwgpsRoute,this.props.rwgpsRouteIsTrip);
         }
-        if (this.props.routeProps !== undefined && this.props.needToViewTable) {
+        if (this.props.routeProps != null && this.props.routeProps.history != null && this.props.needToViewTable) {
             this.props.routeProps.history.replace('/table/')
         }
     }
