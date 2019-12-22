@@ -114,6 +114,19 @@ app.use('/static',publicPath);
 app.set('views', path.resolve(__dirname,'views'));
 app.set('view engine', 'ejs');
 
+const isValidRouteResult = (body, type) => {
+    if (body !== undefined) {
+        let obj = JSON.parse(body);
+        if (type === 'routes' && obj.type === 'route') {
+            return true;
+        }
+        if (type === 'trips' && obj.type === 'trip') {
+            return true;
+        }
+    }
+    return false;
+};
+
 app.get('/rwgps_route', (req, res) => {
     const routeNumber = req.query.route;
     if (routeNumber === undefined) {
@@ -128,17 +141,12 @@ app.get('/rwgps_route', (req, res) => {
         return;
     }
 
-    const rwgpsUrl = `https://ridewithgps.com/${routeType}/${routeNumber}.json?apikey=${rwgpsApiKey}`;
+    const rwgpsUrl = `https://ridewithgps.com/${routeType}/${routeNumber}.json?apikey=${rwgpsApiKey}&version=2`;
     const memoryUsage = process.memoryUsage();
     console.info(`Memory usage before fetching route: ${JSON.stringify(memoryUsage)}`);
-    // check status below and retry with opposite route type if it failed
     fetch(rwgpsUrl).then(fetchResult => {if (!fetchResult.ok) {throw Error(fetchResult.status)} return fetchResult.text()})
-        .then(body => {console.info(`Route data was ${body.length} long`);res.status(200).send(body)})
-        .catch(firstErr => {
-            fetch(`https://ridewithgps.com/${routeType==='trips'?'routes':'trips'}/${routeNumber}.json?apikey=${rwgpsApiKey}`).
-                then(retryResult => {if (!retryResult.ok) {throw Error(retryResult.status)} return retryResult.text()}).
-                then(body => res.status(200).send(body)).
-                catch(err => {res.status(firstErr.message).json({'status':err})})});
+        .then(body => {if (!isValidRouteResult(body, routeType)) {res.status(401).send(body)} else {res.status(200).send(body)}})
+        .catch(err => {res.status(err.message).json({'status':err})});
     console.info(`Memory usage after fetching route: ${JSON.stringify(memoryUsage)}`);
 });
 
