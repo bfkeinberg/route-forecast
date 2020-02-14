@@ -17,7 +17,6 @@ import {setStart} from "../actions/actions";
 const DateSelect = ({start,setStart}) => {
     // allow us to continue to show the start time if the route was forecast for a time before the present
     const now = new Date();
-    let firstDate = now > start ? start : now;
     let later = new Date();
     const daysToAdd = 14;
     later.setDate(now.getDate() + daysToAdd);
@@ -32,7 +31,6 @@ const DateSelect = ({start,setStart}) => {
                        options={{enableTime: true,
                            altInput: true, altFormat: 'F j, Y h:i K',
                            altInputClass: 'dateDisplay',
-                           minDate: firstDate,
                            maxDate: later,
                            defaultDate: start,
                            dateFormat: 'Y-m-d H:i',

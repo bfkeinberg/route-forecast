@@ -1,10 +1,10 @@
 import {Button, Modal, ModalBody} from 'reactstrap';
-import rideRatingText from './cyclerouteplanner.htm';
+import rideRatingText from './rideRating.htm';
 import React, {Component} from 'react';
 import { Icon, Intent } from "@blueprintjs/core";
 import { IconNames } from "@blueprintjs/icons";
 
-class PaceExplanation extends Component {
+class RideRating extends Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -34,5 +34,5 @@ class PaceExplanation extends Component {
     }
 }
 
-export default PaceExplanation;
+export default RideRating;
 
