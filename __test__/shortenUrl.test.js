@@ -14,10 +14,8 @@ describe('Call URL shortener', () => {
     });
 
     it('Shorten URL', async () => {
-/*
         fetchMock
             .get('/rwgps_route?route=6275002&trip=false', {body:routeData, headers: { 'content-type': 'application/json' }});
-*/
 
         const expectedActions = [
             { type: actions.SET_SHORT_URL, url:"http://bit.ly/2D3VYkz" },

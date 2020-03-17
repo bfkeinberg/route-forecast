@@ -125,6 +125,7 @@ class AnalyzeRoute {
         let idlingTime = 0;
         let calculatedValues = [];
         let lastTime = 0;
+        let previousAccumulatedTime = 0;
         // correct start time for time zone
         let startTime = moment.tz(userStartTime.format('YYYY-MM-DDTHH:mm'), timeZoneId);
         let bearings = [];
@@ -141,7 +142,10 @@ class AnalyzeRoute {
                 // accumulate elevation gain
                 accumulatedClimbMeters += deltas.climb;
                 // then find elapsed time given pace
-                accumulatedTime = AnalyzeRoute.calculateElapsedTime(accumulatedClimbMeters, accumulatedDistanceKm, baseSpeed);
+                accumulatedTime = Math.max(
+                    AnalyzeRoute.calculateElapsedTime(accumulatedClimbMeters, accumulatedDistanceKm, baseSpeed),
+                    previousAccumulatedTime
+                );
             }
             idlingTime += checkAndUpdateControls(accumulatedDistanceKm, startTime, (accumulatedTime + idlingTime),
                 controls, calculatedValues, metric, point);
@@ -150,6 +154,7 @@ class AnalyzeRoute {
                 forecastRequests.push(AnalyzeRoute.addToForecast(point, startTime, (accumulatedTime + idlingTime),
                     accumulatedDistanceKm * kmToMiles));
                 lastTime = accumulatedTime + idlingTime;
+                previousAccumulatedTime = accumulatedTime;
                 bearings.push(AnalyzeRoute.getRelativeBearing(forecastPoint,point));
                 forecastPoint = point;
             }

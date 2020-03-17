@@ -133,7 +133,7 @@ export class ForecastTable extends Component {
                         <thead>
                         <tr>
                             <th className={'headerCell'}>Time</th>
-                            <th className={'headerCell'}>{distHeader}</th>
+                            <th id={'dist'} className={'headerCell'}>{distHeader}</th>
                                 <th className={'headerCell'}>Summary</th>
                             <th id={'temp'} className={'headerCell'} onClick={this.toggleApparentDisplay}>{temperatureHeader}</th>
                             <th className={'headerCell'}>Chance of rain</th>
@@ -149,6 +149,7 @@ export class ForecastTable extends Component {
                         {this.expandTable(this.props.forecast, this.props.metric)}
                     </Table>
                     </ErrorBoundary>
+                    <UncontrolledTooltip placement={'top'} target={'dist'}>Distance at start of segment</UncontrolledTooltip>
                     <UncontrolledTooltip placement={'top'} target={'temp'}>Click to toggle between temperature and apparent temperature</UncontrolledTooltip>
                     <UncontrolledTooltip placement={'top'} target={'wind'}>Click to toggle between average wind speed and wind gusts</UncontrolledTooltip>
                 </div>
