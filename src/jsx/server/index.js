@@ -127,6 +127,15 @@ const isValidRouteResult = (body, type) => {
     return false;
 };
 
+app.use((req, res, next) => {
+    // Switch to randoplan.com
+    var host = req.get('Host');
+    if (host === 'cyclerouteforecast.com') {
+        return res.redirect(301, 'https://www.randoplan.com/' + req.originalUrl);
+    }
+    return next();
+});
+
 app.get('/rwgps_route', (req, res) => {
     const routeNumber = req.query.route;
     if (routeNumber === undefined) {
