@@ -315,7 +315,7 @@ class AnalyzeRoute {
         let calculatedValues = [];
         let maxGustSpeed = 0;
 
-        stream.filter(point => point.lat !== undefined && point.lon !== undefined).forEach(currentPoint => {
+        stream.filter(point => point != null && point.lat !== undefined && point.lon !== undefined).forEach(currentPoint => {
             if (previousPoint !== null) {
                 let distanceInKm = gpxParse.utils.calculateDistance(previousPoint.lat, previousPoint.lon,
                     currentPoint.lat,currentPoint.lon);

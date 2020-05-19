@@ -129,9 +129,11 @@ const isValidRouteResult = (body, type) => {
 
 app.use((req, res, next) => {
     // Switch to randoplan.com
-    var host = req.get('Host');
-    if (host === 'cyclerouteforecast.com') {
-        return res.redirect(301, 'https://www.randoplan.com/' + req.originalUrl);
+    var host = req.hostname;
+    logger.info(`host = ${host}`);
+    logger.info(`original url ${req.originalUrl}`);
+    if (host === 'www.cyclerouteforecast.com') {
+        return res.redirect(301, 'https://www.randoplan.com' + req.originalUrl);
     }
     return next();
 });
