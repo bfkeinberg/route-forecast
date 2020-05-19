@@ -8,6 +8,6 @@ sentry-cli releases set-commits --auto $VERSION
 # run prod build, which will also publish artifacts to Sentry and finalize the release
 ./node_modules/.bin/webpack --mode production --config webpack.prod.js --env.sentryRelease=$VERSION
 # deploy build to GAE
-gcloud app deploy --project route-forecast -v current nodejs.yaml
+gcloud app deploy --quiet --project route-forecast -v current nodejs.yaml
 # mark Sentry release as deployed
 sentry-cli releases deploys "$VERSION" new --env production --name latest
