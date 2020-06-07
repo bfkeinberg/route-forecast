@@ -30,7 +30,7 @@ const RidingPace = ({pace,actualPace,setPace,metric}) => {
         pace_text = `Speed on flat ground, which will be adjusted for climbing`;
     } else {
         pace_tooltip_class = getPaceTooltipId(actualPace,pace_mph);
-        pace_text = `Actual riding pace was ${getAlphaPace(actualPace)}`;
+        pace_text = `Actual riding pace was ${getAlphaPace(actualPace)} (${actualPace.toFixed(1)})`;
     }
     return (
         <FormGroup>
