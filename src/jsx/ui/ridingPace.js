@@ -4,7 +4,7 @@ import {Label, Input, FormGroup, UncontrolledTooltip} from 'reactstrap';
 import {connect} from 'react-redux';
 import {setPace} from "../actions/actions";
 
-export const paceToSpeed = {'A-':9, 'A':10, 'B-':11, 'B':12, 'C-':13, 'C':14, 'C+':15, 'D-':15, 'D':16, 'D+':17, 'E-':17, 'E':18};
+export const paceToSpeed = {'Q':3, 'R':4, 'S':5, 'T':6, 'A-':9, 'A':10, 'B-':11, 'B':12, 'C-':13, 'C':14, 'C+':15, 'D-':15, 'D':16, 'D+':17, 'E-':17, 'E':18};
 export const metricPaceToSpeed = {'A-':15, 'A':16, 'B-':18, 'B':19, 'C-':21, 'C':22, 'C+':24, 'D-':24, 'D':26, 'D+':27, 'E-':27, 'E':29};
 
 const getAlphaPace = function(pace) {
@@ -39,6 +39,10 @@ const RidingPace = ({pace,actualPace,setPace,metric}) => {
             {metric ?
                 <Input tabIndex='3' type="select" value={pace} name="pace"
                              id='paceInput' onChange={event => {setPace(event.target.value)}}>
+                    <option value="Q">5 kph</option>
+                    <option value="R">6 kph</option>
+                    <option value="S">8 kph</option>
+                    <option value="T">10 kph</option>
                     <option value="A">16 kph</option>
                     <option value="B-">18 kph</option>
                     <option value="B">19 kph</option>
@@ -51,6 +55,10 @@ const RidingPace = ({pace,actualPace,setPace,metric}) => {
                 </Input> :
                 <Input tabIndex='3' type="select" value={pace} name="pace"
                        id='paceInput' onChange={event => {setPace(event.target.value)}}>
+                    <option value="Q">3 mph</option>
+                    <option value="R">4 mph</option>
+                    <option value="S">5 mph</option>
+                    <option value="T">6 mph</option>
                     <option value="A">10 mph</option>
                     <option value="B-">11 mph</option>
                     <option value="B">12 mph</option>
