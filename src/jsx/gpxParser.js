@@ -273,8 +273,8 @@ class AnalyzeRoute {
         return bounds;
     }
 
-    static addToForecast(trackPoint, currentTime, elapsedTimeInHours, distance) {
-        return {lat:trackPoint.lat,lon:trackPoint.lon,distance:Math.round(distance),
+    static addToForecast(trackPoint, currentTime, elapsedTimeInHours, distanceInMiles) {
+        return {lat:trackPoint.lat,lon:trackPoint.lon,distance:Math.round(distanceInMiles),
             time:moment(currentTime).add(elapsedTimeInHours,'hours').format('YYYY-MM-DDTHH:mm:00ZZ')};
     }
 

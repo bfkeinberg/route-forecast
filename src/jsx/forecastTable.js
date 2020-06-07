@@ -7,7 +7,7 @@ import {connect} from 'react-redux';
 import {setWeatherRange, toggleWeatherRange, setTableViewed} from './actions/actions';
 import MediaQuery from 'react-responsive';
 
-const milesToKm = 1609.34;
+const milesToMeters = 1609.34;
 const gustySpeed = 25;
 
 export class ForecastTable extends Component {
@@ -30,13 +30,13 @@ export class ForecastTable extends Component {
 
     updateWeatherRange = (event) => {
         const start = parseInt(event.currentTarget.getAttribute('start'));
-        this.props.setWeatherRange(start, event.currentTarget.getAttribute('end'));
+        this.props.setWeatherRange(start, parseInt(event.currentTarget.getAttribute('end')));
         this.setState({selectedRow:start});
     };
 
     toggleRange = (event) => {
         const start = parseInt(event.currentTarget.getAttribute('start'));
-        this.props.toggleWeatherRange(start, event.currentTarget.getAttribute('end'));
+        this.props.toggleWeatherRange(start, parseInt(event.currentTarget.getAttribute('end')));
         if (this.state.selectedRow === start) {
             this.setState({selectedRow: null});
         } else {
@@ -69,7 +69,7 @@ export class ForecastTable extends Component {
     toggleApparentDisplay = () => this.setState({showApparentTemp:!this.state.showApparentTemp});
 
     static formatSpeed = (speed, isMetric) => {
-        return isMetric ? `${((speed*milesToKm)/1000).toFixed(0)} kph` : `${speed} mph`;
+        return isMetric ? `${((speed*milesToMeters)/1000).toFixed(0)} kph` : `${speed} mph`;
     };
 
     expandTable(forecast, metric) {
@@ -79,12 +79,12 @@ export class ForecastTable extends Component {
                 {forecast.map((point,index) =>
                     /*<tr key={Math.random().toString(36).slice(2)}>*/
                     <tr key={point.time+Math.random().toString(10)}
-                        start={point.distance*milesToKm}
-                        end={index!==forecast.length-1?forecast[index+1].distance*milesToKm:null}
-                        className={this.state.selectedRow===parseInt(point.distance*milesToKm)?'highlighted':null}
+                        start={point.distance*milesToMeters}
+                        end={index!==forecast.length-1?forecast[index+1].distance*milesToMeters:null}
+                        className={this.state.selectedRow===parseInt(point.distance*milesToMeters)?'highlighted':null}
                         onClick={this.toggleRange} onMouseEnter={this.updateWeatherRange}>
                         <td>{point.time}</td>
-                        <td>{metric ? ((point.distance*milesToKm)/1000).toFixed(0) : point.distance}</td>
+                        <td>{metric ? ((point.distance*milesToMeters)/1000).toFixed(0) : point.distance}</td>
                         <td>{point.summary}</td>
                         <td>{this.state.showApparentTemp?
                             <i>{ForecastTable.formatTemperature(point.feel, this.props.metric)}</i>:
