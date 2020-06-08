@@ -240,7 +240,7 @@ app.post('/bitly', async (req, res) => {
 });
 
 const getStravaAuthUrl = (baseUrl,state) => {
-    if (baseUrl === 'www.route-forecast.appspot.com') {
+    if (baseUrl === 'http://www.route-forecast.appspot.com' || baseUrl === 'https://www.route-forecast.appspot.com') {
         process.env.STRAVA_REDIRECT_URI = 'https://www.randoplan.com/stravaAuthReply';
     } else {
         process.env.STRAVA_REDIRECT_URI = baseUrl + '/stravaAuthReply';
