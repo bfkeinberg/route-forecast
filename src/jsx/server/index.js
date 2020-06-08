@@ -52,10 +52,6 @@ var compression = require('compression');
 import TopLevel from '../app/topLevel';
 import LocationContext from '../locationContext';
 
-// for hot reloading
-import webpack from 'webpack';
-import webpackDevMiddleware from 'webpack-dev-middleware';
-
 const colorize = process.env.NODE_ENV !== 'production';
 
 app.use(compression());
@@ -350,13 +346,6 @@ app.get('/', (req, res) => {
     }
 });
 
-if (process.env.NODE_ENV !== 'production' && !process.env.NO_HOT) {
-    console.info('Debug mode, enabling hot reloading');
-    const config = require('webpack.hot.dev.js');
-    const compiler = webpack(config({},{mode:'development'}));
-    app.use(webpackDevMiddleware(compiler, {writeToDisk: true, publicPath: config({}, undefined).output.publicPath}));
-    app.use(require("webpack-hot-middleware")(compiler));
-}
 if (!process.env.NO_LOGGING) {
     app.use(errorLogger);
 }
