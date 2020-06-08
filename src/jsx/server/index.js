@@ -128,7 +128,7 @@ app.use((req, res, next) => {
     var host = req.hostname;
     logger.info(`host = ${host}`);
     logger.info(`original url ${req.originalUrl}`);
-    if (host === 'www.cyclerouteforecast.com') {
+    if (host === 'www.cyclerouteforecast.com' || host === 'route-forecast.appspot.com') {
         return res.redirect(301, 'https://www.randoplan.com' + req.originalUrl);
     }
     return next();
