@@ -128,7 +128,7 @@ app.use((req, res, next) => {
     var host = req.hostname;
     logger.info(`host = ${host}`);
     logger.info(`original url ${req.originalUrl}`);
-    if (host === 'www.cyclerouteforecast.com' || host === 'www.route-forecast.appspot.com') {
+    if (host === 'www.cyclerouteforecast.com') {
         return res.redirect(301, 'https://www.randoplan.com' + req.originalUrl);
     }
     return next();
@@ -240,7 +240,11 @@ app.post('/bitly', async (req, res) => {
 });
 
 const getStravaAuthUrl = (baseUrl,state) => {
-    process.env.STRAVA_REDIRECT_URI = baseUrl + '/stravaAuthReply';
+    if (baseUrl === 'www.route-forecast.appspot.com') {
+        process.env.STRAVA_REDIRECT_URI = 'https://www.randoplan.com/stravaAuthReply';
+    } else {
+        process.env.STRAVA_REDIRECT_URI = baseUrl + '/stravaAuthReply';
+    }
     return strava.oauth.getRequestAccessURL({scope:'activity:read_all', state:encodeURIComponent(state)});
 };
 
