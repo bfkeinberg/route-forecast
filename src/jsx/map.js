@@ -107,8 +107,8 @@ class RouteForecastMap extends Component {
     getMapBounds(bounds) {
         if (this.props.subrange.length === 2 && !isNaN(this.props.subrange[1])) {
             let bounds = new google.maps.LatLngBounds();
-            this.props.points.filter(point => point.dist === undefined || point.dist >= this.props.subrange[0] &&
-                (isNaN(this.props.subrange[1]) || point.dist <= this.props.subrange[1]))
+            this.props.points.filter(point => (point.dist !== undefined) && (point.dist >= this.props.subrange[0] &&
+                (isNaN(this.props.subrange[1]) || point.dist <= this.props.subrange[1])))
                 .forEach(point => bounds.extend(point));
             return bounds;
         }
@@ -165,7 +165,8 @@ class RouteForecastMap extends Component {
                 <div id="map" style={{'height':'95%'}}>
                     {this.props.forecast.length > 0 && this.props.bounds !== null ?
                         <Map google={this.props.google}
-                             mapType={'ROADMAP'} scaleControl={true} bounds={mapBounds} initialCenter={mapBounds.getCenter()==null?null:mapBounds.getCenter().toJSON()}
+                             mapType={'ROADMAP'} scaleControl={true} bounds={mapBounds}
+                             initialCenter={(mapBounds === null || mapBounds.getCenter()==null)?null:mapBounds.getCenter().toJSON()}
                              onReady={(mapProps, map) => {map.fitBounds(mapBounds)}}>
                             <Polyline path={this.getRoutePoints(this.props.points)} strokeColor={'#ff0000'} strokeWeight={2} strokeOpacity={1.0}/>
                             {highlight}

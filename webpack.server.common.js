@@ -53,7 +53,8 @@ module.exports = (env,argv) => {
                 },
                 {
                     test: /\.js$/,
-                    use: [{loader: "source-map-loader", options: {enforce: "pre"}}],
+                    enforce: "pre",
+                    use: [{loader: "source-map-loader"}],
                 },
                 {
                     test: /\.tsx?$/,
