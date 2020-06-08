@@ -66,14 +66,5 @@ export default function configureStore(preloadedState,mode) {
         applyMiddleware(...selectMiddleware(mode))
     );
 
-    if (module.hot) {
-        // Enable Webpack hot module replacement for reducers
-        module.hot.accept('./reducers/reducer', () => {
-            const nextRootReducer = require('./reducers/reducer').default;
-            console.log('replacing reducer');
-            store.replaceReducer(nextRootReducer);
-        });
-    }
-
     return store;
 }
