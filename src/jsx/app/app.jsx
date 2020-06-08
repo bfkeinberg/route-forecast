@@ -39,9 +39,3 @@ const render = Component => {
 };
 
 render(TopLevel);
-
-if (module.hot) {
-    module.hot.accept('./topLevel.jsx', () => {
-        render(TopLevel);
-    });
-}
