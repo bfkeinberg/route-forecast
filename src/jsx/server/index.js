@@ -5,11 +5,11 @@ require('source-map-support').install();
 const expressStaticGzip = require("express-static-gzip");
 
 const path = require('path');
-import fetch from 'node-fetch';
-import bodyParser from 'body-parser';
+const fetch = require('node-fetch');
+const bodyParser = require('body-parser');
 const multer = require('multer'); // v1.0.5
 const upload = multer(); // for parsing multipart/form-data
-import callWeatherService from './weatherCalculator';
+const callWeatherService = require('./weatherCalculator');
 const url = require('url');
 var strava = require('strava-v3');
 const querystring = require('querystring');

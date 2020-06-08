@@ -3,7 +3,6 @@ const APP_DIR = path.resolve(__dirname, 'src/jsx');
 
 const merge = require('webpack-merge');
 const serverCommon = require('./webpack.server.common.js');
-const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 const BrotliPlugin = require('brotli-webpack-plugin');
 const CompressionPlugin = require("compression-webpack-plugin");
 const TerserPlugin = require('terser-webpack-plugin');
