@@ -109,10 +109,10 @@ module.exports = (env,argv) => {
                     {test: 'main', attribute: 'maps_api_key', value: '{{ maps_key }}'},
                 ]
             }),
-            new CopyWebpackPlugin([
+            new CopyWebpackPlugin({patterns:[
                 {from: SRC_STATIC_DIR + '/favicon*.*', to: STATIC_DIR, flatten: true},
                 {from: SRC_STATIC_DIR + '/apple-*.*', to: STATIC_DIR, flatten: true}
-                ])
+                ]})
         ],
         output:
         {
