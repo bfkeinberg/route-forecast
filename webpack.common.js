@@ -33,10 +33,18 @@ module.exports = (env,argv) => {
                     options: {
                         cacheDirectory: true,
                         babelrc: false,
-                        presets: ["@babel/env", "@babel/preset-react"],
+                        presets: [
+                            "@babel/env",
+                            "@babel/preset-react"
+                        ],
                         // how to target specific browsers
                         // presets: [["babel-preset-env",{targets:{browsers:["last 3 versions","Explorer 11"]}}],"babel-preset-react","babel-preset-stage-0"],
-                        plugins: ['@babel/transform-runtime', "react-html-attrs", "transform-class-properties","react-hot-loader/babel","@babel/plugin-syntax-dynamic-import"],
+                        plugins: [
+                            '@babel/transform-runtime',
+                            "react-html-attrs",
+                            "transform-class-properties",
+                            "@babel/plugin-syntax-dynamic-import"
+                        ],
                         // if we want to remove arrow functions as well
                         // plugins: ['babel-plugin-transform-runtime',"react-html-attrs", "transform-class-properties","transform-es2015-arrow-functions"],
                         comments: true
@@ -44,7 +52,8 @@ module.exports = (env,argv) => {
                 },
                 {
                     test: /\.js$/,
-                    use: [{loader: "source-map-loader", options: {enforce: "pre"}}],
+                    enforce: "pre",
+                    use: [{loader: "source-map-loader"}],
                 },
                 {
                     test: /\.tsx?$/,
@@ -100,10 +109,10 @@ module.exports = (env,argv) => {
                     {test: 'main', attribute: 'maps_api_key', value: '{{ maps_key }}'},
                 ]
             }),
-            new CopyWebpackPlugin([
+            new CopyWebpackPlugin({patterns:[
                 {from: SRC_STATIC_DIR + '/favicon*.*', to: STATIC_DIR, flatten: true},
                 {from: SRC_STATIC_DIR + '/apple-*.*', to: STATIC_DIR, flatten: true}
-                ])
+                ]})
         ],
         output:
         {

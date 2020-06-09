@@ -48,6 +48,7 @@ var compression = require('compression');
 const colorize = process.env.NODE_ENV !== 'production';
 
 app.use(compression());
+app.set('trust proxy', true);
 
 let requestLogger = null;
 let errorLogger = null;
@@ -87,8 +88,6 @@ if (!process.env.NO_LOGGING) {
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-// redirect bare domain
-app.use(require('express-naked-redirect')());
 const publicPath = express.static(path.resolve(__dirname, '../static'),{fallthrough:false,index:false});
 app.use('/static', expressStaticGzip(path.resolve(__dirname,'../'), {
     enableBrotli: true,
@@ -121,7 +120,8 @@ app.use((req, res, next) => {
     var host = req.hostname;
     logger.info(`host = ${host}`);
     logger.info(`original url ${req.originalUrl}`);
-    if (host === 'www.cyclerouteforecast.com') {
+    if (host === 'www.cyclerouteforecast.com' || host === 'route-forecast.ue.r.appspot.com' ||
+        host === 'cyclerouteforecast.com' || host === 'randoplan.com') {
         return res.redirect(301, 'https://www.randoplan.com' + req.originalUrl);
     }
     return next();
@@ -142,12 +142,9 @@ app.get('/rwgps_route', (req, res) => {
     }
 
     const rwgpsUrl = `https://ridewithgps.com/${routeType}/${routeNumber}.json?apikey=${rwgpsApiKey}&version=2`;
-    const memoryUsage = process.memoryUsage();
-    console.info(`Memory usage before fetching route: ${JSON.stringify(memoryUsage)}`);
     fetch(rwgpsUrl).then(fetchResult => {if (!fetchResult.ok) {throw Error(fetchResult.status)} return fetchResult.text()})
         .then(body => {if (!isValidRouteResult(body, routeType)) {res.status(401).send(body)} else {res.status(200).send(body)}})
         .catch(err => {res.status(err.message).json({'status':err})});
-    console.info(`Memory usage after fetching route: ${JSON.stringify(memoryUsage)}`);
 });
 
 app.post('/forecast', upload.none(), (req, res) => {
@@ -233,7 +230,11 @@ app.post('/bitly', async (req, res) => {
 });
 
 const getStravaAuthUrl = (baseUrl,state) => {
-    process.env.STRAVA_REDIRECT_URI = baseUrl + '/stravaAuthReply';
+    if (baseUrl === 'http://www.route-forecast.appspot.com' || baseUrl === 'https://www.route-forecast.appspot.com') {
+        process.env.STRAVA_REDIRECT_URI = 'https://www.randoplan.com/stravaAuthReply';
+    } else {
+        process.env.STRAVA_REDIRECT_URI = baseUrl + '/stravaAuthReply';
+    }
     return strava.oauth.getRequestAccessURL({scope:'activity:read_all', state:encodeURIComponent(state)});
 };
 
