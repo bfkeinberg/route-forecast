@@ -242,7 +242,7 @@ export class ControlTable extends Component {
         let rowData = [];
         let newColDefs = this.state.columnDefs.slice();
         this.props.controls.forEach((item,index) => rowData.push({...item, ...this.props.calculatedValues[index], id:index}));
-        return (<div id={'controlTable'} className="ag-theme-fresh">
+        return (<div id={'controlTable'} className="ag-theme-alpine">
             <AgGridReact enableCellChangeFlash={true} animateRows
                          sortingOrder={['asc']} unSortIcon rowData={rowData}
                          context={this.state.context} frameworkComponents={this.state.frameworkComponents}
