@@ -172,7 +172,7 @@
     "deploy": "./buildRelease.sh",
     "lint": "eslint src",
     "test": "nyc jest",
-    "start": "node dist/server/main.bundle.js"
+    "start": "node dist/server/index.js"
   },
   "repository": {
     "type": "git",
