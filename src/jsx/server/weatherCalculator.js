@@ -1,5 +1,5 @@
-import moment from 'moment-timezone';
-import fetch from 'node-fetch';
+const moment = require('moment-timezone');
+const fetch = require('node-fetch');
 
 const getBearingDifference = function (bearing,windBearing) {
     return Math.min(bearing - windBearing < 0 ? bearing - windBearing + 360 : bearing - windBearing,
@@ -20,7 +20,7 @@ const getBearingDifference = function (bearing,windBearing) {
  * lat: *, lon: *, temp: string, fullTime: *, relBearing: null, rainy: boolean, windBearing: number,
  * vectorBearing: *, gust: string} | never>} a promise to evaluate to get the forecast results
  */
-export default function callWeatherService (lat, lon, currentTime, distance, zone, bearing) {
+const callWeatherService = function (lat, lon, currentTime, distance, zone, bearing) {
     const MAX_API_CALLS_PER_DAY = 2000;
 
     const darkSkyKey = process.env.DARKSKY_API_KEY;
@@ -66,4 +66,6 @@ export default function callWeatherService (lat, lon, currentTime, distance, zon
         throw error;
     });
     return forecastResult;
-}
+};
+
+module.exports = callWeatherService;

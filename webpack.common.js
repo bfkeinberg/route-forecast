@@ -8,9 +8,10 @@ const CopyWebpackPlugin = require('copy-webpack-plugin');
 const APP_DIR = path.resolve(__dirname, 'src/jsx');
 const TEMPLATE_DIR = path.resolve(__dirname, 'src/templates');
 const SRC_STATIC_DIR = path.resolve(__dirname, 'src/static');
+const SRC_SERVER_DIR = path.resolve(APP_DIR, 'server');
 const BUILD_DIR = path.resolve(__dirname, 'dist');
-const STATIC_DIR = path.resolve(__dirname, 'dist/static');
-const SERVER_DIR = path.resolve(__dirname, 'dist/server');
+const STATIC_DIR = path.resolve(BUILD_DIR, 'static');
+const SERVER_DIR = path.resolve(BUILD_DIR, 'server');
 const VIEWS_DIR = path.resolve(SERVER_DIR, 'views');
 var webpack = require('webpack');
 
@@ -18,9 +19,7 @@ module.exports = (env,argv) => {
     const mode = argv === undefined ? 'development' : argv.mode;
     return {
         mode:mode,
-        entry: [
-            path.resolve(APP_DIR, 'app/app.jsx')
-        ],
+        entry: [path.resolve(APP_DIR, 'app/app.jsx')],
         module: {
             rules: [
                 {test: /\.jsx?$/,
@@ -111,12 +110,14 @@ module.exports = (env,argv) => {
             }),
             new CopyWebpackPlugin({patterns:[
                 {from: SRC_STATIC_DIR + '/favicon*.*', to: STATIC_DIR, flatten: true},
-                {from: SRC_STATIC_DIR + '/apple-*.*', to: STATIC_DIR, flatten: true}
+                {from: SRC_STATIC_DIR + '/apple-*.*', to: STATIC_DIR, flatten: true},
+                {from:SRC_SERVER_DIR + '/*.js', to:SERVER_DIR, flatten:true}
                 ]})
         ],
         output:
         {
             path: STATIC_DIR,
+            pathinfo:true,
             filename: "[name].bundle.js",
             chunkFilename: '[name].bundle.js',
             // sourceMapFilename: "[name].bundle.js.map",
@@ -131,9 +132,7 @@ module.exports = (env,argv) => {
                 '.tsx'
             ],
                 modules:
-            [
-                "node_modules"
-            ],
+            ["node_modules"],
                 alias:
             {
                 Images: SRC_STATIC_DIR

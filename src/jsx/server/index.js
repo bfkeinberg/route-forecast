@@ -1,18 +1,15 @@
 /* eslint-disable max-lines */
 const express = require('express');
 const app = express();
-import 'source-map-support/register';
+require('source-map-support').install();
 const expressStaticGzip = require("express-static-gzip");
-import thunkMiddleware from 'redux-thunk';
 
 const path = require('path');
-import fetch from 'node-fetch';
-import { renderToString } from 'react-dom/server';
-import React from 'react';
-import bodyParser from 'body-parser';
+const fetch = require('node-fetch');
+const bodyParser = require('body-parser');
 const multer = require('multer'); // v1.0.5
 const upload = multer(); // for parsing multipart/form-data
-import callWeatherService from './weatherCalculator';
+const callWeatherService = require('./weatherCalculator');
 const url = require('url');
 var strava = require('strava-v3');
 const querystring = require('querystring');
@@ -46,11 +43,7 @@ if (!process.env.NO_LOGGING) {
     });
 }
 
-import reducer from '../reducers/reducer';
-import {applyMiddleware, createStore} from 'redux';
 var compression = require('compression');
-import TopLevel from '../app/topLevel';
-import LocationContext from '../locationContext';
 
 const colorize = process.env.NODE_ENV !== 'production';
 
@@ -128,6 +121,7 @@ app.use((req, res, next) => {
     logger.info(`host = ${host}`);
     logger.info(`original url ${req.originalUrl}`);
     if (host === 'www.cyclerouteforecast.com' || host === 'route-forecast.ue.r.appspot.com' ||
+        host === 'route-forecast.appspot.com' ||
         host === 'cyclerouteforecast.com' || host === 'randoplan.com') {
         return res.redirect(301, 'https://www.randoplan.com' + req.originalUrl);
     }
@@ -303,50 +297,16 @@ app.get('/refreshStravaToken', async (req,res) => {
 });
 
 app.get('/', (req, res) => {
-    console.log('in / handler');
-    const action = '/forecast';     // TODO: use common variable between express and browser side
-
-    const search = req.url.substring(req.url.indexOf('?'));
-    const href = url.format({
-        protocol: req.protocol,
-        host: req.get('host'),
-        path: req.originalUrl,
-        search:search});
-    const origin = url.format({
-        protocol: req.protocol,
-        host: req.get('host')});
-    if (!process.env.ENABLE_SSR) {
-        console.warn(`SSR disabled`);
-        const ejsVariables = {
-            'maps_key': process.env.MAPS_KEY,
-            'timezone_api_key': process.env.TIMEZONE_API_KEY,
-            'bitly_token':process.env.BITLY_TOKEN,
-            'preloaded_state':'',
-            'reactDom': '',
-            delimiter: '?'
-        };
-        res.render('index', ejsVariables)
-    } else {
-        logger.warn('SSR enabled');
-        const store = createStore(reducer, undefined, applyMiddleware(thunkMiddleware));
-
-        const reactDom = renderToString(
-            <LocationContext.Provider value={{href:href,search:search,origin:origin}}>
-                <TopLevel serverStore={store} action={action} maps_api_key={process.env.MAPS_KEY} timezone_api_key={process.env.TIMEZONE_API_KEY}/>
-            </LocationContext.Provider>
-        );
-        const ejsVariables = {
-            'maps_key':process.env.MAPS_KEY,
-            'timezone_api_key':process.env.TIMEZONE_API_KEY,
-            'bitly_token':process.env.BITLY_TOKEN,
-            'reactDom':reactDom,
-            'preloaded_state':JSON.stringify(store.getState()).replace(/</g, '\\u003c'),
-            delimiter: '?'
-        };
-        res.render('index', ejsVariables);
-    }
+    const ejsVariables = {
+        'maps_key': process.env.MAPS_KEY,
+        'timezone_api_key': process.env.TIMEZONE_API_KEY,
+        'bitly_token': process.env.BITLY_TOKEN,
+        'preloaded_state': '',
+        'reactDom': '',
+        delimiter: '?'
+    };
+    res.render('index', ejsVariables)
 });
-
 if (!process.env.NO_LOGGING) {
     app.use(errorLogger);
 }
