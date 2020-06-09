@@ -18,6 +18,7 @@ let expressWinston = null;
 let logger = console;
 let StackdriverTransport = null;
 if (!process.env.NO_LOGGING) {
+    require('./logging');
     winston = require('winston');
     expressWinston = require('express-winston');
     const {LoggingWinston} = require('@google-cloud/logging-winston');

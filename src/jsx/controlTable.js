@@ -136,7 +136,7 @@ export class ControlTable extends Component {
         if (params.backwards) {
             return nextCell;
         } else {
-            if (nextCell.column.colId==='arrival') {
+            if (nextCell !== undefined && nextCell.column.colId==='arrival') {
                 let col = nextCell.column.columnApi.getColumn('name');
                 let renderedRowCount = nextCell.column.gridApi.getModel().getRowCount();
                 let nextRowIndex = nextCell.rowIndex + 1;

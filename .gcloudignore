@@ -12,7 +12,6 @@ src/templates/
 report.*json$
 phtest.js
 crittest.js
-route-forecast-c4075d06140e.json
 test.errs
 webpack*
 routeWeather*
@@ -30,3 +29,4 @@ TODOS
 *sh
 .shelf/
 __test__/
+!route-forecast-c4075d06140e.json

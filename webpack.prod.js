@@ -38,7 +38,7 @@ module.exports = (env,argv) => merge(common(env,argv), {
         new SentryCliPlugin({
             include: '.',
             ignoreFile: '.sentrycliignore',
-            ignore: ['node_modules', 'webpack.config.js', 'webpack.common.js', 'webpack.dev.js'],
+            ignore: ['node_modules', 'webpack.prod.js', 'webpack.common.js', 'webpack.dev.js'],
             configFile: 'sentry.properties',
             rewrite:true,
             stripPrefix: ['/dist'],
