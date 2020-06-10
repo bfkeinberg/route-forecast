@@ -4,24 +4,13 @@ import ErrorBoundary from './errorBoundary';
 import PropTypes from 'prop-types';
 import {addControl, toggleDisplayBanked, toggleMetric} from './actions/actions';
 import {connect} from 'react-redux';
-import loadable from 'react-loadable';
+import loadable from '@loadable/component';
 import '../static/controlsStyles.css';
 import MediaQuery from 'react-responsive';
 import DesktopControls from "./ui/desktopControls";
 import MobileControls from "./ui/mobileControls";
 
-const LoadableControlTable = loadable({
-    loader: () => import(/* webpackChunkName: "ControlTable" */'./controlTable'),
-    loading(props) {
-        if (props.error) {
-            return <div>Error loading control table!</div>;
-        } else if (props.pastDelay) {
-            return <div>Loading control table...</div>;
-        } else {
-            return null;
-        }
-    }
-});
+const LoadableControlTable = loadable(() => import('./controlTable'));
 
 class ControlPoints extends Component {
 
