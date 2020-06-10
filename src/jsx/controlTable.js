@@ -22,7 +22,7 @@ class DeleteRenderer extends Component {
     invokeDelete = () => {this.props.context.componentParent.removeRow(this.props.node.id)};
 
     render() {
-        return (<Button onClick={this.invokeDelete} class={'pt-minimal'} icon={'delete'}/>);
+        return (<Button onClick={this.invokeDelete} minimal={true} icon={'delete'}/>);
     }
 }
 
@@ -242,7 +242,7 @@ export class ControlTable extends Component {
         let rowData = [];
         let newColDefs = this.state.columnDefs.slice();
         this.props.controls.forEach((item,index) => rowData.push({...item, ...this.props.calculatedValues[index], id:index}));
-        return (<div id={'controlTable'} className="ag-theme-alpine">
+        return (<div id={'controlTable'} className="ag-theme-balham">
             <AgGridReact enableCellChangeFlash={true} animateRows
                          sortingOrder={['asc']} unSortIcon rowData={rowData}
                          context={this.state.context} frameworkComponents={this.state.frameworkComponents}
