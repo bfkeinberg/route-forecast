@@ -262,7 +262,12 @@ class AnalyzeRoute {
             return 0;
         }
         let hilliness = Math.floor(Math.min((climbInFeet / distanceInMiles) / 25, 5));
-        return distanceInMiles / (baseSpeed - hilliness);     // hours
+        // handle edge case for walking speeds
+        let effectiveSpeed = baseSpeed - hilliness;
+        if (baseSpeed <= hilliness) {
+            effectiveSpeed = 1;
+        }
+        return distanceInMiles / effectiveSpeed;     // hours
     }
 
     static setMinMaxCoords(trackPoint,bounds) {
