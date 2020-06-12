@@ -262,27 +262,28 @@ app.get('/stravaAuthReq', (req,res) => {
 
 app.get('/stravaAuthReply', async (req,res) => {
     const code = req.query.code;
-    if (code === undefined) {
-        res.status(400).json({'status':'Bad Strava auth reply'});
-        return;
+    let error = req.query.error;
+    if (error === undefined && code === undefined) {
+        error = 'Strava authentication denied';
     }
-    const error = req.query.error;
     const state = req.query.state;
     let restoredState = {};
     if (state !== undefined && state !== '') {
         restoredState = JSON.parse(decodeURIComponent(state));
     }
-    if (error !== undefined) {
-        console.error(`Strava authentication error ${error}`);
+    if (error === undefined) {
+        process.env.STRAVA_CLIENT_SECRET = process.env.STRAVA_API_KEY;
+        const token = await getStravaToken(code)
+            .catch(error => {console.log('got bad auth reply');res.status(400).json({'status':`Bad Strava auth reply ${error}`})});
+        // process.env.STRAVA_ACCESS_TOKEN = token.body.access_token;
+        restoredState.strava_access_token = token.body.access_token;
+        restoredState.strava_refresh_token = token.body.refresh_token;
+        restoredState.strava_token_expires_at = token.body.expires_at;
     }
-    process.env.STRAVA_CLIENT_SECRET = process.env.STRAVA_API_KEY;
-    const token = await getStravaToken(code)
-        .catch(error => {console.log('got bad auth reply');res.status(400).json({'status':`Bad Strava auth reply ${error}`})});
-    // process.env.STRAVA_ACCESS_TOKEN = token.body.access_token;
-    restoredState.strava_access_token = token.body.access_token;
+    else {
+        restoredState.strava_activity = undefined;
+    }
     restoredState.strava_error = error;
-    restoredState.strava_refresh_token = token.body.refresh_token;
-    restoredState.strava_token_expires_at = token.body.expires_at;
     res.redirect(url.format('/?') + querystring.stringify(restoredState));
 });
 

@@ -290,7 +290,7 @@ const strava = function(state = {analysisInterval:defaultAnalysisIntervalInHours
         }
         case Actions.SET_STRAVA_ERROR:
             if (action.error !== undefined) {
-                return {...state, error:action.error};
+                return {...state, errorDetails:action.error};
             } else {return state;}
         case Actions.SET_ACTUAL_FINISH_TIME:
             return {...state, actualFinishTime:action.finishTime};
