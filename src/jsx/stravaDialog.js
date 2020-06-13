@@ -40,7 +40,7 @@ class StravaDialog extends Component {
     }
 
     static getDerivedStateFromProps(newProps, prevState) {
-        if (newProps.strava_error !== null) {
+        if (newProps.strava_error !== null && newProps.strava_error !== '') {
             return {...prevState, stravaAlertVisible:true};
         }
         return null;

@@ -121,11 +121,15 @@ export class RouteWeatherUI extends Component {
         if (queryParams.strava_access_token !== undefined) {
             saveCookie('strava_access_token', queryParams.strava_access_token);
             saveCookie('strava_refresh_token', queryParams.strava_refresh_token);
+            saveCookie('strava_token_expires_at', queryParams.strava_token_expires_at);
             props.setStravaToken(queryParams.strava_access_token, queryParams.strava_token_expires_at);
             props.setStravaRefreshToken(queryParams.strava_refresh_token);
             return queryParams.strava_access_token;
         } else {
-            return loadCookie('strava_access_token');
+            const stravaToken = loadCookie('strava_access_token');
+            props.setStravaToken(stravaToken, loadCookie('strava_token_expires_at'));
+            props.setStravaRefreshToken(loadCookie('strava_refresh_token'));
+            return stravaToken;
         }
     }
 

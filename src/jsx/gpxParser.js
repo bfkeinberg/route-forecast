@@ -174,7 +174,7 @@ class AnalyzeRoute {
         forecastRequests.forEach(request => request.bearing = bearings.shift());
         return {forecastRequest:forecastRequests,
             points:stream,name:trackName,values:calculatedValues,
-            bounds:bounds, finishTime: finishTime};
+            bounds:bounds, finishTime: finishTime, timeInHours:accumulatedTime + idlingTime};
     }
 
     static getRelativeBearing(point1,point2) {

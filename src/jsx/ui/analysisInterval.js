@@ -5,7 +5,7 @@ import {connect} from 'react-redux';
 import {setAnalysisInterval,getPaceOverTime} from "../actions/actions";
 
 const AnalysisInterval = ({interval,setInterval,visible,getPaceOverTime}) => {
-    const interval_tooltip_text = 'Interval at which to calculate effective pace';
+    const interval_tooltip_text = 'Interval in hours at which to calculate effective pace';
     const isVisible = visible ? 'inline-flex' : 'none';
     return (
         <FormGroup size='sm' style={{flex:'1',display:isVisible}}>
@@ -13,13 +13,13 @@ const AnalysisInterval = ({interval,setInterval,visible,getPaceOverTime}) => {
             <Label>Analysis Interval
                 <Input id='analysisInterval' type="select" value={interval} name="analysisInterval"
                              onChange={event => {setInterval(event.target.value);getPaceOverTime()}}>
-                    <option value="1">1</option>
-                    <option value="2">2</option>
-                    <option value="4">4</option>
-                    <option value="6">6</option>
-                    <option value="8">8</option>
-                    <option value="12">12</option>
-                    <option value="24">24</option>
+                    <option value="1">1 hour</option>
+                    <option value="2">2 hours</option>
+                    <option value="4">4 hours</option>
+                    <option value="6">6 hours</option>
+                    <option value="8">8 hours</option>
+                    <option value="12">12 hours</option>
+                    <option value="24">24 hours</option>
                 </Input>
             </Label>
         </FormGroup>

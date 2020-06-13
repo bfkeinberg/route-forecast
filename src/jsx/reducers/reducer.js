@@ -78,7 +78,7 @@ export const finishTimeFormat = 'ddd, MMM DD YYYY h:mma';
 const defaultPace = 'D';
 const defaultIntervalInHours = 1;
 const startHour = 7;
-const defaultAnalysisIntervalInHours = 12;
+const defaultAnalysisIntervalInHours = 1;
 
 const initialStartTime = function() {
     let now = new Date();
@@ -182,7 +182,7 @@ loadingSource:null,fetchingForecast:false,fetchingRoute:false}, action) {
 };
 
 const routeInfo = function(state = {finishTime:'',initialFinishTime:'',weatherCorrectionMinutes:null,
-    forecastRequest:null,points:[], fetchAfterLoad:false,bounds:null,name:'',rwgpsRouteData:null,
+    forecastRequest:null,points:[], fetchAfterLoad:false,bounds:null,name:'',rwgpsRouteData:null,totalTimeInHours:null,
     gpxRouteData:null, maxGustSpeed:0}, action) {
     switch (action.type) {
         case Actions.SET_TIME_ZONE:
@@ -193,16 +193,18 @@ const routeInfo = function(state = {finishTime:'',initialFinishTime:'',weatherCo
             return {...state,gpxRouteData:action.gpxRouteData,rwgpsRouteData:null};
         case Actions.SET_ROUTE_INFO:
             if (action.routeInfo===null) {
-                return {...state,rwgpsRouteData:null,gpxRouteData:null,points:[],bounds:null,name:'',forecastRequest:null};
+                return {...state,rwgpsRouteData:null,gpxRouteData:null,points:[],bounds:null,name:'',
+                    forecastRequest:null,totalTimeInHours:null};
             }
             return {...state, points:action.routeInfo.points,name:action.routeInfo.name,bounds:action.routeInfo.bounds,
                 finishTime:action.routeInfo.finishTime,initialFinishTime:action.routeInfo.finishTime,
-                forecastRequest:action.routeInfo.forecastRequest};
+                forecastRequest:action.routeInfo.forecastRequest,totalTimeInHours:action.routeInfo.timeInHours};
         case Actions.CLEAR_ROUTE_DATA:
             return {...state,rwgpsRouteData:null,gpxRouteData:null,points:[],bounds:null,name:'',forecastRequest:null};
         // clear when the route is changed
         case Actions.SET_RWGPS_ROUTE:
-            return {...state,rwgpsRouteData:null,gpxRouteData:null,points:[],bounds:null,name:'',forecastRequest:null,maxGustSpeed: 0};
+            return {...state,rwgpsRouteData:null,gpxRouteData:null,points:[],bounds:null,name:'',forecastRequest:null,
+                maxGustSpeed: 0, totalTimeInHours:null};
         case Actions.ADD_WEATHER_CORRECTION:
             return {...state,weatherCorrectionMinutes:action.weatherCorrectionMinutes,finishTime:action.finishTime,maxGustSpeed:action.maxGustSpeed};
         case Actions.SET_FETCH_AFTER_LOAD:
@@ -264,6 +266,30 @@ export const controls = function(state = {metric:false,displayBanked:false,strav
     }
 };
 
+const getAnalysisIntervalFromRouteDuration = (durationInHours) => {
+    if (durationInHours > 72) {
+        return 24;
+    }
+    else if (durationInHours > 59) {
+        return 12;
+    }
+    else if (durationInHours > 39) {
+        return 8;
+    }
+    else if (durationInHours > 29) {
+        return 6;
+    }
+    else if (durationInHours > 19) {
+        return 4;
+    }
+    else if (durationInHours > 11)  {
+        return 2;
+    }
+    else {
+        return 1;
+    }
+};
+
 const strava = function(state = {analysisInterval:defaultAnalysisIntervalInHours,activity:'',access_token:null,
     refresh_token:null, expires_at:null,
     fetching:false,activityData:null,calculatedPaces:null,errorDetails:null, subrange:[]},
@@ -271,7 +297,6 @@ const strava = function(state = {analysisInterval:defaultAnalysisIntervalInHours
     switch (action.type) {
         case Actions.SET_STRAVA_TOKEN:
             if (action.token !== undefined) {
-                console.log(`Setting strava access token to ${action.token}`);
                 return {...state, access_token:action.token, expires_at: action.expires_at};
             }
             else {return state;}
@@ -313,6 +338,8 @@ const strava = function(state = {analysisInterval:defaultAnalysisIntervalInHours
                     parseFloat(action.finish)
                 ]
             };
+        case Actions.SET_ROUTE_INFO:
+            return {...state, analysisInterval: getAnalysisIntervalFromRouteDuration(action.routeInfo.timeInHours)};
         default:
             return state;
     }

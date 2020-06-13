@@ -677,6 +677,7 @@ export const setPaceOverTime = function(calculatedPaces) {
 export const getPaceOverTime = function() {
     return async function (dispatch,getState) {
         if (getState().strava.activityData===null) {
+            console.log('returning from getPaceOverTime because no activity data');
             return;
         }
         const parser = await getStravaParser().catch((err) => {dispatch(stravaFetchFailure(err));return null});

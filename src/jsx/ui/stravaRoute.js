@@ -4,7 +4,7 @@ import {Label, Input, FormGroup} from 'reactstrap';
 import {connect} from 'react-redux';
 import {setStravaActivity, updateExpectedTimes} from "../actions/actions";
 
-const StravaRoute = ({stravaAnalysis,setStravaActivity,strava_activity,updateExpectedTimes}) => {
+const StravaRoute = ({stravaAnalysis,setStravaActivity,strava_activity,updateExpectedTimes,canAnalyze}) => {
     return (
         <FormGroup style={{display:stravaAnalysis?'inline-flex':'none'}}>
             <Label for='stravaRoute'>Strava</Label>
@@ -44,7 +44,10 @@ const StravaRoute = ({stravaAnalysis,setStravaActivity,strava_activity,updateExp
                          }
                      }}
                      value={strava_activity} onChange={event => {setStravaActivity(event.target.value)}}
-                     onBlur={() => {if (strava_activity !== '') {updateExpectedTimes(strava_activity)}}}/>
+                   onFocus={() => {if (canAnalyze) {
+                       updateExpectedTimes(strava_activity)} else {
+                       console.log('gained focus but not acting')}}}
+                   onBlur={() => {if (strava_activity !== '') {updateExpectedTimes(strava_activity)}}}/>
     </FormGroup>
     );
 };
@@ -56,13 +59,15 @@ StravaRoute.propTypes = {
         PropTypes.oneOf([''])
     ]).isRequired,
     setStravaActivity:PropTypes.func.isRequired,
-    updateExpectedTimes:PropTypes.func.isRequired
+    updateExpectedTimes:PropTypes.func.isRequired,
+    canAnalyze:PropTypes.bool.isRequired
 };
 
 const mapStateToProps = (state) =>
     ({
         stravaAnalysis: state.controls.stravaAnalysis,
-        strava_activity: state.strava.activity
+        strava_activity: state.strava.activity,
+        canAnalyze: state.strava.activity !== '' && state.strava.access_token != null
     });
 
 const mapDispatchToProps = {
