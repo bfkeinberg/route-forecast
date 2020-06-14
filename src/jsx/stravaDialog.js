@@ -57,7 +57,7 @@ class StravaDialog extends Component {
             <ErrorBoundary>
                 <Popover id='analysisControls' target={'enableAnalysis'} /*onClick={this.props.toggleStravaAnalysis}*/
                          size="sm" isOpen={this.props.stravaAnalysis && this.state.mounted} placement='auto-end' hideArrow={true}
-                         delay={{show:0,hide:2}} offset={70}>
+                         delay={{show:0,hide:2}} offset={"[600,400]"}>
                     <PopoverHeader className={'stravaDialogTitle'}>Analyze with Strava</PopoverHeader>
                     <PopoverBody>
                         <StravaRoute/>
