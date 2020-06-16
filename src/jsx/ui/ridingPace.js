@@ -10,7 +10,7 @@ export const metricPaceToSpeed = {'A-':15, 'A':16, 'B-':18, 'B':19, 'C-':21, 'C'
 const getAlphaPace = function(pace) {
     let alpha = 'A';     // default
     alpha = Object.keys(paceToSpeed).reverse().find(value => {
-        return (pace > paceToSpeed[value])});
+        return (pace >= paceToSpeed[value])});
     return alpha;
 };
 
@@ -30,7 +30,7 @@ const RidingPace = ({pace,actualPace,setPace,metric}) => {
         pace_text = `Speed on flat ground, which will be adjusted for climbing`;
     } else {
         pace_tooltip_class = getPaceTooltipId(actualPace,pace_mph);
-        pace_text = `Actual riding pace was ${getAlphaPace(actualPace)} (${actualPace.toFixed(1)})`;
+        pace_text = `Actual riding pace was ${getAlphaPace(Math.round(actualPace))} (${actualPace.toFixed(1)})`;
     }
     return (
         <FormGroup>

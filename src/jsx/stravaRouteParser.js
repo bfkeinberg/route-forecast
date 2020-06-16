@@ -121,7 +121,7 @@ class StravaRouteParser {
             return ({
                 speed: movingAverage, distance: distanceTraveledMiles, climb: climbInFeet,
                 start:startingDistanceMeters, end:distance,
-                pace: pace, alphaPace: StravaRouteParser.getAlphaPace(pace), time: currentMoment.format('ddd, MMM DD h:mma')
+                pace: pace, alphaPace: StravaRouteParser.getAlphaPace(Math.round(pace)), time: currentMoment.format('ddd, MMM DD h:mma')
             });
         };
 
@@ -166,7 +166,7 @@ class StravaRouteParser {
     static getAlphaPace(pace) {
         let alpha = 'A-';     // default
         alpha = Object.keys(paceToSpeed).reverse().find(value => {
-            return (pace > paceToSpeed[value])});
+            return (pace >= paceToSpeed[value])});
         return alpha;
     }
 
