@@ -5,6 +5,7 @@ import {finishTimeFormat} from './reducers/reducer';
 
 import {paceToSpeed} from "./ui/ridingPace";
 import {getPowerOrVelocity} from "./windUtils";
+import {setMinMaxCoords} from "./actions/actions";
 
 const kmToMiles = 0.62137;
 
@@ -130,7 +131,7 @@ class AnalyzeRoute {
         let startTime = moment.tz(userStartTime.format('YYYY-MM-DDTHH:mm'), timeZoneId);
         let bearings = [];
         stream.filter(point => point.lat!==undefined && point.lon!==undefined).forEach(point => {
-            bounds = AnalyzeRoute.setMinMaxCoords(point,bounds);
+            bounds = setMinMaxCoords(point,bounds);
             if (first) {
                 forecastRequests.push(AnalyzeRoute.addToForecast(point, startTime, accumulatedTime, accumulatedDistanceKm * kmToMiles));
                 forecastPoint = point;
@@ -268,14 +269,6 @@ class AnalyzeRoute {
             effectiveSpeed = 1;
         }
         return distanceInMiles / effectiveSpeed;     // hours
-    }
-
-    static setMinMaxCoords(trackPoint,bounds) {
-        bounds.min_latitude = Math.min(trackPoint.lat, bounds.min_latitude);
-        bounds.min_longitude = Math.min(trackPoint.lon, bounds.min_longitude);
-        bounds.max_latitude = Math.max(trackPoint.lat, bounds.max_latitude);
-        bounds.max_longitude = Math.max(trackPoint.lon, bounds.max_longitude);
-        return bounds;
     }
 
     static addToForecast(trackPoint, currentTime, elapsedTimeInHours, distanceInMiles) {

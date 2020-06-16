@@ -2,6 +2,14 @@ import moment from 'moment';
 import cookie from 'react-cookies';
 import * as Sentry from '@sentry/browser';
 
+export const setMinMaxCoords = (trackPoint,bounds) => {
+    bounds.min_latitude = Math.min(trackPoint.lat, bounds.min_latitude);
+    bounds.min_longitude = Math.min(trackPoint.lon, bounds.min_longitude);
+    bounds.max_latitude = Math.max(trackPoint.lat, bounds.max_latitude);
+    bounds.max_longitude = Math.max(trackPoint.lon, bounds.max_longitude);
+    return bounds;
+};
+
 const sanitizeCookieName = (cookieName) => {
     return encodeURIComponent(cookieName.replace(/[ =/]/,''));
 };
@@ -237,6 +245,15 @@ const setRouteInfo = (routeInfo) => {
             routeInfo: routeInfo
         });
     };
+};
+
+export const SET_ROUTE_POINTS_BOUNDS = 'SET_ROUTE_POINTS_BOUNDS';
+const setRoutePointsAndBounds = (pointsAndBounds) => {
+    return {
+        type: SET_ROUTE_POINTS_BOUNDS,
+        points: pointsAndBounds.points,
+        bounds: pointsAndBounds.bounds
+    }
 };
 
 export const SET_TIME_ZONE = 'SET_TIME_ZONE';
@@ -690,6 +707,17 @@ export const getPaceOverTime = function() {
     }
 };
 
+const getPointsFromStrava = (activityStream) => {
+    let latlng = activityStream.filter( stream => stream.type === 'latlng')[0];
+    let distance = activityStream.filter( stream => stream.type === 'distance')[0];
+    let bounds = {min_latitude:90, min_longitude:180, max_latitude:-90, max_longitude:-180};
+    return {points:latlng.data.map ((coord, i) => {
+        let point = Object.assign({}, {lat:coord[0], lon:coord[1]}, {dist:distance.data[i]});
+            bounds = setMinMaxCoords(point,bounds);
+            return point}),
+        bounds:bounds};
+};
+
 export const updateExpectedTimes = function(activity) {
     return function (dispatch,getState) {
         dispatch(loadStravaActivity(activity)).then( async result => {
@@ -704,6 +732,7 @@ export const updateExpectedTimes = function(activity) {
             dispatch(updateActualArrivalTimes(timesFromData.controls));
             dispatch(setActualPace(timesFromData.actualPace));
             dispatch(setActualFinishTime(timesFromData.actualFinishTime));
+            dispatch(setRoutePointsAndBounds(getPointsFromStrava(getState().strava.activityStream)));
             return dispatch(getPaceOverTime());
         }, error => {
             dispatch(stravaFetchFailure(error));
@@ -716,6 +745,15 @@ export const SUBRANGE_MAP = 'SUBRANGE_MAP';
 export const setSubrange = function(start,finish) {
     return {
         type: SUBRANGE_MAP,
+        start: start,
+        finish: finish
+    };
+};
+
+export const TOGGLE_MAP_RANGE = 'TOGGLE_MAP_RANGE';
+export const toggleMapRange = function(start,finish) {
+    return {
+        type: TOGGLE_MAP_RANGE,
         start: start,
         finish: finish
     };

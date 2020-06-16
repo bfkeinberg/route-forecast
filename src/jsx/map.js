@@ -36,7 +36,6 @@ class RouteForecastMap extends Component {
     constructor(props) {
         super(props);
         this.map = null;
-        this.markers = [];
         // this.onDesktop = window.matchMedia("(min-width: 1000px)").matches;
         props.setMapViewed();
     }
@@ -167,7 +166,7 @@ class RouteForecastMap extends Component {
         return (
             <ErrorBoundary>
                 <div id="map" style={{'height':'95%'}}>
-                    {this.props.forecast.length > 0 && this.props.bounds !== null ?
+                    {/*this.props.forecast.length > 0 && */this.props.bounds !== null ?
                         <Map google={this.props.google}
                              mapType={'ROADMAP'} scaleControl={true} bounds={mapBounds}
                              initialCenter={(mapBounds === null) ? null:mapBounds.getCenter().toJSON()}
@@ -204,7 +203,7 @@ const mapStateToProps = (state) =>
         // maps_api_key: state.params.maps_api_key,
         controls: state.controls.calculatedControlValues,
         controlNames: state.controls.userControlPoints.map(control => control.name),
-        subrange: state.strava.subrange.length > 0 ? state.strava.subrange : state.forecast.range,
+        subrange: state.controls.stravaAnalysis ? state.strava.subrange : state.forecast.range,
         metric: state.controls.metric
     });
 

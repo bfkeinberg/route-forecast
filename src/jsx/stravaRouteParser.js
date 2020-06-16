@@ -209,7 +209,7 @@ class StravaRouteParser {
     processActivityStream(activityId,token) {
         const promise = new Promise((resolve, reject) =>
         {
-            strava.streams.activity({access_token:token, id:activityId, types:'distance,time,altitude,velocity_smooth'},
+            strava.streams.activity({access_token:token, id:activityId, types:'distance,time,altitude,velocity_smooth,latlng'},
                 function(err,payload)
                 {
                     if (err) {

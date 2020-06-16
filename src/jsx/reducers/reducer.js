@@ -199,6 +199,8 @@ const routeInfo = function(state = {finishTime:'',initialFinishTime:'',weatherCo
             return {...state, points:action.routeInfo.points,name:action.routeInfo.name,bounds:action.routeInfo.bounds,
                 finishTime:action.routeInfo.finishTime,initialFinishTime:action.routeInfo.finishTime,
                 forecastRequest:action.routeInfo.forecastRequest,totalTimeInHours:action.routeInfo.timeInHours};
+        case Actions.SET_ROUTE_POINTS_BOUNDS:
+            return {...state, points:action.points, bounds: action.bounds};
         case Actions.CLEAR_ROUTE_DATA:
             return {...state,rwgpsRouteData:null,gpxRouteData:null,points:[],bounds:null,name:'',forecastRequest:null};
         // clear when the route is changed
@@ -337,6 +339,19 @@ const strava = function(state = {analysisInterval:defaultAnalysisIntervalInHours
                     parseFloat(action.start),
                     parseFloat(action.finish)
                 ]
+            };
+        case Actions.TOGGLE_MAP_RANGE:
+            if (state.subrange[0] === parseFloat(action.start) && state.subrange[1] === parseFloat(action.finish)) {
+                return {
+                    ...state,
+                    subrange: []
+                }
+            }
+            return {...state, subrange:
+                    [
+                        parseFloat(action.start),
+                        parseFloat(action.finish)
+                    ]
             };
         case Actions.SET_ROUTE_INFO:
             return {...state, analysisInterval: getAnalysisIntervalFromRouteDuration(action.routeInfo.timeInHours)};
