@@ -63,7 +63,7 @@ class StravaRouteParser {
     }
 
     static wwPaceCalc(climbInFeet, distanceInMiles, averageSpeedInMilesPerHour) {
-        let hilliness = Math.floor(Math.min((climbInFeet / distanceInMiles) / 25, 5));
+        let hilliness = (climbInFeet / distanceInMiles) / 25;
         return averageSpeedInMilesPerHour + hilliness;
     }
 
@@ -86,19 +86,21 @@ class StravaRouteParser {
     }
 
     findMovingAverages(activity,activityStreams,intervalInHours) {
+        const min_speed = 1.3;  // m/s for 3pmh
+
         let start = moment(activity.start_date);
         let intervalInSeconds = intervalInHours * 3600;
         let distances = activityStreams.filter(stream => stream.type === 'distance')[0].data;
         let times = activityStreams.filter(stream => stream.type === 'time')[0].data;
-        let moving = activityStreams.filter(stream => stream.type === 'moving')[0].data;
         let altitudes = activityStreams.filter(stream => stream.type === 'altitude')[0].data;
+        let speeds = activityStreams.filter(stream => stream.type === 'velocity_smooth')[0].data;
 
         let index = 0;
         let startingDistanceMeters = 0;
         let lastMovingTimeSeconds = null;
         let intervalMovingTimeSeconds = 0;
         let intervalStartTimeSeconds = 0;
-        let isMoving = false;
+        let isMoving = speeds[0] >= min_speed;
         let intervalElevationGainMeters = 0;
         let lastElevation = null;
         let averages = [];
@@ -124,12 +126,12 @@ class StravaRouteParser {
         };
 
         for (let value of times) {
-            if (moving[index] === true && !isMoving) {
+            if (speeds[index] >= min_speed && !isMoving) {
                 lastMovingTimeSeconds = value;
                 isMoving = true;
-            } else if (moving[index] === false && isMoving) {
+            } else if (speeds[index] < min_speed && isMoving) {
                 intervalMovingTimeSeconds += (value - lastMovingTimeSeconds);
-                isMoving = false
+                isMoving = false;
             }
             // try to apply some smoothing to elevation gain
             if (lastElevation !== null) {
@@ -141,9 +143,11 @@ class StravaRouteParser {
                 }
             }
             lastElevation = altitudes[index];
-            if ((value - intervalStartTimeSeconds) >= intervalInSeconds) {
+            // only calculate speed while we are moving, and determine the moving time by adding moving time
+            // in the interval up until now, and add in the time since we started moving most recently
+            if (isMoving && ((value - lastMovingTimeSeconds) + intervalMovingTimeSeconds) >= intervalInSeconds) {
                 averages.push(addToAverages(intervalStartTimeSeconds,startingDistanceMeters,distances[index],
-                    lastMovingTimeSeconds,value,moving[index]));
+                    lastMovingTimeSeconds,value,speeds[index] >= min_speed));
                 intervalMovingTimeSeconds = 0;
                 intervalStartTimeSeconds = value;
                 startingDistanceMeters = distances[index];
@@ -154,7 +158,7 @@ class StravaRouteParser {
         }
         if (intervalMovingTimeSeconds > 0) {
             averages.push(addToAverages(intervalStartTimeSeconds,startingDistanceMeters,distances[distances.length-1],
-                lastMovingTimeSeconds,times[times.length-1],moving[moving.length-1]));
+                lastMovingTimeSeconds,times[times.length-1],speeds[speeds.length-1]>= min_speed));
         }
         return averages;
     }
@@ -205,7 +209,7 @@ class StravaRouteParser {
     processActivityStream(activityId,token) {
         const promise = new Promise((resolve, reject) =>
         {
-            strava.streams.activity({access_token:token, id:activityId, types:'distance,time,moving,altitude'},
+            strava.streams.activity({access_token:token, id:activityId, types:'distance,time,altitude,velocity_smooth'},
                 function(err,payload)
                 {
                     if (err) {

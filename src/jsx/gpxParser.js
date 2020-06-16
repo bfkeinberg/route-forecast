@@ -261,7 +261,7 @@ class AnalyzeRoute {
         if (distanceInMiles < 1) {
             return 0;
         }
-        let hilliness = Math.floor(Math.min((climbInFeet / distanceInMiles) / 25, 5));
+        let hilliness = (climbInFeet / distanceInMiles) / 25;
         // handle edge case for walking speeds
         let effectiveSpeed = baseSpeed - hilliness;
         if (baseSpeed <= hilliness) {
