@@ -248,7 +248,7 @@ const setRouteInfo = (routeInfo) => {
 };
 
 export const SET_ROUTE_POINTS_BOUNDS = 'SET_ROUTE_POINTS_BOUNDS';
-const setRoutePointsAndBounds = (pointsAndBounds) => {
+export const setRoutePointsAndBounds = (pointsAndBounds) => {
     return {
         type: SET_ROUTE_POINTS_BOUNDS,
         points: pointsAndBounds.points,

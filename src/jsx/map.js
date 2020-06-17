@@ -30,6 +30,7 @@ class RouteForecastMap extends Component {
         subrange:PropTypes.arrayOf(PropTypes.number),
         google:PropTypes.object,
         metric:PropTypes.bool.isRequired,
+        stravaAnalysis:PropTypes.bool.isRequired,
         setMapViewed:PropTypes.func.isRequired
     };
 
@@ -166,7 +167,7 @@ class RouteForecastMap extends Component {
         return (
             <ErrorBoundary>
                 <div id="map" style={{'height':'95%'}}>
-                    {/*this.props.forecast.length > 0 && */this.props.bounds !== null ?
+                    {(this.props.forecast.length > 0 || this.props.stravaAnalysis) && this.props.bounds !== null ?
                         <Map google={this.props.google}
                              mapType={'ROADMAP'} scaleControl={true} bounds={mapBounds}
                              initialCenter={(mapBounds === null) ? null:mapBounds.getCenter().toJSON()}
@@ -204,6 +205,7 @@ const mapStateToProps = (state) =>
         controls: state.controls.calculatedControlValues,
         controlNames: state.controls.userControlPoints.map(control => control.name),
         subrange: state.controls.stravaAnalysis ? state.strava.subrange : state.forecast.range,
+        stravaAnalysis: state.controls.stravaAnalysis,
         metric: state.controls.metric
     });
 
