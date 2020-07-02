@@ -9,7 +9,7 @@ import {addControl, toggleDisplayBanked, toggleMetric} from "../actions/actions"
 const DesktopControls = (props) => {
     return <div className="controls-container">
         <div className="controls-item">
-            <Button class={"pt-minimal"} tabIndex='10' onClick={props.addControl} id='addButton' icon={"add"}>Add</Button>
+            <Button minimal={true} tabIndex='10' onClick={props.addControl} id='addButton' icon={"add"}>Add</Button>
             <UncontrolledTooltip target={"addButton"}>Add a control point</UncontrolledTooltip>
         </div>
         <div className="controls-item controls-item-finish-time">

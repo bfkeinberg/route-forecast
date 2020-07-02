@@ -10,7 +10,7 @@
     "@google-cloud/debug-agent": "^5.1.0",
     "@google-cloud/logging-winston": "^3.0.6",
     "@google-cloud/trace-agent": "^5.1.0",
-    "@loadable/component": "^5.12.0",
+    "@loadable/component": "^5.13.1",
     "@sentry/browser": "^5.19.0",
     "@sentry/node": "^5.19.0",
     "@types/pure-render-decorator": "^0.2.27",

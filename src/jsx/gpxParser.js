@@ -262,11 +262,16 @@ class AnalyzeRoute {
         if (distanceInMiles < 1) {
             return 0;
         }
-        let hilliness = Math.max(((climbInFeet / distanceInMiles) / 25), 5);
+        let hilliness = Math.min(((climbInFeet / distanceInMiles) / 25), 6);
         // handle edge case for walking speeds
         let effectiveSpeed = baseSpeed - hilliness;
+        // sanity checking
         if (baseSpeed <= hilliness) {
             effectiveSpeed = 1;
+        }
+        // cycling speeds less than 3 mph will not happen
+        if (baseSpeed > 9 && effectiveSpeed < 3) {
+            effectiveSpeed = 3;
         }
         return distanceInMiles / effectiveSpeed;     // hours
     }
