@@ -1,9 +1,12 @@
-const merge = require('webpack-merge');
+const { mergeWithCustomize, customizeObject } = require('webpack-merge');
 const clientCommon = require('./webpack.common.js');
 
-module.exports = (env, argv) => merge.strategy(
+// eslint-disable-next-line no-undef
+module.exports = (env, argv) => mergeWithCustomize(
     {
-        entry: 'prepend'
+        customizeObject: customizeObject({
+            entry: 'prepend'
+        })
     })(clientCommon(env,argv), {
         devtool: 'source-map',
         optimization: {

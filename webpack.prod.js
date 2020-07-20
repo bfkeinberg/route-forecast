@@ -1,4 +1,4 @@
-const merge = require('webpack-merge');
+const { merge } = require('webpack-merge');
 const common = require('./webpack.common.js');
 const path = require('path');
 const webpack = require('webpack');
@@ -38,7 +38,12 @@ module.exports = (env,argv) => merge(common(env,argv), {
         new SentryCliPlugin({
             include: '.',
             ignoreFile: '.sentrycliignore',
-            ignore: ['node_modules', 'webpack.prod.js', 'webpack.common.js', 'webpack.dev.js'],
+            ignore: [
+                'node_modules',
+                'webpack.prod.js',
+                'webpack.common.js',
+                'webpack.dev.js'
+            ],
             configFile: 'sentry.properties',
             rewrite:true,
             stripPrefix: ['/dist'],
@@ -48,8 +53,17 @@ module.exports = (env,argv) => merge(common(env,argv), {
         }),
         new CompressionPlugin({
             minRatio:0.85, cache:true,
-            test:[/\.css/,/\.ttf/,/\.eot/,/\.js/],
-            exclude:[/\.png/,/\.ico/,/\.html/]
+            test: [
+                /\.css/,
+                /\.ttf/,
+                /\.eot/,
+                /\.js/
+            ],
+            exclude:[
+                /\.png/,
+                /\.ico/,
+                /\.html/
+            ]
         }),
         new BrotliPlugin({
             asset: '[path].br[query]',
