@@ -3,14 +3,11 @@ import ReactDOM from 'react-dom';
 import TopLevel from './topLevel';
 import LocationContext from '../locationContext';
 import * as Sentry from '@sentry/browser';
-import { Integrations as ApmIntegrations } from '@sentry/apm';
 
 /* global SENTRY_RELEASE */
 if (!window.origin.startsWith('http://localhost')) {
     Sentry.init({ dsn: 'https://ea4c472ff9054dab8c18d594b95d8da2@sentry.io/298059',
         release:SENTRY_RELEASE, environment:'production',
-        integrations: [new ApmIntegrations.Tracing()],
-        tracesSampleRate: 0.1, // Be sure to lower this in production
         /*,
         beforeBreadcrumb(breadcrumb) {
             if (breadcrumb.category==='console') {return null} else {return breadcrumb}
