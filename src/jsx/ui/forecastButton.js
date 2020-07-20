@@ -6,7 +6,8 @@ import {requestForecast, setFetchAfterLoad} from "../actions/actions";
 import MediaQuery from 'react-responsive';
 
 const ForecastButton = ({fetchingForecast,requestForecast,routeInfo,submitDisabled,routeIsLoaded,setFetchAfterLoad}) => {
-    let forecast_tooltip = submitDisabled ? (
+    let forecast_tooltip = submitDisabled ?
+        (
             <UncontrolledTooltip target='forecast' placement='bottom' id="forecast_tooltip">Must either upload a gpx file or provide an rwgps route id</UncontrolledTooltip> ):
         (<UncontrolledTooltip target='forecast' placement='bottom' id="'forecast_tooltip">Request a ride forecast</UncontrolledTooltip>);
     let buttonStyle = submitDisabled ? {pointerEvents : 'none', display:'inline-flex'} : null;

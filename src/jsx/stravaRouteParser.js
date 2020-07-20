@@ -197,11 +197,9 @@ class StravaRouteParser {
         let arrivalTimes = [];
         let modifiedControls = controlPoints.slice();
         modifiedControls.sort((a,b) => a['distance']-b['distance']);
-        if (activityStream[0].type==='distance') {
-            StravaRouteParser.walkActivity(activity['start_date'], activityStream[0].data, activityStream[1].data,modifiedControls,arrivalTimes);
-        } else {
-            StravaRouteParser.walkActivity(activity['start_date'], activityStream[1].data, activityStream[0].data, modifiedControls,arrivalTimes);
-        }
+        let distances = activityStream.filter(stream => stream.type === 'distance')[0].data;
+        let times = activityStream.filter(stream => stream.type === 'time')[0].data;
+        StravaRouteParser.walkActivity(activity['start_date'], distances, times, modifiedControls,arrivalTimes);
         arrivalTimes.sort((a,b) => a['val']-b['val']);
         return arrivalTimes;
     }

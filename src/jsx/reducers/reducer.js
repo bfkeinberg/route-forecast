@@ -293,9 +293,34 @@ const getAnalysisIntervalFromRouteDuration = (durationInHours) => {
 };
 
 const strava = function(state = {analysisInterval:defaultAnalysisIntervalInHours,activity:'',access_token:null,
-    refresh_token:null, expires_at:null,
+    refresh_token:null, expires_at:null, actualPace:0,
     fetching:false,activityData:null,calculatedPaces:null,errorDetails:null, subrange:[]},
                         action) {
+    let setNewActivity = function () {
+        if (action.activity === undefined) {
+            return state;
+        }
+        let newValue = RouteInfoForm.getRouteNumberFromValue(action.activity);
+        return {
+            ...state, activity: !isNaN(newValue) ? newValue : action.activity,
+            activityData: null, activityStream: null, calculatedPaces: null, subrange: []
+        };
+    };
+    let toggleMapRange = function () {
+        if (state.subrange[0] === parseFloat(action.start) && state.subrange[1] === parseFloat(action.finish)) {
+            return {
+                ...state,
+                subrange: []
+            }
+        }
+        return {
+            ...state, subrange:
+                [
+                    parseFloat(action.start),
+                    parseFloat(action.finish)
+                ]
+        };
+    };
     switch (action.type) {
         case Actions.SET_STRAVA_TOKEN:
             if (action.token !== undefined) {
@@ -308,12 +333,7 @@ const strava = function(state = {analysisInterval:defaultAnalysisIntervalInHours
             }
             else {return state;}
         case Actions.SET_STRAVA_ACTIVITY: {
-            if (action.activity === undefined) {
-                return state;
-            }
-            let newValue = RouteInfoForm.getRouteNumberFromValue(action.activity);
-            return {...state, activity:!isNaN(newValue) ? newValue : action.activity,
-                activityData:null, activityStream:null, calculatedPaces:null, subrange:[]};
+            return setNewActivity();
         }
         case Actions.SET_STRAVA_ERROR:
             if (action.error !== undefined) {
@@ -341,18 +361,7 @@ const strava = function(state = {analysisInterval:defaultAnalysisIntervalInHours
                 ]
             };
         case Actions.TOGGLE_MAP_RANGE:
-            if (state.subrange[0] === parseFloat(action.start) && state.subrange[1] === parseFloat(action.finish)) {
-                return {
-                    ...state,
-                    subrange: []
-                }
-            }
-            return {...state, subrange:
-                    [
-                        parseFloat(action.start),
-                        parseFloat(action.finish)
-                    ]
-            };
+            return toggleMapRange();
         case Actions.SET_ROUTE_INFO:
             return {...state, analysisInterval: getAnalysisIntervalFromRouteDuration(action.routeInfo.timeInHours)};
         default:

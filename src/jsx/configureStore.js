@@ -7,7 +7,6 @@ import createSentryMiddleware from "redux-sentry-middleware";
 
 export const loggerMiddleware = createLogger();
 /* eslint-disable global-require */
-/*global module*/
 
 const bannedActionKeys = [
     'routeData',
@@ -20,14 +19,6 @@ const bannedActionKeys = [
     'calculatedPaces',
     'bitlyToken'
 ];
-
-// below is for server side rendering
-/*
-if (typeof Raven === 'undefined') {
-    var Raven = require('raven-js');
-    Raven.config('https://ea4c472ff9054dab8c18d594b95d8da2@sentry.io/298059').install();
-}
-*/
 
 /**
  *
