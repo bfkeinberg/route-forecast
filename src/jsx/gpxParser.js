@@ -273,6 +273,10 @@ class AnalyzeRoute {
         if (baseSpeed > 9 && effectiveSpeed < 3) {
             effectiveSpeed = 3;
         }
+        // if the pace is a hiking pace, the cycling hilliness computation doesn't really work
+        if (baseSpeed < 7) {
+            effectiveSpeed = baseSpeed;
+        }
         return distanceInMiles / effectiveSpeed;     // hours
     }
 

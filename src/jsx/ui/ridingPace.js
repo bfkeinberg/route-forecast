@@ -26,15 +26,15 @@ const RidingPace = ({pace,actualPace,setPace,metric}) => {
     let pace_mph = paceToSpeed[pace];
     let pace_text;
     let pace_tooltip_class = 'pace_tooltip';
-    if (actualPace === undefined) {
-        pace_text = `Speed on flat ground, which will be adjusted for climbing`;
+    if (actualPace === undefined || actualPace === 0) {
+        pace_text = `Speed on flat ground, which will be reduced by climbing`;
     } else {
         pace_tooltip_class = getPaceTooltipId(actualPace,pace_mph);
         pace_text = `Actual riding pace was ${getAlphaPace(Math.round(actualPace))} (${actualPace.toFixed(1)})`;
     }
     return (
         <FormGroup>
-            <Label size='sm' tag='b' for='paceInput'>Pace</Label>
+            <Label size='sm' tag='b' for='paceInput'>Pace on flat</Label>
             <UncontrolledTooltip innerClassName={pace_tooltip_class} target='paceInput' placement="bottom">{pace_text}</UncontrolledTooltip>
             {metric ?
                 <Input tabIndex='3' type="select" value={pace} name="pace"
