@@ -10,7 +10,9 @@ import MediaQuery from 'react-responsive';
 import DesktopControls from "./ui/desktopControls";
 import MobileControls from "./ui/mobileControls";
 
-const LoadableControlTable = loadable(() => import('./controlTable'));
+const LoadableControlTable = loadable(() => import('./controlTable'),{
+    fallback: <div>Failed to load ControlTable...</div>,
+});
 
 class ControlPoints extends Component {
 

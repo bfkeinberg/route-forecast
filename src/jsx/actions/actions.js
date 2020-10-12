@@ -2,6 +2,23 @@ import moment from 'moment';
 import cookie from 'react-cookies';
 import * as Sentry from '@sentry/browser';
 
+const componentLoader = (lazyComponent, attemptsLeft) => {
+    return new Promise((resolve, reject) => {
+        lazyComponent
+            .then(resolve)
+            .catch((error)=>{
+                // let us retry after 1500 ms
+                setTimeout(() => {
+                    if (attemptsLeft === 1) {
+                        reject(error);
+                        return;
+                    }
+                    componentLoader(lazyComponent, attemptsLeft - 1).then(resolve, reject);
+                }, 1500)
+            })
+    });
+};
+
 export const setMinMaxCoords = (trackPoint,bounds) => {
     bounds.min_latitude = Math.min(trackPoint.lat, bounds.min_latitude);
     bounds.min_longitude = Math.min(trackPoint.lon, bounds.min_longitude);
@@ -70,7 +87,7 @@ export const toggleRouteIsTrip = function() {
 };
 
 const getRouteParser = async function () {
-    const parser = await import(/* webpackChunkName: "RwgpsParser" */ '../gpxParser');
+    const parser = await componentLoader(import(/* webpackChunkName: "RwgpsParser" */ '../gpxParser'), 5);
     return parser.default;
 };
 
