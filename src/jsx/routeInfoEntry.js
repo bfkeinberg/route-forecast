@@ -18,6 +18,7 @@ import ForecastButton from './ui/forecastButton';
 import AnalysisButton from './ui/analysisButton';
 import StravaDialog from './stravaDialog';
 import BugReportButton from './ui/bugReportButton';
+import WeatherProvider from './ui/providerSelector';
 
 class RouteInfoForm extends Component {
     static propTypes = {
@@ -132,6 +133,11 @@ class RouteInfoForm extends Component {
                             <MediaQuery minDeviceWidth={501}>
                                 <Col sm="1">
                                     <PaceExplanation/>
+                                </Col>
+                            </MediaQuery>
+                            <MediaQuery minDeviceWidth={501}>
+                                <Col sm="1">
+                                    <WeatherProvider/>
                                 </Col>
                             </MediaQuery>
                         </Row>

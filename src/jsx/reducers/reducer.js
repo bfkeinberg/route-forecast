@@ -1,73 +1,3 @@
-/*
-let state = {
-    controls:{
-        metric:false,
-        displayBanked,
-        stravaAnalysis,
-        /// separate data entered by user from data calculated by route update
-        /// updating actual and predicted arrival times, and banked time, should not force a recalc
-        /// only distance and duration should do that
-        userControlPoints:[
-            name:'here', distance:20, duration:15
-        ],
-        calculatedControlValues:[
-            arrival:'Jan 13', actual:'Jan 14', banked:'11:05'
-        ],
-    },
-    // input to fetch weather forecast, populated by loading route
-    routeInfo:{
-        rwgpsRouteData:
-        gpxRouteData:
-        timeZoneOffset:
-        timeZoneId,
-        bounds:{min_latitude:0, max_latitude:0, min_longitude:0, max_longitude:0},
-        points:[
-            {latitude:17.5, longitude:130.9}...
-        ],
-        forecastRequest:
-        name:"This route",
-        finishTime:"Thu, Jan 11 3:29pm",
-        weatherCorrectionMinutes
-    },
-    // received from weather forecast, consumed by map and table rendering components
-    forecast:{[
-        [time, distance, summary, temperature_str, precipitation, cloudCover, windspeed,
-        latitude, longitude, temperature_int, long_time, relative_bearing, rain, wind_bearing]
-        ]
-        forecastValid:false,
-    },
-
-    // entered by user, used to fetch route and request forecast
-    ui_fields:[
-        start,
-        pace,
-        interval,
-        rwgpsRoute,
-        rwgpsRouteIsTrip,
-        fetchingRoute:false,
-        fetchingForecast:false,
-        errorDetails,
-        errorSource,
-        shortUrl,
-        displayedFinishTime
-    ],
-    params:{
-        action: '/forecast',
-        maps_key:'dddsss333',
-        timezone_key:'eee444333'
-    },
-    fetchAfterLoad:false,
-    strava: {
-        strava_token:null,
-        strava_activity:null,
-        strava_error,
-        fetching,
-        actualFinishTime:"Fri, Jan 12 3:29pm",
-        actualPace: 18.5,
-        stravaStreams:{}
-    }
-}*/
-
 import * as Actions from '../actions/actions';
 import {combineReducers} from 'redux';
 import RouteInfoForm from "../routeInfoEntry";
@@ -369,7 +299,7 @@ const strava = function(state = {analysisInterval:defaultAnalysisIntervalInHours
     }
 };
 
-const forecast = function(state = {forecast:[],valid:false,range:[], tableViewed:false, mapViewed:false}, action) {
+const forecast = function(state = {forecast:[],valid:false,range:[], tableViewed:false, mapViewed:false, weatherProvider:'darksky'}, action) {
     switch (action.type) {
         case Actions.FORECAST_FETCH_SUCCESS:
             return {...state,forecast:action.forecastInfo.forecast,valid:true,tableViewed:false,mapViewed:false,range:[]};
@@ -405,6 +335,8 @@ const forecast = function(state = {forecast:[],valid:false,range:[], tableViewed
             return {...state, tableViewed: true};
         case Actions.SET_MAP_VIEWED:
             return {...state, mapViewed: true};
+        case Actions.SET_WEATHER_PROVIDER:
+            return {...state, weatherProvider:action.weatherProvider}
         default:
             return state;
     }

@@ -1,0 +1,131 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 54;
+	objects = {
+
+/* Begin PBXFileReference section */
+		D353731A25D61B2C004AF9AF /* actions.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = actions.js; path = ../src/jsx/actions/actions.js; sourceTree = "<group>"; };
+		D353731B25D61B48004AF9AF /* topLevel.jsx */ = {isa = PBXFileReference; lastKnownFileType = text; name = topLevel.jsx; path = ../src/jsx/app/topLevel.jsx; sourceTree = "<group>"; };
+		D353731C25D61B48004AF9AF /* app.jsx */ = {isa = PBXFileReference; lastKnownFileType = text; name = app.jsx; path = ../src/jsx/app/app.jsx; sourceTree = "<group>"; };
+		D353731D25D61B79004AF9AF /* controlTable.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = controlTable.js; path = ../src/jsx/controlTable.js; sourceTree = "<group>"; };
+		D353731E25D61B79004AF9AF /* rideRating.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = rideRating.js; path = ../src/jsx/rideRating.js; sourceTree = "<group>"; };
+		D353731F25D61B79004AF9AF /* stravaDialog.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = stravaDialog.js; path = ../src/jsx/stravaDialog.js; sourceTree = "<group>"; };
+		D353732025D61B79004AF9AF /* configureStore.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = configureStore.js; path = ../src/jsx/configureStore.js; sourceTree = "<group>"; };
+		D353732125D61B79004AF9AF /* MobileUI.jsx */ = {isa = PBXFileReference; lastKnownFileType = text; name = MobileUI.jsx; path = ../src/jsx/MobileUI.jsx; sourceTree = "<group>"; };
+		D353732225D61B79004AF9AF /* paceTable.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = paceTable.js; path = ../src/jsx/paceTable.js; sourceTree = "<group>"; };
+		D353732325D61B79004AF9AF /* locationContext.jsx */ = {isa = PBXFileReference; lastKnownFileType = text; name = locationContext.jsx; path = ../src/jsx/locationContext.jsx; sourceTree = "<group>"; };
+		D353732425D61B79004AF9AF /* DesktopUI.jsx */ = {isa = PBXFileReference; lastKnownFileType = text; name = DesktopUI.jsx; path = ../src/jsx/DesktopUI.jsx; sourceTree = "<group>"; };
+		D353732525D61B79004AF9AF /* loginDialog.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = loginDialog.js; path = ../src/jsx/loginDialog.js; sourceTree = "<group>"; };
+		D353732625D61B79004AF9AF /* stravaRouteParser.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = stravaRouteParser.js; path = ../src/jsx/stravaRouteParser.js; sourceTree = "<group>"; };
+		D353732725D61B79004AF9AF /* paceExplanation.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = paceExplanation.js; path = ../src/jsx/paceExplanation.js; sourceTree = "<group>"; };
+		D353732825D61B79004AF9AF /* map.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = map.js; path = ../src/jsx/map.js; sourceTree = "<group>"; };
+		D353732925D61B79004AF9AF /* windUtils.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = windUtils.js; path = ../src/jsx/windUtils.js; sourceTree = "<group>"; };
+		D353732A25D61B79004AF9AF /* recalculate.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = recalculate.js; path = ../src/jsx/recalculate.js; sourceTree = "<group>"; };
+		D353732B25D61B79004AF9AF /* controls.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = controls.js; path = ../src/jsx/controls.js; sourceTree = "<group>"; };
+		D353732C25D61B79004AF9AF /* gpxParser.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = gpxParser.js; path = ../src/jsx/gpxParser.js; sourceTree = "<group>"; };
+		D353732D25D61B79004AF9AF /* queryString.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = queryString.js; path = ../src/jsx/queryString.js; sourceTree = "<group>"; };
+		D353732E25D61B79004AF9AF /* errorBoundary.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = errorBoundary.js; path = ../src/jsx/errorBoundary.js; sourceTree = "<group>"; };
+		D353732F25D61B79004AF9AF /* routeInfoEntry.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = routeInfoEntry.js; path = ../src/jsx/routeInfoEntry.js; sourceTree = "<group>"; };
+		D353733025D61B79004AF9AF /* main.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = main.js; path = ../src/jsx/main.js; sourceTree = "<group>"; };
+		D353733125D61B79004AF9AF /* forecastTable.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = forecastTable.js; path = ../src/jsx/forecastTable.js; sourceTree = "<group>"; };
+		D353733225D61B9B004AF9AF /* server */ = {isa = PBXFileReference; lastKnownFileType = folder; name = server; path = ../src/jsx/server; sourceTree = "<group>"; };
+		D353733325D8EF2A004AF9AF /* nodejs.yaml */ = {isa = PBXFileReference; lastKnownFileType = text.yaml; name = nodejs.yaml; path = ../nodejs.yaml; sourceTree = "<group>"; };
+		D353733425DB7E12004AF9AF /* ui */ = {isa = PBXFileReference; lastKnownFileType = folder; name = ui; path = ../src/jsx/ui; sourceTree = "<group>"; };
+		D353733525DB7EE4004AF9AF /* actions */ = {isa = PBXFileReference; lastKnownFileType = folder; name = actions; path = ../src/jsx/actions; sourceTree = "<group>"; };
+		D353733625DB7FC2004AF9AF /* reducers */ = {isa = PBXFileReference; lastKnownFileType = folder; name = reducers; path = ../src/jsx/reducers; sourceTree = "<group>"; };
+		D353733725DB7FFE004AF9AF /* static */ = {isa = PBXFileReference; lastKnownFileType = folder; name = static; path = ../src/static; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		D353731325D61AA7004AF9AF = {
+			isa = PBXGroup;
+			children = (
+				D353733725DB7FFE004AF9AF /* static */,
+				D353733625DB7FC2004AF9AF /* reducers */,
+				D353733525DB7EE4004AF9AF /* actions */,
+				D353733425DB7E12004AF9AF /* ui */,
+				D353733325D8EF2A004AF9AF /* nodejs.yaml */,
+				D353733225D61B9B004AF9AF /* server */,
+				D353732025D61B79004AF9AF /* configureStore.js */,
+				D353732B25D61B79004AF9AF /* controls.js */,
+				D353731D25D61B79004AF9AF /* controlTable.js */,
+				D353732425D61B79004AF9AF /* DesktopUI.jsx */,
+				D353732E25D61B79004AF9AF /* errorBoundary.js */,
+				D353733125D61B79004AF9AF /* forecastTable.js */,
+				D353732C25D61B79004AF9AF /* gpxParser.js */,
+				D353732325D61B79004AF9AF /* locationContext.jsx */,
+				D353732525D61B79004AF9AF /* loginDialog.js */,
+				D353733025D61B79004AF9AF /* main.js */,
+				D353732825D61B79004AF9AF /* map.js */,
+				D353732125D61B79004AF9AF /* MobileUI.jsx */,
+				D353732725D61B79004AF9AF /* paceExplanation.js */,
+				D353732225D61B79004AF9AF /* paceTable.js */,
+				D353732D25D61B79004AF9AF /* queryString.js */,
+				D353732A25D61B79004AF9AF /* recalculate.js */,
+				D353731E25D61B79004AF9AF /* rideRating.js */,
+				D353732F25D61B79004AF9AF /* routeInfoEntry.js */,
+				D353731F25D61B79004AF9AF /* stravaDialog.js */,
+				D353732625D61B79004AF9AF /* stravaRouteParser.js */,
+				D353732925D61B79004AF9AF /* windUtils.js */,
+				D353731C25D61B48004AF9AF /* app.jsx */,
+				D353731B25D61B48004AF9AF /* topLevel.jsx */,
+				D353731A25D61B2C004AF9AF /* actions.js */,
+			);
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXProject section */
+		D353731425D61AA7004AF9AF /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 1240;
+			};
+			buildConfigurationList = D353731725D61AA7004AF9AF /* Build configuration list for PBXProject "randoplan" */;
+			compatibilityVersion = "Xcode 12.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = D353731325D61AA7004AF9AF;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+			);
+		};
+/* End PBXProject section */
+
+/* Begin XCBuildConfiguration section */
+		D353731825D61AA7004AF9AF /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+			};
+			name = Debug;
+		};
+		D353731925D61AA7004AF9AF /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		D353731725D61AA7004AF9AF /* Build configuration list for PBXProject "randoplan" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D353731825D61AA7004AF9AF /* Debug */,
+				D353731925D61AA7004AF9AF /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = D353731425D61AA7004AF9AF /* Project object */;
+}
