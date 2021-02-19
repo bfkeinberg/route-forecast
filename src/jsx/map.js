@@ -175,9 +175,9 @@ class RouteForecastMap extends Component {
                     {(this.props.forecast.length > 0 || this.props.stravaAnalysis) && this.props.bounds !== null ?
                         <Map google={this.props.google}
                              mapType={'ROADMAP'} scaleControl={true} bounds={mapBounds}
-                             initialCenter={(mapBounds == null) ? null:mapBounds.getCenter().toJSON()}
+                             initialCenter={(mapBounds === null) ? null:mapBounds.getCenter().toJSON()}
                              onReady={(mapProps, map) => {map.fitBounds(mapBounds)}}>
-                            <Polyline path={this.getRoutePoints(this.props.points)} strokeColor={'#ff0000'} strokeWeight={2} strokeOpacity={1.0}/>y
+                            <Polyline path={this.getRoutePoints(this.props.points)} strokeColor={'#ff0000'} strokeWeight={2} strokeOpacity={1.0}/>
                             {highlight}
                             {this.buildMarkers(this.props.forecast, this.props.controls, this.props.controlNames, this.props.subrange)}
                             <InfoWindow position={infoPosition} visible={infoVisible}>
