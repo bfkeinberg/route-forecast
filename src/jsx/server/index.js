@@ -9,9 +9,12 @@ const fetch = require('node-fetch');
 const bodyParser = require('body-parser');
 const multer = require('multer'); // v1.0.5
 const upload = multer(); // for parsing multipart/form-data
-const callWeatherService = require('./weatherCalculator');
+const callWeatherService = require('./weatherForecastDispatcher');
 const url = require('url');
 var strava = require('strava-v3');
+
+let default_provider = 'darksky';
+
 const querystring = require('querystring');
 let winston = null;
 let expressWinston = null;
@@ -166,11 +169,14 @@ app.post('/forecast', upload.none(), (req, res) => {
         res.status(400).json({'details': 'Invalid request, increase forecast time interval'});
         return;
     }
-
+    let service = process.env.WEATHER_SERVICE;
+    if (req.body.service != null) {
+        service = req.body.service;
+    }
     let zone = req.body.timezone;
 
     try {
-        const resultPromises = forecastPoints.map(point => {return callWeatherService(point.lat, point.lon, point.time, point.distance, zone, point.bearing)});
+        const resultPromises = forecastPoints.map(point => {return callWeatherService(service, point.lat, point.lon, point.time, point.distance, zone, point.bearing)});
         Promise.all(resultPromises).then(result => {res.status(200).json({'forecast':result})},
             error => res.status(500).json({'details':`Error calling weather service : ${error}`}));
     } catch (error) {

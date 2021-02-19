@@ -23,25 +23,25 @@ const MobileUI = (props) => {
             <NavbarBrand>Route plan</NavbarBrand>
             <NavItem>
                 <ErrorBoundary>
-                    <Link to={"/"} class={'nav-link'}>
+                    <Link to={"/"} className={'nav-link'}>
                         <Icon icon={IconNames.HOME} iconSize={Icon.SIZE_STANDARD} intent={Intent.PRIMARY} />
                     </Link>
                 </ErrorBoundary>
             </NavItem>
             <NavItem>
             <ErrorBoundary>
-                <Link to={"/controlPoints/"} class={'nav-link'}>
+                <Link to={"/controlPoints/"} className={'nav-link'}>
                     <Icon icon={IconNames.SHOP} iconSize={Icon.SIZE_STANDARD} intent={Intent.NONE} />
                 </Link>
             </ErrorBoundary>
             </NavItem>
             <NavItem>
-                <Link to={"/map/"} class={'nav-link'}>
+                <Link to={"/map/"} className={'nav-link'}>
                     <Icon icon={IconNames.GLOBE} iconSize={Icon.SIZE_STANDARD} intent={props.needToViewMap?Intent.DANGER:Intent.NONE} />
                 </Link>
             </NavItem>
             <NavItem>
-                <Link to={"/table/"} class={'nav-link'}>
+                <Link to={"/table/"} className={'nav-link'}>
                     <Icon icon={IconNames.TH} iconSize={Icon.SIZE_STANDARD} intent={props.needToViewTable?Intent.DANGER:Intent.NONE} />
                 </Link>
             </NavItem>
