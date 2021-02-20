@@ -52,8 +52,8 @@ const callClimacell = function (lat, lon, currentTime, distance, zone, bearing) 
     const startTime = moment(currentTime);
     const endTime = startTime.clone();
     endTime.add(1, 'hours');
-    const startTimeString = startTime.format('YYYY-MM-DD[T]HH:mm:ssZ');
-    const endTimeString = endTime.format('YYYY-MM-DD[T]HH:mm:ssZ');
+    const startTimeString = startTime.utc().format('YYYY-MM-DD[T]HH:mm:ss[Z]');
+    const endTimeString = endTime.utc().format('YYYY-MM-DD[T]HH:mm:ss[Z]');
     const now = startTime.tz(zone);
     console.log(`now is ${now}`);
 //    console.log(`Current:${currentTime} Start: ${startTimeString} End: ${endTimeString} Time zone is ${zone} iso:${startTime.toISOString()}`);

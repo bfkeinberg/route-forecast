@@ -136,12 +136,12 @@ class RouteInfoForm extends Component {
                                 </Col>
                             </MediaQuery>
                             <MediaQuery minDeviceWidth={501}>
-                                <Col sm="1">
+                                <Col sm="2">
                                     <WeatherProvider/>
                                 </Col>
                             </MediaQuery>
                         </Row>
-                        <MediaQuery minDeviceWidth={501}>
+                        <MediaQuery minDeviceWidth={3000}>
                             <Row noGutters>
                                 <Col sm={{size:"auto"}}>
                                     <FileInput/>
