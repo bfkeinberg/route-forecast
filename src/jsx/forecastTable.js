@@ -6,6 +6,8 @@ import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 import {setWeatherRange, toggleWeatherRange, setTableViewed} from './actions/actions';
 import MediaQuery from 'react-responsive';
+import {finishTimeFormat} from './reducers/reducer';
+const moment = require('moment-timezone');
 
 const milesToMeters = 1609.34;
 const gustySpeed = 25;
@@ -18,7 +20,8 @@ export class ForecastTable extends Component {
         toggleWeatherRange:PropTypes.func.isRequired,
         setTableViewed:PropTypes.func.isRequired,
         metric:PropTypes.bool.isRequired,
-        gustSpeed: PropTypes.number
+        gustSpeed: PropTypes.number,
+        finishTime: PropTypes.string.isRequired
     };
 
     constructor(props) {
@@ -72,6 +75,14 @@ export class ForecastTable extends Component {
         return isMetric ? `${((speed*milesToMeters)/1000).toFixed(0)} kph` : `${speed} mph`;
     };
 
+    showTime = (index, length, time) => {
+            if (index === length-1) {
+                return moment(this.props.finishTime, finishTimeFormat).format('h:mmA');
+            } else {
+                return time;
+            }
+        }
+                
     expandTable(forecast, metric) {
         if (forecast.length > 0) {
             return (
@@ -83,7 +94,7 @@ export class ForecastTable extends Component {
                         end={index!==forecast.length-1?forecast[index+1].distance*milesToMeters:null}
                         className={this.state.selectedRow===parseInt(point.distance*milesToMeters)?'highlighted':null}
                         onClick={this.toggleRange} onMouseEnter={this.updateWeatherRange}>
-                        <td>{point.time}</td>
+                        <td>{this.showTime(index, forecast.length, point.time)}</td>
                         <td>{metric ? ((point.distance*milesToMeters)/1000).toFixed(0) : point.distance}</td>
                         <td>{point.summary}</td>
                         <td>{this.state.showApparentTemp?
@@ -162,7 +173,8 @@ const mapStateToProps = (state) =>
         forecast: state.forecast.forecast,
         weatherCorrectionMinutes: state.routeInfo.weatherCorrectionMinutes,
         gustSpeed: state.routeInfo.maxGustSpeed,
-        metric: state.controls.metric
+        metric: state.controls.metric,
+        finishTime: state.routeInfo.finishTime
     });
 
 const mapDispatchToProps = {

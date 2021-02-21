@@ -210,7 +210,7 @@ export const requestForecast = function(routeInfo) {
         let formdata = new FormData();
         formdata.append('locations', JSON.stringify(routeInfo.forecastRequest));
         formdata.append('timezone', getState().routeInfo.timeZoneId);
-        formdata.append('service', getState().forecast.weatherProvider);
+        formdata.append('service', getState().forecast.weatherProvider)
         return fetch(getState().params.action,
             {
                 method:'POST',
