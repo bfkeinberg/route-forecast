@@ -6,31 +6,36 @@ const getBearingDifference = function (bearing,windBearing) {
         windBearing - bearing < 0 ? windBearing - bearing + 360 : windBearing - bearing);
 };
 
-/*
+const weatherCodes = {
+     "0": "Unknown",
+     "1000": "Clear",
+     "1001": "Cloudy",
+     "1100": "Mostly Clear",
+     "1101": "Partly Cloudy",
+     "1102": "Mostly Cloudy",
+     "2000": "Fog",
+     "2100": "Light Fog",
+     "3000": "Light Wind",
+     "3001": "Wind",
+     "3002": "Strong Wind",
+     "4000": "Drizzle",
+     "4001": "Rain",
+     "4200": "Light Rain",
+     "4201": "Heavy Rain",
+     "5000": "Snow",
+     "5001": "Flurries",
+     "5100": "Light Snow",
+     "5101": "Heavy Snow",
+     "6000": "Freezing Drizzle",
+     "6001": "Freezing Rain",
+     "6200": "Light Freezing Rain",
+     "6201": "Heavy Freezing Rain",
+     "7000": "Ice Pellets",
+     "7101": "Heavy Ice Pellets",
+     "7102": "Light Ice Pellets",
+     "8000": "Thunderstorm"
+   };
 
-const fetch = require('node-fetch');
-
-const url = 'https://data.climacell.co/v4/timelines';
-
-const options = {
-  method: 'GET',
-  qs: {
-    location: '50.071359537541866,19.90203430876136',
-    fields: ['windSpeed', 'precipitationProbability', 'windDirection'],
-    startTime: '2021-02-12T16:00:00Z',
-    endTime: '2021-02-12T18:00:00Z',
-    timesteps: '1h',
-    units: 'imperial',
-    apikey: 'WwsOI3NGPH6OoWclCk5rloJHlQoDrimM'
-  }
-};
-
-fetch(url, options)
-  .then(res => res.json())
-  .then(json => console.log(json))
-  .catch(err => console.error('error:' + err));
-  
-*/
 /* eslint-disable max-params*/
 
 /**
@@ -80,28 +85,28 @@ const callClimacell = function (lat, lon, currentTime, distance, zone, bearing) 
         const relativeBearing = hasWind && windBearing !== undefined ? getBearingDifference(bearing, windBearing) : null;
         const rainy = current.precipitationType === 1;
 //        console.log(`current is ${JSON.stringify(current)}`);
-        console.info ('return ' + JSON.stringify({
-            'time':now.format('h:mmA'),
-            'distance':distance,
-            'summary':values.weatherCode,
-            'tempStr':`${Math.round(values.temperature)}F`,
-            'precip':values.precipitationProbability===undefined?'<unavailable>':`${(values.precipitationProbability).toFixed(1)}%`,
-            'cloudCover':values.cloudCover===undefined?'<unavailable>':`${values.cloudCover.toFixed(1)}%`,
-            'windSpeed':!hasWind?'<unavailable>':`${Math.round(values.windSpeed)}`,
-            'lat':lat,
-            'lon':lon,
-            'temp':`${Math.round(values.temperature)}`,
-            'fullTime':now.format('ddd MMM D h:mmA YYYY'),
-            'relBearing':relativeBearing,
-            'rainy':rainy,
-            'windBearing':windBearing,
-            'vectorBearing':bearing,
-            'gust':values.windGust===undefined?'<unavailable>':`${Math.round(values.windGust)}`,
-            'feel':values.temperatureApparent===undefined?Math.round(values.temperature):Math.round(values.temperatureApparent)}));
+//        console.info ('return ' + JSON.stringify({
+//            'time':now.format('h:mmA'),
+//            'distance':distance,
+//            'summary':values.weatherCode,
+//            'tempStr':`${Math.round(values.temperature)}F`,
+//            'precip':values.precipitationProbability===undefined?'<unavailable>':`${(values.precipitationProbability).toFixed(1)}%`,
+//            'cloudCover':values.cloudCover===undefined?'<unavailable>':`${values.cloudCover.toFixed(1)}%`,
+//            'windSpeed':!hasWind?'<unavailable>':`${Math.round(values.windSpeed)}`,
+//            'lat':lat,
+//            'lon':lon,
+//            'temp':`${Math.round(values.temperature)}`,
+//            'fullTime':now.format('ddd MMM D h:mmA YYYY'),
+//            'relBearing':relativeBearing,
+//            'rainy':rainy,
+//            'windBearing':windBearing,
+//            'vectorBearing':bearing,
+//            'gust':values.windGust===undefined?'<unavailable>':`${Math.round(values.windGust)}`,
+//            'feel':values.temperatureApparent===undefined?Math.round(values.temperature):Math.round(values.temperatureApparent)}));
         return {
             'time':now.format('h:mmA'),
             'distance':distance,
-            'summary':values.weatherCode,
+            'summary':weatherCodes[values.weatherCode],
             'tempStr':`${Math.round(values.temperature)}F`,
             'precip':values.precipitationProbability===undefined?'<unavailable>':`${(values.precipitationProbability).toFixed(1)}%`,
             'cloudCover':values.cloudCover===undefined?'<unavailable>':`${values.cloudCover.toFixed(1)}%`,
@@ -112,7 +117,7 @@ const callClimacell = function (lat, lon, currentTime, distance, zone, bearing) 
             'fullTime':now.format('ddd MMM D h:mmA YYYY'),
             'relBearing':relativeBearing,
             'rainy':rainy,
-            'windBearing':windBearing,
+            'windBearing':Math.round(windBearing),
             'vectorBearing':bearing,
             'gust':values.windGust===undefined?'<unavailable>':`${Math.round(values.windGust)}`,
             'feel':values.temperatureApparent===undefined?Math.round(values.temperature):Math.round(values.temperatureApparent)

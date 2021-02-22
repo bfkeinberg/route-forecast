@@ -41,8 +41,8 @@ const callWeatherApi = function (lat, lon, currentTime, distance, zone, bearing)
             throw forecast.error.message;
         }
         const current = forecast.forecast.forecastday[0].hour[0];
-//        console.log(`current is ${JSON.stringify(current)}`);
-        const now = moment(startTime).tz(zone);
+        console.log(`current is ${JSON.stringify(current)}`);
+        const now = moment.unix(current.time_epoch).tz(zone)
         console.log(`now is ${now}`);
         const hasWind = current.wind_mph !== undefined;
         const windBearing = current.wind_degree;
