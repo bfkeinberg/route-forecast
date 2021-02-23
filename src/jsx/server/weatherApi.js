@@ -28,8 +28,8 @@ const callWeatherApi = function (lat, lon, currentTime, distance, zone, bearing)
     const MAX_API_CALLS_PER_DAY = 1000;
 
     const weatherApiKey = process.env.WEATHER_API_KEY;
-    const startTime = moment(currentTime);
-    const url = `https://api.weatherapi.com/v1/forecast.json?key=${weatherApiKey}&q=${lat},${lon}&days=1&hour=${startTime.format('H')}&dt=${startTime.format('YYYY-MM-DD')}`;
+    const startTime = moment(currentTime).tz(zone);
+    const url = `https://api.weatherapi.com/v1/forecast.json?key=${weatherApiKey}&q=${lat},${lon}&days=1&hour=${startTime.format('H')}&unixdt=${startTime.unix()}`;
     console.log(`url is ${url}`);
     const forecastResult = fetch(url).then(response => {
         const result = response.json();

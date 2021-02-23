@@ -6,7 +6,7 @@ import {setWeatherProvider} from "../actions/actions";
 
 const WeatherProvider = ({weatherProvider,setWeatherProvider}) => {
     return (
-        <FormGroup inline row size='lg'>
+        <FormGroup inline row size='md'>
             <UncontrolledTooltip target='provider' placement='bottom'>The weather provider to use for forecasts</UncontrolledTooltip>
             <Label for='provider' size='sm' tag='b'>Weather service</Label>
             <select size="5" id='provider' tabIndex='2'
