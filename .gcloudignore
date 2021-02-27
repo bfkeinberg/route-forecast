@@ -1,4 +1,7 @@
 node_modules/
+dotfiles/
+new_dotfiles/
+randoplan/
 .git/
 .idea/
 src/static/
