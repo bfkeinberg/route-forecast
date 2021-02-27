@@ -36,7 +36,8 @@ import {
     toggleStravaAnalysis,
     updateUserControls,
     setStravaRefreshToken,
-    setWeatherProvider
+    setWeatherProvider,
+    showWeatherProvider
 } from "./actions/actions";
 import QueryString from './queryString';
 
@@ -191,6 +192,9 @@ export class RouteWeatherUI extends Component {
         if (queryParams.provider !== undefined) {
             props.setWeatherProvider(queryParams.provider);
         }
+        if (queryParams.showProvider !== undefined) {
+            props.showWeatherProvider(queryParams.showProvider==="true");
+        }
     }
 
     render() {
@@ -199,7 +203,6 @@ export class RouteWeatherUI extends Component {
             <LocationContext.Consumer>
                 {value => <QueryString href={value.href} origin={value.origin}/>}
             </LocationContext.Consumer>
-
             {/*TODO: values is needed for SSR, but messes up real device detection, seemingly*/}
             {/*<MediaQuery minDeviceWidth={1000} values={{deviceWidth:1400}}>*/}
             <MediaQuery minWidth={501}>
@@ -218,7 +221,7 @@ export class RouteWeatherUI extends Component {
 const mapDispatchToProps = {
     setStravaToken, setActionUrl, setRwgpsRoute, setApiKeys, setStravaError, setInitialStart, setPace, setInterval, setMetric,
     setStravaActivity, updateControls:updateUserControls, setFetchAfterLoad, toggleStravaAnalysis, setStravaRefreshToken,
-    loadFromRideWithGps, reset, newUserMode, setWeatherProvider
+    loadFromRideWithGps, reset, newUserMode, setWeatherProvider, showWeatherProvider
 };
 
 const mapStateToProps = (state) =>

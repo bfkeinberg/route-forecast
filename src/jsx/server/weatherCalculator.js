@@ -37,30 +37,30 @@ const callDarkSky = function (lat, lon, currentTime, distance, zone, bearing) {
         }
         const current = forecast.currently;
         const now = moment.unix(current.time).tz(zone);
-        console.log(`now is ${now}`);
+//        console.log(`now is ${now}`);
         const hasWind = current.windSpeed !== undefined;
         const windBearing = current.windBearing;
         const relativeBearing = hasWind && windBearing !== undefined ? getBearingDifference(bearing, windBearing) : null;
         const rainy = current.icon !== undefined && current.icon === 'rain';
-        console.info( {
-            'time':now.format('h:mmA'),
-            'distance':distance,
-            'summary':current.summary,
-            'tempStr':`${Math.round(current.temperature)}F`,
-            'precip':current.precipProbability===undefined?'<unavailable>':`${(current.precipProbability*100).toFixed(1)}%`,
-            'cloudCover':current.cloudCover===undefined?'<unavailable>':`${(current.cloudCover*100).toFixed(1)}%`,
-            'windSpeed':!hasWind?'<unavailable>':`${Math.round(current.windSpeed)}`,
-            'lat':lat,
-            'lon':lon,
-            'temp':`${Math.round(current.temperature)}`,
-            'fullTime':now.format('ddd MMM D h:mmA YYYY'),
-            'relBearing':relativeBearing,
-            'rainy':rainy,
-            'windBearing':windBearing,
-            'vectorBearing':bearing,
-            'gust':current.windGust===undefined?'<unavailable>':`${Math.round(current.windGust)}`,
-            'feel':current.apparentTemperature===undefined?Math.round(current.temperature):Math.round(current.apparentTemperature)
-        });
+//        console.info( {
+//            'time':now.format('h:mmA'),
+//            'distance':distance,
+//            'summary':current.summary,
+//            'tempStr':`${Math.round(current.temperature)}F`,
+//            'precip':current.precipProbability===undefined?'<unavailable>':`${(current.precipProbability*100).toFixed(1)}%`,
+//            'cloudCover':current.cloudCover===undefined?'<unavailable>':`${(current.cloudCover*100).toFixed(1)}%`,
+//            'windSpeed':!hasWind?'<unavailable>':`${Math.round(current.windSpeed)}`,
+//            'lat':lat,
+//            'lon':lon,
+//            'temp':`${Math.round(current.temperature)}`,
+//            'fullTime':now.format('ddd MMM D h:mmA YYYY'),
+//            'relBearing':relativeBearing,
+//            'rainy':rainy,
+//            'windBearing':windBearing,
+//            'vectorBearing':bearing,
+//            'gust':current.windGust===undefined?'<unavailable>':`${Math.round(current.windGust)}`,
+//            'feel':current.apparentTemperature===undefined?Math.round(current.temperature):Math.round(current.apparentTemperature)
+//        });
         return {
             'time':now.format('h:mmA'),
             'distance':distance,

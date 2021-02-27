@@ -23,19 +23,21 @@ export const dateToShortDate = function(date) {
     return moment(date).format("ddd MMM D YYYY HH:mm:ss");
 };
 
-export const makeQuery = (routeNumber, pace,interval,metric,controls, strava_activity, provider) => {
+export const makeQuery = (routeNumber, pace,interval,metric,controls, strava_activity,
+                          provider, showProvider) => {
     return {pace:pace,interval:interval,metric:metric,
         rwgpsRoute:routeNumber,controlPoints:formatControlsForUrl(controls),
-        strava_activity:strava_activity, provider:provider};
+        strava_activity:strava_activity, provider:provider, showProvider:showProvider};
 };
 
 const QueryStringUpdater = ({routeNumber,start,pace,interval,metric,controls,/*setQueryString,*/
-                         shortenUrl,urlIsShortened,strava_activity,origin,href,provider}) => {
+                         shortenUrl,urlIsShortened,strava_activity,origin,href,provider,showProvider}) => {
     let url = origin;
     let query = null;
     if (routeNumber !== '') {
         const shortDate = dateToShortDate(start);
-        query = makeQuery(routeNumber, pace, interval, metric, controls, strava_activity, provider);
+        query = makeQuery(routeNumber, pace, interval, metric, controls, strava_activity,
+                          provider, showProvider);
         if (shortDate !== 'Invalid date') {
             query.start = shortDate;
         }
@@ -79,7 +81,8 @@ QueryStringUpdater.propTypes = {
     urlIsShortened: PropTypes.bool.isRequired,
     origin: PropTypes.string.isRequired,
     provider: PropTypes.string.isRequired,
-    href: PropTypes.string.isRequired
+    href: PropTypes.string.isRequired,
+    showProvider: PropTypes.bool.isRequired
 };
 
 const mapStateToProps = (state) =>
@@ -92,7 +95,8 @@ const mapStateToProps = (state) =>
         controls: state.controls.userControlPoints,
         urlIsShortened: state.uiInfo.dialogParams.shortUrl !== ' ',
         strava_activity: state.strava.activity,
-        provider: state.forecast.weatherProvider
+        provider: state.forecast.weatherProvider,
+        showProvider: state.controls.showWeatherProvider
     });
 
 const mapDispatchToProps = {
