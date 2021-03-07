@@ -60,14 +60,15 @@ const callClimacell = function (lat, lon, currentTime, distance, zone, bearing) 
     const startTimeString = startTime.utc().format('YYYY-MM-DD[T]HH:mm:ss[Z]');
     const endTimeString = endTime.utc().format('YYYY-MM-DD[T]HH:mm:ss[Z]');
     const now = startTime.tz(zone);
-    console.log(`now is ${now}`);
+//    console.log(`now is ${now}`);
 //    console.log(`Current:${currentTime} Start: ${startTimeString} End: ${endTimeString} Time zone is ${zone} iso:${startTime.toISOString()}`);
     const url = `https://data.climacell.co/v4/timelines?location=${lat},${lon}&fields=windSpeed&fields=precipitationProbability&fields=windDirection&fields=temperature&fields=temperatureApparent&fields=windGust&fields=cloudCover&fields=precipitationType&fields=weatherCode&timezone=${zone}&startTime=${startTimeString}&endTime=${endTimeString}&timesteps=1h&units=imperial&apikey=${climacellKey}`;
     console.log(`url is ${url}`);
     const forecastResult = fetch(url).then(response => {
         const result = response.json();
         result.apiCalls = response.headers.get('X-RateLimit-Remaining-day');
-        console.log(`api calls remaining:${result.apiCalls}`);
+        console.log(`${response.headers.get('X-RateLimit-Remaining-hour')} calls remaining this hour`);
+//        console.log(`api calls remaining:${result.apiCalls}`);
         return result;
         }).
     then(forecast => {
