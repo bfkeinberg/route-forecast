@@ -13,6 +13,7 @@ const callWeatherService = require('./weatherForecastDispatcher');
 const url = require('url');
 var strava = require('strava-v3');
 const {Datastore} = require('@google-cloud/datastore');
+const cors = require('cors');
 
 let default_provider = 'darksky';
 
@@ -122,10 +123,11 @@ const isValidRouteResult = (body, type) => {
     return false;
 };
 
-const makeRecord = (point) => {
+const makeRecord = (point, routeNumber) => {
     // Create a visit record to be stored in the database
     return {
       timestamp: new Date(),
+      routeNumber: routeNumber===undefined?null:routeNumber,
       latitude: point.lat,
       longitude: point.lon
       };
@@ -146,10 +148,10 @@ const getVisits = () => {
   return datastore.runQuery(query);
 };
 
-app.get('/dbquery', async (req, res) => {
+app.get('/dbquery', cors(), async (req, res) => {
     const [entities] = await getVisits();
     const visits = entities.map(
-        entity => `{"Time": "${entity.timestamp}", "RouteName": "${entity[datastore.KEY].name}", "Latitude": "${entity.latitude}", "Longitude":"${entity.longitude}"}`
+        entity => `{"Time": "${entity.timestamp}", "RouteName": "${entity[datastore.KEY].name}", "RouteNumber": "${entity.routeNumber}", "Latitude": "${entity.latitude}", "Longitude":"${entity.longitude}"}`
       );
     res
        .status(200)
@@ -213,7 +215,7 @@ app.post('/forecast', upload.none(), (req, res) => {
         service = req.body.service;
     }
     if (req.body.routeName !== undefined && req.body.routeName !== '') {
-        let dbRecord = makeRecord(forecastPoints[0]);
+        let dbRecord = makeRecord(forecastPoints[0], req.body.routeNumber);
         insertRecord (dbRecord, req.body.routeName );
     }
     let zone = req.body.timezone;

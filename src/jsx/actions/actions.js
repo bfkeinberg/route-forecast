@@ -212,6 +212,7 @@ export const requestForecast = function(routeInfo) {
         formdata.append('timezone', getState().routeInfo.timeZoneId);
         formdata.append('service', getState().forecast.weatherProvider);
         formdata.append('routeName', routeInfo.name);
+        formdata.append('routeNumber', getState().uiInfo.routeParams.rwgpsRoute);
         return fetch(getState().params.action,
             {
                 method:'POST',
