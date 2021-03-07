@@ -9,7 +9,8 @@ sentry-cli releases set-commits --auto $VERSION
 ./node_modules/.bin/webpack --mode production --config webpack.prod.js --env.sentryRelease=$VERSION
 # deploy build to GAE
 RELEASE=${1:-current}
-if ["$RELEASE" != 'current' ]
+if [ "$RELEASE" != 'current' ]
+then
 gcloud app deploy --quiet --project route-forecast -v $RELEASE --no-promote nodejs.yaml
 else
 gcloud app deploy --quiet --project route-forecast -v $RELEASE nodejs.yaml
