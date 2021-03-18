@@ -148,7 +148,7 @@ const routeInfo = function(state = {finishTime:'',initialFinishTime:'',weatherCo
 
 export const controls = function(state = {metric:false,displayBanked:false,stravaAnalysis:false,
     userControlPoints:[],calculatedControlValues:[],initialControlValues:[], count:0,displayedFinishTime:'',
-    queryString:null}, action) {
+    queryString:null, showWeatherProvider:false}, action) {
     switch (action.type) {
         case Actions.SET_METRIC:
             if (action.metric !== undefined) {
@@ -193,6 +193,8 @@ export const controls = function(state = {metric:false,displayBanked:false,strav
             }
             return state;
         }
+        case Actions.SET_SHOW_WEATHER_PROVIDER:
+            return {...state, showWeatherProvider:action.showProvider};
         default:
             return state;
     }

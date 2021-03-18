@@ -1,11 +1,6 @@
-
 # Elastic Beanstalk Files
-.elasticbeanstalk/*
-!.elasticbeanstalk/*.cfg.yml
-!.elasticbeanstalk/*.global.yml
-*.pyc
 .idea
 node_modules/
 dist/
-
+.DS_Store
 package-lock.json 

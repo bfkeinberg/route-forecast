@@ -12,6 +12,8 @@ const upload = multer(); // for parsing multipart/form-data
 const callWeatherService = require('./weatherForecastDispatcher');
 const url = require('url');
 var strava = require('strava-v3');
+const {Datastore} = require('@google-cloud/datastore');
+const cors = require('cors');
 
 let default_provider = 'darksky';
 
@@ -53,6 +55,8 @@ const colorize = process.env.NODE_ENV !== 'production';
 
 app.use(compression());
 app.set('trust proxy', true);
+// Instantiate a datastore client
+const datastore = new Datastore();
 
 let requestLogger = null;
 let errorLogger = null;
@@ -119,6 +123,43 @@ const isValidRouteResult = (body, type) => {
     return false;
 };
 
+const makeRecord = (point, routeNumber) => {
+    // Create a visit record to be stored in the database
+    return {
+      timestamp: new Date(),
+      routeNumber: routeNumber===undefined?null:routeNumber,
+      latitude: point.lat,
+      longitude: point.lon
+      };
+}
+
+const insertRecord = (record, routeName) => {
+  return datastore.save({
+    key: datastore.key(['RouteName', routeName]),
+    data: record,
+  });
+};
+
+const getVisits = () => {
+  const query = datastore
+    .createQuery('RouteName')
+    .order('timestamp', {descending: true});
+
+  return datastore.runQuery(query);
+};
+
+app.get('/dbquery', cors(), async (req, res) => {
+    const [entities] = await getVisits();
+    const visits = entities.map(
+        entity => `{"Time": "${entity.timestamp}", "RouteName": "${entity[datastore.KEY].name}", "RouteNumber": "${entity.routeNumber}", "Latitude": "${entity.latitude}", "Longitude":"${entity.longitude}"}`
+      );
+    res
+       .status(200)
+       .set('Content-Type', 'text/plain')
+       .send(`[\n${visits.join(',\n')}]`)
+       .end();
+});
+
 app.use((req, res, next) => {
     // Switch to randoplan.com
     var host = req.hostname;
@@ -172,6 +213,10 @@ app.post('/forecast', upload.none(), (req, res) => {
     let service = process.env.WEATHER_SERVICE;
     if (req.body.service != null) {
         service = req.body.service;
+    }
+    if (req.body.routeName !== undefined && req.body.routeName !== '') {
+        let dbRecord = makeRecord(forecastPoints[0], req.body.routeNumber);
+        insertRecord (dbRecord, req.body.routeName );
     }
     let zone = req.body.timezone;
 

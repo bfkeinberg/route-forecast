@@ -211,6 +211,8 @@ export const requestForecast = function(routeInfo) {
         formdata.append('locations', JSON.stringify(routeInfo.forecastRequest));
         formdata.append('timezone', getState().routeInfo.timeZoneId);
         formdata.append('service', getState().forecast.weatherProvider);
+        formdata.append('routeName', routeInfo.name);
+        formdata.append('routeNumber', getState().uiInfo.routeParams.rwgpsRoute);
         return fetch(getState().params.action,
             {
                 method:'POST',
@@ -809,3 +811,6 @@ export const setMapViewed = () => {return {type:SET_MAP_VIEWED}};
                                                       
 export const SET_WEATHER_PROVIDER = 'SET_WEATHER_PROVIDER';
 export const setWeatherProvider = (weatherProvider) => {return {type:SET_WEATHER_PROVIDER, weatherProvider:weatherProvider}}
+
+export const SET_SHOW_WEATHER_PROVIDER = 'SET_SHOW_WEATHER_PROVIDER';
+export const showWeatherProvider = (showProvider) => {return {type:SET_SHOW_WEATHER_PROVIDER, showProvider:showProvider}}

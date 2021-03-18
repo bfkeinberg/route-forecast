@@ -36,6 +36,7 @@ class RouteInfoForm extends Component {
         firstUse:PropTypes.bool.isRequired,
         routeSelected:PropTypes.bool.isRequired,
         needToViewTable: PropTypes.bool.isRequired,
+        showProvider: PropTypes.bool.isRequired,
         routeProps:PropTypes.object
     };
 
@@ -135,13 +136,13 @@ class RouteInfoForm extends Component {
                                     <PaceExplanation/>
                                 </Col>
                             </MediaQuery>
-                            <MediaQuery minDeviceWidth={501}>
-                                <Col sm="1">
+                            <MediaQuery minDeviceWidth={this.props.showProvider?501:4000}>
+                                <Col sm="2">
                                     <WeatherProvider/>
                                 </Col>
                             </MediaQuery>
                         </Row>
-                        <MediaQuery minDeviceWidth={501}>
+                        <MediaQuery minDeviceWidth={3000}>
                             <Row noGutters>
                                 <Col sm={{size:"auto"}}>
                                     <FileInput/>
@@ -198,7 +199,8 @@ const mapStateToProps = (state) =>
         controlPoints:state.controls.userControlPoints,
         firstUse: state.params.newUserMode,
         routeSelected: state.uiInfo.dialogParams.loadingSource !== null,
-        needToViewTable:state.forecast.valid && !state.forecast.tableViewed
+        needToViewTable:state.forecast.valid && !state.forecast.tableViewed,
+        showProvider:state.controls.showWeatherProvider
     });
 
 const mapDispatchToProps = {
