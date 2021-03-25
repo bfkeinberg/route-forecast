@@ -151,8 +151,9 @@ const getVisits = () => {
 app.get('/dbquery', cors(), async (req, res) => {
     const [entities] = await getVisits();
     const visits = entities.map(
-        entity => `{"Time": "${entity.timestamp}", "RouteName": "${entity[datastore.KEY].name}", "RouteNumber": "${entity.routeNumber}", "Latitude": "${entity.latitude}", "Longitude":"${entity.longitude}"}`
-      );
+        entity => JSON.stringify({"Time":entity.timestamp, "RouteName":entity[datastore.KEY].name, "RouteNumber":entity.routeNumber,
+        "Latitude":entity.latitude, "Longitude":entity.longitude})
+                                );
     res
        .status(200)
        .set('Content-Type', 'text/plain')
