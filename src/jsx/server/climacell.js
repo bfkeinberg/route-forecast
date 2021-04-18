@@ -69,6 +69,7 @@ const callClimacell = async function (lat, lon, currentTime, distance, zone, bea
     const forecastResult = fetch(url).then(response => {
         const result = response.json();
         result.apiCalls = response.headers.get('X-RateLimit-Remaining-day');
+        result.apiCallsHour = response.headers.get('X-RateLimit-Remaining-hour');
         console.log(`${result.apiCalls}/${response.headers.get('X-RateLimit-Limit-day')} calls for today`);
         console.log(`${response.headers.get('X-RateLimit-Remaining-hour')}/${response.headers.get('X-RateLimit-Limit-hour')} calls remaining this hour`);
 //        console.log(`api calls remaining:${result.apiCalls}`);
@@ -81,6 +82,9 @@ const callClimacell = async function (lat, lon, currentTime, distance, zone, bea
         }
         if (forecast.apiCalls < 50) {
             throw Error({'details':'Daily count exceeded'});
+        }
+        if (forecast.apiCallsHour < 3) {
+            throw Error({'details':'Hourly count exceeded'});
         }
         const current = forecast.data.timelines[0];
         const values =  current.intervals[0].values;
