@@ -13,7 +13,6 @@ module.exports = (env,argv) => merge(common(env,argv), {
     plugins: [
         new TerserPlugin({
             parallel: true,
-            sourceMap: true,
             terserOptions: {
                 ecma: 6,
             },
@@ -42,7 +41,7 @@ module.exports = (env,argv) => merge(common(env,argv), {
                 'node_modules',
                 'webpack.prod.js',
                 'webpack.common.js',
-                'webpack.dev.js'x
+                'webpack.dev.js'
             ],
             configFile: 'sentry.properties',
             rewrite:true,
@@ -54,7 +53,7 @@ module.exports = (env,argv) => merge(common(env,argv), {
             deploy: {env:'production', name:'latest'}
         }),
         new CompressionPlugin({
-            minRatio:0.85, cache:true,
+            minRatio:0.85,
             test: [
                 /\.css/,
                 /\.ttf/,

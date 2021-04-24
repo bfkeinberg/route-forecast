@@ -18,6 +18,9 @@ module.exports = (env,argv) => {
     const mode = argv === undefined ? 'development' : argv.mode;
     return {
         mode:mode,
+        cache: {
+            type:'filesystem'
+        },
         entry: [path.resolve(APP_DIR, 'app/app.jsx')],
         module: {
             rules: [
