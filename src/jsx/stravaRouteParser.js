@@ -1,6 +1,6 @@
 import queryString from 'query-string';
 import moment from 'moment';
-import strava from 'strava-v3'
+import strava from 'strava-v3-alpaca'
 import cookie from 'react-cookies';
 import {paceToSpeed} from './ui/ridingPace';
 

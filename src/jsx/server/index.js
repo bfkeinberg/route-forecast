@@ -11,7 +11,7 @@ const multer = require('multer'); // v1.0.5
 const upload = multer(); // for parsing multipart/form-data
 const callWeatherService = require('./weatherForecastDispatcher');
 const url = require('url');
-var strava = require('strava-v3');
+var strava = require('strava-v3-alpaca');
 const {Datastore} = require('@google-cloud/datastore');
 const cors = require('cors');
 

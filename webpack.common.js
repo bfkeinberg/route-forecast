@@ -2,7 +2,6 @@ const path = require('path');
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
-const ScriptExtHtmlWebpackPlugin = require('script-ext-html-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 
 const APP_DIR = path.resolve(__dirname, 'src/jsx');
@@ -53,6 +52,9 @@ module.exports = (env,argv) => {
                     test: /\.js$/,
                     enforce: "pre",
                     use: [{loader: "source-map-loader"}],
+                    "exclude": [
+                                path.join(process.cwd(), 'node_modules/react-responsive')
+                    ]
                 },
                 {
                     test: /\.tsx?$/,
@@ -74,14 +76,14 @@ module.exports = (env,argv) => {
                         "css-loader"
                     ]
                 },
-                {test: /\.(png|woff2?|ttf|eot)$/, loader: "url-loader?limit=100000"},
+                {test: /\.(png|woff2?|ttf|eot)$/, loader: "url-loader", options: {limit: 100000} },
                 {test: /\.(jpg|ico|svg)$/, loader: "file-loader"},
                 {test: /\.htm$/, use: 'raw-loader'}
             ]
         },
         plugins: [
             new CleanWebpackPlugin({}),
-            new webpack.DefinePlugin({SENTRY_RELEASE: JSON.stringify(env.sentryRelease)}),
+            new webpack.DefinePlugin({SENTRY_RELEASE: JSON.stringify(env.sentryRelease), "process.env": "{}"}),
             new MiniCssExtractPlugin({
                 // Options similar to the same options in webpackOptions.output
                 // both options are optional
@@ -99,19 +101,10 @@ module.exports = (env,argv) => {
                 mode: mode
                 // favicon:'src/static/favicon.ico'
             }),
-            new ScriptExtHtmlWebpackPlugin({
-                custom: [
-                    {
-                        test: 'main', attribute: 'id', value: 'routeui'
-                    },
-                    {test: 'main', attribute: 'timezone_api_key', value: '{{ timezone_api_key }}'},
-                    {test: 'main', attribute: 'maps_api_key', value: '{{ maps_key }}'},
-                ]
-            }),
             new CopyWebpackPlugin({patterns:[
-                {from: SRC_STATIC_DIR + '/favicon*.*', to: STATIC_DIR, flatten: true},
-                {from: SRC_STATIC_DIR + '/apple-*.*', to: STATIC_DIR, flatten: true},
-                {from:SRC_SERVER_DIR + '/*.js', to:SERVER_DIR, flatten:true}
+                {from: SRC_STATIC_DIR + '/favicon*.*', to: path.resolve(STATIC_DIR, "[name][ext]")},
+                {from: SRC_STATIC_DIR + '/apple-*.*', to: path.resolve(STATIC_DIR, "[name][ext]")},
+                {from:SRC_SERVER_DIR + '/*.js', to:path.resolve(SERVER_DIR, "[name][ext]")}
                 ]})
         ],
         output:
@@ -136,10 +129,19 @@ module.exports = (env,argv) => {
                 alias:
             {
                 Images: SRC_STATIC_DIR
+            },
+            fallback: { "timers": require.resolve("timers-browserify"),
+                        "crypto": require.resolve("crypto-browserify"),
+                        "stream": require.resolve("stream-browserify"),
+                        "https": require.resolve("https-browserify"),
+                        "util": require.resolve("util"),
+                        "assert": require.resolve("assert"),
+                        "http": require.resolve("stream-http"),
+                        "os": require.resolve("os-browserify/browser"),
+                        "zlib": require.resolve("browserify-zlib"),
+                        "path": require.resolve("path-browserify"),
+                        "fs": false
             }
-        },
-        node: {
-            fs: 'empty'
         }
     }
 };

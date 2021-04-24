@@ -2,6 +2,18 @@
 <Workspace
    version = "1.0">
    <FileRef
+      location = "group:../../webpack.common.js">
+   </FileRef>
+   <FileRef
+      location = "group:../../package.json">
+   </FileRef>
+   <FileRef
+      location = "group:../../webpack.dev.js">
+   </FileRef>
+   <FileRef
+      location = "group:../../webpack.prod.js">
+   </FileRef>
+   <FileRef
       location = "self:">
    </FileRef>
 </Workspace>

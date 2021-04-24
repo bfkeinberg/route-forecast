@@ -42,14 +42,16 @@ module.exports = (env,argv) => merge(common(env,argv), {
                 'node_modules',
                 'webpack.prod.js',
                 'webpack.common.js',
-                'webpack.dev.js'
+                'webpack.dev.js'x
             ],
             configFile: 'sentry.properties',
             rewrite:true,
             stripPrefix: ['/dist'],
             stripCommonPrefix: true,
             urlPrefix: '/static',
-            debug: true
+            debug: false,
+            setCommits: {auto:true},
+            deploy: {env:'production', name:'latest'}
         }),
         new CompressionPlugin({
             minRatio:0.85, cache:true,
