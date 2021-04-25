@@ -57,7 +57,7 @@ jobs:
           CLIMACELL_KEY: ${{ secrets.CLIMACELL_KEY }}  
           WEATHERAPI_KEY: ${{ secrets.WEATHER_API_KEY }}  
           BITLY_TOKEN: ${{ secrets.BITLY_TOKEN }}  
-          STRAVA_CLIENT_ID:  ${{ secrets.STRAVA_CLIEBT_ID }}  
+          STRAVA_CLIENT_ID:  ${{ secrets.STRAVA_CLIENT_ID }}  
       - name: Deploy
         uses: google-github-actions/deploy-appengine@main
         with:
