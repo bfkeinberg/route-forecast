@@ -37,12 +37,22 @@
 		D353733525DB7EE4004AF9AF /* actions */ = {isa = PBXFileReference; lastKnownFileType = folder; name = actions; path = ../src/jsx/actions; sourceTree = "<group>"; };
 		D353733625DB7FC2004AF9AF /* reducers */ = {isa = PBXFileReference; lastKnownFileType = folder; name = reducers; path = ../src/jsx/reducers; sourceTree = "<group>"; };
 		D353733725DB7FFE004AF9AF /* static */ = {isa = PBXFileReference; lastKnownFileType = folder; name = static; path = ../src/static; sourceTree = "<group>"; };
+		D35A34142634F86300238904 /* package.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = package.json; path = ../package.json; sourceTree = "<group>"; };
+		D35A34152634F86300238904 /* package-lock.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = "package-lock.json"; path = "../package-lock.json"; sourceTree = "<group>"; };
+		D35A34162634F86300238904 /* webpack.prod.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = webpack.prod.js; path = ../webpack.prod.js; sourceTree = "<group>"; };
+		D35A34172634F86300238904 /* webpack.dev.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = webpack.dev.js; path = ../webpack.dev.js; sourceTree = "<group>"; };
+		D35A34182634F86300238904 /* webpack.common.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = webpack.common.js; path = ../webpack.common.js; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
 		D353731325D61AA7004AF9AF = {
 			isa = PBXGroup;
 			children = (
+				D35A34152634F86300238904 /* package-lock.json */,
+				D35A34142634F86300238904 /* package.json */,
+				D35A34182634F86300238904 /* webpack.common.js */,
+				D35A34172634F86300238904 /* webpack.dev.js */,
+				D35A34162634F86300238904 /* webpack.prod.js */,
 				D353733725DB7FFE004AF9AF /* static */,
 				D353733625DB7FC2004AF9AF /* reducers */,
 				D353733525DB7EE4004AF9AF /* actions */,
