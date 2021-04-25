@@ -53,7 +53,7 @@ jobs:
           DARKSKY_KEY: ${{ secrets.DARKSKY_API_KEY }}  
           RWGPS_KEY: ${{ secrets.RWGPS_API_KEY }}  
           STRAVA_KEY: ${{ secrets.STRAVA_API_KEY }}  
-          TIMEZONE_KEY: ${{ secrets.TIMEZONE_KEY }}  
+          TIMEZONE_KEY: ${{ secrets.TIMEZONE_API_KEY }}  
           CLIMACELL_KEY: ${{ secrets.CLIMACELL_KEY }}  
           WEATHERAPI_KEY: ${{ secrets.WEATHER_API_KEY }}  
           BITLY_TOKEN: ${{ secrets.BITLY_TOKEN }}  
