@@ -18,4 +18,15 @@ handlers:
 - url: /.*
   script: auto
   secure: always
+  
+env_variables:
+     MAPS_KEY: $MAPS_KEY
+     DARKSKY_KEY: $DARKSKY_KEY
+     RWGPS_KEY: $RWGPS_KEY
+     STRAVA_KEY: $STRAVA_KEY
+     TIMEZONE_KEY: $TIMEZONE_KEY
+     CLIMACELL_KEY: $CLIMACELL_KEY
+     WEATHER_API_KEY: $WEATHERAPI_KEY
+     BITLY_TOKEN: $BITLY_TOKEN
+     STRAVA_CLIENT_ID: $STRAVA_CLIENT_ID
 
