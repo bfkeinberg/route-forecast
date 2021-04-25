@@ -49,7 +49,8 @@ module.exports = (env,argv) => merge(common(env,argv), {
             stripCommonPrefix: true,
             urlPrefix: '/static',
             debug: false,
-            setCommits: {auto:true}
+            setCommits: {auto:true},
+            deploy: {env:'production', name:'latest'}
         }),
         new CompressionPlugin({
             minRatio:0.85,
