@@ -50,3 +50,4 @@ jobs:
         uses: google-github-actions/deploy-appengine@main
         with:
           project_id: ${{ secrets.PROJECT_ID }}  
+          version: current
