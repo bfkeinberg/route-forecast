@@ -1,0 +1,21 @@
+runtime: nodejs10
+
+inbound_services:
+- warmup
+
+service: default
+
+handlers:
+- url: /static
+  static_dir: dist/static
+  secure: always
+
+- url: /(.*\.(ico|png))$
+  static_files: dist/static/\1
+  upload: static/.*\.(ico|png)$
+  secure: always
+
+- url: /.*
+  script: auto
+  secure: always
+
