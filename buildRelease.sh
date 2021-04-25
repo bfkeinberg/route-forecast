@@ -6,7 +6,7 @@ VERSION=$(sentry-cli releases propose-version)
 sentry-cli releases new $VERSION
 sentry-cli releases set-commits --auto $VERSION
 # run prod build, which will also publish artifacts to Sentry and finalize the release
-./node_modules/.bin/webpack --mode production --config webpack.prod.js --env.sentryRelease=$VERSION
+./node_modules/.bin/webpack --mode production --config webpack.prod.js --env sentryRelease=$VERSION
 # deploy build to GAE
 RELEASE=${1:-current}
 if [ "$RELEASE" != 'current' ]

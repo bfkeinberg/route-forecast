@@ -13,7 +13,6 @@ module.exports = (env,argv) => merge(common(env,argv), {
     plugins: [
         new TerserPlugin({
             parallel: true,
-            sourceMap: true,
             terserOptions: {
                 ecma: 6,
             },
@@ -49,10 +48,12 @@ module.exports = (env,argv) => merge(common(env,argv), {
             stripPrefix: ['/dist'],
             stripCommonPrefix: true,
             urlPrefix: '/static',
-            debug: true
+            debug: false,
+            setCommits: {auto:true},
+            deploy: {env:'production', name:'latest'}
         }),
         new CompressionPlugin({
-            minRatio:0.85, cache:true,
+            minRatio:0.85,
             test: [
                 /\.css/,
                 /\.ttf/,

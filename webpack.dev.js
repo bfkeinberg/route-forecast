@@ -10,7 +10,7 @@ module.exports = (env, argv) => mergeWithCustomize(
     })(clientCommon(env,argv), {
         devtool: 'source-map',
         optimization: {
-            noEmitOnErrors: true
+            emitOnErrors: false
         }
     }
 );
