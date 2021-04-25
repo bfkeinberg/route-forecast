@@ -47,17 +47,16 @@ jobs:
           service_account_key: ${{ secrets.GCP_SA_KEY }}
           export_default_credentials: true        
       - name: Secrets
-        uses: google-github-actions/get-secretmanager-secrets@main
-        with:
-          secrets: |-
-             maps_key:route-forecast/GOOGLE_MAPS_API_KEY
-             darksky_key:route-forecast/DARKSKY_API_KEY
-             rwgps_key:route-forecast/RWGPS_API_KEY
-             strava_key:route-forecast/STRAVA_API_KEY
-             timezone_key:route-forecast/TIMEZONE_KEY
-             bitly_token:route-forecast/BITLY_TOKEN
-             climacell_key:route-forecast/CLIMACELL_KEY
-             weatherapi_key:route-forecast/WEATHER_API_KEY
+        uses: ikuanyshbekov/app-yaml-env-compiler@v1.0
+        env:
+          MAPS_KEY: ${{ secrets.GOOGLE_MAPS_API_KEY }}
+          DARKSKY_KEY: ${{ secrets.DARKSKY_API_KEY }}  
+          RWGPS_KEY: ${{ secrets.RWGPS_API_KEY }}  
+          STRAVA_KEY: ${{ secrets.STRAVA_API_KEY }}  
+          TIMEZONE_KEY: ${{ secrets.TIMEZONE_KEY }}  
+          CLIMACELL_KEY: ${{ secrets.CLIMACELL_KEY }}  
+          WEATHERAPI_KEY: ${{ secrets.WEATHER_API_KEY }}  
+          BITLY_TOKEN: ${{ secrets.BITLY_TOKEN }}  
       - name: Deploy
         uses: google-github-actions/deploy-appengine@main
         with:
