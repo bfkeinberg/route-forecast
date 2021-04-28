@@ -107,6 +107,7 @@ module.exports = (env,argv) => {
             new CopyWebpackPlugin({patterns:[
                 {from: SRC_STATIC_DIR + '/favicon*.*', to: path.resolve(STATIC_DIR, "[name][ext]")},
                 {from: SRC_STATIC_DIR + '/apple-*.*', to: path.resolve(STATIC_DIR, "[name][ext]")},
+                {from: 'manifest.json', to: path.resolve(STATIC_DIR, "[name][ext]")},
                 {from:SRC_SERVER_DIR + '/*.js', to:path.resolve(SERVER_DIR, "[name][ext]")}
                 ]})
         ],
