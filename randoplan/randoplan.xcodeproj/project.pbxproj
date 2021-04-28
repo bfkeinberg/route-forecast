@@ -42,12 +42,19 @@
 		D35A34162634F86300238904 /* webpack.prod.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = webpack.prod.js; path = ../webpack.prod.js; sourceTree = "<group>"; };
 		D35A34172634F86300238904 /* webpack.dev.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = webpack.dev.js; path = ../webpack.dev.js; sourceTree = "<group>"; };
 		D35A34182634F86300238904 /* webpack.common.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = webpack.common.js; path = ../webpack.common.js; sourceTree = "<group>"; };
+		D35A34192637AF7600238904 /* tsconfig.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = tsconfig.json; path = ../tsconfig.json; sourceTree = "<group>"; };
+		D35A341A2637AF7600238904 /* app.yaml */ = {isa = PBXFileReference; lastKnownFileType = text.yaml; name = app.yaml; path = ../app.yaml; sourceTree = "<group>"; };
+		D35A341B2637AF7600238904 /* sentry.properties */ = {isa = PBXFileReference; lastKnownFileType = text; name = sentry.properties; path = ../sentry.properties; sourceTree = "<group>"; };
+		D35A341D2637B09500238904 /* templates */ = {isa = PBXFileReference; lastKnownFileType = folder; name = templates; path = ../src/templates; sourceTree = "<group>"; };
+		D35A341E2637B21700238904 /* manifest.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = manifest.json; path = ../manifest.json; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
 		D353731325D61AA7004AF9AF = {
 			isa = PBXGroup;
 			children = (
+				D35A341E2637B21700238904 /* manifest.json */,
+				D35A341D2637B09500238904 /* templates */,
 				D35A34152634F86300238904 /* package-lock.json */,
 				D35A34142634F86300238904 /* package.json */,
 				D35A34182634F86300238904 /* webpack.common.js */,
@@ -58,6 +65,9 @@
 				D353733525DB7EE4004AF9AF /* actions */,
 				D353733425DB7E12004AF9AF /* ui */,
 				D353733325D8EF2A004AF9AF /* nodejs.yaml */,
+				D35A341A2637AF7600238904 /* app.yaml */,
+				D35A341B2637AF7600238904 /* sentry.properties */,
+				D35A34192637AF7600238904 /* tsconfig.json */,
 				D353733225D61B9B004AF9AF /* server */,
 				D353732025D61B79004AF9AF /* configureStore.js */,
 				D353732B25D61B79004AF9AF /* controls.js */,
