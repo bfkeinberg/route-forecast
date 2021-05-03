@@ -7,9 +7,9 @@
 <form method="post" action="/handle_login">
     Note that user name and password are not currently persisted, so they will need to be re-entered on future sessions<br/><br/>
     <label for="username">User name</label>
-    <input type="text" name='username' id="'username" required>
+    <input type="text" name='username' id="'username" required autocomplete='username'>
     <label for="password" id="password">Password</label>
-    <input type="password" name='password' id="'password" required><br/><br/>
+    <input type="password" name='password' id="'password" required autocomplete='current-password'><br/><br/>
     <input type="submit" value="Login" id="login">
     <button onclick="window.location.href='/form'">Cancel</button>
 </form>

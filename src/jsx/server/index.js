@@ -14,8 +14,7 @@ const url = require('url');
 var strava = require('strava-v3-alpaca');
 const {Datastore} = require('@google-cloud/datastore');
 const cors = require('cors');
-
-let default_provider = 'darksky';
+const axios = require('axios');
 
 const querystring = require('querystring');
 let winston = null;
@@ -180,7 +179,7 @@ app.get('/rwgps_route', (req, res) => {
         res.status(400).json("{'status': 'Missing route number'}");
         return;
     }
-    const isTrip = req.query.trip;
+    const isTrip = req.query.trip=="true";
     const routeType = isTrip===true ? 'trips' : 'routes';
     const rwgpsApiKey = process.env.RWGPS_API_KEY;
     if (rwgpsApiKey === undefined) {
@@ -364,6 +363,34 @@ app.get('/', (req, res) => {
 if (!process.env.NO_LOGGING) {
     app.use(errorLogger);
 }
+
+app.get('/pinned_routes', async( req, res) => {
+    const rwgpsApiKey = process.env.RWGPS_API_KEY;
+    const username = req.query.username ;
+    const password = req.query.password ;
+    if (username === undefined || username === '') {
+        res.status(400).json("{'status': 'Missing username'}");
+        return;
+    }
+    if (password === undefined || password === '') {
+        res.status(400).json("{'status': 'Missing password'}");
+        return;
+    }
+    if (rwgpsApiKey === undefined) {
+        res.status(500).json({'details': 'Missing rwgps API key'});
+        return;
+    }
+    const url = `https://ridewithgps.com/users/current.json?apikey=${rwgpsApiKey}&version=2&email=${req.query.username}&password=${req.query.password}`;
+    try {
+        const response = await axios.get(url);
+        console.log(`Returning profile data for ${response.data.user.first_name} ${response.data.user.last_name} ${response.data.user.email}`);
+        res.status(200).json(response.data);
+    } catch (e) {
+        console.log(`EXCEPTION: ${e}`);
+        console.log(`RESULTS: ${JSON.stringify(e.response.data.user)}`);
+        res.status(e.response.status).json(e.response.data);
+    }
+});
 
 const port = process.env.PORT || 8080;
 app.listen(port, () =>

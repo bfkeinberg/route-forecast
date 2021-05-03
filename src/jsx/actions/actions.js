@@ -86,6 +86,13 @@ export const toggleRouteIsTrip = function() {
     }
 };
 
+ export const SET_ROUTE_IS_TRIP = 'SET_ROUTE_IS_TRIP';
+ export const setRouteIsTrip = function(isTrip) {
+     return {
+         type: SET_ROUTE_IS_TRIP, isTrip:isTrip
+     }
+ };
+
 const getRouteParser = async function () {
     const parser = await componentLoader(import(/* webpackChunkName: "RwgpsParser" */ '../gpxParser'), 5);
     return parser.default;
@@ -814,3 +821,12 @@ export const setWeatherProvider = (weatherProvider) => {return {type:SET_WEATHER
 
 export const SET_SHOW_WEATHER_PROVIDER = 'SET_SHOW_WEATHER_PROVIDER';
 export const showWeatherProvider = (showProvider) => {return {type:SET_SHOW_WEATHER_PROVIDER, showProvider:showProvider}}
+                                                      
+export const SET_RWGPS_CREDENTIALS = 'SET_RWGPS_CREDENTIALS';
+export const setRwgpsCredentials = (username, password) => {
+        return {type:SET_RWGPS_CREDENTIALS, username:username, password:password}};
+                                                      
+export const SET_PINNED_ROUTES = 'SET_PINNED_ROUTES';
+export const setPinnedRoutes = (pinned) => {
+        return {type:SET_PINNED_ROUTES, pinned:pinned};
+};

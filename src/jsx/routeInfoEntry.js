@@ -19,6 +19,8 @@ import AnalysisButton from './ui/analysisButton';
 import StravaDialog from './stravaDialog';
 import BugReportButton from './ui/bugReportButton';
 import WeatherProvider from './ui/providerSelector';
+import PinnedRouteLoader from './ui/pinnedRouteLoader.jsx';
+import ErrorBoundary from "./errorBoundary";
 
 class RouteInfoForm extends Component {
     static propTypes = {
@@ -153,6 +155,13 @@ class RouteInfoForm extends Component {
                             <Col sm={{size:"auto"}}>
                                 <RideWithGpsId/>
                             </Col>
+                            <MediaQuery maxDeviceWidth={500}>
+                                <Col sm={{size:"auto"}}>
+                                    <ErrorBoundary>
+                                    <PinnedRouteLoader/>
+                                    </ErrorBoundary>
+                                </Col>
+                            </MediaQuery>
                             <Col size={{size:"auto"}}>
                                 <RwGpsTypeSelector visible={false}/>
                             </Col>

@@ -70,7 +70,9 @@ export const routeParams = function(state = {interval:defaultIntervalInHours,pac
                 return state;
             }
         case Actions.TOGGLE_ROUTE_IS_TRIP:
-            return {...status,rwgpsRouteIsTrip:!state.rwgpsRouteIsTrip}
+            return {...state,rwgpsRouteIsTrip:!state.rwgpsRouteIsTrip}
+        case Actions.SET_ROUTE_IS_TRIP:
+            return {...state,rwgpsRouteIsTrip:action.isTrip}
         default:
             return state;
     }
@@ -106,6 +108,8 @@ loadingSource:null,fetchingForecast:false,fetchingRoute:false}, action) {
             return {...state, errorDetails: action.details};
         case Actions.SET_SHORT_URL:
             return {...state, shortUrl: action.url};
+        case Actions.SET_PINNED_ROUTES:
+            return {...state, errorDetails: null};
         default:
             return state;
     }
@@ -357,8 +361,19 @@ const params = function(state = {newUserMode:false}, action) {
     }
 };
 
+const rideWithGpsInfo = function(state = {pinnedRoutes:[], username:'', password:''}, action) {
+    switch (action.type) {
+        case Actions.SET_RWGPS_CREDENTIALS:
+            return {...state, username:action.username, password:action.password};
+        case Actions.SET_PINNED_ROUTES:
+            return {...state, pinnedRoutes:action.pinned};
+        default:
+            return state;
+    }
+};
+
 const appReducer = combineReducers({uiInfo:combineReducers({routeParams,dialogParams}),
-    routeInfo, controls, strava, forecast, params});
+    routeInfo, controls, strava, forecast, params, rideWithGpsInfo});
 
 const rootReducer = (state, action) => {
     if (action.type === 'RESET') {
