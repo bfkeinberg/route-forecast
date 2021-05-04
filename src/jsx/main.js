@@ -37,7 +37,8 @@ import {
     updateUserControls,
     setStravaRefreshToken,
     setWeatherProvider,
-    showWeatherProvider
+    showWeatherProvider,
+    setRwgpsCredentials
 } from "./actions/actions";
 import QueryString from './queryString';
 
@@ -89,7 +90,8 @@ export class RouteWeatherUI extends Component {
         action: PropTypes.string.isRequired,
         maps_api_key: PropTypes.string.isRequired,
         timezone_api_key: PropTypes.string.isRequired,
-        bitly_token: PropTypes.string.isRequired
+        bitly_token: PropTypes.string.isRequired,
+        setRwgpsCredentials:PropTypes.func.isRequired
     };
 
     constructor(props) {
@@ -101,6 +103,7 @@ export class RouteWeatherUI extends Component {
         RouteWeatherUI.updateFromQueryParams(this.props, queryParams);
         props.setActionUrl(props.action);
         props.setApiKeys(props.maps_api_key,props.timezone_api_key, props.bitly_token);
+        RouteWeatherUI.setupRideWithGps(props);
         this.props.updateControls(queryParams.controlPoints==undefined?[]:this.parseControls(queryParams.controlPoints));
         if (newUserMode) {
             RouteWeatherUI.loadCannedData(this.props);
@@ -120,6 +123,14 @@ export class RouteWeatherUI extends Component {
         }
     }
 
+    static setupRideWithGps(props) {
+        const user = loadCookie("rwgpsUsername");
+        const password = loadCookie("rwgpsPassword");
+        if (user !== undefined && password !== undefined) {
+            props.setRwgpsCredentials(user,password);
+        }
+    }
+    
     static getStravaToken(queryParams, props) {
         if (queryParams.strava_access_token !== undefined) {
             saveCookie('strava_access_token', queryParams.strava_access_token);
@@ -221,7 +232,7 @@ export class RouteWeatherUI extends Component {
 const mapDispatchToProps = {
     setStravaToken, setActionUrl, setRwgpsRoute, setApiKeys, setStravaError, setInitialStart, setPace, setInterval, setMetric,
     setStravaActivity, updateControls:updateUserControls, setFetchAfterLoad, toggleStravaAnalysis, setStravaRefreshToken,
-    loadFromRideWithGps, reset, newUserMode, setWeatherProvider, showWeatherProvider
+    loadFromRideWithGps, reset, newUserMode, setWeatherProvider, showWeatherProvider, setRwgpsCredentials
 };
 
 const mapStateToProps = (state) =>

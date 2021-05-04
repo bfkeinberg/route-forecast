@@ -5,12 +5,15 @@ import RideWithGpsCreds from './rideWithGpsCreds.jsx';
 import RouteList from './routeList.js';
 import axios from 'axios';
 import {setPinnedRoutes, setErrorDetails, setRwgpsCredentials} from "../actions/actions";
+import cookie from 'react-cookies';
 
 const getPinnedRoutes = async (rwgpsUsername, rwgpsPassword, setErrorDetails, setRwgpsCredentials) => {
     
     const url = `/pinned_routes?username=${rwgpsUsername}&password=${rwgpsPassword}`;
     try {
         const response = await axios.get(url);
+        cookie.save('rwgpsUsername', rwgpsUsername);
+        cookie.save('rwgpsPassword', rwgpsPassword);
         return response.data.user.slim_favorites;
     } catch (e) {
         console.log(e);
@@ -62,11 +65,13 @@ PinnedRouteLoader.propTypes = {
     hasRoutes:PropTypes.bool.isRequired
 };
 
+const isValid = (field) => {return (field !== undefined && field !== null && field !== '')};
+
 const mapStateToProps = (state) =>
 ({
     rwgpsUsername:state.rideWithGpsInfo.username,
     rwgpsPassword:state.rideWithGpsInfo.password,
-    credentialsValid:state.rideWithGpsInfo.username != '' && state.rideWithGpsInfo.password != '',
+    credentialsValid:isValid(state.rideWithGpsInfo.username) && isValid(state.rideWithGpsInfo.password),
     hasRoutes:Array.isArray(state.rideWithGpsInfo.pinnedRoutes) && state.rideWithGpsInfo.pinnedRoutes.length > 0
 });
 

@@ -1,4 +1,4 @@
-import {Spinner} from '@blueprintjs/core';
+import {Spinner, Button} from '@blueprintjs/core';
 import {Alert, Form, Card, CardBody, CardTitle, Col, Row, Container} from 'reactstrap';
 import React, {Component} from 'react';
 import ShortUrl from './ui/shortUrl';
@@ -44,7 +44,7 @@ class RouteInfoForm extends Component {
 
     constructor(props) {
         super(props);
-        this.state = {};
+        this.state = {showPinnedRoutes:false};
     }
 
     componentDidMount() {
@@ -155,10 +155,16 @@ class RouteInfoForm extends Component {
                             <Col sm={{size:"auto"}}>
                                 <RideWithGpsId/>
                             </Col>
-                            <MediaQuery maxDeviceWidth={500}>
+                            <MediaQuery maxDeviceWidth={3000}>
                                 <Col sm={{size:"auto"}}>
                                     <ErrorBoundary>
-                                    <PinnedRouteLoader/>
+                                    <Button intent="secondary"
+                                            small={true}
+                                            outlined={this.state.showPinnedRoutes}
+                                            icon="star"
+                                            text="Pinned routes"
+                                            onClick={()=>this.setState({showPinnedRoutes:!this.state.showPinnedRoutes})}/>
+                                    {this.state.showPinnedRoutes?<PinnedRouteLoader/>:null}
                                     </ErrorBoundary>
                                 </Col>
                             </MediaQuery>

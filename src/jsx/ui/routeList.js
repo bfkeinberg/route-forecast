@@ -21,7 +21,7 @@ const renderFavorite = (favorite, { handleClick, modifiers }) => {
 };
 
 const RouteList = ({pinnedRoutes, setRwgpsRoute, route_id, loadFromRideWithGps, setFetchAfterLoad, setRouteIsTrip}) => {
-    return (<Label>Ride with GPS routes
+    return (<Label>Ride with GPS pinned
             <Select
                         items={pinnedRoutes}
                         noResults={<MenuItem disabled={true} text="No results." />}

@@ -364,6 +364,23 @@ if (!process.env.NO_LOGGING) {
     app.use(errorLogger);
 }
 
+const makeFeatureRecord = (response) => {
+    // Create a visit record to be stored in the database
+    return {
+      timestamp: new Date(),
+      email: response.data.user.email,
+      first_name: response.data.user.first_name,
+      last_name: response.data.user.last_name
+      };
+}
+
+const insertFeatureRecord = (record, featureName) => {
+  return datastore.save({
+    key: datastore.key(['Feature', featureName]),
+    data: record,
+  });
+};
+
 app.get('/pinned_routes', async( req, res) => {
     const rwgpsApiKey = process.env.RWGPS_API_KEY;
     const username = req.query.username ;
@@ -383,13 +400,38 @@ app.get('/pinned_routes', async( req, res) => {
     const url = `https://ridewithgps.com/users/current.json?apikey=${rwgpsApiKey}&version=2&email=${req.query.username}&password=${req.query.password}`;
     try {
         const response = await axios.get(url);
-        console.log(`Returning profile data for ${response.data.user.first_name} ${response.data.user.last_name} ${response.data.user.email}`);
+        insertFeatureRecord(makeFeatureRecord(response), "pinned");
         res.status(200).json(response.data);
     } catch (e) {
         console.log(`EXCEPTION: ${e}`);
-        console.log(`RESULTS: ${JSON.stringify(e.response.data.user)}`);
         res.status(e.response.status).json(e.response.data);
     }
+});
+
+const getFeatureVisits = (featureName) => {
+  const query = datastore
+    .createQuery("Feature")
+    .filter('__key__', '=', datastore.key(['Feature', featureName]))
+    .order('timestamp', {descending: true});
+
+  return datastore.runQuery(query);
+};
+
+app.get('/queryfeature', cors(), async (req, res) => {
+    if (req.query.feature === undefined) {
+        res.status(400).send("Missing feature name");
+        return;
+    }
+    const [entities] = await getFeatureVisits(req.query.feature);
+    const visits = entities.map(
+        entity => JSON.stringify({"Time":entity.timestamp, "Email":entity.email, "FirstName":entity.first_name,
+        "LastName":entity.last_name})
+                                );
+    res
+       .status(200)
+       .set('Content-Type', 'text/plain')
+       .send(`[\n${visits.join(',\n')}]`)
+       .end();
 });
 
 const port = process.env.PORT || 8080;
