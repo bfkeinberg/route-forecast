@@ -304,6 +304,12 @@ app.get('/stravaAuthReq', (req,res) => {
         res.status(400).json({'status': 'Missing keys'});
         return;
     }
+    let restoredState = JSON.parse(decodeURIComponent(state));
+    insertFeatureRecord({
+        timestamp: new Date(),
+        routeNumber: state.rwgpsRoute===undefined?null:state.rwgpsRoute
+        },
+        "strava");
     const baseUrl = url.format({
         protocol: req.protocol,
         host: req.get('host')});
@@ -425,7 +431,7 @@ app.get('/queryfeature', cors(), async (req, res) => {
     const [entities] = await getFeatureVisits(req.query.feature);
     const visits = entities.map(
         entity => JSON.stringify({"Time":entity.timestamp, "Email":entity.email, "FirstName":entity.first_name,
-        "LastName":entity.last_name})
+        "LastName":entity.last_name, "Route":entity.routeNumber})
                                 );
     res
        .status(200)

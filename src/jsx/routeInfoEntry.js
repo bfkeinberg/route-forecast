@@ -161,6 +161,7 @@ class RouteInfoForm extends Component {
                                     <Button intent="secondary"
                                             small={true}
                                             outlined={this.state.showPinnedRoutes}
+                                            active={this.state.showPinnedRoutes}
                                             icon="star"
                                             text="Pinned routes"
                                             onClick={()=>this.setState({showPinnedRoutes:!this.state.showPinnedRoutes})}/>
