@@ -14,7 +14,7 @@ const getPinnedRoutes = async (rwgpsUsername, rwgpsPassword, setErrorDetails, se
         const response = await axios.get(url);
         cookie.save('rwgpsUsername', rwgpsUsername);
         cookie.save('rwgpsPassword', rwgpsPassword);
-        return response.data.user.slim_favorites;
+        return response.data;
     } catch (e) {
         console.log(e);
         setErrorDetails(JSON.stringify(e.response.data));

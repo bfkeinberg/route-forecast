@@ -372,6 +372,7 @@ if (!process.env.NO_LOGGING) {
 
 const makeFeatureRecord = (response) => {
     // Create a visit record to be stored in the database
+    console.info(`${response.data.user.email} used the feature`);
     return {
       timestamp: new Date(),
       email: response.data.user.email,
@@ -385,6 +386,23 @@ const insertFeatureRecord = (record, featureName) => {
     key: datastore.key(['Feature', featureName]),
     data: record,
   });
+};
+
+const fetchRouteName = async (id, type) => {
+    const rwgpsApiKey = process.env.RWGPS_API_KEY;
+    const url = `https://ridewithgps.com/${type}s/${id}.json?apikey=${rwgpsApiKey}&version=2`;
+    try {
+        const response = await axios.get(url);
+        return response.data[type].name;
+    } catch (e) {
+        console.error(e);
+        return '';
+    }
+};
+
+const retrieveNames = async (pinned) => {
+    pinned.sort((el1,el2)=>Number(el1.associated_object_id)-Number(el2.associated_object_id));
+    return pinned.map (async fav => {fav.name = await fetchRouteName(fav.associated_object_id, fav.associated_object_type); return fav});
 };
 
 app.get('/pinned_routes', async( req, res) => {
@@ -407,7 +425,7 @@ app.get('/pinned_routes', async( req, res) => {
     try {
         const response = await axios.get(url);
         insertFeatureRecord(makeFeatureRecord(response), "pinned");
-        res.status(200).json(response.data);
+        res.status(200).json(await Promise.all(await retrieveNames(response.data.user.slim_favorites)));
     } catch (e) {
         console.log(`EXCEPTION: ${e}`);
         res.status(e.response.status).json(e.response.data);

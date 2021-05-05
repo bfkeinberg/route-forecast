@@ -153,7 +153,7 @@ class RouteInfoForm extends Component {
                         </MediaQuery>
                         <Row noGutters>
                             <Col sm={{size:"auto"}}>
-                                <RideWithGpsId/>
+                                {this.state.showPinnedRoutes?null:<RideWithGpsId/>}
                             </Col>
                             <MediaQuery maxDeviceWidth={3000}>
                                 <Col sm={{size:"auto"}}>

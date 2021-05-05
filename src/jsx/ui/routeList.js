@@ -13,7 +13,7 @@ const renderFavorite = (favorite, { handleClick, modifiers }) => {
         <MenuItem
             active={modifiers.active}
             key={favorite.id}
-            label={favorite.associated_object_type}
+            label={favorite.name}
             onClick={handleClick}
             text={favorite.associated_object_id}
         />
@@ -27,7 +27,7 @@ const RouteList = ({pinnedRoutes, setRwgpsRoute, route_id, loadFromRideWithGps, 
                         noResults={<MenuItem disabled={true} text="No results." />}
                         itemRenderer={renderFavorite}
                         filterable={false}
-                        itemsEqual="id"
+                        itemsEqual="associated_object_id"
                         onItemSelect={(selected) => {
                             setFetchAfterLoad(true);
                             setRouteIsTrip(selected.associated_object_type=="trip");
