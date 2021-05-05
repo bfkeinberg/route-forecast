@@ -401,7 +401,7 @@ const fetchRouteName = async (id, type) => {
 };
 
 const retrieveNames = async (pinned) => {
-    pinned.sort((el1,el2)=>Number(el1.associated_object_id)-Number(el2.associated_object_id));
+    pinned.sort((el1,el2)=>Number(el2.id)-Number(el1.id));
     return pinned.map (async fav => {fav.name = await fetchRouteName(fav.associated_object_id, fav.associated_object_type); return fav});
 };
 
