@@ -383,7 +383,7 @@ const makeFeatureRecord = (response) => {
 
 const insertFeatureRecord = (record, featureName) => {
   return datastore.save({
-    key: datastore.key(['Feature', featureName]),
+  key: datastore.key(featureName),
     data: record,
   });
 };
@@ -434,8 +434,8 @@ app.get('/pinned_routes', async( req, res) => {
 
 const getFeatureVisits = (featureName) => {
   const query = datastore
-    .createQuery("Feature")
-    .filter('__key__', '=', datastore.key(['Feature', featureName]))
+    .createQuery(featureName)
+//    .filter('__key__', '=', datastore.key(featureName)
     .order('timestamp', {descending: true});
 
   return datastore.runQuery(query);
