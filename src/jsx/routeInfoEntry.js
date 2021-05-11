@@ -1,4 +1,5 @@
-import {Spinner} from '@blueprintjs/core';
+import {Spinner, Button} from '@blueprintjs/core';
+import { Tooltip2 } from "@blueprintjs/popover2";
 import {Alert, Form, Card, CardBody, CardTitle, Col, Row, Container} from 'reactstrap';
 import React, {Component} from 'react';
 import ShortUrl from './ui/shortUrl';
@@ -19,6 +20,8 @@ import AnalysisButton from './ui/analysisButton';
 import StravaDialog from './stravaDialog';
 import BugReportButton from './ui/bugReportButton';
 import WeatherProvider from './ui/providerSelector';
+import PinnedRouteLoader from './ui/pinnedRouteLoader.jsx';
+import ErrorBoundary from "./errorBoundary";
 
 class RouteInfoForm extends Component {
     static propTypes = {
@@ -42,7 +45,7 @@ class RouteInfoForm extends Component {
 
     constructor(props) {
         super(props);
-        this.state = {};
+        this.state = {showPinnedRoutes:false};
     }
 
     componentDidMount() {
@@ -151,8 +154,24 @@ class RouteInfoForm extends Component {
                         </MediaQuery>
                         <Row noGutters>
                             <Col sm={{size:"auto"}}>
-                                <RideWithGpsId/>
+                                {this.state.showPinnedRoutes?null:<RideWithGpsId/>}
                             </Col>
+                            <MediaQuery maxDeviceWidth={3000}>
+                                <Col sm={{size:"auto"}}>
+                                    <ErrorBoundary>
+                                    <Tooltip2 content='Load pinned routes from ride with GPS, will need login credentials the first time'>
+                                        <Button intent="secondary"
+                                                small={true}
+                                                outlined={this.state.showPinnedRoutes}
+                                                active={this.state.showPinnedRoutes}
+                                                icon="star"
+                                                text="Pinned routes"
+                                                onClick={()=>this.setState({showPinnedRoutes:!this.state.showPinnedRoutes})}/>
+                                    </Tooltip2>
+                                    {this.state.showPinnedRoutes?<PinnedRouteLoader/>:null}
+                                    </ErrorBoundary>
+                                </Col>
+                            </MediaQuery>
                             <Col size={{size:"auto"}}>
                                 <RwGpsTypeSelector visible={false}/>
                             </Col>

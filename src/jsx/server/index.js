@@ -14,8 +14,7 @@ const url = require('url');
 var strava = require('strava-v3-alpaca');
 const {Datastore} = require('@google-cloud/datastore');
 const cors = require('cors');
-
-let default_provider = 'darksky';
+const axios = require('axios');
 
 const querystring = require('querystring');
 let winston = null;
@@ -180,7 +179,7 @@ app.get('/rwgps_route', (req, res) => {
         res.status(400).json("{'status': 'Missing route number'}");
         return;
     }
-    const isTrip = req.query.trip;
+    const isTrip = req.query.trip=="true";
     const routeType = isTrip===true ? 'trips' : 'routes';
     const rwgpsApiKey = process.env.RWGPS_API_KEY;
     if (rwgpsApiKey === undefined) {
@@ -305,6 +304,12 @@ app.get('/stravaAuthReq', (req,res) => {
         res.status(400).json({'status': 'Missing keys'});
         return;
     }
+    let restoredState = JSON.parse(decodeURIComponent(state));
+    insertFeatureRecord({
+        timestamp: new Date(),
+        routeNumber: state.rwgpsRoute===undefined?null:state.rwgpsRoute
+        },
+        "strava");
     const baseUrl = url.format({
         protocol: req.protocol,
         host: req.get('host')});
@@ -364,6 +369,94 @@ app.get('/', (req, res) => {
 if (!process.env.NO_LOGGING) {
     app.use(errorLogger);
 }
+
+const makeFeatureRecord = (response) => {
+    // Create a visit record to be stored in the database
+    console.info(`${response.data.user.email} used the feature`);
+    return {
+      timestamp: new Date(),
+      email: response.data.user.email,
+      first_name: response.data.user.first_name,
+      last_name: response.data.user.last_name
+      };
+}
+
+const insertFeatureRecord = (record, featureName) => {
+  return datastore.save({
+  key: datastore.key(featureName),
+    data: record,
+  });
+};
+
+const fetchRouteName = async (id, type) => {
+    const rwgpsApiKey = process.env.RWGPS_API_KEY;
+    const url = `https://ridewithgps.com/${type}s/${id}.json?apikey=${rwgpsApiKey}&version=2`;
+    try {
+        const response = await axios.get(url);
+        return response.data[type].name;
+    } catch (e) {
+        console.error(e);
+        return '';
+    }
+};
+
+const retrieveNames = async (pinned) => {
+    pinned.sort((el1,el2)=>Number(el2.id)-Number(el1.id));
+    return pinned.map (async fav => {fav.name = await fetchRouteName(fav.associated_object_id, fav.associated_object_type); return fav});
+};
+
+app.get('/pinned_routes', async( req, res) => {
+    const rwgpsApiKey = process.env.RWGPS_API_KEY;
+    const username = req.query.username ;
+    const password = req.query.password ;
+    if (username === undefined || username === '') {
+        res.status(400).json("{'status': 'Missing username'}");
+        return;
+    }
+    if (password === undefined || password === '') {
+        res.status(400).json("{'status': 'Missing password'}");
+        return;
+    }
+    if (rwgpsApiKey === undefined) {
+        res.status(500).json({'details': 'Missing rwgps API key'});
+        return;
+    }
+    const url = `https://ridewithgps.com/users/current.json?apikey=${rwgpsApiKey}&version=2&email=${req.query.username}&password=${req.query.password}`;
+    try {
+        const response = await axios.get(url);
+        insertFeatureRecord(makeFeatureRecord(response), "pinned");
+        res.status(200).json(await Promise.all(await retrieveNames(response.data.user.slim_favorites)));
+    } catch (e) {
+        console.log(`EXCEPTION: ${e}`);
+        res.status(e.response.status).json(e.response.data);
+    }
+});
+
+const getFeatureVisits = (featureName) => {
+  const query = datastore
+    .createQuery(featureName)
+//    .filter('__key__', '=', datastore.key(featureName)
+    .order('timestamp', {descending: true});
+
+  return datastore.runQuery(query);
+};
+
+app.get('/queryfeature', cors(), async (req, res) => {
+    if (req.query.feature === undefined) {
+        res.status(400).send("Missing feature name");
+        return;
+    }
+    const [entities] = await getFeatureVisits(req.query.feature);
+    const visits = entities.map(
+        entity => JSON.stringify({"Time":entity.timestamp, "Email":entity.email, "FirstName":entity.first_name,
+        "LastName":entity.last_name, "Route":entity.routeNumber})
+                                );
+    res
+       .status(200)
+       .set('Content-Type', 'text/plain')
+       .send(`[\n${visits.join(',\n')}]`)
+       .end();
+});
 
 const port = process.env.PORT || 8080;
 app.listen(port, () =>

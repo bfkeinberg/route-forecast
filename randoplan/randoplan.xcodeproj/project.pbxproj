@@ -24,7 +24,6 @@
 		D353732825D61B79004AF9AF /* map.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = map.js; path = ../src/jsx/map.js; sourceTree = "<group>"; };
 		D353732925D61B79004AF9AF /* windUtils.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = windUtils.js; path = ../src/jsx/windUtils.js; sourceTree = "<group>"; };
 		D353732A25D61B79004AF9AF /* recalculate.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = recalculate.js; path = ../src/jsx/recalculate.js; sourceTree = "<group>"; };
-		D353732B25D61B79004AF9AF /* controls.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = controls.js; path = ../src/jsx/controls.js; sourceTree = "<group>"; };
 		D353732C25D61B79004AF9AF /* gpxParser.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = gpxParser.js; path = ../src/jsx/gpxParser.js; sourceTree = "<group>"; };
 		D353732D25D61B79004AF9AF /* queryString.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = queryString.js; path = ../src/jsx/queryString.js; sourceTree = "<group>"; };
 		D353732E25D61B79004AF9AF /* errorBoundary.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = errorBoundary.js; path = ../src/jsx/errorBoundary.js; sourceTree = "<group>"; };
@@ -47,12 +46,17 @@
 		D35A341B2637AF7600238904 /* sentry.properties */ = {isa = PBXFileReference; lastKnownFileType = text; name = sentry.properties; path = ../sentry.properties; sourceTree = "<group>"; };
 		D35A341D2637B09500238904 /* templates */ = {isa = PBXFileReference; lastKnownFileType = folder; name = templates; path = ../src/templates; sourceTree = "<group>"; };
 		D35A341E2637B21700238904 /* manifest.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = manifest.json; path = ../manifest.json; sourceTree = "<group>"; };
+		D37B3B4A263E388D00D39923 /* controls.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = controls.js; path = ../src/jsx/controls.js; sourceTree = "<group>"; };
+		D37B3B4B263F3FB500D39923 /* pinnedRouteLoader.jsx */ = {isa = PBXFileReference; lastKnownFileType = text; name = pinnedRouteLoader.jsx; path = ../src/jsx/ui/pinnedRouteLoader.jsx; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
 		D353731325D61AA7004AF9AF = {
 			isa = PBXGroup;
 			children = (
+				D353732C25D61B79004AF9AF /* gpxParser.js */,
+				D353732325D61B79004AF9AF /* locationContext.jsx */,
+				D37B3B49263E35D500D39923 /* components */,
 				D35A341E2637B21700238904 /* manifest.json */,
 				D35A341D2637B09500238904 /* templates */,
 				D35A34152634F86300238904 /* package-lock.json */,
@@ -69,23 +73,6 @@
 				D35A341B2637AF7600238904 /* sentry.properties */,
 				D35A34192637AF7600238904 /* tsconfig.json */,
 				D353733225D61B9B004AF9AF /* server */,
-				D353732025D61B79004AF9AF /* configureStore.js */,
-				D353732B25D61B79004AF9AF /* controls.js */,
-				D353731D25D61B79004AF9AF /* controlTable.js */,
-				D353732425D61B79004AF9AF /* DesktopUI.jsx */,
-				D353732E25D61B79004AF9AF /* errorBoundary.js */,
-				D353733125D61B79004AF9AF /* forecastTable.js */,
-				D353732C25D61B79004AF9AF /* gpxParser.js */,
-				D353732325D61B79004AF9AF /* locationContext.jsx */,
-				D353732525D61B79004AF9AF /* loginDialog.js */,
-				D353733025D61B79004AF9AF /* main.js */,
-				D353732825D61B79004AF9AF /* map.js */,
-				D353732125D61B79004AF9AF /* MobileUI.jsx */,
-				D353732725D61B79004AF9AF /* paceExplanation.js */,
-				D353732225D61B79004AF9AF /* paceTable.js */,
-				D353732D25D61B79004AF9AF /* queryString.js */,
-				D353732A25D61B79004AF9AF /* recalculate.js */,
-				D353731E25D61B79004AF9AF /* rideRating.js */,
 				D353732F25D61B79004AF9AF /* routeInfoEntry.js */,
 				D353731F25D61B79004AF9AF /* stravaDialog.js */,
 				D353732625D61B79004AF9AF /* stravaRouteParser.js */,
@@ -94,6 +81,29 @@
 				D353731B25D61B48004AF9AF /* topLevel.jsx */,
 				D353731A25D61B2C004AF9AF /* actions.js */,
 			);
+			sourceTree = "<group>";
+		};
+		D37B3B49263E35D500D39923 /* components */ = {
+			isa = PBXGroup;
+			children = (
+				D353731D25D61B79004AF9AF /* controlTable.js */,
+				D353732425D61B79004AF9AF /* DesktopUI.jsx */,
+				D353733125D61B79004AF9AF /* forecastTable.js */,
+				D353732E25D61B79004AF9AF /* errorBoundary.js */,
+				D353732525D61B79004AF9AF /* loginDialog.js */,
+				D353732125D61B79004AF9AF /* MobileUI.jsx */,
+				D353733025D61B79004AF9AF /* main.js */,
+				D353732825D61B79004AF9AF /* map.js */,
+				D353732A25D61B79004AF9AF /* recalculate.js */,
+				D353732725D61B79004AF9AF /* paceExplanation.js */,
+				D353732225D61B79004AF9AF /* paceTable.js */,
+				D353732D25D61B79004AF9AF /* queryString.js */,
+				D353731E25D61B79004AF9AF /* rideRating.js */,
+				D353732025D61B79004AF9AF /* configureStore.js */,
+				D37B3B4B263F3FB500D39923 /* pinnedRouteLoader.jsx */,
+				D37B3B4A263E388D00D39923 /* controls.js */,
+			);
+			name = components;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
