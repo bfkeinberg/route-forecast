@@ -4,7 +4,7 @@ import rainCloud from "Images/rainCloud.png";
 import {connect} from 'react-redux';
 import ErrorBoundary from "./errorBoundary";
 import circus_tent from 'Images/circus tent.png';
-import {Map, InfoWindow, Marker, GoogleApiWrapper, Polyline} from 'google-maps-react';
+import {Map, InfoWindow, Marker, GoogleApiWrapper, Polyline} from 'google-maps-react-17';
 import { createSelector } from 'reselect';
 import {formatTemperature} from "./forecastTable";
 // import {withRouter} from 'react-router-dom';
