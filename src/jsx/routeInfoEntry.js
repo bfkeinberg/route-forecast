@@ -157,21 +157,19 @@ class RouteInfoForm extends Component {
                             <Col sm={{size:"auto"}}>
                                 {this.state.showPinnedRoutes?null:<RideWithGpsId/>}
                             </Col>
-                            <MediaQuery maxDeviceWidth={3000}>
-                                <Col sm={{size:"auto"}}>
-                                    <ErrorBoundary>
-                                        <Button intent="primary"
-                                                small={true}
-                                                outlined={this.state.showPinnedRoutes}
-                                                active={this.state.showPinnedRoutes}
-                                                icon="star"
-                                                loading={this.props.loadingPinnedRoutes}
-                                                text="Pinned routes"
-                                                onClick={()=>this.setState({showPinnedRoutes:!this.state.showPinnedRoutes})}/>
-                                    {this.state.showPinnedRoutes?<PinnedRouteLoader/>:null}
-                                    </ErrorBoundary>
-                                </Col>
-                            </MediaQuery>
+                            <Col sm={{size:"auto"}}>
+                                <ErrorBoundary>
+                                    <Button intent="primary"
+                                            small={true}
+                                            outlined={this.state.showPinnedRoutes}
+                                            active={this.state.showPinnedRoutes}
+                                            icon="star"
+                                            loading={this.props.loadingPinnedRoutes}
+                                            text={this.state.showPinnedRoutes?"Don't use pinned routes":"Use pinned routes"}
+                                            onClick={()=>this.setState({showPinnedRoutes:!this.state.showPinnedRoutes})}/>
+                                {this.state.showPinnedRoutes?<PinnedRouteLoader/>:null}
+                                </ErrorBoundary>
+                            </Col>
                             <Col size={{size:"auto"}}>
                                 <RwGpsTypeSelector visible={false}/>
                             </Col>
