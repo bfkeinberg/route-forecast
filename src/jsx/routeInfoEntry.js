@@ -40,7 +40,8 @@ class RouteInfoForm extends Component {
         routeSelected:PropTypes.bool.isRequired,
         needToViewTable: PropTypes.bool.isRequired,
         showProvider: PropTypes.bool.isRequired,
-        routeProps:PropTypes.object
+        routeProps:PropTypes.object,
+        loadingPinnedRoutes:PropTypes.bool.isRequired
     };
 
     constructor(props) {
@@ -159,15 +160,14 @@ class RouteInfoForm extends Component {
                             <MediaQuery maxDeviceWidth={3000}>
                                 <Col sm={{size:"auto"}}>
                                     <ErrorBoundary>
-                                    <Tooltip2 content='Load pinned routes from ride with GPS, will need login credentials the first time'>
-                                        <Button intent="secondary"
+                                        <Button intent="primary"
                                                 small={true}
                                                 outlined={this.state.showPinnedRoutes}
                                                 active={this.state.showPinnedRoutes}
                                                 icon="star"
+                                                loading={this.props.loadingPinnedRoutes}
                                                 text="Pinned routes"
                                                 onClick={()=>this.setState({showPinnedRoutes:!this.state.showPinnedRoutes})}/>
-                                    </Tooltip2>
                                     {this.state.showPinnedRoutes?<PinnedRouteLoader/>:null}
                                     </ErrorBoundary>
                                 </Col>
@@ -219,7 +219,8 @@ const mapStateToProps = (state) =>
         firstUse: state.params.newUserMode,
         routeSelected: state.uiInfo.dialogParams.loadingSource !== null,
         needToViewTable:state.forecast.valid && !state.forecast.tableViewed,
-        showProvider:state.controls.showWeatherProvider
+        showProvider:state.controls.showWeatherProvider,
+        loadingPinnedRoutes:state.rideWithGpsInfo.loadingRoutes
     });
 
 const mapDispatchToProps = {

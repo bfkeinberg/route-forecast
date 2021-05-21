@@ -361,12 +361,14 @@ const params = function(state = {newUserMode:false}, action) {
     }
 };
 
-const rideWithGpsInfo = function(state = {pinnedRoutes:[], username:'', password:''}, action) {
+const rideWithGpsInfo = function(state = {pinnedRoutes:[], username:'', password:'', loadingRoutes:false}, action) {
     switch (action.type) {
         case Actions.SET_RWGPS_CREDENTIALS:
             return {...state, username:action.username, password:action.password};
         case Actions.SET_PINNED_ROUTES:
             return {...state, pinnedRoutes:action.pinned};
+        case Actions.SET_LOADING_PINNED:
+            return {...state, loadingRoutes:action.loading};
         default:
             return state;
     }

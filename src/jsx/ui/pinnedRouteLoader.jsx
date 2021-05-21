@@ -4,7 +4,7 @@ import {connect} from 'react-redux';
 import RideWithGpsCreds from './rideWithGpsCreds.jsx';
 import RouteList from './routeList.js';
 import axios from 'axios';
-import {setPinnedRoutes, setErrorDetails, setRwgpsCredentials} from "../actions/actions";
+import {setPinnedRoutes, setErrorDetails, setRwgpsCredentials, setLoadingPinned} from "../actions/actions";
 import cookie from 'react-cookies';
 
 const getPinnedRoutes = async (rwgpsUsername, rwgpsPassword, setErrorDetails, setRwgpsCredentials) => {
@@ -12,8 +12,8 @@ const getPinnedRoutes = async (rwgpsUsername, rwgpsPassword, setErrorDetails, se
     const url = `/pinned_routes?username=${rwgpsUsername}&password=${rwgpsPassword}`;
     try {
         const response = await axios.get(url);
-        cookie.save('rwgpsUsername', rwgpsUsername);
-        cookie.save('rwgpsPassword', rwgpsPassword);
+        cookie.save('rwgpsUsername', rwgpsUsername, { path: '/' });
+        cookie.save('rwgpsPassword', rwgpsPassword, { path: '/' });
         return response.data;
     } catch (e) {
         console.log(e);
@@ -24,20 +24,23 @@ const getPinnedRoutes = async (rwgpsUsername, rwgpsPassword, setErrorDetails, se
     }
 }
 
-const setRoutes = async (rwgpsUsername, rwgpsPassword, setError, setPinnedRoutes, setRwgpsCredentials) => {
+const setRoutes = async (rwgpsUsername, rwgpsPassword, setError, setPinnedRoutes, setRwgpsCredentials, setLoadingPinned) => {
     if (rwgpsUsername ==='' || rwgpsPassword === '') {
         return null;
     }
+    setLoadingPinned(true);
     const user_favorites = await getPinnedRoutes(rwgpsUsername, rwgpsPassword, setError, setRwgpsCredentials);
     if (user_favorites != null) {
         setPinnedRoutes(user_favorites);
     }
+    setLoadingPinned(false);
 }
 
-const PinnedRouteLoader = ({rwgpsUsername, rwgpsPassword, credentialsValid, setPinnedRoutes, setErrorDetails, hasRoutes, setRwgpsCredentials}) => {
+const PinnedRouteLoader = ({rwgpsUsername, rwgpsPassword, credentialsValid, setPinnedRoutes, setErrorDetails, hasRoutes,
+setRwgpsCredentials, setLoadingPinned}) => {
     
     useEffect(() => {
-        setRoutes(rwgpsUsername, rwgpsPassword, setErrorDetails, setPinnedRoutes, setRwgpsCredentials);
+        setRoutes(rwgpsUsername, rwgpsPassword, setErrorDetails, setPinnedRoutes, setRwgpsCredentials, setLoadingPinned);
     }, [rwgpsUsername, rwgpsPassword]);
     if (credentialsValid) {
         if (!hasRoutes) {
@@ -62,7 +65,8 @@ PinnedRouteLoader.propTypes = {
     setPinnedRoutes:PropTypes.func.isRequired,
     setErrorDetails:PropTypes.func.isRequired,
     setRwgpsCredentials:PropTypes.func.isRequired,
-    hasRoutes:PropTypes.bool.isRequired
+    hasRoutes:PropTypes.bool.isRequired,
+    setLoadingPinned:PropTypes.func.isRequired
 };
 
 const isValid = (field) => {return (field !== undefined && field !== null && field !== '')};
@@ -76,7 +80,7 @@ const mapStateToProps = (state) =>
 });
 
 const mapDispatchToProps = {
-    setPinnedRoutes, setErrorDetails, setRwgpsCredentials
+    setPinnedRoutes, setErrorDetails, setRwgpsCredentials, setLoadingPinned
 };
 
 export default connect(mapStateToProps,mapDispatchToProps)(PinnedRouteLoader);

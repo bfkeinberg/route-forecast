@@ -10,7 +10,7 @@ import React from "react";
 
 const DesktopUI = (props) => {
     return <SplitPane defaultSize={320} minSize={150} maxSize={530} split="horizontal">
-        <SplitPane defaultSize={550} minSize={150} split='vertical' pane2Style={{"overflow": "scroll"}}>
+        <SplitPane defaultSize={560} minSize={150} split='vertical' pane2Style={{"overflow": "scroll"}}>
             <ErrorBoundary>
                 <RouteInfoForm routeProps={{}} formatControlsForUrl={props.formatControlsForUrl}/>
             </ErrorBoundary>
