@@ -18,16 +18,12 @@ const RideWithGpsCreds = ({rwgpsUsername, rwgpsPassword, setRwgpsCredentials}) =
             isOpen={dlgIsOpen} autoFocus={true} canEscapeKeyClose={true}
             onClose={() => setOpen(false)}
             >
-            <Tooltip2 content='Ride with GPS username'>
-                <InputGroup value={username} placeholder="RideWithGPS username"
-                    onChange={event => setUsername(event.target.value)}
-                    id='username' autoComplete='username'/>
-            </Tooltip2>
-            <Tooltip2 content='Ride with GPS password'>
-                <InputGroup value={password} placeholder="RideWithGPS password"
-                    onChange={event => setPassword(event.target.value)}
-                    id='password' type='password' autoComplete='current-password'/>
-            </Tooltip2>
+            <InputGroup value={username} placeholder="RideWithGPS username"
+                onChange={event => setUsername(event.target.value)}
+                id='username' autoComplete='username'/>
+            <InputGroup value={password} placeholder="RideWithGPS password"
+                onChange={event => setPassword(event.target.value)}
+                id='password' type='password' autoComplete='current-password'/>
             <Tooltip2 content="Accept credentials.">
                 <Button onClick={() => {close(); setRwgpsCredentials(username,password)}}>Accept</Button>
             </Tooltip2>

@@ -830,3 +830,8 @@ export const SET_PINNED_ROUTES = 'SET_PINNED_ROUTES';
 export const setPinnedRoutes = (pinned) => {
         return {type:SET_PINNED_ROUTES, pinned:pinned};
 };
+                                                      
+export const SET_LOADING_PINNED = 'SET_LOADING_PINNED';
+export const setLoadingPinned = (value) => {
+        return {type:SET_LOADING_PINNED, loading:value};
+};

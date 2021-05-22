@@ -52,12 +52,14 @@ module.exports = (env,argv) => {
                     }
                 },
                 {
-                    test: /\.js$/,
+                    test: /\.(js|css)$/,
                     enforce: "pre",
-                    use: [{loader: "source-map-loader"}],
+                    use: [
+                          {loader: "source-map-loader"}
+                    ],
                     "exclude": [
                                 path.join(process.cwd(), 'node_modules/react-responsive')
-                    ]
+                    ],
                 },
                 {
                     test: /\.tsx?$/,
