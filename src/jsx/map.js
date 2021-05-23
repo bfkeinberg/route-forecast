@@ -107,8 +107,6 @@ class RouteForecastMap extends Component {
     getMapBounds(bounds) {
         let southWest = { lat:bounds.min_latitude, lng:bounds.min_longitude };
         let northEast = { lat:bounds.max_latitude, lng:bounds.max_longitude };
-        console.info(`sw point:lat:${bounds.min_latitude} lon:{bounds.min_longitude}`);
-        console.info(`ne point:lat:${bounds.max_latitude} lon:{bounds.max_longitude}`);
         if (isNaN(bounds.min_latitude) || isNaN(bounds.max_latitude)) {
             console.error(`Bad latitude in bounds`);
         }
