@@ -131,7 +131,7 @@ export class RouteWeatherUI extends Component {
             props.setRwgpsCredentials(user,password);
         }
     }
-    
+
     static getStravaToken(queryParams, props) {
         if (queryParams.strava_access_token !== undefined) {
             saveCookie('strava_access_token', queryParams.strava_access_token);

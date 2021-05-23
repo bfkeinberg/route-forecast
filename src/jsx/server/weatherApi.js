@@ -6,11 +6,11 @@ const getBearingDifference = function (bearing,windBearing) {
         windBearing - bearing < 0 ? windBearing - bearing + 360 : windBearing - bearing);
 };
 
-/*
-
-const fetch = require('node-fetch');
-
-/* eslint-disable max-params*/
+//
+//
+// const fetch = require('node-fetch');
+//
+// /* eslint-disable max-params
 
 /**
  *
@@ -38,7 +38,7 @@ const callWeatherApi = function (lat, lon, currentTime, distance, zone, bearing)
     const forecastResult = fetch(url).then(response => {
         const result = response.json();
         return result;
-        }).
+    }).
     then(forecast => {
         if (forecast.error != null && forecast.error.code != null) {
             console.error(`got error code ${forecast.error.message}`);
@@ -77,7 +77,7 @@ const callWeatherApi = function (lat, lon, currentTime, distance, zone, bearing)
             'summary':current.condition.text,
             'tempStr':`${Math.round(current.temp_f)}F`,
             'precip':current.chance_of_rain===undefined?'<unavailable>':`${current.chance_of_rain}%`,
-            'cloudCover':current.cloud===undefined?'<unavailable>':`${(current.cloud).toFixed(1)}%`,
+            'cloudCover':current.cloud===undefined?'<unavailable>':`${current.cloud.toFixed(1)}%`,
             'windSpeed':!hasWind?'<unavailable>':`${Math.round(current.wind_mph)}`,
             'lat':lat,
             'lon':lon,
@@ -99,4 +99,3 @@ const callWeatherApi = function (lat, lon, currentTime, distance, zone, bearing)
 };
 
 module.exports = callWeatherApi;
-

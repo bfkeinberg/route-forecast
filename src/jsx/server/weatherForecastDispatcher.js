@@ -25,15 +25,15 @@ const getBearingDifference = function (bearing,windBearing) {
  */
 const callWeatherService = function (service, lat, lon, currentTime, distance, zone, bearing) {
     switch (service) {
-        case 'darksky':
-            return callDarkSky(lat, lon, currentTime, distance, zone, bearing);
-            break;
-        case 'climacell':
-            return callClimacell(lat, lon, currentTime, distance, zone, bearing);
-        case 'weatherapi':
-            return callWeatherApi(lat, lon, currentTime, distance, zone, bearing);
-        default:
-            return null;
+    case 'darksky':
+        return callDarkSky(lat, lon, currentTime, distance, zone, bearing);
+        break;
+    case 'climacell':
+        return callClimacell(lat, lon, currentTime, distance, zone, bearing);
+    case 'weatherapi':
+        return callWeatherApi(lat, lon, currentTime, distance, zone, bearing);
+    default:
+        return null;
     }
 }
 

@@ -125,33 +125,36 @@ const isValidRouteResult = (body, type) => {
 const makeRecord = (point, routeNumber) => {
     // Create a visit record to be stored in the database
     return {
-      timestamp: new Date(),
-      routeNumber: routeNumber===undefined?null:routeNumber,
-      latitude: point.lat,
-      longitude: point.lon
-      };
+        timestamp: new Date(),
+        routeNumber: routeNumber===undefined?null:routeNumber,
+        latitude: point.lat,
+        longitude: point.lon
+    };
 }
 
 const insertRecord = (record, routeName) => {
-  return datastore.save({
-    key: datastore.key(['RouteName', routeName]),
-    data: record,
-  });
+    return datastore.save({
+        key: datastore.key([
+            'RouteName',
+            routeName
+        ]),
+        data: record
+    });
 };
 
 const getVisits = () => {
-  const query = datastore
+    const query = datastore
     .createQuery('RouteName')
     .order('timestamp', {descending: true});
 
-  return datastore.runQuery(query);
+    return datastore.runQuery(query);
 };
 
 app.get('/dbquery', cors(), async (req, res) => {
     const [entities] = await getVisits();
     const visits = entities.map(
         entity => JSON.stringify({"Time":entity.timestamp, "RouteName":entity[datastore.KEY].name, "RouteNumber":entity.routeNumber,
-        "Latitude":entity.latitude, "Longitude":entity.longitude})
+            "Latitude":entity.latitude, "Longitude":entity.longitude})
                                 );
     res
        .status(200)
@@ -216,7 +219,7 @@ app.post('/forecast', upload.none(), (req, res) => {
     }
     if (req.body.routeName !== undefined && req.body.routeName !== '') {
         let dbRecord = makeRecord(forecastPoints[0], req.body.routeNumber);
-        insertRecord (dbRecord, req.body.routeName );
+        insertRecord(dbRecord, req.body.routeName);
     }
     let zone = req.body.timezone;
 
@@ -308,7 +311,7 @@ app.get('/stravaAuthReq', (req,res) => {
     insertFeatureRecord({
         timestamp: new Date(),
         routeNumber: state.rwgpsRoute===undefined?null:state.rwgpsRoute
-        },
+    },
         "strava");
     const baseUrl = url.format({
         protocol: req.protocol,
@@ -374,18 +377,18 @@ const makeFeatureRecord = (response) => {
     // Create a visit record to be stored in the database
     console.info(`${response.data.user.email} used the feature`);
     return {
-      timestamp: new Date(),
-      email: response.data.user.email,
-      first_name: response.data.user.first_name,
-      last_name: response.data.user.last_name
-      };
+        timestamp: new Date(),
+        email: response.data.user.email,
+        first_name: response.data.user.first_name,
+        last_name: response.data.user.last_name
+    };
 }
 
 const insertFeatureRecord = (record, featureName) => {
-  return datastore.save({
-  key: datastore.key(featureName),
-    data: record,
-  });
+    return datastore.save({
+        key: datastore.key(featureName),
+        data: record
+    });
 };
 
 const fetchRouteName = async (id, type) => {
@@ -401,14 +404,14 @@ const fetchRouteName = async (id, type) => {
 };
 
 const retrieveNames = async (pinned) => {
-    pinned.sort((el1,el2)=>Number(el2.id)-Number(el1.id));
-    return pinned.map (async fav => {fav.name = await fetchRouteName(fav.associated_object_id, fav.associated_object_type); return fav});
+    pinned.sort((el1,el2) => Number(el2.id)-Number(el1.id));
+    return pinned.map(async fav => {fav.name = await fetchRouteName(fav.associated_object_id, fav.associated_object_type);return fav});
 };
 
-app.get('/pinned_routes', async( req, res) => {
+app.get('/pinned_routes', async (req, res) => {
     const rwgpsApiKey = process.env.RWGPS_API_KEY;
-    const username = req.query.username ;
-    const password = req.query.password ;
+    const username = req.query.username;
+    const password = req.query.password;
     if (username === undefined || username === '') {
         res.status(400).json("{'status': 'Missing username'}");
         return;
@@ -433,12 +436,12 @@ app.get('/pinned_routes', async( req, res) => {
 });
 
 const getFeatureVisits = (featureName) => {
-  const query = datastore
+    const query = datastore
     .createQuery(featureName)
 //    .filter('__key__', '=', datastore.key(featureName)
     .order('timestamp', {descending: true});
 
-  return datastore.runQuery(query);
+    return datastore.runQuery(query);
 };
 
 app.get('/queryfeature', cors(), async (req, res) => {
@@ -449,7 +452,7 @@ app.get('/queryfeature', cors(), async (req, res) => {
     const [entities] = await getFeatureVisits(req.query.feature);
     const visits = entities.map(
         entity => JSON.stringify({"Time":entity.timestamp, "Email":entity.email, "FirstName":entity.first_name,
-        "LastName":entity.last_name, "Route":entity.routeNumber})
+            "LastName":entity.last_name, "Route":entity.routeNumber})
                                 );
     res
        .status(200)
