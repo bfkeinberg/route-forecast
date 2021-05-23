@@ -64,8 +64,11 @@ class ControlPoints extends Component {
                     </Card>
                 </ErrorBoundary>
                 <div tabIndex="98" onFocus={() => {
-                    document.getElementById('addButton').focus()
-                }}/>
+                    let button = document.getElementById('addButton');
+                    if (button != null) {
+                        button.focus();
+                    }
+            }}/>
             </div>
         );
     }

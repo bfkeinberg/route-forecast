@@ -46,7 +46,10 @@ RouteList.propTypes = {
         associated_object_type: PropTypes.string,
         associated_object_id: PropTypes.number
     })),
-    route_id:PropTypes.oneOfType([PropTypes.number,PropTypes.string]),
+    route_id:PropTypes.oneOfType([
+PropTypes.number,
+PropTypes.string
+]),
     loadFromRideWithGps:PropTypes.func.isRequired,
     setFetchAfterLoad:PropTypes.func.isRequired,
     setRouteIsTrip:PropTypes.func.isRequired

@@ -82,7 +82,7 @@ export class ForecastTable extends Component {
                 return time;
             }
         }
-                
+
     expandTable(forecast, metric) {
         if (forecast.length > 0) {
             return (

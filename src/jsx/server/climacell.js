@@ -7,39 +7,39 @@ const getBearingDifference = function (bearing,windBearing) {
 };
 
 const weatherCodes = {
-     "0": "Unknown",
-     "1000": "Clear",
-     "1001": "Cloudy",
-     "1100": "Mostly Clear",
-     "1101": "Partly Cloudy",
-     "1102": "Mostly Cloudy",
-     "2000": "Fog",
-     "2100": "Light Fog",
-     "3000": "Light Wind",
-     "3001": "Wind",
-     "3002": "Strong Wind",
-     "4000": "Drizzle",
-     "4001": "Rain",
-     "4200": "Light Rain",
-     "4201": "Heavy Rain",
-     "5000": "Snow",
-     "5001": "Flurries",
-     "5100": "Light Snow",
-     "5101": "Heavy Snow",
-     "6000": "Freezing Drizzle",
-     "6001": "Freezing Rain",
-     "6200": "Light Freezing Rain",
-     "6201": "Heavy Freezing Rain",
-     "7000": "Ice Pellets",
-     "7101": "Heavy Ice Pellets",
-     "7102": "Light Ice Pellets",
-     "8000": "Thunderstorm"
-   };
+    "0": "Unknown",
+    "1000": "Clear",
+    "1001": "Cloudy",
+    "1100": "Mostly Clear",
+    "1101": "Partly Cloudy",
+    "1102": "Mostly Cloudy",
+    "2000": "Fog",
+    "2100": "Light Fog",
+    "3000": "Light Wind",
+    "3001": "Wind",
+    "3002": "Strong Wind",
+    "4000": "Drizzle",
+    "4001": "Rain",
+    "4200": "Light Rain",
+    "4201": "Heavy Rain",
+    "5000": "Snow",
+    "5001": "Flurries",
+    "5100": "Light Snow",
+    "5101": "Heavy Snow",
+    "6000": "Freezing Drizzle",
+    "6001": "Freezing Rain",
+    "6200": "Light Freezing Rain",
+    "6201": "Heavy Freezing Rain",
+    "7000": "Ice Pellets",
+    "7101": "Heavy Ice Pellets",
+    "7102": "Light Ice Pellets",
+    "8000": "Thunderstorm"
+};
 
 /* eslint-disable max-params*/
 
-function sleep(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
+function sleep (ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
 }
 
 /**
@@ -74,7 +74,7 @@ const callClimacell = async function (lat, lon, currentTime, distance, zone, bea
         console.log(`${response.headers.get('X-RateLimit-Remaining-hour')}/${response.headers.get('X-RateLimit-Limit-hour')} calls remaining this hour`);
 //        console.log(`api calls remaining:${result.apiCalls}`);
         return result;
-        }).
+    }).
     then(forecast => {
         if (forecast.code != null) {
             console.error(`got error code ${forecast.code}`);
@@ -87,7 +87,7 @@ const callClimacell = async function (lat, lon, currentTime, distance, zone, bea
             throw Error({'details':'Hourly count exceeded'});
         }
         const current = forecast.data.timelines[0];
-        const values =  current.intervals[0].values;
+        const values = current.intervals[0].values;
         const hasWind = values.windSpeed !== undefined;
         const windBearing = values.windDirection;
         const relativeBearing = hasWind && windBearing !== undefined ? getBearingDifference(bearing, windBearing) : null;
@@ -116,7 +116,7 @@ const callClimacell = async function (lat, lon, currentTime, distance, zone, bea
             'distance':distance,
             'summary':weatherCodes[values.weatherCode],
             'tempStr':`${Math.round(values.temperature)}F`,
-            'precip':values.precipitationProbability===undefined?'<unavailable>':`${(values.precipitationProbability).toFixed(1)}%`,
+            'precip':values.precipitationProbability===undefined?'<unavailable>':`${values.precipitationProbability.toFixed(1)}%`,
             'cloudCover':values.cloudCover===undefined?'<unavailable>':`${values.cloudCover.toFixed(1)}%`,
             'windSpeed':!hasWind?'<unavailable>':`${Math.round(values.windSpeed)}`,
             'lat':lat,
@@ -140,4 +140,3 @@ const callClimacell = async function (lat, lon, currentTime, distance, zone, bea
 };
 
 module.exports = callClimacell;
-

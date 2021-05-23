@@ -815,22 +815,22 @@ export const setTableViewed = () => {return {type:SET_TABLE_VIEWED}};
 
 export const SET_MAP_VIEWED = 'SET_MAP_VIEWED';
 export const setMapViewed = () => {return {type:SET_MAP_VIEWED}};
-                                                      
+
 export const SET_WEATHER_PROVIDER = 'SET_WEATHER_PROVIDER';
 export const setWeatherProvider = (weatherProvider) => {return {type:SET_WEATHER_PROVIDER, weatherProvider:weatherProvider}}
 
 export const SET_SHOW_WEATHER_PROVIDER = 'SET_SHOW_WEATHER_PROVIDER';
 export const showWeatherProvider = (showProvider) => {return {type:SET_SHOW_WEATHER_PROVIDER, showProvider:showProvider}}
-                                                      
+
 export const SET_RWGPS_CREDENTIALS = 'SET_RWGPS_CREDENTIALS';
 export const setRwgpsCredentials = (username, password) => {
         return {type:SET_RWGPS_CREDENTIALS, username:username, password:password}};
-                                                      
+
 export const SET_PINNED_ROUTES = 'SET_PINNED_ROUTES';
 export const setPinnedRoutes = (pinned) => {
         return {type:SET_PINNED_ROUTES, pinned:pinned};
 };
-                                                      
+
 export const SET_LOADING_PINNED = 'SET_LOADING_PINNED';
 export const setLoadingPinned = (value) => {
         return {type:SET_LOADING_PINNED, loading:value};
