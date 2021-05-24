@@ -188,8 +188,7 @@ app.use((req, res, next) => {
     // Switch to randoplan.com
     var host = req.hostname;
     logger.info(`host = ${host}`);
-    logger.info(`original url ${req.originalUrl}`);
-    logger.info(`calling host is ${req.get('host')} remote address is ${req.socket.remoteAddress}`);
+    logger.info(`calling host is ${req.get('Referrer')}`);
     if (host === 'www.cyclerouteforecast.com' || host === 'cyclerouteforecast.com') {
         datastore.save({key:datastore.key('OldUrl'), data:{caller:req.socket.remoteAddress}});
     }
