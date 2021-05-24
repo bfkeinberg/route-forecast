@@ -1,4 +1,3 @@
-const moment = require('moment-timezone');
 const callDarkSky = require('./weatherCalculator');
 const callClimacell = require('./climacell');
 const callWeatherApi = require('./weatherApi');
@@ -12,11 +11,11 @@ const getBearingDifference = function (bearing,windBearing) {
 
 /**
  *
- * @param {string} which service to call
- * @param {number} lat latitude
- * @param {number} lon longitude
- * @param {date} currentTime time at which to obtain forecast
- * @param {number} distance used only in the return value, not the call
+ * @param {string} service - which service to call
+ * @param {number} lat - latitude
+ * @param {number} lon - longitude
+ * @param {date} currentTime - time at which to obtain forecast
+ * @param {number} distance - used only in the return value, not the call
  * @param {string} zone time zone
  * @param {number} bearing the direction of travel at the time of the forecast
  * @returns {Promise<{time: *, distance: *, summary: *, tempStr: string, precip: string, cloudCover: string, windSpeed: string,
@@ -26,12 +25,11 @@ const getBearingDifference = function (bearing,windBearing) {
 const callWeatherService = function (service, lat, lon, currentTime, distance, zone, bearing) {
     switch (service) {
     case 'darksky':
-        return callDarkSky(lat, lon, currentTime, distance, zone, bearing);
-        break;
+        return callDarkSky(lat, lon, currentTime, distance, zone, bearing, getBearingDifference);
     case 'climacell':
-        return callClimacell(lat, lon, currentTime, distance, zone, bearing);
+        return callClimacell(lat, lon, currentTime, distance, zone, bearing, getBearingDifference);
     case 'weatherapi':
-        return callWeatherApi(lat, lon, currentTime, distance, zone, bearing);
+        return callWeatherApi(lat, lon, currentTime, distance, zone, bearing, getBearingDifference);
     default:
         return null;
     }

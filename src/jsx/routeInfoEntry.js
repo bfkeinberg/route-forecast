@@ -1,5 +1,5 @@
 import {Spinner, Button} from '@blueprintjs/core';
-import { Tooltip2 } from "@blueprintjs/popover2";
+//import { Tooltip2 } from "@blueprintjs/popover2";
 import {Alert, Form, Card, CardBody, CardTitle, Col, Row, Container} from 'reactstrap';
 import React, {Component} from 'react';
 import ShortUrl from './ui/shortUrl';

@@ -1,18 +1,16 @@
 import {Card, CardBody, CardTitle} from 'reactstrap';
-import React, {Component} from 'react';
+import React, {Component, Suspense} from 'react';
 import ErrorBoundary from './errorBoundary';
 import PropTypes from 'prop-types';
 import {addControl, toggleDisplayBanked, toggleMetric} from './actions/actions';
 import {connect} from 'react-redux';
-import loadable from '@loadable/component';
+import {lazy} from '@loadable/component';
 import '../static/controlsStyles.css';
 import MediaQuery from 'react-responsive';
 import DesktopControls from "./ui/desktopControls";
 import MobileControls from "./ui/mobileControls";
 
-const LoadableControlTable = loadable(() => import('./controlTable'),{
-    fallback: <div>Failed to load ControlTable...</div>,
-});
+const LoadableControlTable = lazy(() => import('./controlTable'));
 
 class ControlPoints extends Component {
 
@@ -43,7 +41,11 @@ class ControlPoints extends Component {
             title = (<div id={'controlListTitle'}>Control point list for <i>{this.props.name}</i></div>);
         }
         if (this.props.name !== '' || this.props.hasControls) {
-            table = (<LoadableControlTable/>);
+            table = (
+                     <Suspense fallback={<div>Loading ControlTable...</div>}>
+                        <LoadableControlTable/>
+                     </Suspense>
+                     );
         }
         return (
             <div className="controlPoints">
@@ -65,7 +67,7 @@ class ControlPoints extends Component {
                 </ErrorBoundary>
                 <div tabIndex="98" onFocus={() => {
                     let button = document.getElementById('addButton');
-                    if (button != null) {
+                    if (button !== undefined) {
                         button.focus();
                     }
             }}/>

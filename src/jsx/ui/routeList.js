@@ -1,6 +1,6 @@
-import React, {useState} from 'react';
+import React from 'react';
 import { Select } from "@blueprintjs/select";
-import { Button, MenuItem, Label } from "@blueprintjs/core";
+import { Button, MenuItem } from "@blueprintjs/core";
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 import {setRwgpsRoute, loadFromRideWithGps, setFetchAfterLoad, setRouteIsTrip} from "../actions/actions";

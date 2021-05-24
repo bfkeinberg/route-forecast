@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {Label, Input, FormGroup, UncontrolledTooltip} from 'reactstrap';
+import {Label, FormGroup, UncontrolledTooltip} from 'reactstrap';
 import {connect} from 'react-redux';
 import {setWeatherProvider} from "../actions/actions";
 

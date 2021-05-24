@@ -125,7 +125,6 @@ export class RouteWeatherUI extends Component {
 
     static setupRideWithGps(props) {
         const user = loadCookie("rwgpsUsername");
-        console.info('fetched user name ' + user + ' from cookie');
         const password = loadCookie("rwgpsPassword");
         if (user !== undefined && password !== undefined) {
             props.setRwgpsCredentials(user,password);

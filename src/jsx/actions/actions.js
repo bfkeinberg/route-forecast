@@ -10,7 +10,9 @@ const componentLoader = (lazyComponent, attemptsLeft) => {
                 // let us retry after 1500 ms
                 setTimeout(() => {
                     if (attemptsLeft === 1) {
-                        reject(error);
+                        // instead of rejecting reload the window
+                        console.error(error);
+                        window.location.reload();
                         return;
                     }
                     componentLoader(lazyComponent, attemptsLeft - 1).then(resolve, reject);

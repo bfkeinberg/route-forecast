@@ -163,11 +163,36 @@ app.get('/dbquery', cors(), async (req, res) => {
        .end();
 });
 
+const getOldUrlCalls = () => {
+    const query = datastore
+    .createQuery('OldUrl')
+    .order('timestamp', {descending: true});
+
+    return datastore.runQuery(query);
+};
+
+app.get('/get_redirects', cors(), async (req, res) => {
+    const [entities] = await getOldUrlCalls();
+    const visits = entities.map(
+        entity => JSON.stringify({"Time":entity.timestamp, "From":entity.caller,
+            "Host":entity.caller})
+                                );
+    res
+       .status(200)
+       .set('Content-Type', 'text/plain')
+       .send(`[\n${visits.join(',\n')}]`)
+       .end();
+});
+
 app.use((req, res, next) => {
     // Switch to randoplan.com
     var host = req.hostname;
     logger.info(`host = ${host}`);
     logger.info(`original url ${req.originalUrl}`);
+    logger.info(`calling host is ${req.get('host')}`);
+    if (host === 'www.cyclerouteforecast.com' || host === 'cyclerouteforecast.com') {
+        datastore.save({key:datastore.key('OldUrl'), data:{caller:req.socket.remoteAddress}});
+    }
     if (host === 'www.cyclerouteforecast.com' || host === 'route-forecast.ue.r.appspot.com' ||
         host === 'route-forecast.appspot.com' ||
         host === 'cyclerouteforecast.com' || host === 'randoplan.com') {
@@ -182,7 +207,7 @@ app.get('/rwgps_route', (req, res) => {
         res.status(400).json("{'status': 'Missing route number'}");
         return;
     }
-    const isTrip = req.query.trip=="true";
+    const isTrip = req.query.trip==="true";
     const routeType = isTrip===true ? 'trips' : 'routes';
     const rwgpsApiKey = process.env.RWGPS_API_KEY;
     if (rwgpsApiKey === undefined) {
@@ -214,7 +239,7 @@ app.post('/forecast', upload.none(), (req, res) => {
         return;
     }
     let service = process.env.WEATHER_SERVICE;
-    if (req.body.service != null) {
+    if (req.body.service !== undefined) {
         service = req.body.service;
     }
     if (req.body.routeName !== undefined && req.body.routeName !== '') {
@@ -301,6 +326,16 @@ const getStravaToken = (code) => {
     });
 };
 
+const insertFeatureRecord = (record, featureName, user) => {
+    return datastore.save({
+        key: datastore.key([
+            featureName,
+            user
+        ]),
+        data: record
+    });
+};
+
 app.get('/stravaAuthReq', (req,res) => {
     const state = req.query.state;
     if (state === undefined) {
@@ -310,7 +345,7 @@ app.get('/stravaAuthReq', (req,res) => {
     let restoredState = JSON.parse(decodeURIComponent(state));
     insertFeatureRecord({
         timestamp: new Date(),
-        routeNumber: state.rwgpsRoute===undefined?null:state.rwgpsRoute
+        routeNumber: restoredState.rwgpsRoute===undefined?null:restoredState.rwgpsRoute
     },
         "strava");
     const baseUrl = url.format({
@@ -384,26 +419,19 @@ const makeFeatureRecord = (response) => {
     };
 }
 
-const insertFeatureRecord = (record, featureName) => {
-    return datastore.save({
-        key: datastore.key(featureName),
-        data: record
-    });
-};
-
 const fetchRouteName = async (id, type) => {
     const rwgpsApiKey = process.env.RWGPS_API_KEY;
     const url = `https://ridewithgps.com/${type}s/${id}.json?apikey=${rwgpsApiKey}&version=2`;
     try {
         const response = await axios.get(url);
         return response.data[type].name;
-    } catch (e) {
-        console.error(e);
+    } catch (err) {
+        console.error(err);
         return '';
     }
 };
 
-const retrieveNames = async (pinned) => {
+const retrieveNames = (pinned) => {
     pinned.sort((el1,el2) => Number(el2.id)-Number(el1.id));
     return pinned.map(async fav => {fav.name = await fetchRouteName(fav.associated_object_id, fav.associated_object_type);return fav});
 };
@@ -427,11 +455,11 @@ app.get('/pinned_routes', async (req, res) => {
     const url = `https://ridewithgps.com/users/current.json?apikey=${rwgpsApiKey}&version=2&email=${req.query.username}&password=${req.query.password}`;
     try {
         const response = await axios.get(url);
-        insertFeatureRecord(makeFeatureRecord(response), "pinned");
+        insertFeatureRecord(makeFeatureRecord(response), "pinned", response.data.user.email);
         res.status(200).json(await Promise.all(await retrieveNames(response.data.user.slim_favorites)));
-    } catch (e) {
-        console.log(`EXCEPTION: ${e}`);
-        res.status(e.response.status).json(e.response.data);
+    } catch (err) {
+        console.log(`EXCEPTION: ${err}`);
+        res.status(err.response.status).json(err.response.data);
     }
 });
 
