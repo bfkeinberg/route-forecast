@@ -4,7 +4,7 @@ import RouteInfoForm from "./routeInfoEntry";
 import ControlPoints from "./controls";
 import PaceTable from "./paceTable";
 import ForecastTable from "./forecastTable";
-import RouteForecastMap from "./map";
+import MapLoader from "./mapLoader";
 import PropTypes from "prop-types";
 import React from "react";
 
@@ -20,7 +20,7 @@ const DesktopUI = (props) => {
         </SplitPane>
         <SplitPane defaultSize={545} minSize={150} split="vertical" paneStyle={{"overflow": "scroll"}}>
             {props.showPacePerTme ? <PaceTable/> : <ForecastTable/>}
-            <RouteForecastMap maps_api_key={props.mapsApiKey}/>
+            <MapLoader maps_api_key={props.mapsApiKey}/>
         </SplitPane>
     </SplitPane>;
 };

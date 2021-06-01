@@ -1,9 +1,9 @@
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 import {setShortUrl, shortenUrl} from "./actions/actions";
-import moment from 'moment';
 require('isomorphic-fetch');
 import queryString from 'query-string';
+import { DateTime } from 'luxon';
 
 const formatOneControl = function(controlPoint) {
     if (typeof controlPoint === 'string') {
@@ -20,7 +20,7 @@ const formatControlsForUrl = function(controlPoints) {
 // this function exists to let us preserve the user's specified start time and share the url for this route
 // with someone in another time zone
 export const dateToShortDate = function(date) {
-    return moment(date).format("ddd MMM D YYYY HH:mm:ss");
+    return DateTime.fromJSDate(date).toFormat('EEE MMM d yyyy HH:mm:ss');
 };
 
 export const makeQuery = (routeNumber, pace,interval,metric,controls, strava_activity,

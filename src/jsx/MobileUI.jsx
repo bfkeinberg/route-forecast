@@ -3,7 +3,7 @@ import RouteInfoForm from "./routeInfoEntry";
 import ControlPoints from "./controls";
 import PaceTable from "./paceTable";
 import ForecastTable from "./forecastTable";
-import RouteForecastMap from "./map";
+import MapLoader from "./mapLoader";
 import PropTypes from "prop-types";
 import React from "react";
 import { Router, Route, Link, MemoryRouter } from "react-router-dom";
@@ -49,7 +49,7 @@ const MobileUI = (props) => {
 
         <Route path="/" exact render={(routeProps) => <RouteInfoForm routeProps={routeProps} formatControlsForUrl={props.formatControlsForUrl}/>}/>
         <Route path="/controlPoints/" exact component={ControlPoints} />
-        <Route path="/map/" exact render={(routeProps) => <RouteForecastMap maps_api_key={props.mapsApiKey} />} />
+        <Route path="/map/" exact render={(routeProps) => <MapLoader maps_api_key={props.mapsApiKey} />} />
         <Route path="/table/" exact component={DataTable} />
 
     </MemoryRouter>;

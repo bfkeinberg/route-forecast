@@ -1,54 +1,90 @@
-const gpxParse = require("gpx-parse-alpaca");
-import moment from 'moment-timezone';
-// import 'whatwg-fetch';
+//const gpxParse = require("gpx-parse-alpaca");
 import {finishTimeFormat} from './reducers/reducer';
+import { DateTime } from 'luxon';
+import Duration from 'luxon/src/duration.js'
 
 import {paceToSpeed} from "./ui/ridingPace";
 import {getPowerOrVelocity} from "./windUtils";
 import {setMinMaxCoords} from "./actions/actions";
 
 const kmToMiles = 0.62137;
+/**
+ Begin section swiped from gpx parser
+ */
+const greatCircleRadius = {
+        miles: 3956,
+        km: 6367
+};
+
+if (!Number.prototype.toRad) {
+        Number.prototype.toRad = function() {
+                return this * Math.PI / 180;
+        };
+
+}
 
 class AnalyzeRoute {
     constructor() {
         this.walkRwgpsRoute = this.walkRwgpsRoute.bind(this);
         this.walkGpxRoute = this.walkGpxRoute.bind(this);
-        this.loadGpxFile = this.loadGpxFile.bind(this);
+//        this.loadGpxFile = this.loadGpxFile.bind(this);
         this.analyzeRoute = this.analyzeRoute.bind(this);
     }
 
-    loadGpxFile(gpxFile) {
-        let reader = new FileReader();
-        const fileLoad = new Promise((resolve, reject) => {
-            reader.onerror = event => reject(event.target.error.code);
-            reader.onload = event => resolve(event.target.result);
-        });
-        reader.readAsText(gpxFile);
-        return new Promise((resolve, reject) => {
-            fileLoad.then(fileData => {
-                const parseGpx = new Promise((resolve, reject) => {
-                    gpxParse.parseGpx(fileData, (error, gpxData) => {
-                        if (error !== null) {
-                            reject(error);          // error in parsing the file
-                        }
-                        resolve(gpxData);
-                    })
-                });
-                parseGpx.then(gpxData => {
-                    resolve(gpxData);
-                }, error => {
-                    reject(error);      // error parsing gpx
-                });
-            }, error => {
-                reject(error);      // errors in reading the file
-            });
-        });
-    }
+//    loadGpxFile(gpxFile) {
+//        let reader = new FileReader();
+//        const fileLoad = new Promise((resolve, reject) => {
+//            reader.onerror = event => reject(event.target.error.code);
+//            reader.onload = event => resolve(event.target.result);
+//        });
+//        reader.readAsText(gpxFile);
+//        return new Promise((resolve, reject) => {
+//            fileLoad.then(fileData => {
+//                const parseGpx = new Promise((resolve, reject) => {
+//                    gpxParse.parseGpx(fileData, (error, gpxData) => {
+//                        if (error !== null) {
+//                            reject(error);          // error in parsing the file
+//                        }
+//                        resolve(gpxData);
+//                    })
+//                });
+//                parseGpx.then(gpxData => {
+//                    resolve(gpxData);
+//                }, error => {
+//                    reject(error);      // error parsing gpx
+//                });
+//            }, error => {
+//                reject(error);      // errors in reading the file
+//            });
+//        });
+//    }
+
+    /**
+     * Calculates the distance between the two points using the haversine method.
+     * @param {number} lat1 The latitude of the first point.
+     * @param {number} lon1 The longtitude of the first point.
+     * @param {number} lat2 The latitude of the first point.
+     * @param {number} lon2 The longtitude of the first point.
+     * @returns {number} The distance in miles between the two points.
+    **/
+    calculateDistance(lat1, lon1, lat2, lon2) {
+            var dLat = (lat2 - lat1).toRad(),
+                    dLon = (lon2 - lon1).toRad();
+
+            lat1 = lat1.toRad();
+            lat2 = lat2.toRad();
+
+            var a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                    Math.sin(dLon / 2) * Math.sin(dLon / 2) * Math.cos(lat1) * Math.cos(lat2);
+            var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+            return greatCircleRadius.km * c;
+    };
+
 
     // returns distance traveled in _miles_, and climb in meters
     findDeltas(previousPoint, currentPoint) {
         // calculate distance and elevation from last
-        let distanceFromLast = gpxParse.utils.calculateDistance(previousPoint.lat, previousPoint.lon,
+        let distanceFromLast = this.calculateDistance(previousPoint.lat, previousPoint.lon,
             currentPoint.lat,currentPoint.lon);
         if (currentPoint.elevation > previousPoint.elevation) {
             return {distance:distanceFromLast,climb:currentPoint.elevation-previousPoint.elevation};
@@ -104,9 +140,9 @@ class AnalyzeRoute {
                 }
             }
             let delayInMinutes = controls[nextControl].duration;
-            let arrivalTime = moment(startTime).add(elapsedTimeInHours,'hours');
+            let arrivalTime = startTime.plus({hours:elapsedTimeInHours});
             let banked = Math.round(AnalyzeRoute.rusa_time(distanceInKm, elapsedTimeInHours));
-            calculatedValues.push({arrival:arrivalTime.format(finishTimeFormat),
+            calculatedValues.push({arrival:arrivalTime.toFormat(finishTimeFormat),
                 banked: banked,
                 val:controls[nextControl].id, lat:point.lat, lon:point.lon
             });
@@ -128,7 +164,7 @@ class AnalyzeRoute {
         let lastTime = 0;
         let previousAccumulatedTime = 0;
         // correct start time for time zone
-        let startTime = moment.tz(userStartTime.format('YYYY-MM-DDTHH:mm'), timeZoneId);
+        let startTime = DateTime.fromISO(userStartTime.toFormat("yyyy-MM-dd'T'HH:mm"), {zone:timeZoneId});
         let bearings = [];
         stream.filter(point => point.lat!==undefined && point.lon!==undefined).forEach(point => {
             bounds = setMinMaxCoords(point,bounds);
@@ -203,7 +239,7 @@ class AnalyzeRoute {
     }
 
     static formatFinishTime(startTime,accumulatedTime,restTime) {
-        return moment(startTime).add(accumulatedTime+restTime,'hours').format(finishTimeFormat);
+            return startTime.plus({hours:accumulatedTime+restTime}).toFormat(finishTimeFormat);
     }
 
     walkRwgpsRoute(routeData,startTime,pace,interval,controls,metric,timeZoneId) {
@@ -223,7 +259,7 @@ class AnalyzeRoute {
     }
 
     findTimezoneForPoint(lat, lon, time, maps_api_key) {
-        return fetch(`https://maps.googleapis.com/maps/api/timezone/json?location=${lat},${lon}&timestamp=${time.format("X")}&key=${maps_api_key}`).then( response => {
+        return fetch(`https://maps.googleapis.com/maps/api/timezone/json?location=${lat},${lon}&timestamp=${time.toFormat("X")}&key=${maps_api_key}`).then( response => {
             if (response.ok) {
                 return response.json();
             }
@@ -282,7 +318,7 @@ class AnalyzeRoute {
 
     static addToForecast(trackPoint, currentTime, elapsedTimeInHours, distanceInMiles) {
         return {lat:trackPoint.lat,lon:trackPoint.lon,distance:Math.round(distanceInMiles),
-            time:moment(currentTime).add(elapsedTimeInHours,'hours').format('YYYY-MM-DDTHH:mm:00ZZ')};
+            time:currentTime.plus({hours:elapsedTimeInHours}).toFormat("yyyy-MM-dd'T'HH:mm:00ZZZ")};
     }
 
     static getBearingBetween(trackBearing,windBearing) {
@@ -324,7 +360,7 @@ class AnalyzeRoute {
 
         stream.filter(point => point != null && point.lat !== undefined && point.lon !== undefined).forEach(currentPoint => {
             if (previousPoint !== null) {
-                let distanceInKm = gpxParse.utils.calculateDistance(previousPoint.lat, previousPoint.lon,
+                let distanceInKm = this.calculateDistance(previousPoint.lat, previousPoint.lon,
                     currentPoint.lat,currentPoint.lon);
                 totalDistanceInKm += distanceInKm;
 
@@ -367,7 +403,7 @@ class AnalyzeRoute {
         });
 
         return {time:totalMinutesLost,values:calculatedValues, gustSpeed:maxGustSpeed,
-            finishTime:moment(finishTime,finishTimeFormat).add(totalMinutesLost,'minutes').format(finishTimeFormat)};
+                finishTime:DateTime.fromFormat(finishTime,finishTimeFormat).plus({minutes:totalMinutesLost}).toFormat(finishTimeFormat)};
     };
 
     static calculateValuesForWind(controls, previouslyCalculatedValues,
@@ -375,12 +411,13 @@ class AnalyzeRoute {
                                   totalMinutesLost, start, totalDistanceInMiles) {
         if (controls.length > currentControl) {
             if (desiredDistance >= controls[currentControl].distance) {
-                let previousArrivalTime = moment(previouslyCalculatedValues[currentControl].arrival, finishTimeFormat);
-                let arrivalTime = previousArrivalTime.add(totalMinutesLost, 'minutes');
-                let elapsedTimeMs = arrivalTime.toDate() - start;
-                let elapsedDuration = moment.duration(elapsedTimeMs, 'ms');
-                let banked = Math.round(AnalyzeRoute.rusa_time(totalDistanceInMiles / kmToMiles, elapsedDuration.asHours()));
-                calculatedValues.push({...previouslyCalculatedValues[currentControl], arrival:arrivalTime.format(finishTimeFormat),banked:banked});
+                let previousArrivalTime = DateTime.fromFormat(previouslyCalculatedValues[currentControl].arrival, finishTimeFormat);
+                let arrivalTime = previousArrivalTime.plus({minutes:totalMinutesLost});
+                let elapsedTimeMs = arrivalTime.toJSDate() - start;
+                let elapsedDuration = Duration.fromMillis(elapsedTimeMs);
+                let banked = Math.round(AnalyzeRoute.rusa_time(totalDistanceInMiles / kmToMiles, elapsedDuration.as('hours')));
+                calculatedValues.push({...previouslyCalculatedValues[currentControl], arrival:arrivalTime.toFormat(finishTimeFormat),
+                    banked:banked});
 
                 currentControl++;
             }

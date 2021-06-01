@@ -7,7 +7,7 @@ import {connect} from 'react-redux';
 import {setWeatherRange, toggleWeatherRange, setTableViewed} from './actions/actions';
 import MediaQuery from 'react-responsive';
 import {finishTimeFormat} from './reducers/reducer';
-const moment = require('moment-timezone');
+import { DateTime } from 'luxon';
 
 const milesToMeters = 1609.34;
 const gustySpeed = 25;
@@ -77,7 +77,7 @@ export class ForecastTable extends Component {
 
     showTime = (index, length, time) => {
             if (index === length-1) {
-                return moment(this.props.finishTime, finishTimeFormat).format('h:mmA');
+                return DateTime.fromFormat(this.props.finishTime, finishTimeFormat).toFormat('h:mma');
             } else {
                 return time;
             }

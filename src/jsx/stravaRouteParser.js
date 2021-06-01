@@ -1,8 +1,8 @@
 import queryString from 'query-string';
-import moment from 'moment';
 import strava from 'strava-v3-alpaca'
 import cookie from 'react-cookies';
 import {paceToSpeed} from './ui/ridingPace';
+import { DateTime } from 'luxon';
 
 const metersToMiles = 0.00062137;
 const metersToFeet = 3.2808;
@@ -68,7 +68,7 @@ class StravaRouteParser {
     }
 
     static computeActualFinishTime(activity) {
-        return moment(activity['start_date']).add(activity['elapsed_time'],'seconds').format('ddd, MMM DD h:mma');
+            return DateTime.fromJSDate(activity['start_date']).plus({seconds:activity['elapsed_time']}).toFormat('EEE, MMM dd h:mma');
     }
 
     fetchActivity(activityId, token) {
@@ -88,7 +88,7 @@ class StravaRouteParser {
     findMovingAverages(activity,activityStreams,intervalInHours) {
         const min_speed = 1.3;  // m/s for 3pmh
 
-        let start = moment(activity.start_date);
+        let start = DateTime.fromJSDate(activity.start_date);
         let intervalInSeconds = intervalInHours * 3600;
         let distances = activityStreams.filter(stream => stream.type === 'distance')[0].data;
         let times = activityStreams.filter(stream => stream.type === 'time')[0].data;
@@ -108,7 +108,7 @@ class StravaRouteParser {
         const addToAverages = function (intervalStartTimeSeconds, startingDistanceMeters, distance,
                                         lastMovingTimeSeconds, value, movingNow) {
             // compute average, set up for next interval
-            let currentMoment = moment(start).add(intervalStartTimeSeconds, 'seconds');
+            let currentMoment = start.plus({seconds:intervalStartTimeSeconds});
             let distanceTraveledMeters = distance - startingDistanceMeters;
             let distanceTraveledMiles = distanceTraveledMeters * metersToMiles;
             // regardless of whether we're moving at this point, sum up the moving time
@@ -174,15 +174,15 @@ class StravaRouteParser {
         if (controlPoints.length === 0) {
             return;
         }
-        let startMoment = moment(start);
+        let startMoment = start;
         let controlsCopy = controlPoints.slice();
         let currentControl = controlsCopy.shift();
         let index = 0;
         for (let value of distance) {
             let distanceInMiles = value * metersToMiles;
             if (distanceInMiles >= currentControl.distance) {
-                let currentMoment = moment(startMoment).add(time[index],'seconds');
-                arrivalTimes.push({time:currentMoment.format('ddd, MMM DD h:mma'),val:currentControl.id});
+                let currentMoment = startMoment.plus({seconds:time[index]});
+                arrivalTimes.push({time:currentMoment.toFormat('EEE, MMM dd h:mma'),val:currentControl.id});
                 if (controlsCopy.length===0) {
                     return;
                 } else {

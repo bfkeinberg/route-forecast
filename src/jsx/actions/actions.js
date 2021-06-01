@@ -1,6 +1,6 @@
-import moment from 'moment';
 import cookie from 'react-cookies';
 import * as Sentry from '@sentry/browser';
+import { DateTime } from 'luxon';
 
 const componentLoader = (lazyComponent, attemptsLeft) => {
     return new Promise((resolve, reject) => {
@@ -305,13 +305,13 @@ export const setErrorDetails = function(details) {
 export const fetchTimeZone = (point, parser, rwgpsRouteData) => {
   return (dispatch, getState) => {
       let timeZonePromise = parser.findTimezoneForPoint(point.y, point.x,
-          moment(getState().uiInfo.routeParams.start), getState().params.timezone_api_key);
+          DateTime.fromJSDate(getState().uiInfo.routeParams.start), getState().params.timezone_api_key);
       return timeZonePromise.then(timeZoneResult => {
           dispatch(setTimeZone(timeZoneResult.zoneId,timeZoneResult.offset));
           dispatch(setRouteInfo(
               parser.walkRwgpsRoute(
                   rwgpsRouteData,
-                  moment(getState().uiInfo.routeParams.start),
+                  DateTime.fromJSDate(getState().uiInfo.routeParams.start),
                   getState().uiInfo.routeParams.pace,
                   getState().uiInfo.routeParams.interval,
                   getState().controls.userControlPoints,
@@ -338,13 +338,13 @@ export const recalcRoute = function() {
             let point = rwgpsRouteDatum['track_points'][0];
             //TODO: create another action for this section
             let timeZonePromise = parser.findTimezoneForPoint(point.y, point.x,
-                moment(getState().uiInfo.routeParams.start), getState().params.timezone_api_key);
+                DateTime.fromJSDate(getState().uiInfo.routeParams.start), getState().params.timezone_api_key);
             return timeZonePromise.then(timeZoneResult => {
                 dispatch(setTimeZone(timeZoneResult.zoneId,timeZoneResult.offset));
                 dispatch(setRouteInfo(
                     parser.walkRwgpsRoute(
                         rwgpsRouteData,
-                        moment(getState().uiInfo.routeParams.start),
+                        DateTime.fromJSDate(getState().uiInfo.routeParams.start),
                         getState().uiInfo.routeParams.pace,
                         getState().uiInfo.routeParams.interval,
                         getState().controls.userControlPoints,
@@ -374,13 +374,13 @@ export const recalcRoute = function() {
             }
             let point = getState().routeInfo.gpxRouteData.tracks[0].segments[0][0];
             let timeZonePromise = parser.findTimezoneForPoint(point.lat, point.lon,
-                moment(getState().uiInfo.routeParams.start), getState().params.timezone_api_key);
+                Datetime.fromJSDate(getState().uiInfo.routeParams.start), getState().params.timezone_api_key);
             return timeZonePromise.then(timeZoneResult => {
                 dispatch(setTimeZone(timeZoneResult.zoneId,timeZoneResult.offset));
                 dispatch(setRouteInfo(
                     parser.walkGpxRoute(
                         getState().routeInfo.gpxRouteData,
-                        moment(getState().uiInfo.routeParams.start),
+                        DateTime.fromJSDate(getState().uiInfo.routeParams.start),
                         getState().uiInfo.routeParams.pace,
                         getState().uiInfo.routeParams.interval,
                         getState().controls.userControlPoints,

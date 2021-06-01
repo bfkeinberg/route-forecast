@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXFileReference section */
+		D336A3472664AFBB0051C85A /* mapLoader.jsx */ = {isa = PBXFileReference; lastKnownFileType = text; name = mapLoader.jsx; path = ../src/jsx/mapLoader.jsx; sourceTree = "<group>"; };
+		D336A348266572470051C85A /* webpack.prod-nosentry.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = "webpack.prod-nosentry.js"; path = "../webpack.prod-nosentry.js"; sourceTree = "<group>"; };
 		D353731A25D61B2C004AF9AF /* actions.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = actions.js; path = ../src/jsx/actions/actions.js; sourceTree = "<group>"; };
 		D353731B25D61B48004AF9AF /* topLevel.jsx */ = {isa = PBXFileReference; lastKnownFileType = text; name = topLevel.jsx; path = ../src/jsx/app/topLevel.jsx; sourceTree = "<group>"; };
 		D353731C25D61B48004AF9AF /* app.jsx */ = {isa = PBXFileReference; lastKnownFileType = text; name = app.jsx; path = ../src/jsx/app/app.jsx; sourceTree = "<group>"; };
@@ -62,6 +64,7 @@
 				D35A34152634F86300238904 /* package-lock.json */,
 				D35A34142634F86300238904 /* package.json */,
 				D35A34182634F86300238904 /* webpack.common.js */,
+				D336A348266572470051C85A /* webpack.prod-nosentry.js */,
 				D35A34172634F86300238904 /* webpack.dev.js */,
 				D35A34162634F86300238904 /* webpack.prod.js */,
 				D353733725DB7FFE004AF9AF /* static */,
@@ -94,6 +97,7 @@
 				D353732125D61B79004AF9AF /* MobileUI.jsx */,
 				D353733025D61B79004AF9AF /* main.js */,
 				D353732825D61B79004AF9AF /* map.js */,
+				D336A3472664AFBB0051C85A /* mapLoader.jsx */,
 				D353732A25D61B79004AF9AF /* recalculate.js */,
 				D353732725D61B79004AF9AF /* paceExplanation.js */,
 				D353732225D61B79004AF9AF /* paceTable.js */,

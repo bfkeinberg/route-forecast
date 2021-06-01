@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import {Button} from '@blueprintjs/core';
 import {AgGridReact} from 'ag-grid-react';
-import ReactDOM from 'react-dom';
+//import ReactDOM from 'react-dom';
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 import {updateUserControls} from './actions/actions';

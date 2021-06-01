@@ -3,7 +3,7 @@ import {combineReducers} from 'redux';
 import RouteInfoForm from "../routeInfoEntry";
 // import Immutable from 'immutable';
 
-export const finishTimeFormat = 'ddd, MMM DD YYYY h:mma';
+export const finishTimeFormat = 'EEE, MMM dd yyyy h:mma';
 
 const defaultPace = 'D';
 const defaultIntervalInHours = 1;
@@ -73,6 +73,8 @@ export const routeParams = function(state = {interval:defaultIntervalInHours,pac
             return {...state,rwgpsRouteIsTrip:!state.rwgpsRouteIsTrip}
         case Actions.SET_ROUTE_IS_TRIP:
             return {...state,rwgpsRouteIsTrip:action.isTrip}
+        case Actions.BEGIN_FETCHING_FORECAST:
+            return {...state,initialStart:state.start}
         default:
             return state;
     }

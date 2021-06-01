@@ -53,7 +53,7 @@ module.exports = (env,argv) => merge(common(env,argv), {
             threshold: 10240,
             minRatio: 0.8
         }),
-        // new BundleAnalyzerPlugin()
+         new BundleAnalyzerPlugin()
     ],
     devtool: 'source-map'
 });

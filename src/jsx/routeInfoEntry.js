@@ -11,7 +11,6 @@ import PaceExplanation from './paceExplanation';
 import ForecastInterval from './ui/forecastInterval';
 import RidingPace from './ui/ridingPace';
 import Recalculate from './recalculate';
-import FileInput from './ui/fileInput';
 import DateSelect from './ui/dateSelect';
 import RideWithGpsId from './ui/rideWithGpsId';
 import RwGpsTypeSelector from './ui/rwGpsTypeSelector';
@@ -146,13 +145,6 @@ class RouteInfoForm extends Component {
                                 </Col>
                             </MediaQuery>
                         </Row>
-                        <MediaQuery minDeviceWidth={3000}>
-                            <Row noGutters>
-                                <Col sm={{size:"auto"}}>
-                                    <FileInput/>
-                                </Col>
-                            </Row>
-                        </MediaQuery>
                         <Row noGutters>
                             <Col sm={{size:"auto"}}>
                                 {this.state.showPinnedRoutes?null:<RideWithGpsId/>}
