@@ -62,7 +62,8 @@ module.exports = (env,argv) => merge(common(env,argv), {
             compressionOptions: {
                params: {
                  [zlib.constants.BROTLI_PARAM_QUALITY]: 11,
-               },
+               }
+            },
             exclude:[
                 /\.png/,
                 /\.ico/,
