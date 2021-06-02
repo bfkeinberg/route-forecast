@@ -52,13 +52,13 @@ module.exports = (env,argv) => {
                     }
                 },
                 {
-                    test: /\.(js|css)$/,
+                    test: /\.(js|css|scss)$/,
                     enforce: "pre",
                     use: [
                           {loader: "source-map-loader"}
                     ],
                     "exclude": [
-                                path.join(process.cwd(), 'node_modules/react-responsive')
+                        path.join(process.cwd(), 'node_modules/react-responsive')
                     ],
                 },
                 {
@@ -137,16 +137,16 @@ module.exports = (env,argv) => {
             {
                 Images: SRC_STATIC_DIR
             },
-            fallback: { "timers": require.resolve("timers-browserify"),
-                        "crypto": require.resolve("crypto-browserify"),
-                        "stream": require.resolve("stream-browserify"),
-                        "https": require.resolve("https-browserify"),
-                        "util": require.resolve("util"),
-                        "assert": require.resolve("assert"),
-                        "http": require.resolve("stream-http"),
-                        "os": require.resolve("os-browserify/browser"),
-                        "zlib": require.resolve("browserify-zlib"),
-                        "path": require.resolve("path-browserify"),
+            fallback: { "timers": false,
+                        "crypto": false,
+                        "stream": false,
+                        "https": false,
+                        "util": false,
+                        "assert": false,
+                        "http": false,
+                        "os": false,
+                        "zlib": false,
+                        "path": false,
                         "fs": false
             }
         }

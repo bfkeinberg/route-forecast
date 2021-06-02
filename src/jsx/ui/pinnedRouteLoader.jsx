@@ -19,7 +19,11 @@ const getPinnedRoutes = async (rwgpsUsername, rwgpsPassword, setErrorDetails, se
         return response.data;
     } catch (e) {
         console.log(e);
-        setErrorDetails(JSON.stringify(e.response.data));
+        if (e.response !== undefined) {
+            setErrorDetails(JSON.stringify(e.response.data));
+        } else {
+            setErrorDetails(e);
+        }
         setRwgpsCredentials(null, null);
         return null;
         

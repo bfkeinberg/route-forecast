@@ -9,7 +9,7 @@ const MapLoader = (props) => {
     if (props.hasMap) {
          return <Suspense fallback={<div>Loading Map...</div>}>
             <LoadableMap {...props}/>
-         </Suspense>
+         </Suspense>;
      } else {
         return <div>Map for forecast</div>
     }

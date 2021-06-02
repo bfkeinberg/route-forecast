@@ -1,13 +1,8 @@
 import React, {Component} from 'react';
 import MediaQuery from 'react-responsive';
-// for react-splitter
-//import 'normalize.css/normalize.css';
 import '@blueprintjs/core/lib/css/blueprint.css';
-import 'bootstrap/dist/css/bootstrap.min.css';
-import 'ag-grid-community/dist/styles/ag-grid.css';
-import 'ag-grid-community/dist/styles/ag-theme-fresh.css';
-import 'flatpickr/dist/themes/confetti.css';
 import 'Images/style.css';
+import 'Images/controlsStyles.css';
 import queryString from 'query-string';
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';

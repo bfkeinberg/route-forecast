@@ -1,7 +1,8 @@
 import {Spinner, Button} from '@blueprintjs/core';
 //import { Tooltip2 } from "@blueprintjs/popover2";
 import {Alert, Form, Card, CardBody, CardTitle, Col, Row, Container} from 'reactstrap';
-import React, {Component} from 'react';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import React, {Component, Suspense} from 'react';
 import ShortUrl from './ui/shortUrl';
 import MediaQuery from 'react-responsive';
 import PropTypes from 'prop-types';
@@ -11,7 +12,7 @@ import PaceExplanation from './paceExplanation';
 import ForecastInterval from './ui/forecastInterval';
 import RidingPace from './ui/ridingPace';
 import Recalculate from './recalculate';
-import DateSelect from './ui/dateSelect';
+//import DateSelect from './ui/dateSelect';
 import RideWithGpsId from './ui/rideWithGpsId';
 import RwGpsTypeSelector from './ui/rwGpsTypeSelector';
 import ForecastButton from './ui/forecastButton';
@@ -21,6 +22,15 @@ import BugReportButton from './ui/bugReportButton';
 import WeatherProvider from './ui/providerSelector';
 import PinnedRouteLoader from './ui/pinnedRouteLoader.jsx';
 import ErrorBoundary from "./errorBoundary";
+import {lazy} from '@loadable/component';
+
+const LoadableDatePicker = lazy(() => import(/* webpackChunkName: "DateSelect" */ /* webpackPrefetch: true */ './ui/dateSelect'));
+
+const DatePickerLoader = (props) => {
+     return <Suspense fallback={<div>Loading date-time picker...</div>}>
+        <LoadableDatePicker {...props}/>
+     </Suspense>
+};
 
 class RouteInfoForm extends Component {
     static propTypes = {
@@ -123,7 +133,7 @@ class RouteInfoForm extends Component {
                     <Form inline id="forecast_form">
                         <Row>
                             <Col>
-                                <DateSelect/>
+                                <DatePickerLoader/>
                                 <Recalculate/>
                             </Col>
                         </Row>

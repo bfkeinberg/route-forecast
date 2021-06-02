@@ -5,6 +5,7 @@ import {Icon} from '@blueprintjs/core';
 import {Label, FormGroup, UncontrolledTooltip} from 'reactstrap';
 import {connect} from 'react-redux';
 import {setStart} from "../actions/actions";
+import 'flatpickr/dist/themes/confetti.css';
 
 /*const setDateAndTime = function(dates, datestr, instance) {
     if (datestr === '') {
