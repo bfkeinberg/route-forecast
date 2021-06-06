@@ -8,7 +8,9 @@ const path = require('path');
 const fetch = require('node-fetch');
 const bodyParser = require('body-parser');
 const multer = require('multer'); // v1.0.5
-const upload = multer(); // for parsing multipart/form-data
+const upload = multer({
+limits: { fieldSize: 2 * 1024 * 1024 }
+}); // for parsing multipart/form-data
 const callWeatherService = require('./weatherForecastDispatcher');
 const url = require('url');
 var strava = require('strava-v3-alpaca');
