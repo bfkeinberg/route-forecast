@@ -65,6 +65,9 @@ const callVisualCrossing = function (lat, lon, currentTime, distance, zone, bear
             throw forecast.message;
         }
         const current = forecast.currentConditions;
+        if (current === undefined) {
+            throw "No current conditions";
+        }
         console.info(`returned was ${JSON.stringify(forecast)}`);
         const now = moment.unix(current.datetimeEpoch).tz(zone)
         console.log(`now is ${now}`);
@@ -72,13 +75,13 @@ const callVisualCrossing = function (lat, lon, currentTime, distance, zone, bear
         const windBearing = current.winddir;
         const relativeBearing = hasWind && windBearing !== undefined ? getBearingDifference(bearing, windBearing) : null;
         const rainy = current.precip !== 0;
-
+        const precip = current.precipprob !== undefined ? current.precipprob : forecast.days[0].precipprob;
         return {
             'time':now.format('h:mmA'),
             'distance':distance,
             'summary':forecast.days[0].conditions,
             'tempStr':`${Math.round(current.temp)}F`,
-            'precip':current.precipprob===undefined?'<unavailable>':`${(current.precipprob).toFixed(1)}%`,
+            'precip':`${(precip).toFixed(1)}%`,
             'cloudCover':current.cloudcover===undefined?'<unavailable>':`${current.cloudcover.toFixed(1)}%`,
             'windSpeed':!hasWind?'<unavailable>':`${Math.round(current.windspeed)}`,
             'lat':lat,
