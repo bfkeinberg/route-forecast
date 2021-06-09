@@ -2,6 +2,7 @@ import React, {Component} from 'react';
 import {Table, UncontrolledTooltip} from 'reactstrap';
 import ErrorBoundary from "./errorBoundary";
 import darkSky from 'Images/darkSkySmall.png';
+import climacell from 'Images/Powered_by_Tomorrow-Black.png';
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 import {setWeatherRange, toggleWeatherRange, setTableViewed} from './actions/actions';
@@ -21,7 +22,8 @@ export class ForecastTable extends Component {
         setTableViewed:PropTypes.func.isRequired,
         metric:PropTypes.bool.isRequired,
         gustSpeed: PropTypes.number,
-        finishTime: PropTypes.string.isRequired
+        finishTime: PropTypes.string.isRequired,
+        provider: PropTypes.string.isRequired
     };
 
     constructor(props) {
@@ -83,6 +85,17 @@ export class ForecastTable extends Component {
             }
         }
 
+    displayBacklink = (provider) => {
+            if (provider === 'darksky') {
+                return <a tabIndex='-1' href="https://darksky.net/poweredby/"><img src={darkSky}/></a>;
+            } else if (provider === 'climacell') {
+                    return <a tabIndex='-1' href="https://www.tomorrow.io/"><img src={climacell}/></a>;
+            } else {
+                return <a href="https://www.weatherapi.com/" title="Free Weather API"><img src='//cdn.weatherapi.com/v4/images/weatherapi_logo.png' alt="Weather data by WeatherAPI.com" border="0"/></a>;
+            }
+            
+    }
+                
     expandTable(forecast, metric) {
         if (forecast.length > 0) {
             return (
@@ -138,7 +151,7 @@ export class ForecastTable extends Component {
         return (
                 <div className="animated slideInLeft">
                     <ErrorBoundary>
-                    <a tabIndex='-1' href="https://darksky.net/poweredby/"><img src={darkSky}/></a>
+                    {this.displayBacklink(this.props.provider)}
                     <span id={weatherId}>{weatherCorrections}</span>
                     <Table size='sm' hover bordered>
                         <thead>
@@ -171,6 +184,7 @@ export class ForecastTable extends Component {
 const mapStateToProps = (state) =>
     ({
         forecast: state.forecast.forecast,
+        provider: state.forecast.weatherProvider,
         weatherCorrectionMinutes: state.routeInfo.weatherCorrectionMinutes,
         gustSpeed: state.routeInfo.maxGustSpeed,
         metric: state.controls.metric,
