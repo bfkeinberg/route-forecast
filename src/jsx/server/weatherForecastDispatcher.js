@@ -1,6 +1,7 @@
 const callDarkSky = require('./weatherCalculator');
 const callClimacell = require('./climacell');
 const callWeatherApi = require('./weatherApi');
+const callVisualCrossing = require('./visualCrossing');
 
 const getBearingDifference = function (bearing,windBearing) {
     return Math.min(bearing - windBearing < 0 ? bearing - windBearing + 360 : bearing - windBearing,
@@ -30,6 +31,8 @@ const callWeatherService = function (service, lat, lon, currentTime, distance, z
         return callClimacell(lat, lon, currentTime, distance, zone, bearing, getBearingDifference);
     case 'weatherapi':
         return callWeatherApi(lat, lon, currentTime, distance, zone, bearing, getBearingDifference);
+    case 'visualcrossing':
+        return callVisualCrossing(lat, lon, currentTime, distance, zone, bearing, getBearingDifference);
     default:
         return null;
     }
