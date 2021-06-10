@@ -88,7 +88,7 @@ class StravaRouteParser {
     findMovingAverages(activity,activityStreams,intervalInHours) {
         const min_speed = 1.3;  // m/s for 3pmh
 
-        let start = DateTime.fromJSDate(activity.start_date);
+        let start = DateTime.fromISO(activity.start_date);
         let intervalInSeconds = intervalInHours * 3600;
         let distances = activityStreams.filter(stream => stream.type === 'distance')[0].data;
         let times = activityStreams.filter(stream => stream.type === 'time')[0].data;
@@ -121,7 +121,7 @@ class StravaRouteParser {
             return ({
                 speed: movingAverage, distance: distanceTraveledMiles, climb: climbInFeet,
                 start:startingDistanceMeters, end:distance,
-                pace: pace, alphaPace: StravaRouteParser.getAlphaPace(Math.round(pace)), time: currentMoment.format('ddd, MMM DD h:mma')
+                pace: pace, alphaPace: StravaRouteParser.getAlphaPace(Math.round(pace)), time: currentMoment.toFormat('EEE, MMM dd h:mma')
             });
         };
 
@@ -174,7 +174,8 @@ class StravaRouteParser {
         if (controlPoints.length === 0) {
             return;
         }
-        let startMoment = start;
+            console.info(`activity start ${start}`);
+        let startMoment = DateTime.fromJSDate(start);
         let controlsCopy = controlPoints.slice();
         let currentControl = controlsCopy.shift();
         let index = 0;

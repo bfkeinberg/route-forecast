@@ -89,6 +89,10 @@ module.exports = (env,argv) => {
         plugins: [
             new CleanWebpackPlugin({}),
             new webpack.DefinePlugin({SENTRY_RELEASE: JSON.stringify(env.sentryRelease), "process.env": "{}"}),
+            new webpack.ProvidePlugin({
+                Buffer: ['buffer', 'Buffer'],
+                process: 'process/browser',
+            }),
             new MiniCssExtractPlugin({
                 // Options similar to the same options in webpackOptions.output
                 // both options are optional
@@ -138,16 +142,15 @@ module.exports = (env,argv) => {
                 Images: SRC_STATIC_DIR
             },
             fallback: { "timers": false,
-                        "crypto": false,
-                        "stream": false,
-                        "https": false,
-                        "util": false,
                         "assert": false,
-                        "http": false,
-                        "os": false,
+                        "crypto": require.resolve("crypto-browserify"),
+                        "https": require.resolve("https-browserify"),
+                        "stream": require.resolve("stream-browserify"),
+                        "http": require.resolve("stream-http"),
                         "zlib": false,
-                        "path": false,
-                        "fs": false
+                        "os": require.resolve("os-browserify/browser"),
+                        "fs": require.resolve("browserify-fs"),
+                        "path": false
             }
         }
     }
