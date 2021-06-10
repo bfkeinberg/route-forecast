@@ -68,7 +68,7 @@ class StravaRouteParser {
     }
 
     static computeActualFinishTime(activity) {
-            return DateTime.fromJSDate(activity['start_date']).plus({seconds:activity['elapsed_time']}).toFormat('EEE, MMM dd h:mma');
+            return DateTime.fromISO(activity['start_date']).plus({seconds:activity['elapsed_time']}).toFormat('EEE, MMM dd h:mma');
     }
 
     fetchActivity(activityId, token) {
