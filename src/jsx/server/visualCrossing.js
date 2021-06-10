@@ -46,19 +46,17 @@ const weatherCodes = {
  * lat: *, lon: *, temp: string, fullTime: *, relBearing: null, rainy: boolean, windBearing: number,
  * vectorBearing: *, gust: string} | never>} a promise to evaluate to get the forecast results
  */
-const callClimacell = function (lat, lon, currentTime, distance, zone, bearing, getBearingDifference) {
-    const climacellKey = process.env.CLIMACELL_KEY;
+const callVisualCrossing = function (lat, lon, currentTime, distance, zone, bearing, getBearingDifference) {
+    const visualCrossingKey = process.env.VISUAL_CROSSING_KEY;
     const startTime = moment(currentTime);
     const endTime = startTime.clone();
     endTime.add(1, 'hours');
-    const startTimeString = startTime.utc().format('YYYY-MM-DD[T]HH:mm:ss[Z]');
-    const endTimeString = endTime.utc().format('YYYY-MM-DD[T]HH:mm:ss[Z]');
-    const now = startTime.tz(zone);
-    console.log(`now is ${now}`);
-    const url = `https://data.climacell.co/v4/timelines?location=${lat},${lon}&fields=windSpeed&fields=precipitationProbability&fields=windDirection&fields=temperature&fields=temperatureApparent&fields=windGust&fields=cloudCover&fields=precipitationType&fields=weatherCode&timezone=${zone}&startTime=${startTimeString}&endTime=${endTimeString}&timesteps=1h&units=imperial&apikey=${climacellKey}`;
+    const startTimeString = startTime.unix();
+    const endTimeString = endTime.unix();
+    const url = `https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/${lat},${lon}/${startTimeString}?unitGroup=us&include=current&options=nonulls&key=${visualCrossingKey}`;
+//    console.info(`url is ${url}`)
     const forecastResult = fetch(url).then(response => {
         const result = response.json();
-        result.apiCalls = response.headers.get('X-RateLimit-Remaining-day');
         return result;
     }).
     then(forecast => {
@@ -66,34 +64,36 @@ const callClimacell = function (lat, lon, currentTime, distance, zone, bearing, 
             console.error(`got error code ${forecast.code}`);
             throw forecast.message;
         }
-        if (forecast.apiCalls < 50) {
-            throw Error({'details':'Daily count exceeded'});
+        const current = forecast.currentConditions;
+        if (current === undefined) {
+            throw "No current conditions";
         }
-        const current = forecast.data.timelines[0];
-        const values = current.intervals[0].values;
-        const hasWind = values.windSpeed !== undefined;
-        const windBearing = values.windDirection;
+        console.info(`returned was ${JSON.stringify(forecast)}`);
+        const now = moment.unix(current.datetimeEpoch).tz(zone)
+        console.log(`now is ${now}`);
+        const hasWind = current.windspeed !== undefined;
+        const windBearing = current.winddir;
         const relativeBearing = hasWind && windBearing !== undefined ? getBearingDifference(bearing, windBearing) : null;
-        const rainy = current.precipitationType === 1;
-
+        const rainy = current.precip !== 0;
+        const precip = current.precipprob !== undefined ? current.precipprob : forecast.days[0].precipprob;
         return {
             'time':now.format('h:mmA'),
             'distance':distance,
-            'summary':weatherCodes[values.weatherCode],
-            'tempStr':`${Math.round(values.temperature)}F`,
-            'precip':values.precipitationProbability===undefined?'<unavailable>':`${values.precipitationProbability.toFixed(1)}%`,
-            'cloudCover':values.cloudCover===undefined?'<unavailable>':`${values.cloudCover.toFixed(1)}%`,
-            'windSpeed':!hasWind?'<unavailable>':`${Math.round(values.windSpeed)}`,
+            'summary':forecast.days[0].conditions,
+            'tempStr':`${Math.round(current.temp)}F`,
+            'precip':`${(precip).toFixed(1)}%`,
+            'cloudCover':current.cloudcover===undefined?'<unavailable>':`${current.cloudcover.toFixed(1)}%`,
+            'windSpeed':!hasWind?'<unavailable>':`${Math.round(current.windspeed)}`,
             'lat':lat,
             'lon':lon,
-            'temp':`${Math.round(values.temperature)}`,
+            'temp':`${Math.round(current.temp)}`,
             'fullTime':now.format('ddd MMM D h:mmA YYYY'),
             'relBearing':relativeBearing,
             'rainy':rainy,
             'windBearing':Math.round(windBearing),
             'vectorBearing':bearing,
-            'gust':values.windGust===undefined?'<unavailable>':`${Math.round(values.windGust)}`,
-            'feel':values.temperatureApparent===undefined?Math.round(values.temperature):Math.round(values.temperatureApparent)
+            'gust':current.windgust===undefined?'<unavailable>':`${Math.round(current.windgust)}`,
+            'feel':current.feelslike===undefined?Math.round(current.temperature):Math.round(current.feelslike)
         }
     }).
     catch(error => {
@@ -103,4 +103,4 @@ const callClimacell = function (lat, lon, currentTime, distance, zone, bearing, 
     return forecastResult;
 };
 
-module.exports = callClimacell;
+module.exports = callVisualCrossing;

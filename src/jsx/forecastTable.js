@@ -3,6 +3,7 @@ import {Table, UncontrolledTooltip} from 'reactstrap';
 import ErrorBoundary from "./errorBoundary";
 import darkSky from 'Images/darkSkySmall.png';
 import climacell from 'Images/Powered_by_Tomorrow-Black.png';
+import visualcrossing from 'Images/visualCrossing.png';
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 import {setWeatherRange, toggleWeatherRange, setTableViewed} from './actions/actions';
@@ -86,14 +87,18 @@ export class ForecastTable extends Component {
         }
 
     displayBacklink = (provider) => {
-            if (provider === 'darksky') {
-                return <a tabIndex='-1' href="https://darksky.net/poweredby/"><img src={darkSky}/></a>;
-            } else if (provider === 'climacell') {
+            switch (provider) {
+                case 'darksky':
+                    return <a tabIndex='-1' href="https://darksky.net/poweredby/"><img src={darkSky}/></a>;
+                case 'climacell':
                     return <a tabIndex='-1' href="https://www.tomorrow.io/"><img src={climacell}/></a>;
-            } else {
-                return <a href="https://www.weatherapi.com/" title="Free Weather API"><img src='//cdn.weatherapi.com/v4/images/weatherapi_logo.png' alt="Weather data by WeatherAPI.com" border="0"/></a>;
+                case 'weatherapi':
+                    return <a href="https://www.weatherapi.com/" title="Free Weather API"><img src='//cdn.weatherapi.com/v4/images/weatherapi_logo.png' alt="Weather data by WeatherAPI.com" border="0"/></a>;
+                case 'visualcrossing':
+//                    return <a href="https://www.visualcrossing.com/weather-data"><img src={visualcrossing}/></a>;
+                    return <div><a href="https://www.visualcrossing.com/weather-data">Powered by Visual Crossing Weather</a><p/></div>;
+                default: return <div/>;
             }
-            
     }
                 
     expandTable(forecast, metric) {
