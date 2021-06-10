@@ -1,5 +1,5 @@
 import queryString from 'query-string';
-import strava from 'strava-v3-alpaca'
+import { Api } from 'rest-api-handler';
 import cookie from 'react-cookies';
 import {paceToSpeed} from './ui/ridingPace';
 import { DateTime } from 'luxon';
@@ -11,6 +11,7 @@ class StravaRouteParser {
     constructor() {
         this.processActivityStream = this.processActivityStream.bind(this);
         this.fetchActivity = this.fetchActivity.bind(this);
+        this.api = new Api('https://www.strava.com/api/v3', [(response) => Promise.resolve(response.json())]);
     }
 
     fetchStravaActivity(activityId, token) {
@@ -18,10 +19,11 @@ class StravaRouteParser {
             StravaRouteParser.authenticate(activityId);
             return new Promise((resolve, reject) => reject(new Error('fetching authentication token')));
         }
-        let activityPromise = this.fetchActivity(activityId, token);
+        this.api.setDefaultHeader('Authorization', `Bearer ${token}`);
+        let activityPromise = this.fetchActivity(activityId, this.api);
         return new Promise((resolve, reject) => {
             activityPromise.then(activityData => {
-                    let activityDataPromise = this.processActivityStream(activityId,token);
+                    let activityDataPromise = this.processActivityStream(activityId, this.api);
                     activityDataPromise.then(activityStream => {
                             if (activityData.message !== undefined) {
                                 cookie.remove('strava_token');
@@ -71,18 +73,8 @@ class StravaRouteParser {
             return DateTime.fromISO(activity['start_date']).plus({seconds:activity['elapsed_time']}).toFormat('EEE, MMM dd h:mma');
     }
 
-    fetchActivity(activityId, token) {
-        return new Promise((resolve, reject) => {
-            strava.activities.get({access_token: token, id: activityId},
-                function (err, payload) {
-                    if (err) {
-                        reject(err);
-                    } else {
-                        resolve(payload);
-                    }
-                }
-            );
-        });
+    fetchActivity(activityId, api) {
+        return api.get(`/activities/${activityId}`);
     }
 
     findMovingAverages(activity,activityStreams,intervalInHours) {
@@ -90,10 +82,10 @@ class StravaRouteParser {
 
         let start = DateTime.fromISO(activity.start_date);
         let intervalInSeconds = intervalInHours * 3600;
-        let distances = activityStreams.filter(stream => stream.type === 'distance')[0].data;
-        let times = activityStreams.filter(stream => stream.type === 'time')[0].data;
-        let altitudes = activityStreams.filter(stream => stream.type === 'altitude')[0].data;
-        let speeds = activityStreams.filter(stream => stream.type === 'velocity_smooth')[0].data;
+        let distances = activityStreams.distance.data;
+        let times = activityStreams.time.data;
+        let altitudes = activityStreams.altitude.data;
+        let speeds = activityStreams.velocity_smooth.data;
 
         let index = 0;
         let startingDistanceMeters = 0;
@@ -174,7 +166,6 @@ class StravaRouteParser {
         if (controlPoints.length === 0) {
             return;
         }
-            console.info(`activity start ${start}`);
         let startMoment = DateTime.fromISO(start);
         let controlsCopy = controlPoints.slice();
         let currentControl = controlsCopy.shift();
@@ -198,29 +189,15 @@ class StravaRouteParser {
         let arrivalTimes = [];
         let modifiedControls = controlPoints.slice();
         modifiedControls.sort((a,b) => a['distance']-b['distance']);
-        let distances = activityStream.filter(stream => stream.type === 'distance')[0].data;
-        let times = activityStream.filter(stream => stream.type === 'time')[0].data;
+        let distances = activityStream.distance.data;
+        let times = activityStream.time.data;
         StravaRouteParser.walkActivity(activity['start_date'], distances, times, modifiedControls,arrivalTimes);
         arrivalTimes.sort((a,b) => a['val']-b['val']);
         return arrivalTimes;
     }
 
-    processActivityStream(activityId,token) {
-        const promise = new Promise((resolve, reject) =>
-        {
-            strava.streams.activity({access_token:token, id:activityId, types:'distance,time,altitude,velocity_smooth,latlng'},
-                function(err,payload)
-                {
-                    if (err) {
-                        reject(err);
-                    } else {
-                        resolve(payload);
-                    }
-                }
-            );
-        }
-        );
-        return promise;
+    processActivityStream(activityId,api) {
+        return api.get(`activities/${activityId}/streams?keys=distance,time,altitude,velocity_smooth,latlng&key_by_type=true`);
     }
 
     static authenticate(activityId) {
