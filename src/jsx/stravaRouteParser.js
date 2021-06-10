@@ -175,7 +175,7 @@ class StravaRouteParser {
             return;
         }
             console.info(`activity start ${start}`);
-        let startMoment = DateTime.fromJSDate(start);
+        let startMoment = DateTime.fromISO(start);
         let controlsCopy = controlPoints.slice();
         let currentControl = controlsCopy.shift();
         let index = 0;
