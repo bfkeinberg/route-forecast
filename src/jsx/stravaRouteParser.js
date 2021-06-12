@@ -1,5 +1,5 @@
 import queryString from 'query-string';
-import strava from 'strava-v3-alpaca'
+import { Api } from 'rest-api-handler';
 import cookie from 'react-cookies';
 import {paceToSpeed} from './ui/ridingPace';
 import { DateTime } from 'luxon';
@@ -11,6 +11,7 @@ class StravaRouteParser {
     constructor() {
         this.processActivityStream = this.processActivityStream.bind(this);
         this.fetchActivity = this.fetchActivity.bind(this);
+        this.api = new Api('https://www.strava.com/api/v3', [(response) => Promise.resolve(response.json())]);
     }
 
     fetchStravaActivity(activityId, token) {
@@ -18,10 +19,11 @@ class StravaRouteParser {
             StravaRouteParser.authenticate(activityId);
             return new Promise((resolve, reject) => reject(new Error('fetching authentication token')));
         }
-        let activityPromise = this.fetchActivity(activityId, token);
+        this.api.setDefaultHeader('Authorization', `Bearer ${token}`);
+        let activityPromise = this.fetchActivity(activityId, this.api);
         return new Promise((resolve, reject) => {
             activityPromise.then(activityData => {
-                    let activityDataPromise = this.processActivityStream(activityId,token);
+                    let activityDataPromise = this.processActivityStream(activityId, this.api);
                     activityDataPromise.then(activityStream => {
                             if (activityData.message !== undefined) {
                                 cookie.remove('strava_token');
@@ -71,68 +73,53 @@ class StravaRouteParser {
             return DateTime.fromISO(activity['start_date']).plus({seconds:activity['elapsed_time']}).toFormat('EEE, MMM dd h:mma');
     }
 
-    fetchActivity(activityId, token) {
-        return new Promise((resolve, reject) => {
-            strava.activities.get({access_token: token, id: activityId},
-                function (err, payload) {
-                    if (err) {
-                        reject(err);
-                    } else {
-                        resolve(payload);
-                    }
-                }
-            );
-        });
+    fetchActivity(activityId, api) {
+        return api.get(`/activities/${activityId}`);
     }
 
     findMovingAverages(activity,activityStreams,intervalInHours) {
-        const min_speed = 1.3;  // m/s for 3pmh
-
         let start = DateTime.fromISO(activity.start_date);
         let intervalInSeconds = intervalInHours * 3600;
-        let distances = activityStreams.filter(stream => stream.type === 'distance')[0].data;
-        let times = activityStreams.filter(stream => stream.type === 'time')[0].data;
-        let altitudes = activityStreams.filter(stream => stream.type === 'altitude')[0].data;
-        let speeds = activityStreams.filter(stream => stream.type === 'velocity_smooth')[0].data;
+        let distances = activityStreams.distance.data;
+        let times = activityStreams.time.data;
+        let altitudes = activityStreams.altitude.data;
+        let speeds = activityStreams.velocity_smooth.data;
 
         let index = 0;
         let startingDistanceMeters = 0;
-        let lastMovingTimeSeconds = null;
-        let intervalMovingTimeSeconds = 0;
         let intervalStartTimeSeconds = 0;
-        let isMoving = speeds[0] >= min_speed;
         let intervalElevationGainMeters = 0;
         let lastElevation = null;
         let averages = [];
 
         const addToAverages = function (intervalStartTimeSeconds, startingDistanceMeters, distance,
-                                        lastMovingTimeSeconds, value, movingNow) {
+                                        intervalMovingTimeSeconds, value, stoppedTimeSeconds) {
             // compute average, set up for next interval
             let currentMoment = start.plus({seconds:intervalStartTimeSeconds});
             let distanceTraveledMeters = distance - startingDistanceMeters;
             let distanceTraveledMiles = distanceTraveledMeters * metersToMiles;
-            // regardless of whether we're moving at this point, sum up the moving time
-            if (movingNow) {
-                intervalMovingTimeSeconds += (value - lastMovingTimeSeconds);
-            }
             let movingAverage = (distanceTraveledMiles) / (intervalMovingTimeSeconds / 3600);
             let climbInFeet = intervalElevationGainMeters * metersToFeet;
             let pace = StravaRouteParser.wwPaceCalc(climbInFeet, distanceTraveledMiles, movingAverage);
             return ({
                 speed: movingAverage, distance: distanceTraveledMiles, climb: climbInFeet,
                 start:startingDistanceMeters, end:distance,
-                pace: pace, alphaPace: StravaRouteParser.getAlphaPace(Math.round(pace)), time: currentMoment.toFormat('EEE, MMM dd h:mma')
+                pace: pace, alphaPace: StravaRouteParser.getAlphaPace(Math.round(pace)),
+                time: currentMoment.toFormat('EEE, MMM dd h:mma'), stoppedTimeSeconds: stoppedTimeSeconds
             });
         };
 
+        const moving = activityStreams.moving.data;
+        let prevTime = 0;
+        let movingTimeSeconds = 0;
+        let stoppedTimeSeconds = 0;
         for (let value of times) {
-            if (speeds[index] >= min_speed && !isMoving) {
-                lastMovingTimeSeconds = value;
-                isMoving = true;
-            } else if (speeds[index] < min_speed && isMoving) {
-                intervalMovingTimeSeconds += (value - lastMovingTimeSeconds);
-                isMoving = false;
+            if (moving[index]) {
+                movingTimeSeconds += value - prevTime;
+            } else {
+                stoppedTimeSeconds += value - prevTime;
             }
+            prevTime = value;
             // try to apply some smoothing to elevation gain
             if (lastElevation !== null) {
                 if (altitudes[index] > (lastElevation + 0.2)) {
@@ -145,20 +132,20 @@ class StravaRouteParser {
             lastElevation = altitudes[index];
             // only calculate speed while we are moving, and determine the moving time by adding moving time
             // in the interval up until now, and add in the time since we started moving most recently
-            if (isMoving && ((value - lastMovingTimeSeconds) + intervalMovingTimeSeconds) >= intervalInSeconds) {
-                averages.push(addToAverages(intervalStartTimeSeconds,startingDistanceMeters,distances[index],
-                    lastMovingTimeSeconds,value,speeds[index] >= min_speed));
-                intervalMovingTimeSeconds = 0;
+            if (moving[index] && movingTimeSeconds >= intervalInSeconds) {
+                averages.push(addToAverages(intervalStartTimeSeconds, startingDistanceMeters, distances[index],
+                                            movingTimeSeconds, value, stoppedTimeSeconds));
                 intervalStartTimeSeconds = value;
                 startingDistanceMeters = distances[index];
                 intervalElevationGainMeters = 0;
-                lastMovingTimeSeconds = value;
+                movingTimeSeconds = 0;
+                stoppedTimeSeconds = 0;
             }
             ++index;
         }
-        if (intervalMovingTimeSeconds > 0) {
+        if (movingTimeSeconds > 0) {
             averages.push(addToAverages(intervalStartTimeSeconds,startingDistanceMeters,distances[distances.length-1],
-                lastMovingTimeSeconds,times[times.length-1],speeds[speeds.length-1]>= min_speed));
+                                        movingTimeSeconds, times[times.length-1], stoppedTimeSeconds));
         }
         return averages;
     }
@@ -174,7 +161,6 @@ class StravaRouteParser {
         if (controlPoints.length === 0) {
             return;
         }
-            console.info(`activity start ${start}`);
         let startMoment = DateTime.fromISO(start);
         let controlsCopy = controlPoints.slice();
         let currentControl = controlsCopy.shift();
@@ -198,29 +184,15 @@ class StravaRouteParser {
         let arrivalTimes = [];
         let modifiedControls = controlPoints.slice();
         modifiedControls.sort((a,b) => a['distance']-b['distance']);
-        let distances = activityStream.filter(stream => stream.type === 'distance')[0].data;
-        let times = activityStream.filter(stream => stream.type === 'time')[0].data;
-        StravaRouteParser.walkActivity(activity['start_date'], distances, times, modifiedControls,arrivalTimes);
+        let distances = activityStream.distance.data;
+        let times = activityStream.time.data;
+        StravaRouteParser.walkActivity(activity['start_date'], distances, times, modifiedControls, arrivalTimes);
         arrivalTimes.sort((a,b) => a['val']-b['val']);
         return arrivalTimes;
     }
 
-    processActivityStream(activityId,token) {
-        const promise = new Promise((resolve, reject) =>
-        {
-            strava.streams.activity({access_token:token, id:activityId, types:'distance,time,altitude,velocity_smooth,latlng'},
-                function(err,payload)
-                {
-                    if (err) {
-                        reject(err);
-                    } else {
-                        resolve(payload);
-                    }
-                }
-            );
-        }
-        );
-        return promise;
+    processActivityStream(activityId,api) {
+        return api.get(`activities/${activityId}/streams?keys=distance,time,altitude,velocity_smooth,moving,latlng&key_by_type=true`);
     }
 
     static authenticate(activityId) {

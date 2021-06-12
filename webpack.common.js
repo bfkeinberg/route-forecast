@@ -141,17 +141,6 @@ module.exports = (env,argv) => {
             {
                 Images: SRC_STATIC_DIR
             },
-            fallback: { "timers": false,
-                        "assert": false,
-                        "crypto": require.resolve("crypto-browserify"),
-                        "https": require.resolve("https-browserify"),
-                        "stream": require.resolve("stream-browserify"),
-                        "http": require.resolve("stream-http"),
-                        "zlib": false,
-                        "os": require.resolve("os-browserify/browser"),
-                        "fs": require.resolve("browserify-fs"),
-                        "path": false
-            }
         }
     }
 };
