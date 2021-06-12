@@ -13,7 +13,8 @@ class PaceTable extends Component {
             time:PropTypes.string.isRequired,
             pace:PropTypes.number,
             alphaPace:PropTypes.string.isRequired,
-            climb:PropTypes.number
+            climb:PropTypes.number,
+            stoppedTime:PropTypes.number
         })).isRequired,
         setSubrange:PropTypes.func.isRequired,
         toggleMapRange:PropTypes.func.isRequired,
@@ -51,6 +52,7 @@ class PaceTable extends Component {
                     <td>{pace.alphaPace}</td>
                     <td>{pace.distance.toFixed(0)}</td>
                     <td>{pace.climb.toFixed(0)}</td>
+                   <td>{(pace.stoppedTimeSeconds/60).toFixed(1)}min</td>
                 </tr>
             )}
             </tbody>
