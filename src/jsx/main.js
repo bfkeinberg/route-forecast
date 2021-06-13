@@ -187,7 +187,9 @@ export class RouteWeatherUI extends Component {
         }
         RouteWeatherUI.getStravaToken(queryParams,props);
         props.setInitialStart(queryParams.start);
-        props.setPace(queryParams.pace.trim());
+        if (queryParams.pace !== undefined) {
+            props.setPace(queryParams.pace.trim());
+        }
         props.setInterval(queryParams.interval);
         props.setMetric(queryParams.metric==="true");
         props.setStravaActivity(queryParams.strava_activity);
