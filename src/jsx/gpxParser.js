@@ -27,7 +27,6 @@ class AnalyzeRoute {
     constructor() {
         this.walkRwgpsRoute = this.walkRwgpsRoute.bind(this);
         this.walkGpxRoute = this.walkGpxRoute.bind(this);
-//        this.loadGpxFile = this.loadGpxFile.bind(this);
         this.analyzeRoute = this.analyzeRoute.bind(this);
     }
 
