@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import Flatpickr from 'react-flatpickr'
 import {Icon} from '@blueprintjs/core';
-import {Label, FormGroup, UncontrolledTooltip} from 'reactstrap';
+import {Label, UncontrolledTooltip, Row, Col} from 'reactstrap';
 import {connect} from 'react-redux';
 import {setStart} from "../actions/actions";
 import 'flatpickr/dist/themes/confetti.css';
@@ -23,12 +23,12 @@ const DateSelect = ({start,setStart}) => {
     later.setDate(now.getDate() + daysToAdd);
 
     return (
-        <FormGroup row size='sm' tabIndex="1"
-                   style={{flex:'1',display:'inline-flex',alignItems:'center'}}>
+        <Row tabIndex="1">
             <UncontrolledTooltip placement='bottom' target="startingTime">When you plan to begin riding</UncontrolledTooltip>
-            <Icon icon="calendar"/>
-            <Label for='calendar' size='sm' tag='b' id='startingTime'>Starting time</Label>
-            <Flatpickr key={start.getTime()} id='calendar'
+            <Col>
+                <Icon icon="calendar"/>
+                <Label for='calendar' size='sm' tag='b' id='startingTime'>Starting time</Label>
+                <Flatpickr key={start.getTime()} id='calendar'
                        options={{enableTime: true,
                            altInput: true, altFormat: 'F j, Y h:i K',
                            altInputClass: 'dateDisplay',
@@ -37,7 +37,8 @@ const DateSelect = ({start,setStart}) => {
                            dateFormat: 'Y-m-d H:i',
                            onParseConfig:(dates,datestr,instance) => instance.config.onClose.push((dates) => {setStart(new Date(dates[0]))})
                        }}/>
-        </FormGroup>
+            </Col>
+        </Row>
     );
 };
 
