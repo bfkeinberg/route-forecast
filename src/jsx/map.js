@@ -109,6 +109,7 @@ class RouteForecastMap extends Component {
         let northEast = { lat:bounds.max_latitude, lng:bounds.max_longitude };
         if (isNaN(bounds.min_latitude) || isNaN(bounds.max_latitude)) {
             console.error(`Bad latitude in bounds`);
+            return new google.maps.LatLngBounds({lat:0,lng:0},{lat:0,lng:0});
         }
         const defaultBounds = new google.maps.LatLngBounds(southWest,northEast);
         if (this.props.subrange.length === 2 && !isNaN(this.props.subrange[1])) {
@@ -167,13 +168,14 @@ class RouteForecastMap extends Component {
             infoVisible = true;
         }
         const mapBounds = this.props.bounds !== null ? this.getMapBounds(this.props.bounds) : null;
+        const mapCenter = (mapBounds !== null && mapBounds !== undefined) ? mapBounds.getCenter() : null;
         return (
             <ErrorBoundary>
                 <div id="map" style={{'height':'95%'}}>
                     {(this.props.forecast.length > 0 || this.props.stravaAnalysis) && this.props.bounds !== null ?
                         <Map google={this.props.google}
                              mapType={'ROADMAP'} scaleControl={true} bounds={mapBounds}
-                             initialCenter={(mapBounds === null) ? null:mapBounds.getCenter().toJSON()}
+                             initialCenter={(mapCenter === null) ? null : mapCenter.toJSON()}
                              onReady={(mapProps, map) => {map.fitBounds(mapBounds)}}>
                             <Polyline path={this.getRoutePoints(this.props.points)} strokeColor={'#ff0000'} strokeWeight={2} strokeOpacity={1.0}/>
                             {highlight}
