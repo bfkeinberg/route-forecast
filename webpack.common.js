@@ -90,8 +90,7 @@ module.exports = (env,argv) => {
             new CleanWebpackPlugin({}),
             new webpack.DefinePlugin({SENTRY_RELEASE: JSON.stringify(env.sentryRelease), "process.env": "{}"}),
             new webpack.ProvidePlugin({
-                Buffer: ['buffer', 'Buffer'],
-                process: 'process/browser',
+                Buffer: ['buffer', 'Buffer']
             }),
             new MiniCssExtractPlugin({
                 // Options similar to the same options in webpackOptions.output

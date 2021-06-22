@@ -4,7 +4,7 @@ import Flatpickr from 'react-flatpickr'
 import {Icon} from '@blueprintjs/core';
 import {Label, UncontrolledTooltip, Row, Col} from 'reactstrap';
 import {connect} from 'react-redux';
-import {setStart} from "../actions/actions";
+import {setStart, setInitialStart} from "../actions/actions";
 import 'flatpickr/dist/themes/confetti.css';
 
 /*const setDateAndTime = function(dates, datestr, instance) {
@@ -15,7 +15,7 @@ import 'flatpickr/dist/themes/confetti.css';
     this.props.setStart(new Date(dates[0]));
 };*/
 
-const DateSelect = ({start,setStart}) => {
+const DateSelect = ({start,setStart, setInitialStart}) => {
     // allow us to continue to show the start time if the route was forecast for a time before the present
     const now = new Date();
     let later = new Date();
@@ -26,7 +26,7 @@ const DateSelect = ({start,setStart}) => {
         <Row tabIndex="1">
             <UncontrolledTooltip placement='bottom' target="startingTime">When you plan to begin riding</UncontrolledTooltip>
             <Col>
-                <Icon icon="calendar"/>
+            <Icon icon="calendar" onClick={ev => setInitialStart(new Date())}/>
                 <Label for='calendar' size='sm' tag='b' id='startingTime'>Starting time</Label>
                 <Flatpickr key={start.getTime()} id='calendar'
                        options={{enableTime: true,
@@ -44,7 +44,8 @@ const DateSelect = ({start,setStart}) => {
 
 DateSelect.propTypes = {
     start:PropTypes.instanceOf(Date).isRequired,
-    setStart:PropTypes.func.isRequired
+    setStart:PropTypes.func.isRequired,
+    setInitialStart:PropTypes.func.isRequired
 };
 
 const mapStateToProps = (state) =>
@@ -53,7 +54,7 @@ const mapStateToProps = (state) =>
     });
 
 const mapDispatchToProps = {
-    setStart
+    setStart, setInitialStart
 };
 
 export default connect(mapStateToProps,mapDispatchToProps)(DateSelect);
