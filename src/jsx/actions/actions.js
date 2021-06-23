@@ -374,7 +374,7 @@ export const recalcRoute = function() {
             }
             let point = getState().routeInfo.gpxRouteData.tracks[0].segments[0][0];
             let timeZonePromise = parser.findTimezoneForPoint(point.lat, point.lon,
-                Datetime.fromJSDate(getState().uiInfo.routeParams.start), getState().params.timezone_api_key);
+                DateTime.fromJSDate(getState().uiInfo.routeParams.start), getState().params.timezone_api_key);
             return timeZonePromise.then(timeZoneResult => {
                 dispatch(setTimeZone(timeZoneResult.zoneId,timeZoneResult.offset));
                 dispatch(setRouteInfo(

@@ -9,7 +9,7 @@ const fetch = require('node-fetch');
 const bodyParser = require('body-parser');
 const multer = require('multer'); // v1.0.5
 const upload = multer({
-limits: { fieldSize: 2 * 1024 * 1024 }
+    limits: { fieldSize: 2 * 1024 * 1024 }
 }); // for parsing multipart/form-data
 const callWeatherService = require('./weatherForecastDispatcher');
 const url = require('url');

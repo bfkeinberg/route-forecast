@@ -6,6 +6,7 @@ import {connect} from 'react-redux';
 import {updateUserControls} from './actions/actions';
 import 'ag-grid-community/dist/styles/ag-grid.css';
 import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
+import ReactDOM from 'react-dom';
 
 const smallScreenWidth = 800;
 const deleteColumnWidth = 39;
@@ -243,7 +244,7 @@ export class ControlTable extends Component {
         let rowData = [];
         let newColDefs = this.state.columnDefs.slice();
         this.props.controls.forEach((item,index) => rowData.push({...item, ...this.props.calculatedValues[index], id:index}));
-        return (<div id={'controlTable'} class="ag-theme-alpine">
+        return (<div id={'controlTable'} className="ag-theme-alpine">
             <AgGridReact enableCellChangeFlash={true} animateRows
                          sortingOrder={['asc']} unSortIcon rowData={rowData}
                          context={this.state.context} frameworkComponents={this.state.frameworkComponents}

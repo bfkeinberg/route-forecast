@@ -83,7 +83,6 @@ class StravaRouteParser {
         let distances = activityStreams.distance.data;
         let times = activityStreams.time.data;
         let altitudes = activityStreams.altitude.data;
-        let speeds = activityStreams.velocity_smooth.data;
 
         let index = 0;
         let startingDistanceMeters = 0;

@@ -1,6 +1,10 @@
+/**
+ * @jest-environment jsdom
+ */
+
 import React from 'react'
 import { configure } from 'enzyme'
-import Adapter from 'enzyme-adapter-react-16';
+import Adapter from '@wojtekmaj/enzyme-adapter-react-17';
 import {routeParams} from '../src/jsx/reducers/reducer.js';
 import {SET_START} from '../src/jsx/actions/actions';
 

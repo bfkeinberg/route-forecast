@@ -26,7 +26,7 @@ const DateSelect = ({start,setStart, setInitialStart}) => {
         <Row tabIndex="1">
             <UncontrolledTooltip placement='bottom' target="startingTime">When you plan to begin riding</UncontrolledTooltip>
             <Col>
-            <Icon icon="calendar" onClick={ev => setInitialStart(new Date())}/>
+            <Icon icon="calendar" onClick={() => setInitialStart(new Date())}/>
                 <Label for='calendar' size='sm' tag='b' id='startingTime'>Starting time</Label>
                 <Flatpickr key={start.getTime()} id='calendar'
                        options={{enableTime: true,

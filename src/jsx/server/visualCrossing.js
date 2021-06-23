@@ -1,36 +1,6 @@
 const moment = require('moment-timezone');
 const fetch = require('node-fetch');
 
-const weatherCodes = {
-    "0": "Unknown",
-    "1000": "Clear",
-    "1001": "Cloudy",
-    "1100": "Mostly Clear",
-    "1101": "Partly Cloudy",
-    "1102": "Mostly Cloudy",
-    "2000": "Fog",
-    "2100": "Light Fog",
-    "3000": "Light Wind",
-    "3001": "Wind",
-    "3002": "Strong Wind",
-    "4000": "Drizzle",
-    "4001": "Rain",
-    "4200": "Light Rain",
-    "4201": "Heavy Rain",
-    "5000": "Snow",
-    "5001": "Flurries",
-    "5100": "Light Snow",
-    "5101": "Heavy Snow",
-    "6000": "Freezing Drizzle",
-    "6001": "Freezing Rain",
-    "6200": "Light Freezing Rain",
-    "6201": "Heavy Freezing Rain",
-    "7000": "Ice Pellets",
-    "7101": "Heavy Ice Pellets",
-    "7102": "Light Ice Pellets",
-    "8000": "Thunderstorm"
-};
-
 /* eslint-disable max-params, max-lines-per-function */
 
 /**
@@ -52,7 +22,6 @@ const callVisualCrossing = function (lat, lon, currentTime, distance, zone, bear
     const endTime = startTime.clone();
     endTime.add(1, 'hours');
     const startTimeString = startTime.unix();
-    const endTimeString = endTime.unix();
     const url = `https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/${lat},${lon}/${startTimeString}?unitGroup=us&include=current&options=nonulls&key=${visualCrossingKey}`;
 //    console.info(`url is ${url}`)
     const forecastResult = fetch(url).then(response => {
@@ -81,7 +50,7 @@ const callVisualCrossing = function (lat, lon, currentTime, distance, zone, bear
             'distance':distance,
             'summary':forecast.days[0].conditions,
             'tempStr':`${Math.round(current.temp)}F`,
-            'precip':`${(precip).toFixed(1)}%`,
+            'precip':`${precip.toFixed(1)}%`,
             'cloudCover':current.cloudcover===undefined?'<unavailable>':`${current.cloudcover.toFixed(1)}%`,
             'windSpeed':!hasWind?'<unavailable>':`${Math.round(current.windspeed)}`,
             'lat':lat,

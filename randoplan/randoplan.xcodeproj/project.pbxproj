@@ -50,12 +50,30 @@
 		D35A341E2637B21700238904 /* manifest.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = manifest.json; path = ../manifest.json; sourceTree = "<group>"; };
 		D37B3B4A263E388D00D39923 /* controls.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = controls.js; path = ../src/jsx/controls.js; sourceTree = "<group>"; };
 		D37B3B4B263F3FB500D39923 /* pinnedRouteLoader.jsx */ = {isa = PBXFileReference; lastKnownFileType = text; name = pinnedRouteLoader.jsx; path = ../src/jsx/ui/pinnedRouteLoader.jsx; sourceTree = "<group>"; };
+		D3DDB3B92683A57E00CE4872 /* bugReportButton.test.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = bugReportButton.test.js; sourceTree = "<group>"; };
+		D3DDB3BA2683A57E00CE4872 /* routeInfo.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = routeInfo.json; sourceTree = "<group>"; };
+		D3DDB3BB2683A57E00CE4872 /* queryString.test.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = queryString.test.js; sourceTree = "<group>"; };
+		D3DDB3BC2683A57E00CE4872 /* routeInfoEntry.test.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = routeInfoEntry.test.js; sourceTree = "<group>"; };
+		D3DDB3BD2683A57E00CE4872 /* loadFromRwgps.test.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = loadFromRwgps.test.js; sourceTree = "<group>"; };
+		D3DDB3BE2683A57E00CE4872 /* requestForecast.test.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = requestForecast.test.js; sourceTree = "<group>"; };
+		D3DDB3BF2683A57E00CE4872 /* expectedRecalcActions.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = expectedRecalcActions.json; sourceTree = "<group>"; };
+		D3DDB3C02683A57E00CE4872 /* routeData.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = routeData.json; sourceTree = "<group>"; };
+		D3DDB3C12683A57E00CE4872 /* recalcRouteState.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = recalcRouteState.json; sourceTree = "<group>"; };
+		D3DDB3C22683A57E00CE4872 /* configureStore.test.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = configureStore.test.js; sourceTree = "<group>"; };
+		D3DDB3C32683A57E00CE4872 /* shortenUrl.test.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = shortenUrl.test.js; sourceTree = "<group>"; };
+		D3DDB3C42683A57E00CE4872 /* app.test.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = app.test.js; sourceTree = "<group>"; };
+		D3DDB3C52683A57E00CE4872 /* controlsReducer.test.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = controlsReducer.test.js; sourceTree = "<group>"; };
+		D3DDB3C62683A57E00CE4872 /* recalculate.test.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = recalculate.test.js; sourceTree = "<group>"; };
+		D3DDB3C72683A57E00CE4872 /* controlTable.test.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = controlTable.test.js; sourceTree = "<group>"; };
+		D3DDB3C82683A57E00CE4872 /* routeParamsReducer.test.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = routeParamsReducer.test.js; sourceTree = "<group>"; };
+		D3DDB3C92683A57E00CE4872 /* recalcRoute.test.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = recalcRoute.test.js; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
 		D353731325D61AA7004AF9AF = {
 			isa = PBXGroup;
 			children = (
+				D3DDB3B82683A57E00CE4872 /* __test__ */,
 				D353732C25D61B79004AF9AF /* gpxParser.js */,
 				D353732325D61B79004AF9AF /* locationContext.jsx */,
 				D37B3B49263E35D500D39923 /* components */,
@@ -108,6 +126,31 @@
 				D37B3B4A263E388D00D39923 /* controls.js */,
 			);
 			name = components;
+			sourceTree = "<group>";
+		};
+		D3DDB3B82683A57E00CE4872 /* __test__ */ = {
+			isa = PBXGroup;
+			children = (
+				D3DDB3B92683A57E00CE4872 /* bugReportButton.test.js */,
+				D3DDB3BA2683A57E00CE4872 /* routeInfo.json */,
+				D3DDB3BB2683A57E00CE4872 /* queryString.test.js */,
+				D3DDB3BC2683A57E00CE4872 /* routeInfoEntry.test.js */,
+				D3DDB3BD2683A57E00CE4872 /* loadFromRwgps.test.js */,
+				D3DDB3BE2683A57E00CE4872 /* requestForecast.test.js */,
+				D3DDB3BF2683A57E00CE4872 /* expectedRecalcActions.json */,
+				D3DDB3C02683A57E00CE4872 /* routeData.json */,
+				D3DDB3C12683A57E00CE4872 /* recalcRouteState.json */,
+				D3DDB3C22683A57E00CE4872 /* configureStore.test.js */,
+				D3DDB3C32683A57E00CE4872 /* shortenUrl.test.js */,
+				D3DDB3C42683A57E00CE4872 /* app.test.js */,
+				D3DDB3C52683A57E00CE4872 /* controlsReducer.test.js */,
+				D3DDB3C62683A57E00CE4872 /* recalculate.test.js */,
+				D3DDB3C72683A57E00CE4872 /* controlTable.test.js */,
+				D3DDB3C82683A57E00CE4872 /* routeParamsReducer.test.js */,
+				D3DDB3C92683A57E00CE4872 /* recalcRoute.test.js */,
+			);
+			name = __test__;
+			path = ../__test__;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */

@@ -1,6 +1,10 @@
+/**
+ * @jest-environment jsdom
+ */
+
 import React from 'react'
 import { configure, shallow } from 'enzyme'
-import Adapter from 'enzyme-adapter-react-16';
+import Adapter from '@wojtekmaj/enzyme-adapter-react-17';
 import BugReportButton from '../src/jsx/ui/bugReportButton';
 import {Button} from '@blueprintjs/core';
 configure({ adapter: new Adapter() });
