@@ -23,7 +23,7 @@ const callVisualCrossing = async function (lat, lon, currentTime, distance, zone
     endTime.add(1, 'hours');
     const startTimeString = startTime.unix();
     const url = `https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/${lat},${lon}/${startTimeString}?unitGroup=us&include=current&options=nonulls&key=${visualCrossingKey}`;
-    console.info(`url is ${url}`)
+//    console.info(`url is ${url} for ${currentTime}`);
     const weatherResult = await axios.get(url).catch(error => {console.error('axios error',error.response.data);
         throw error.response.data});
     const forecast = weatherResult.data;

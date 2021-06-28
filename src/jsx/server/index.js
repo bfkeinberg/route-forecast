@@ -251,7 +251,7 @@ app.post('/forecast', upload.none(), async (req, res) => {
     try {
         let results = [];
         while (forecastPoints.length > 0) {
-            point = forecastPoints.pop();
+            point = forecastPoints.shift();
             results.push(await callWeatherService(service, point.lat, point.lon, point.time, point.distance, zone, point.bearing));
         }
         res.status(200).json({'forecast':results});
