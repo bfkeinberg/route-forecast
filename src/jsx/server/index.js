@@ -221,7 +221,7 @@ app.get('/rwgps_route', (req, res) => {
         .catch(err => {res.status(err.message).json({'status':err})});
 });
 
-app.post('/forecast', upload.none(), (req, res) => {
+app.post('/forecast', upload.none(), async (req, res) => {
     if (req.body.locations === undefined) {
         res.status(400).json("{'status': 'Missing location key'}");
         return;
@@ -249,9 +249,12 @@ app.post('/forecast', upload.none(), (req, res) => {
     let zone = req.body.timezone;
 
     try {
-        const resultPromises = forecastPoints.map(point => {return callWeatherService(service, point.lat, point.lon, point.time, point.distance, zone, point.bearing)});
-        Promise.all(resultPromises).then(result => {res.status(200).json({'forecast':result})},
-            error => res.status(500).json({'details':`Error calling weather service : ${error}`}));
+        let results = [];
+        while (forecastPoints.length > 0) {
+            point = forecastPoints.pop();
+            results.push(await callWeatherService(service, point.lat, point.lon, point.time, point.distance, zone, point.bearing));
+        }
+        res.status(200).json({'forecast':results});
     } catch (error) {
         res.status(500).json({'details':`Error calling weather service : ${error}`});
     }
