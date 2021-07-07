@@ -15,6 +15,14 @@ import 'flatpickr/dist/themes/confetti.css';
     this.props.setStart(new Date(dates[0]));
 };*/
 
+const setDateOnly = (start, setInitialStart) => {
+    let now = new Date();
+    start.setDate(now.getDate());
+    start.setMonth(now.getMonth());
+    start.setFullYear(now.getFullYear());
+    setInitialStart(start);
+};
+
 const DateSelect = ({start,setStart, setInitialStart}) => {
     // allow us to continue to show the start time if the route was forecast for a time before the present
     const now = new Date();
@@ -26,7 +34,7 @@ const DateSelect = ({start,setStart, setInitialStart}) => {
         <Row tabIndex="1">
             <UncontrolledTooltip placement='bottom' target="startingTime">When you plan to begin riding</UncontrolledTooltip>
             <Col>
-            <Icon icon="calendar" onClick={() => setInitialStart(new Date())}/>
+                <Icon icon="calendar" onClick={() => setDateOnly(start, setInitialStart)}/>
                 <Label for='calendar' size='sm' tag='b' id='startingTime'>Starting time</Label>
                 <Flatpickr key={start.getTime()} id='calendar'
                        options={{enableTime: true,
