@@ -189,6 +189,11 @@ export class RouteWeatherUI extends Component {
         props.setInitialStart(queryParams.start);
         if (queryParams.pace !== undefined) {
             props.setPace(queryParams.pace.trim());
+        } else {
+            let lastPace = loadCookie("pace");
+            if (lastPace !== undefined) {
+                props.setPace(lastPace);
+            }
         }
         props.setInterval(queryParams.interval);
         props.setMetric(queryParams.metric==="true");

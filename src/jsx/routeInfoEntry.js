@@ -76,7 +76,7 @@ class RouteInfoForm extends Component {
     static getDerivedStateFromProps(nextProps) {
         if (nextProps.routeInfo.name !== '') {
             document.title = `Forecast for ${nextProps.routeInfo.name}`;
-            if (!nextProps.firstUse) {
+            if (!nextProps.firstUse && nextProps.controlPoints !== '' && nextProps.controlPoints.length !== 0) {
                 saveCookie(nextProps.routeInfo.name, nextProps.formatControlsForUrl(nextProps.controlPoints));
             }
         }

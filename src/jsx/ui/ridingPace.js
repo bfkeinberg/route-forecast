@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import {Label, Input, FormGroup, UncontrolledTooltip} from 'reactstrap';
 import {connect} from 'react-redux';
-import {setPace} from "../actions/actions";
+import {setPace, saveCookie} from "../actions/actions";
 
 export const paceToSpeed = {'Q':3, 'R':4, 'S':5, 'T':6, 'A-':9, 'A':10, 'A+':11, 'B':12, 'B+':13, 'C':14, 'C+':15, 'D':16, 'D+':17, 'E':18, 'E+':19};
 export const metricPaceToSpeed = {'A-':15, 'A':16, 'B-':18, 'B':19, 'C-':21, 'C':22, 'C+':24, 'D-':24, 'D':26, 'D+':27, 'E-':27, 'E':29};
@@ -38,7 +38,7 @@ const RidingPace = ({pace,actualPace,setPace,metric}) => {
             <UncontrolledTooltip innerClassName={pace_tooltip_class} target='paceInput' placement="bottom">{pace_text}</UncontrolledTooltip>
             {metric ?
                 <Input tabIndex='3' type="select" value={pace} name="pace"
-                             id='paceInput' onChange={event => {setPace(event.target.value)}}>
+                             id='paceInput' onChange={event => {saveCookie("pace",event.target.value); setPace(event.target.value)}}>
                     <option value="Q">5 kph</option>
                     <option value="R">6 kph</option>
                     <option value="S">8 kph</option>
@@ -54,7 +54,7 @@ const RidingPace = ({pace,actualPace,setPace,metric}) => {
                     <option value="E">29 kph</option>
                 </Input> :
                 <Input tabIndex='3' type="select" value={pace} name="pace"
-                       id='paceInput' onChange={event => {setPace(event.target.value)}}>
+                       id='paceInput' onChange={event => {saveCookie("pace",event.target.value); setPace(event.target.value)}}>
                     <option value="Q">3 mph</option>
                     <option value="R">4 mph</option>
                     <option value="S">5 mph</option>

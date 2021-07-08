@@ -34,7 +34,7 @@ const sanitizeCookieName = (cookieName) => {
 };
 
 export const saveCookie = (name,value) => {
-    cookie.save(sanitizeCookieName(name),value);
+        cookie.save(sanitizeCookieName(name),value,{maxAge:60*60*24*7});
 };
 
 export const loadCookie = (name) => {
