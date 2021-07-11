@@ -2,7 +2,7 @@ import cookie from 'react-cookies';
 import * as Sentry from '@sentry/browser';
 import { DateTime } from 'luxon';
 
-const componentLoader = (lazyComponent, attemptsLeft) => {
+export const componentLoader = (lazyComponent, attemptsLeft) => {
     return new Promise((resolve, reject) => {
         lazyComponent
             .then(resolve)
@@ -837,3 +837,8 @@ export const SET_LOADING_PINNED = 'SET_LOADING_PINNED';
 export const setLoadingPinned = (value) => {
         return {type:SET_LOADING_PINNED, loading:value};
 };
+                                                      
+export const TOGGLE_ZOOM_TO_RANGE = 'TOGGLE_ZOOM_TO_RANGE';
+export const toggleZoomToRange = () => {
+        return {type:TOGGLE_ZOOM_TO_RANGE};
+}

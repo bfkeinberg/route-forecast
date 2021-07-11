@@ -31,7 +31,8 @@ class RouteForecastMap extends Component {
         google:PropTypes.object,
         metric:PropTypes.bool.isRequired,
         stravaAnalysis:PropTypes.bool.isRequired,
-        setMapViewed:PropTypes.func.isRequired
+        setMapViewed:PropTypes.func.isRequired,
+        zoomToRange:PropTypes.bool.isRequired
     };
 
     constructor(props) {
@@ -104,7 +105,7 @@ class RouteForecastMap extends Component {
         return <Marker key={latitude+longitude} position={{lat: latitude, lng: longitude}} title={value} icon={controlIcon}/>;
     }
 
-    getMapBounds(bounds) {
+    getMapBounds(bounds, zoomToRange) {
         let southWest = { lat:bounds.min_latitude, lng:bounds.min_longitude };
         let northEast = { lat:bounds.max_latitude, lng:bounds.max_longitude };
         if (isNaN(bounds.min_latitude) || isNaN(bounds.max_latitude)) {
@@ -112,7 +113,7 @@ class RouteForecastMap extends Component {
             return new google.maps.LatLngBounds({lat:0,lng:0},{lat:0,lng:0});
         }
         const defaultBounds = new google.maps.LatLngBounds(southWest,northEast);
-        if (this.props.subrange.length === 2 && !isNaN(this.props.subrange[1])) {
+        if (zoomToRange && this.props.subrange.length === 2 && !isNaN(this.props.subrange[1])) {
             let bounds = new google.maps.LatLngBounds();
             this.props.points.filter(point => (point.dist !== undefined) && (point.dist >= this.props.subrange[0] &&
                 (isNaN(this.props.subrange[1]) || point.dist <= this.props.subrange[1])))
@@ -167,7 +168,7 @@ class RouteForecastMap extends Component {
             infoContents = `Temperature ${markedInfo[0].tempStr} Wind speed ${markedInfo[0].windSpeed} Wind bearing ${markedInfo[0].windBearing}`;
             infoVisible = true;
         }
-        const mapBounds = this.props.bounds !== null ? this.getMapBounds(this.props.bounds) : null;
+        const mapBounds = this.props.bounds !== null ? this.getMapBounds(this.props.bounds, this.props.zoomToRange) : null;
         const mapCenter = (mapBounds !== null && mapBounds !== undefined) ? mapBounds.getCenter() : null;
         return (
             <ErrorBoundary>
@@ -206,12 +207,12 @@ const mapStateToProps = (state) =>
         forecast: state.forecast.forecast,
         bounds:state.routeInfo.bounds,
         points:getPointsState(state),
-        // maps_api_key: state.params.maps_api_key,
         controls: state.controls.calculatedControlValues,
         controlNames: state.controls.userControlPoints.map(control => control.name),
         subrange: state.controls.stravaAnalysis ? state.strava.subrange : state.forecast.range,
         stravaAnalysis: state.controls.stravaAnalysis,
-        metric: state.controls.metric
+        metric: state.controls.metric,
+        zoomToRange: state.forecast.zoomToRange
     });
 
 const mapDispatchToProps = {

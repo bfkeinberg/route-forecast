@@ -7,7 +7,7 @@ import climacell from 'Images/Powered_by_Tomorrow-Black.png';
 //import visualcrossing from 'Images/visualCrossing.png';
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
-import {setWeatherRange, toggleWeatherRange, setTableViewed} from './actions/actions';
+import {setWeatherRange, toggleWeatherRange, setTableViewed, toggleZoomToRange} from './actions/actions';
 import MediaQuery from 'react-responsive';
 import {finishTimeFormat} from './reducers/reducer';
 import { DateTime } from 'luxon';
@@ -25,7 +25,8 @@ export class ForecastTable extends Component {
         metric:PropTypes.bool.isRequired,
         gustSpeed: PropTypes.number,
         finishTime: PropTypes.string.isRequired,
-        provider: PropTypes.string.isRequired
+        provider: PropTypes.string.isRequired,
+        toggleZoomToRange:PropTypes.func.isRequired
     };
 
     constructor(props) {
@@ -35,6 +36,10 @@ export class ForecastTable extends Component {
         props.setTableViewed();
     }
 
+    toggleZoom = (event) => {
+        this.props.toggleZoomToRange();
+    };
+    
     updateWeatherRange = (event) => {
         const start = parseInt(event.currentTarget.getAttribute('start'));
         this.props.setWeatherRange(start, parseInt(event.currentTarget.getAttribute('end')));
@@ -158,7 +163,7 @@ export class ForecastTable extends Component {
                 <div className="animated slideInLeft">
                     <ErrorBoundary>
                     {this.displayBacklink(this.props.provider)}
-                    <span id={weatherId}>{weatherCorrections}</span>
+                    <span id={weatherId} onClick={this.toggleZoom}>{weatherCorrections}</span>
                     <Table size='sm' hover bordered>
                         <thead>
                         <tr>
@@ -198,7 +203,7 @@ const mapStateToProps = (state) =>
     });
 
 const mapDispatchToProps = {
-    setWeatherRange, setTableViewed, toggleWeatherRange
+    setWeatherRange, setTableViewed, toggleWeatherRange, toggleZoomToRange
 };
 
 export const formatTemperature = ForecastTable.formatTemperature;
