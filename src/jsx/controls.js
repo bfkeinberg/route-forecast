@@ -9,8 +9,9 @@ import '../static/controlsStyles.css';
 import MediaQuery from 'react-responsive';
 import DesktopControls from "./ui/desktopControls";
 import MobileControls from "./ui/mobileControls";
+import {componentLoader} from "./actions/actions.js";
 
-const LoadableControlTable = lazy(() => import(/* webpackChunkName: "ControlTable" */'./controlTable'));
+const LoadableControlTable = lazy(() => componentLoader(import(/* webpackChunkName: "ControlTable" */'./controlTable'), 5));
 
 class ControlPoints extends Component {
 
