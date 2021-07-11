@@ -9,13 +9,33 @@ import {lazy} from '@loadable/component';
 
 const LoadableRouteList = lazy(() => import(/* webpackChunkName: "RouteList" */ './routeList'));
 
+const saveRwgpsCredentials = (username, password) => {
+    if ("PasswordCredential" in window) {
+
+        let credential = new PasswordCredential({
+            id: username,
+            name:username,
+            password:password
+        });
+
+        navigator.credentials.store(credential).then(() => {
+        console.info("Credential stored in the user agent's credential manager.");
+        }, (err) => {
+            console.error("Error while storing the credential: ", err);
+        });
+    } else {
+        cookie.save('rwgpsUsername', rwgpsUsername, { path: '/' });
+        cookie.save('rwgpsPassword', rwgpsPassword, { path: '/' });
+        console.info('credentials stored in cookie');
+    }
+};
+
 const getPinnedRoutes = async (rwgpsUsername, rwgpsPassword, setErrorDetails, setRwgpsCredentials) => {
     
     const url = `/pinned_routes?username=${rwgpsUsername}&password=${rwgpsPassword}`;
     try {
         const response = await axios.get(url);
-        cookie.save('rwgpsUsername', rwgpsUsername, { path: '/' });
-        cookie.save('rwgpsPassword', rwgpsPassword, { path: '/' });
+        saveRwgpsCredentials(rwgpsUsername, rwgpsPassword);
         return response.data;
     } catch (e) {
         console.log(e);

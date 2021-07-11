@@ -118,11 +118,35 @@ export class RouteWeatherUI extends Component {
         }
     }
 
-    static setupRideWithGps(props) {
-        const user = loadCookie("rwgpsUsername");
-        const password = loadCookie("rwgpsPassword");
-        if (user !== undefined && password !== undefined) {
-            props.setRwgpsCredentials(user,password);
+    static async setupRideWithGps(props) {
+        let credentials = null;
+        if ("PasswordCredential" in window) {
+            credentials = await navigator.credentials.get({password:true,mediation:"silent"});
+            if (credentials === null) {
+                const user = loadCookie("rwgpsUsername");
+                const password = loadCookie("rwgpsPassword");
+                console.info('credentials retrieved from cookie');
+                if (user !== undefined && password !== undefined) {
+                    props.setRwgpsCredentials(user,password);
+                }
+            } else {
+                console.info('credentials retrieved from credential manager');
+            }
+        } else {
+            const user = loadCookie("rwgpsUsername");
+            const password = loadCookie("rwgpsPassword");
+            console.info('credentials retrieved from cookie');
+            if (user !== undefined && password !== undefined) {
+                props.setRwgpsCredentials(user,password);
+            }
+        }
+        if (credentials === null) {
+            const user = loadCookie("rwgpsUsername");
+            const password = loadCookie("rwgpsPassword");
+            console.info('credentials retrieved from cookie');
+            if (user !== undefined && password !== undefined) {
+                props.setRwgpsCredentials(user,password);
+            }
         }
     }
 

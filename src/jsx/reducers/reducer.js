@@ -1,7 +1,6 @@
 import * as Actions from '../actions/actions';
 import {combineReducers} from 'redux';
 import RouteInfoForm from "../routeInfoEntry";
-// import Immutable from 'immutable';
 
 export const finishTimeFormat = 'EEE, MMM dd yyyy h:mma';
 
@@ -307,7 +306,8 @@ const strava = function(state = {analysisInterval:defaultAnalysisIntervalInHours
     }
 };
 
-const forecast = function(state = {forecast:[],valid:false,range:[], tableViewed:false, mapViewed:false, weatherProvider:'darksky'}, action) {
+const forecast = function(state = {forecast:[],valid:false,range:[], tableViewed:false, mapViewed:false,
+    weatherProvider:'darksky', zoomToRange:true}, action) {
     switch (action.type) {
         case Actions.FORECAST_FETCH_SUCCESS:
             return {...state,forecast:action.forecastInfo.forecast,valid:true,tableViewed:false,mapViewed:false,range:[]};
@@ -345,6 +345,8 @@ const forecast = function(state = {forecast:[],valid:false,range:[], tableViewed
             return {...state, mapViewed: true};
         case Actions.SET_WEATHER_PROVIDER:
             return {...state, weatherProvider:action.weatherProvider}
+        case Actions.TOGGLE_ZOOM_TO_RANGE:
+            return {...state, zoomToRange:!state.zoomToRange}
         default:
             return state;
     }
