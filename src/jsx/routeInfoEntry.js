@@ -12,7 +12,6 @@ import PaceExplanation from './paceExplanation';
 import ForecastInterval from './ui/forecastInterval';
 import RidingPace from './ui/ridingPace';
 import Recalculate from './recalculate';
-//import DateSelect from './ui/dateSelect';
 import RideWithGpsId from './ui/rideWithGpsId';
 import RwGpsTypeSelector from './ui/rwGpsTypeSelector';
 import ForecastButton from './ui/forecastButton';
@@ -23,8 +22,9 @@ import WeatherProvider from './ui/providerSelector';
 import PinnedRouteLoader from './ui/pinnedRouteLoader.jsx';
 import ErrorBoundary from "./errorBoundary";
 import {lazy} from '@loadable/component';
+import {componentLoader} from "./actions/actions.js";
 
-const LoadableDatePicker = lazy(() => import(/* webpackChunkName: "DateSelect" */ /* webpackPrefetch: true */ './ui/dateSelect'));
+const LoadableDatePicker = lazy(() => componentLoader(import(/* webpackChunkName: "DateSelect" */ /* webpackPrefetch: true */ './ui/dateSelect'), 5));
 
 const DatePickerLoader = (props) => {
      return <Suspense fallback={<div>Loading date-time picker...</div>}>
