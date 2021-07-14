@@ -596,7 +596,7 @@ describe('request forecast', () => {
                     "pace": "B+",
                     "rwgpsRoute": 27904106,
                     "rwgpsRouteIsTrip": false,
-                    "start": DateTime.fromISO("2018-07-14T11:00:00.000Z"),
+                    "start": DateTime.fromSeconds(1531566000),
                     "loadingSource": null,
                     "succeeded": null
                 },
