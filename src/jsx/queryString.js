@@ -73,7 +73,6 @@ QueryStringUpdater.propTypes = {
         PropTypes.oneOf([''])
     ]),
     start:PropTypes.instanceOf(DateTime).isRequired,
-    zone:PropTypes.string.isRequired,
     pace:PropTypes.string.isRequired,
     interval:PropTypes.number.isRequired,
     // setQueryString:PropTypes.func.isRequired,
