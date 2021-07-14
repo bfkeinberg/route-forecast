@@ -15,7 +15,8 @@ describe('controls reducer', () => {
         expect(controls(undefined,{})).toEqual(
             {
                 metric:false,displayBanked:false,stravaAnalysis:false,
-                userControlPoints:[],initialControlValues:[], calculatedControlValues:[],count:0,displayedFinishTime:'',queryString:null
+                userControlPoints:[],initialControlValues:[], calculatedControlValues:[],count:0,displayedFinishTime:'',queryString:null,
+                showWeatherProvider:false
             }
         );
     });

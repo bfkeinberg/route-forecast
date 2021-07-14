@@ -11,10 +11,10 @@ configure({ adapter: new Adapter() });
 
 describe('<QueryString />', () => {
     it('check short date', () => {
-        let shortDate = dateToShortDate('2018-08-01T15:00:00.000Z');
+        let shortDate = dateToShortDate(new Date('2018-08-01T15:00:00Z'));
         expect(shortDate).toEqual("Wed Aug 1 2018 08:00:00");
         shortDate = dateToShortDate('ggg6677');
-        expect(shortDate).toEqual('Invalid date');
+        expect(shortDate).toEqual('Invalid DateTime');
     });
 
     it('make query', () => {

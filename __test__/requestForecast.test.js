@@ -12,12 +12,14 @@ const middlewares = [thunk];
 const mockStore = configureMockStore(middlewares);
 
 describe('request forecast', () => {
+    
     afterEach(() => {
         fetchMock.reset();
         fetchMock.restore();
     });
 
     it('sends forecast request and updates state', async () => {
+
         const forecast = [
             {
                 "cloudCover": "27.0%",
@@ -344,6 +346,9 @@ describe('request forecast', () => {
                 "windSpeed": "2 mph"
             }
         ];
+        
+        fetchMock.get('https://maps.googleapis.com/maps/api/timezone/json',
+                      {body: {dstOffset:0, rawOffset:0, timeZoneId:0} });
         fetchMock
             .post('/forecast', { body: {
                     "forecast": forecast
@@ -352,70 +357,70 @@ describe('request forecast', () => {
 
         const calculatedControls = [
             {
-                "arrival": "Sat, Jul 14 2018 5:30am",
+                "arrival": "Sat, Jul 14 2018 5:30AM",
                 "banked": -13,
                 "val": 1,
                 "lat": 38.66683,
                 "lon": -119.63601
             },
             {
-                "arrival": "Sat, Jul 14 2018 6:42am",
+                "arrival": "Sat, Jul 14 2018 6:42AM",
                 "banked": -27,
                 "val": 2,
                 "lat": 38.64231,
                 "lon": -119.55148
             },
             {
-                "arrival": "Sat, Jul 14 2018 8:10am",
+                "arrival": "Sat, Jul 14 2018 8:10AM",
                 "banked": -44,
                 "val": 3,
                 "lat": 38.67462,
                 "lon": -119.62253
             },
             {
-                "arrival": "Sat, Jul 14 2018 10:52am",
+                "arrival": "Sat, Jul 14 2018 10:52AM",
                 "banked": -71,
                 "val": 4,
                 "lat": 38.54632,
                 "lon": -119.81012
             },
             {
-                "arrival": "Sat, Jul 14 2018 11:35am",
+                "arrival": "Sat, Jul 14 2018 11:35AM",
                 "banked": -82,
                 "val": 5,
                 "lat": 38.54217,
                 "lon": -119.88666
             },
             {
-                "arrival": "Sat, Jul 14 2018 12:17pm",
+                "arrival": "Sat, Jul 14 2018 12:17PM",
                 "banked": -92,
                 "val": 6,
                 "lat": 38.54699,
                 "lon": -119.8089
             },
             {
-                "arrival": "Sat, Jul 14 2018 2:52pm",
+                "arrival": "Sat, Jul 14 2018 2:52PM",
                 "banked": -118,
                 "val": 7,
                 "lat": 38.72277,
                 "lon": -119.79849
             },
             {
-                "arrival": "Sat, Jul 14 2018 3:27pm",
+                "arrival": "Sat, Jul 14 2018 3:27PM",
                 "banked": -127,
                 "val": 8,
                 "lat": 38.77446,
                 "lon": -119.82219
             },
             {
-                "arrival": "Sat, Jul 14 2018 5:25pm",
+                "arrival": "Sat, Jul 14 2018 5:25PM",
                 "banked": -148,
                 "val": 9,
                 "lat": 38.69634,
                 "lon": -119.99097
             },
             {
-                "arrival": "Sat, Jul 14 2018 7:22pm",
+                "arrival": "Sat, Jul 14 2018 7:22PM",
                 "banked": -169,
                 "val": 10,
                 "lat": 38.77348,
@@ -424,71 +429,71 @@ describe('request forecast', () => {
         ];
         const nextControlValues = [
             {
-                "arrival": "Sat, Jul 14 2018 5:28am",
+                "arrival": "Sat, Jul 14 2018 5:28AM",
                 "banked": -11,
                 "val": 1,
                 "lat": 38.66683,
                 "lon": -119.63601
             },
             {
-                "arrival": "Sat, Jul 14 2018 6:38am",
-                "banked": -23,
+                "arrival": "Sat, Jul 14 2018 6:39AM",
+                "banked": -24,
                 "val": 2,
                 "lat": 38.64231,
                 "lon": -119.55148
             },
             {
-                "arrival": "Sat, Jul 14 2018 8:08am",
-                "banked": -42,
+                "arrival": "Sat, Jul 14 2018 8:08AM",
+                "banked": -43,
                 "val": 3,
                 "lat": 38.67462,
                 "lon": -119.62253
             },
             {
-                "arrival": "Sat, Jul 14 2018 10:52am",
-                "banked": -71,
+                "arrival": "Sat, Jul 14 2018 10:52AM",
+                "banked": -72,
                 "val": 4,
                 "lat": 38.54632,
                 "lon": -119.81012
             },
             {
-                "arrival": "Sat, Jul 14 2018 11:34am",
-                "banked": -81,
+                "arrival": "Sat, Jul 14 2018 11:35AM",
+                "banked": -82,
                 "val": 5,
                 "lat": 38.54217,
                 "lon": -119.88666
             },
             {
-                "arrival": "Sat, Jul 14 2018 12:17pm",
+                "arrival": "Sat, Jul 14 2018 12:17PM",
                 "banked": -92,
                 "val": 6,
                 "lat": 38.54699,
                 "lon": -119.8089
             },
             {
-                "arrival": "Sat, Jul 14 2018 2:59pm",
-                "banked": -124,
+                "arrival": "Sat, Jul 14 2018 2:56PM",
+                "banked": -122,
                 "val": 7,
                 "lat": 38.72277,
                 "lon": -119.79849
             },
             {
-                "arrival": "Sat, Jul 14 2018 3:32pm",
-                "banked": -132,
+                "arrival": "Sat, Jul 14 2018 3:30PM",
+                "banked": -130,
                 "val": 8,
                 "lat": 38.77446,
                 "lon": -119.82219
             },
             {
-                "arrival": "Sat, Jul 14 2018 5:35pm",
-                "banked": -159,
+                "arrival": "Sat, Jul 14 2018 5:30PM",
+                "banked": -154,
                 "val": 9,
                 "lat": 38.69634,
                 "lon": -119.99097
             },
             {
-                "arrival": "Sat, Jul 14 2018 7:24pm",
-                "banked": -172,
+                "arrival": "Sat, Jul 14 2018 7:21PM",
+                "banked": -168,
                 "val": 10,
                 "lat": 38.77348,
                 "lon": -119.81972
@@ -496,9 +501,8 @@ describe('request forecast', () => {
         ];
         const expectedActions = [
             { type: actions.BEGIN_FETCHING_FORECAST },
-            { type: actions.HIDE_FORM },
             { type: actions.FORECAST_FETCH_SUCCESS, forecastInfo: {forecast:forecast}},
-            { type: actions.ADD_WEATHER_CORRECTION, finishTime: "Sat, Jul 14 2018 8:12pm", weatherCorrectionMinutes: -0.7707451611248307 },
+            { type: actions.ADD_WEATHER_CORRECTION, finishTime: "Sat, Jul 14 2018 8:09PM", weatherCorrectionMinutes: -3.58560511411573, maxGustSpeed: 7 },
             { type: actions.UPDATE_CALCULATED_VALUES, values:nextControlValues }
             ];
 
@@ -509,6 +513,9 @@ describe('request forecast', () => {
                 "newUserMode": false,
                 "action": "/forecast"
             },
+        forecast:{
+          weatherProvider:'darksky'
+        },
             controls:{
                 "metric": false,
                 "displayBanked": false,
@@ -584,7 +591,7 @@ describe('request forecast', () => {
             uiInfo:{
                 "routeParams": {
                     "interval": 1,
-                    "pace": "C-",
+                    "pace": "B+",
                     "rwgpsRoute": 27904106,
                     "rwgpsRouteIsTrip": false,
                     "start": new Date("2018-07-14T11:00:00.000Z"),
@@ -602,8 +609,7 @@ describe('request forecast', () => {
                 }
             }};
         let store = mockStore(initialState);
-
-        await(store.dispatch(actions.requestForecast(routeInfo)));
+        let v = await(store.dispatch(actions.requestForecast(routeInfo)));
         expect(store.getActions()).toEqual(expectedActions);
 
         let newState = expectedActions.reduce((previousValue, currentValue) => rootReducer(previousValue,currentValue),initialState);

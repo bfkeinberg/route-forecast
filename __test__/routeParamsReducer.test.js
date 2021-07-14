@@ -17,7 +17,8 @@ describe('route params reducer', () => {
             {
                 interval:1,pace:'D',rwgpsRoute:'',
                 rwgpsRouteIsTrip:false,
-                start: expect.any(Date)
+                start: expect.any(Date),
+                initialStart: expect.any(Date)
             }
         );
     });
@@ -28,7 +29,8 @@ describe('route params reducer', () => {
             "pace": "C",
             "rwgpsRoute": 201276,
             "rwgpsRouteIsTrip": false,
-            "start": "2018-07-31T14:00:00.981Z",
+            "start": new Date("2018-07-31T14:00:00.981Z"),
+            "initialStart": new Date("2018-07-31T14:00:00.981Z"),
             "loadingSource": null,
             "succeeded": null
         };
@@ -43,6 +45,7 @@ describe('route params reducer', () => {
                 "rwgpsRoute": 201276,
                 "rwgpsRouteIsTrip": false,
                 "start": new Date('2018-08-01T15:00:00.000Z'),
+                "initialStart": new Date('2018-07-31T14:00:00.981Z'),
                 "loadingSource": null,
                 "succeeded": null
             }

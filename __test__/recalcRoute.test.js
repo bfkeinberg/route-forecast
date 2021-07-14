@@ -2,10 +2,10 @@
  * @jest-environment jsdom
  */
 
-
 import configureMockStore from 'redux-mock-store';
 import thunk from 'redux-thunk';
-import * as actions from '../src/jsx/actions/actions';
+import {recalcRoute} from '../src/jsx/actions/actions';
+import fetchMock from 'fetch-mock';
 require('isomorphic-fetch');
 
 const middlewares = [thunk];
@@ -17,12 +17,15 @@ describe('recalculate route', () => {
         const dir = process.cwd();
 
         const expectedActions = require(`${dir}/__test__/expectedRecalcActions.json`);
-
+        expectedActions[1].routeInfo.points = expectedActions[1].routeInfo.points.map( point => {point.dist=undefined; return point});
         const initialState = require(`${dir}/__test__/recalcRouteState.json`);
-
+        initialState.uiInfo.routeParams.start = new Date(initialState.uiInfo.routeParams.start);
+        
         let store = mockStore(initialState);
+        fetchMock.get('begin:https://maps.googleapis.com/maps/api/timezone/json',
+                      {body: {dstOffset:0, rawOffset:7200, timeZoneId:'Europe/Madrid'} });
 
-        await(store.dispatch(actions.recalcRoute()));
+        let v = await(store.dispatch(recalcRoute()));
         expect(store.getActions()).toEqual(expectedActions);
 
         })

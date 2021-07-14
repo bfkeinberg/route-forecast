@@ -13,49 +13,49 @@
           "lon": -1.900513,
           "distance": 0,
           "time": "2018-07-30T07:00:00+0200",
-          "bearing": 72.84156163581078
+          "bearing": 73.74704501422613
         },
         {
-          "lat": 43.34961,
-          "lon": -1.74408,
-          "distance": 11,
+          "lat": 43.34599,
+          "lon": -1.75197,
+          "distance": 10,
           "time": "2018-07-30T08:00:00+0200",
-          "bearing": 105.14192033550249
+          "bearing": 96.27158421933103
         },
         {
-          "lat": 43.32075,
-          "lon": -1.59796,
-          "distance": 22,
-          "time": "2018-07-30T09:00:00+0200",
-          "bearing": 253.76542188632155
+          "lat": 43.33444,
+          "lon": -1.6086,
+          "distance": 21,
+          "time": "2018-07-30T09:01:00+0200",
+          "bearing": 221.7787727320681
         },
         {
-          "lat": 43.30136,
-          "lon": -1.68929,
-          "distance": 33,
-          "time": "2018-07-30T10:00:00+0200",
-          "bearing": 331.64078100525103
+          "lat": 43.28278,
+          "lon": -1.67198,
+          "distance": 30,
+          "time": "2018-07-30T10:01:00+0200",
+          "bearing": 352.77225169399344
         },
         {
-          "lat": 43.3774,
-          "lon": -1.74577,
-          "distance": 44,
-          "time": "2018-07-30T11:00:00+0200",
-          "bearing": 239.05707740134437
+          "lat": 43.38032,
+          "lon": -1.689,
+          "distance": 40,
+          "time": "2018-07-30T11:01:00+0200",
+          "bearing": 245.44878321193244
         },
         {
-          "lat": 43.31324,
-          "lon": -1.89264,
-          "distance": 55,
-          "time": "2018-07-30T12:00:00+0200",
-          "bearing": 300.8747554890813
+          "lat": 43.33625,
+          "lon": -1.82141,
+          "distance": 50,
+          "time": "2018-07-30T12:02:00+0200",
+          "bearing": 252.4082178399264
         },
         {
           "lat": 43.31752,
           "lon": -1.90248,
           "distance": 56,
-          "time": "2018-07-30T12:05:00+0200",
-          "bearing": 300.8747554890813
+          "time": "2018-07-30T12:35:00+0200",
+          "bearing": 252.4082178399264
         }
       ],
       "points": [
@@ -7576,6 +7576,7 @@
         }
       ],
       "name": "Niessen, Sara, Ibardin, Cornisse, Niessen",
+      "timeInHours": 5.5940740353082035,
       "values": [],
       "bounds": {
         "min_latitude": 43.28036,
@@ -7583,7 +7584,17 @@
         "max_latitude": 43.39056,
         "max_longitude": -1.58309
       },
-      "finishTime": "Mon, Jul 30 2018 12:05pm"
+      "finishTime": "Mon, Jul 30 2018 12:35PM"
     }
+  },
+  {
+    "finishTime": "",
+    "maxGustSpeed": 0,
+    "type": "ADD_WEATHER_CORRECTION",
+    "weatherCorrectionMinutes": 0
+  },
+  {
+    "type": "UPDATE_CALCULATED_VALUES",
+    "values": []
   }
 ]

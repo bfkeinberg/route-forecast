@@ -12,7 +12,9 @@ export const componentLoader = (lazyComponent, attemptsLeft) => {
                     if (attemptsLeft === 1) {
                         // instead of rejecting reload the window
                         console.error(error);
-                        window.location.reload();
+                        if (!navigator.userAgent.includes("jsdom")) {
+                            window.location.reload();
+                        }
                         return;
                     }
                     componentLoader(lazyComponent, attemptsLeft - 1).then(resolve, reject);

@@ -87,7 +87,7 @@
     "@wojtekmaj/enzyme-adapter-react-17": "^0.6.2",
     "babel-core": "^6.26.3",
     "babel-eslint": "^10.1.0",
-    "babel-jest": "^27.0.2",
+    "babel-jest": "^27.0.6",
     "babel-loader": "^8.2.2",
     "babel-plugin-dynamic-import-node": "^2.3.3",
     "babel-plugin-react-html-attrs": "^3.0.5",
@@ -112,6 +112,7 @@
     "html-webpack-plugin": "^5.3.1",
     "imports-loader": "^3.0.0",
     "jest": "^27.0.5",
+    "jest-cli": "^27.0.6",
     "jest-enzyme": "^7.0.1",
     "jest-haste-map": "^27.0.5",
     "jest-resolve": "^27.0.5",
@@ -144,6 +145,7 @@
     "deploy": "./buildRelease.sh",
     "lint": "eslint src --fix",
     "test": "nyc jest",
+    "testDbg": "node --inspect-brk node_modules/.bin/jest",
     "start": "node dist/server/index.js"
   },
   "repository": {
@@ -182,6 +184,12 @@
     ],
     "setupFiles": [
       "<rootDir>/setupFile.js"
+    ],
+    "transform": {
+      "\\.[jt]sx?$": "babel-jest"
+    },
+    "transformIgnorePatterns": [
+      "node_modules/(?!luxon)"
     ]
   }
 }

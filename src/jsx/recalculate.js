@@ -14,7 +14,7 @@ export const Recalculate = ({rwgpsRoute,gpxRouteData,start,recalcRoute}) => {
 };
 
 Recalculate.propTypes = {
-    start:PropTypes.instanceOf(Date).isRequired,
+    start:PropTypes.instanceOf(Date),
     pace:PropTypes.string.isRequired,
     interval:PropTypes.number.isRequired,
     recalcRoute:PropTypes.func.isRequired,
