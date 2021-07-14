@@ -1,4 +1,5 @@
 {
+    "timeZoneId":"America/Los_Angeles",
             "forecastRequest": [
                 {
                     "lat": 38.69463,

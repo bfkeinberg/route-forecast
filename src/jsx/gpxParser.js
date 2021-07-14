@@ -342,7 +342,7 @@ class AnalyzeRoute {
         return (distance*60)/modifiedVelocity-(distance*60)/baseSpeed;
     }
 
-    adjustForWind = (forecastInfo,stream,pace,controls,previouslyCalculatedValues,start,metric,finishTime) => {
+    adjustForWind = (forecastInfo,stream,pace,controls,previouslyCalculatedValues,start,metric,finishTime,timeZoneId) => {
         if (forecastInfo.length===0) {
             return {time:0,values:[],gustSpeed:0,finishTime:finishTime};
         }
@@ -395,7 +395,7 @@ class AnalyzeRoute {
                 let desiredDistance = metric ? totalDistanceInKm: totalDistanceInKm*kmToMiles;
                 currentControl = AnalyzeRoute.calculateValuesForWind(controls, previouslyCalculatedValues,
                     calculatedValues, currentControl,
-                    desiredDistance, totalMinutesLost, start, totalDistanceInKm*kmToMiles);
+                    desiredDistance, totalMinutesLost, start, totalDistanceInKm*kmToMiles, timeZoneId);
             }
             previousPoint = currentPoint;
         });
@@ -406,10 +406,10 @@ class AnalyzeRoute {
 
     static calculateValuesForWind(controls, previouslyCalculatedValues,
                                   calculatedValues, currentControl, desiredDistance,
-                                  totalMinutesLost, start, totalDistanceInMiles) {
+                                  totalMinutesLost, start, totalDistanceInMiles, timeZoneId) {
         if (controls.length > currentControl) {
             if (desiredDistance >= controls[currentControl].distance) {
-                let previousArrivalTime = DateTime.fromFormat(previouslyCalculatedValues[currentControl].arrival, finishTimeFormat);
+                let previousArrivalTime = DateTime.fromFormat(previouslyCalculatedValues[currentControl].arrival, finishTimeFormat, {zone:timeZoneId});
                 let arrivalTime = previousArrivalTime.plus({minutes:totalMinutesLost});
                 let elapsedDuration = arrivalTime.diff(start);
                 let banked = Math.round(AnalyzeRoute.rusa_time(totalDistanceInMiles / kmToMiles, elapsedDuration.as('hours')));

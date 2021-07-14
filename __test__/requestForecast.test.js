@@ -350,7 +350,7 @@ describe('request forecast', () => {
         ];
         
         fetchMock.get('https://maps.googleapis.com/maps/api/timezone/json',
-                      {body: {dstOffset:0, rawOffset:0, timeZoneId:0} });
+                      {body: {dstOffset:0, rawOffset:0, timeZoneId:'America/Los_Angeles'} });
         fetchMock
             .post('/forecast', { body: {
                     "forecast": forecast
@@ -596,7 +596,8 @@ describe('request forecast', () => {
                     "pace": "B+",
                     "rwgpsRoute": 27904106,
                     "rwgpsRouteIsTrip": false,
-                    "start": DateTime.fromSeconds(1531566000),
+                    "start": DateTime.fromSeconds(1531566000, {zone:'America/Los_Angeles'}),
+                    "timeZoneId": 'America/Los_Angeles',
                     "loadingSource": null,
                     "succeeded": null
                 },

@@ -145,6 +145,7 @@
     "deploy": "./buildRelease.sh",
     "lint": "eslint src --fix",
     "test": "nyc jest",
+    "testUTC": "TZ=utc nyc jest",
     "testDbg": "node --inspect-brk node_modules/.bin/jest",
     "start": "node dist/server/index.js"
   },

@@ -51,26 +51,29 @@ export const setRwgpsRoute = function(route) {
 };
 
 export const SET_START = 'SET_START';
-export const setStart = function (start) {
+export const setStart = function (start, zone) {
     return {
         type: SET_START,
-        start: start
+        start: start,
+        zone: zone
     }
 };
 
 export const SET_INITIAL_START = 'SET_INITIAL_START';
-export const setInitialStart = function (start) {
+export const setInitialStart = function (start, zone) {
     return {
         type: SET_INITIAL_START,
-        start: start
+        start: start,
+        zone: zone
     }
 };
 
  export const SET_START_TIMESTAMP = 'SET_START_TIMESTAMP';
- export const setStartTimestamp = function (start) {
+ export const setStartTimestamp = function (start, zone) {
      return {
          type: SET_START_TIMESTAMP,
-         start: Number.parseInt(start)
+         start: Number.parseInt(start),
+         zone: zone
      }
  };
 
@@ -260,7 +263,8 @@ export const requestForecast = function(routeInfo) {
                     userControls, calculatedValues,
                     getState().uiInfo.routeParams.start,
                     getState().controls.metric,
-                    getState().routeInfo.initialFinishTime);
+                    getState().routeInfo.initialFinishTime,
+                    getState().routeInfo.timeZoneId);
                 dispatch(addWeatherCorrection(weatherCorrectionMinutes,finishTime,gustSpeed));
                 dispatch(updateCalculatedValues(recalculatedValues));
             }).catch (error => {
@@ -368,7 +372,8 @@ export const recalcRoute = function() {
                         getState().controls.initialControlValues,
                         getState().uiInfo.routeParams.start,
                         getState().controls.metric,
-                        getState().routeInfo.initialFinishTime);
+                        getState().routeInfo.initialFinishTime,
+                        getState().routeInfo.timeZoneId);
                     dispatch(addWeatherCorrection(weatherCorrectionMinutes,finishTime,gustSpeed));
                     dispatch(updateCalculatedValues(recalculatedValues));
                 }

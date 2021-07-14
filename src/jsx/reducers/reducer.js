@@ -45,7 +45,7 @@ export const routeParams = function(state = {interval:defaultIntervalInHours,pac
             }
         case Actions.SET_INITIAL_START:
             if (action.start !== undefined && action.start !== null) {
-                const start = DateTime.fromISO(action.start);
+                const start = DateTime.fromISO(action.start, {zone:action.zone===undefined?"local":action.zone});
                 if (!start.isValid) {
                     return state;
                 } else {
@@ -56,7 +56,7 @@ export const routeParams = function(state = {interval:defaultIntervalInHours,pac
             }
         case Actions.SET_START_TIMESTAMP:
             if (action.start !== undefined && action.start !== null) {
-                const start = DateTime.fromSeconds(action.start);
+                const start = DateTime.fromSeconds(action.start, {zone:action.zone===undefined?"local":action.zone});
                 if (!start.isValid) {
                     return state;
                 } else {
@@ -127,7 +127,7 @@ loadingSource:null,fetchingForecast:false,fetchingRoute:false}, action) {
 
 const routeInfo = function(state = {finishTime:'',initialFinishTime:'',weatherCorrectionMinutes:null,
     forecastRequest:null,points:[], fetchAfterLoad:false,bounds:null,name:'',rwgpsRouteData:null,totalTimeInHours:null,
-    gpxRouteData:null, maxGustSpeed:0}, action) {
+    gpxRouteData:null, maxGustSpeed:0, timeZoneOffset:0, timeZoneId:'America/Los_Angeles'}, action) {
     switch (action.type) {
         case Actions.SET_TIME_ZONE:
             return {...state,timeZoneOffset:action.offset,timeZoneId:action.id};

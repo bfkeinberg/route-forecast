@@ -214,10 +214,18 @@ export class RouteWeatherUI extends Component {
         }
         RouteWeatherUI.getStravaToken(queryParams,props);
         if (queryParams.startTimestamp !== undefined) {
-            props.setStartTimestamp(queryParams.startTimestamp);
+            if (queryParams.zone !== undefined) {
+                props.setStartTimestamp(queryParams.startTimestamp, queryParams.zone);
+            } else {
+                props.setStartTimestamp(queryParams.startTimestamp);
+            }
         }
         else if (queryParams.start !== undefined) {
-            props.setInitialStart(queryParams.start);
+            if (queryParams.zone !== undefined) {
+                props.setInitialStart(queryParams.start, queryParams.zone);
+            } else {
+                props.setInitialStart(queryParams.start);
+            }
         }
         if (queryParams.pace !== undefined) {
             props.setPace(queryParams.pace.trim());

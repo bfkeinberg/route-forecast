@@ -40,6 +40,7 @@ const QueryStringUpdater = ({routeNumber,start,pace,interval,metric,controls,/*s
                           provider, showProvider);
         if (shortDate !== 'Invalid DateTime') {
             query.startTimestamp = shortDate;
+            query.zone = start.zoneName;
         }
         url += `/?${queryString.stringify(query)}`;
         // don't shorten localhost with bitly
@@ -72,6 +73,7 @@ QueryStringUpdater.propTypes = {
         PropTypes.oneOf([''])
     ]),
     start:PropTypes.instanceOf(DateTime).isRequired,
+    zone:PropTypes.string.isRequired,
     pace:PropTypes.string.isRequired,
     interval:PropTypes.number.isRequired,
     // setQueryString:PropTypes.func.isRequired,
