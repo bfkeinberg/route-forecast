@@ -6,6 +6,7 @@ import {Label, UncontrolledTooltip, Row, Col} from 'reactstrap';
 import {connect} from 'react-redux';
 import {setStart, setInitialStart} from "../actions/actions";
 import 'flatpickr/dist/themes/confetti.css';
+import { DateTime } from 'luxon';
 
 /*const setDateAndTime = function(dates, datestr, instance) {
     if (datestr === '') {
@@ -23,7 +24,8 @@ const setDateOnly = (start, setInitialStart) => {
     setInitialStart(start);
 };
 
-const DateSelect = ({start,setStart, setInitialStart}) => {
+//"EEE MMM dd yyyy HH:mm:ss 'GMT'ZZZ"
+const DateSelect = ({start, setStart, setInitialStart}) => {
     // allow us to continue to show the start time if the route was forecast for a time before the present
     const now = new Date();
     let later = new Date();
@@ -36,14 +38,15 @@ const DateSelect = ({start,setStart, setInitialStart}) => {
             <Col>
                 <Icon icon="calendar" onClick={() => setDateOnly(start, setInitialStart)}/>
                 <Label for='calendar' size='sm' tag='b' id='startingTime'>Starting time</Label>
-                <Flatpickr key={start.getTime()} id='calendar'
+                <Flatpickr key={start.seconds} id='calendar'
                        options={{enableTime: true,
                            altInput: true, altFormat: 'F j, Y h:i K',
                            altInputClass: 'dateDisplay',
                            maxDate: later,
-                           defaultDate: start,
+                           defaultDate: start.toJSDate(),
                            dateFormat: 'Y-m-d H:i',
-                           onParseConfig:(dates,datestr,instance) => instance.config.onClose.push((dates) => {setStart(new Date(dates[0]))})
+                           onParseConfig:(dates,datestr,instance) => instance.config.onClose.push((dates) =>
+        {setStart(DateTime.fromJSDate(dates[0]))})
                        }}/>
             </Col>
         </Row>
@@ -51,7 +54,7 @@ const DateSelect = ({start,setStart, setInitialStart}) => {
 };
 
 DateSelect.propTypes = {
-    start:PropTypes.instanceOf(Date).isRequired,
+    start:PropTypes.instanceOf(DateTime).isRequired,
     setStart:PropTypes.func.isRequired,
     setInitialStart:PropTypes.func.isRequired
 };

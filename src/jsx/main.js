@@ -33,7 +33,8 @@ import {
     setStravaRefreshToken,
     setWeatherProvider,
     showWeatherProvider,
-    setRwgpsCredentials
+    setRwgpsCredentials,
+    setStartTimestamp
 } from "./actions/actions";
 import QueryString from './queryString';
 
@@ -75,6 +76,7 @@ export class RouteWeatherUI extends Component {
         setRwgpsRoute: PropTypes.func.isRequired,
         setStravaToken: PropTypes.func.isRequired,
         setInitialStart: PropTypes.func.isRequired,
+        setStartTimestamp: PropTypes.func.isRequired,
         setWeatherProvider: PropTypes.func.isRequired,
         setPace: PropTypes.func.isRequired,
         setInterval: PropTypes.func.isRequired,
@@ -211,7 +213,12 @@ export class RouteWeatherUI extends Component {
             props.setFetchAfterLoad(true);
         }
         RouteWeatherUI.getStravaToken(queryParams,props);
-        props.setInitialStart(queryParams.start);
+        if (queryParams.startTimestamp !== undefined) {
+            props.setStartTimestamp(queryParams.startTimestamp);
+        }
+        else if (queryParams.start !== undefined) {
+            props.setInitialStart(queryParams.start);
+        }
         if (queryParams.pace !== undefined) {
             props.setPace(queryParams.pace.trim());
         } else {
@@ -259,7 +266,7 @@ export class RouteWeatherUI extends Component {
 const mapDispatchToProps = {
     setStravaToken, setActionUrl, setRwgpsRoute, setApiKeys, setStravaError, setInitialStart, setPace, setInterval, setMetric,
     setStravaActivity, updateControls:updateUserControls, setFetchAfterLoad, toggleStravaAnalysis, setStravaRefreshToken,
-    loadFromRideWithGps, reset, newUserMode, setWeatherProvider, showWeatherProvider, setRwgpsCredentials
+    loadFromRideWithGps, reset, newUserMode, setWeatherProvider, showWeatherProvider, setRwgpsCredentials, setStartTimestamp
 };
 
 const mapStateToProps = (state) =>

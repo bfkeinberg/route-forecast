@@ -34,7 +34,7 @@ const callVisualCrossing = async function (lat, lon, currentTime, distance, zone
     const current = forecast.currentConditions;
     if (current === undefined) {
         console.error(`Throwing error because no current conditions were returned`);
-        throw "No current conditions";
+        throw Error({details:"No current conditions"});
     }
     const now = moment.unix(current.datetimeEpoch).tz(zone)
 //    console.log(`now is ${now}`);

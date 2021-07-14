@@ -36,10 +36,10 @@ export class ForecastTable extends Component {
         props.setTableViewed();
     }
 
-    toggleZoom = (event) => {
+    toggleZoom = () => {
         this.props.toggleZoomToRange();
     };
-    
+
     updateWeatherRange = (event) => {
         const start = parseInt(event.currentTarget.getAttribute('start'));
         this.props.setWeatherRange(start, parseInt(event.currentTarget.getAttribute('end')));

@@ -1,6 +1,5 @@
 import cookie from 'react-cookies';
 import * as Sentry from '@sentry/browser';
-import { DateTime } from 'luxon';
 
 export const componentLoader = (lazyComponent, attemptsLeft) => {
     return new Promise((resolve, reject) => {
@@ -66,6 +65,14 @@ export const setInitialStart = function (start) {
         start: start
     }
 };
+
+ export const SET_START_TIMESTAMP = 'SET_START_TIMESTAMP';
+ export const setStartTimestamp = function (start) {
+     return {
+         type: SET_START_TIMESTAMP,
+         start: Number.parseInt(start)
+     }
+ };
 
 export const SET_PACE = 'SET_PACE';
 export const setPace = function(pace) {
@@ -307,13 +314,13 @@ export const setErrorDetails = function(details) {
 export const fetchTimeZone = (point, parser, rwgpsRouteData) => {
   return (dispatch, getState) => {
       let timeZonePromise = parser.findTimezoneForPoint(point.y, point.x,
-          DateTime.fromJSDate(getState().uiInfo.routeParams.start), getState().params.timezone_api_key);
+          getState().uiInfo.routeParams.start, getState().params.timezone_api_key);
       return timeZonePromise.then(timeZoneResult => {
           dispatch(setTimeZone(timeZoneResult.zoneId,timeZoneResult.offset));
           dispatch(setRouteInfo(
               parser.walkRwgpsRoute(
                   rwgpsRouteData,
-                  DateTime.fromJSDate(getState().uiInfo.routeParams.start),
+                  getState().uiInfo.routeParams.start,
                   getState().uiInfo.routeParams.pace,
                   getState().uiInfo.routeParams.interval,
                   getState().controls.userControlPoints,
@@ -340,13 +347,13 @@ export const recalcRoute = function() {
             let point = rwgpsRouteDatum['track_points'][0];
             //TODO: create another action for this section
             let timeZonePromise = parser.findTimezoneForPoint(point.y, point.x,
-                DateTime.fromJSDate(getState().uiInfo.routeParams.start), getState().params.timezone_api_key);
+                getState().uiInfo.routeParams.start, getState().params.timezone_api_key);
             return timeZonePromise.then(timeZoneResult => {
                 dispatch(setTimeZone(timeZoneResult.zoneId,timeZoneResult.offset));
                 dispatch(setRouteInfo(
                     parser.walkRwgpsRoute(
                         rwgpsRouteData,
-                        DateTime.fromJSDate(getState().uiInfo.routeParams.start),
+                        getState().uiInfo.routeParams.start,
                         getState().uiInfo.routeParams.pace,
                         getState().uiInfo.routeParams.interval,
                         getState().controls.userControlPoints,
@@ -376,13 +383,13 @@ export const recalcRoute = function() {
             }
             let point = getState().routeInfo.gpxRouteData.tracks[0].segments[0][0];
             let timeZonePromise = parser.findTimezoneForPoint(point.lat, point.lon,
-                DateTime.fromJSDate(getState().uiInfo.routeParams.start), getState().params.timezone_api_key);
+                getState().uiInfo.routeParams.start, getState().params.timezone_api_key);
             return timeZonePromise.then(timeZoneResult => {
                 dispatch(setTimeZone(timeZoneResult.zoneId,timeZoneResult.offset));
                 dispatch(setRouteInfo(
                     parser.walkGpxRoute(
                         getState().routeInfo.gpxRouteData,
-                        DateTime.fromJSDate(getState().uiInfo.routeParams.start),
+                        getState().uiInfo.routeParams.start,
                         getState().uiInfo.routeParams.pace,
                         getState().uiInfo.routeParams.interval,
                         getState().controls.userControlPoints,
@@ -839,7 +846,7 @@ export const SET_LOADING_PINNED = 'SET_LOADING_PINNED';
 export const setLoadingPinned = (value) => {
         return {type:SET_LOADING_PINNED, loading:value};
 };
-                                                      
+
 export const TOGGLE_ZOOM_TO_RANGE = 'TOGGLE_ZOOM_TO_RANGE';
 export const toggleZoomToRange = () => {
         return {type:TOGGLE_ZOOM_TO_RANGE};

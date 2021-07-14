@@ -1,7 +1,6 @@
 //const gpxParse = require("gpx-parse-alpaca");
 import {finishTimeFormat} from './reducers/reducer';
 import { DateTime } from 'luxon';
-import Duration from 'luxon/src/duration.js'
 
 import {paceToSpeed} from "./ui/ridingPace";
 import {getPowerOrVelocity} from "./windUtils";
@@ -258,7 +257,7 @@ class AnalyzeRoute {
     }
 
     findTimezoneForPoint(lat, lon, time, maps_api_key) {
-        return fetch(`https://maps.googleapis.com/maps/api/timezone/json?location=${lat},${lon}&timestamp=${time.toFormat("X")}&key=${maps_api_key}`).then( response => {
+        return fetch(`https://maps.googleapis.com/maps/api/timezone/json?location=${lat},${lon}&timestamp=${time.toSeconds()}&key=${maps_api_key}`).then( response => {
             if (response.ok) {
                 return response.json();
             }
@@ -412,8 +411,7 @@ class AnalyzeRoute {
             if (desiredDistance >= controls[currentControl].distance) {
                 let previousArrivalTime = DateTime.fromFormat(previouslyCalculatedValues[currentControl].arrival, finishTimeFormat);
                 let arrivalTime = previousArrivalTime.plus({minutes:totalMinutesLost});
-                let elapsedTimeMs = arrivalTime.toJSDate() - start;
-                let elapsedDuration = Duration.fromMillis(elapsedTimeMs);
+                let elapsedDuration = arrivalTime.diff(start);
                 let banked = Math.round(AnalyzeRoute.rusa_time(totalDistanceInMiles / kmToMiles, elapsedDuration.as('hours')));
                 calculatedValues.push({...previouslyCalculatedValues[currentControl], arrival:arrivalTime.toFormat(finishTimeFormat),
                     banked:banked});

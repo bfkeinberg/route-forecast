@@ -6,15 +6,14 @@ import React from 'react'
 import { configure } from 'enzyme'
 import Adapter from '@wojtekmaj/enzyme-adapter-react-17';
 import {dateToShortDate, makeQuery} from '../src/jsx/queryString';
+import { DateTime } from 'luxon';
 
 configure({ adapter: new Adapter() });
 
 describe('<QueryString />', () => {
     it('check short date', () => {
-        let shortDate = dateToShortDate(new Date('2018-08-01T15:00:00Z'));
-        expect(shortDate).toEqual("Wed Aug 1 2018 08:00:00");
-        shortDate = dateToShortDate('ggg6677');
-        expect(shortDate).toEqual('Invalid DateTime');
+        let shortDate = dateToShortDate(DateTime.fromISO('2018-08-01T15:00:00Z'));
+        expect(shortDate).toEqual(1533135600);
     });
 
     it('make query', () => {

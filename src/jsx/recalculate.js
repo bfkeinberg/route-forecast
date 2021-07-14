@@ -1,6 +1,7 @@
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 import {recalcRoute} from "./actions/actions";
+import { DateTime } from 'luxon';
 
 export const Recalculate = ({rwgpsRoute,gpxRouteData,start,recalcRoute}) => {
     if (rwgpsRoute === '' && gpxRouteData===null) {
@@ -14,7 +15,7 @@ export const Recalculate = ({rwgpsRoute,gpxRouteData,start,recalcRoute}) => {
 };
 
 Recalculate.propTypes = {
-    start:PropTypes.instanceOf(Date),
+    start:PropTypes.instanceOf(DateTime),
     pace:PropTypes.string.isRequired,
     interval:PropTypes.number.isRequired,
     recalcRoute:PropTypes.func.isRequired,

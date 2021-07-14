@@ -251,7 +251,8 @@ app.post('/forecast', upload.none(), async (req, res) => {
     try {
         let results = [];
         while (forecastPoints.length > 0) {
-            point = forecastPoints.shift();
+            let point = forecastPoints.shift();
+            // eslint-disable-next-line no-await-in-loop
             results.push(await callWeatherService(service, point.lat, point.lon, point.time, point.distance, zone, point.bearing));
         }
         res.status(200).json({'forecast':results});

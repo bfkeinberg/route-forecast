@@ -38,7 +38,7 @@ const RidingPace = ({pace,actualPace,setPace,metric}) => {
             <UncontrolledTooltip innerClassName={pace_tooltip_class} target='paceInput' placement="bottom">{pace_text}</UncontrolledTooltip>
             {metric ?
                 <Input tabIndex='3' type="select" value={pace} name="pace"
-                             id='paceInput' onChange={event => {saveCookie("pace",event.target.value); setPace(event.target.value)}}>
+                             id='paceInput' onChange={event => {saveCookie("pace",event.target.value);setPace(event.target.value)}}>
                     <option value="Q">5 kph</option>
                     <option value="R">6 kph</option>
                     <option value="S">8 kph</option>
@@ -54,7 +54,7 @@ const RidingPace = ({pace,actualPace,setPace,metric}) => {
                     <option value="E">29 kph</option>
                 </Input> :
                 <Input tabIndex='3' type="select" value={pace} name="pace"
-                       id='paceInput' onChange={event => {saveCookie("pace",event.target.value); setPace(event.target.value)}}>
+                       id='paceInput' onChange={event => {saveCookie("pace",event.target.value);setPace(event.target.value)}}>
                     <option value="Q">3 mph</option>
                     <option value="R">4 mph</option>
                     <option value="S">5 mph</option>

@@ -7,12 +7,14 @@ import thunk from 'redux-thunk';
 import fetchMock from 'fetch-mock';
 import * as actions from '../src/jsx/actions/actions';
 import rootReducer from "../src/jsx/reducers/reducer";
+import { DateTime } from 'luxon';
 
 const middlewares = [thunk];
 const mockStore = configureMockStore(middlewares);
 
 describe('request forecast', () => {
-    
+    debugger;
+
     afterEach(() => {
         fetchMock.reset();
         fetchMock.restore();
@@ -594,7 +596,7 @@ describe('request forecast', () => {
                     "pace": "B+",
                     "rwgpsRoute": 27904106,
                     "rwgpsRouteIsTrip": false,
-                    "start": new Date("2018-07-14T11:00:00.000Z"),
+                    "start": DateTime.fromISO("2018-07-14T11:00:00.000Z"),
                     "loadingSource": null,
                     "succeeded": null
                 },

@@ -7,6 +7,7 @@ import { configure } from 'enzyme'
 import Adapter from '@wojtekmaj/enzyme-adapter-react-17';
 import {routeParams} from '../src/jsx/reducers/reducer.js';
 import {SET_START} from '../src/jsx/actions/actions';
+import { DateTime } from 'luxon';
 
 configure({ adapter: new Adapter() });
 
@@ -17,8 +18,8 @@ describe('route params reducer', () => {
             {
                 interval:1,pace:'D',rwgpsRoute:'',
                 rwgpsRouteIsTrip:false,
-                start: expect.any(Date),
-                initialStart: expect.any(Date)
+                start: expect.any(DateTime),
+                initialStart: expect.any(DateTime)
             }
         );
     });
@@ -29,23 +30,23 @@ describe('route params reducer', () => {
             "pace": "C",
             "rwgpsRoute": 201276,
             "rwgpsRouteIsTrip": false,
-            "start": new Date("2018-07-31T14:00:00.981Z"),
-            "initialStart": new Date("2018-07-31T14:00:00.981Z"),
+            "start": DateTime.fromISO("2018-07-31T14:00:00.981Z"),
+            "initialStart": DateTime.fromISO("2018-07-31T14:00:00.981Z"),
             "loadingSource": null,
             "succeeded": null
         };
         expect(routeParams( routeParamsState,
             {
                 type:SET_START,
-                start:new Date('2018-08-01T15:00:00.000Z')
+                start:DateTime.fromISO('2018-08-01T15:00:00.000Z')
         })).toEqual(
             {
                 "interval": 0.5,
                 "pace": "C",
                 "rwgpsRoute": 201276,
                 "rwgpsRouteIsTrip": false,
-                "start": new Date('2018-08-01T15:00:00.000Z'),
-                "initialStart": new Date('2018-07-31T14:00:00.981Z'),
+                "start": DateTime.fromISO('2018-08-01T15:00:00.000Z'),
+                "initialStart": DateTime.fromISO('2018-07-31T14:00:00.981Z'),
                 "loadingSource": null,
                 "succeeded": null
             }

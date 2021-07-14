@@ -1,6 +1,7 @@
 import * as Actions from '../actions/actions';
 import {combineReducers} from 'redux';
 import RouteInfoForm from "../routeInfoEntry";
+import { DateTime } from 'luxon';
 
 export const finishTimeFormat = 'EEE, MMM dd yyyy h:mma';
 
@@ -10,12 +11,9 @@ const startHour = 7;
 const defaultAnalysisIntervalInHours = 1;
 
 const initialStartTime = function() {
-    let now = new Date();
-    if (now.getHours() > startHour) {
-        now.setDate(now.getDate() + 1);
-        now.setHours(startHour);
-        now.setMinutes(0);
-        now.setSeconds(0);
+    let now = DateTime.now();
+    if (now.hours > startHour) {
+        now = now.set({day:now.day+1, hour:startHour, minutes:0, seconds:0});
     }
     return now;
 };
@@ -36,8 +34,8 @@ export const routeParams = function(state = {interval:defaultIntervalInHours,pac
             return state;
         case Actions.SET_START:
             if (action.start !== undefined && action.start !== null) {
-                const start =  new Date(action.start);
-                if (isNaN(start.getTime())) {
+                const start =  DateTime.fromISO(action.start);
+                if (!start.isValid) {
                     return state;
                 } else {
                     return {...state, start: start};
@@ -47,8 +45,19 @@ export const routeParams = function(state = {interval:defaultIntervalInHours,pac
             }
         case Actions.SET_INITIAL_START:
             if (action.start !== undefined && action.start !== null) {
-                const start =  new Date(action.start);
-                if (isNaN(start.getTime())) {
+                const start = DateTime.fromISO(action.start);
+                if (!start.isValid) {
+                    return state;
+                } else {
+                    return {...state, start: start, initialStart: start};
+                }
+            } else {
+                return state;
+            }
+        case Actions.SET_START_TIMESTAMP:
+            if (action.start !== undefined && action.start !== null) {
+                const start = DateTime.fromSeconds(action.start);
+                if (!start.isValid) {
                     return state;
                 } else {
                     return {...state, start: start, initialStart: start};

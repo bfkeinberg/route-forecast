@@ -20,7 +20,7 @@ const formatControlsForUrl = function(controlPoints) {
 // this function exists to let us preserve the user's specified start time and share the url for this route
 // with someone in another time zone
 export const dateToShortDate = function(date) {
-    return DateTime.fromJSDate(date).toFormat('EEE MMM d yyyy HH:mm:ss');
+    return Number.parseInt(date.toSeconds().toFixed(0));
 };
 
 export const makeQuery = (routeNumber, pace,interval,metric,controls, strava_activity,
@@ -38,8 +38,8 @@ const QueryStringUpdater = ({routeNumber,start,pace,interval,metric,controls,/*s
         const shortDate = dateToShortDate(start);
         query = makeQuery(routeNumber, pace, interval, metric, controls, strava_activity,
                           provider, showProvider);
-        if (shortDate !== 'Invalid date') {
-            query.start = shortDate;
+        if (shortDate !== 'Invalid DateTime') {
+            query.startTimestamp = shortDate;
         }
         url += `/?${queryString.stringify(query)}`;
         // don't shorten localhost with bitly
@@ -71,7 +71,7 @@ QueryStringUpdater.propTypes = {
         PropTypes.number,
         PropTypes.oneOf([''])
     ]),
-    start:PropTypes.instanceOf(Date).isRequired,
+    start:PropTypes.instanceOf(DateTime).isRequired,
     pace:PropTypes.string.isRequired,
     interval:PropTypes.number.isRequired,
     // setQueryString:PropTypes.func.isRequired,
