@@ -35,6 +35,8 @@ jobs:
         run: npm install
       - name: Install Sentry client
         run: npm install @sentry/cli
+      - name: Run tests
+        run: npm run test
       - name: Get Sentry version
         run: VERSION=$(./node_modules/.bin/sentry-cli releases propose-version)
       - name: Build page
