@@ -134,6 +134,7 @@ export class RouteWeatherUI extends Component {
                     }
                 } else {
                     console.info('credentials retrieved from credential manager');
+                    props.setRwgpsCredentials(credentials.name, credentials.password);
                 }
             } catch (err) {
                 console.info(`failed to load credentials with ${err}`);
