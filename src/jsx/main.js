@@ -90,7 +90,7 @@ export class RouteWeatherUI extends Component {
         timezone_api_key: PropTypes.string.isRequired,
         bitly_token: PropTypes.string.isRequired,
         setRwgpsCredentials:PropTypes.func.isRequired,
-        setZoomToRange:PropsTypes.func.isRequired
+        setZoomToRange:PropsType.func.isRequired
     };
 
     constructor(props) {
