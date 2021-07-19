@@ -856,3 +856,8 @@ export const TOGGLE_ZOOM_TO_RANGE = 'TOGGLE_ZOOM_TO_RANGE';
 export const toggleZoomToRange = () => {
         return {type:TOGGLE_ZOOM_TO_RANGE};
 }
+
+export const SET_ZOOM_TO_RANGE = 'SET_ZOOM_TO_RANGE';
+export const setZoomToRange = (value) => {
+        return {type:SET_ZOOM_TO_RANGE, zoom:value};
+}

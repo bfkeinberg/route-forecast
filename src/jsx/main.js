@@ -34,7 +34,8 @@ import {
     setWeatherProvider,
     showWeatherProvider,
     setRwgpsCredentials,
-    setStartTimestamp
+    setStartTimestamp,
+    setZoomToRange
 } from "./actions/actions";
 import QueryString from './queryString';
 
@@ -88,7 +89,8 @@ export class RouteWeatherUI extends Component {
         maps_api_key: PropTypes.string.isRequired,
         timezone_api_key: PropTypes.string.isRequired,
         bitly_token: PropTypes.string.isRequired,
-        setRwgpsCredentials:PropTypes.func.isRequired
+        setRwgpsCredentials:PropTypes.func.isRequired,
+        setZoomToRange:PropsTypes.func.isRequired
     };
 
     constructor(props) {
@@ -104,6 +106,10 @@ export class RouteWeatherUI extends Component {
         this.props.updateControls(queryParams.controlPoints==undefined?[]:this.parseControls(queryParams.controlPoints));
         if (newUserMode) {
             RouteWeatherUI.loadCannedData(this.props);
+        }
+        const zoomToRange = loadCookie('zoomToRange');
+        if (zoomToRange !== undefined) {
+            this.setZoomToRange(zoomToRange);
         }
         this.state = {};
         if (typeof window !== 'undefined') {
@@ -275,7 +281,8 @@ export class RouteWeatherUI extends Component {
 const mapDispatchToProps = {
     setStravaToken, setActionUrl, setRwgpsRoute, setApiKeys, setStravaError, setInitialStart, setPace, setInterval, setMetric,
     setStravaActivity, updateControls:updateUserControls, setFetchAfterLoad, toggleStravaAnalysis, setStravaRefreshToken,
-    loadFromRideWithGps, reset, newUserMode, setWeatherProvider, showWeatherProvider, setRwgpsCredentials, setStartTimestamp
+    loadFromRideWithGps, reset, newUserMode, setWeatherProvider, showWeatherProvider, setRwgpsCredentials, setStartTimestamp,
+    setZoomToRange
 };
 
 const mapStateToProps = (state) =>

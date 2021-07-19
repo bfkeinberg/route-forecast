@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {Table, UncontrolledTooltip} from 'reactstrap';
+import {Table, UncontrolledTooltip, Row, Col} from 'reactstrap';
 import ErrorBoundary from "./errorBoundary";
 import darkSky from 'Images/darkSkySmall.png';
 import climacell from 'Images/Powered_by_Tomorrow-Black.png';
@@ -11,6 +11,8 @@ import {setWeatherRange, toggleWeatherRange, setTableViewed, toggleZoomToRange} 
 import MediaQuery from 'react-responsive';
 import {finishTimeFormat} from './reducers/reducer';
 import { DateTime } from 'luxon';
+import { Checkbox } from '@blueprintjs/core';
+import cookie from 'react-cookies';
 
 const milesToMeters = 1609.34;
 const gustySpeed = 25;
@@ -26,7 +28,8 @@ export class ForecastTable extends Component {
         gustSpeed: PropTypes.number,
         finishTime: PropTypes.string.isRequired,
         provider: PropTypes.string.isRequired,
-        toggleZoomToRange:PropTypes.func.isRequired
+        toggleZoomToRange:PropTypes.func.isRequired,
+        zoomToRange:PropTypes.bool.isRequired
     };
 
     constructor(props) {
@@ -38,6 +41,7 @@ export class ForecastTable extends Component {
 
     toggleZoom = () => {
         this.props.toggleZoomToRange();
+        cookie.save('zoomToRange', !this.props.zoomToRange, { path: '/' });        
     };
 
     updateWeatherRange = (event) => {
@@ -162,8 +166,17 @@ export class ForecastTable extends Component {
         return (
                 <div className="animated slideInLeft">
                     <ErrorBoundary>
-                    {this.displayBacklink(this.props.provider)}
-                    <span id={weatherId} onClick={this.toggleZoom}>{weatherCorrections}</span>
+                        <Row>
+                            <Col>
+                                {this.displayBacklink(this.props.provider)}
+                            </Col>
+                            <Col>
+                                <span id={weatherId}>{weatherCorrections}</span>
+                            </Col>
+                            <Col>
+                                <Checkbox checked={this.props.zoomToRange} label="Zoom to segment" onChange={this.toggleZoom} />
+                            </Col>
+                        </Row>
                     <Table size='sm' hover bordered>
                         <thead>
                         <tr>
@@ -199,7 +212,8 @@ const mapStateToProps = (state) =>
         weatherCorrectionMinutes: state.routeInfo.weatherCorrectionMinutes,
         gustSpeed: state.routeInfo.maxGustSpeed,
         metric: state.controls.metric,
-        finishTime: state.routeInfo.finishTime
+        finishTime: state.routeInfo.finishTime,
+        zoomToRange: state.forecast.zoomToRange
     });
 
 const mapDispatchToProps = {
