@@ -13,7 +13,8 @@ import Flatpickr from 'react-flatpickr'
 import React from 'react'
 import { configure, shallow, mount, render } from 'enzyme'
 import Adapter from '@wojtekmaj/enzyme-adapter-react-17';
-import DateSelect from '../src/jsx/ui/dateSelect';
+import DateSelect, {setDateOnly} from '../src/jsx/ui/dateSelect';
+import expressStaticGzip from 'express-static-gzip';
 configure({ adapter: new Adapter() });
 
 const dir = process.cwd();
@@ -42,7 +43,7 @@ const initialState = {routeInfo:routeInfo, uiInfo:{
 }};
 
 let store = mockStore(initialState);
-                      
+     
 describe('<DateSelect />', () => {
     it('should display calendar picker', () => {
         const div = document.createElement('div');
@@ -50,6 +51,8 @@ describe('<DateSelect />', () => {
         document.body.appendChild(div)
         const wrapper = mount((<Provider store={store}><DateSelect/></Provider>));
         expect(wrapper.find(Flatpickr).length).toBe(1);
+        const setStart = jest.fn();
+        expect(setDateOnly(DateTime.now(), setStart)).toBe(undefined);
     });
 });
 

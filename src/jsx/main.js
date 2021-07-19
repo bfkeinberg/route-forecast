@@ -109,7 +109,7 @@ export class RouteWeatherUI extends Component {
         }
         const zoomToRange = loadCookie('zoomToRange');
         if (zoomToRange !== undefined) {
-            this.setZoomToRange(zoomToRange);
+            this.props.setZoomToRange(zoomToRange);
         }
         this.state = {};
         if (typeof window !== 'undefined') {

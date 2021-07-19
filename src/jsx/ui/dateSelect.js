@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useRef} from 'react';
 import PropTypes from 'prop-types';
 import Flatpickr from 'react-flatpickr'
 import {Icon} from '@blueprintjs/core';
@@ -16,12 +16,10 @@ import { DateTime } from 'luxon';
     this.props.setStart(new Date(dates[0]));
 };*/
 
-const setDateOnly = (start, setInitialStart) => {
+export const setDateOnly = (start, setInitialStart) => {
     let now = new Date();
-    start.setDate(now.getDate());
-    start.setMonth(now.getMonth());
-    start.setFullYear(now.getFullYear());
-    setInitialStart(start);
+    let newStart = start.set({day: now.getDate(), month:now.getMonth(), year:now.getFullYear()});
+    setInitialStart(newStart, newStart.zone.name);
 };
 
 //"EEE MMM dd yyyy HH:mm:ss 'GMT'ZZZ"

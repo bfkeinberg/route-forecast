@@ -97,7 +97,7 @@
     "copy-webpack-plugin": "^9.0.0",
     "critical": "^4.0.0",
     "criticalcss": "^2.1.0",
-    "css-loader": "^5.2.2",
+    "css-loader": "^6.1.0",
     "css-minimizer-webpack-plugin": "^3.0.1",
     "enzyme": "^3.11.0",
     "enzyme-matchers": "^7.0.1",
@@ -108,7 +108,6 @@
     "exports-loader": "^3.0.0",
     "fetch-mock": "^9.10.7",
     "file-loader": "^6.1.1",
-    "html-critical-webpack-plugin": "^2.1.0",
     "html-webpack-plugin": "^5.3.1",
     "imports-loader": "^3.0.0",
     "jest": "^27.0.5",
@@ -134,8 +133,7 @@
     "webpack-bundle-analyzer": "^4.4.2",
     "webpack-cli": "^4.6.0",
     "webpack-merge": "^5.2.0",
-    "webpack-node-externals": "^3.0.0",
-    "webpack-plugin-critical": "^1.0.0"
+    "webpack-node-externals": "^3.0.0"
   },
   "scripts": {
     "prod": "./node_modules/.bin/webpack --mode production --config webpack.prod.js --env sentryRelease",
