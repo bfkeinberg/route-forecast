@@ -9,8 +9,8 @@ import {lazy} from '@loadable/component';
 
 const LoadableRouteList = lazy(() => import(/* webpackChunkName: "RouteList" */ './routeList'));
 
-const saveRwgpsCredentials = (username, password) => {
-    if ("PasswordCredential" in window) {
+export const saveRwgpsCredentials = (username, password) => {
+    if ("credentials" in navigator && "PasswordCredential" in window) {
 
         let credential = new PasswordCredential({
             id: username,
@@ -24,8 +24,8 @@ const saveRwgpsCredentials = (username, password) => {
             console.error("Error while storing the credential: ", err);
         });
     } else {
-        cookie.save('rwgpsUsername', rwgpsUsername, { path: '/' });
-        cookie.save('rwgpsPassword', rwgpsPassword, { path: '/' });
+        cookie.save('rwgpsUsername', username, { path: '/' });
+        cookie.save('rwgpsPassword', password, { path: '/' });
         console.info('credentials stored in cookie');
     }
 };
@@ -38,7 +38,7 @@ const getPinnedRoutes = async (rwgpsUsername, rwgpsPassword, setErrorDetails, se
         saveRwgpsCredentials(rwgpsUsername, rwgpsPassword);
         return response.data;
     } catch (e) {
-        console.log(e);
+        console.log(`axios exception is ${e}`);
         if (e.response !== undefined) {
             setErrorDetails(JSON.stringify(e.response.data));
         } else {
