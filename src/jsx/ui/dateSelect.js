@@ -17,8 +17,8 @@ import { DateTime } from 'luxon';
 };*/
 
 export const setDateOnly = (start, setInitialStart) => {
-    let now = new Date();
-    let newStart = start.set({day: now.getDate(), month:now.getMonth(), year:now.getFullYear()});
+    let now = DateTime.now();
+    let newStart = start.set({day: now.day, month:now.month, year:now.year});
     setInitialStart(newStart, newStart.zone.name);
 };
 
@@ -37,6 +37,7 @@ const DateSelect = ({start, setStart, setInitialStart}) => {
                 <Icon icon="calendar" onClick={() => setDateOnly(start, setInitialStart)}/>
                 <Label for='calendar' size='sm' tag='b' id='startingTime'>Starting time</Label>
                 <Flatpickr key={start.seconds} id='calendar'
+                       value={start.toJSDate()}
                        options={{enableTime: true,
                            altInput: true, altFormat: 'F j, Y h:i K',
                            altInputClass: 'dateDisplay',
