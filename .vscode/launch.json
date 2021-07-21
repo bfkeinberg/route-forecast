@@ -1,0 +1,33 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "pwa-node",
+            "request": "launch",
+            "name": "Launch Program",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "program": "/Users/brian/Documents/src/route-forecast/dist/server/index.js",
+            "localRoot": "/Users/brian/Documents/src/route-forecast/src/jsx/server",
+            "remoteRoot": "${workspaceFolder}/dist/server",
+            "sourceMaps": true,
+            "trace": true,
+            "env":{"AIRNOW_KEY":"4604D5DA-8D8C-4693-9D7F-741C63AD4EBF",
+                "PURPLE_AIR_KEY":"CDB7F040-F990-11EA-910A-42010A800178",
+                "IQAIR_KEY":"70261f7e-80d7-477c-ac92-1a453cd59a71",
+                "MAPS_KEY":"AIzaSyCjL4CiLjxKP2XfD5Aa_a0jdD-OLNtp6jc",
+                "DARKSKY_API_KEY":"9f1075d7f3960b4ec949f0dddae04cfc",
+                "RWGPS_API_KEY":"91a12f680b4e0ef87f500f039c76e449",
+                "STRAVA_API_KEY":"14f3f80e3a99ce401d48009af8105fd6b25373ef",
+                "TIMEZONE_API_KEY":"AIzaSyBS_wyxfIuLDEJWNOKs4w1NqbmwSDjLqCE",
+                "STRAVA_CLIENT_ID":"21996",
+                "BITLY_KEY":"R_c745bf113ea94496bda89da42813a5dd",
+                "BITLY_TOKEN":"2404bc27371060258248c4782ad4d242cbca258d",
+                "CLIMACELL_KEY":"WwsOI3NGPH6OoWclCk5rloJHlQoDrimM"}
+        }
+    ]
+}

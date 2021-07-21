@@ -81,9 +81,16 @@ module.exports = (env,argv) => {
                         "css-loader"
                     ]
                 },
-                {test: /\.(png|woff2?|ttf|eot)$/, loader: "url-loader", options: {limit: 100000} },
-                {test: /\.(jpg|ico|svg)$/, loader: "file-loader"},
-                {test: /\.htm$/, use: 'raw-loader'}
+                {test: /\.(png|woff2?|ttf|eot)$/, 
+                    type: "asset",
+                    parser: {
+                        dataUrlCondition: {
+                            maxSize: 100000
+                        }
+                    } 
+                },
+                {test: /\.(jpg|ico|svg)$/, type: "asset/resource"},
+                {test: /\.htm$/, type: "asset/source"}
             ]
         },
         plugins: [
