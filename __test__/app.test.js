@@ -33,7 +33,9 @@ describe('<RouteWeatherUI />', () => {
     const setStravaRefreshToken=jest.fn();
     const setWeatherProvider=jest.fn();
     const setRwgpsCredentials=jest.fn();
-    const setStartTimestamp=jest.fn()
+    const setStartTimestamp=jest.fn();
+    const setZoomToRange=jest.fn();
+
     it('renders without crashing', () => {
 
         const wrapper = shallow(<RouteWeatherUI action={'/forecast'} search={''} setActionUrl={setActionUrl} setApiKeys={setApiKeys} updateControls={updateControls}
@@ -42,7 +44,7 @@ describe('<RouteWeatherUI />', () => {
                                                 rwgpsRouteIsTrip={false} reset={reset} newUserMode={newUserMode} firstUse={false}
                                                 setRwgpsRoute={setRwgpsRoute} setStravaToken={setStravaToken} setStart={setStart}
                                                 setInterval={setInterval} setPace={setPace} setMetric={setMetric} setStravaActivity={setStravaActivity}setStravaError={setStravaError}
-                                                setStartTimestamp={setStartTimestamp}
+                                                setStartTimestamp={setStartTimestamp} setZoomToRange={setZoomToRange}
                                                 setStravaRefreshToken={setStravaRefreshToken}
                                 setInitialStart={setInitialStart} setWeatherProvider={setWeatherProvider} setRwgpsCredentials={setRwgpsCredentials}
                                 maps_api_key={'zzzz'} bitly_token={'ddd'} timezone_api_key={'lll'}/>);
