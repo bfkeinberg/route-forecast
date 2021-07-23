@@ -25,13 +25,13 @@ const ForecastButton = ({fetchingForecast,requestForecast,routeInfo,submitDisabl
     return (
         <div id='forecast' style={{'display':'inline-flex',padding:'0px 14px'}} cursor='not-allowed'>
             {forecast_tooltip}
-            <MediaQuery minDeviceWidth={1000} values={{deviceWidth:1400}}>
+            <MediaQuery minDeviceWidth={801}>
                 <Button tabIndex='6' color="primary" onClick={forecastClick}
                         style={buttonStyle}
                         disabled={submitDisabled || fetchingForecast}>
                     {fetchingForecast?'Updating...':'Find forecast'}</Button>
             </MediaQuery>
-            <MediaQuery maxDeviceWidth={800} values={{deviceWidth:1400}}>
+            <MediaQuery maxDeviceWidth={800}>
                 <Button id='forecast' tabIndex='6' color="primary" onClick={forecastClick}
                         style={buttonStyle}
                         disabled={submitDisabled || fetchingForecast} size="sm">
