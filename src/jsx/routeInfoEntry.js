@@ -125,6 +125,8 @@ class RouteInfoForm extends Component {
 
     render() {
         const header = (<div style={{textAlign:"center",'fontSize':'90%'}}>Forecast and time estimate</div>);
+        const providerButton = this.props.showProvider?<Col sm={{size:"auto"}}><WeatherProvider/></Col>:null;
+
         return (
             <div>
                 <Card>
@@ -149,11 +151,6 @@ class RouteInfoForm extends Component {
                                     <PaceExplanation/>
                                 </Col>
                             </MediaQuery>
-                            <MediaQuery minDeviceWidth={this.props.showProvider?501:4000}>
-                                <Col sm="2">
-                                    <WeatherProvider/>
-                                </Col>
-                            </MediaQuery>
                         </Row>
                         <Row noGutters>
                             <Col sm={{size:"auto"}}>
@@ -172,12 +169,13 @@ class RouteInfoForm extends Component {
                                 {this.state.showPinnedRoutes?<PinnedRouteLoader/>:null}
                                 </ErrorBoundary>
                             </Col>
+                            {providerButton}                            
                             <Col size={{size:"auto"}}>
                                 <RwGpsTypeSelector visible={false}/>
                             </Col>
                             <Col size={{size:"auto"}}>
                                 <ForecastButton/>
-                            </Col>
+                            </Col>}
                         </Row>
                         {RouteInfoForm.showErrorDetails(this.props.errorDetails)}
                         {RouteInfoForm.showProgressSpinner(this.props.fetchingRoute)}
