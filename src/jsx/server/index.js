@@ -223,11 +223,11 @@ app.get('/rwgps_route', (req, res) => {
 
 app.post('/forecast', upload.none(), async (req, res) => {
     if (req.body.locations === undefined) {
-        res.status(400).json("{'status': 'Missing location key'}");
+        res.status(400).json({'status': 'Missing location key'});
         return;
     }
-    if (req.body.timezone === undefined) {
-        res.status(400).json("{'status': 'Missing timezone key'}");
+    if (req.body.timezone === undefined || req.body.timezone === 'undefined') {
+        res.status(400).json({'status': 'Missing timezone key'});
         return;
     }
     const forecastPoints = JSON.parse(req.body.locations);
@@ -246,8 +246,7 @@ app.post('/forecast', upload.none(), async (req, res) => {
         let dbRecord = makeRecord(forecastPoints[0], req.body.routeNumber);
         insertRecord(dbRecord, req.body.routeName);
     }
-    let zone = req.body.timezone;
-
+    const zone = req.body.timezone;
     try {
         let results = [];
         while (forecastPoints.length > 0) {
