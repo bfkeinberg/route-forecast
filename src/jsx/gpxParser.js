@@ -263,6 +263,10 @@ class AnalyzeRoute {
             }
             throw Error(response.error());
         }).then (body => {
+            // check for error in body of message
+            if (body.errorMessage !== undefined) {
+                throw Error(body.errorMessage);
+            }
             // determine total timezone offset in seconds
             let tzOffset = body.dstOffset + body.rawOffset;
             return ({offset:tzOffset,zoneId:body.timeZoneId});
