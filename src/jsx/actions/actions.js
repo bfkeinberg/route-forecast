@@ -245,7 +245,11 @@ export const requestForecast = function(routeInfo) {
                 } else {
                     let details = await response.json();
                     if (details !== undefined) {
-                        throw new Error(details.details);
+                        if (details.details !== undefined) {
+                            throw new Error(details.details);
+                        } else {
+                            throw new Error(details.status);
+                        }
                     }
                     let error = response.statusText !== undefined ? response.statusText : response['status'];
                     throw new Error(error);
