@@ -13,7 +13,6 @@ const middlewares = [thunk];
 const mockStore = configureMockStore(middlewares);
 
 describe('request forecast', () => {
-    debugger;
 
     afterEach(() => {
         fetchMock.reset();
