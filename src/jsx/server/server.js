@@ -189,7 +189,6 @@ app.get('/get_redirects', cors(), async (req, res) => {
 app.use((req, res, next) => {
     // Switch to randoplan.com
     var host = req.hostname;
-    logger.info(`host = ${host}`);
     if (host === 'www.cyclerouteforecast.com' || host === 'cyclerouteforecast.com') {
         datastore.save({key:datastore.key('OldUrl'), data:{caller:req.socket.remoteAddress}});
     }
@@ -405,7 +404,11 @@ app.get('/', (req, res) => {
         'reactDom': '',
         delimiter: '?'
     };
-    res.render('index', ejsVariables)
+    try {
+        res.render('index', ejsVariables)
+    } catch (err) {
+        console.info(err);
+    }
 });
 if (!process.env.NO_LOGGING) {
     app.use(errorLogger);

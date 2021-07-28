@@ -2,10 +2,12 @@ const request = require("supertest");
 jest.mock('node-fetch', () => require('fetch-mock-jest').sandbox());
 const fetchMock = require('node-fetch');
 process.env.NO_LOGGING = true;
-const app = require("../dist/server/server");
+const app = require("../src/jsx/server/server");
+app.set('views', './__test__/views');
 
 describe("Test the root path", () => {
   test("It should respond to the root method", () => {
+    debugger;
     return request(app)
       .get("/")
       .expect(200);
