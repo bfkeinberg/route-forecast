@@ -14,7 +14,6 @@ import React from 'react'
 import { configure, shallow, mount, render } from 'enzyme'
 import Adapter from '@wojtekmaj/enzyme-adapter-react-17';
 import DateSelect, {setDateOnly} from '../src/jsx/ui/dateSelect';
-import expressStaticGzip from 'express-static-gzip';
 configure({ adapter: new Adapter() });
 
 const dir = process.cwd();
