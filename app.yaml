@@ -1,4 +1,4 @@
-runtime: nodejs10
+runtime: nodejs14
 
 inbound_services:
 - warmup
