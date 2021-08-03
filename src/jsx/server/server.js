@@ -189,8 +189,10 @@ app.get('/get_redirects', cors(), async (req, res) => {
 app.use((req, res, next) => {
     // Switch to randoplan.com
     var host = req.hostname;
-    if (host === 'www.cyclerouteforecast.com' || host === 'cyclerouteforecast.com') {
-        datastore.save({key:datastore.key('OldUrl'), data:{caller:req.socket.remoteAddress}});
+    const originalHost = req.header('X-Forwarded-Host');
+    console.info(`Forwarded host is ${originalHost}`);
+    if (originalHost === 'www.cyclerouteforecast.com' || originalHost === 'cyclerouteforecast.com') {
+        datastore.save({key:datastore.key('OldUrl'), data:{caller:req.header('X-Forwarded-For')}});
     }
     if (host === 'www.cyclerouteforecast.com' || host === 'route-forecast.ue.r.appspot.com' ||
         host === 'route-forecast.appspot.com' ||
