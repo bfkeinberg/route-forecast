@@ -190,6 +190,7 @@ app.use((req, res, next) => {
     // Switch to randoplan.com
     var host = req.hostname;
     const originalHost = req.header('X-Forwarded-Host');
+    console.info(`headers ${JSON.stringify(req.headers)}`);
     console.info(`Forwarded host is ${originalHost}`);
     if (originalHost === 'www.cyclerouteforecast.com' || originalHost === 'cyclerouteforecast.com') {
         datastore.save({key:datastore.key('OldUrl'), data:{caller:req.header('X-Forwarded-For')}});
