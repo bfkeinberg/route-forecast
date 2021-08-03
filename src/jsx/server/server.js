@@ -175,6 +175,7 @@ const getOldUrlCalls = () => {
 
 app.get('/get_redirects', cors(), async (req, res) => {
     const [entities] = await getOldUrlCalls();
+    console.info(`entities ${JSON.stringify(entities)}`);
     const visits = entities.map(
         entity => JSON.stringify({"Time":entity.timestamp, "From":entity.caller,
             "Host":entity.caller})
@@ -186,19 +187,20 @@ app.get('/get_redirects', cors(), async (req, res) => {
        .end();
 });
 
-app.use((req, res, next) => {
+app.use(async (req, res, next) => {
     // Switch to randoplan.com
     var host = req.hostname;
     const originalHost = req.header('host');
     console.info(`headers ${JSON.stringify(req.headers)}`);
     console.info(`Forwarded host is ${originalHost} request host is ${host}`);
     if (originalHost === 'www.cyclerouteforecast.com' || originalHost === 'cyclerouteforecast.com') {
-        datastore.save({key:datastore.key('OldUrl'), data:{caller:req.header('x-forwarded-for')}});
+        await datastore.save({key:datastore.key('OldUrl'), data:{timestamp: new Date(), caller:req.header('x-forwarded-for')}});
     }
     if (host === 'www.cyclerouteforecast.com' || host === 'route-forecast.ue.r.appspot.com' ||
         host === 'route-forecast.appspot.com' ||
         host === 'cyclerouteforecast.com' || host === 'randoplan.com') {
-        return res.redirect(301, 'https://www.randoplan.com' + req.originalUrl);
+            console.info(`Redirected ${host} to randoplan.com`);
+            return res.redirect(301, 'https://www.randoplan.com' + req.originalUrl);
     }
     return next();
 });
