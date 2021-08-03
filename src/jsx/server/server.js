@@ -191,7 +191,7 @@ app.use((req, res, next) => {
     var host = req.hostname;
     const originalHost = req.header('host');
     console.info(`headers ${JSON.stringify(req.headers)}`);
-    console.info(`Forwarded host is ${originalHost}`);
+    console.info(`Forwarded host is ${originalHost} request host is ${host}`);
     if (originalHost === 'www.cyclerouteforecast.com' || originalHost === 'cyclerouteforecast.com') {
         datastore.save({key:datastore.key('OldUrl'), data:{caller:req.header('x-forwarded-for')}});
     }
