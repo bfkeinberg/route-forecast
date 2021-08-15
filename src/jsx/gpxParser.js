@@ -100,7 +100,7 @@ class AnalyzeRoute {
                 }
             ).then(response => {
                 if (response === undefined) {
-                    reject(new Error("No such Ride with GPS route"));
+                    reject(new Error("Private or non-existent Ride with GPS route"));
                     return;
                 }
                 let rwgpsRouteDatum = response[response['trip'] === undefined ? 'route' : 'trip'];
