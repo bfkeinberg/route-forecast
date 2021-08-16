@@ -45,16 +45,30 @@ const ridingPaceState = {
     }
 };
 
-let store = mockStore(ridingPaceState);
 
 describe('<RidingPace />', () => {
     it('should allow all options', () => {
+        let store = mockStore(ridingPaceState);
         const div = document.createElement('div');
         div.setAttribute("id", "paceInput")
         document.body.appendChild(div)
         const wrapper = mount((<Provider store={store}><RidingPace /></Provider>));
         expect(wrapper.find(Input).length).toBe(1);
         expect((wrapper.find(Input).children().children()).length).toBe(13);
+        expect(wrapper.find('Input').prop('value')).toBe('D');
     });
+
+    it('handling of obsolete pace values' , () => {
+        ridingPaceState.uiInfo.routeParams.pace = 'C-';
+        let store = mockStore(ridingPaceState);
+        const div = document.createElement('div');
+        div.setAttribute("id", "paceInput")
+        document.body.appendChild(div)
+        const wrapper = mount((<Provider store={store}><RidingPace /></Provider>));
+        expect(wrapper.find(Input).length).toBe(1);
+        expect((wrapper.find(Input).children().children()).length).toBe(13);
+        expect(wrapper.find('Input').prop('value')).toBe('B+');
+    });
+
 });
 

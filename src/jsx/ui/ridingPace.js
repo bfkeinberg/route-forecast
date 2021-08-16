@@ -5,6 +5,7 @@ import {connect} from 'react-redux';
 import {setPace, saveCookie} from "../actions/actions";
 
 export const paceToSpeed = {'Q':3, 'R':4, 'S':5, 'T':6, 'A-':9, 'A':10, 'A+':11, 'B':12, 'B+':13, 'C':14, 'C+':15, 'D':16, 'D+':17, 'E':18, 'E+':19};
+export const inputPaceToSpeed = {'Q':3, 'R':4, 'S':5, 'T':6, 'A-':9, 'A':10, 'A+':11, 'B':12, 'B+':13, 'C-':13, 'C':14, 'C+':15, 'D-':15, 'D':16, 'D+':17, 'E':18, 'E+':19};
 export const metricPaceToSpeed = {'A-':15, 'A':16, 'B-':18, 'B':19, 'C-':21, 'C':22, 'C+':24, 'D-':24, 'D':26, 'D+':27, 'E-':27, 'E':29};
 
 const getAlphaPace = function(pace) {
@@ -22,7 +23,20 @@ const getPaceTooltipId = function(realPace, predictedPace) {
     }
 };
 
+const correctPaceValue = (paceAlpha, setPace) => {
+    let paceNumeric = paceToSpeed[paceAlpha];
+    if (paceNumeric === undefined) {
+        paceNumeric = inputPaceToSpeed[paceAlpha];
+        let pace = getAlphaPace(paceNumeric);
+        setPace(pace);
+        return pace;
+    } else {
+        return paceAlpha;
+    }
+}
+
 const RidingPace = ({pace,actualPace,setPace,metric}) => {
+    pace = correctPaceValue(pace, setPace);
     let pace_mph = paceToSpeed[pace];
     let pace_text;
     let pace_tooltip_class = 'pace_tooltip';

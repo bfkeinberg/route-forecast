@@ -2,7 +2,7 @@
 import {finishTimeFormat} from './reducers/reducer';
 import { DateTime } from 'luxon';
 
-import {paceToSpeed} from "./ui/ridingPace";
+import {inputPaceToSpeed} from "./ui/ridingPace";
 import {getPowerOrVelocity} from "./windUtils";
 import {setMinMaxCoords} from "./actions/actions";
 
@@ -149,7 +149,7 @@ class AnalyzeRoute {
         };
 
         let forecastRequests = [];
-        let baseSpeed = paceToSpeed[pace];
+        let baseSpeed = inputPaceToSpeed[pace];
         let bounds = {min_latitude:90, min_longitude:180, max_latitude:-90, max_longitude:-180};
         let first = true;
         let previousPoint = null;
@@ -350,7 +350,7 @@ class AnalyzeRoute {
         if (forecastInfo.length===0) {
             return {time:0,values:[],gustSpeed:0,finishTime:finishTime};
         }
-        let baseSpeed = paceToSpeed[pace];
+        let baseSpeed = inputPaceToSpeed[pace];
         let forecast = forecastInfo.slice().reverse();
         let currentForecast = forecast.pop();
         let currentControl = 0;
