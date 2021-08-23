@@ -4,7 +4,7 @@ import ErrorBoundary from "./errorBoundary";
 import darkSky from 'Images/darkSkySmall.png';
 import climacell from 'Images/Powered_by_Tomorrow-Black.png';
 //too large
-//import visualcrossing from 'Images/visualCrossing.png';
+import visualcrossing from 'Images/visualCrossing.png';
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 import {setWeatherRange, toggleWeatherRange, setTableViewed, toggleZoomToRange} from './actions/actions';
@@ -105,8 +105,8 @@ export class ForecastTable extends Component {
                 case 'weatherapi':
                     return <a href="https://www.weatherapi.com/" title="Free Weather API"><img src='//cdn.weatherapi.com/v4/images/weatherapi_logo.png' alt="Weather data by WeatherAPI.com" border="0"/></a>;
                 case 'visualcrossing':
-//                    return <a href="https://www.visualcrossing.com/weather-data"><img src={visualcrossing}/></a>;
-                    return <div><a href="https://www.visualcrossing.com/weather-data">Powered by Visual Crossing Weather</a><p/></div>;
+                   return <a href="https://www.visualcrossing.com/weather-data"><img src={visualcrossing}/></a>;
+                    // return <div><a href="https://www.visualcrossing.com/weather-data">Powered by Visual Crossing Weather</a><p/></div>;
                 default: return <div/>;
             }
     }
@@ -132,6 +132,7 @@ export class ForecastTable extends Component {
                         <MediaQuery minWidth={501}>
                             <td>{point.cloudCover}</td>
                         </MediaQuery>
+                        <td>{point.aqi}</td>
                         <td className={ForecastTable.windStyle(point)}>{this.state.showGusts?
                             <i>{
                             ForecastTable.formatSpeed(point.gust, this.props.metric)}</i>:
@@ -188,6 +189,7 @@ export class ForecastTable extends Component {
                             <MediaQuery minWidth={501}>
                                 <th className={'headerCell'}>Cloud cover</th>
                             </MediaQuery>
+                            <th className={'headerCell'} id={'aqi'}>AQI</th>
                             <th id={'wind'} className={'headerCell'} onClick={this.toggleGustDisplay}>{windHeader}</th>
                             <MediaQuery minWidth={501}>
                                 <th className={'headerCell'}>Wind bearing</th>
@@ -200,6 +202,7 @@ export class ForecastTable extends Component {
                     <UncontrolledTooltip placement={'top'} target={'dist'}>Distance at start of segment</UncontrolledTooltip>
                     <UncontrolledTooltip placement={'top'} target={'temp'}>Click to toggle between temperature and apparent temperature</UncontrolledTooltip>
                     <UncontrolledTooltip placement={'top'} target={'wind'}>Click to toggle between average wind speed and wind gusts</UncontrolledTooltip>
+                    <UncontrolledTooltip placement={'top'} target={'aqi'}>Current conditions, not forecasted</UncontrolledTooltip>
                 </div>
         );
     }
