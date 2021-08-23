@@ -59,6 +59,7 @@ jobs:
           BITLY_TOKEN: ${{ secrets.BITLY_TOKEN }}  
           STRAVA_CLIENT_ID:  ${{ secrets.STRAVA_CLIENT_ID }}  
           VISUAL_CROSSING_KEY: ${{ secrets.VISUAL_CROSSING_KEY }}
+          PURPLE_AIR_KEY: ${{ secrets.PURPLE_AIR_KEY }}
       - name: Deploy
         uses: google-github-actions/deploy-appengine@main
         with:
