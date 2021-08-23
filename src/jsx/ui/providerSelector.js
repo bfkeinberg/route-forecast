@@ -6,10 +6,9 @@ import {setWeatherProvider} from "../actions/actions";
 
 const WeatherProvider = ({weatherProvider,setWeatherProvider}) => {
     return (
-        <Form>
             <FormGroup inline row size='sm'>
                 <UncontrolledTooltip target='provider' placement='bottom'>The weather provider to use for forecasts</UncontrolledTooltip>
-                <Input type="select" size="sm" id='provider' tabIndex='2'
+                <Input type="select" bsSize="sm" id='provider' tabIndex='2'
                     name="provider"
                     value={weatherProvider} onChange={event => {setWeatherProvider(event.target.value)}}>
                     <option value="darksky">Dark Sky</option>
@@ -18,7 +17,6 @@ const WeatherProvider = ({weatherProvider,setWeatherProvider}) => {
                     <option value="visualcrossing">Visual Crossing</option>
                 </Input>
             </FormGroup>
-        </Form>
     );
 };
 

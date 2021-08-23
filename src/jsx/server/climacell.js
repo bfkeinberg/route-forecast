@@ -58,7 +58,7 @@ const callClimacell = async function (lat, lon, currentTime, distance, zone, bea
     const startTimeString = startTime.utc().format('YYYY-MM-DD[T]HH:mm:ss[Z]');
     const endTimeString = endTime.utc().format('YYYY-MM-DD[T]HH:mm:ss[Z]');
     const now = startTime.tz(zone);
-    const url = `https://data.climacell.co/v4/timelines?location=${lat},${lon}&fields=windSpeed&fields=precipitationProbability&fields=windDirection&fields=temperature&fields=temperatureApparent&fields=windGust&fields=cloudCover&fields=precipitationType&fields=weatherCode&timezone=${zone}&startTime=${startTimeString}&endTime=${endTimeString}&timesteps=1h&units=imperial&apikey=${climacellKey}`;
+    const url = `https://data.climacell.co/v4/timelines?location=${lat},${lon}&fields=windSpeed,precipitationProbability,windDirection,temperature,temperatureApparent,windGust,cloudCover,precipitationType,weatherCode&timezone=${zone}&startTime=${startTimeString}&endTime=${endTimeString}&timesteps=1h&units=metric&apikey=${climacellKey}`;
     const forecastResult = fetch(url).then(response => {
         const result = response.json();
         result.apiCalls = response.headers.get('X-RateLimit-Remaining-day');
@@ -106,8 +106,9 @@ const callClimacell = async function (lat, lon, currentTime, distance, zone, bea
     }).
     catch(error => {
         console.error('error',JSON.stringify(error));
-        throw error;
+        throw Error(error);
     });
+
     await sleep(300);
     return forecastResult;
 };

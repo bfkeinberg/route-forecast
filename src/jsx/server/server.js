@@ -17,7 +17,7 @@ var strava = require('strava-v3-alpaca');
 const {Datastore} = require('@google-cloud/datastore');
 const cors = require('cors');
 const axios = require('axios');
-
+const getPurpleAirAQI = require('./purpleAirAQI');
 const querystring = require('querystring');
 let winston = null;
 let expressWinston = null;
@@ -190,12 +190,11 @@ app.get('/get_redirects', cors(), async (req, res) => {
 app.use(async (req, res, next) => {
     // Switch to randoplan.com
     var host = req.hostname;
-    const originalHost = req.header('host');
-    console.info(`headers ${JSON.stringify(req.headers)}`);
-    console.info(`Forwarded host is ${originalHost} request host is ${host}`);
-    if (originalHost === 'www.cyclerouteforecast.com' || originalHost === 'cyclerouteforecast.com') {
-        await datastore.save({key:datastore.key('OldUrl'), data:{timestamp: new Date(), caller:req.header('x-forwarded-for')}});
-    }
+    // const originalHost = req.header('host');
+    // console.info(`Forwarded host is ${originalHost} request host is ${host}`);
+    // if (originalHost === 'www.cyclerouteforecast.com' || originalHost === 'cyclerouteforecast.com') {
+    //     await datastore.save({key:datastore.key('OldUrl'), data:{timestamp: new Date(), caller:req.header('x-forwarded-for')}});
+    // }
     if (host === 'www.cyclerouteforecast.com' || host === 'route-forecast.ue.r.appspot.com' ||
         host === 'route-forecast.appspot.com' ||
         host === 'cyclerouteforecast.com' || host === 'randoplan.com') {
@@ -256,7 +255,12 @@ app.post('/forecast', upload.none(), async (req, res) => {
         while (forecastPoints.length > 0) {
             let point = forecastPoints.shift();
             // eslint-disable-next-line no-await-in-loop
-            results.push(await callWeatherService(service, point.lat, point.lon, point.time, point.distance, zone, point.bearing));
+            const result = await callWeatherService(service, point.lat, point.lon, point.time, point.distance, zone, point.bearing).catch(error => {
+                throw error;
+            });
+            const aqi = await getPurpleAirAQI(point.lat, point.lon);
+            result.aqi = aqi["PM2.5"];
+            results.push(result);
         }
         res.status(200).json({'forecast':results});
     } catch (error) {
