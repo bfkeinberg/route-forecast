@@ -132,7 +132,7 @@ export class ForecastTable extends Component {
                         <MediaQuery minWidth={501}>
                             <td>{point.cloudCover}</td>
                         </MediaQuery>
-                        <td>{point.aqi}</td>
+                        <td>{point.aqi!==undefined?point.aqi:'N/A'}</td>
                         <td className={ForecastTable.windStyle(point)}>{this.state.showGusts?
                             <i>{
                             ForecastTable.formatSpeed(point.gust, this.props.metric)}</i>:

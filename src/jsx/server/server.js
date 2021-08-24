@@ -258,8 +258,7 @@ app.post('/forecast', upload.none(), async (req, res) => {
             const result = await callWeatherService(service, point.lat, point.lon, point.time, point.distance, zone, point.bearing).catch(error => {
                 throw error;
             });
-            const aqi = await getPurpleAirAQI(point.lat, point.lon);
-            result.aqi = aqi["PM2.5"];
+            result.aqi = await getPurpleAirAQI(point.lat, point.lon);
             results.push(result);
         }
         res.status(200).json({'forecast':results});

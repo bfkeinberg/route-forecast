@@ -10,9 +10,7 @@ const getPurpleAirAQI = async function (lat, lon) {
         let purpleairResult = await axios.get(purpleAirUrl);
         if (purpleairResult.data.data[0] === undefined) {
             console.error('No conditions returned from Purple Air');
-            let query = req.originalUrl.slice(req.originalUrl.indexOf('?'));
-            console.log(`redirecting to /iqair${query}`);
-            iqAirHandler(req, res, lat, lon);
+            return undefined;
         } else {
             return processPurpleResults(lat, lon, purpleairResult.data);
         }
@@ -54,9 +52,7 @@ const processPurpleResults = (lat, lon, results) => {
     results.data.sort((first, second) => {
         return calculateDistance(lat, lon, first[sensorLatitude], first[sensorLongitude]) - calculateDistance(lat, lon, second[sensorLatitude], second[sensorLongitude])
     });
-    let aqi = usEPAfromPm(results.data[0][pm25index], results.data[0][humidityIndex]);
-    let conditions = { 'PM2.5': aqi, 'O3': results.data[0][ozoneIndex] };
-    return conditions;
+    return usEPAfromPm(results.data[0][pm25index], results.data[0][humidityIndex]);
 };
 
 const toDegrees = (radians) => (radians * 180) / Math.PI;
