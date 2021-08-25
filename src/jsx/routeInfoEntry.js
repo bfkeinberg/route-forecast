@@ -169,13 +169,13 @@ class RouteInfoForm extends Component {
                                 {this.state.showPinnedRoutes?<PinnedRouteLoader/>:null}
                                 </ErrorBoundary>
                             </Col>
-                            {providerButton}                            
+                            {providerButton}
                             <Col size={{size:"auto"}}>
                                 <RwGpsTypeSelector visible={false}/>
                             </Col>
                             <Col size={{size:"auto"}}>
                                 <ForecastButton/>
-                            </Col>}
+                            </Col>
                         </Row>
                         {RouteInfoForm.showErrorDetails(this.props.errorDetails)}
                         {RouteInfoForm.showProgressSpinner(this.props.fetchingRoute)}

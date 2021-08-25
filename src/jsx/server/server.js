@@ -198,8 +198,8 @@ app.use(async (req, res, next) => {
     if (host === 'www.cyclerouteforecast.com' || host === 'route-forecast.ue.r.appspot.com' ||
         host === 'route-forecast.appspot.com' ||
         host === 'cyclerouteforecast.com' || host === 'randoplan.com') {
-            console.info(`Redirected ${host} to randoplan.com`);
-            return res.redirect(301, 'https://www.randoplan.com' + req.originalUrl);
+        console.info(`Redirected ${host} to randoplan.com`);
+        return res.redirect(301, 'https://www.randoplan.com' + req.originalUrl);
     }
     return next();
 });

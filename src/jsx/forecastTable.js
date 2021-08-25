@@ -41,7 +41,7 @@ export class ForecastTable extends Component {
 
     toggleZoom = () => {
         this.props.toggleZoomToRange();
-        cookie.save('zoomToRange', !this.props.zoomToRange, { path: '/' });        
+        cookie.save('zoomToRange', !this.props.zoomToRange, { path: '/' });
     };
 
     updateWeatherRange = (event) => {
