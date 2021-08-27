@@ -45,7 +45,6 @@ const calculateDistance = (lat1, lon1, lat2, lon2) => {
 // sort the results so that we take aqi from the closest sensor
 const processPurpleResults = (lat, lon, results) => {
     let pm25index = results.fields.indexOf('pm2.5_cf_1');
-    let ozoneIndex = results.fields.indexOf('ozone1');
     let humidityIndex = results.fields.indexOf('humidity');
     let sensorLatitude = results.fields.indexOf('latitude');
     let sensorLongitude = results.fields.indexOf('longitude');
@@ -75,10 +74,6 @@ const calcBoundingBox = (lat, lon, distInKm) => {
     ];
 }
 
-const aqanduAQIFromPM = (pm) => {
-    return aqiFromPM(0.778 * pm + 2.65);
-};
-
 const usEPAfromPm = (pm, rh) => {
     return aqiFromPM(0.534 * pm - 0.0844 * rh + 5.604);
 };
@@ -87,7 +82,7 @@ function aqiFromPM (pm) {
 
     if (isNaN(pm)) {return "-";}
     if (pm == undefined) {return "-";}
-    if (pm < 0) {return pm;}
+    if (pm < 0) {console.info(`weird AQI: PM=${pm} humidity=${rh}`); return 0;}
     if (pm > 1000) {return "-";}
 
     //
