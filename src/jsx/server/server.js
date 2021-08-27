@@ -13,7 +13,7 @@ const upload = multer({
 }); // for parsing multipart/form-data
 const callWeatherService = require('./weatherForecastDispatcher');
 const url = require('url');
-var strava = require('strava-v3-alpaca');
+const strava = require('strava-v3');
 const {Datastore} = require('@google-cloud/datastore');
 const cors = require('cors');
 const axios = require('axios');
