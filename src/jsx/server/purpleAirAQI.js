@@ -75,14 +75,18 @@ const calcBoundingBox = (lat, lon, distInKm) => {
 }
 
 const usEPAfromPm = (pm, rh) => {
-    return aqiFromPM(0.534 * pm - 0.0844 * rh + 5.604);
+    const aqi = aqiFromPM(0.534 * pm - 0.0844 * rh + 5.604);
+    if (aqi === 0) {
+        console.info(`weird AQI: PM=${pm} humidity=${rh}`); 
+    }
+    return aqi;
 };
 
 function aqiFromPM (pm) {
 
     if (isNaN(pm)) {return "-";}
     if (pm == undefined) {return "-";}
-    if (pm < 0) {console.info(`weird AQI: PM=${pm} humidity=${rh}`); return 0;}
+    if (pm < 0) {return 0;}
     if (pm > 1000) {return "-";}
 
     //
