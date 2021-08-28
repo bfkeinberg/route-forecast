@@ -1,4 +1,31 @@
 const axios = require('axios');
+const fetch = require('node-fetch');
+
+const iqAirHandler = (lat, lon) => {
+
+    const iqAirkey = process.env.IQAIR_KEY;
+    const iqAirurl = `https://api.airvisual.com/v2/nearest_city?lat=${lat}&lon=${lon}&key=${iqAirkey}`;
+
+    fetch(iqAirurl).then(fetchResult => {
+        if (!fetchResult.ok) {
+            throw Error(fetchResult.status)
+        }
+        return fetchResult.json()
+    })
+        .then(body => {
+            if (body.status === 'success') {
+                const aqi = body.data.current.pollution.aqius;
+                return aqi;
+            } else {
+                console.error(`Error, status : ${body.status}`);
+                throw Error(400);
+            }
+        })
+        .catch(err => {
+            console.error(`NO IQAir results because of ${err}`);
+            return undefined;
+        });
+};
 
 const getPurpleAirAQI = async function (lat, lon) {
     let boundingBox = calcBoundingBox(parseFloat(lat), parseFloat(lon), 10);
@@ -9,14 +36,14 @@ const getPurpleAirAQI = async function (lat, lon) {
     try {
         let purpleairResult = await axios.get(purpleAirUrl);
         if (purpleairResult.data.data[0] === undefined) {
-            console.error('No conditions returned from Purple Air');
-            return undefined;
+            console.error(`No conditions returned from Purple Air inside ${boundingBox[2]} ${boundingBox[0]}, ${boundingBox[3]} ${boundingBox[1]}`);
+            return iqAirHandler(lat, lon);
         }
         return processPurpleResults(lat, lon, purpleairResult.data);
 
     } catch (err) {
-        console.error(err);
-        throw Error(`No Purple Air results because : ${err}`)
+        console.error(`No Purple Air results for ${lat} ${lon} because : ${err}`);
+        return undefined;
     }
 }
 
@@ -77,17 +104,17 @@ const calcBoundingBox = (lat, lon, distInKm) => {
 const usEPAfromPm = (pm, rh) => {
     const aqi = aqiFromPM(0.534 * pm - 0.0844 * rh + 5.604);
     if (aqi === 0) {
-        console.info(`weird AQI: PM=${pm} humidity=${rh}`); 
+        console.warn(`weird AQI: PM=${pm} humidity=${rh}`);
     }
     return aqi;
 };
 
-function aqiFromPM (pm) {
+function aqiFromPM(pm) {
 
-    if (isNaN(pm)) {return "-";}
-    if (pm == undefined) {return "-";}
-    if (pm < 0) {return 0;}
-    if (pm > 1000) {return "-";}
+    if (isNaN(pm)) { return "-"; }
+    if (pm == undefined) { return "-"; }
+    if (pm < 0) { return 0; }
+    if (pm > 1000) { return "-"; }
 
     //
     //       Good                              0 - 50         0.0 - 15.0         0.0 – 12.0
@@ -117,10 +144,10 @@ function aqiFromPM (pm) {
 
 
 }
-function bplFromPM (pm) {
-    if (isNaN(pm)) {return 0;}
-    if (pm == undefined) {return 0;}
-    if (pm < 0) {return 0;}
+function bplFromPM(pm) {
+    if (isNaN(pm)) { return 0; }
+    if (pm == undefined) { return 0; }
+    if (pm < 0) { return 0; }
 
     //
     //       Good                              0 - 50         0.0 - 15.0         0.0 – 12.0
@@ -150,11 +177,11 @@ function bplFromPM (pm) {
 
 
 }
-function bphFromPM (pm) {
+function bphFromPM(pm) {
     // return 0;
-    if (isNaN(pm)) {return 0;}
-    if (pm == undefined) {return 0;}
-    if (pm < 0) {return 0;}
+    if (isNaN(pm)) { return 0; }
+    if (pm == undefined) { return 0; }
+    if (pm < 0) { return 0; }
 
     //
     //       Good                              0 - 50         0.0 - 15.0         0.0 – 12.0
@@ -185,7 +212,7 @@ function bphFromPM (pm) {
 
 }
 
-function calcAQI (Cp, Ih, Il, BPh, BPl) {
+function calcAQI(Cp, Ih, Il, BPh, BPl) {
 
     var a = Ih - Il;
     var b = BPh - BPl;
