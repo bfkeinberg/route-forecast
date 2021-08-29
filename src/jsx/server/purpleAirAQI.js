@@ -6,6 +6,7 @@ const iqAirHandler = (lat, lon) => {
     const iqAirkey = process.env.IQAIR_KEY;
     const iqAirurl = `https://api.airvisual.com/v2/nearest_city?lat=${lat}&lon=${lon}&key=${iqAirkey}`;
 
+    console.info(`IQAir url ${iqAirurl}`);
     fetch(iqAirurl).then(fetchResult => {
         if (!fetchResult.ok) {
             throw Error(fetchResult.status)
