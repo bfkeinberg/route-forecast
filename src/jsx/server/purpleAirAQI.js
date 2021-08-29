@@ -34,7 +34,10 @@ const getPurpleAirAQI = async function (lat, lon) {
     let purpleAirUrl =
         `https://api.purpleair.com/v1/sensors?fields=pm2.5_cf_1,ozone1,humidity,latitude,longitude&location_type=0&nwlng=${boundingBox[0]}&nwlat=${boundingBox[2]}&selng=${boundingBox[1]}&selat=${boundingBox[3]}&api_key=${purpleAirKey}`;
     try {
-        let purpleairResult = await axios.get(purpleAirUrl);
+        let purpleairResult = await axios.get(purpleAirUrl).catch(error => {
+            console.error(`axios error at ${lat} ${lon}`, error.response.data);
+            return undefined;
+        });
         if (purpleairResult.data.data[0] === undefined) {
             console.error(`No conditions returned from Purple Air inside ${boundingBox[2]} ${boundingBox[0]}, ${boundingBox[3]} ${boundingBox[1]}`);
             return iqAirHandler(lat, lon);

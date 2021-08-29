@@ -14,7 +14,7 @@ const upload = multer({
 const callWeatherService = require('./weatherForecastDispatcher');
 const url = require('url');
 const strava = require('strava-v3');
-const {Datastore} = require('@google-cloud/datastore');
+const { Datastore } = require('@google-cloud/datastore');
 const cors = require('cors');
 const axios = require('axios');
 const getPurpleAirAQI = require('./purpleAirAQI');
@@ -27,8 +27,8 @@ if (!process.env.NO_LOGGING) {
     require('./logging');
     winston = require('winston');
     expressWinston = require('express-winston');
-    const {LoggingWinston} = require('@google-cloud/logging-winston');
-    const loggingWinston = new LoggingWinston({projectId: 'route-forecast'});
+    const { LoggingWinston } = require('@google-cloud/logging-winston');
+    const loggingWinston = new LoggingWinston({ projectId: 'route-forecast' });
 
     logger = winston.createLogger({
         level: 'info',
@@ -41,12 +41,12 @@ if (!process.env.NO_LOGGING) {
     StackdriverTransport = new LoggingWinston({
         projectId: 'route-forecast'
 
-    // keyFilename: 'gcp_key.json',
-    // prefix: 'myservice',
-    // serviceContext: {
-    // service: 'myservice',
-    // version: 'dev'
-    // }
+        // keyFilename: 'gcp_key.json',
+        // prefix: 'myservice',
+        // serviceContext: {
+        // service: 'myservice',
+        // version: 'dev'
+        // }
     });
 }
 
@@ -97,18 +97,18 @@ if (!process.env.NO_LOGGING) {
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-const publicPath = express.static(path.resolve(__dirname, '../static'),{fallthrough:false,index:false});
-app.use('/static', expressStaticGzip(path.resolve(__dirname,'../'), {
+const publicPath = express.static(path.resolve(__dirname, '../static'), { fallthrough: false, index: false });
+app.use('/static', expressStaticGzip(path.resolve(__dirname, '../'), {
     enableBrotli: true,
     orderPreference: [
         'br',
         'gz'
     ]
 }));
-app.use('/static',publicPath);
+app.use('/static', publicPath);
 
 // ejs
-app.set('views', path.resolve(__dirname,'views'));
+app.set('views', path.resolve(__dirname, 'views'));
 app.set('view engine', 'ejs');
 
 const isValidRouteResult = (body, type) => {
@@ -128,7 +128,7 @@ const makeRecord = (point, routeNumber) => {
     // Create a visit record to be stored in the database
     return {
         timestamp: new Date(),
-        routeNumber: routeNumber===undefined?null:routeNumber,
+        routeNumber: routeNumber === undefined ? null : routeNumber,
         latitude: point.lat,
         longitude: point.lon
     };
@@ -146,8 +146,8 @@ const insertRecord = (record, routeName) => {
 
 const getVisits = () => {
     const query = datastore
-    .createQuery('RouteName')
-    .order('timestamp', {descending: true});
+        .createQuery('RouteName')
+        .order('timestamp', { descending: true });
 
     return datastore.runQuery(query);
 };
@@ -155,20 +155,22 @@ const getVisits = () => {
 app.get('/dbquery', cors(), async (req, res) => {
     const [entities] = await getVisits();
     const visits = entities.map(
-        entity => JSON.stringify({"Time":entity.timestamp, "RouteName":entity[datastore.KEY].name, "RouteNumber":entity.routeNumber,
-            "Latitude":entity.latitude, "Longitude":entity.longitude})
-                                );
+        entity => JSON.stringify({
+            "Time": entity.timestamp, "RouteName": entity[datastore.KEY].name, "RouteNumber": entity.routeNumber,
+            "Latitude": entity.latitude, "Longitude": entity.longitude
+        })
+    );
     res
-       .status(200)
-       .set('Content-Type', 'text/plain')
-       .send(`[\n${visits.join(',\n')}]`)
-       .end();
+        .status(200)
+        .set('Content-Type', 'text/plain')
+        .send(`[\n${visits.join(',\n')}]`)
+        .end();
 });
 
 const getOldUrlCalls = () => {
     const query = datastore
-    .createQuery('OldUrl')
-    .order('timestamp', {descending: true});
+        .createQuery('OldUrl')
+        .order('timestamp', { descending: true });
 
     return datastore.runQuery(query);
 };
@@ -177,14 +179,16 @@ app.get('/get_redirects', cors(), async (req, res) => {
     const [entities] = await getOldUrlCalls();
     console.info(`entities ${JSON.stringify(entities)}`);
     const visits = entities.map(
-        entity => JSON.stringify({"Time":entity.timestamp, "From":entity.caller,
-            "Host":entity.caller})
-                                );
+        entity => JSON.stringify({
+            "Time": entity.timestamp, "From": entity.caller,
+            "Host": entity.caller
+        })
+    );
     res
-       .status(200)
-       .set('Content-Type', 'text/plain')
-       .send(`[\n${visits.join(',\n')}]`)
-       .end();
+        .status(200)
+        .set('Content-Type', 'text/plain')
+        .send(`[\n${visits.join(',\n')}]`)
+        .end();
 });
 
 app.use(async (req, res, next) => {
@@ -210,27 +214,27 @@ app.get('/rwgps_route', (req, res) => {
         res.status(400).json("{'status': 'Missing route number'}");
         return;
     }
-    const isTrip = req.query.trip==="true";
-    const routeType = isTrip===true ? 'trips' : 'routes';
+    const isTrip = req.query.trip === "true";
+    const routeType = isTrip === true ? 'trips' : 'routes';
     const rwgpsApiKey = process.env.RWGPS_API_KEY;
     if (rwgpsApiKey === undefined) {
-        res.status(500).json({'details': 'Missing rwgps API key'});
+        res.status(500).json({ 'details': 'Missing rwgps API key' });
         return;
     }
 
     const rwgpsUrl = `https://ridewithgps.com/${routeType}/${routeNumber}.json?apikey=${rwgpsApiKey}&version=2`;
-    fetch(rwgpsUrl).then(fetchResult => {if (!fetchResult.ok) {throw Error(fetchResult.status)} return fetchResult.text()})
-        .then(body => {if (!isValidRouteResult(body, routeType)) {res.status(401).send(body)} else {res.status(200).send(body)}})
-        .catch(err => {res.status(err.message).json({'status':JSON.stringify(err)})});
+    fetch(rwgpsUrl).then(fetchResult => { if (!fetchResult.ok) { throw Error(fetchResult.status) } return fetchResult.text() })
+        .then(body => { if (!isValidRouteResult(body, routeType)) { res.status(401).send(body) } else { res.status(200).send(body) } })
+        .catch(err => { res.status(err.message).json({ 'status': JSON.stringify(err) }) });
 });
 
 app.post('/forecast', upload.none(), async (req, res) => {
     if (req.body.locations === undefined) {
-        res.status(400).json({'status': 'Missing location key'});
+        res.status(400).json({ 'status': 'Missing location key' });
         return;
     }
     if (req.body.timezone === undefined || req.body.timezone === 'undefined') {
-        res.status(400).json({'status': 'Missing timezone key'});
+        res.status(400).json({ 'status': 'Missing timezone key' });
         return;
     }
     const forecastPoints = JSON.parse(req.body.locations);
@@ -238,7 +242,7 @@ app.post('/forecast', upload.none(), async (req, res) => {
         logger.info(`Request from ${req.ip} for ${forecastPoints.length} forecast points`);
     }
     if (forecastPoints.length > 75) {
-        res.status(400).json({'details': 'Invalid request, increase forecast time interval'});
+        res.status(400).json({ 'details': 'Invalid request, increase forecast time interval' });
         return;
     }
     let service = process.env.WEATHER_SERVICE;
@@ -261,9 +265,9 @@ app.post('/forecast', upload.none(), async (req, res) => {
             result.aqi = await getPurpleAirAQI(point.lat, point.lon);
             results.push(result);
         }
-        res.status(200).json({'forecast':results});
+        res.status(200).json({ 'forecast': results });
     } catch (error) {
-        res.status(500).json({'details':`Error calling weather service : ${error}`});
+        res.status(500).json({ 'details': `Error calling weather service : ${error}` });
     }
 });
 
@@ -281,58 +285,58 @@ const getBitlyShortenedUrl = (accessToken, longUrl) => {
         throw Error(`Bitly groupid fetch failed with ${response.status} ${response.statusText}`);
     }
     ).
-    then(responseJson => {
-        if (!responseJson.groups) {
-            throw Error(`Bitly is probably mad at authentication for some reason; failed with message ${responseJson.message}`);
-        }
-        const groupID = responseJson.groups[0].guid;
-
-        return fetch('https://api-ssl.bitly.com/v4/shorten', {
-            method: "POST",
-            headers: {
-                Accept: 'application/json',
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${accessToken}`
-            },
-            body: JSON.stringify({
-                "long_url": longUrl,
-                "group_guid": groupID
-            })
-        }).then(response => {
-            if (response.ok) {
-                return response.json();
-            }
-            throw Error(`Bitly link creation failed with ${response.status} ${response.statusText}`);
-        }).
         then(responseJson => {
-            if (responseJson.link) {
-                return {error: null, url: responseJson.link};
+            if (!responseJson.groups) {
+                throw Error(`Bitly is probably mad at authentication for some reason; failed with message ${responseJson.message}`);
             }
-            throw Error(`Bitly is mad for some reason: ${responseJson.message}`);
-        })
-    }).
-    catch(error => ({error: error.toString(), url: null}));
+            const groupID = responseJson.groups[0].guid;
+
+            return fetch('https://api-ssl.bitly.com/v4/shorten', {
+                method: "POST",
+                headers: {
+                    Accept: 'application/json',
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${accessToken}`
+                },
+                body: JSON.stringify({
+                    "long_url": longUrl,
+                    "group_guid": groupID
+                })
+            }).then(response => {
+                if (response.ok) {
+                    return response.json();
+                }
+                throw Error(`Bitly link creation failed with ${response.status} ${response.statusText}`);
+            }).
+                then(responseJson => {
+                    if (responseJson.link) {
+                        return { error: null, url: responseJson.link };
+                    }
+                    throw Error(`Bitly is mad for some reason: ${responseJson.message}`);
+                })
+        }).
+        catch(error => ({ error: error.toString(), url: null }));
 };
 
 app.post('/bitly', async (req, res) => {
     const longUrl = req.body.longUrl;
-    const {error, url} = await getBitlyShortenedUrl(process.env.BITLY_TOKEN, longUrl);
-    res.json({error, url})
+    const { error, url } = await getBitlyShortenedUrl(process.env.BITLY_TOKEN, longUrl);
+    res.json({ error, url })
 });
 
-const getStravaAuthUrl = (baseUrl,state) => {
+const getStravaAuthUrl = (baseUrl, state) => {
     if (baseUrl === 'http://www.route-forecast.appspot.com' || baseUrl === 'https://www.route-forecast.appspot.com') {
         process.env.STRAVA_REDIRECT_URI = 'https://www.randoplan.com/stravaAuthReply';
     } else {
         process.env.STRAVA_REDIRECT_URI = baseUrl + '/stravaAuthReply';
     }
-    return strava.oauth.getRequestAccessURL({scope:'activity:read_all', state:encodeURIComponent(state)});
+    return strava.oauth.getRequestAccessURL({ scope: 'activity:read_all', state: encodeURIComponent(state) });
 };
 
 const getStravaToken = (code) => {
     process.env.STRAVA_ACCESS_TOKEN = 'fake';
     return new Promise((resolve, reject) => {
-        strava.oauth.getToken(code, (err,payload) => {if (err !== null) {reject(err.msg)} else {resolve(payload)}});
+        strava.oauth.getToken(code, (err, payload) => { if (err !== null) { reject(err.msg) } else { resolve(payload) } });
     });
 };
 
@@ -346,26 +350,27 @@ const insertFeatureRecord = (record, featureName, user) => {
     });
 };
 
-app.get('/stravaAuthReq', (req,res) => {
+app.get('/stravaAuthReq', (req, res) => {
     const state = req.query.state;
     if (state === undefined) {
-        res.status(400).json({'status': 'Missing keys'});
+        res.status(400).json({ 'status': 'Missing keys' });
         return;
     }
     let restoredState = JSON.parse(decodeURIComponent(state));
     insertFeatureRecord({
         timestamp: new Date(),
-        routeNumber: restoredState.rwgpsRoute===undefined?null:restoredState.rwgpsRoute
+        routeNumber: restoredState.rwgpsRoute === undefined ? null : restoredState.rwgpsRoute
     },
         "strava");
     const baseUrl = url.format({
         protocol: req.protocol,
-        host: req.get('host')});
+        host: req.get('host')
+    });
     res.redirect(getStravaAuthUrl(baseUrl, state));
 
 });
 
-app.get('/stravaAuthReply', async (req,res) => {
+app.get('/stravaAuthReply', async (req, res) => {
     const code = req.query.code;
     let error = req.query.error;
     if (error === undefined && code === undefined) {
@@ -379,7 +384,7 @@ app.get('/stravaAuthReply', async (req,res) => {
     if (error === undefined) {
         process.env.STRAVA_CLIENT_SECRET = process.env.STRAVA_API_KEY;
         const token = await getStravaToken(code)
-            .catch(error => {console.log('got bad auth reply');res.status(400).json({'status':`Bad Strava auth reply ${error}`})});
+            .catch(error => { console.log('got bad auth reply'); res.status(400).json({ 'status': `Bad Strava auth reply ${error}` }) });
         // process.env.STRAVA_ACCESS_TOKEN = token.body.access_token;
         restoredState.strava_access_token = token.body.access_token;
         restoredState.strava_refresh_token = token.body.refresh_token;
@@ -392,10 +397,10 @@ app.get('/stravaAuthReply', async (req,res) => {
     res.redirect(url.format('/?') + querystring.stringify(restoredState));
 });
 
-app.get('/refreshStravaToken', async (req,res) => {
+app.get('/refreshStravaToken', async (req, res) => {
     const refreshToken = req.query.refreshToken;
     if (refreshToken === undefined) {
-        res.status(400).json({'status':'Bad call to refresh Strava token'});
+        res.status(400).json({ 'status': 'Bad call to refresh Strava token' });
         return;
     }
     process.env.STRAVA_CLIENT_SECRET = process.env.STRAVA_API_KEY;
@@ -437,7 +442,10 @@ const fetchRouteName = async (id, type) => {
     const rwgpsApiKey = process.env.RWGPS_API_KEY;
     const url = `https://ridewithgps.com/${type}s/${id}.json?apikey=${rwgpsApiKey}&version=2`;
     try {
-        const response = await axios.get(url);
+        const response = await axios.get(url).catch(error => {
+            console.error(`Error fetching pinned route ${id} ${error.response.data}`);
+            return '';
+        });
         return response.data[type].name;
     } catch (err) {
         console.error(err);
@@ -446,8 +454,8 @@ const fetchRouteName = async (id, type) => {
 };
 
 const retrieveNames = (pinned) => {
-    pinned.sort((el1,el2) => Number(el2.id)-Number(el1.id));
-    return pinned.map(async fav => {fav.name = await fetchRouteName(fav.associated_object_id, fav.associated_object_type);return fav});
+    pinned.sort((el1, el2) => Number(el2.id) - Number(el1.id));
+    return pinned.map(async fav => { fav.name = await fetchRouteName(fav.associated_object_id, fav.associated_object_type); return fav });
 };
 
 app.get('/pinned_routes', async (req, res) => {
@@ -463,12 +471,15 @@ app.get('/pinned_routes', async (req, res) => {
         return;
     }
     if (rwgpsApiKey === undefined) {
-        res.status(500).json({'details': 'Missing rwgps API key'});
+        res.status(500).json({ 'details': 'Missing rwgps API key' });
         return;
     }
     const url = `https://ridewithgps.com/users/current.json?apikey=${rwgpsApiKey}&version=2&email=${req.query.username}&password=${req.query.password}`;
     try {
-        const response = await axios.get(url);
+        const response = await axios.get(url).catch(error => {
+            console.error(`Error fetching pinned routes for ${req.query.username} ${error.response.data}`);
+            res.status(err.response.status).json(err.response.data);
+        });
         insertFeatureRecord(makeFeatureRecord(response), "pinned", response.data.user.email);
         res.status(200).json(await Promise.all(await retrieveNames(response.data.user.slim_favorites)));
     } catch (err) {
@@ -479,9 +490,9 @@ app.get('/pinned_routes', async (req, res) => {
 
 const getFeatureVisits = (featureName) => {
     const query = datastore
-    .createQuery(featureName)
-//    .filter('__key__', '=', datastore.key(featureName)
-    .order('timestamp', {descending: true});
+        .createQuery(featureName)
+        //    .filter('__key__', '=', datastore.key(featureName)
+        .order('timestamp', { descending: true });
 
     return datastore.runQuery(query);
 };
@@ -493,14 +504,16 @@ app.get('/queryfeature', cors(), async (req, res) => {
     }
     const [entities] = await getFeatureVisits(req.query.feature);
     const visits = entities.map(
-        entity => JSON.stringify({"Time":entity.timestamp, "Email":entity.email, "FirstName":entity.first_name,
-            "LastName":entity.last_name, "Route":entity.routeNumber})
-                                );
+        entity => JSON.stringify({
+            "Time": entity.timestamp, "Email": entity.email, "FirstName": entity.first_name,
+            "LastName": entity.last_name, "Route": entity.routeNumber
+        })
+    );
     res
-       .status(200)
-       .set('Content-Type', 'text/plain')
-       .send(`[\n${visits.join(',\n')}]`)
-       .end();
+        .status(200)
+        .set('Content-Type', 'text/plain')
+        .send(`[\n${visits.join(',\n')}]`)
+        .end();
 });
 
 module.exports = app;
