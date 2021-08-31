@@ -40,10 +40,14 @@ const getPurpleAirAQI = async function (lat, lon) {
             return undefined;
         });
         if (purpleairResult.data.data[0] === undefined) {
-            console.error(`No conditions returned from Purple Air inside ${boundingBox[2]} ${boundingBox[0]}, ${boundingBox[3]} ${boundingBox[1]}`);
+            console.error(`No conditions returned from Purple Air inside ${boundingBox[2]},${boundingBox[0]} ; ${boundingBox[3]},${boundingBox[1]}`);
             return iqAirHandler(lat, lon);
         }
-        return processPurpleResults(lat, lon, purpleairResult.data);
+        const aqi = processPurpleResults(lat, lon, purpleairResult.data);
+        if (aqi < 0) {
+            return iqAirHandler(lat, lon);
+        }
+        return aqi;
 
     } catch (err) {
         console.error(`No Purple Air results for ${lat} ${lon} because : ${err}`);
@@ -79,10 +83,10 @@ const processPurpleResults = (lat, lon, results) => {
     let humidityIndex = results.fields.indexOf('humidity');
     let sensorLatitude = results.fields.indexOf('latitude');
     let sensorLongitude = results.fields.indexOf('longitude');
-    results.data.sort((first, second) => {
+    const data = results.data.filter(data => data[pm25index] > 1).sort((first, second) => {
         return calculateDistance(lat, lon, first[sensorLatitude], first[sensorLongitude]) - calculateDistance(lat, lon, second[sensorLatitude], second[sensorLongitude])
     });
-    return usEPAfromPm(results.data[0][pm25index], results.data[0][humidityIndex]);
+    return usEPAfromPm(data[0][pm25index], data[0][humidityIndex]);
 };
 
 const toDegrees = (radians) => radians * 180 / Math.PI;
@@ -107,8 +111,9 @@ const calcBoundingBox = (lat, lon, distInKm) => {
 
 const usEPAfromPm = (pm, rh) => {
     const aqi = aqiFromPM(0.534 * pm - 0.0844 * rh + 5.604);
-    if (aqi === 0) {
+    if (aqi < 0) {
         console.warn(`weird AQI: PM=${pm} humidity=${rh}`);
+        return aqi;
     }
     return aqi;
 };
@@ -117,7 +122,7 @@ function aqiFromPM(pm) {
 
     if (isNaN(pm)) { return "-"; }
     if (pm == undefined) { return "-"; }
-    if (pm < 0) { return 0; }
+    if (pm < 0) { return pm; }
     if (pm > 1000) { return "-"; }
 
     //
