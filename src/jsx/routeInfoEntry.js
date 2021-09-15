@@ -9,6 +9,7 @@ import PropTypes from 'prop-types';
 import {loadFromRideWithGps, saveCookie} from './actions/actions';
 import {connect} from 'react-redux';
 import PaceExplanation from './paceExplanation';
+import Donation from './ui/donationRequest';
 import ForecastInterval from './ui/forecastInterval';
 import RidingPace from './ui/ridingPace';
 import Recalculate from './recalculate';
@@ -151,6 +152,9 @@ class RouteInfoForm extends Component {
                                     <PaceExplanation/>
                                 </Col>
                             </MediaQuery>
+                            <Col sm="1">
+                                <Donation/>
+                            </Col>
                         </Row>
                         <Row noGutters>
                             <Col sm={{size:"auto"}}>
