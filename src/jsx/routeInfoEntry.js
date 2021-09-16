@@ -152,9 +152,6 @@ class RouteInfoForm extends Component {
                                     <PaceExplanation/>
                                 </Col>
                             </MediaQuery>
-                            <Col sm="1">
-                                <Donation/>
-                            </Col>
                         </Row>
                         <Row noGutters>
                             <Col sm={{size:"auto"}}>
@@ -198,6 +195,9 @@ class RouteInfoForm extends Component {
                         <Col>
                             <AnalysisButton/>
                             <StravaDialog/>
+                        </Col>
+                        <Col>
+                            <Donation/>
                         </Col>
                         <Col>
                             <BugReportButton/>
