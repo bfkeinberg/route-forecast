@@ -9,7 +9,7 @@ const SentryCliPlugin = require('@sentry/webpack-plugin');
 const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
 const zlib = require("zlib");
 
-module.exports = (env,argv) => merge(common(env,argv), {
+module.exports = (env, argv) => merge(common(env, argv), {
     plugins: [
         new TerserPlugin({
             parallel: true,
@@ -17,7 +17,10 @@ module.exports = (env,argv) => merge(common(env,argv), {
                 ecma: 6,
             },
         }),
-        new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
+        new webpack.IgnorePlugin({
+            resourceRegExp: /^\.\/locale$/,
+            contextRegExp: /moment$/,
+        }),
         new SentryCliPlugin({
             include: '.',
             ignoreFile: '.sentrycliignore',
@@ -28,25 +31,25 @@ module.exports = (env,argv) => merge(common(env,argv), {
                 'webpack.dev.js'
             ],
             configFile: 'sentry.properties',
-            rewrite:true,
+            rewrite: true,
             stripPrefix: ['/dist'],
             stripCommonPrefix: true,
             urlPrefix: '/static',
             debug: false,
-            setCommits: {auto:true},
-            deploy: {env:'production', name:'latest'}
+            setCommits: { auto: true },
+            deploy: { env: 'production', name: 'latest' }
         }),
         new CompressionPlugin({
-            minRatio:0.85,
+            minRatio: 0.85,
             filename: "[path][base].br",
             algorithm: "brotliCompress",
             test: /\.(js|css|html|svg|ttf|eot)$/,
             compressionOptions: {
-               params: {
-                 [zlib.constants.BROTLI_PARAM_QUALITY]: 11,
-               }
+                params: {
+                    [zlib.constants.BROTLI_PARAM_QUALITY]: 11,
+                }
             },
-            exclude:[
+            exclude: [
                 /\.png/,
                 /\.ico/,
                 /\.html/
@@ -56,9 +59,9 @@ module.exports = (env,argv) => merge(common(env,argv), {
     ],
     optimization: {
         minimizer: [
-           `...`,
-          new CssMinimizerPlugin(),
+            `...`,
+            new CssMinimizerPlugin(),
         ],
-      },
+    },
     devtool: 'source-map'
 });
