@@ -477,14 +477,19 @@ app.get('/pinned_routes', async (req, res) => {
     const url = `https://ridewithgps.com/users/current.json?apikey=${rwgpsApiKey}&version=2&email=${req.query.username}&password=${req.query.password}`;
     try {
         const response = await axios.get(url).catch(error => {
-            console.error(`Error fetching pinned routes for ${req.query.username} ${error.response.data}`);
-            res.status(err.response.status).json(err.response.data);
+            console.error(`Error fetching pinned routes for ${req.query.username} ${error.response.data.error}`);
+            res.status(error.response.status).json(error.response.data.error);
         });
+        if (response === undefined) {
+            return;
+        }
         insertFeatureRecord(makeFeatureRecord(response), "pinned", response.data.user.email);
         res.status(200).json(await Promise.all(await retrieveNames(response.data.user.slim_favorites)));
     } catch (err) {
-        console.log(`EXCEPTION: ${err}`);
-        res.status(err.response.status).json(err.response.data);
+        if (err !== undefined) {
+            console.log(`EXCEPTION: ${err}`);
+            res.status(err.response.status).json(err.response.data);
+        }
     }
 });
 
