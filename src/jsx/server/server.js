@@ -443,10 +443,15 @@ const fetchRouteName = async (id, type) => {
     const url = `https://ridewithgps.com/${type}s/${id}.json?apikey=${rwgpsApiKey}&version=2`;
     try {
         const response = await axios.get(url).catch(error => {
-            console.error(`Error fetching pinned route ${id} ${error.response.data}`);
+            console.error(`Error fetching pinned route ${id} ${JSON.stringify(error.response.data)}`);
             return '';
         });
-        return response.data[type].name;
+        if (response.data !== undefined) {
+            return response.data[type].name;
+        } else {
+            console.warn(`No data returned for a pinned route - ${JSON.stringify(Object.keys(response))}`);
+            return '';
+        }
     } catch (err) {
         console.error(err);
         return '';
