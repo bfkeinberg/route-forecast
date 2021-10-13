@@ -29,7 +29,7 @@ const iqAirHandler = (lat, lon) => {
 };
 
 const getPurpleAirAQI = async function (lat, lon) {
-    let boundingBox = calcBoundingBox(parseFloat(lat), parseFloat(lon), 10);
+    let boundingBox = calcBoundingBox(parseFloat(lat), parseFloat(lon), 15);
 
     const purpleAirKey = process.env.PURPLE_AIR_KEY;
     let purpleAirUrl =
