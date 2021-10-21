@@ -87,7 +87,7 @@ describe("Test forecast", () => {
             "vectorBearing": 304.2881770410651,
             "gust": "9",
             "feel": 81,
-            "aqi": 16
+            "aqi": 10
           },
           {
             "time": "1:00PM",
