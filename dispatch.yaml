@@ -1,0 +1,6 @@
+dispatch:
+  - url: "*/aqi"
+  - service: aqi
+  
+  - url: "*"
+  - service: default

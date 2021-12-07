@@ -13,7 +13,7 @@ const formatOneControl = function(controlPoint) {
 };
 
 const formatControlsForUrl = function(controlPoints) {
-    return controlPoints.filter(point => point.name !== '').reduce((queryParam,point) => {
+    return controlPoints.filter(point => point.name !== '').filter(point => {return !isNaN(point.distance) && !isNaN(point.duration)}).reduce((queryParam,point) => {
         return `${formatOneControl(queryParam)}:${formatOneControl(point)}`},'');
 };
 
