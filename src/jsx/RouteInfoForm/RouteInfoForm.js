@@ -1,4 +1,4 @@
-import {Spinner, Button} from '@blueprintjs/core';
+import {Spinner} from '@blueprintjs/core';
 //import { Tooltip2 } from "@blueprintjs/popover2";
 import {Alert, Form, Card, CardBody, CardTitle, Col, Row, Container} from 'reactstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -50,8 +50,7 @@ class RouteInfoForm extends Component {
         routeSelected:PropTypes.bool.isRequired,
         needToViewTable: PropTypes.bool.isRequired,
         showProvider: PropTypes.bool.isRequired,
-        routeProps:PropTypes.object,
-        loadingPinnedRoutes:PropTypes.bool.isRequired
+        routeProps:PropTypes.object
     };
 
     constructor(props) {
@@ -155,19 +154,14 @@ class RouteInfoForm extends Component {
                         </Row>
                         <Row noGutters>
                             <Col sm={{size:"auto"}}>
-                                {this.state.showPinnedRoutes?null:<RideWithGpsId/>}
+                                {this.state.showPinnedRoutes ? null : <RideWithGpsId />}
                             </Col>
                             <Col sm={{size:"auto"}}>
                                 <ErrorBoundary>
-                                    <Button intent="primary"
-                                            small={true}
-                                            outlined={this.state.showPinnedRoutes}
-                                            active={this.state.showPinnedRoutes}
-                                            icon="star"
-                                            loading={this.props.loadingPinnedRoutes}
-                                            text={this.state.showPinnedRoutes?"Don't use pinned routes":"Use pinned routes"}
-                                            onClick={()=>this.setState({showPinnedRoutes:!this.state.showPinnedRoutes})}/>
-                                {this.state.showPinnedRoutes?<PinnedRouteLoader/>:null}
+                                    <PinnedRouteLoader
+                                        showPinnedRoutes={this.state.showPinnedRoutes}
+                                        setShowPinnedRoutes={(showPinnedRoutes) => this.setState({ showPinnedRoutes: showPinnedRoutes })}
+                                    />
                                 </ErrorBoundary>
                             </Col>
                             {providerButton}
@@ -222,7 +216,6 @@ const mapStateToProps = (state) =>
         routeSelected: state.uiInfo.dialogParams.loadingSource !== null,
         needToViewTable:state.forecast.valid && !state.forecast.tableViewed,
         showProvider:state.controls.showWeatherProvider,
-        loadingPinnedRoutes:state.rideWithGpsInfo.loadingRoutes
     });
 
 const mapDispatchToProps = {

@@ -5,30 +5,33 @@ import { Tooltip2 } from "@blueprintjs/popover2";
 import {connect} from 'react-redux';
 import {setRwgpsCredentials} from "../actions/actions";
 
-const RideWithGpsCreds = ({rwgpsUsername, rwgpsPassword, setRwgpsCredentials}) => {
+const RideWithGpsCreds = ({rwgpsUsername, rwgpsPassword, setRwgpsCredentials, dialogClosed}) => {
     const [dlgIsOpen, setOpen] = useState(true);
     const [username, setUsername] = useState(rwgpsUsername);
     const [password, setPassword] = useState(rwgpsPassword);
     
-    const close = () => {setOpen(false)};
+    const close = () => {
+        setOpen(false)
+        dialogClosed()
+    };
     
     return (
         <Dialog
             title='Ride with GPS credentials'
             isOpen={dlgIsOpen} autoFocus={true} canEscapeKeyClose={true}
-            onClose={() => setOpen(false)}
+            onClose={close}
             >
-            <InputGroup value={username} placeholder="RideWithGPS username"
+            <InputGroup value={username || ""} placeholder="RideWithGPS username"
                 onChange={event => setUsername(event.target.value)}
                 id='username' autoComplete='username'/>
-            <InputGroup value={password} placeholder="RideWithGPS password"
+            <InputGroup value={password || ""} placeholder="RideWithGPS password"
                 onChange={event => setPassword(event.target.value)}
                 id='password' type='password' autoComplete='current-password'/>
             <Tooltip2 content="Accept credentials.">
                 <Button onClick={() => {close(); setRwgpsCredentials(username,password)}}>Accept</Button>
             </Tooltip2>
             <Tooltip2 content="Don't set credentials.">
-                <Button onClick={() => setOpen(false)}>Cancel</Button>
+                <Button onClick={close}>Cancel</Button>
             </Tooltip2>
         </Dialog>
     );
@@ -37,7 +40,8 @@ const RideWithGpsCreds = ({rwgpsUsername, rwgpsPassword, setRwgpsCredentials}) =
 RideWithGpsCreds.propTypes = {
     rwgpsUsername:PropTypes.string,
     rwgpsPassword:PropTypes.string,
-    setRwgpsCredentials:PropTypes.func.isRequired
+    setRwgpsCredentials:PropTypes.func.isRequired,
+    dialogClosed:PropTypes.func.isRequired
 };
 
 const mapStateToProps = (state) =>

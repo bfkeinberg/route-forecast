@@ -1,4 +1,4 @@
-import React, {Suspense, useState, useEffect} from 'react';
+import React, {Suspense, useEffect} from 'react';
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 import RideWithGpsCreds from './RideWithGpsCreds.jsx';
@@ -6,6 +6,7 @@ import axios from 'axios';
 import {setPinnedRoutes, setErrorDetails, setRwgpsCredentials, setLoadingPinned} from "../actions/actions";
 import cookie from 'react-cookies';
 import {lazy} from '@loadable/component';
+import { Button } from '@blueprintjs/core';
 
 const LoadableRouteList = lazy(() => import(/* webpackChunkName: "RouteList" */ '../ui/routeList'));
 
@@ -39,11 +40,8 @@ const getPinnedRoutes = async (rwgpsUsername, rwgpsPassword, setErrorDetails, se
         return response.data;
     } catch (e) {
         console.log(`axios exception is ${e}`);
-        if (e.response !== undefined) {
-            setErrorDetails(JSON.stringify(e.response.data));
-        } else {
-            setErrorDetails(e);
-        }
+        const errorMessage = e.response !== undefined ? JSON.stringify(e.response.data) : e
+        setErrorDetails(`Ride with GPS login failure: ${errorMessage}`);
         setRwgpsCredentials(null, null);
         return null;
         
@@ -63,24 +61,34 @@ const setRoutes = async (rwgpsUsername, rwgpsPassword, setError, setPinnedRoutes
 }
 
 const PinnedRouteLoader = ({rwgpsUsername, rwgpsPassword, credentialsValid, setPinnedRoutes, setErrorDetails, hasRoutes,
-setRwgpsCredentials, setLoadingPinned}) => {
-    
+    loadingPinnedRoutes, setRwgpsCredentials, setLoadingPinned, showPinnedRoutes, setShowPinnedRoutes}) => {
+
     useEffect(() => {
         setRoutes(rwgpsUsername, rwgpsPassword, setErrorDetails, setPinnedRoutes, setRwgpsCredentials, setLoadingPinned);
     }, [rwgpsUsername, rwgpsPassword]);
-    if (credentialsValid) {
-        if (!hasRoutes) {
-            return null;
-        } else {
-            return (
-                <Suspense fallback={<p>Loading pinned routes</p>}>
-                    <LoadableRouteList/>
-                </Suspense>
-            );
-        }
-    } else {
-        return <RideWithGpsCreds/>;
-    }
+
+    return (
+        <>
+            <Button intent="primary"
+                small={true}
+                outlined={showPinnedRoutes}
+                active={showPinnedRoutes}
+                icon="star"
+                loading={loadingPinnedRoutes}
+                text={showPinnedRoutes ? "Don't use pinned routes" : "Use pinned routes"}
+                onClick={() => setShowPinnedRoutes(!showPinnedRoutes)}
+            />
+            {credentialsValid ? (
+                hasRoutes && (
+                    <Suspense fallback={<p>Loading pinned routes</p>}>
+                        <LoadableRouteList/>
+                    </Suspense>
+                )
+            ) : (
+                showPinnedRoutes && <RideWithGpsCreds dialogClosed={() => setShowPinnedRoutes(false)} />
+            )}
+        </>
+    )
 };
 
 
@@ -92,7 +100,10 @@ PinnedRouteLoader.propTypes = {
     setErrorDetails:PropTypes.func.isRequired,
     setRwgpsCredentials:PropTypes.func.isRequired,
     hasRoutes:PropTypes.bool.isRequired,
-    setLoadingPinned:PropTypes.func.isRequired
+    loadingPinnedRoutes:PropTypes.bool.isRequired,
+    setLoadingPinned:PropTypes.func.isRequired,
+    showPinnedRoutes:PropTypes.bool.isRequired,
+    setShowPinnedRoutes:PropTypes.func.isRequired
 };
 
 const isValid = (field) => {return (field !== undefined && field !== null && field !== '')};
@@ -102,7 +113,8 @@ const mapStateToProps = (state) =>
     rwgpsUsername:state.rideWithGpsInfo.username,
     rwgpsPassword:state.rideWithGpsInfo.password,
     credentialsValid:isValid(state.rideWithGpsInfo.username) && isValid(state.rideWithGpsInfo.password),
-    hasRoutes:Array.isArray(state.rideWithGpsInfo.pinnedRoutes) && state.rideWithGpsInfo.pinnedRoutes.length > 0
+    hasRoutes:Array.isArray(state.rideWithGpsInfo.pinnedRoutes) && state.rideWithGpsInfo.pinnedRoutes.length > 0,
+    loadingPinnedRoutes:state.rideWithGpsInfo.loadingRoutes
 });
 
 const mapDispatchToProps = {
