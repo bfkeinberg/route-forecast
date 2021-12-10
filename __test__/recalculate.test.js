@@ -5,7 +5,7 @@
 import React from 'react'
 import { configure, shallow } from 'enzyme'
 import Adapter from '@wojtekmaj/enzyme-adapter-react-17';
-import {Recalculate} from '../src/jsx/recalculate';
+import {Recalculate} from '../src/jsx/RouteInfoForm/Recalculate';
 import { DateTime } from 'luxon';
 
 configure({ adapter: new Adapter() });

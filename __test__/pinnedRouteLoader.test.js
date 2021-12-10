@@ -5,7 +5,7 @@
  import React from 'react'
  import { configure } from 'enzyme'
  import Adapter from '@wojtekmaj/enzyme-adapter-react-17';
- import {saveRwgpsCredentials} from '../src/jsx/ui/pinnedRouteLoader';
+ import {saveRwgpsCredentials} from '../src/jsx/RouteInfoForm/PinnedRouteLoader';
  import { DateTime } from 'luxon';
  import PasswordCredential from '../__mocks__/PasswordCredential';
  

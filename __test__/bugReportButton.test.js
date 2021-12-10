@@ -5,7 +5,7 @@
 import React from 'react'
 import { configure, shallow } from 'enzyme'
 import Adapter from '@wojtekmaj/enzyme-adapter-react-17';
-import BugReportButton from '../src/jsx/ui/bugReportButton';
+import BugReportButton from '../src/jsx/RouteInfoForm/BugReportButton';
 import {Button} from '@blueprintjs/core';
 configure({ adapter: new Adapter() });
 

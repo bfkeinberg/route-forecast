@@ -12,7 +12,7 @@ const mockStore = configureMockStore(middlewares);
 import React from 'react'
 import { configure, shallow, mount, render } from 'enzyme'
 import Adapter from '@wojtekmaj/enzyme-adapter-react-17';
-import RidingPace from '../src/jsx/ui/ridingPace';
+import RidingPace from '../src/jsx/RouteInfoForm/RidingPace';
 configure({ adapter: new Adapter() });
 
 const ridingPaceState = {
@@ -52,7 +52,7 @@ describe('<RidingPace />', () => {
         const div = document.createElement('div');
         div.setAttribute("id", "paceInput")
         document.body.appendChild(div)
-        const wrapper = mount((<Provider store={store}><RidingPace /></Provider>));
+        const wrapper = mount((<Provider store={store}><RidingPace/></Provider>));
         expect(wrapper.find(Input).length).toBe(1);
         expect((wrapper.find(Input).children().children()).length).toBe(13);
         expect(wrapper.find('Input').prop('value')).toBe('D');
