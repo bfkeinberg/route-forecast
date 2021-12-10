@@ -3,29 +3,29 @@ import {Spinner, Button} from '@blueprintjs/core';
 import {Alert, Form, Card, CardBody, CardTitle, Col, Row, Container} from 'reactstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import React, {Component, Suspense} from 'react';
-import ShortUrl from './ui/shortUrl';
+import ShortUrl from './ShortUrl';
 import MediaQuery from 'react-responsive';
 import PropTypes from 'prop-types';
-import {loadFromRideWithGps, saveCookie} from './actions/actions';
+import {loadFromRideWithGps, saveCookie} from '../actions/actions';
 import {connect} from 'react-redux';
-import PaceExplanation from './paceExplanation';
-import Donation from './ui/donationRequest';
-import ForecastInterval from './ui/forecastInterval';
-import RidingPace from './ui/ridingPace';
-import Recalculate from './recalculate';
-import RideWithGpsId from './ui/rideWithGpsId';
-import RwGpsTypeSelector from './ui/rwGpsTypeSelector';
-import ForecastButton from './ui/forecastButton';
-import AnalysisButton from './ui/analysisButton';
-import StravaDialog from './stravaDialog';
-import BugReportButton from './ui/bugReportButton';
-import WeatherProvider from './ui/providerSelector';
-import PinnedRouteLoader from './ui/pinnedRouteLoader.jsx';
-import ErrorBoundary from "./errorBoundary";
+import PaceExplanation from './PaceExplanation';
+import Donation from './DonationRequest';
+import ForecastInterval from './ForecastInterval';
+import RidingPace from './RidingPace';
+import Recalculate from './Recalculate';
+import RideWithGpsId from './RideWithGpsId';
+import RwGpsTypeSelector from './RwGpsTypeSelector';
+import ForecastButton from './ForecastButton';
+import AnalysisButton from './AnalysisButton';
+import StravaDialog from './StravaDialog';
+import BugReportButton from './BugReportButton';
+import WeatherProvider from '../ui/providerSelector';
+import PinnedRouteLoader from './PinnedRouteLoader.jsx';
+import ErrorBoundary from "../errorBoundary";
 import {lazy} from '@loadable/component';
-import {componentLoader} from "./actions/actions.js";
+import {componentLoader} from "../actions/actions.js";
 
-const LoadableDatePicker = lazy(() => componentLoader(import(/* webpackChunkName: "DateSelect" */ /* webpackPrefetch: true */ './ui/dateSelect'), 5));
+const LoadableDatePicker = lazy(() => componentLoader(import(/* webpackChunkName: "DateSelect" */ /* webpackPrefetch: true */ './DateSelect'), 5));
 
 const DatePickerLoader = (props) => {
      return <Suspense fallback={<div>Loading date-time picker...</div>}>

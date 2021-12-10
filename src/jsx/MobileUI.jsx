@@ -1,5 +1,4 @@
 import ErrorBoundary from "./errorBoundary";
-import RouteInfoForm from "./routeInfoEntry";
 import ControlPoints from "./controls";
 import PaceTable from "./paceTable";
 import ForecastTable from "./forecastTable";
@@ -12,6 +11,7 @@ import {Nav, NavItem, NavbarBrand} from "reactstrap";
 import { Icon, Intent } from "@blueprintjs/core";
 import {IconNames} from "@blueprintjs/icons";
 import {connect} from 'react-redux';
+import RouteInfoForm from "./RouteInfoForm/RouteInfoForm";
 
 const DataTable = (props) => {
     return (props.showPacePerTme ? <PaceTable/> : <ForecastTable/>);

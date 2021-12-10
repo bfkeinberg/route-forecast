@@ -1,12 +1,12 @@
 import SplitPane from "react-split-pane";
 import ErrorBoundary from "./errorBoundary";
-import RouteInfoForm from "./routeInfoEntry";
 import ControlPoints from "./controls";
 import PaceTable from "./paceTable";
 import ForecastTable from "./forecastTable";
 import MapLoader from "./mapLoader";
 import PropTypes from "prop-types";
 import React from "react";
+import RouteInfoForm from "./RouteInfoForm/RouteInfoForm";
 
 const DesktopUI = (props) => {
     return <SplitPane defaultSize={320} minSize={150} maxSize={530} split="horizontal">

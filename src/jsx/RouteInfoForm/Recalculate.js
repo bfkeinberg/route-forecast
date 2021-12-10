@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
-import {recalcRoute} from "./actions/actions";
+import {recalcRoute} from "../actions/actions";
 import { DateTime } from 'luxon';
 
 export const Recalculate = ({rwgpsRoute,gpxRouteData,start,recalcRoute}) => {

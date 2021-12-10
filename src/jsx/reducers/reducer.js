@@ -1,7 +1,7 @@
 import * as Actions from '../actions/actions';
 import {combineReducers} from 'redux';
-import RouteInfoForm from "../routeInfoEntry";
 import { DateTime } from 'luxon';
+import RouteInfoForm from '../RouteInfoForm/RouteInfoForm';
 
 export const finishTimeFormat = 'EEE, MMM dd yyyy h:mma';
 

@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import {Label, Input, FormGroup} from 'reactstrap';
 import {connect} from 'react-redux';
-import {setStravaActivity, updateExpectedTimes} from "../actions/actions";
+import {setStravaActivity, updateExpectedTimes} from "./actions/actions";
 
 const StravaRoute = ({stravaAnalysis,setStravaActivity,strava_activity,updateExpectedTimes,canAnalyze}) => {
     return (

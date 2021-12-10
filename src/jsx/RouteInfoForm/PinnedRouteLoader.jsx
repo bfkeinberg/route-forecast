@@ -1,13 +1,13 @@
 import React, {Suspense, useState, useEffect} from 'react';
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
-import RideWithGpsCreds from './rideWithGpsCreds.jsx';
+import RideWithGpsCreds from './RideWithGpsCreds.jsx';
 import axios from 'axios';
 import {setPinnedRoutes, setErrorDetails, setRwgpsCredentials, setLoadingPinned} from "../actions/actions";
 import cookie from 'react-cookies';
 import {lazy} from '@loadable/component';
 
-const LoadableRouteList = lazy(() => import(/* webpackChunkName: "RouteList" */ './routeList'));
+const LoadableRouteList = lazy(() => import(/* webpackChunkName: "RouteList" */ '../ui/routeList'));
 
 export const saveRwgpsCredentials = (username, password) => {
     if ("credentials" in navigator && "PasswordCredential" in window) {

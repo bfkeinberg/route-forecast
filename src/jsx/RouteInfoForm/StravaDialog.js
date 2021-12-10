@@ -1,11 +1,11 @@
 import {Button, Popover, PopoverHeader, PopoverBody, Alert} from 'reactstrap';
 import React, {Component} from 'react';
-import ErrorBoundary from './errorBoundary';
+import ErrorBoundary from '../errorBoundary';
 import {Spinner} from '@blueprintjs/core';
 import PropTypes from 'prop-types';
-import StravaRoute from './ui/stravaRoute';
-import AnalysisInterval from './ui/analysisInterval';
-import {toggleStravaAnalysis,getPaceOverTime} from './actions/actions';
+import StravaRoute from '../StravaRoute';
+import AnalysisInterval from '../ui/analysisInterval';
+import {toggleStravaAnalysis,getPaceOverTime} from '../actions/actions';
 import {connect} from 'react-redux';
 
 class StravaDialog extends Component {

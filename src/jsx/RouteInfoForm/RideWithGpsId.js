@@ -4,7 +4,7 @@ import {Label, Input, FormGroup, UncontrolledTooltip} from 'reactstrap';
 import {connect} from 'react-redux';
 import {loadFromRideWithGps, setRwgpsRoute, newUserMode} from "../actions/actions";
 import cookie from 'react-cookies';
-import {getRouteNumberFromValue, decideValidationStateFor} from "../routeInfoEntry";
+import { getRouteNumberFromValue, decideValidationStateFor } from './RouteInfoForm';
 
 const RideWithGpsId = ({setRwgpsRoute,loadingSource,loadingSuccess,rwgpsRoute,rwgpsRouteIsTrip,loadFromRideWithGps,
                        newUserMode,firstUse}) => {
