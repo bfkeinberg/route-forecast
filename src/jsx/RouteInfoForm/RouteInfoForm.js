@@ -24,6 +24,7 @@ import PinnedRouteLoader from './PinnedRouteLoader.jsx';
 import ErrorBoundary from "../errorBoundary";
 import {lazy} from '@loadable/component';
 import {componentLoader} from "../actions/actions.js";
+import { formatControlsForUrl } from '../../util';
 
 const LoadableDatePicker = lazy(() => componentLoader(import(/* webpackChunkName: "DateSelect" */ /* webpackPrefetch: true */ './DateSelect'), 5));
 
@@ -41,7 +42,6 @@ class RouteInfoForm extends Component {
         ]),
         rwgpsRouteIsTrip: PropTypes.bool.isRequired,
         controlPoints:PropTypes.arrayOf(PropTypes.object).isRequired,
-        formatControlsForUrl:PropTypes.func.isRequired,
         fetchingRoute:PropTypes.bool,
         errorDetails:PropTypes.string,
         routeInfo:PropTypes.shape({name:PropTypes.string}),
@@ -77,7 +77,7 @@ class RouteInfoForm extends Component {
         if (nextProps.routeInfo.name !== '') {
             document.title = `Forecast for ${nextProps.routeInfo.name}`;
             if (!nextProps.firstUse && nextProps.controlPoints !== '' && nextProps.controlPoints.length !== 0) {
-                saveCookie(nextProps.routeInfo.name, nextProps.formatControlsForUrl(nextProps.controlPoints));
+                saveCookie(nextProps.routeInfo.name, formatControlsForUrl(nextProps.controlPoints));
             }
         }
         return null;
@@ -129,7 +129,7 @@ class RouteInfoForm extends Component {
 
         return (
             <div>
-                <Card>
+                <Card style={{borderTop: "none"}}>
                     <CardBody>
                         <CardTitle className='dlgTitle' tag='h6'>{header}</CardTitle>
                     <Form inline id="forecast_form">

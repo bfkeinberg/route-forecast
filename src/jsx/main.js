@@ -176,17 +176,6 @@ export class RouteWeatherUI extends Component {
         }
     }
 
-    static formatOneControl(controlPoint) {
-        if (typeof controlPoint === 'string') {
-            return controlPoint;
-        }
-        return controlPoint.name + "," + controlPoint.distance + "," + controlPoint.duration;
-    }
-
-    formatControlsForUrl = (controlPoints) => {
-        return controlPoints.reduce((queryParam,point) => {return RouteWeatherUI.formatOneControl(queryParam) + ':' + RouteWeatherUI.formatOneControl(point)},'');
-    };
-
     static isNewUserMode(/*search*/) {
         return false;
         // return (search === '' && cookie.load('initialized') === undefined);
@@ -268,12 +257,12 @@ export class RouteWeatherUI extends Component {
             {/*TODO: values is needed for SSR, but messes up real device detection, seemingly*/}
             {/*<MediaQuery minDeviceWidth={1000} values={{deviceWidth:1400}}>*/}
             <MediaQuery minWidth={501}>
-                <DesktopUI formatControlsForUrl={this.formatControlsForUrl} showPacePerTme={this.props.showPacePerTme}
+                <DesktopUI showPacePerTme={this.props.showPacePerTme}
                            mapsApiKey={this.props.maps_api_key}/>
             </MediaQuery>
             {/*<MediaQuery maxDeviceWidth={800} values={{deviceWidth:1400}}>*/}
             <MediaQuery maxWidth={500}>
-                <MobileUI formatControlsForUrl={this.formatControlsForUrl} mapsApiKey={this.props.maps_api_key}/>
+                <MobileUI mapsApiKey={this.props.maps_api_key}/>
             </MediaQuery>
         </div>
       );

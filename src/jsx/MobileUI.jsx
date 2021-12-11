@@ -47,7 +47,7 @@ const MobileUI = (props) => {
             </NavItem>
         </Nav>
 
-        <Route path="/" exact render={(routeProps) => <RouteInfoForm routeProps={routeProps} formatControlsForUrl={props.formatControlsForUrl}/>}/>
+        <Route path="/" exact render={(routeProps) => <RouteInfoForm routeProps={routeProps} />}/>
         <Route path="/controlPoints/" exact component={ControlPoints} />
         <Route path="/map/" exact render={(routeProps) => <MapLoader maps_api_key={props.mapsApiKey} />} />
         <Route path="/table/" exact component={DataTable} />
@@ -56,7 +56,6 @@ const MobileUI = (props) => {
 };
 
 MobileUI.propTypes = {
-    formatControlsForUrl: PropTypes.func.isRequired,
     showPacePerTme: PropTypes.bool,
     mapsApiKey: PropTypes.string.isRequired,
     needToViewTable: PropTypes.bool.isRequired,
