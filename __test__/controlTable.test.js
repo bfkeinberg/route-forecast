@@ -5,7 +5,7 @@
 import React from 'react'
 import { configure, shallow, mount } from 'enzyme'
 import Adapter from '@wojtekmaj/enzyme-adapter-react-17';
-import {ControlTable} from '../src/jsx/controlTable';
+import {ControlTable} from '../src/jsx/ControlPoints/ControlTable';
 // import quixote from "quixote";
 
 Object.defineProperty(window, 'matchMedia', {

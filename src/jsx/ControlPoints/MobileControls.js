@@ -1,42 +1,45 @@
 import {Button} from "@blueprintjs/core";
 import {UncontrolledTooltip} from "reactstrap";
-import FinishTime from "./finishTime";
+import FinishTime from "./FinishTime";
 import PropTypes from "prop-types";
 import React from "react";
 import {connect} from 'react-redux';
 import {addControl, toggleDisplayBanked, toggleMetric} from "../actions/actions";
-import { Tooltip2 } from "@blueprintjs/popover2";
 
-const DesktopControls = (props) => {
-    return <div className="controls-container">
+const MobileControls = (props) => {
+    return <div className="mobile-controls-container">
         <div className="controls-item">
-            <Button minimal={true} tabIndex='10' onClick={props.addControl} id='addButton' icon={"add"}>Add</Button>
-            <UncontrolledTooltip target={"addButton"}>Add a control point</UncontrolledTooltip>
-        </div>
-        <div className="controls-item controls-item-finish-time">
             <FinishTime/>
         </div>
         <div className="controls-item">
             <div id="metric" className="controls-item-contents">
+
                 <span className="controls-checkbox-label">Metric</span>
-    <Tooltip2 usePortal={true} content='Control distances in km, other units displayed in km or degrees C'>
-                    <input type='checkbox' checked={props.metric} onChange={props.toggleMetric}/>
-                </Tooltip2>
+                <input type='checkbox' checked={props.metric} onChange={props.toggleMetric}/>
+
+                <UncontrolledTooltip target={"metric"}>Control distances in km, other units displayed in km or degrees
+                </UncontrolledTooltip>
             </div>
+
         </div>
         <div id="banked" className="controls-item">
             <div id="metric" className="controls-item-contents">
                 <span className="controls-checkbox-label">Display banked time</span>
-    <Tooltip2 usePortal={true} placement='bottom' content='Show how many minutes remain to be within ACP/RUSA brevet finishing times'>
-                    <input type='checkbox' checked={props.displayBanked} onChange={props.toggleDisplayBanked}/>
-                </Tooltip2>
+                <input type='checkbox' checked={props.displayBanked} onChange={props.toggleDisplayBanked}/>
+                <UncontrolledTooltip target={"banked"}>Show how many minutes remain to be within ACP/RUSA brevet
+                    finishing times</UncontrolledTooltip>
             </div>
+
+        </div>
+        <div className="controls-item">
+    <Button minimal={true} tabIndex='10' onClick={props.addControl} id='addButton' icon={"add"}>Add</Button>
+            <UncontrolledTooltip target={"addButton"}>Add a control point</UncontrolledTooltip>
         </div>
     </div>;
 };
 
-DesktopControls.propTypes = {
-    addControl: PropTypes.func.isRequired,
+MobileControls.propTypes = {
+    addControl: PropTypes.func,
     metric: PropTypes.bool.isRequired,
     toggleMetric: PropTypes.func.isRequired,
     displayBanked: PropTypes.bool.isRequired,
@@ -53,4 +56,4 @@ const mapDispatchToProps = {
     toggleMetric, toggleDisplayBanked, addControl
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(DesktopControls);
+export default connect(mapStateToProps, mapDispatchToProps)(MobileControls);

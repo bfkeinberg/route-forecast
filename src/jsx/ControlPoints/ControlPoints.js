@@ -1,17 +1,17 @@
 import {Card, CardBody, CardTitle} from 'reactstrap';
 import React, {Component, Suspense} from 'react';
-import ErrorBoundary from './errorBoundary';
+import ErrorBoundary from '../errorBoundary';
 import PropTypes from 'prop-types';
-import {addControl, toggleDisplayBanked, toggleMetric} from './actions/actions';
+import {addControl, toggleDisplayBanked, toggleMetric} from '../actions/actions';
 import {connect} from 'react-redux';
 import {lazy} from '@loadable/component';
-import '../static/controlsStyles.css';
+import '../../static/controlsStyles.css';
 import MediaQuery from 'react-responsive';
-import DesktopControls from "./ui/desktopControls";
-import MobileControls from "./ui/mobileControls";
-import {componentLoader} from "./actions/actions.js";
+import DesktopControls from "./DesktopControls";
+import MobileControls from "./MobileControls";
+import {componentLoader} from "../actions/actions.js";
 
-const LoadableControlTable = lazy(() => componentLoader(import(/* webpackChunkName: "ControlTable" */'./controlTable'), 5));
+const LoadableControlTable = lazy(() => componentLoader(import(/* webpackChunkName: "ControlTable" */'./ControlTable'), 5));
 
 class ControlPoints extends Component {
 

@@ -1,6 +1,6 @@
 import SplitPane from "react-split-pane";
 import ErrorBoundary from "./errorBoundary";
-import ControlPoints from "./controls";
+import ControlPoints from "./ControlPoints/ControlPoints";
 import PaceTable from "./paceTable";
 import ForecastTable from "./forecastTable";
 import MapLoader from "./mapLoader";
