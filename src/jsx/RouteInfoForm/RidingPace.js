@@ -8,6 +8,45 @@ export const paceToSpeed = {'Q':3, 'R':4, 'S':5, 'T':6, 'A-':9, 'A':10, 'A+':11,
 export const inputPaceToSpeed = {'Q':3, 'R':4, 'S':5, 'T':6, 'A-':9, 'A':10, 'A+':11, 'B':12, 'B+':13, 'C-':13, 'C':14, 'C+':15, 'D-':15, 'D':16, 'D+':17, 'E':18, 'E+':19};
 export const metricPaceToSpeed = {'A-':15, 'A':16, 'B-':18, 'B':19, 'C-':21, 'C':22, 'C+':24, 'D-':24, 'D':26, 'D+':27, 'E-':27, 'E':29};
 
+const paceValues = {
+    imperialLikeAPenguin: {
+        values: [
+            {name: "Q", number: 3}, 
+            {name: "R", number: 4},
+            {name: "S", number: 5},
+            {name: "T", number: 6},
+            {name: "A", number: 10},
+            {name: "A+", number: 11},
+            {name: "B", number: 12},
+            {name: "B+", number: 13},
+            {name: "C", number: 14},
+            {name: "C+", number: 15},
+            {name: "D", number: 16},
+            {name: "D+", number: 17},
+            {name: "E", number: 18},
+        ],
+        label: "mph"
+    },
+    metric: {
+        values: [
+            {name: "Q", number: 5}, 
+            {name: "R", number: 6},
+            {name: "S", number: 8},
+            {name: "T", number: 10},
+            {name: "A", number: 16},
+            {name: "A+", number: 18},
+            {name: "B", number: 19},
+            {name: "B+", number: 21},
+            {name: "C", number: 22},
+            {name: "C+", number: 24},
+            {name: "D", number: 26},
+            {name: "D+", number: 27},
+            {name: "E", number: 29},
+        ],
+        label: "kph"
+    }
+}
+
 const getAlphaPace = function(pace) {
     let alpha = 'A';     // default
     alpha = Object.keys(paceToSpeed).reverse().find(value => {
@@ -46,44 +85,19 @@ const RidingPace = ({pace,actualPace,setPace,metric}) => {
         pace_tooltip_class = getPaceTooltipId(actualPace,pace_mph);
         pace_text = `Actual riding pace was ${getAlphaPace(Math.round(actualPace))} (${actualPace.toFixed(1)})`;
     }
+    
+    const dropdownValues = metric ? paceValues.metric : paceValues.imperialLikeAPenguin
+
     return (
         <FormGroup>
             <Label size='sm' tag='b' for='paceInput'>Pace on flat</Label>
             <UncontrolledTooltip innerClassName={pace_tooltip_class} target='paceInput' placement="bottom">{pace_text}</UncontrolledTooltip>
-            {metric ?
-                <Input tabIndex='3' type="select" value={pace} name="pace"
-                             id='paceInput' onChange={event => {saveCookie("pace",event.target.value);setPace(event.target.value)}}>
-                    <option value="Q">5 kph</option>
-                    <option value="R">6 kph</option>
-                    <option value="S">8 kph</option>
-                    <option value="T">10 kph</option>
-                    <option value="A">16 kph</option>
-                    <option value="A+">18 kph</option>
-                    <option value="B">19 kph</option>
-                    <option value="B+">21 kph</option>
-                    <option value="C">22 kph</option>
-                    <option value="C+">24 kph</option>
-                    <option value="D">26 kph</option>
-                    <option value="D+">27 kph</option>
-                    <option value="E">29 kph</option>
-                </Input> :
-                <Input tabIndex='3' type="select" value={pace} name="pace"
-                       id='paceInput' onChange={event => {saveCookie("pace",event.target.value);setPace(event.target.value)}}>
-                    <option value="Q">3 mph</option>
-                    <option value="R">4 mph</option>
-                    <option value="S">5 mph</option>
-                    <option value="T">6 mph</option>
-                    <option value="A">10 mph</option>
-                    <option value="A+">11 mph</option>
-                    <option value="B">12 mph</option>
-                    <option value="B+">13 mph</option>
-                    <option value="C">14 mph</option>
-                    <option value="C+">15 mph</option>
-                    <option value="D">16 mph</option>
-                    <option value="D+">17 mph</option>
-                    <option value="E">18 mph</option>
-                </Input>
-            }
+            <Input tabIndex='3' type="select" value={pace} name="pace"
+                id='paceInput' onChange={event => {saveCookie("pace",event.target.value);setPace(event.target.value)}}>
+                {dropdownValues.values.map(({name, number}) =>
+                    <option value={name}>{number} {dropdownValues.label}</option>
+                )}
+            </Input>
         </FormGroup>
     );
 };

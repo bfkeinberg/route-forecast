@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import {Button, UncontrolledTooltip} from 'reactstrap';
 import {connect} from 'react-redux';
 import {requestForecast, setFetchAfterLoad} from "../actions/actions";
-import MediaQuery from 'react-responsive';
+import { useMediaQuery } from 'react-responsive';
 
 const ForecastButton = ({fetchingForecast,requestForecast,routeInfo,submitDisabled,routeIsLoaded,setFetchAfterLoad}) => {
     let forecast_tooltip = submitDisabled ?
@@ -22,21 +22,23 @@ const ForecastButton = ({fetchingForecast,requestForecast,routeInfo,submitDisabl
         requestForecast(routeInfo);
     };
 
+    const smallScreen = useMediaQuery({query: "(max-width: 800px)"})
+
     return (
-        <div id='forecast' style={{'display':'inline-flex',padding:'0px 14px'}} cursor='not-allowed'>
+        <div id='forecast' style={{ 'display': 'flex', width: '100%', justifyContent: "center", marginTop: "20px" }} cursor='not-allowed'>
             {forecast_tooltip}
-            <MediaQuery minDeviceWidth={801}>
-                <Button tabIndex='6' color="primary" onClick={forecastClick}
-                        style={buttonStyle}
-                        disabled={submitDisabled || fetchingForecast}>
-                    {fetchingForecast?'Updating...':'Find forecast'}</Button>
-            </MediaQuery>
-            <MediaQuery maxDeviceWidth={800}>
-                <Button id='forecast' tabIndex='6' color="primary" onClick={forecastClick}
-                        style={buttonStyle}
-                        disabled={submitDisabled || fetchingForecast} size="sm">
-                    {fetchingForecast?'Updating...':'Find forecast'}</Button>
-            </MediaQuery>
+            <Button
+                id='forecast'
+                tabIndex='6'
+                color="primary"
+                onClick={forecastClick}
+                style={buttonStyle}
+                disabled={submitDisabled || fetchingForecast}
+                size={smallScreen ? "sm" : ""}
+            >
+                {fetchingForecast ? 'Updating...' : 'Find Forecast'}
+            </Button>
+
         </div>
     );
 };

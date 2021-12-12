@@ -6,7 +6,7 @@ import {setInterval} from "../actions/actions";
 
 const ForecastInterval = ({interval,setInterval}) => {
     return (
-        <FormGroup inline row size='lg'>
+        <FormGroup>
             <UncontrolledTooltip target='interval' placement='bottom'>How often to generate weather forecast</UncontrolledTooltip>
             <Label for='interval' size='sm' tag='b'>Interval in hours</Label>
             <Input size="5" bsSize='xsm' id='interval' tabIndex='2' type="number"

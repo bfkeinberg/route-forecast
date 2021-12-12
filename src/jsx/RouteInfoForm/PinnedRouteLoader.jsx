@@ -76,6 +76,7 @@ const PinnedRouteLoader = ({rwgpsUsername, rwgpsPassword, credentialsValid, setP
                 icon="star"
                 loading={loadingPinnedRoutes}
                 text={showPinnedRoutes ? "Don't use pinned routes" : "Use pinned routes"}
+                style={{fontSize: "13px"}}
                 onClick={() => setShowPinnedRoutes(!showPinnedRoutes)}
             />
             {credentialsValid ? (

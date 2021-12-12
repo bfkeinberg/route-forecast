@@ -8,6 +8,7 @@ import React, { useState } from "react";
 import RouteInfoForm from "./RouteInfoForm/RouteInfoForm";
 import DonationRequest from "./DonationRequest";
 import BugReportButton from "./BugReportButton";
+import PaceExplanation from "./PaceExplanation";
 
 const DesktopUI = ({showPacePerTme, mapsApiKey}) => {
     const sidePaneOptions = [
@@ -54,10 +55,13 @@ const TopBar = ({sidePaneOptions, activeSidePane, setActiveSidePane, sidebarWidt
                     </TopBarItem>
                 )}
             </div>
-            <div style={{flexGrow: 1, display: "flex", justifyContent: "flex-end", alignItems: "center"}}>
-                <DonationRequest/>
-                <div style={{margin: "0px 10px"}}><BugReportButton/></div>
-                <NonexistentLogo/>
+            <div style={{display: "flex", flexGrow: 1, alignItems: "center", padding: "0px 20px"}}>
+                <PaceExplanation/>
+                <div style={{flexGrow: 1, display: "flex", justifyContent: "flex-end", alignItems: "center"}}>
+                    <DonationRequest/>
+                    <div style={{margin: "0px 10px", flexShrink: 0}}><BugReportButton/></div>
+                    <NonexistentLogo/>
+                </div>
             </div>
         </div>
     )
@@ -65,11 +69,11 @@ const TopBar = ({sidePaneOptions, activeSidePane, setActiveSidePane, sidebarWidt
 
 const NonexistentLogo = () => {
     return (
-        <div style={{userSelect: "none", padding: "10px"}}>
+        <div style={{userSelect: "none", padding: "0px 10px"}}>
             <span style={{fontSize: "30px"}}>
                 Randoplan
             </span>
-            <span style={{fontSize: "6px"}}>(imagine a world where one had a logo)</span>
+            <span style={{fontSize: "6px"}}>(pretend this is a logo)</span>
         </div>
     )
 }

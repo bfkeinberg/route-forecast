@@ -8,7 +8,6 @@ import MediaQuery from 'react-responsive';
 import PropTypes from 'prop-types';
 import {loadFromRideWithGps, saveCookie} from '../actions/actions';
 import {connect} from 'react-redux';
-import PaceExplanation from './PaceExplanation';
 import ForecastInterval from './ForecastInterval';
 import RidingPace from './RidingPace';
 import Recalculate from './Recalculate';
@@ -138,37 +137,39 @@ class RouteInfoForm extends Component {
                             </Col>
                         </Row>
                         <Row>
-                            <Col sm="5">
-                                <ForecastInterval/>
-                            </Col>
-                            <Col sm="4">
-                                <RidingPace/>
-                            </Col>
-                            <MediaQuery minDeviceWidth={501}>
-                                <Col sm="1">
-                                    <PaceExplanation/>
-                                </Col>
-                            </MediaQuery>
+                            <div style={{display: "flex"}}>
+                                <div style={{flex: 1, padding: "5px"}}>
+                                    <ForecastInterval/>
+                                </div>
+                                <div style={{flex: 1, padding: "5px"}}>
+                                    <RidingPace/>
+                                </div>
+                            </div>
                         </Row>
-                        <Row noGutters>
-                            <Col sm={{size:"auto"}}>
-                                {this.state.showPinnedRoutes ? null : <RideWithGpsId />}
-                            </Col>
-                            <Col sm={{size:"auto"}}>
+                        <Row>
+                            <Col>
+                            <div style={{display: "flex", justifyContent: "center", alignItems: "center"}}>
+                                {this.state.showPinnedRoutes ? null : 
+                                    <>
+                                        <div style={{flex: 1, padding: "5px"}}><RideWithGpsId /></div>
+                                        <div className="or-divider" style={{flex: 0.3, fontSize: "13px", textAlign: "center"}}>- OR -</div>
+                                    </>
+                                }
                                 <ErrorBoundary>
-                                    <PinnedRouteLoader
-                                        showPinnedRoutes={this.state.showPinnedRoutes}
-                                        setShowPinnedRoutes={(showPinnedRoutes) => this.setState({ showPinnedRoutes: showPinnedRoutes })}
-                                    />
+                                    <div style={{flex: 1, padding: "5px"}}>
+                                        <PinnedRouteLoader
+                                            showPinnedRoutes={this.state.showPinnedRoutes}
+                                            setShowPinnedRoutes={(showPinnedRoutes) => this.setState({ showPinnedRoutes: showPinnedRoutes })}
+                                        />
+                                    </div>
                                 </ErrorBoundary>
-                            </Col>
-                            {providerButton}
-                            <Col size={{size:"auto"}}>
                                 <RwGpsTypeSelector visible={false}/>
+                                {providerButton}
+                             </div>
                             </Col>
-                            <Col size={{size:"auto"}}>
-                                <ForecastButton/>
-                            </Col>
+                        </Row>
+                        <Row>
+                            <ForecastButton/>
                         </Row>
                         {RouteInfoForm.showErrorDetails(this.props.errorDetails)}
                         {RouteInfoForm.showProgressSpinner(this.props.fetchingRoute)}

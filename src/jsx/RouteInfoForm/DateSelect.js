@@ -31,24 +31,24 @@ const DateSelect = ({start, setStart, setInitialStart}) => {
     later.setDate(now.getDate() + daysToAdd);
 
     return (
-        <Row tabIndex="1">
+        <div style={{display: "flex", alignItems: "center", justifyContent: "center"}}>
             <UncontrolledTooltip placement='bottom' target="startingTime">When you plan to begin riding</UncontrolledTooltip>
-            <Col>
-                <Icon icon="calendar" onClick={() => setDateOnly(start, setInitialStart)}/>
-                <Label for='calendar' size='sm' tag='b' id='startingTime'>Starting time</Label>
-                <Flatpickr key={start.seconds} id='calendar'
-                       value={start.toJSDate()}
-                       options={{enableTime: true,
-                           altInput: true, altFormat: 'F j, Y h:i K',
-                           altInputClass: 'dateDisplay',
-                           maxDate: later,
-                           defaultDate: start.toJSDate(),
-                           dateFormat: 'Y-m-d H:i',
-                           onParseConfig:(dates,datestr,instance) => instance.config.onClose.push((dates) =>
-        {setStart(DateTime.fromJSDate(dates[0]))})
-                       }}/>
-            </Col>
-        </Row>
+            <Icon icon="calendar" onClick={() => setDateOnly(start, setInitialStart)} style={{cursor: "pointer", marginRight: "3px"}}/>
+            <Label for='calendar' size='sm' tag='b' id='startingTime' style={{marginRight: "5px"}}>Starting time</Label>
+            <Flatpickr key={start.seconds} id='calendar'
+                value={start.toJSDate()}
+                options={{enableTime: true,
+                    altInput: true, altFormat: 'F j, Y h:i K',
+                    altInputClass: 'dateDisplay',
+                    maxDate: later,
+                    defaultDate: start.toJSDate(),
+                    dateFormat: 'Y-m-d H:i',
+                    onParseConfig:(dates,datestr,instance) =>
+                        instance.config.onClose.push((dates) =>
+                            {setStart(DateTime.fromJSDate(dates[0]))})
+                }}
+            />
+        </div>
     );
 };
 
