@@ -6,7 +6,11 @@ const bugReportUrl = "https://github.com/bfkeinberg/route-forecast/issues";
 const BugReportButton = () => {
     return (
         <Button className="pt-intent-warning pt-small pt-minimal"
-                onClick={() => window.open(bugReportUrl,"_blank")}><img id='bugImage' src={LadyBug}/>Report a bug</Button>
+                onClick={() => window.open(bugReportUrl,"_blank")}
+                style={{height: "40px"}}
+        >
+                <img style={{height: "auto"}} id='bugImage' src={LadyBug}/>Report a bug
+        </Button>
         );
 };
 

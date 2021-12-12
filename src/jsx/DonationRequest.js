@@ -2,7 +2,7 @@ import {Modal, ModalBody, UncontrolledTooltip} from 'reactstrap';
 import React, {Component} from 'react';
 import { Button, AnchorButton, Icon, IconSize, Intent } from "@blueprintjs/core";
 
-class Donation extends Component {
+class DonationRequest extends Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -20,7 +20,7 @@ class Donation extends Component {
         return (
             <div>
                 <AnchorButton id={'donate'} href="https://paypal.me/BFeinberg" target="_blank">
-                    <img alt="" border="0" src="https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif" width="75" height="30" />
+                    <img alt="" border="0" src="https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif" height="30" />
                 </AnchorButton>
                 <UncontrolledTooltip placement={'top'} target={'donate'}>Hi, if you'd like to support randoplan, please consider donating something to my Paypal</UncontrolledTooltip>
             </div>
@@ -29,5 +29,5 @@ class Donation extends Component {
 }
 //
 
-export default Donation;
+export default DonationRequest;
 

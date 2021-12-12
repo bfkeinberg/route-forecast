@@ -9,7 +9,6 @@ import PropTypes from 'prop-types';
 import {loadFromRideWithGps, saveCookie} from '../actions/actions';
 import {connect} from 'react-redux';
 import PaceExplanation from './PaceExplanation';
-import Donation from './DonationRequest';
 import ForecastInterval from './ForecastInterval';
 import RidingPace from './RidingPace';
 import Recalculate from './Recalculate';
@@ -18,7 +17,6 @@ import RwGpsTypeSelector from './RwGpsTypeSelector';
 import ForecastButton from './ForecastButton';
 import AnalysisButton from './AnalysisButton';
 import StravaDialog from './StravaDialog';
-import BugReportButton from './BugReportButton';
 import WeatherProvider from '../ui/providerSelector';
 import PinnedRouteLoader from './PinnedRouteLoader.jsx';
 import ErrorBoundary from "../errorBoundary";
@@ -189,12 +187,6 @@ class RouteInfoForm extends Component {
                         <Col>
                             <AnalysisButton/>
                             <StravaDialog/>
-                        </Col>
-                        <Col>
-                            <Donation/>
-                        </Col>
-                        <Col>
-                            <BugReportButton/>
                         </Col>
                     </Row>
                 </Container>
