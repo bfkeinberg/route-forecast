@@ -11,7 +11,7 @@ import {setWeatherRange, toggleWeatherRange, setTableViewed, toggleZoomToRange} 
 import MediaQuery from 'react-responsive';
 import {finishTimeFormat} from './reducers/reducer';
 import { DateTime } from 'luxon';
-import { Checkbox } from '@blueprintjs/core';
+import { Checkbox, Icon } from '@blueprintjs/core';
 import cookie from 'react-cookies';
 
 const milesToMeters = 1609.34;
@@ -162,7 +162,7 @@ export class ForecastTable extends Component {
         }
         const windHeader = this.state.showGusts ? 'Wind gust' : 'Wind speed';
         const distHeader = this.props.metric ? 'Kilometer' : 'Mile';
-        const temperatureHeader = this.state.showApparentTemp ? 'Apparent temp' : 'Temperature';
+        const temperatureHeader = this.state.showApparentTemp ? 'Apparent temp' : <Icon icon="temperature"/>;
         const weatherId = (this.props.gustSpeed > gustySpeed) ? 'gustyWeather' : 'weatherCorrections';
         return (
                 <div className="animated slideInLeft">
@@ -178,7 +178,7 @@ export class ForecastTable extends Component {
                                 <Checkbox checked={this.props.zoomToRange} label="Zoom to segment" onChange={this.toggleZoom} />
                             </Col>
                         </Row>
-                    <Table size='sm' hover bordered>
+                    <Table size='sm' hover bordered style={{fontSize: "12px"}}>
                         <thead>
                         <tr>
                             <th className={'headerCell'}>Time</th>

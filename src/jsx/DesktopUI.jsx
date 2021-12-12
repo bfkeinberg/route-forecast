@@ -90,7 +90,8 @@ const TopBarItem = ({children, active, onClick}) => {
         userSelect: "none",
         backgroundColor: active ? "" : "#00000030",
         flex: 1,
-        justifyContent: "center"
+        justifyContent: "center",
+        transition: "background-color 0.3s"
     }
 
     return (
