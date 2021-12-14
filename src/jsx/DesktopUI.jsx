@@ -9,6 +9,7 @@ import RouteInfoForm from "./RouteInfoForm/RouteInfoForm";
 import DonationRequest from "./DonationRequest";
 import BugReportButton from "./BugReportButton";
 import PaceExplanation from "./PaceExplanation";
+import ShortUrl from "./RouteInfoForm/ShortUrl";
 
 const DesktopUI = ({showPacePerTme, mapsApiKey}) => {
     const sidePaneOptions = [
@@ -58,7 +59,8 @@ const TopBar = ({sidePaneOptions, activeSidePane, setActiveSidePane, sidebarWidt
             <div style={{display: "flex", flexGrow: 1, alignItems: "center", padding: "0px 20px"}}>
                 <PaceExplanation/>
                 <div style={{flexGrow: 1, display: "flex", justifyContent: "flex-end", alignItems: "center"}}>
-                    <DonationRequest/>
+                    <ShortUrl/>
+                    <DonationRequest wacky/>
                     <div style={{margin: "0px 10px", flexShrink: 0}}><BugReportButton/></div>
                     <NonexistentLogo/>
                 </div>

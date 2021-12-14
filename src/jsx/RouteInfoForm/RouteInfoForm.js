@@ -175,16 +175,15 @@ class RouteInfoForm extends Component {
                         {RouteInfoForm.showProgressSpinner(this.props.fetchingRoute)}
                     </Form>
                     <MediaQuery maxDeviceWidth={500}>
-                        <ShortUrl/>
+                        <div style={{marginTop: "10px", textAlign: "center"}}>
+                            <ShortUrl/>
+                        </div>
                     </MediaQuery>
                     </CardBody>
                 </Card>
             <MediaQuery minDeviceWidth={501}>
                 <Container fluid={true}>
                     <Row className="justify-content-sm-between">
-                        <Col sm={{size:"auto"}}>
-                            <ShortUrl/>
-                        </Col>
                         <Col>
                             <AnalysisButton/>
                             <StravaDialog/>
