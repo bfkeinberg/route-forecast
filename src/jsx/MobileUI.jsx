@@ -11,7 +11,7 @@ import { Icon, Intent } from "@blueprintjs/core";
 import {IconNames} from "@blueprintjs/icons";
 import {connect} from 'react-redux';
 import RouteInfoForm from "./RouteInfoForm/RouteInfoForm";
-import ControlPoints from "./ControlPoints/ControlPoints";
+import ForecastSettings from "./ForecastSettings/ForecastSettings";
 
 const DataTable = (props) => {
     return (props.showPacePerTme ? <PaceTable/> : <ForecastTable/>);
@@ -48,7 +48,7 @@ const MobileUI = (props) => {
         </Nav>
 
         <Route path="/" exact render={(routeProps) => <RouteInfoForm routeProps={routeProps} />}/>
-        <Route path="/controlPoints/" exact component={ControlPoints} />
+        <Route path="/controlPoints/" exact component={ForecastSettings} />
         <Route path="/map/" exact render={(routeProps) => <MapLoader maps_api_key={props.mapsApiKey} />} />
         <Route path="/table/" exact component={DataTable} />
 

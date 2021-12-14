@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {Button} from '@blueprintjs/core';
+import {Button, Icon} from '@blueprintjs/core';
 import {AgGridReact} from 'ag-grid-react';
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
@@ -7,6 +7,7 @@ import {updateUserControls} from '../actions/actions';
 import 'ag-grid-community/dist/styles/ag-grid.css';
 import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
 import ReactDOM from 'react-dom';
+import { Table } from './Table';
 
 const smallScreenWidth = 800;
 const deleteColumnWidth = 39;

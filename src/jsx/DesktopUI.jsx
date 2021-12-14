@@ -1,5 +1,4 @@
 import ErrorBoundary from "./errorBoundary";
-import ControlPoints from "./ControlPoints/ControlPoints";
 import PaceTable from "./paceTable";
 import ForecastTable from "./forecastTable";
 import MapLoader from "./mapLoader";
@@ -10,11 +9,12 @@ import DonationRequest from "./DonationRequest";
 import BugReportButton from "./BugReportButton";
 import PaceExplanation from "./PaceExplanation";
 import ShortUrl from "./RouteInfoForm/ShortUrl";
+import ForecastSettings from "./ForecastSettings/ForecastSettings";
 
 const DesktopUI = ({showPacePerTme, mapsApiKey}) => {
     const sidePaneOptions = [
         {title: "Route Info", content: <ErrorBoundary><RouteInfoForm routeProps={{}} /></ErrorBoundary>},
-        {title: "Control Points", content: <ErrorBoundary><ControlPoints/></ErrorBoundary>},
+        {title: "Control Points", content: <ErrorBoundary><ForecastSettings/></ErrorBoundary>},
         {title: "Forecast", content: <ErrorBoundary>{showPacePerTme ? <PaceTable/> : <ForecastTable/>}</ErrorBoundary>}
     ]
     const [activeSidePane, setActiveSidePane] = useState(0)
