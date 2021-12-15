@@ -1,38 +1,69 @@
 import {Button} from "@blueprintjs/core";
-import {UncontrolledTooltip} from "reactstrap";
+import {Col, Row, UncontrolledTooltip} from "reactstrap";
 import FinishTime from "./FinishTime";
 import PropTypes from "prop-types";
-import React from "react";
+import React, { Suspense } from "react";
 import {connect} from 'react-redux';
 import {addControl, toggleDisplayBanked, toggleMetric} from "../actions/actions";
 import { Tooltip2 } from "@blueprintjs/popover2";
+import Recalculate from "./Recalculate";
+import ForecastInterval from "./ForecastInterval";
+import RidingPace from "./RidingPace";
+import {lazy} from '@loadable/component';
+import {componentLoader} from "../actions/actions.js";
+
+const LoadableDatePicker = lazy(() => componentLoader(import(/* webpackChunkName: "DateSelect" */ /* webpackPrefetch: true */ './DateSelect'), 5));
+
+const DatePickerLoader = (props) => {
+     return <Suspense fallback={<div>Loading date-time picker...</div>}>
+        <LoadableDatePicker {...props}/>
+     </Suspense>
+};
 
 const DesktopControls = (props) => {
-    return <div className="controls-container">
-        <div className="controls-item">
-            <Button minimal={true} tabIndex='10' onClick={props.addControl} id='addButton' icon={"add"}>Add</Button>
-            <UncontrolledTooltip target={"addButton"}>Add a control point</UncontrolledTooltip>
-        </div>
-        <div className="controls-item controls-item-finish-time">
-            <FinishTime/>
-        </div>
-        <div className="controls-item">
-            <div id="metric" className="controls-item-contents">
-                <span className="controls-checkbox-label">Metric</span>
-    <Tooltip2 usePortal={true} content='Control distances in km, other units displayed in km or degrees C'>
-                    <input type='checkbox' checked={props.metric} onChange={props.toggleMetric}/>
-                </Tooltip2>
+    return (
+        <div className="controls-container">
+            <Row>
+                <Col>
+                    <DatePickerLoader/>
+                    <Recalculate/>
+                </Col>
+            </Row>
+            <Row>
+                <div style={{display: "flex"}}>
+                    <div style={{flex: 1, padding: "5px"}}>
+                        <ForecastInterval/>
+                    </div>
+                    <div style={{flex: 1, padding: "5px"}}>
+                        <RidingPace/>
+                    </div>
+                </div>
+            </Row>
+            <div className="controls-item">
+                <Button minimal={true} tabIndex='10' onClick={props.addControl} id='addButton' icon={"add"}>Add</Button>
+                <UncontrolledTooltip target={"addButton"}>Add a control point</UncontrolledTooltip>
+            </div>
+            <div className="controls-item controls-item-finish-time">
+                <FinishTime />
+            </div>
+            <div className="controls-item">
+                <div id="metric" className="controls-item-contents">
+                    <span className="controls-checkbox-label">Metric</span>
+                    <Tooltip2 usePortal={true} content='Control distances in km, other units displayed in km or degrees C'>
+                        <input type='checkbox' checked={props.metric} onChange={props.toggleMetric} />
+                    </Tooltip2>
+                </div>
+            </div>
+            <div id="banked" className="controls-item">
+                <div id="metric" className="controls-item-contents">
+                    <span className="controls-checkbox-label">Display banked time</span>
+                    <Tooltip2 usePortal={true} placement='bottom' content='Show how many minutes remain to be within ACP/RUSA brevet finishing times'>
+                        <input type='checkbox' checked={props.displayBanked} onChange={props.toggleDisplayBanked} />
+                    </Tooltip2>
+                </div>
             </div>
         </div>
-        <div id="banked" className="controls-item">
-            <div id="metric" className="controls-item-contents">
-                <span className="controls-checkbox-label">Display banked time</span>
-    <Tooltip2 usePortal={true} placement='bottom' content='Show how many minutes remain to be within ACP/RUSA brevet finishing times'>
-                    <input type='checkbox' checked={props.displayBanked} onChange={props.toggleDisplayBanked}/>
-                </Tooltip2>
-            </div>
-        </div>
-    </div>;
+    );
 };
 
 DesktopControls.propTypes = {

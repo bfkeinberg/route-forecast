@@ -1,16 +1,12 @@
 import {Spinner} from '@blueprintjs/core';
-//import { Tooltip2 } from "@blueprintjs/popover2";
 import {Alert, Form, Card, CardBody, CardTitle, Col, Row, Container} from 'reactstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import React, {Component, Suspense} from 'react';
-import ShortUrl from './ShortUrl';
+import React, { useEffect } from 'react';
+import ShortUrl from '../ShortUrl';
 import MediaQuery from 'react-responsive';
 import PropTypes from 'prop-types';
 import {loadFromRideWithGps, saveCookie} from '../actions/actions';
 import {connect} from 'react-redux';
-import ForecastInterval from './ForecastInterval';
-import RidingPace from './RidingPace';
-import Recalculate from './Recalculate';
 import RideWithGpsId from './RideWithGpsId';
 import RwGpsTypeSelector from './RwGpsTypeSelector';
 import ForecastButton from './ForecastButton';
@@ -19,168 +15,106 @@ import StravaDialog from './StravaDialog';
 import WeatherProvider from '../ui/providerSelector';
 import PinnedRouteLoader from './PinnedRouteLoader.jsx';
 import ErrorBoundary from "../errorBoundary";
-import {lazy} from '@loadable/component';
-import {componentLoader} from "../actions/actions.js";
 import { formatControlsForUrl } from '../../util';
 
-const LoadableDatePicker = lazy(() => componentLoader(import(/* webpackChunkName: "DateSelect" */ /* webpackPrefetch: true */ './DateSelect'), 5));
-
-const DatePickerLoader = (props) => {
-     return <Suspense fallback={<div>Loading date-time picker...</div>}>
-        <LoadableDatePicker {...props}/>
-     </Suspense>
-};
-
-class RouteInfoForm extends Component {
-    static propTypes = {
-        rwgpsRoute:PropTypes.oneOfType([
-            PropTypes.number,
-            PropTypes.oneOf([''])
-        ]),
-        rwgpsRouteIsTrip: PropTypes.bool.isRequired,
-        controlPoints:PropTypes.arrayOf(PropTypes.object).isRequired,
-        fetchingRoute:PropTypes.bool,
-        errorDetails:PropTypes.string,
-        routeInfo:PropTypes.shape({name:PropTypes.string}),
-        loadFromRideWithGps:PropTypes.func.isRequired,
-        firstUse:PropTypes.bool.isRequired,
-        routeSelected:PropTypes.bool.isRequired,
-        needToViewTable: PropTypes.bool.isRequired,
-        showProvider: PropTypes.bool.isRequired,
-        routeProps:PropTypes.object
-    };
-
-    constructor(props) {
-        super(props);
-        this.state = {showPinnedRoutes:false};
+export const getRouteNumberFromValue = (value) => {
+    if (value !== '' && value !== null) {
+        // is this just a number or a full url?
+        let route = parseInt(value);
+        if (isNaN(route)) {
+            route = value.split('/').map(part => parseInt(part)).find(val => !isNaN(val));
+        }
+        return route;
     }
+    return value;
+}
 
-    componentDidMount() {
-        if (this.props.rwgpsRoute !== '') {
-            this.props.loadFromRideWithGps(this.props.rwgpsRoute,this.props.rwgpsRouteIsTrip);
+export const decideValidationStateFor = (type, methodUsed, loadingSuccess) => {
+    if (type === methodUsed) {
+        if (loadingSuccess) {
+            return {'valid':null};
+        } else {
+            return {'invalid':null};
         }
-    }
-
-    componentDidUpdate() {
-        if (this.props.rwgpsRoute !== '' && !this.props.routeSelected) {
-            this.props.loadFromRideWithGps(this.props.rwgpsRoute,this.props.rwgpsRouteIsTrip);
-        }
-        if (this.props.routeProps != null && this.props.routeProps.history != null && this.props.needToViewTable) {
-            this.props.routeProps.history.replace('/table/')
-        }
-    }
-
-    static getDerivedStateFromProps(nextProps) {
-        if (nextProps.routeInfo.name !== '') {
-            document.title = `Forecast for ${nextProps.routeInfo.name}`;
-            if (!nextProps.firstUse && nextProps.controlPoints !== '' && nextProps.controlPoints.length !== 0) {
-                saveCookie(nextProps.routeInfo.name, formatControlsForUrl(nextProps.controlPoints));
-            }
-        }
+    } else {
         return null;
     }
+}
 
-    static showErrorDetails(errorState) {
-        if (errorState !== null) {
-            return (
-                <Alert style={{padding:'10px'}} color="danger">{errorState}</Alert>
-            );
+const RouteInfoForm = ({ rwgpsRoute, rwgpsRouteIsTrip, controlPoints, fetchingRoute, errorDetails, routeInfo, loadFromRideWithGps, firstUse, routeSelected, needToViewTable, showProvider, routeProps }) => {
+    const [showPinnedRoutes, setShowPinnedRoutes] = useState(false)
+
+    useEffect(() => {
+        if (rwgpsRoute !== '') {
+            loadFromRideWithGps(rwgpsRoute, rwgpsRouteIsTrip);
         }
-    }
+    }, [])
 
-    static showProgressSpinner(running) {
-        if (running) {
-            return (
-                <Spinner/>
-            );
+    useEffect(() => {
+        if (rwgpsRoute !== '' && !routeSelected) {
+            loadFromRideWithGps(rwgpsRoute,rwgpsRouteIsTrip);
         }
-    }
+    }, [rwgpsRoute, routeSelected, rwgpsRouteIsTrip])
+    
+    useEffect(() => {
+        if (routeProps != null && routeProps.history != null && needToViewTable) {
+            routeProps.history.replace('/table/')
+        }
+    }, [routeProps, needToViewTable])
 
-    static getRouteNumberFromValue(value) {
-        if (value !== '' && value !== null) {
-            // is this just a number or a full url?
-            let route = parseInt(value);
-            if (isNaN(route)) {
-                route = value.split('/').map(part => parseInt(part)).find(val => !isNaN(val));
+    useEffect(() => {
+        if (routeInfo.name !== '') {
+            document.title = `Forecast for ${routeInfo.name}`;
+            if (!firstUse && controlPoints !== '' && controlPoints.length !== 0) {
+                saveCookie(routeInfo.name, formatControlsForUrl(controlPoints));
             }
-            return route;
         }
-        return value;
-    }
+    }, [routeInfo.name, firstUse, controlPoints])
 
-    static decideValidationStateFor(type, methodUsed, loadingSuccess) {
-        if (type === methodUsed) {
-            if (loadingSuccess) {
-                return {'valid':null};
-            } else {
-                return {'invalid':null};
-            }
-        } else {
-            return null;
-        }
-    }
+    const header = (<div style={{textAlign:"center",'fontSize':'90%'}}>Load Route</div>);
+    const providerButton = showProvider ? <Col sm={{ size: "auto" }}><WeatherProvider /></Col> : null;
 
-    render() {
-        const header = (<div style={{textAlign:"center",'fontSize':'90%'}}>Forecast and time estimate</div>);
-        const providerButton = this.props.showProvider?<Col sm={{size:"auto"}}><WeatherProvider/></Col>:null;
-
-        return (
-            <div>
-                <Card style={{borderTop: "none"}}>
-                    <CardBody>
-                        <CardTitle className='dlgTitle' tag='h6'>{header}</CardTitle>
+    return (
+        <div>
+            <Card style={{borderTop: "none"}}>
+                <CardBody>
+                    <CardTitle className='dlgTitle' tag='h6'>{header}</CardTitle>
                     <Form inline id="forecast_form">
                         <Row>
                             <Col>
-                                <DatePickerLoader/>
-                                <Recalculate/>
-                            </Col>
-                        </Row>
-                        <Row>
-                            <div style={{display: "flex"}}>
-                                <div style={{flex: 1, padding: "5px"}}>
-                                    <ForecastInterval/>
+                                <div style={{display: "flex", justifyContent: "center", alignItems: "center"}}>
+                                    {showPinnedRoutes ? null : 
+                                        <>
+                                            <div style={{flex: 1, padding: "5px"}}><RideWithGpsId /></div>
+                                            <div className="or-divider" style={{flex: 0.3, fontSize: "13px", textAlign: "center"}}>- OR -</div>
+                                        </>
+                                    }
+                                    <ErrorBoundary>
+                                        <div style={{flex: 1, padding: "5px"}}>
+                                            <PinnedRouteLoader
+                                                showPinnedRoutes={showPinnedRoutes}
+                                                setShowPinnedRoutes={setShowPinnedRoutes}
+                                            />
+                                        </div>
+                                    </ErrorBoundary>
+                                    <RwGpsTypeSelector visible={false}/>
+                                    {providerButton}
                                 </div>
-                                <div style={{flex: 1, padding: "5px"}}>
-                                    <RidingPace/>
-                                </div>
-                            </div>
-                        </Row>
-                        <Row>
-                            <Col>
-                            <div style={{display: "flex", justifyContent: "center", alignItems: "center"}}>
-                                {this.state.showPinnedRoutes ? null : 
-                                    <>
-                                        <div style={{flex: 1, padding: "5px"}}><RideWithGpsId /></div>
-                                        <div className="or-divider" style={{flex: 0.3, fontSize: "13px", textAlign: "center"}}>- OR -</div>
-                                    </>
-                                }
-                                <ErrorBoundary>
-                                    <div style={{flex: 1, padding: "5px"}}>
-                                        <PinnedRouteLoader
-                                            showPinnedRoutes={this.state.showPinnedRoutes}
-                                            setShowPinnedRoutes={(showPinnedRoutes) => this.setState({ showPinnedRoutes: showPinnedRoutes })}
-                                        />
-                                    </div>
-                                </ErrorBoundary>
-                                <RwGpsTypeSelector visible={false}/>
-                                {providerButton}
-                             </div>
                             </Col>
                         </Row>
                         <Row>
                             <ForecastButton/>
                         </Row>
-                        {RouteInfoForm.showErrorDetails(this.props.errorDetails)}
-                        {RouteInfoForm.showProgressSpinner(this.props.fetchingRoute)}
+                        {errorDetails !== null && <Alert style={{ padding: '10px' }} color="danger">{errorDetails}</Alert>}
+                        {fetchingRoute && <Spinner/>}
                     </Form>
                     <MediaQuery maxDeviceWidth={500}>
                         <div style={{marginTop: "10px", textAlign: "center"}}>
                             <ShortUrl/>
                         </div>
                     </MediaQuery>
-                    </CardBody>
-                </Card>
+                </CardBody>
+            </Card>
             <MediaQuery minDeviceWidth={501}>
                 <Container fluid={true}>
                     <Row className="justify-content-sm-between">
@@ -191,9 +125,8 @@ class RouteInfoForm extends Component {
                     </Row>
                 </Container>
             </MediaQuery>
-            </div>
-        );
-    }
+        </div>
+    );
 }
 
 const mapStateToProps = (state) =>
@@ -214,6 +147,22 @@ const mapDispatchToProps = {
     loadFromRideWithGps
 };
 
-export const decideValidationStateFor = RouteInfoForm.decideValidationStateFor;
-export const getRouteNumberFromValue = RouteInfoForm.getRouteNumberFromValue;
+RouteInfoForm.propTypes = {
+    rwgpsRoute:PropTypes.oneOfType([
+        PropTypes.number,
+        PropTypes.oneOf([''])
+    ]),
+    rwgpsRouteIsTrip: PropTypes.bool.isRequired,
+    controlPoints:PropTypes.arrayOf(PropTypes.object).isRequired,
+    fetchingRoute:PropTypes.bool,
+    errorDetails:PropTypes.string,
+    routeInfo:PropTypes.shape({name:PropTypes.string}),
+    loadFromRideWithGps:PropTypes.func.isRequired,
+    firstUse:PropTypes.bool.isRequired,
+    routeSelected:PropTypes.bool.isRequired,
+    needToViewTable: PropTypes.bool.isRequired,
+    showProvider: PropTypes.bool.isRequired,
+    routeProps:PropTypes.object
+};
+
 export default connect(mapStateToProps, mapDispatchToProps, null, {pure:true})(RouteInfoForm);

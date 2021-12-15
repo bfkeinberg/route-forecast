@@ -14,7 +14,7 @@ import ForecastSettings from "./ForecastSettings/ForecastSettings";
 const DesktopUI = ({showPacePerTme, mapsApiKey}) => {
     const sidePaneOptions = [
         {title: "Route Info", content: <ErrorBoundary><RouteInfoForm routeProps={{}} /></ErrorBoundary>},
-        {title: "Control Points", content: <ErrorBoundary><ForecastSettings/></ErrorBoundary>},
+        {title: "Forecast Settings", content: <ErrorBoundary><ForecastSettings/></ErrorBoundary>},
         {title: "Forecast", content: <ErrorBoundary>{showPacePerTme ? <PaceTable/> : <ForecastTable/>}</ErrorBoundary>}
     ]
     const [activeSidePane, setActiveSidePane] = useState(0)

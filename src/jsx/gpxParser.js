@@ -2,7 +2,7 @@
 import {finishTimeFormat} from './reducers/reducer';
 import { DateTime } from 'luxon';
 
-import {inputPaceToSpeed} from "./RouteInfoForm/RidingPace";
+import {inputPaceToSpeed} from "./ForecastSettings/RidingPace";
 import {getPowerOrVelocity} from "./windUtils";
 import {setMinMaxCoords} from "./actions/actions";
 

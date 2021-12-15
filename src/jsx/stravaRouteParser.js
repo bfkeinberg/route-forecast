@@ -1,7 +1,7 @@
 import queryString from 'query-string';
 import { Api } from 'rest-api-handler';
 import cookie from 'react-cookies';
-import {paceToSpeed} from './RouteInfoForm/RidingPace';
+import {paceToSpeed} from './ForecastSettings/RidingPace';
 import { DateTime } from 'luxon';
 
 const metersToMiles = 0.00062137;
