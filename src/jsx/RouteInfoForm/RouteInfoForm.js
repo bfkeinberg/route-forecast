@@ -2,7 +2,7 @@ import {Spinner} from '@blueprintjs/core';
 import {Alert, Form, Card, CardBody, CardTitle, Col, Row, Container} from 'reactstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import React, { useEffect } from 'react';
-import ShortUrl from '../ShortUrl';
+import ShortUrl from '../TopBar/ShortUrl';
 import MediaQuery from 'react-responsive';
 import PropTypes from 'prop-types';
 import {loadFromRideWithGps, saveCookie} from '../actions/actions';
