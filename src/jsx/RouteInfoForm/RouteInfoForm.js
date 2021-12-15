@@ -17,30 +17,6 @@ import PinnedRouteLoader from './PinnedRouteLoader.jsx';
 import ErrorBoundary from "../errorBoundary";
 import { formatControlsForUrl } from '../../util';
 
-export const getRouteNumberFromValue = (value) => {
-    if (value !== '' && value !== null) {
-        // is this just a number or a full url?
-        let route = parseInt(value);
-        if (isNaN(route)) {
-            route = value.split('/').map(part => parseInt(part)).find(val => !isNaN(val));
-        }
-        return route;
-    }
-    return value;
-}
-
-export const decideValidationStateFor = (type, methodUsed, loadingSuccess) => {
-    if (type === methodUsed) {
-        if (loadingSuccess) {
-            return {'valid':null};
-        } else {
-            return {'invalid':null};
-        }
-    } else {
-        return null;
-    }
-}
-
 const RouteInfoForm = ({ rwgpsRoute, rwgpsRouteIsTrip, controlPoints, fetchingRoute, errorDetails, routeInfo, loadFromRideWithGps, firstUse, routeSelected, needToViewTable, showProvider, routeProps }) => {
     const [showPinnedRoutes, setShowPinnedRoutes] = useState(false)
 

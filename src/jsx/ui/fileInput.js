@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import {Label, Input, FormGroup, UncontrolledTooltip, Row, Col} from 'reactstrap';
 import {connect} from 'react-redux';
 import {loadGpxRoute} from "../actions/actions";
-import {decideValidationStateFor} from "../routeInfoEntry";
+import { decideValidationStateFor } from '../RouteInfoForm/RideWithGpsId';
 
 const FileInput = ({loadingSource,loadingSuccess,loadGpxRoute}) => {
     const ok=decideValidationStateFor('gpx',loadingSource,loadingSuccess);

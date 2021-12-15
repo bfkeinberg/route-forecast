@@ -1,7 +1,7 @@
 import * as Actions from '../actions/actions';
 import {combineReducers} from 'redux';
 import { DateTime } from 'luxon';
-import RouteInfoForm from '../RouteInfoForm/RouteInfoForm';
+import { getRouteNumberFromValue } from '../RouteInfoForm/RideWithGpsId';
 
 export const finishTimeFormat = 'EEE, MMM dd yyyy h:mma';
 
@@ -23,7 +23,7 @@ export const routeParams = function(state = {interval:defaultIntervalInHours,pac
     switch (action.type) {
         case Actions.SET_RWGPS_ROUTE:
             if (action.route !== undefined) {
-                let route = RouteInfoForm.getRouteNumberFromValue(action.route);
+                let route = getRouteNumberFromValue(action.route);
                 return {
                     ...state,
                     rwgpsRoute: !isNaN(route) ? route : action.route,
@@ -246,7 +246,7 @@ const strava = function(state = {analysisInterval:defaultAnalysisIntervalInHours
         if (action.activity === undefined) {
             return state;
         }
-        let newValue = RouteInfoForm.getRouteNumberFromValue(action.activity);
+        let newValue = getRouteNumberFromValue(action.activity);
         return {
             ...state, activity: !isNaN(newValue) ? newValue : action.activity,
             activityData: null, activityStream: null, calculatedPaces: null, subrange: []

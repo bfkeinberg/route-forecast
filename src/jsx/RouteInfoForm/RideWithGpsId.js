@@ -4,7 +4,30 @@ import {Label, Input, FormGroup, UncontrolledTooltip} from 'reactstrap';
 import {connect} from 'react-redux';
 import {loadFromRideWithGps, setRwgpsRoute, newUserMode} from "../actions/actions";
 import cookie from 'react-cookies';
-import { getRouteNumberFromValue, decideValidationStateFor } from './RouteInfoForm';
+
+export const getRouteNumberFromValue = (value) => {
+    if (value !== '' && value !== null) {
+        // is this just a number or a full url?
+        let route = parseInt(value);
+        if (isNaN(route)) {
+            route = value.split('/').map(part => parseInt(part)).find(val => !isNaN(val));
+        }
+        return route;
+    }
+    return value;
+}
+
+export const decideValidationStateFor = (type, methodUsed, loadingSuccess) => {
+    if (type === methodUsed) {
+        if (loadingSuccess) {
+            return {'valid':null};
+        } else {
+            return {'invalid':null};
+        }
+    } else {
+        return null;
+    }
+}
 
 const RideWithGpsId = ({setRwgpsRoute,loadingSource,loadingSuccess,rwgpsRoute,rwgpsRouteIsTrip,loadFromRideWithGps,
                        newUserMode,firstUse}) => {
