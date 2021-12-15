@@ -1,0 +1,12 @@
+label.bp3-control.bp3-switch.always-filled-switch > span.bp3-control-indicator {
+  width: 50px;
+  transition: background-color 0.15s linear;
+}
+
+label.bp3-control.bp3-switch.always-filled-switch.checked > span.bp3-control-indicator {
+  background-color: rgb(234, 89, 41) !important;
+}
+
+label.bp3-control.bp3-switch.always-filled-switch.unchecked > span.bp3-control-indicator {
+  background-color: #106ba3 !important;
+}

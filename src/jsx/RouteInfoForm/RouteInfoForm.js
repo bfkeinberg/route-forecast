@@ -1,5 +1,5 @@
-import {Spinner} from '@blueprintjs/core';
-import {Alert, Form, Card, CardBody, CardTitle, Col, Row, Container} from 'reactstrap';
+import { Spinner } from '@blueprintjs/core';
+import {Alert, Form, Card, CardBody, CardTitle, Col, Row} from 'reactstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import React, { useEffect, useState } from 'react';
 import ShortUrl from '../TopBar/ShortUrl';
@@ -7,28 +7,31 @@ import MediaQuery from 'react-responsive';
 import PropTypes from 'prop-types';
 import {loadFromRideWithGps, saveCookie} from '../actions/actions';
 import {connect} from 'react-redux';
-import RideWithGpsId from './RideWithGpsId';
-import RwGpsTypeSelector from './RwGpsTypeSelector';
-import ForecastButton from './ForecastButton';
-import AnalysisButton from './AnalysisButton';
-import StravaDialog from './StravaDialog';
-import WeatherProvider from '../ui/providerSelector';
-import PinnedRouteLoader from './PinnedRouteLoader.jsx';
-import ErrorBoundary from "../errorBoundary";
 import { formatControlsForUrl } from '../../util';
+import { AlwaysFilledSwitch } from './AlwaysFilledSwitch';
+import { RouteInfoInputRWGPS } from './RouteInfoInputRWGPS';
+import { RouteInfoInputStrava } from './RouteInfoInputStrava';
+
+const routeLoadingModes = {
+    RWGPS: 1,
+    STRAVA: 2
+}
 
 const RouteInfoForm = ({ rwgpsRoute, rwgpsRouteIsTrip, controlPoints, fetchingRoute, errorDetails, routeInfo, loadFromRideWithGps, firstUse, routeSelected, needToViewTable, showProvider, routeProps }) => {
-    const [showPinnedRoutes, setShowPinnedRoutes] = useState(false)
+    const [mode, setMode] = useState(routeLoadingModes.RWGPS)
+    const modeSwitched = (event) => {
+        setMode(event.target.checked ? routeLoadingModes.STRAVA : routeLoadingModes.RWGPS)
+    }
 
     useEffect(() => {
         if (rwgpsRoute !== '') {
-            loadFromRideWithGps(rwgpsRoute, rwgpsRouteIsTrip);
+            // loadFromRideWithGps(rwgpsRoute, rwgpsRouteIsTrip);
         }
     }, [])
 
     useEffect(() => {
         if (rwgpsRoute !== '' && !routeSelected) {
-            loadFromRideWithGps(rwgpsRoute,rwgpsRouteIsTrip);
+            // loadFromRideWithGps(rwgpsRoute,rwgpsRouteIsTrip);
         }
     }, [rwgpsRoute, routeSelected, rwgpsRouteIsTrip])
     
@@ -48,7 +51,6 @@ const RouteInfoForm = ({ rwgpsRoute, rwgpsRouteIsTrip, controlPoints, fetchingRo
     }, [routeInfo.name, firstUse, controlPoints])
 
     const header = (<div style={{textAlign:"center",'fontSize':'90%'}}>Load Route</div>);
-    const providerButton = showProvider ? <Col sm={{ size: "auto" }}><WeatherProvider /></Col> : null;
 
     return (
         <div>
@@ -56,31 +58,10 @@ const RouteInfoForm = ({ rwgpsRoute, rwgpsRouteIsTrip, controlPoints, fetchingRo
                 <CardBody>
                     <CardTitle className='dlgTitle' tag='h6'>{header}</CardTitle>
                     <Form inline id="forecast_form">
-                        <Row>
-                            <Col>
-                                <div style={{display: "flex", justifyContent: "center", alignItems: "center"}}>
-                                    {showPinnedRoutes ? null : 
-                                        <>
-                                            <div style={{flex: 1, padding: "5px"}}><RideWithGpsId /></div>
-                                            <div className="or-divider" style={{flex: 0.3, fontSize: "13px", textAlign: "center"}}>- OR -</div>
-                                        </>
-                                    }
-                                    <ErrorBoundary>
-                                        <div style={{flex: 1, padding: "5px"}}>
-                                            <PinnedRouteLoader
-                                                showPinnedRoutes={showPinnedRoutes}
-                                                setShowPinnedRoutes={setShowPinnedRoutes}
-                                            />
-                                        </div>
-                                    </ErrorBoundary>
-                                    <RwGpsTypeSelector visible={false}/>
-                                    {providerButton}
-                                </div>
-                            </Col>
-                        </Row>
-                        <Row>
-                            <ForecastButton/>
-                        </Row>
+                        <RouteLoadingModeSelector mode={mode} setMode={setMode} modeSwitched={modeSwitched}/>
+                        {mode === routeLoadingModes.RWGPS ?
+                            <RouteInfoInputRWGPS showProvider={showProvider}/> :
+                            <RouteInfoInputStrava/>}
                         {errorDetails !== null && <Alert style={{ padding: '10px' }} color="danger">{errorDetails}</Alert>}
                         {fetchingRoute && <Spinner/>}
                     </Form>
@@ -91,18 +72,25 @@ const RouteInfoForm = ({ rwgpsRoute, rwgpsRouteIsTrip, controlPoints, fetchingRo
                     </MediaQuery>
                 </CardBody>
             </Card>
-            <MediaQuery minDeviceWidth={501}>
-                <Container fluid={true}>
-                    <Row className="justify-content-sm-between">
-                        <Col>
-                            <AnalysisButton/>
-                            <StravaDialog/>
-                        </Col>
-                    </Row>
-                </Container>
-            </MediaQuery>
         </div>
     );
+}
+
+const RouteLoadingModeSelector = ({mode, setMode, modeSwitched}) => {
+    return (
+        <>
+            <div>Load From</div>
+            <div style={{display: "flex", justifyContent: "center"}}>
+                <div style={{flex: 1, cursor: "pointer", display: "flex", justifyContent: "flex-end"}} onClick={() => setMode(routeLoadingModes.RWGPS)}>
+                    <div style={{width: "fit-content", borderBottom: mode === routeLoadingModes.RWGPS ? "1px solid #106ba3" : "1px solid #0000"}}>Ride with GPS</div>
+                </div>
+                <AlwaysFilledSwitch checked={mode === routeLoadingModes.STRAVA} onChange={modeSwitched} />
+                <div style={{flex: 1, cursor: "pointer"}} onClick={() => setMode(routeLoadingModes.STRAVA)}>
+                    <div style={{width: "fit-content", borderBottom: mode === routeLoadingModes.STRAVA ? "1px solid rgb(234, 89, 41)" : "1px solid #0000"}}>Strava</div>
+                </div>
+            </div>
+        </>
+    )
 }
 
 const mapStateToProps = (state) =>

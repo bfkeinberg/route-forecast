@@ -674,7 +674,7 @@ export const setAnalysisInterval = function(interval) {
 };
 
 const getStravaParser = async function() {
-    const parser = await import(/* webpackChunkName: "StravaRouteParser" */ '../stravaRouteParser');
+    const parser = await import(/* webpackChunkName: "StravaRouteParser" */ '../../stravaRouteParser');
     return parser.default;
 };
 

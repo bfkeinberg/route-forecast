@@ -4,7 +4,7 @@ import {Label, Form, Input, FormGroup, UncontrolledTooltip} from 'reactstrap';
 import {connect} from 'react-redux';
 import {setWeatherProvider} from "../actions/actions";
 
-const WeatherProvider = ({weatherProvider,setWeatherProvider}) => {
+const WeatherProviderSelector = ({weatherProvider,setWeatherProvider}) => {
     return (
             <FormGroup inline row size='sm'>
                 <UncontrolledTooltip target='provider' placement='bottom'>The weather provider to use for forecasts</UncontrolledTooltip>
@@ -20,7 +20,7 @@ const WeatherProvider = ({weatherProvider,setWeatherProvider}) => {
     );
 };
 
-WeatherProvider.propTypes = {
+WeatherProviderSelector.propTypes = {
     weatherProvider:PropTypes.string.isRequired,
     setWeatherProvider:PropTypes.func.isRequired
 };
@@ -34,5 +34,5 @@ const mapDispatchToProps = {
     setWeatherProvider
 };
 
-export default connect(mapStateToProps,mapDispatchToProps)(WeatherProvider);
+export default connect(mapStateToProps,mapDispatchToProps)(WeatherProviderSelector);
 

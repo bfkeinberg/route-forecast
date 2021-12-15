@@ -8,7 +8,7 @@ import cookie from 'react-cookies';
 import {lazy} from '@loadable/component';
 import { Button } from '@blueprintjs/core';
 
-const LoadableRouteList = lazy(() => import(/* webpackChunkName: "RouteList" */ '../ui/routeList'));
+const LoadableRouteList = lazy(() => import(/* webpackChunkName: "RouteList" */ './RWGPSRouteList'));
 
 export const saveRwgpsCredentials = (username, password) => {
     if ("credentials" in navigator && "PasswordCredential" in window) {

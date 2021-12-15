@@ -1,12 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {Container, UncontrolledTooltip} from 'reactstrap';
-import {connect} from 'react-redux';
-import {toggleStravaAnalysis} from "../actions/actions";
+import { Container, UncontrolledTooltip } from 'reactstrap';
+import { connect } from 'react-redux';
+import { toggleStravaAnalysis } from "../actions/actions";
 import Strava from 'Images/api_logo_pwrdBy_strava_stack_light.png';
-import {Button} from '@blueprintjs/core';
+import { Button } from '@blueprintjs/core';
 
-const AnalysisButton = ({stravaAnalysis,toggleStravaAnalysis}) => {
+const AnalysisButton = ({ stravaAnalysis, toggleStravaAnalysis }) => {
     let classes = 'pt-small pt-minimal';
     if (stravaAnalysis) {
         classes += ' pt-active';

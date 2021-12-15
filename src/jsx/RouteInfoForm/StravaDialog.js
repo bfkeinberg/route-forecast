@@ -1,12 +1,12 @@
-import {Button, Popover, PopoverHeader, PopoverBody, Alert} from 'reactstrap';
-import React, {Component} from 'react';
+import { Button, PopoverHeader, PopoverBody, Alert } from 'reactstrap';
+import React, { Component } from 'react';
 import ErrorBoundary from '../errorBoundary';
-import {Spinner} from '@blueprintjs/core';
+import { Spinner } from '@blueprintjs/core';
 import PropTypes from 'prop-types';
-import StravaRoute from '../StravaRoute';
-import AnalysisInterval from '../ui/analysisInterval';
-import {toggleStravaAnalysis,getPaceOverTime} from '../actions/actions';
-import {connect} from 'react-redux';
+import StravaRouteIdInput from './StravaRouteIdInput';
+import StravaAnalysisIntervalInput from './StravaAnalysisIntervalInput';
+import { toggleStravaAnalysis, getPaceOverTime } from '../actions/actions';
+import { connect } from 'react-redux';
 
 class StravaDialog extends Component {
     constructor(props) {
@@ -55,18 +55,14 @@ class StravaDialog extends Component {
     render() {
         return (
             <ErrorBoundary>
-                <Popover id='analysisControls' target={'enableAnalysis'} /*onClick={this.props.toggleStravaAnalysis}*/
-                         size="sm" isOpen={this.props.stravaAnalysis && this.state.mounted} placement='auto-end' hideArrow={true}
-                         delay={{show:0,hide:2}} offset={"[600,400]"}>
-                    <PopoverHeader className={'stravaDialogTitle'}>Analyze with Strava</PopoverHeader>
-                    <PopoverBody>
-                        <StravaRoute/>
-                        <AnalysisInterval visible={true}/>
-                        <Button disabled={this.props.disableAnalysis} outline onClick={this.props.getPaceOverTime}>Perform analysis</Button>
-                        <Alert isOpen={this.state.stravaAlertVisible}  color='warning'>{this.props.strava_error}</Alert>
-                        {StravaDialog.showProgressSpinner(this.props.fetchingFromStrava)}
-                    </PopoverBody>
-                </Popover>
+                <PopoverHeader className={'stravaDialogTitle'}>Analyze with Strava</PopoverHeader>
+                <PopoverBody>
+                    <StravaRouteIdInput/>
+                    <StravaAnalysisIntervalInput visible={true}/>
+                    {/* <Button disabled={this.props.disableAnalysis} outline onClick={this.props.getPaceOverTime}>Perform analysis</Button> */}
+                    <Alert isOpen={this.state.stravaAlertVisible}  color='warning'>{this.props.strava_error}</Alert>
+                    {StravaDialog.showProgressSpinner(this.props.fetchingFromStrava)}
+                </PopoverBody>
             </ErrorBoundary>
         );
     }

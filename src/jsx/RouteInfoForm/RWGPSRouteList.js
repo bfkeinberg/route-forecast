@@ -20,7 +20,7 @@ const renderFavorite = (favorite, { handleClick, modifiers }) => {
     );
 };
 
-const RouteList = ({pinnedRoutes, setRwgpsRoute, route_id, loadFromRideWithGps, setFetchAfterLoad, setRouteIsTrip}) => {
+const RWGPSRouteList = ({pinnedRoutes, setRwgpsRoute, route_id, loadFromRideWithGps, setFetchAfterLoad, setRouteIsTrip}) => {
     return (
             <Select
                         items={pinnedRoutes}
@@ -39,7 +39,7 @@ const RouteList = ({pinnedRoutes, setRwgpsRoute, route_id, loadFromRideWithGps, 
     </Select>)
 }
 
-RouteList.propTypes = {
+RWGPSRouteList.propTypes = {
     setRwgpsRoute:PropTypes.func.isRequired,
     pinnedRoutes:PropTypes.arrayOf(PropTypes.shape({
         id: PropTypes.number,
@@ -47,9 +47,9 @@ RouteList.propTypes = {
         associated_object_id: PropTypes.number
     })),
     route_id:PropTypes.oneOfType([
-PropTypes.number,
-PropTypes.string
-]),
+        PropTypes.number,
+        PropTypes.string
+    ]),
     loadFromRideWithGps:PropTypes.func.isRequired,
     setFetchAfterLoad:PropTypes.func.isRequired,
     setRouteIsTrip:PropTypes.func.isRequired
@@ -65,4 +65,4 @@ const mapDispatchToProps = {
     setRwgpsRoute, loadFromRideWithGps, setFetchAfterLoad, setRouteIsTrip
 };
 
-export default connect(mapStateToProps,mapDispatchToProps)(RouteList);
+export default connect(mapStateToProps,mapDispatchToProps)(RWGPSRouteList);
