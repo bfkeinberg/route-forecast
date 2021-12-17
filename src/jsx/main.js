@@ -278,7 +278,7 @@ const mapDispatchToProps = {
 
 const mapStateToProps = (state) =>
     ({
-        showPacePerTme:state.controls.stravaAnalysis && state.strava.calculatedPaces !== null,
+        showPacePerTme:state.controls.stravaAnalysis,
         rwgpsRouteIsTrip: state.uiInfo.routeParams.rwgpsRouteIsTrip,
         firstUse: state.params.newUserMode
     });

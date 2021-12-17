@@ -1,5 +1,4 @@
 import ErrorBoundary from "./errorBoundary";
-import PaceTable from "./paceTable";
 import ForecastTable from "./forecastTable";
 import MapLoader from "./mapLoader";
 import PropTypes from "prop-types";
@@ -7,6 +6,7 @@ import React, { useState } from "react";
 import RouteInfoForm from "./RouteInfoForm/RouteInfoForm";
 import ForecastSettings from "./ForecastSettings/ForecastSettings";
 import { TopBar } from "./TopBar/TopBar";
+import PaceTable from "./resultsTab/PaceTable";
 
 const DesktopUI = ({showPacePerTme, mapsApiKey}) => {
     const sidePaneOptions = [
@@ -43,8 +43,8 @@ export default DesktopUI;
 
 const Sidebar = ({sidePaneOptions, activeSidePane, sidebarWidth}) => {
     return (
-        sidePaneOptions.map(({content}, index) =>
-            <div style={{display: index !== activeSidePane ? "none" : "", width: `${sidebarWidth}px`}}>
+        sidePaneOptions.map(({title, content}, index) =>
+            <div key={title} style={{display: index !== activeSidePane ? "none" : "", width: `${sidebarWidth}px`}}>
                 {content}
             </div>
         )

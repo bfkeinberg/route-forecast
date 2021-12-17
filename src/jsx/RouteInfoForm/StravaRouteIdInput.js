@@ -18,7 +18,7 @@ const StravaRouteIdInput = ({ setStravaActivity, strava_activity, updateExpected
                                 dt.items[i].getAsString(value => {
                                     setStravaActivity(value);
                                     if (strava_activity !== '') {
-                                        //updateExpectedTimes(strava_activity);
+                                        updateExpectedTimes(strava_activity);
                                     }
                                 });
                             } else {
@@ -43,15 +43,20 @@ const StravaRouteIdInput = ({ setStravaActivity, strava_activity, updateExpected
                         }
                     }
                 }}
-                value={strava_activity} onChange={event => { setStravaActivity(event.target.value) }}
+                value={strava_activity}
+                onChange={event => { setStravaActivity(event.target.value) }}
                 onFocus={() => {
                     if (canAnalyze) {
+                        // TODO
+                        // i suspect this is here as a mechanism to automatially begin fetching if linked to with a premade url
+                        // but this feels not ideal to me, making that functionality rely on the focus details of a random text input deep in the component tree
+                        // should think about better ways of doing this
                         //updateExpectedTimes(strava_activity)
                     } else {
                         console.log('gained focus but not acting')
                     }
                 }}
-                onBlur={() => { if (strava_activity !== '') { /*updateExpectedTimes(strava_activity)*/ } }} />
+                onBlur={() => { if (strava_activity !== '') { updateExpectedTimes(strava_activity) } }} />
         </FormGroup>
     );
 };

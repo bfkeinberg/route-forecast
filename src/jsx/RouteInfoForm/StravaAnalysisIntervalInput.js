@@ -1,10 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {Label, Input, FormGroup, UncontrolledTooltip} from 'reactstrap';
-import {connect} from 'react-redux';
-import {setAnalysisInterval,getPaceOverTime} from "../actions/actions";
+import { Label, Input, FormGroup, UncontrolledTooltip } from 'reactstrap';
+import { connect } from 'react-redux';
+import { setAnalysisInterval } from "../actions/actions";
 
-const StravaAnalysisIntervalInput = ({interval,setInterval,visible,getPaceOverTime}) => {
+const StravaAnalysisIntervalInput = ({ interval, setInterval, visible }) => {
     const interval_tooltip_text = 'Interval in hours at which to calculate effective pace';
     const isVisible = visible ? 'inline-flex' : 'none';
     return (
@@ -12,7 +12,7 @@ const StravaAnalysisIntervalInput = ({interval,setInterval,visible,getPaceOverTi
             <UncontrolledTooltip placement="bottom" target='analysisInterval'>{interval_tooltip_text}</UncontrolledTooltip>
             <Label>Analysis Interval
                 <Input id='analysisInterval' type="select" value={interval} name="analysisInterval"
-                             onChange={event => {setInterval(event.target.value);/*getPaceOverTime()*/}}>
+                    onChange={event => { setInterval(event.target.value); }}>
                     <option value="1">1 hour</option>
                     <option value="2">2 hours</option>
                     <option value="4">4 hours</option>
@@ -29,8 +29,7 @@ const StravaAnalysisIntervalInput = ({interval,setInterval,visible,getPaceOverTi
 StravaAnalysisIntervalInput.propTypes = {
     interval:PropTypes.number.isRequired,
     setInterval:PropTypes.func.isRequired,
-    visible:PropTypes.bool.isRequired,
-    getPaceOverTime:PropTypes.func.isRequired
+    visible:PropTypes.bool.isRequired
 };
 
 const mapStateToProps = (state) =>
@@ -39,7 +38,7 @@ const mapStateToProps = (state) =>
     });
 
 const mapDispatchToProps = {
-    setInterval:setAnalysisInterval, getPaceOverTime
+    setInterval:setAnalysisInterval
 };
 
 export default connect(mapStateToProps,mapDispatchToProps)(StravaAnalysisIntervalInput);

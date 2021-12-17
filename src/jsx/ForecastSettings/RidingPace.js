@@ -95,7 +95,7 @@ const RidingPace = ({pace,actualPace,setPace,metric}) => {
             <Input tabIndex='3' type="select" value={pace} name="pace"
                 id='paceInput' onChange={event => {saveCookie("pace",event.target.value);setPace(event.target.value)}}>
                 {dropdownValues.values.map(({name, number}) =>
-                    <option value={name}>{number} {dropdownValues.label}</option>
+                    <option key={name} value={name}>{number} {dropdownValues.label}</option>
                 )}
             </Input>
         </FormGroup>

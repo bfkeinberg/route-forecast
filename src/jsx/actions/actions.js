@@ -730,30 +730,6 @@ export const loadStravaActivity = function(activity) {
     }
 };
 
-export const SET_PACE_OVER_TIME = 'SET_PACE_OVER_TIME';
-export const setPaceOverTime = function(calculatedPaces) {
-    return {
-        type: SET_PACE_OVER_TIME,
-        calculatedPaces: calculatedPaces
-    };
-};
-
-export const getPaceOverTime = function() {
-    return async function (dispatch,getState) {
-        if (getState().strava.activityData===null) {
-            console.log('returning from getPaceOverTime because no activity data');
-            return;
-        }
-        const parser = await getStravaParser().catch((err) => {dispatch(stravaFetchFailure(err));return null});
-        // handle failed load, error has already been dispatched
-        if (parser == null) {
-            return Promise.resolve(Error('Cannot load parser'));
-        }
-        return dispatch(setPaceOverTime(parser.findMovingAverages(getState().strava.activityData,
-            getState().strava.activityStream, getState().strava.analysisInterval)));
-    }
-};
-
 const getPointsFromStrava = (activityStream) => {
     let latlng = activityStream.latlng;
     let distance = activityStream.distance;
@@ -780,7 +756,6 @@ export const updateExpectedTimes = function(activity) {
             dispatch(setActualPace(timesFromData.actualPace));
             dispatch(setActualFinishTime(timesFromData.actualFinishTime));
             dispatch(setRoutePointsAndBounds(getPointsFromStrava(getState().strava.activityStream)));
-            return dispatch(getPaceOverTime());
         }, error => {
             dispatch(stravaFetchFailure(error));
             dispatch(setStravaToken(null, null))

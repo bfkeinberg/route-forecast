@@ -1,5 +1,5 @@
 import ErrorBoundary from "./errorBoundary";
-import PaceTable from "./paceTable";
+import PaceTable from "./resultsTab/PaceTable";
 import ForecastTable from "./forecastTable";
 import MapLoader from "./mapLoader";
 import PropTypes from "prop-types";
@@ -64,7 +64,7 @@ MobileUI.propTypes = {
 
 const mapStateToProps = (state) =>
     ({
-        showPacePerTme:state.controls.stravaAnalysis && state.strava.calculatedPaces !== null,
+        showPacePerTme:state.controls.stravaAnalysis,
         needToViewTable:state.forecast.valid && !state.forecast.tableViewed,
         needToViewMap:state.forecast.valid && !state.forecast.mapViewed
     });

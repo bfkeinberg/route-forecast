@@ -16,7 +16,6 @@ const bannedActionKeys = [
     'gpxRouteData',
     'data',
     'arrivalTimes',
-    'calculatedPaces',
     'bitlyToken'
 ];
 
