@@ -8,6 +8,7 @@ import fetchMock from 'fetch-mock';
 import * as actions from '../src/jsx/actions/actions';
 import rootReducer from "../src/jsx/reducers/reducer";
 import { DateTime } from 'luxon';
+import { routeLoadingModes } from '../src/data/enums';
 
 const middlewares = [thunk];
 const mockStore = configureMockStore(middlewares);
@@ -520,7 +521,6 @@ describe('request forecast', () => {
             controls:{
                 "metric": false,
                 "displayBanked": false,
-                "stravaAnalysis": false,
                 "userControlPoints": [
                     {
                         "name": "Pass 1",
@@ -598,7 +598,8 @@ describe('request forecast', () => {
                     "start": DateTime.fromSeconds(1531566000, {zone:'America/Los_Angeles'}),
                     "timeZoneId": 'America/Los_Angeles',
                     "loadingSource": null,
-                    "succeeded": null
+                    "succeeded": null,
+                    "routeLoadingMode": routeLoadingModes.RWGPS
                 },
                 "dialogParams": {
                     "formVisible": false,

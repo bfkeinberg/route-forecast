@@ -2,6 +2,7 @@ import * as Actions from '../actions/actions';
 import {combineReducers} from 'redux';
 import { DateTime } from 'luxon';
 import { getRouteNumberFromValue } from '../RouteInfoForm/RideWithGpsId';
+import { routeLoadingModes } from '../../data/enums';
 
 export const finishTimeFormat = 'EEE, MMM dd yyyy h:mma';
 
@@ -18,8 +19,15 @@ const initialStartTime = function() {
     return now;
 };
 
-export const routeParams = function(state = {interval:defaultIntervalInHours,pace:defaultPace,rwgpsRoute:'',
-    rwgpsRouteIsTrip:false, start:initialStartTime(), initialStart:initialStartTime()}, action) {
+export const routeParams = function(state = {
+    interval: defaultIntervalInHours,
+    pace: defaultPace,
+    rwgpsRoute: '',
+    rwgpsRouteIsTrip: false,
+    start: initialStartTime(),
+    initialStart: initialStartTime(),
+    routeLoadingMode: routeLoadingModes.RWGPS
+}, action) {
     switch (action.type) {
         case Actions.SET_RWGPS_ROUTE:
             if (action.route !== undefined) {
@@ -83,6 +91,8 @@ export const routeParams = function(state = {interval:defaultIntervalInHours,pac
             return {...state,rwgpsRouteIsTrip:action.isTrip}
         case Actions.BEGIN_FETCHING_FORECAST:
             return {...state,initialStart:state.start}
+        case Actions.SET_ROUTE_LOADING_MODE:
+            return {...state, routeLoadingMode: action.newMode};
         default:
             return state;
     }
@@ -160,7 +170,7 @@ const routeInfo = function(state = {finishTime:'',initialFinishTime:'',weatherCo
     }
 };
 
-export const controls = function(state = {metric:false,displayBanked:false,stravaAnalysis:false,
+export const controls = function(state = {metric:false,displayBanked:false,
     userControlPoints:[],calculatedControlValues:[],initialControlValues:[], count:0,displayedFinishTime:'',
     queryString:null, showWeatherProvider:false}, action) {
     switch (action.type) {
@@ -174,8 +184,6 @@ export const controls = function(state = {metric:false,displayBanked:false,strav
             return {...state, metric: !state.metric};
         case Actions.TOGGLE_DISPLAY_BANKED:
             return {...state, displayBanked: !state.displayBanked};
-        case Actions.TOGGLE_STRAVA_ANALYSIS:
-            return {...state, stravaAnalysis: !state.stravaAnalysis};
         case Actions.UPDATE_USER_CONTROLS:
             return {...state, userControlPoints: action.controls, count: action.controls.length};
         case Actions.UPDATE_CALCULATED_VALUES:

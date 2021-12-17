@@ -14,7 +14,7 @@ describe('controls reducer', () => {
     it('should return the initial state', () => {
         expect(controls(undefined,{})).toEqual(
             {
-                metric:false,displayBanked:false,stravaAnalysis:false,
+                metric:false,displayBanked:false,
                 userControlPoints:[],initialControlValues:[], calculatedControlValues:[],count:0,displayedFinishTime:'',queryString:null,
                 showWeatherProvider:false
             }
@@ -23,7 +23,7 @@ describe('controls reducer', () => {
 
     it('should handle SET_ROUTE_INFO', () => {
         expect(controls( {
-            metric:false,displayBanked:false,stravaAnalysis:false,
+            metric:false,displayBanked:false,
             userControlPoints:[],calculatedControlValues:[],initialControlValues:[],count:0,displayedFinishTime:'',queryString:null
         },
             {
@@ -314,7 +314,6 @@ describe('controls reducer', () => {
                 ],
                 metric:false,
                 displayBanked:false,
-                stravaAnalysis:false,
                 count:0,
                 queryString:null,
                 userControlPoints:[],
@@ -471,7 +470,6 @@ describe('controls reducer', () => {
                 ],
                 metric:false,
                 displayBanked:false,
-                stravaAnalysis:false,
                 count:0,
                 queryString:null,
                 userControlPoints:[],
@@ -699,7 +697,6 @@ describe('controls reducer', () => {
                 ],
                 metric:false,
                 displayBanked:false,
-                stravaAnalysis:false,
                 count:0,
                 queryString:null,
                 userControlPoints:[],

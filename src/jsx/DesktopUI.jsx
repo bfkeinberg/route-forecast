@@ -8,11 +8,11 @@ import ForecastSettings from "./ForecastSettings/ForecastSettings";
 import { TopBar } from "./TopBar/TopBar";
 import PaceTable from "./resultsTab/PaceTable";
 
-const DesktopUI = ({showPacePerTme, mapsApiKey}) => {
+const DesktopUI = ({showPaceTable, mapsApiKey}) => {
     const sidePaneOptions = [
         {title: "Route Info", content: <ErrorBoundary><RouteInfoForm routeProps={{}} /></ErrorBoundary>},
         {title: "Forecast Settings", content: <ErrorBoundary><ForecastSettings/></ErrorBoundary>},
-        {title: "Forecast", content: <ErrorBoundary>{showPacePerTme ? <PaceTable/> : <ForecastTable/>}</ErrorBoundary>}
+        {title: "Forecast", content: <ErrorBoundary>{showPaceTable ? <PaceTable/> : <ForecastTable/>}</ErrorBoundary>}
     ]
     const [activeSidePane, setActiveSidePane] = useState(0)
 
@@ -35,7 +35,7 @@ const DesktopUI = ({showPacePerTme, mapsApiKey}) => {
 };
 
 DesktopUI.propTypes = {
-    showPacePerTme: PropTypes.bool,
+    showPaceTable: PropTypes.bool,
     mapsApiKey: PropTypes.string
 };
 

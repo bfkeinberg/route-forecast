@@ -9,6 +9,7 @@ import { createSelector } from 'reselect';
 import {formatTemperature} from "./forecastTable";
 // import {withRouter} from 'react-router-dom';
 import {setMapViewed} from "./actions/actions";
+import { routeLoadingModes } from '../data/enums';
 
 /*global google*/
 const arrow = "M16.317,32.634c-0.276,0-0.5-0.224-0.5-0.5V0.5c0-0.276,0.224-0.5,0.5-0.5s0.5,0.224,0.5,0.5v31.634\n" +
@@ -30,7 +31,7 @@ class RouteForecastMap extends Component {
         subrange:PropTypes.arrayOf(PropTypes.number),
         google:PropTypes.object,
         metric:PropTypes.bool.isRequired,
-        stravaAnalysis:PropTypes.bool.isRequired,
+        routeLoadingMode:PropTypes.number.isRequired,
         setMapViewed:PropTypes.func.isRequired,
         zoomToRange:PropTypes.bool.isRequired
     };
@@ -173,7 +174,7 @@ class RouteForecastMap extends Component {
         return (
             <ErrorBoundary>
                 <div id="map" style={{'height':'95%'}}>
-                    {(this.props.forecast.length > 0 || this.props.stravaAnalysis) && this.props.bounds !== null ?
+                    {(this.props.forecast.length > 0 || this.props.routeLoadingMode === routeLoadingModes.STRAVA) && this.props.bounds !== null ?
                         <Map google={this.props.google}
                              mapType={'ROADMAP'} scaleControl={true} bounds={mapBounds}
                              initialCenter={(mapCenter === null || mapCenter === undefined) ? undefined : mapCenter.toJSON()}
@@ -209,8 +210,8 @@ const mapStateToProps = (state) =>
         points:getPointsState(state),
         controls: state.controls.calculatedControlValues,
         controlNames: state.controls.userControlPoints.map(control => control.name),
-        subrange: state.controls.stravaAnalysis ? state.strava.subrange : state.forecast.range,
-        stravaAnalysis: state.controls.stravaAnalysis,
+        subrange: state.uiInfo.routeParams.routeLoadingMode === routeLoadingModes.STRAVA ? state.strava.subrange : state.forecast.range,
+        routeLoadingMode: state.uiInfo.routeParams.routeLoadingMode,
         metric: state.controls.metric,
         zoomToRange: state.forecast.zoomToRange
     });

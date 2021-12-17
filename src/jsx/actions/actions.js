@@ -552,10 +552,11 @@ export const toggleDisplayBanked = function() {
     };
 };
 
-export const TOGGLE_STRAVA_ANALYSIS = 'TOGGLE_STRAVA_ANALYSIS';
-export const toggleStravaAnalysis = function() {
+export const SET_ROUTE_LOADING_MODE = 'SET_ROUTE_LOADING_MODE';
+export const setRouteLoadingMode = function(newMode) {
     return {
-        type: TOGGLE_STRAVA_ANALYSIS
+        type: SET_ROUTE_LOADING_MODE,
+        newMode
     };
 };
 

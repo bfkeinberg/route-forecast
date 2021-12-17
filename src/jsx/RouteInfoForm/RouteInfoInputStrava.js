@@ -1,14 +1,14 @@
 
 import React from 'react';
-import AnalysisButton from './AnalysisButton';
 import StravaDialog from './StravaDialog';
+import stravaImage from 'Images/api_logo_pwrdBy_strava_stack_light.png';
 
 export const RouteInfoInputStrava = ({}) => {
 
   return (
     <>
-      <AnalysisButton/>
       <StravaDialog/>
+      <img id='stravaImage' src={stravaImage}/>
     </>
   )
 }

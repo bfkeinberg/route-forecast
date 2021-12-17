@@ -5,7 +5,6 @@ import { Spinner } from '@blueprintjs/core';
 import PropTypes from 'prop-types';
 import StravaRouteIdInput from './StravaRouteIdInput';
 import StravaAnalysisIntervalInput from './StravaAnalysisIntervalInput';
-import { toggleStravaAnalysis } from '../actions/actions';
 import { connect } from 'react-redux';
 
 class StravaDialog extends Component {
@@ -20,9 +19,7 @@ class StravaDialog extends Component {
 
     static propTypes = {
         strava_error: PropTypes.string,
-        fetchingFromStrava:PropTypes.bool,
-        stravaAnalysis: PropTypes.bool.isRequired,
-        toggleStravaAnalysis: PropTypes.func.isRequired
+        fetchingFromStrava:PropTypes.bool
     };
 
     static showProgressSpinner(running) {
@@ -68,12 +65,10 @@ class StravaDialog extends Component {
 const mapStateToProps = (state) =>
     ({
         strava_error: state.strava.errorDetails,
-        stravaAnalysis: state.controls.stravaAnalysis,
         fetchingFromStrava: state.strava.fetching
     });
 
 const mapDispatchToProps = {
-    toggleStravaAnalysis
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(StravaDialog);

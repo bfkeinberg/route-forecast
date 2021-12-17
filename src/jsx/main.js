@@ -28,7 +28,7 @@ import {
     setStravaActivity,
     setStravaError,
     setStravaToken,
-    toggleStravaAnalysis,
+    setRouteLoadingMode,
     updateUserControls,
     setStravaRefreshToken,
     setWeatherProvider,
@@ -38,6 +38,7 @@ import {
     setZoomToRange
 } from "./actions/actions";
 import QueryString from './queryString';
+import { routeLoadingModes } from '../data/enums';
 
 const demoRoute = 1797453;
 const demoControls = [
@@ -66,9 +67,9 @@ export class RouteWeatherUI extends Component {
         setActionUrl:PropTypes.func.isRequired,
         setApiKeys:PropTypes.func.isRequired,
         updateControls:PropTypes.func.isRequired,
-        showPacePerTme:PropTypes.bool.isRequired,
+        showPaceTable:PropTypes.bool.isRequired,
         setFetchAfterLoad:PropTypes.func.isRequired,
-        toggleStravaAnalysis: PropTypes.func.isRequired,
+        setRouteLoadingMode: PropTypes.func.isRequired,
         loadFromRideWithGps: PropTypes.func.isRequired,
         rwgpsRouteIsTrip: PropTypes.bool.isRequired,
         reset: PropTypes.func.isRequired,
@@ -238,7 +239,7 @@ export class RouteWeatherUI extends Component {
         props.setStravaActivity(queryParams.strava_activity);
         props.setStravaError(queryParams.strava_error);
         if (queryParams.strava_analysis !== undefined) {
-            props.toggleStravaAnalysis();
+            props.setRouteLoadingMode(routeLoadingModes.STRAVA);
         }
         if (queryParams.provider !== undefined) {
             props.setWeatherProvider(queryParams.provider);
@@ -257,7 +258,7 @@ export class RouteWeatherUI extends Component {
             {/*TODO: values is needed for SSR, but messes up real device detection, seemingly*/}
             {/*<MediaQuery minDeviceWidth={1000} values={{deviceWidth:1400}}>*/}
             <MediaQuery minWidth={501}>
-                <DesktopUI showPacePerTme={this.props.showPacePerTme}
+                <DesktopUI showPaceTable={this.props.showPaceTable}
                            mapsApiKey={this.props.maps_api_key}/>
             </MediaQuery>
             {/*<MediaQuery maxDeviceWidth={800} values={{deviceWidth:1400}}>*/}
@@ -271,14 +272,14 @@ export class RouteWeatherUI extends Component {
 
 const mapDispatchToProps = {
     setStravaToken, setActionUrl, setRwgpsRoute, setApiKeys, setStravaError, setInitialStart, setPace, setInterval, setMetric,
-    setStravaActivity, updateControls:updateUserControls, setFetchAfterLoad, toggleStravaAnalysis, setStravaRefreshToken,
+    setStravaActivity, updateControls:updateUserControls, setFetchAfterLoad, setRouteLoadingMode, setStravaRefreshToken,
     loadFromRideWithGps, reset, newUserMode, setWeatherProvider, showWeatherProvider, setRwgpsCredentials, setStartTimestamp,
     setZoomToRange
 };
 
 const mapStateToProps = (state) =>
     ({
-        showPacePerTme:state.controls.stravaAnalysis,
+        showPaceTable:state.uiInfo.routeParams.routeLoadingMode === routeLoadingModes.STRAVA,
         rwgpsRouteIsTrip: state.uiInfo.routeParams.rwgpsRouteIsTrip,
         firstUse: state.params.newUserMode
     });

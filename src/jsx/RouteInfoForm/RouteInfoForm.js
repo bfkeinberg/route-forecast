@@ -1,26 +1,23 @@
 import { Spinner } from '@blueprintjs/core';
-import {Alert, Form, Card, CardBody, CardTitle, Col, Row} from 'reactstrap';
+import {Alert, Form, Card, CardBody, CardTitle} from 'reactstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import ShortUrl from '../TopBar/ShortUrl';
 import MediaQuery from 'react-responsive';
 import PropTypes from 'prop-types';
-import {loadFromRideWithGps, saveCookie} from '../actions/actions';
+import {loadFromRideWithGps, saveCookie, setRouteLoadingMode} from '../actions/actions';
 import {connect} from 'react-redux';
 import { formatControlsForUrl } from '../../util';
 import { AlwaysFilledSwitch } from './AlwaysFilledSwitch';
 import { RouteInfoInputRWGPS } from './RouteInfoInputRWGPS';
 import { RouteInfoInputStrava } from './RouteInfoInputStrava';
+import { routeLoadingModes } from '../../data/enums';
 
-const routeLoadingModes = {
-    RWGPS: 1,
-    STRAVA: 2
-}
-
-const RouteInfoForm = ({ rwgpsRoute, rwgpsRouteIsTrip, controlPoints, fetchingRoute, errorDetails, routeInfo, loadFromRideWithGps, firstUse, routeSelected, needToViewTable, showProvider, routeProps }) => {
-    const [mode, setMode] = useState(routeLoadingModes.RWGPS)
+const RouteInfoForm = ({ rwgpsRoute, rwgpsRouteIsTrip, controlPoints, fetchingRoute, errorDetails, routeInfo, firstUse, routeSelected, needToViewTable, showProvider, routeProps, routeLoadingMode, setRouteLoadingMode, loadFromRideWithGps }) => {
+    const mode = routeLoadingMode
+    console.log(mode)
     const modeSwitched = (event) => {
-        setMode(event.target.checked ? routeLoadingModes.STRAVA : routeLoadingModes.RWGPS)
+        setRouteLoadingMode(event.target.checked ? routeLoadingModes.STRAVA : routeLoadingModes.RWGPS)
     }
 
     useEffect(() => {
@@ -58,7 +55,7 @@ const RouteInfoForm = ({ rwgpsRoute, rwgpsRouteIsTrip, controlPoints, fetchingRo
                 <CardBody>
                     <CardTitle className='dlgTitle' tag='h6'>{header}</CardTitle>
                     <Form inline id="forecast_form">
-                        <RouteLoadingModeSelector mode={mode} setMode={setMode} modeSwitched={modeSwitched}/>
+                        <RouteLoadingModeSelector mode={mode} setMode={setRouteLoadingMode} modeSwitched={modeSwitched}/>
                         {mode === routeLoadingModes.RWGPS ?
                             <RouteInfoInputRWGPS showProvider={showProvider}/> :
                             <RouteInfoInputStrava/>}
@@ -98,35 +95,39 @@ const mapStateToProps = (state) =>
         rwgpsRoute: state.uiInfo.routeParams.rwgpsRoute,
         rwgpsRouteIsTrip: state.uiInfo.routeParams.rwgpsRouteIsTrip,
         fetchingRoute: state.uiInfo.dialogParams.fetchingRoute,
-        errorDetails:state.uiInfo.dialogParams.errorDetails,
-        routeInfo:state.routeInfo,
-        controlPoints:state.controls.userControlPoints,
+        errorDetails: state.uiInfo.dialogParams.errorDetails,
+        routeInfo: state.routeInfo,
+        controlPoints: state.controls.userControlPoints,
         firstUse: state.params.newUserMode,
         routeSelected: state.uiInfo.dialogParams.loadingSource !== null,
-        needToViewTable:state.forecast.valid && !state.forecast.tableViewed,
-        showProvider:state.controls.showWeatherProvider,
+        needToViewTable: state.forecast.valid && !state.forecast.tableViewed,
+        showProvider: state.controls.showWeatherProvider,
+        routeLoadingMode: state.uiInfo.routeParams.routeLoadingMode
     });
 
 const mapDispatchToProps = {
-    loadFromRideWithGps
+    loadFromRideWithGps,
+    setRouteLoadingMode
 };
 
 RouteInfoForm.propTypes = {
-    rwgpsRoute:PropTypes.oneOfType([
+    rwgpsRoute: PropTypes.oneOfType([
         PropTypes.number,
         PropTypes.oneOf([''])
     ]),
     rwgpsRouteIsTrip: PropTypes.bool.isRequired,
-    controlPoints:PropTypes.arrayOf(PropTypes.object).isRequired,
-    fetchingRoute:PropTypes.bool,
-    errorDetails:PropTypes.string,
-    routeInfo:PropTypes.shape({name:PropTypes.string}),
-    loadFromRideWithGps:PropTypes.func.isRequired,
-    firstUse:PropTypes.bool.isRequired,
-    routeSelected:PropTypes.bool.isRequired,
+    controlPoints: PropTypes.arrayOf(PropTypes.object).isRequired,
+    fetchingRoute: PropTypes.bool,
+    errorDetails: PropTypes.string,
+    routeInfo: PropTypes.shape({ name: PropTypes.string }),
+    firstUse: PropTypes.bool.isRequired,
+    routeSelected: PropTypes.bool.isRequired,
     needToViewTable: PropTypes.bool.isRequired,
     showProvider: PropTypes.bool.isRequired,
-    routeProps:PropTypes.object
+    routeProps: PropTypes.object,
+    routeLoadingMode: PropTypes.number,
+    loadFromRideWithGps: PropTypes.func.isRequired,
+    setRouteLoadingMode: PropTypes.func.isRequired,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps, null, {pure:true})(RouteInfoForm);

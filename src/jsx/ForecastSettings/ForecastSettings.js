@@ -24,7 +24,6 @@ class ControlPoints extends Component {
         displayBanked:PropTypes.bool.isRequired,
         fetchingFromStrava:PropTypes.bool,
         toggleDisplayBanked:PropTypes.func.isRequired,
-        stravaAnalysis: PropTypes.bool.isRequired,
         hasControls:PropTypes.bool.isRequired
     };
 
@@ -84,7 +83,6 @@ const mapStateToProps = (state) =>
         calculatedValues: state.controls.calculatedValues,
         name: state.routeInfo.name,
         displayBanked: state.controls.displayBanked,
-        stravaAnalysis: state.controls.stravaAnalysis,
         fetchingFromStrava: state.strava.fetching,
         hasStravaData: state.strava.activityData !== null
     });

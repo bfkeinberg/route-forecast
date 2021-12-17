@@ -7,6 +7,7 @@ import thunk from 'redux-thunk';
 import fetchMock from 'fetch-mock';
 import * as actions from '../src/jsx/actions/actions';
 import rootReducer from "../src/jsx/reducers/reducer";
+import { routeLoadingModes } from '../src/data/enums';
 
 const middlewares = [thunk];
 const mockStore = configureMockStore(middlewares);
@@ -38,7 +39,8 @@ describe('load route from Ride with GPS', () => {
                     "rwgpsRouteIsTrip": false,
                     "start": "2018-08-04T14:00:00.000Z",
                     "loadingSource": null,
-                    "succeeded": null
+                    "succeeded": null,
+                    "routeLoadingMode": routeLoadingModes.RWGPS
                 },
                 "dialogParams": {
                     "formVisible": true,
@@ -65,7 +67,6 @@ describe('load route from Ride with GPS', () => {
             "controls": {
                 "metric": false,
                 "displayBanked": false,
-                "stravaAnalysis": false,
                 "userControlPoints": [],
                 "calculatedControlValues": [],
                 "initialControlValues": [],

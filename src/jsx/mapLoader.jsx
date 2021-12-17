@@ -2,6 +2,7 @@ import React, {Suspense} from 'react';
 import {lazy} from '@loadable/component';
 import {connect} from 'react-redux';
 import PropTypes from 'prop-types';
+import { routeLoadingModes } from '../data/enums';
 
 const LoadableMap = lazy(() => import(/* webpackChunkName: "Map" */ './map'));
 
@@ -21,7 +22,7 @@ MapLoader.propTypes = {
 
 const mapStateToProps = (state) =>
     ({
-        hasMap: (state.forecast.forecast.length > 0 || state.controls.stravaAnalysis) && state.routeInfo.bounds !== null
+        hasMap: (state.forecast.forecast.length > 0 || state.uiInfo.routeParams.routeLoadingMode === routeLoadingModes.STRAVA) && state.routeInfo.bounds !== null
     });
 
 // eslint-disable-next-line new-cap

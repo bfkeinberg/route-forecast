@@ -8,6 +8,7 @@ import 'ag-grid-community/dist/styles/ag-grid.css';
 import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
 import ReactDOM from 'react-dom';
 import { Table } from './Table';
+import { routeLoadingModes } from '../../data/enums';
 
 const smallScreenWidth = 800;
 const deleteColumnWidth = 39;
@@ -242,6 +243,20 @@ export class ControlTable extends Component {
     };
 
     render() {
+    //     const tableData = {
+    //         rows: [
+    //             {name: "hi", distance: 3, expectedTimeSpent: 5, estimatedArrivalTime: 7, delete: <Icon icon="delete"/>},
+    //             {name: "hello", distance: 4, expectedTimeSpent: 2, estimatedArrivalTime: 1, delete: <Icon icon="delete"/>}
+    //         ],
+    //         columns: [
+    //             {name: "name", render: "Name"},
+    //             {name: "distance", render: "Miles"},
+    //             {name: "expectedTimeSpent", render: "Expected Time Spent", valueTransformFunction: value => `${value} min`},
+    //             {name: "estimatedArrivalTime", render: "Estimated Arrival Time"},
+    //             {name: "delete", render: "Delete"}
+    //         ]
+    //     }
+    //     return <Table data={tableData}/>
         let rowData = [];
         let newColDefs = this.state.columnDefs.slice();
         this.props.controls.forEach((item,index) => rowData.push({...item, ...this.props.calculatedValues[index], id:index}));
@@ -259,7 +274,7 @@ export class ControlTable extends Component {
 const mapStateToProps = (state) =>
     ({
         displayBanked: state.controls.displayBanked,
-        compare: state.controls.stravaAnalysis,
+        compare: state.uiInfo.routeParams.routeLoadingMode === routeLoadingModes.STRAVA,
         metric: state.controls.metric,
         count: state.controls.count,
         controls: state.controls.userControlPoints,

@@ -12,9 +12,10 @@ import {IconNames} from "@blueprintjs/icons";
 import {connect} from 'react-redux';
 import RouteInfoForm from "./RouteInfoForm/RouteInfoForm";
 import ForecastSettings from "./ForecastSettings/ForecastSettings";
+import { routeLoadingModes } from "../data/enums";
 
 const DataTable = (props) => {
-    return (props.showPacePerTme ? <PaceTable/> : <ForecastTable/>);
+    return (props.routeLoadingMode === routeLoadingModes.STRAVA ? <PaceTable/> : <ForecastTable/>);
 };
 
 const MobileUI = (props) => {
@@ -56,7 +57,7 @@ const MobileUI = (props) => {
 };
 
 MobileUI.propTypes = {
-    showPacePerTme: PropTypes.bool,
+    routeLoadingMode: PropTypes.number,
     mapsApiKey: PropTypes.string.isRequired,
     needToViewTable: PropTypes.bool.isRequired,
     needToViewMap: PropTypes.bool.isRequired
@@ -64,7 +65,7 @@ MobileUI.propTypes = {
 
 const mapStateToProps = (state) =>
     ({
-        showPacePerTme:state.controls.stravaAnalysis,
+        routeLoadingMode:state.uiInfo.routeParams.routeLoadingMode,
         needToViewTable:state.forecast.valid && !state.forecast.tableViewed,
         needToViewMap:state.forecast.valid && !state.forecast.mapViewed
     });

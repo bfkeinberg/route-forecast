@@ -7,6 +7,7 @@ import thunk from 'redux-thunk';
 import fetchMock from 'fetch-mock';
 import * as actions from '../src/jsx/actions/actions';
 import {shortenUrl} from "../src/jsx/actions/actions";
+import { routeLoadingModes } from '../src/data/enums';
 require('isomorphic-fetch');
 const middlewares = [thunk];
 const mockStore = configureMockStore(middlewares);
@@ -39,7 +40,8 @@ describe('Call URL shortener', () => {
                     "rwgpsRouteIsTrip": false,
                     "start": "2018-08-04T14:00:00.000Z",
                     "loadingSource": null,
-                    "succeeded": null
+                    "succeeded": null,
+                    "routeLoadingMode": routeLoadingModes.RWGPS
                 },
                 "dialogParams": {
                     "formVisible": true,
@@ -66,7 +68,6 @@ describe('Call URL shortener', () => {
             "controls": {
                 "metric": false,
                 "displayBanked": false,
-                "stravaAnalysis": false,
                 "userControlPoints": [],
                 "calculatedControlValues": [],
                 "initialControlValues": [],
