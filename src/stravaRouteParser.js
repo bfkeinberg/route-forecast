@@ -16,34 +16,36 @@ class StravaRouteParser {
 
     fetchStravaActivity(activityId, token) {
         if (token === null) {
-            StravaRouteParser.authenticate(activityId);
+            this.authenticate(activityId);
             return new Promise((resolve, reject) => reject(new Error('fetching authentication token')));
         }
         this.api.setDefaultHeader('Authorization', `Bearer ${token}`);
         let activityPromise = this.fetchActivity(activityId, this.api);
         return new Promise((resolve, reject) => {
             activityPromise.then(activityData => {
-                    let activityDataPromise = this.processActivityStream(activityId, this.api);
-                    activityDataPromise.then(activityStream => {
-                            if (activityData.message !== undefined) {
-                                cookie.remove('strava_token');
-                                reject(activityData.message);
-                                return;
-                            }
-                            if (activityStream.message !== undefined) {
-                                cookie.remove('strava_token');
-                                reject(activityStream.message);
-                                return;
-                            }
-                            resolve({activity: activityData, stream: activityStream});
-                        }, error => {
-                            reject(error);
+                let activityDataPromise = this.processActivityStream(activityId, this.api);
+                activityDataPromise.then(activityStream => {
+                    if (activityData.message !== undefined) {
+                        if (activityData.message !== "Record Not Found") {
+                            cookie.remove('strava_token');
                         }
-                    );
+                        reject(activityData.message);
+                        return;
+                    }
+                    if (activityStream.message !== undefined) {
+                        if (activityStream.message !== "Record Not Found") {
+                            cookie.remove('strava_token');
+                        }
+                        reject(activityStream.message);
+                        return;
+                    }
+                    resolve({ activity: activityData, stream: activityStream });
                 }, error => {
                     reject(error);
-                }
-            );
+                });
+            }, error => {
+                reject(error);
+            });
         });
     }
 
@@ -194,7 +196,7 @@ class StravaRouteParser {
         return api.get(`activities/${activityId}/streams?keys=distance,time,altitude,velocity_smooth,moving,latlng&key_by_type=true`);
     }
 
-    static authenticate(activityId) {
+    authenticate(activityId) {
         let params = queryString.parse(location.search);
         params['strava_activity'] = activityId;
         params['strava_analysis'] = true;

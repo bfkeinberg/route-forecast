@@ -300,9 +300,10 @@ const strava = function(state = {analysisInterval:defaultAnalysisIntervalInHours
         case Actions.BEGIN_STRAVA_FETCH:
             return {...state, fetching:true};
         case Actions.STRAVA_FETCH_SUCCESS:
-            return {...state, fetching:false, activityData:action.data.activity, activityStream:action.data.stream};
+            return {...state, fetching: false, errorDetails: null, activityData: action.data.activity, activityStream: action.data.stream};
         case Actions.STRAVA_FETCH_FAILURE:
-            return {...state, fetching:false, access_token:null, errorDetails:typeof action.error === 'object' ? action.error.message : action.error};
+            const errorMessage = typeof action.error === 'object' ? action.error.message : action.error
+            return {...state, fetching: false, errorDetails: errorMessage, access_token: errorMessage === "Authorization Error" ? null : state.access_token};
         case Actions.SET_ANALYSIS_INTERVAL:
             return {...state, analysisInterval:parseInt(action.interval),subrange:[]};
         case Actions.SUBRANGE_MAP:

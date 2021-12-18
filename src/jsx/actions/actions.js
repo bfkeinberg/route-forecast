@@ -760,7 +760,6 @@ export const updateExpectedTimes = function() {
             dispatch(setRoutePointsAndBounds(getPointsFromStrava(getState().strava.activityStream)));
         }, error => {
             dispatch(stravaFetchFailure(error));
-            dispatch(setStravaToken(null, null))
         });
     }
 };
