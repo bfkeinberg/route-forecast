@@ -27,8 +27,7 @@ const StravaAnalysisIntervalInput = ({ interval, setInterval }) => {
 
 StravaAnalysisIntervalInput.propTypes = {
     interval:PropTypes.number.isRequired,
-    setInterval:PropTypes.func.isRequired,
-    visible:PropTypes.bool.isRequired
+    setInterval:PropTypes.func.isRequired
 };
 
 const mapStateToProps = (state) =>
