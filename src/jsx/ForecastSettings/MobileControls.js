@@ -10,6 +10,7 @@ import ForecastInterval from "./ForecastInterval";
 import RidingPace from "./RidingPace";
 import {lazy} from '@loadable/component';
 import {componentLoader} from "../actions/actions.js";
+import StravaAnalysisIntervalInput from "./StravaAnalysisIntervalInput";
 
 const LoadableDatePicker = lazy(() => componentLoader(import(/* webpackChunkName: "DateSelect" */ /* webpackPrefetch: true */ './DateSelect'), 5));
 
@@ -65,6 +66,7 @@ const MobileControls = (props) => {
                 <Button minimal={true} tabIndex='10' onClick={props.addControl} id='addButton' icon={"add"}>Add</Button>
                 <UncontrolledTooltip target={"addButton"}>Add a control point</UncontrolledTooltip>
             </div>
+            <StravaAnalysisIntervalInput/>
         </div>
     );
 };

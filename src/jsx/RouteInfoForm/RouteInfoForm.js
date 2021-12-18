@@ -10,12 +10,11 @@ import {connect} from 'react-redux';
 import { formatControlsForUrl } from '../../util';
 import { AlwaysFilledSwitch } from './AlwaysFilledSwitch';
 import { RouteInfoInputRWGPS } from './RouteInfoInputRWGPS';
-import { RouteInfoInputStrava } from './RouteInfoInputStrava';
+import RouteInfoInputStrava from './RouteInfoInputStrava';
 import { routeLoadingModes } from '../../data/enums';
 
 const RouteInfoForm = ({ rwgpsRoute, rwgpsRouteIsTrip, controlPoints, fetchingRoute, errorDetails, routeInfo, firstUse, routeSelected, needToViewTable, showProvider, routeProps, routeLoadingMode, setRouteLoadingMode, loadFromRideWithGps }) => {
     const mode = routeLoadingMode
-    console.log(mode)
     const modeSwitched = (event) => {
         setRouteLoadingMode(event.target.checked ? routeLoadingModes.STRAVA : routeLoadingModes.RWGPS)
     }

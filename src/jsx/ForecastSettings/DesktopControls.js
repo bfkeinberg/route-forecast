@@ -11,6 +11,7 @@ import ForecastInterval from "./ForecastInterval";
 import RidingPace from "./RidingPace";
 import {lazy} from '@loadable/component';
 import {componentLoader} from "../actions/actions.js";
+import StravaAnalysisIntervalInput from "./StravaAnalysisIntervalInput";
 
 const LoadableDatePicker = lazy(() => componentLoader(import(/* webpackChunkName: "DateSelect" */ /* webpackPrefetch: true */ './DateSelect'), 5));
 
@@ -62,6 +63,7 @@ const DesktopControls = (props) => {
                     </Tooltip2>
                 </div>
             </div>
+            <StravaAnalysisIntervalInput/>
         </div>
     );
 };

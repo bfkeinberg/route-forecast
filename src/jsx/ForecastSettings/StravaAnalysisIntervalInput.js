@@ -4,11 +4,10 @@ import { Label, Input, FormGroup, UncontrolledTooltip } from 'reactstrap';
 import { connect } from 'react-redux';
 import { setAnalysisInterval } from "../actions/actions";
 
-const StravaAnalysisIntervalInput = ({ interval, setInterval, visible }) => {
+const StravaAnalysisIntervalInput = ({ interval, setInterval }) => {
     const interval_tooltip_text = 'Interval in hours at which to calculate effective pace';
-    const isVisible = visible ? 'inline-flex' : 'none';
     return (
-        <FormGroup size='sm' style={{flex:'1',display:isVisible}}>
+        <FormGroup size='sm' style={{ flex: '1' }}>
             <UncontrolledTooltip placement="bottom" target='analysisInterval'>{interval_tooltip_text}</UncontrolledTooltip>
             <Label>Analysis Interval
                 <Input id='analysisInterval' type="select" value={interval} name="analysisInterval"

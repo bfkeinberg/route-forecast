@@ -742,9 +742,10 @@ const getPointsFromStrava = (activityStream) => {
         bounds:bounds};
 };
 
-export const updateExpectedTimes = function(activity) {
+export const updateExpectedTimes = function() {
     return function (dispatch,getState) {
-        dispatch(loadStravaActivity(activity)).then( async result => {
+        const activityId = getState().strava.activity
+        dispatch(loadStravaActivity(activityId)).then( async result => {
             dispatch(stravaFetchSuccess(result));
             const parser = await getStravaParser().catch((err) => {dispatch(stravaFetchFailure(err));return null});
             // handle failed load, error has already been dispatched

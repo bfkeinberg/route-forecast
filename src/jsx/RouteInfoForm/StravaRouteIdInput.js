@@ -18,7 +18,7 @@ const StravaRouteIdInput = ({ setStravaActivity, strava_activity, updateExpected
                                 dt.items[i].getAsString(value => {
                                     setStravaActivity(value);
                                     if (strava_activity !== '') {
-                                        updateExpectedTimes(strava_activity);
+                                        //updateExpectedTimes(strava_activity);
                                     }
                                 });
                             } else {
@@ -56,7 +56,7 @@ const StravaRouteIdInput = ({ setStravaActivity, strava_activity, updateExpected
                         console.log('gained focus but not acting')
                     }
                 }}
-                onBlur={() => { if (strava_activity !== '') { updateExpectedTimes(strava_activity) } }} />
+                onBlur={() => { if (strava_activity !== '') { /*updateExpectedTimes(strava_activity)*/ } }} />
         </FormGroup>
     );
 };
