@@ -283,8 +283,10 @@ export const SET_ROUTE_INFO = 'SET_ROUTE_INFO';
 const setRouteInfo = (routeInfo) => {
     return (dispatch,getState) => {
         if (getState().routeInfo.fetchAfterLoad && routeInfo.forecastRequest !== null) {
-            dispatch(requestForecast(routeInfo));
-            dispatch(setFetchAfterLoad(false));
+            // TODO
+            // disable magic for now
+            // dispatch(requestForecast(routeInfo));
+            // dispatch(setFetchAfterLoad(false));
         }
         return dispatch({
             type: SET_ROUTE_INFO,
@@ -412,7 +414,9 @@ export const recalcRoute = function() {
 };
 
 export const loadFromRideWithGps = function(routeNumber, isTrip) {
-    return async function(dispatch) {
+    return async function(dispatch, getState) {
+        routeNumber = routeNumber || getState().uiInfo.routeParams.rwgpsRoute
+        isTrip = isTrip || getState().uiInfo.routeParams.rwgpsRouteIsTrip
         dispatch(beginLoadingRoute('rwgps'));
         const parser = await getRouteParser().catch((err) => {dispatch(rwgpsRouteLoadingFailure(err));return null});
         // handle failed load, error has already been dispatched

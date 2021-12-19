@@ -1,0 +1,26 @@
+.top-bar-item {
+  opacity: 1;
+  padding: 10px;
+  flex: 1;
+  white-space: nowrap;
+}
+
+.top-bar-item.animated-entry {
+  animation: slide-in 1.5s ease-out forwards;
+}
+
+@keyframes slide-in {
+  0% {
+    opacity: 0;
+    padding: 0px;
+    flex: 0;
+  }
+  20% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+    padding: 10px;
+    flex: 1;
+  }
+}

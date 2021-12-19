@@ -18,29 +18,31 @@ const RouteInfoInputStrava = ({stravaError, fetchingFromStrava, updateExpectedTi
   const validRouteId = true
 
   return (
-    <>
+    <div style={{display: "flex", flexFlow: "column", alignItems: "flex-end"}}>
       <ErrorBoundary>
-        {accessToken === null ?
-          <StravaLoginButton/> :
-          <>
-            <StravaRouteIdInput/>
-            <Button
-              id='forecast'
-              tabIndex='6'
-              color="primary"
-              onClick={fetchRoute}
-              disabled={fetchingFromStrava || !validRouteId}
-              style={{backgroundColor: "rgb(234, 89, 41)", borderColor: "rgb(234, 89, 41)"}}
-            >
-              Analyze Route
-              {fetchingFromStrava && <Spinner/>}
-            </Button>
-          </>
-        }
-        <Alert isOpen={stravaError !== null && stravaError !== ""} color='danger'>Error loading route from Strava: {stravaError}</Alert>
+        <div style={{width: "100%"}}>
+          {accessToken === null ?
+            <StravaLoginButton/> :
+            <>
+              <StravaRouteIdInput/>
+              <Button
+                id='forecast'
+                tabIndex='6'
+                color="primary"
+                onClick={fetchRoute}
+                disabled={fetchingFromStrava || !validRouteId}
+                style={{backgroundColor: "rgb(234, 89, 41)", borderColor: "rgb(234, 89, 41)"}}
+              >
+                Analyze Route
+                {fetchingFromStrava && <Spinner/>}
+              </Button>
+            </>
+          }
+          <Alert isOpen={stravaError !== null && stravaError !== ""} color='danger'>Error loading route from Strava: {stravaError}</Alert>
+        </div>
       </ErrorBoundary>
-      <img id='stravaImage' src={stravaImage}/>
-    </>
+      <img style={{marginTop: "10px"}} id='stravaImage' src={stravaImage}/>
+    </div>
   )
 }
 
@@ -67,7 +69,7 @@ export default connect(mapStateToProps, mapDispatchToProps)(RouteInfoInputStrava
 const StravaLoginButton = () => {
   return (
     <Button
-      style={{backgroundColor: "rgb(234, 89, 41)", borderColor: "rgb(234, 89, 41)"}}
+      style={{backgroundColor: "rgb(234, 89, 41)", borderColor: "rgb(234, 89, 41)", width: "100%"}}
       onClick={() => stravaRouteParser.authenticate()}
     >
       Login to Strava

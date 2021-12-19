@@ -6,7 +6,9 @@ import PinnedRouteLoader from './PinnedRouteLoader.jsx';
 import ErrorBoundary from "../errorBoundary";
 import WeatherProviderSelector from './WeatherProviderSelector';
 import ForecastButton from './ForecastButton';
-import { Col, Row } from 'reactstrap';
+import { Button, Col, Row } from 'reactstrap';
+import { connect } from 'react-redux';
+import { loadFromRideWithGps } from '../actions/actions';
 
 export const RouteInfoInputRWGPS = ({showProvider}) => {
   const [showPinnedRoutes, setShowPinnedRoutes] = useState(false)
@@ -38,8 +40,19 @@ export const RouteInfoInputRWGPS = ({showProvider}) => {
         </Col>
       </Row>
       <Row>
+        <RWGPSLoadRouteButton/>
         <ForecastButton/>
       </Row>
     </>
   )
 }
+
+const RWGPSLoadRouteButton = connect(state => ({}), {loadFromRideWithGps})(
+  ({loadFromRideWithGps}) => {
+    return (
+      <Button style={{backgroundColor: "#137cbd", borderColor: "#137cbd"}} onClick={() => loadFromRideWithGps()}>
+        Load Route
+      </Button>
+    )
+  }
+)

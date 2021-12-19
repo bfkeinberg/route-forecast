@@ -7,6 +7,7 @@ import RouteInfoForm from "./RouteInfoForm/RouteInfoForm";
 import ForecastSettings from "./ForecastSettings/ForecastSettings";
 import { TopBar } from "./TopBar/TopBar";
 import PaceTable from "./resultsTab/PaceTable";
+import { useSelector } from "react-redux";
 
 const DesktopUI = ({showPaceTable, mapsApiKey}) => {
     const sidePaneOptions = [
@@ -17,6 +18,9 @@ const DesktopUI = ({showPaceTable, mapsApiKey}) => {
     const [activeSidePane, setActiveSidePane] = useState(0)
 
     const sidebarWidth = 400
+
+    const routeData = useSelector(state => state.routeInfo.rwgpsRouteData)
+    const panesVisible = routeData !== null ? 2 : 1
     
     return (
         <div>
@@ -25,6 +29,7 @@ const DesktopUI = ({showPaceTable, mapsApiKey}) => {
                 activeSidePane={activeSidePane}
                 setActiveSidePane={setActiveSidePane}
                 sidebarWidth={sidebarWidth}
+                panesVisible={panesVisible}
             />
             <div style={{display: "flex"}}>
                 <Sidebar sidePaneOptions={sidePaneOptions} activeSidePane={activeSidePane} sidebarWidth={sidebarWidth}/>
