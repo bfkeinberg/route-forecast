@@ -4,16 +4,12 @@ import RwGpsTypeSelector from './RwGpsTypeSelector';
 import RideWithGpsId from './RideWithGpsId';
 import PinnedRouteLoader from './PinnedRouteLoader.jsx';
 import ErrorBoundary from "../errorBoundary";
-import WeatherProviderSelector from './WeatherProviderSelector';
-import ForecastButton from './ForecastButton';
 import { Button, Col, Row } from 'reactstrap';
 import { connect } from 'react-redux';
 import { loadFromRideWithGps } from '../actions/actions';
 
-export const RouteInfoInputRWGPS = ({showProvider}) => {
+export const RouteInfoInputRWGPS = () => {
   const [showPinnedRoutes, setShowPinnedRoutes] = useState(false)
-  
-  const providerButton = showProvider ? <Col sm={{ size: "auto" }}><WeatherProviderSelector /></Col> : null;
 
   return (
     <>
@@ -35,13 +31,11 @@ export const RouteInfoInputRWGPS = ({showProvider}) => {
               </div>
             </ErrorBoundary>
             <RwGpsTypeSelector visible={false}/>
-            {providerButton}
           </div>
         </Col>
       </Row>
       <Row>
         <RWGPSLoadRouteButton/>
-        <ForecastButton/>
       </Row>
     </>
   )

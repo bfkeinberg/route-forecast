@@ -23,7 +23,7 @@ const RouteInfoInputStrava = ({stravaError, fetchingFromStrava, updateExpectedTi
         <div style={{width: "100%"}}>
           {accessToken === null ?
             <StravaLoginButton/> :
-            <>
+            <div>
               <StravaRouteIdInput/>
               <Button
                 id='forecast'
@@ -31,12 +31,12 @@ const RouteInfoInputStrava = ({stravaError, fetchingFromStrava, updateExpectedTi
                 color="primary"
                 onClick={fetchRoute}
                 disabled={fetchingFromStrava || !validRouteId}
-                style={{backgroundColor: "rgb(234, 89, 41)", borderColor: "rgb(234, 89, 41)"}}
+                style={{backgroundColor: "rgb(234, 89, 41)", borderColor: "rgb(234, 89, 41)", width: "100%", marginTop: "10px"}}
               >
                 Analyze Route
                 {fetchingFromStrava && <Spinner/>}
               </Button>
-            </>
+            </div>
           }
           <Alert isOpen={stravaError !== null && stravaError !== ""} color='danger'>Error loading route from Strava: {stravaError}</Alert>
         </div>

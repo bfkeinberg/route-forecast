@@ -7,7 +7,7 @@ import { setStravaActivity, updateExpectedTimes } from "../actions/actions";
 const StravaRouteIdInput = ({ setStravaActivity, strava_activity, updateExpectedTimes, canAnalyze }) => {
     return (
         <FormGroup>
-            <Label for='stravaRoute'>Strava Activity Id</Label>
+            <Label for='stravaRoute' size='sm' tag='b'>Strava Activity Id</Label>
             <Input autoFocus id='stravaRoute' tabIndex='-1' type="text"
                 onDrop={event => {
                     let dt = event.dataTransfer;

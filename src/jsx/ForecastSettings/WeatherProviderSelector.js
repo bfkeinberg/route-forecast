@@ -1,12 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {Label, Form, Input, FormGroup, UncontrolledTooltip} from 'reactstrap';
+import {Input, FormGroup, UncontrolledTooltip} from 'reactstrap';
 import {connect} from 'react-redux';
 import {setWeatherProvider} from "../actions/actions";
 
 const WeatherProviderSelector = ({weatherProvider,setWeatherProvider}) => {
     return (
-            <FormGroup inline row size='sm'>
+            <FormGroup size='sm'>
                 <UncontrolledTooltip target='provider' placement='bottom'>The weather provider to use for forecasts</UncontrolledTooltip>
                 <Input type="select" bsSize="sm" id='provider' tabIndex='2'
                     name="provider"

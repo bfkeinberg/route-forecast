@@ -20,7 +20,10 @@ const DesktopUI = ({showPaceTable, mapsApiKey}) => {
     const sidebarWidth = 400
 
     const routeData = useSelector(state => state.routeInfo.rwgpsRouteData)
-    const panesVisible = routeData !== null ? 2 : 1
+    const stravaActivityData = useSelector(state => state.strava.activityData)
+    const forecastData = useSelector(state => state.forecast.forecast)
+    // this is comically ugly but w/e
+    const panesVisible = stravaActivityData !== null ? 3 : (routeData !== null ? (forecastData.length > 0 ? 3 : 2) : 1)
     
     return (
         <div>

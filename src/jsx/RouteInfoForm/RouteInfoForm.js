@@ -13,7 +13,7 @@ import { RouteInfoInputRWGPS } from './RouteInfoInputRWGPS';
 import RouteInfoInputStrava from './RouteInfoInputStrava';
 import { routeLoadingModes } from '../../data/enums';
 
-const RouteInfoForm = ({ controlPoints, fetchingRoute, errorDetails, routeInfo, firstUse, needToViewTable, showProvider, routeProps, routeLoadingMode, setRouteLoadingMode }) => {
+const RouteInfoForm = ({ controlPoints, fetchingRoute, errorDetails, routeInfo, firstUse, needToViewTable, routeProps, routeLoadingMode, setRouteLoadingMode }) => {
     const mode = routeLoadingMode
     const modeSwitched = (event) => {
         setRouteLoadingMode(event.target.checked ? routeLoadingModes.STRAVA : routeLoadingModes.RWGPS)
@@ -44,7 +44,7 @@ const RouteInfoForm = ({ controlPoints, fetchingRoute, errorDetails, routeInfo, 
                     <Form inline id="forecast_form">
                         <RouteLoadingModeSelector mode={mode} setMode={setRouteLoadingMode} modeSwitched={modeSwitched}/>
                         {mode === routeLoadingModes.RWGPS ?
-                            <RouteInfoInputRWGPS showProvider={showProvider}/> :
+                            <RouteInfoInputRWGPS/> :
                             <RouteInfoInputStrava/>}
                         {errorDetails !== null && <Alert style={{ padding: '10px' }} color="danger">{errorDetails}</Alert>}
                         {fetchingRoute && <Spinner/>}
@@ -84,7 +84,6 @@ const mapStateToProps = (state) =>
         controlPoints: state.controls.userControlPoints,
         firstUse: state.params.newUserMode,
         needToViewTable: state.forecast.valid && !state.forecast.tableViewed,
-        showProvider: state.controls.showWeatherProvider,
         routeLoadingMode: state.uiInfo.routeParams.routeLoadingMode
     });
 
@@ -99,7 +98,6 @@ RouteInfoForm.propTypes = {
     routeInfo: PropTypes.shape({ name: PropTypes.string }),
     firstUse: PropTypes.bool.isRequired,
     needToViewTable: PropTypes.bool.isRequired,
-    showProvider: PropTypes.bool.isRequired,
     routeProps: PropTypes.object,
     routeLoadingMode: PropTypes.number,
     setRouteLoadingMode: PropTypes.func.isRequired,

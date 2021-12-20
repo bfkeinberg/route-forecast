@@ -16,7 +16,9 @@ const ForecastButton = ({fetchingForecast,requestForecast,routeInfo,submitDisabl
         // while the route was loading asynchronously. Putting this state in keeps them from having to wait
         // until the route is done loading to click.
         if (!routeIsLoaded) {
-            setFetchAfterLoad(true);
+            // setFetchAfterLoad(true);
+            // TODO
+            // disabling magic for now, even though this is less magical than usual
             return;
         }
         requestForecast(routeInfo);

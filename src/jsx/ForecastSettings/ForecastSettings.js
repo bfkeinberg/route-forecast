@@ -1,94 +1,20 @@
-import {Card, CardBody, CardTitle} from 'reactstrap';
-import React, {Component, Suspense} from 'react';
-import ErrorBoundary from '../errorBoundary';
-import PropTypes from 'prop-types';
-import {addControl, toggleDisplayBanked, toggleMetric} from '../actions/actions';
-import {connect} from 'react-redux';
-import {lazy} from '@loadable/component';
+import React from 'react';
+import { useSelector } from 'react-redux';
 import '../../static/controlsStyles.css';
-import MediaQuery from 'react-responsive';
-import DesktopControls from "./DesktopControls";
-import MobileControls from "./MobileControls";
-import {componentLoader} from "../actions/actions.js";
+import { SettingsRWGPS } from './SettingsRWGPS';
+import { SettingsStrava } from './SettingsStrava';
+import { routeLoadingModes } from '../../data/enums';
+import { ControlTableContainer } from './ControlTableContainer';
 
-const LoadableControlTable = lazy(() => componentLoader(import(/* webpackChunkName: "ControlTable" */'./ControlTable'), 5));
+export default () => {
+    const routeLoadingMode = useSelector(state => state.uiInfo.routeParams.routeLoadingMode)
 
-class ControlPoints extends Component {
-
-    static propTypes = {
-        metric: PropTypes.bool.isRequired,
-        hasStravaData:PropTypes.bool.isRequired,
-        name:PropTypes.string,
-        addControl:PropTypes.func.isRequired,
-        toggleMetric:PropTypes.func.isRequired,
-        displayBanked:PropTypes.bool.isRequired,
-        fetchingFromStrava:PropTypes.bool,
-        toggleDisplayBanked:PropTypes.func.isRequired,
-        hasControls:PropTypes.bool.isRequired
-    };
-
-    constructor(props) {
-        super(props);
-        this.state = {};
-    }
-
-    render () {
-        let title;
-        let table = (<div/>);
-        if (this.props.name === '') {
-            title = (<div id={'controlListTitle'}>Control point list</div>);
-        } else {
-            title = (<div id={'controlListTitle'}>Control point list for <i>{this.props.name}</i></div>);
-        }
-        if (this.props.name !== '' || this.props.hasControls) {
-            table = (
-                     <Suspense fallback={<div>Loading ControlTable...</div>}>
-                        <LoadableControlTable/>
-                     </Suspense>
-                     );
-        }
-        return (
-            <div className="controlPoints">
-                <MediaQuery minDeviceWidth={1000}>
-                    <DesktopControls/>
-                </MediaQuery>
-                <MediaQuery maxDeviceWidth={800}>
-                    <MobileControls/>
-                </MediaQuery>
-                <ErrorBoundary>
-                    <Card style={{margin: '10px'}}>
-                        <CardBody>
-                            <CardTitle className="cpListTitle" tag='h6'>{title}</CardTitle>
-                            <ErrorBoundary>
-                                {table}
-                            </ErrorBoundary>
-                        </CardBody>
-                    </Card>
-                </ErrorBoundary>
-                <div tabIndex="98" onFocus={() => {
-                    let button = document.getElementById('addButton');
-                    if (button !== undefined) {
-                        button.focus();
-                    }
-            }}/>
-            </div>
-        );
-    }
+    return (
+        <div className="controlPoints">
+            {routeLoadingMode === routeLoadingModes.RWGPS ?
+                <SettingsRWGPS /> :
+                <SettingsStrava />}
+            <ControlTableContainer/>
+        </div>
+    );
 }
-
-const mapStateToProps = (state) =>
-    ({
-        metric: state.controls.metric,
-        hasControls: state.controls.count !== 0,
-        calculatedValues: state.controls.calculatedValues,
-        name: state.routeInfo.name,
-        displayBanked: state.controls.displayBanked,
-        fetchingFromStrava: state.strava.fetching,
-        hasStravaData: state.strava.activityData !== null
-    });
-
-const mapDispatchToProps = {
-    toggleMetric, toggleDisplayBanked, addControl
-};
-
-export default connect(mapStateToProps, mapDispatchToProps)(ControlPoints);
