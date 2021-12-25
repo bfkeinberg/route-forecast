@@ -12,6 +12,7 @@ import { useSelector } from "react-redux";
 import WeatherProviderSelector from "./WeatherProviderSelector";
 import { useDispatch } from "react-redux";
 import ForecastButton from "./ForecastButton";
+import { ToggleButton } from "../shared/ToggleButton";
 
 const LoadableDatePicker = lazy(() => componentLoader(import(/* webpackChunkName: "DateSelect" */ /* webpackPrefetch: true */ './DateSelect'), 5));
 
@@ -48,22 +49,10 @@ export const SettingsRWGPS = () => {
       <div className="controls-item controls-item-finish-time">
         <FinishTime />
       </div>
-      <div className="controls-item">
-        <div id="metric" className="controls-item-contents">
-          <span className="controls-checkbox-label">Metric</span>
-          <Tooltip2 usePortal={true} content='Control distances in km, other units displayed in km or degrees C'>
-            <input type='checkbox' checked={metric} onChange={() => dispatch(toggleMetric())} />
-          </Tooltip2>
-        </div>
-      </div>
-      <div id="banked" className="controls-item">
-        <div id="metric" className="controls-item-contents">
-          <span className="controls-checkbox-label">Display banked time</span>
-          <Tooltip2 usePortal={true} placement='bottom' content='Show how many minutes remain to be within ACP/RUSA brevet finishing times'>
-            <input type='checkbox' checked={displayBanked} onChange={() => dispatch(toggleDisplayBanked())} />
-          </Tooltip2>
-        </div>
-      </div>
+      <ToggleButton active={metric} onClick={() => dispatch(toggleMetric())}>Metric</ToggleButton>
+      <Tooltip2 usePortal={true} placement='bottom' content='Show how many minutes remain to be within ACP/RUSA brevet finishing times'>
+        <ToggleButton active={displayBanked} onClick={() => dispatch(toggleDisplayBanked())}>Display banked time</ToggleButton>
+      </Tooltip2>
       {showProvider && (
         <WeatherProviderSelector />
       )}

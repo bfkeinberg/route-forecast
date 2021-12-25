@@ -11,8 +11,9 @@ import {setWeatherRange, toggleWeatherRange, setTableViewed, toggleZoomToRange} 
 import MediaQuery from 'react-responsive';
 import {finishTimeFormat} from '../../redux/reducer';
 import { DateTime } from 'luxon';
-import { Checkbox, Icon } from '@blueprintjs/core';
+import { Icon } from '@blueprintjs/core';
 import cookie from 'react-cookies';
+import { ToggleButton } from '../shared/ToggleButton';
 
 const milesToMeters = 1609.34;
 const gustySpeed = 25;
@@ -175,7 +176,7 @@ export class ForecastTable extends Component {
                                 <span id={weatherId}>{weatherCorrections}</span>
                             </Col>
                             <Col>
-                                <Checkbox checked={this.props.zoomToRange} label="Zoom to segment" onChange={this.toggleZoom} />
+                                <ToggleButton active={this.props.zoomToRange} onClick={this.toggleZoom}>Zoom to Segment</ToggleButton>
                             </Col>
                         </Row>
                     <Table size='sm' hover bordered style={{fontSize: "12px"}}>
