@@ -10,6 +10,8 @@ import {formatTemperature} from "./forecastTable";
 // import {withRouter} from 'react-router-dom';
 import {setMapViewed} from "./actions/actions";
 import { routeLoadingModes } from '../data/enums';
+import { getRouteInfo } from '../utils/util';
+import stravaRouteParser from '../stravaRouteParser';
 
 /*global google*/
 const arrow = "M16.317,32.634c-0.276,0-0.5-0.224-0.5-0.5V0.5c0-0.276,0.224-0.5,0.5-0.5s0.5,0.224,0.5,0.5v31.634\n" +
@@ -195,8 +197,22 @@ class RouteForecastMap extends Component {
 
 }
 
-const getPoints = (state) => state.routeInfo.points.filter(point => point.lat !== undefined && point.lon !== undefined).map((point) =>
-{return {lat:point.lat, lng: point.lon, dist:point.dist}});
+const getBounds = state => {
+    const stravaMode = state.uiInfo.routeParams.routeLoadingMode === routeLoadingModes.STRAVA
+    return stravaMode ? 
+        (state.strava.activityStream !== null ? stravaRouteParser.computePointsAndBounds(state.strava.activityStream).bounds : null)
+    : getRouteInfo(state).bounds
+}
+
+const getPoints = state => {
+    const stravaMode = state.uiInfo.routeParams.routeLoadingMode === routeLoadingModes.STRAVA
+    const points = stravaMode ?
+        (state.strava.activityStream !== null ? stravaRouteParser.computePointsAndBounds(state.strava.activityStream).points : [])
+    : getRouteInfo(state).points
+
+    return points.filter(point => point.lat !== undefined && point.lon !== undefined).map((point) =>
+    { return { lat: point.lat, lng: point.lon, dist: point.dist } })
+};
 
 export const getPointsState = createSelector(
     [getPoints],
@@ -206,7 +222,7 @@ export const getPointsState = createSelector(
 const mapStateToProps = (state) =>
     ({
         forecast: state.forecast.forecast,
-        bounds:state.routeInfo.bounds,
+        bounds:getBounds(state),
         points:getPointsState(state),
         controls: state.controls.calculatedControlValues,
         controlNames: state.controls.userControlPoints.map(control => control.name),

@@ -1,5 +1,5 @@
 import { Col, Row } from "reactstrap";
-import FinishTime from "./FinishTime";
+import { FinishTime } from "./FinishTime";
 import React, { Suspense } from "react";
 import { toggleDisplayBanked, toggleMetric } from "../actions/actions";
 import { Tooltip2 } from "@blueprintjs/popover2";

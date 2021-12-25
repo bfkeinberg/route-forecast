@@ -7578,12 +7578,6 @@
       "name": "Niessen, Sara, Ibardin, Cornisse, Niessen",
       "timeInHours": 5.5940740353082035,
       "values": [],
-      "bounds": {
-        "min_latitude": 43.28036,
-        "min_longitude": -1.90248,
-        "max_latitude": 43.39056,
-        "max_longitude": -1.58309
-      },
       "finishTime": "Mon, Jul 30 2018 12:35PM"
     }
   },

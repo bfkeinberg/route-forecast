@@ -11,7 +11,7 @@ export const TopBar = ({sidePaneOptions, activeSidePane, setActiveSidePane, side
     <div style={{display: "flex"}}>
       <div style={{height: "50px", display: "flex", alignItems: "center", width: `${sidebarWidth}px`}}>
         {sidePaneOptions.map((option, index) =>
-          <TopBarItem active={activeSidePane === index} key={option} onClick={() => setActiveSidePane(index)} visible={panesVisible > index}>
+          <TopBarItem active={activeSidePane === index} key={option} onClick={() => setActiveSidePane(index)} visible={panesVisible.has(option)}>
             <div style={{fontWeight: "bold", textAlign: "center"}}>
               {option}
             </div>

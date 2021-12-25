@@ -2,9 +2,8 @@
 import {finishTimeFormat} from './reducers/reducer';
 import { DateTime } from 'luxon';
 
-import {inputPaceToSpeed} from "./ForecastSettings/RidingPace";
 import {getPowerOrVelocity} from "./windUtils";
-import {setMinMaxCoords} from "./actions/actions";
+import { inputPaceToSpeed, setMinMaxCoords } from '../utils/util';
 
 const kmToMiles = 0.62137;
 /**

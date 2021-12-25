@@ -38,7 +38,6 @@ const ridingPaceState = {
         }
     },
     "strava": {
-        "actualPace": 0
     },
     "controls": {
         "metric": false

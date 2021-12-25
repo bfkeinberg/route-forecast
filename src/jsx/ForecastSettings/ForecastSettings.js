@@ -11,9 +11,7 @@ export default () => {
 
     return (
         <div className="controlPoints">
-            {routeLoadingMode === routeLoadingModes.RWGPS ?
-                <SettingsRWGPS /> :
-                <SettingsStrava />}
+            <SettingsRWGPS />
             <ControlTableContainer/>
         </div>
     );

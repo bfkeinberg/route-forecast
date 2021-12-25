@@ -6,8 +6,10 @@ import {connect} from 'react-redux';
 import 'animate.css/animate.min.css';
 import { setSubrange, toggleMapRange } from '../actions/actions';
 import stravaRouteParser from '../../stravaRouteParser';
+import StravaAnalysisIntervalInput from '../ForecastSettings/StravaAnalysisIntervalInput';
+import { useActualPace } from '../../utils/hooks';
 
-const PaceTable = ({actualPace, activityData, activityStream, analysisInterval, setSubrange, toggleMapRange}) =>  {
+const PaceTable = ({activityData, activityStream, analysisInterval, setSubrange, toggleMapRange}) =>  {
 
     const [selectedRow, setSelectedRow] = useState(null)
 
@@ -43,6 +45,8 @@ const PaceTable = ({actualPace, activityData, activityStream, analysisInterval, 
         );
     }
 
+    const actualPace = useActualPace()
+
     if (activityData === null) {
         return null
     }
@@ -51,6 +55,7 @@ const PaceTable = ({actualPace, activityData, activityStream, analysisInterval, 
     return (
             <div className="animated slideInRight">
                 <ErrorBoundary>
+                    <StravaAnalysisIntervalInput />
                     <div id="paceSpan">Overall climb-adjusted pace was {actualPace.toFixed(1)}</div>
                     <Table striped responsive hover bordered>
                         <thead>
@@ -73,13 +78,11 @@ const PaceTable = ({actualPace, activityData, activityStream, analysisInterval, 
 PaceTable.propTypes = {
     setSubrange:PropTypes.func.isRequired,
     toggleMapRange:PropTypes.func.isRequired,
-    actualPace:PropTypes.number.isRequired,
     activityData:PropTypes.object,
 };
 
 const mapStateToProps = (state) =>
     ({
-        actualPace: state.strava.actualPace,
         activityData: state.strava.activityData,
         activityStream: state.strava.activityStream,
         analysisInterval: state.strava.analysisInterval

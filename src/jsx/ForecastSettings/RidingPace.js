@@ -2,11 +2,9 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import {Label, Input, FormGroup, UncontrolledTooltip} from 'reactstrap';
 import {connect} from 'react-redux';
-import {setPace, saveCookie} from "../actions/actions";
-
-export const paceToSpeed = {'Q':3, 'R':4, 'S':5, 'T':6, 'A-':9, 'A':10, 'A+':11, 'B':12, 'B+':13, 'C':14, 'C+':15, 'D':16, 'D+':17, 'E':18, 'E+':19};
-export const inputPaceToSpeed = {'Q':3, 'R':4, 'S':5, 'T':6, 'A-':9, 'A':10, 'A+':11, 'B':12, 'B+':13, 'C-':13, 'C':14, 'C+':15, 'D-':15, 'D':16, 'D+':17, 'E':18, 'E+':19};
-export const metricPaceToSpeed = {'A-':15, 'A':16, 'B-':18, 'B':19, 'C-':21, 'C':22, 'C+':24, 'D-':24, 'D':26, 'D+':27, 'E-':27, 'E':29};
+import {saveCookie, setPace} from "../actions/actions";
+import { useActualPace } from '../../utils/hooks';
+import { inputPaceToSpeed, paceToSpeed } from '../../utils/util';
 
 const paceValues = {
     imperialLikeAPenguin: {
@@ -74,12 +72,15 @@ const correctPaceValue = (paceAlpha, setPace) => {
     }
 }
 
-const RidingPace = ({pace,actualPace,setPace,metric}) => {
+const RidingPace = ({ pace, setPace, metric }) => {
+
+    const actualPace = useActualPace()
+
     pace = correctPaceValue(pace, setPace);
     let pace_mph = paceToSpeed[pace];
     let pace_text;
     let pace_tooltip_class = 'pace_tooltip';
-    if (actualPace === undefined || actualPace === 0) {
+    if (actualPace === null || actualPace === 0) {
         pace_text = `Speed on flat ground, which will be reduced by climbing`;
     } else {
         pace_tooltip_class = getPaceTooltipId(actualPace,pace_mph);
@@ -105,14 +106,12 @@ const RidingPace = ({pace,actualPace,setPace,metric}) => {
 RidingPace.propTypes = {
     pace:PropTypes.string.isRequired,
     setPace:PropTypes.func.isRequired,
-    actualPace:PropTypes.number,
     metric:PropTypes.bool.isRequired
 };
 
 const mapStateToProps = (state) =>
     ({
         pace: state.uiInfo.routeParams.pace,
-        actualPace: state.strava.actualPace,
         metric: state.controls.metric
     });
 

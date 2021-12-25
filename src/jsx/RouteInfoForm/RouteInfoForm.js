@@ -10,7 +10,7 @@ import {connect} from 'react-redux';
 import { formatControlsForUrl } from '../../utils/util';
 import { AlwaysFilledSwitch } from './AlwaysFilledSwitch';
 import { RouteInfoInputRWGPS } from './RouteInfoInputRWGPS';
-import RouteInfoInputStrava from './RouteInfoInputStrava';
+import { RouteInfoInputStrava } from './RouteInfoInputStrava';
 import { routeLoadingModes } from '../../data/enums';
 
 const RouteInfoForm = ({ controlPoints, fetchingRoute, errorDetails, routeInfo, firstUse, needToViewTable, routeProps, routeLoadingMode, setRouteLoadingMode }) => {

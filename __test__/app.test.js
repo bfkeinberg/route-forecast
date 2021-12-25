@@ -49,7 +49,7 @@ describe('<RouteWeatherUI />', () => {
     it('renders without crashing', () => {
 
         const wrapper = shallow(<RouteWeatherUI action={'/forecast'} search={''} setActionUrl={setActionUrl} setApiKeys={setApiKeys} updateControls={updateControls}
-                                                formVisible={true} showForm={showForm} showPaceTable={false} setFetchAfterLoad={setFetchAfterLoad}
+                                                formVisible={true} showForm={showForm} setFetchAfterLoad={setFetchAfterLoad}
                                                 setRouteLoadingMode={setRouteLoadingMode} loadFromRideWithGps={loadFromRideWithGps}
                                                 rwgpsRouteIsTrip={false} reset={reset} newUserMode={newUserMode} firstUse={false}
                                                 setRwgpsRoute={setRwgpsRoute} setStravaToken={setStravaToken} setStart={setStart}

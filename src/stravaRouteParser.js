@@ -1,8 +1,8 @@
 import queryString from 'query-string';
 import { Api } from 'rest-api-handler';
 import cookie from 'react-cookies';
-import {paceToSpeed} from './jsx/ForecastSettings/RidingPace';
 import { DateTime } from 'luxon';
+import { paceToSpeed, setMinMaxCoords } from './utils/util';
 
 const metersToMiles = 0.00062137;
 const metersToFeet = 3.2808;
@@ -49,18 +49,25 @@ class StravaRouteParser {
         });
     }
 
-    computeTimesFromData = (controlPoints, activityData, activityStream) => {
-        return ({controls:this.parseActivity(activityData, activityStream, controlPoints),
-            actualFinishTime:StravaRouteParser.computeActualFinishTime(activityData),
-            actualPace:StravaRouteParser.wwPaceCalcForActivity(activityData)});
-    };
+    computeControlPointArrivalTimes = (activityData, activityStream, controlPoints) => {
+        let arrivalTimes = [];
+        let modifiedControls = controlPoints.slice();
+        modifiedControls.sort((a,b) => a['distance']-b['distance']);
+        let distances = activityStream.distance.data;
+        let times = activityStream.time.data;
+        StravaRouteParser.walkActivity(activityData['start_date'], distances, times, modifiedControls, arrivalTimes);
+        arrivalTimes.sort((a,b) => a['val']-b['val']);
+        return arrivalTimes;
+    }
 
-    static wwPaceCalcForActivity(activity) {
+    computeActualFinishTime = activityData => DateTime.fromISO(activityData['start_date']).plus({seconds:activityData['elapsed_time']}).toFormat('EEE, MMM dd h:mma');
+
+    computeWWPaceForActivity = activityData => {
         // all below in meters
-        let average_speed_in_meters = activity.average_speed;
+        let average_speed_in_meters = activityData.average_speed;
         let averageSpeedInMilesPerHour = (average_speed_in_meters*3600)*metersToMiles;
-        let climbInMeters = activity.total_elevation_gain;
-        let distanceInMeters = activity.distance;
+        let climbInMeters = activityData.total_elevation_gain;
+        let distanceInMeters = activityData.distance;
         let climbInFeet = (climbInMeters * metersToFeet);
         let distanceInMiles = distanceInMeters*metersToMiles;
         return StravaRouteParser.wwPaceCalc(climbInFeet, distanceInMiles, averageSpeedInMilesPerHour);
@@ -71,9 +78,19 @@ class StravaRouteParser {
         return averageSpeedInMilesPerHour + hilliness;
     }
 
-    static computeActualFinishTime(activity) {
-            return DateTime.fromISO(activity['start_date']).plus({seconds:activity['elapsed_time']}).toFormat('EEE, MMM dd h:mma');
-    }
+    computePointsAndBounds = (activityStream) => {
+        let latlng = activityStream.latlng;
+        let distance = activityStream.distance;
+        let bounds = { min_latitude: 90, min_longitude: 180, max_latitude: -90, max_longitude: -180 };
+        return {
+            points: latlng.data.map((coord, i) => {
+                let point = Object.assign({}, {lat:coord[0], lon:coord[1]}, {dist:distance.data[i]});
+                bounds = setMinMaxCoords(point, bounds);
+                return point
+            }),
+            bounds
+        };
+    };
 
     fetchActivity(activityId, api) {
         return api.get(`/activities/${activityId}`);
@@ -179,17 +196,6 @@ class StravaRouteParser {
             }
             index++;
         }
-    }
-
-    parseActivity(activity, activityStream, controlPoints) {
-        let arrivalTimes = [];
-        let modifiedControls = controlPoints.slice();
-        modifiedControls.sort((a,b) => a['distance']-b['distance']);
-        let distances = activityStream.distance.data;
-        let times = activityStream.time.data;
-        StravaRouteParser.walkActivity(activity['start_date'], distances, times, modifiedControls, arrivalTimes);
-        arrivalTimes.sort((a,b) => a['val']-b['val']);
-        return arrivalTimes;
     }
 
     processActivityStream(activityId,api) {

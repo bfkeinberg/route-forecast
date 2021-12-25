@@ -2,9 +2,9 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Label, Input, FormGroup } from 'reactstrap';
 import { connect } from 'react-redux';
-import { setStravaActivity, updateExpectedTimes } from "../actions/actions";
+import { setStravaActivity } from "../actions/actions";
 
-const StravaRouteIdInput = ({ setStravaActivity, strava_activity, updateExpectedTimes, canAnalyze }) => {
+const StravaRouteIdInput = ({ setStravaActivity, strava_activity, canAnalyze }) => {
     return (
         <FormGroup>
             <Label for='stravaRoute' size='sm' tag='b'>Strava Activity Id</Label>
@@ -67,7 +67,6 @@ StravaRouteIdInput.propTypes = {
         PropTypes.oneOf([''])
     ]).isRequired,
     setStravaActivity:PropTypes.func.isRequired,
-    updateExpectedTimes:PropTypes.func.isRequired,
     canAnalyze:PropTypes.bool.isRequired
 };
 
@@ -78,7 +77,7 @@ const mapStateToProps = (state) =>
     });
 
 const mapDispatchToProps = {
-    setStravaActivity, updateExpectedTimes
+    setStravaActivity
 };
 
 export default connect(mapStateToProps,mapDispatchToProps)(StravaRouteIdInput);

@@ -136,7 +136,7 @@ loadingSource:null,fetchingForecast:false,fetchingRoute:false}, action) {
 };
 
 const routeInfo = function(state = {finishTime:'',initialFinishTime:'',weatherCorrectionMinutes:null,
-    forecastRequest:null,points:[], fetchAfterLoad:false,bounds:null,name:'',rwgpsRouteData:null,totalTimeInHours:null,
+    forecastRequest:null, fetchAfterLoad:false,name:'',rwgpsRouteData:null,totalTimeInHours:null,
     gpxRouteData:null, maxGustSpeed:0, timeZoneOffset:0, timeZoneId:'America/Los_Angeles'}, action) {
     switch (action.type) {
         case Actions.SET_TIME_ZONE:
@@ -147,19 +147,17 @@ const routeInfo = function(state = {finishTime:'',initialFinishTime:'',weatherCo
             return {...state,gpxRouteData:action.gpxRouteData,rwgpsRouteData:null};
         case Actions.SET_ROUTE_INFO:
             if (action.routeInfo===null) {
-                return {...state,rwgpsRouteData:null,gpxRouteData:null,points:[],bounds:null,name:'',
+                return {...state,rwgpsRouteData:null,gpxRouteData:null,name:'',
                     forecastRequest:null,totalTimeInHours:null};
             }
-            return {...state, points:action.routeInfo.points,name:action.routeInfo.name,bounds:action.routeInfo.bounds,
+            return {...state,name:action.routeInfo.name,
                 finishTime:action.routeInfo.finishTime,initialFinishTime:action.routeInfo.finishTime,
                 forecastRequest:action.routeInfo.forecastRequest,totalTimeInHours:action.routeInfo.timeInHours};
-        case Actions.SET_ROUTE_POINTS_BOUNDS:
-            return {...state, points:action.points, bounds: action.bounds};
         case Actions.CLEAR_ROUTE_DATA:
-            return {...state,rwgpsRouteData:null,gpxRouteData:null,points:[],bounds:null,name:'',forecastRequest:null};
+            return {...state,rwgpsRouteData:null,gpxRouteData:null,name:'',forecastRequest:null};
         // clear when the route is changed
         case Actions.SET_RWGPS_ROUTE:
-            return {...state,rwgpsRouteData:null,gpxRouteData:null,points:[],bounds:null,name:'',forecastRequest:null,
+            return {...state,rwgpsRouteData:null,gpxRouteData:null,name:'',forecastRequest:null,
                 maxGustSpeed: 0, totalTimeInHours:null};
         case Actions.ADD_WEATHER_CORRECTION:
             return {...state,weatherCorrectionMinutes:action.weatherCorrectionMinutes,finishTime:action.finishTime,maxGustSpeed:action.maxGustSpeed};
@@ -170,9 +168,15 @@ const routeInfo = function(state = {finishTime:'',initialFinishTime:'',weatherCo
     }
 };
 
-export const controls = function(state = {metric:false,displayBanked:false,
-    userControlPoints:[],calculatedControlValues:[],initialControlValues:[], count:0,displayedFinishTime:'',
-    queryString:null, showWeatherProvider:false}, action) {
+export const controls = function (state = {
+    metric: false,
+    displayBanked: false,
+    userControlPoints: [],
+    calculatedControlValues: [],
+    initialControlValues: [],
+    queryString: null,
+    showWeatherProvider: false
+    }, action) {
     switch (action.type) {
         case Actions.SET_METRIC:
             if (action.metric !== undefined) {
@@ -185,24 +189,14 @@ export const controls = function(state = {metric:false,displayBanked:false,
         case Actions.TOGGLE_DISPLAY_BANKED:
             return {...state, displayBanked: !state.displayBanked};
         case Actions.UPDATE_USER_CONTROLS:
-            return {...state, userControlPoints: action.controls, count: action.controls.length};
+            return {...state, userControlPoints: action.controls};
         case Actions.UPDATE_CALCULATED_VALUES:
             return {...state, calculatedControlValues: action.values};
-        case Actions.UPDATE_ACTUAL_ARRIVAL_TIMES: {
-            let calculatedValues = [];
-            state.calculatedControlValues.forEach((item,index) => calculatedValues.push({...item, actual:action.arrivalTimes[index].time}));
-            return {...state, calculatedControlValues:calculatedValues};
-        }
         case Actions.SET_ROUTE_INFO:
             return {...state, calculatedControlValues: action.routeInfo.values,
-                initialControlValues: action.routeInfo.values,
-                displayedFinishTime:action.routeInfo.finishTime};
-        case Actions.ADD_WEATHER_CORRECTION:
-            return {...state,displayedFinishTime:action.finishTime};
+                initialControlValues: action.routeInfo.values};
         case Actions.ADD_CONTROL:
-            return {...state, count:state.count+1};
-        case Actions.SET_DISPLAYED_FINISH_TIME:
-            return {...state, displayedFinishTime:action.displayedTime};
+            return {...state, userControlPoints: [...state.userControlPoints, { name: "", distance: 0, duration: 0 }] };
         case Actions.SET_QUERY:
             // here because it encodes the user entered controls
             return {...state, queryString:action.queryString};
@@ -211,7 +205,7 @@ export const controls = function(state = {metric:false,displayBanked:false,
         case Actions.NEW_USER_MODE:
         {
             if (action.value === false) {
-                return {...state,userControlPoints:[],count:0};
+                return {...state, userControlPoints: []};
             }
             return state;
         }
@@ -246,10 +240,17 @@ const getAnalysisIntervalFromRouteDuration = (durationInHours) => {
     }
 };
 
-const strava = function(state = {analysisInterval:defaultAnalysisIntervalInHours,activity:'',access_token:null,
-    refresh_token:null, expires_at:null, actualPace:0,
-    fetching:false,activityData:null,errorDetails:null, subrange:[]},
-                        action) {
+const strava = function (state = {
+        analysisInterval: defaultAnalysisIntervalInHours,
+        activity: '',
+        access_token: null,
+        refresh_token: null,
+        expires_at: null,
+        fetching: false,
+        activityData: null,
+        errorDetails: null,
+        subrange:[]
+    }, action) {
     let setNewActivity = function () {
         if (action.activity === undefined) {
             return state;
@@ -293,10 +294,6 @@ const strava = function(state = {analysisInterval:defaultAnalysisIntervalInHours
             if (action.error !== undefined) {
                 return {...state, errorDetails:action.error};
             } else {return state;}
-        case Actions.SET_ACTUAL_FINISH_TIME:
-            return {...state, actualFinishTime:action.finishTime};
-        case Actions.SET_ACTUAL_PACE:
-            return {...state, actualPace:action.pace};
         case Actions.BEGIN_STRAVA_FETCH:
             return {...state, fetching:true};
         case Actions.STRAVA_FETCH_SUCCESS:

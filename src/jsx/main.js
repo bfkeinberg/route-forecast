@@ -67,7 +67,6 @@ export class RouteWeatherUI extends Component {
         setActionUrl:PropTypes.func.isRequired,
         setApiKeys:PropTypes.func.isRequired,
         updateControls:PropTypes.func.isRequired,
-        showPaceTable:PropTypes.bool.isRequired,
         setFetchAfterLoad:PropTypes.func.isRequired,
         setRouteLoadingMode: PropTypes.func.isRequired,
         loadFromRideWithGps: PropTypes.func.isRequired,
@@ -258,8 +257,7 @@ export class RouteWeatherUI extends Component {
             {/*TODO: values is needed for SSR, but messes up real device detection, seemingly*/}
             {/*<MediaQuery minDeviceWidth={1000} values={{deviceWidth:1400}}>*/}
             <MediaQuery minWidth={501}>
-                <DesktopUI showPaceTable={this.props.showPaceTable}
-                           mapsApiKey={this.props.maps_api_key}/>
+                <DesktopUI mapsApiKey={this.props.maps_api_key}/>
             </MediaQuery>
             {/*<MediaQuery maxDeviceWidth={800} values={{deviceWidth:1400}}>*/}
             <MediaQuery maxWidth={500}>
@@ -279,7 +277,6 @@ const mapDispatchToProps = {
 
 const mapStateToProps = (state) =>
     ({
-        showPaceTable:state.uiInfo.routeParams.routeLoadingMode === routeLoadingModes.STRAVA,
         rwgpsRouteIsTrip: state.uiInfo.routeParams.rwgpsRouteIsTrip,
         firstUse: state.params.newUserMode
     });

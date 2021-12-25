@@ -201,12 +201,6 @@
                     "lon": -119.81972
                 }
             ],
-            "bounds": {
-                "min_latitude": 38.54177,
-                "min_longitude": -119.99185,
-                "max_latitude": 38.77764,
-                "max_longitude": -119.52807
-            },
             "finishTime": "Sat, Jul 14 2018 8:13pm",
             "initialFinishTime": "Sat, Jul 14 2018 8:13pm",
             "points": [

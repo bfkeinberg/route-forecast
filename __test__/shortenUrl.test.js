@@ -58,9 +58,7 @@ describe('Call URL shortener', () => {
                 "initialFinishTime": "",
                 "weatherCorrectionMinutes": null,
                 "forecastRequest": null,
-                "points": [],
                 "fetchAfterLoad": true,
-                "bounds": null,
                 "name": "",
                 "rwgpsRouteData": null,
                 "gpxRouteData": null
@@ -71,8 +69,6 @@ describe('Call URL shortener', () => {
                 "userControlPoints": [],
                 "calculatedControlValues": [],
                 "initialControlValues": [],
-                "count": 0,
-                "displayedFinishTime": "",
                 "queryString": null
             },
             "strava": {

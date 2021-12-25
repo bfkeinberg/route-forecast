@@ -1,40 +1,25 @@
-import React from 'react';
-import PropTypes from 'prop-types';
-import {connect} from 'react-redux';
-import {setDisplayedFinishTime} from "../actions/actions";
+import React, { useState } from 'react';
+import { useSelector } from 'react-redux';
 import '../../static/controlsStyles.css';
+import { useActualFinishTime } from '../../utils/hooks';
 
-const FinishTime = ({finishTime,actualFinishTime,displayedFinishTime,setDisplayedFinishTime}) => {
+export const FinishTime = () => {
+
+    const predictedFinishTime = useSelector(state => state.routeInfo.finishTime)
+    const actualFinishTime = useActualFinishTime()
+
+    const [displayActualFinishTime, setDisplayActualFinishTime] = useState(false)
+    
     return (
         <div className="controls-item-contents">
             <span id={'finish-time-label'} className="controls-textinput-label">Finish time</span>
             <span className="finish-time-value"
                   onMouseEnter={() => {
-                      if (actualFinishTime !== undefined) {
-                          setDisplayedFinishTime(actualFinishTime);
+                      if (actualFinishTime !== null) {
+                        setDisplayActualFinishTime(true);
                       }}}
-                  onMouseLeave={() => setDisplayedFinishTime(finishTime)}
-            >{displayedFinishTime}</span>
+                  onMouseLeave={() => setDisplayActualFinishTime(false)}
+            >{displayActualFinishTime ? actualFinishTime : predictedFinishTime}</span>
         </div>
-        );
+    );
 };
-
-FinishTime.propTypes = {
-    finishTime:PropTypes.string,
-    actualFinishTime:PropTypes.string,
-    displayedFinishTime:PropTypes.string,
-    setDisplayedFinishTime:PropTypes.func.isRequired
-};
-
-const mapStateToProps = (state) =>
-    ({
-        finishTime: state.routeInfo.finishTime,
-        actualFinishTime: state.strava.actualFinishTime,
-        displayedFinishTime: state.controls.displayedFinishTime
-    });
-
-const mapDispatchToProps = {
-    setDisplayedFinishTime
-};
-
-export default connect(mapStateToProps,mapDispatchToProps)(FinishTime);

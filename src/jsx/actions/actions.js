@@ -1,5 +1,6 @@
 import cookie from 'react-cookies';
 import * as Sentry from '@sentry/browser';
+import { getRouteInfo } from '../../utils/util';
 
 export const componentLoader = (lazyComponent, attemptsLeft) => {
     return new Promise((resolve, reject) => {
@@ -20,14 +21,6 @@ export const componentLoader = (lazyComponent, attemptsLeft) => {
                 }, 1500)
             })
     });
-};
-
-export const setMinMaxCoords = (trackPoint,bounds) => {
-    bounds.min_latitude = Math.min(trackPoint.lat, bounds.min_latitude);
-    bounds.min_longitude = Math.min(trackPoint.lon, bounds.min_longitude);
-    bounds.max_latitude = Math.max(trackPoint.lat, bounds.max_latitude);
-    bounds.max_longitude = Math.max(trackPoint.lon, bounds.max_longitude);
-    return bounds;
 };
 
 const sanitizeCookieName = (cookieName) => {
@@ -260,9 +253,10 @@ export const requestForecast = function(routeInfo) {
                 let userControls = getState().controls.userControlPoints;
                 let calculatedValues = getState().controls.initialControlValues;
                 const parser = await getRouteParser();
+                const routeInfo = getRouteInfo(getState())
                 let {time:weatherCorrectionMinutes,values:recalculatedValues,gustSpeed,finishTime} = parser.adjustForWind(
                     response.forecast,
-                    getState().routeInfo.points,
+                    routeInfo.points,
                     getState().uiInfo.routeParams.pace,
                     userControls, calculatedValues,
                     getState().uiInfo.routeParams.start,
@@ -293,15 +287,6 @@ const setRouteInfo = (routeInfo) => {
             routeInfo: routeInfo
         });
     };
-};
-
-export const SET_ROUTE_POINTS_BOUNDS = 'SET_ROUTE_POINTS_BOUNDS';
-export const setRoutePointsAndBounds = (pointsAndBounds) => {
-    return {
-        type: SET_ROUTE_POINTS_BOUNDS,
-        points: pointsAndBounds.points,
-        bounds: pointsAndBounds.bounds
-    }
 };
 
 export const SET_TIME_ZONE = 'SET_TIME_ZONE';
@@ -360,19 +345,12 @@ export const recalcRoute = function() {
                 getState().uiInfo.routeParams.start, getState().params.timezone_api_key);
             return timeZonePromise.then(timeZoneResult => {
                 dispatch(setTimeZone(timeZoneResult.zoneId,timeZoneResult.offset));
-                dispatch(setRouteInfo(
-                    parser.walkRwgpsRoute(
-                        rwgpsRouteData,
-                        getState().uiInfo.routeParams.start,
-                        getState().uiInfo.routeParams.pace,
-                        getState().uiInfo.routeParams.interval,
-                        getState().controls.userControlPoints,
-                        getState().controls.metric,
-                        timeZoneResult.zoneId)));
+                const routeInfo = getRouteInfo({...getState(), routeInfo: {...getState().routeInfo, timeZoneId: timeZoneResult.zoneId}})
+                dispatch(setRouteInfo(routeInfo));
                 if (getState().forecast.forecast !== []) {
                     let {time:weatherCorrectionMinutes,values:recalculatedValues,gustSpeed,finishTime} = parser.adjustForWind(
                         getState().forecast.forecast,
-                        getState().routeInfo.points,
+                        routeInfo.points,
                         getState().uiInfo.routeParams.pace,
                         getState().controls.userControlPoints,
                         getState().controls.initialControlValues,
@@ -620,38 +598,6 @@ export const stravaFetchFailure = function(error) {
     };
 };
 
-export const SET_ACTUAL_FINISH_TIME = 'SET_ACTUAL_FINISH_TIME';
-export const setActualFinishTime = function(finishTime) {
-    return {
-        type: SET_ACTUAL_FINISH_TIME,
-        finishTime: finishTime
-    };
-};
-
-export const SET_DISPLAYED_FINISH_TIME = 'SET_DISPLAYED_FINISH_TIME';
-export const setDisplayedFinishTime = function(displayedTime) {
-    return {
-        type: SET_DISPLAYED_FINISH_TIME,
-        displayedTime: displayedTime
-    };
-};
-
-export const SET_ACTUAL_PACE = 'SET_ACTUAL_PACE';
-export const setActualPace = function(pace) {
-    return {
-        type: SET_ACTUAL_PACE,
-        pace: pace
-    };
-};
-
-export const UPDATE_ACTUAL_ARRIVAL_TIMES = 'UPDATE_ACTUAL_ARRIVAL_TIMES';
-export const updateActualArrivalTimes = function(times) {
-    return {
-        type: UPDATE_ACTUAL_ARRIVAL_TIMES,
-        arrivalTimes: times
-    };
-};
-
 export const SET_ACTION_URL = 'SET_ACTION_URL';
 export const setActionUrl = function(action) {
     return {
@@ -710,16 +656,8 @@ const refreshOldToken = (dispatch, getState) => {
     }
 };
 
-export const loadStravaActivity = function(activity) {
+export const loadStravaActivity = function() {
     return async function (dispatch, getState) {
-        if (getState().strava.activityData !== null && getState().strava.activityStream !== null) {
-            return new Promise((resolve) => {
-                resolve({
-                    activity: getState().strava.activityData,
-                    stream: getState().strava.activityStream
-                });
-            });
-        }
         const parser = await getStravaParser().catch((err) => {
             dispatch(stravaFetchFailure(err));
             return null
@@ -728,43 +666,16 @@ export const loadStravaActivity = function(activity) {
         if (parser == null) {
             return Promise.resolve(Error('Cannot load parser'));
         }
-        return refreshOldToken(dispatch, getState).then(access_token => {
-            dispatch(beginStravaFetch());
-            return parser.fetchStravaActivity(activity, access_token);
-        });
-    }
-};
 
-const getPointsFromStrava = (activityStream) => {
-    let latlng = activityStream.latlng;
-    let distance = activityStream.distance;
-    let bounds = {min_latitude:90, min_longitude:180, max_latitude:-90, max_longitude:-180};
-    return {points:latlng.data.map ((coord, i) => {
-        let point = Object.assign({}, {lat:coord[0], lon:coord[1]}, {dist:distance.data[i]});
-            bounds = setMinMaxCoords(point,bounds);
-            return point}),
-        bounds:bounds};
-};
-
-export const updateExpectedTimes = function() {
-    return function (dispatch,getState) {
+        const access_token = await refreshOldToken(dispatch, getState)
+        dispatch(beginStravaFetch());
         const activityId = getState().strava.activity
-        dispatch(loadStravaActivity(activityId)).then( async result => {
+        return parser.fetchStravaActivity(activityId, access_token).then(result => {
             dispatch(stravaFetchSuccess(result));
-            const parser = await getStravaParser().catch((err) => {dispatch(stravaFetchFailure(err));return null});
-            // handle failed load, error has already been dispatched
-            if (parser == null) {
-                return Promise.resolve(Error('Cannot load parser'));
-            }
-            let timesFromData = parser.computeTimesFromData(getState().controls.userControlPoints,
-                result.activity, result.stream);
-            dispatch(updateActualArrivalTimes(timesFromData.controls));
-            dispatch(setActualPace(timesFromData.actualPace));
-            dispatch(setActualFinishTime(timesFromData.actualFinishTime));
-            dispatch(setRoutePointsAndBounds(getPointsFromStrava(getState().strava.activityStream)));
-        }, error => {
+        }).catch(error => {
             dispatch(stravaFetchFailure(error));
         });
+        
     }
 };
 

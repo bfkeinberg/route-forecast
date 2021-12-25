@@ -22,7 +22,7 @@ MapLoader.propTypes = {
 
 const mapStateToProps = (state) =>
     ({
-        hasMap: (state.forecast.forecast.length > 0 || state.uiInfo.routeParams.routeLoadingMode === routeLoadingModes.STRAVA) && state.routeInfo.bounds !== null
+        hasMap: (state.forecast.forecast.length > 0 || state.uiInfo.routeParams.routeLoadingMode === routeLoadingModes.STRAVA)
     });
 
 // eslint-disable-next-line new-cap

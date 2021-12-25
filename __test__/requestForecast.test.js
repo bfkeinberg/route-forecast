@@ -585,8 +585,6 @@ describe('request forecast', () => {
                 ],
                 "calculatedControlValues": calculatedControls,
                 "initialControlValues": calculatedControls,
-                "count": 10,
-                "displayedFinishTime": "",
                 "queryString": null
             },
             uiInfo:{

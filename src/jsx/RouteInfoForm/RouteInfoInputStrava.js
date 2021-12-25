@@ -4,16 +4,22 @@ import stravaImage from 'Images/api_logo_pwrdBy_strava_stack_light.png';
 import { Alert, Button } from 'reactstrap';
 import ErrorBoundary from '../errorBoundary';
 import { Spinner } from '@blueprintjs/core';
-import PropTypes from 'prop-types';
 import StravaRouteIdInput from './StravaRouteIdInput';
-import { connect } from 'react-redux';
-import { updateExpectedTimes } from "../actions/actions";
+import { useSelector } from 'react-redux';
+import { loadStravaActivity } from "../actions/actions";
 import stravaRouteParser from '../../stravaRouteParser';
+import { useDispatch } from 'react-redux';
 
-const RouteInfoInputStrava = ({stravaError, fetchingFromStrava, updateExpectedTimes, accessToken}) => {
+export const RouteInfoInputStrava = () => {
+  const dispatch = useDispatch()
+
   const fetchRoute = () => {
-    updateExpectedTimes()
+    dispatch(loadStravaActivity())
   }
+
+  const stravaError = useSelector(state => state.strava.errorDetails)
+  const fetchingFromStrava = useSelector(state => state.strava.fetching)
+  const accessToken = useSelector(state => state.strava.access_token)
 
   const validRouteId = true
 
@@ -45,26 +51,6 @@ const RouteInfoInputStrava = ({stravaError, fetchingFromStrava, updateExpectedTi
     </div>
   )
 }
-
-RouteInfoInputStrava.propTypes = {
-  stravaError: PropTypes.string,
-  fetchingFromStrava:PropTypes.bool,
-  updateExpectedTimes: PropTypes.func.isRequired,
-  accessToken: PropTypes.string
-}
-
-const mapStateToProps = (state) =>
-  ({
-      stravaError: state.strava.errorDetails,
-      fetchingFromStrava: state.strava.fetching,
-      accessToken: state.strava.access_token
-  });
-
-const mapDispatchToProps = {
-  updateExpectedTimes
-};
-
-export default connect(mapStateToProps, mapDispatchToProps)(RouteInfoInputStrava);
 
 const StravaLoginButton = () => {
   return (

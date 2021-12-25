@@ -15,7 +15,7 @@ describe('controls reducer', () => {
         expect(controls(undefined,{})).toEqual(
             {
                 metric:false,displayBanked:false,
-                userControlPoints:[],initialControlValues:[], calculatedControlValues:[],count:0,displayedFinishTime:'',queryString:null,
+                userControlPoints:[],initialControlValues:[], calculatedControlValues:[],queryString:null,
                 showWeatherProvider:false
             }
         );
@@ -24,7 +24,7 @@ describe('controls reducer', () => {
     it('should handle SET_ROUTE_INFO', () => {
         expect(controls( {
             metric:false,displayBanked:false,
-            userControlPoints:[],calculatedControlValues:[],initialControlValues:[],count:0,displayedFinishTime:'',queryString:null
+            userControlPoints:[],calculatedControlValues:[],initialControlValues:[],queryString:null
         },
             {
                 type:SET_ROUTE_INFO,
@@ -230,12 +230,6 @@ describe('controls reducer', () => {
                             "lon": -119.81972
                         }
                     ],
-                    "bounds": {
-                        "min_latitude": 38.54177,
-                        "min_longitude": -119.99185,
-                        "max_latitude": 38.77764,
-                        "max_longitude": -119.52807
-                    },
                     "finishTime": "Sat, Jul 14 2018 8:13pm"
                 }
         })).toEqual(
@@ -314,7 +308,6 @@ describe('controls reducer', () => {
                 ],
                 metric:false,
                 displayBanked:false,
-                count:0,
                 queryString:null,
                 userControlPoints:[],
                 initialControlValues:[
@@ -389,7 +382,6 @@ describe('controls reducer', () => {
                         "lon": -119.81972
                     }
                 ],
-                displayedFinishTime:'Sat, Jul 14 2018 8:13pm'
             }
         )
     });
@@ -470,7 +462,6 @@ describe('controls reducer', () => {
                 ],
                 metric:false,
                 displayBanked:false,
-                count:0,
                 queryString:null,
                 userControlPoints:[],
                 initialControlValues:[
@@ -545,7 +536,6 @@ describe('controls reducer', () => {
                         "lon": -119.81972
                     }
                 ],
-                displayedFinishTime:'Sat, Jul 14 2018 8:13pm'
             },
             {
                 type:UPDATE_CALCULATED_VALUES,
@@ -697,7 +687,6 @@ describe('controls reducer', () => {
                 ],
                 metric:false,
                 displayBanked:false,
-                count:0,
                 queryString:null,
                 userControlPoints:[],
                 initialControlValues:[
@@ -772,7 +761,6 @@ describe('controls reducer', () => {
                         "lon": -119.81972
                     }
                 ],
-                displayedFinishTime:'Sat, Jul 14 2018 8:13pm'
             }
         )
     });

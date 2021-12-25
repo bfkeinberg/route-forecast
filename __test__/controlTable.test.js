@@ -39,7 +39,7 @@ describe('<ControlTable />', () => {
 
 */
     it('should render the table of controls', () => {
-        const wrapper = shallow(<ControlTable displayBanked={false} compare={false} count={0} metric={false} updateControls={jest.fn()} controls={[]} calculatedValues={[]}/>);
+        const wrapper = shallow(<ControlTable displayBanked={false} compare={false} metric={false} updateControls={jest.fn()} controls={[]} calculatedValues={[]}/>);
         // let container = frame.add(wrapper.getText());
         expect(wrapper.find('AgGridReact').length).toBe(1);
         expect(wrapper.find('div#controlTable').length).toBe(1);

@@ -9,11 +9,12 @@ import { TopBar } from "./TopBar/TopBar";
 import PaceTable from "./resultsTab/PaceTable";
 import { useSelector } from "react-redux";
 
-const DesktopUI = ({showPaceTable, mapsApiKey}) => {
+const DesktopUI = ({mapsApiKey}) => {
     const sidePaneOptions = [
         {title: "Route Info", content: <ErrorBoundary><RouteInfoForm routeProps={{}} /></ErrorBoundary>},
         {title: "Forecast Settings", content: <ErrorBoundary><ForecastSettings/></ErrorBoundary>},
-        {title: "Forecast", content: <ErrorBoundary>{showPaceTable ? <PaceTable/> : <ForecastTable/>}</ErrorBoundary>}
+        {title: "Forecast", content: <ErrorBoundary>{<ForecastTable/>}</ErrorBoundary>},
+        {title: "Pace Analysis", content: <ErrorBoundary>{<PaceTable/>}</ErrorBoundary>}
     ]
     const [activeSidePane, setActiveSidePane] = useState(0)
 
@@ -23,7 +24,18 @@ const DesktopUI = ({showPaceTable, mapsApiKey}) => {
     const stravaActivityData = useSelector(state => state.strava.activityData)
     const forecastData = useSelector(state => state.forecast.forecast)
     // this is comically ugly but w/e
-    const panesVisible = stravaActivityData !== null ? 3 : (routeData !== null ? (forecastData.length > 0 ? 3 : 2) : 1)
+
+    const panesVisible = new Set()
+    panesVisible.add("Route Info")
+    if (routeData !== null) {
+        panesVisible.add("Forecast Settings")
+    }
+    if (forecastData.length > 0) {
+        panesVisible.add("Forecast")
+    }
+    if (stravaActivityData !== null) {
+        panesVisible.add("Pace Analysis")
+    }
     
     return (
         <div>
@@ -43,7 +55,6 @@ const DesktopUI = ({showPaceTable, mapsApiKey}) => {
 };
 
 DesktopUI.propTypes = {
-    showPaceTable: PropTypes.bool,
     mapsApiKey: PropTypes.string
 };
 

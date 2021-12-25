@@ -26,9 +26,7 @@
     "initialFinishTime": "",
     "weatherCorrectionMinutes": null,
     "forecastRequest": null,
-    "points": [],
     "fetchAfterLoad": false,
-    "bounds": null,
     "name": "",
     "rwgpsRouteData": {
       "type": "route",
@@ -8102,8 +8100,6 @@
     "userControlPoints": [],
     "calculatedControlValues": [],
     "initialControlValues": [],
-    "count": 0,
-    "displayedFinishTime": "",
     "queryString": null
   },
   "strava": {
