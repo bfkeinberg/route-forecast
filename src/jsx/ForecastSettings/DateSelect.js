@@ -4,7 +4,7 @@ import Flatpickr from 'react-flatpickr'
 import {Icon} from '@blueprintjs/core';
 import {Label, UncontrolledTooltip, Row, Col} from 'reactstrap';
 import {connect} from 'react-redux';
-import {setStart, setInitialStart} from "../actions/actions";
+import {setStart, setInitialStart} from "../../redux/actions";
 import 'flatpickr/dist/themes/confetti.css';
 import { DateTime } from 'luxon';
 

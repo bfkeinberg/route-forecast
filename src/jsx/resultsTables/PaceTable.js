@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { Table, UncontrolledTooltip } from 'reactstrap';
-import ErrorBoundary from "../errorBoundary";
+import ErrorBoundary from "../shared/ErrorBoundary";
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 import 'animate.css/animate.min.css';
-import { setSubrange, toggleMapRange } from '../actions/actions';
-import stravaRouteParser from '../../stravaRouteParser';
+import { setSubrange, toggleMapRange } from '../../redux/actions';
+import stravaRouteParser from '../../utils/stravaRouteParser';
 import StravaAnalysisIntervalInput from '../ForecastSettings/StravaAnalysisIntervalInput';
 import { useActualPace } from '../../utils/hooks';
 

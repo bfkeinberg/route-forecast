@@ -1,12 +1,12 @@
-import ErrorBoundary from "./errorBoundary";
-import ForecastTable from "./forecastTable";
-import MapLoader from "./mapLoader";
+import ErrorBoundary from "./shared/ErrorBoundary";
+import ForecastTable from "./resultsTables/ForecastTable";
+import MapLoader from "./Map/MapLoader";
 import PropTypes from "prop-types";
 import React, { useState } from "react";
 import RouteInfoForm from "./RouteInfoForm/RouteInfoForm";
 import ForecastSettings from "./ForecastSettings/ForecastSettings";
 import { TopBar } from "./TopBar/TopBar";
-import PaceTable from "./resultsTab/PaceTable";
+import PaceTable from "./resultsTables/PaceTable";
 import { useSelector } from "react-redux";
 
 const DesktopUI = ({mapsApiKey}) => {

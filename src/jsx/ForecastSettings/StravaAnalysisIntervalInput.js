@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Label, Input, FormGroup, UncontrolledTooltip } from 'reactstrap';
 import { connect } from 'react-redux';
-import { setAnalysisInterval } from "../actions/actions";
+import { setAnalysisInterval } from "../../redux/actions";
 
 const StravaAnalysisIntervalInput = ({ interval, setInterval }) => {
     const interval_tooltip_text = 'Interval in hours at which to calculate effective pace';

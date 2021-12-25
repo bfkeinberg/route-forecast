@@ -2,7 +2,7 @@ import queryString from 'query-string';
 import { Api } from 'rest-api-handler';
 import cookie from 'react-cookies';
 import { DateTime } from 'luxon';
-import { paceToSpeed, setMinMaxCoords } from './utils/util';
+import { paceToSpeed, setMinMaxCoords } from './util';
 
 const metersToMiles = 0.00062137;
 const metersToFeet = 3.2808;

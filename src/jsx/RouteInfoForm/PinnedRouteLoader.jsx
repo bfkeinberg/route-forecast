@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 import RideWithGpsCreds from './RideWithGpsCreds.jsx';
 import axios from 'axios';
-import {setPinnedRoutes, setErrorDetails, setRwgpsCredentials, setLoadingPinned} from "../actions/actions";
+import {setPinnedRoutes, setErrorDetails, setRwgpsCredentials, setLoadingPinned} from "../../redux/actions";
 import cookie from 'react-cookies';
 import {lazy} from '@loadable/component';
 import { Button } from '@blueprintjs/core';

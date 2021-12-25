@@ -5,7 +5,7 @@ import React, { useEffect } from 'react';
 import ShortUrl from '../TopBar/ShortUrl';
 import MediaQuery from 'react-responsive';
 import PropTypes from 'prop-types';
-import {saveCookie, setRouteLoadingMode} from '../actions/actions';
+import {saveCookie, setRouteLoadingMode} from '../../redux/actions';
 import {connect} from 'react-redux';
 import { formatControlsForUrl } from '../../utils/util';
 import { AlwaysFilledSwitch } from './AlwaysFilledSwitch';

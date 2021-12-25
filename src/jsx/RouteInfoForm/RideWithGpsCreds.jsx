@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { Dialog, Button, InputGroup } from "@blueprintjs/core";
 import { Tooltip2 } from "@blueprintjs/popover2";
 import {connect} from 'react-redux';
-import {setRwgpsCredentials} from "../actions/actions";
+import {setRwgpsCredentials} from "../../redux/actions";
 
 const RideWithGpsCreds = ({rwgpsUsername, rwgpsPassword, setRwgpsCredentials, dialogClosed}) => {
     const [dlgIsOpen, setOpen] = useState(true);

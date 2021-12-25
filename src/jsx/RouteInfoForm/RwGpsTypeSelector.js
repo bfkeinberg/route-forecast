@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import {Input, Label, FormGroup, UncontrolledTooltip} from 'reactstrap';
 import {connect} from 'react-redux';
-import {toggleRouteIsTrip} from "../actions/actions";
+import {toggleRouteIsTrip} from "../../redux/actions";
 
 const RwGpsTypeSelector = ({rwgpsRouteIsTrip,toggleRouteIsTrip,visible}) => {
     const isVisible = visible ? 'inline-flex' : 'none';

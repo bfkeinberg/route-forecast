@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Label, Input, FormGroup } from 'reactstrap';
 import { connect } from 'react-redux';
-import { setStravaActivity } from "../actions/actions";
+import { setStravaActivity } from "../../redux/actions";
 
 const StravaRouteIdInput = ({ setStravaActivity, strava_activity, canAnalyze }) => {
     return (

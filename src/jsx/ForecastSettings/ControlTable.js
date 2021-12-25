@@ -1,7 +1,7 @@
 import React from 'react';
 import { Icon } from '@blueprintjs/core';
 import { useSelector } from 'react-redux';
-import { updateUserControls } from '../actions/actions';
+import { updateUserControls } from '../../redux/actions';
 import { routeLoadingModes } from '../../data/enums';
 import { Table } from "./Table"
 import { useDispatch } from 'react-redux';

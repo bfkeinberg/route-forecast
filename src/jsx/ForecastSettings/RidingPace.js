@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import {Label, Input, FormGroup, UncontrolledTooltip} from 'reactstrap';
 import {connect} from 'react-redux';
-import {saveCookie, setPace} from "../actions/actions";
+import {saveCookie, setPace} from "../../redux/actions";
 import { useActualPace } from '../../utils/hooks';
 import { inputPaceToSpeed, paceToSpeed } from '../../utils/util';
 

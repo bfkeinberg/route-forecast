@@ -1,7 +1,7 @@
 import {applyMiddleware, createStore} from 'redux';
 import thunkMiddleware from 'redux-thunk';
 import {createLogger} from 'redux-logger';
-import rootReducer from './reducers/reducer';
+import rootReducer from './reducer';
 import * as Sentry from '@sentry/browser';
 import createSentryMiddleware from "redux-sentry-middleware";
 
@@ -25,21 +25,26 @@ const bannedActionKeys = [
  * @returns {any[]} array of middleware to be used
  */
 export const selectMiddleware = mode => {
-    return [
-        thunkMiddleware,
-        mode === 'development' ?
-            loggerMiddleware :
+    const middleware = [thunkMiddleware]
+    if (mode !== 'development') {
+        middleware.push(
             createSentryMiddleware(Sentry, {
-            stateTransformer: state => {Object.assign(...Object.keys(state)
-                .filter(key => (key !== 'routeInfo' && key !== 'forecast'))
-                .map( key => ({ [key]: state[key] }) ) )},
-            breadcrumbDataFromAction: action => {
-                return Object.assign(...Object.keys(action)
-                    .filter(key => (!bannedActionKeys.includes(key)))
-                    .map( key => ({ [key]: action[key] }) ) )
-            }
-        })
-    ]
+                stateTransformer: state => {Object.assign(...Object.keys(state)
+                    .filter(key => (key !== 'routeInfo' && key !== 'forecast'))
+                    .map( key => ({ [key]: state[key] }) ) )},
+                breadcrumbDataFromAction: action => {
+                    return Object.assign(...Object.keys(action)
+                        .filter(key => (!bannedActionKeys.includes(key)))
+                        .map( key => ({ [key]: action[key] }) ) )
+                }
+            })
+        )
+    }
+    const logging = true
+    if (logging) {
+        middleware.push(loggerMiddleware)
+    }
+    return middleware
 };
 
 /**

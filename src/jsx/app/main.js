@@ -7,9 +7,9 @@ import queryString from 'query-string';
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 // import cookie from 'react-cookies';
-import LocationContext from './locationContext';
-import DesktopUI from './DesktopUI';
-import MobileUI from './MobileUI';
+import LocationContext from '../locationContext';
+import DesktopUI from '../DesktopUI';
+import MobileUI from '../MobileUI';
 
 import {
     loadCookie,
@@ -36,9 +36,9 @@ import {
     setRwgpsCredentials,
     setStartTimestamp,
     setZoomToRange
-} from "./actions/actions";
-import QueryString from './queryString';
-import { routeLoadingModes } from '../data/enums';
+} from "../../redux/actions";
+import QueryString from './QueryString';
+import { routeLoadingModes } from '../../data/enums';
 
 const demoRoute = 1797453;
 const demoControls = [

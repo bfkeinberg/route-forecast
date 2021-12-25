@@ -1,8 +1,8 @@
-import * as Actions from '../actions/actions';
+import * as Actions from './actions';
 import {combineReducers} from 'redux';
 import { DateTime } from 'luxon';
-import { getRouteNumberFromValue } from '../RouteInfoForm/RideWithGpsId';
-import { routeLoadingModes } from '../../data/enums';
+import { getRouteNumberFromValue } from '../jsx/RouteInfoForm/RideWithGpsId';
+import { routeLoadingModes } from '../data/enums';
 
 export const finishTimeFormat = 'EEE, MMM dd yyyy h:mma';
 

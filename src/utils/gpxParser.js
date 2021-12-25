@@ -1,9 +1,9 @@
 //const gpxParse = require("gpx-parse-alpaca");
-import {finishTimeFormat} from './reducers/reducer';
+import {finishTimeFormat} from '../redux/reducer';
 import { DateTime } from 'luxon';
 
 import {getPowerOrVelocity} from "./windUtils";
-import { inputPaceToSpeed, setMinMaxCoords } from '../utils/util';
+import { inputPaceToSpeed, setMinMaxCoords } from './util';
 
 const kmToMiles = 0.62137;
 /**

@@ -2,9 +2,9 @@ import React, {Suspense} from 'react';
 import {lazy} from '@loadable/component';
 import {connect} from 'react-redux';
 import PropTypes from 'prop-types';
-import { routeLoadingModes } from '../data/enums';
+import { routeLoadingModes } from '../../data/enums';
 
-const LoadableMap = lazy(() => import(/* webpackChunkName: "Map" */ './map'));
+const LoadableMap = lazy(() => import(/* webpackChunkName: "Map" */ './RouteForecastMap'));
 
 const MapLoader = (props) => {
     if (props.hasMap) {

@@ -4,8 +4,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import '../../static/controlsStyles.css';
 import { Button } from "@blueprintjs/core";
 import { Card, CardBody, CardTitle } from "reactstrap";
-import { addControl } from "../actions/actions";
-import ErrorBoundary from '../errorBoundary';
+import { addControl } from "../../redux/actions";
+import ErrorBoundary from '../shared/ErrorBoundary';
 import { ControlTable } from './ControlTable';
 
 export const ControlTableContainer = () => {

@@ -1,6 +1,6 @@
 import cookie from 'react-cookies';
 import * as Sentry from '@sentry/browser';
-import { getRouteInfo } from '../../utils/util';
+import { getRouteInfo } from '../utils/util';
 
 export const componentLoader = (lazyComponent, attemptsLeft) => {
     return new Promise((resolve, reject) => {
@@ -101,7 +101,7 @@ export const toggleRouteIsTrip = function() {
  };
 
 const getRouteParser = async function () {
-    const parser = await componentLoader(import(/* webpackChunkName: "RwgpsParser" */ '../gpxParser'), 5);
+    const parser = await componentLoader(import(/* webpackChunkName: "RwgpsParser" */ '../utils/gpxParser'), 5);
     return parser.default;
 };
 
@@ -625,7 +625,7 @@ export const setAnalysisInterval = function(interval) {
 };
 
 const getStravaParser = async function() {
-    const parser = await import(/* webpackChunkName: "StravaRouteParser" */ '../../stravaRouteParser');
+    const parser = await import(/* webpackChunkName: "StravaRouteParser" */ '../utils/stravaRouteParser');
     return parser.default;
 };
 

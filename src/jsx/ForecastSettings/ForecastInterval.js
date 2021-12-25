@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import {Label, Input, FormGroup, UncontrolledTooltip} from 'reactstrap';
 import {connect} from 'react-redux';
-import {setInterval} from "../actions/actions";
+import {setInterval} from "../../redux/actions";
 
 const ForecastInterval = ({interval,setInterval}) => {
     return (

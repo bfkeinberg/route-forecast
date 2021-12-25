@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import {Input, FormGroup, UncontrolledTooltip} from 'reactstrap';
 import {connect} from 'react-redux';
-import {setWeatherProvider} from "../actions/actions";
+import {setWeatherProvider} from "../../redux/actions";
 
 const WeatherProviderSelector = ({weatherProvider,setWeatherProvider}) => {
     return (

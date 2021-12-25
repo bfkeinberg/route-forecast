@@ -1,7 +1,7 @@
-import ErrorBoundary from "./errorBoundary";
-import PaceTable from "./resultsTab/PaceTable";
-import ForecastTable from "./forecastTable";
-import MapLoader from "./mapLoader";
+import ErrorBoundary from "./shared/ErrorBoundary";
+import PaceTable from "./resultsTables/PaceTable";
+import ForecastTable from "./resultsTables/ForecastTable";
+import MapLoader from "./Map/MapLoader";
 import PropTypes from "prop-types";
 import React from "react";
 import { Router, Route, Link, MemoryRouter } from "react-router-dom";

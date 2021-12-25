@@ -1,15 +1,15 @@
 import React, {Component} from 'react';
 import {Table, UncontrolledTooltip, Row, Col} from 'reactstrap';
-import ErrorBoundary from "./errorBoundary";
+import ErrorBoundary from "../shared/ErrorBoundary";
 import darkSky from 'Images/darkSkySmall.png';
 import climacell from 'Images/Powered_by_Tomorrow-Black.png';
 //too large
 import visualcrossing from 'Images/visualCrossing.png';
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
-import {setWeatherRange, toggleWeatherRange, setTableViewed, toggleZoomToRange} from './actions/actions';
+import {setWeatherRange, toggleWeatherRange, setTableViewed, toggleZoomToRange} from '../../redux/actions';
 import MediaQuery from 'react-responsive';
-import {finishTimeFormat} from './reducers/reducer';
+import {finishTimeFormat} from '../../redux/reducer';
 import { DateTime } from 'luxon';
 import { Checkbox, Icon } from '@blueprintjs/core';
 import cookie from 'react-cookies';

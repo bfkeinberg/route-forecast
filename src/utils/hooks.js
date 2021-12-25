@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react"
 import { useSelector } from "react-redux"
-import stravaRouteParser from "../stravaRouteParser"
+import stravaRouteParser from "./stravaRouteParser"
 
 const useValueHasChanged = (value) => {
   const [initialValue] = useState(value)

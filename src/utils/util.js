@@ -1,4 +1,4 @@
-import gpxParser from "../jsx/gpxParser";
+import gpxParser from "./gpxParser";
 
 const formatOneControl = (controlPoint) => {
   if (typeof controlPoint === 'string') {

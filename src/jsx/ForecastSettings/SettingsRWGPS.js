@@ -1,13 +1,13 @@
 import { Col, Row } from "reactstrap";
 import { FinishTime } from "./FinishTime";
 import React, { Suspense } from "react";
-import { toggleDisplayBanked, toggleMetric } from "../actions/actions";
+import { toggleDisplayBanked, toggleMetric } from "../../redux/actions";
 import { Tooltip2 } from "@blueprintjs/popover2";
 import Recalculate from "./Recalculate";
 import ForecastInterval from "./ForecastInterval";
 import RidingPace from "./RidingPace";
 import { lazy } from '@loadable/component';
-import { componentLoader } from "../actions/actions.js";
+import { componentLoader } from "../../redux/actions.js";
 import { useSelector } from "react-redux";
 import WeatherProviderSelector from "./WeatherProviderSelector";
 import { useDispatch } from "react-redux";

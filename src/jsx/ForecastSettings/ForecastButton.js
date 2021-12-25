@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import {Button, UncontrolledTooltip} from 'reactstrap';
 import {connect} from 'react-redux';
-import {requestForecast, setFetchAfterLoad} from "../actions/actions";
+import {requestForecast, setFetchAfterLoad} from "../../redux/actions";
 import { useMediaQuery } from 'react-responsive';
 
 const ForecastButton = ({fetchingForecast,requestForecast,routeInfo,submitDisabled,routeIsLoaded,setFetchAfterLoad}) => {

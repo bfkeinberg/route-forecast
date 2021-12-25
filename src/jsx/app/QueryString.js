@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
-import {setShortUrl, shortenUrl} from "./actions/actions";
+import {setShortUrl, shortenUrl} from "../../redux/actions";
 require('isomorphic-fetch');
 import queryString from 'query-string';
 import { DateTime } from 'luxon';

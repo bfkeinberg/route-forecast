@@ -3,7 +3,7 @@ import { Select } from "@blueprintjs/select";
 import { Button, MenuItem } from "@blueprintjs/core";
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
-import {setRwgpsRoute, setFetchAfterLoad, setRouteIsTrip} from "../actions/actions";
+import {setRwgpsRoute, setFetchAfterLoad, setRouteIsTrip} from "../../redux/actions";
 
 const renderFavorite = (favorite, { handleClick, modifiers }) => {
     if (!modifiers.matchesPredicate) {

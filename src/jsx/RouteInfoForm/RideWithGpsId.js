@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import {Label, Input, FormGroup, UncontrolledTooltip} from 'reactstrap';
 import {connect} from 'react-redux';
-import {setRwgpsRoute, newUserMode} from "../actions/actions";
+import {setRwgpsRoute, newUserMode} from "../../redux/actions";
 import cookie from 'react-cookies';
 
 export const getRouteNumberFromValue = (value) => {

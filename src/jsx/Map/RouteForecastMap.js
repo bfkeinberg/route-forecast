@@ -2,16 +2,16 @@ import React, {Component} from 'react';
 import PropTypes from 'prop-types';
 import rainCloud from "Images/rainCloud.png";
 import {connect} from 'react-redux';
-import ErrorBoundary from "./errorBoundary";
+import ErrorBoundary from "../shared/ErrorBoundary";
 import circus_tent from 'Images/circus tent.png';
 import {Map, InfoWindow, Marker, GoogleApiWrapper, Polyline} from 'google-maps-react-17';
 import { createSelector } from 'reselect';
-import {formatTemperature} from "./forecastTable";
+import {formatTemperature} from "../resultsTables/ForecastTable";
 // import {withRouter} from 'react-router-dom';
-import {setMapViewed} from "./actions/actions";
-import { routeLoadingModes } from '../data/enums';
-import { getRouteInfo } from '../utils/util';
-import stravaRouteParser from '../stravaRouteParser';
+import {setMapViewed} from "../../redux/actions";
+import { routeLoadingModes } from '../../data/enums';
+import { getRouteInfo } from '../../utils/util';
+import stravaRouteParser from '../../utils/stravaRouteParser';
 
 /*global google*/
 const arrow = "M16.317,32.634c-0.276,0-0.5-0.224-0.5-0.5V0.5c0-0.276,0.224-0.5,0.5-0.5s0.5,0.224,0.5,0.5v31.634\n" +

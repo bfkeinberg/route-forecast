@@ -3,10 +3,10 @@ import React, { useState } from 'react';
 import RwGpsTypeSelector from './RwGpsTypeSelector';
 import RideWithGpsId from './RideWithGpsId';
 import PinnedRouteLoader from './PinnedRouteLoader.jsx';
-import ErrorBoundary from "../errorBoundary";
+import ErrorBoundary from "../shared/ErrorBoundary";
 import { Button, Col, Row } from 'reactstrap';
 import { connect } from 'react-redux';
-import { loadFromRideWithGps } from '../actions/actions';
+import { loadFromRideWithGps } from '../../redux/actions';
 
 export const RouteInfoInputRWGPS = () => {
   const [showPinnedRoutes, setShowPinnedRoutes] = useState(false)
