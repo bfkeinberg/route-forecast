@@ -40,8 +40,8 @@ export const selectMiddleware = mode => {
             })
         )
     }
-    const logging = true
-    if (logging) {
+    const logging = false
+    if (logging && mode === development) {
         middleware.push(loggerMiddleware)
     }
     return middleware

@@ -60,7 +60,7 @@ class StravaRouteParser {
         return arrivalTimes;
     }
 
-    computeActualFinishTime = activityData => DateTime.fromISO(activityData['start_date']).plus({seconds:activityData['elapsed_time']}).toFormat('EEE, MMM dd h:mma');
+    computeActualFinishTime = activityData => DateTime.fromISO(activityData['start_date']).plus({seconds:activityData['elapsed_time']}).toFormat('MMMM dd, yyyy h:mm a');
 
     computeWWPaceForActivity = activityData => {
         // all below in meters
