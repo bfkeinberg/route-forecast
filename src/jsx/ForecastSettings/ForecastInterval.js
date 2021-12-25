@@ -6,9 +6,9 @@ import {setInterval} from "../../redux/actions";
 
 const ForecastInterval = ({interval,setInterval}) => {
     return (
-        <FormGroup>
-            <UncontrolledTooltip target='interval' placement='bottom'>How often to generate weather forecast</UncontrolledTooltip>
-            <Label for='interval' size='sm' tag='b'>Interval in hours</Label>
+        <FormGroup style={{flex: 1}}>
+            <UncontrolledTooltip target='interval' placement='bottom'>How often to generate weather forecast, in hours</UncontrolledTooltip>
+            <Label for='interval' size='sm' tag='b'>Forecast Frequency</Label>
             <Input size="5" bsSize='xsm' id='interval' tabIndex='2' type="number"
                    min={0.5} max={2} step={0.5} name="interval"
                  value={interval} onChange={event => {setInterval(event.target.value)}}/>

@@ -11,7 +11,7 @@ import { Icon, Intent } from "@blueprintjs/core";
 import {IconNames} from "@blueprintjs/icons";
 import {connect} from 'react-redux';
 import RouteInfoForm from "./RouteInfoForm/RouteInfoForm";
-import ForecastSettings from "./ForecastSettings/ForecastSettings";
+import { ForecastSettings } from "./ForecastSettings/ForecastSettings";
 import { routeLoadingModes } from "../data/enums";
 
 const DataTable = (props) => {

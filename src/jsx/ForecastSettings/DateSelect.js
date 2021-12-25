@@ -33,21 +33,25 @@ const DateSelect = ({start, setStart, setInitialStart}) => {
     return (
         <div style={{display: "flex", alignItems: "center", justifyContent: "center"}}>
             <UncontrolledTooltip placement='bottom' target="startingTime">When you plan to begin riding</UncontrolledTooltip>
-            <Icon icon="calendar" onClick={() => setDateOnly(start, setInitialStart)} style={{cursor: "pointer", marginRight: "3px"}}/>
-            <Label for='calendar' size='sm' tag='b' id='startingTime' style={{marginRight: "5px"}}>Starting time</Label>
-            <Flatpickr key={start.seconds} id='calendar'
-                value={start.toJSDate()}
-                options={{enableTime: true,
-                    altInput: true, altFormat: 'F j, Y h:i K',
-                    altInputClass: 'dateDisplay',
-                    maxDate: later,
-                    defaultDate: start.toJSDate(),
-                    dateFormat: 'Y-m-d H:i',
-                    onParseConfig:(dates,datestr,instance) =>
-                        instance.config.onClose.push((dates) =>
-                            {setStart(DateTime.fromJSDate(dates[0]))})
-                }}
-            />
+            <span id={"startingTime"} style={{fontSize: ".875rem", fontWeight: "bolder", padding: "0px 5px", flex: 1}}>
+                <Icon icon="calendar" onClick={() => setDateOnly(start, setInitialStart)} style={{cursor: "pointer", marginRight: "3px"}}/>
+                Starting time
+            </span>
+            <div style={{flex: 2.5}}>
+                <Flatpickr key={start.seconds} id='calendar'
+                    value={start.toJSDate()}
+                    options={{enableTime: true,
+                        altInput: true, altFormat: 'F j, Y h:i K',
+                        altInputClass: 'dateDisplay',
+                        maxDate: later,
+                        defaultDate: start.toJSDate(),
+                        dateFormat: 'Y-m-d H:i',
+                        onParseConfig:(dates,datestr,instance) =>
+                            instance.config.onClose.push((dates) =>
+                                {setStart(DateTime.fromJSDate(dates[0]))})
+                    }}
+                />
+            </div>
         </div>
     );
 };

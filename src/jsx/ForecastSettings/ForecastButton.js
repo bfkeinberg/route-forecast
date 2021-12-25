@@ -27,14 +27,14 @@ const ForecastButton = ({fetchingForecast,requestForecast,routeInfo,submitDisabl
     const smallScreen = useMediaQuery({query: "(max-width: 800px)"})
 
     return (
-        <div id='forecast' style={{ 'display': 'flex', width: '100%', justifyContent: "center", marginTop: "20px" }} cursor='not-allowed'>
+        <div id='forecast' style={{ 'display': 'flex', width: '100%', justifyContent: "center", margin: "10px 0px 0px 10px", flex: 1.6 }} cursor='not-allowed'>
             {forecast_tooltip}
             <Button
                 id='forecast'
                 tabIndex='6'
                 color="primary"
                 onClick={forecastClick}
-                style={buttonStyle}
+                style={{...buttonStyle, width: "100%"}}
                 disabled={submitDisabled || fetchingForecast}
                 size={smallScreen ? "sm" : ""}
             >

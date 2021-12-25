@@ -1,13 +1,42 @@
-import React from 'react';
-import '../../static/controlsStyles.css';
-import { SettingsRWGPS } from './SettingsRWGPS';
+import React, { useState } from 'react';
 import { ControlTableContainer } from './ControlTableContainer';
+import { toggleMetric } from "../../redux/actions";
+import Recalculate from "./Recalculate";
+import ForecastInterval from "./ForecastInterval";
+import RidingPace from "./RidingPace";
+import { useSelector } from "react-redux";
+import WeatherProviderSelector from "./WeatherProviderSelector";
+import { useDispatch } from "react-redux";
+import ForecastButton from "./ForecastButton";
+import { ToggleButton } from "../shared/ToggleButton";
+import { TimeFields } from "./TimeFields";
 
-export default () => {
+export const ForecastSettings = () => {
+    const showProvider = useSelector(state => state.controls.showWeatherProvider)
+    const metric = useSelector(state => state.controls.metric)
+    const dispatch = useDispatch()
+
+    const [showControlPoints, setShowControlPoints] = useState(false)
+    
     return (
-        <div className="controlPoints">
-            <SettingsRWGPS />
-            <ControlTableContainer/>
+        <div style={{display: "flex", flexFlow: "column", alignItems: "center"}}> 
+            <div style={{ padding: "10px" }}>
+                <TimeFields />
+                <div style={{ display: "flex" }}>
+                    <RidingPace />
+                    <ToggleButton style={{flex: 1, margin: "24px 0px 0px 10px"}} active={metric} onClick={() => dispatch(toggleMetric())}>Metric</ToggleButton>
+                </div>
+                <div style={{ display: "flex", margin: "30px 0px" }}>
+                    <ForecastInterval />
+                    <ForecastButton />
+                </div>
+                {showProvider && (
+                    <WeatherProviderSelector />
+                )}
+                <Recalculate />
+            </div>
+            <ToggleButton icon={"chevron-down"} active={showControlPoints} onClick={() => setShowControlPoints(!showControlPoints)}>Add Control Points</ToggleButton>
+            {showControlPoints && <ControlTableContainer/>}
         </div>
     );
 }

@@ -2,7 +2,6 @@ import React, {Component} from 'react';
 import MediaQuery from 'react-responsive';
 import '@blueprintjs/core/lib/css/blueprint.css';
 import 'Images/style.css';
-import 'Images/controlsStyles.css';
 import queryString from 'query-string';
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';

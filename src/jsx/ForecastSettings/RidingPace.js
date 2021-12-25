@@ -90,7 +90,7 @@ const RidingPace = ({ pace, setPace, metric }) => {
     const dropdownValues = metric ? paceValues.metric : paceValues.imperialLikeAPenguin
 
     return (
-        <FormGroup>
+        <FormGroup style={{flex: 3}}>
             <Label size='sm' tag='b' for='paceInput'>Pace on flat</Label>
             <UncontrolledTooltip innerClassName={pace_tooltip_class} target='paceInput' placement="bottom">{pace_text}</UncontrolledTooltip>
             <Input tabIndex='3' type="select" value={pace} name="pace"
