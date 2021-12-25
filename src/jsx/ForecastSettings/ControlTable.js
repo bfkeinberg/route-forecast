@@ -53,7 +53,7 @@ export const ControlTable = () => {
             ({name, distance, duration, arrival, banked, actual, delete: <Icon icon="delete" style={{cursor: "pointer"}} onClick={() => removeControl(index)}/>})),
         columns: [
             {name: "name", render: "Name", width: 40, editable: true},
-            {name: "distance", render: "Miles", width: 40, editable: true},
+            {name: "distance", render: metric ? "Kilometers" : "Miles", width: 40, editable: true},
             {name: "duration", render: "Expected Time Spent", valueTransformFunction: minSuffixFunction, width: 80, editable: true},
             {name: "arrival", render: "Estimated Arrival Time", width: 80},
             {name: "delete", render: "Delete", width: 60}

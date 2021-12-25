@@ -9,7 +9,7 @@ export const ToggleButton = ({children, active, onClick}) => {
       <span>
         <Icon icon={"tick"} style={{marginRight: "5px", opacity: active ? 1 : 0.25, transition: "opacity 0.15s"}}/>
       </span>
-      <span>
+      <span style={{opacity: active ? 1 : 0.25, transition: "opacity 0.15s"}}>
         {children}
       </span>
     </Button>
