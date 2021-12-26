@@ -43,14 +43,25 @@ export const Table = ({data, onCellValueChanged}) => {
 }
 
 const Cell = ({value, transformFunction, editable, onCellValueChanged}) => {
-  const [editing, setEditing] = useState(false)
+  const beginEditing = () => {
+    if (editable) {
+      setEditingValue(value)
+    }
+  }
+
+  const endEditing = () => {
+    onCellValueChanged(editingValue)
+    setEditingValue(null)
+  }
+
+  const [editingValue, setEditingValue] = useState(null)
   return (
-    editing ? 
+    editingValue !== null ? 
     <div>
-      <input autoFocus onKeyPress={(event) => console.log(event.key)} value={value} style={{width: "40px"}} onChange={(event) => onCellValueChanged(event.target.value)} onBlur={() => setEditing(false)}/>
+      <input autoFocus onKeyPress={(event) => console.log(event.key)} value={editingValue} style={{width: "40px"}} onChange={(event) => setEditingValue(event.target.value)} onBlur={endEditing}/>
     </div>
     :
-    <div style={{cursor: editable ? "pointer" : "", width: "100%", height: "100%"}} onClick={() => { if (editable) { setEditing(true) } }}>
+    <div style={{cursor: editable ? "pointer" : "", width: "100%", height: "100%"}} onClick={beginEditing}>
       {value !== undefined && transformFunction(value)}
     </div>
   )
