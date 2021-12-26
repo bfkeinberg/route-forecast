@@ -34,7 +34,7 @@ const ForecastButton = ({fetchingForecast,requestForecast,routeInfo,submitDisabl
                 tabIndex='6'
                 color="primary"
                 onClick={forecastClick}
-                style={{...buttonStyle, width: "100%"}}
+                style={{...buttonStyle, width: "100%", backgroundColor: "#137cbd", borderColor: "#137cbd", }}
                 disabled={submitDisabled || fetchingForecast}
                 size={smallScreen ? "sm" : ""}
             >
