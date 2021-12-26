@@ -38,6 +38,7 @@ import {
 } from "../../redux/actions";
 import QueryString from './QueryString';
 import { routeLoadingModes } from '../../data/enums';
+import { useRecalcRoute } from '../../utils/hooks';
 
 const demoRoute = 1797453;
 const demoControls = [
@@ -249,21 +250,8 @@ export class RouteWeatherUI extends Component {
 
     render() {
         return (
-        <div>
-            <LocationContext.Consumer>
-                {value => <QueryString href={value.href} origin={value.origin}/>}
-            </LocationContext.Consumer>
-            {/*TODO: values is needed for SSR, but messes up real device detection, seemingly*/}
-            {/*<MediaQuery minDeviceWidth={1000} values={{deviceWidth:1400}}>*/}
-            <MediaQuery minWidth={501}>
-                <DesktopUI mapsApiKey={this.props.maps_api_key}/>
-            </MediaQuery>
-            {/*<MediaQuery maxDeviceWidth={800} values={{deviceWidth:1400}}>*/}
-            <MediaQuery maxWidth={500}>
-                <MobileUI mapsApiKey={this.props.maps_api_key}/>
-            </MediaQuery>
-        </div>
-      );
+            <FunAppWrapperThingForHooksUsability maps_api_key={this.props.maps_api_key}/>
+        );
     }
 }
 
@@ -281,3 +269,24 @@ const mapStateToProps = (state) =>
     });
 
 export default connect(mapStateToProps, mapDispatchToProps)(RouteWeatherUI);
+
+const FunAppWrapperThingForHooksUsability = ({maps_api_key}) => {
+    useRecalcRoute()
+    
+    return (
+        <div>
+            <LocationContext.Consumer>
+                {value => <QueryString href={value.href} origin={value.origin} />}
+            </LocationContext.Consumer>
+            {/*TODO: values is needed for SSR, but messes up real device detection, seemingly*/}
+            {/*<MediaQuery minDeviceWidth={1000} values={{deviceWidth:1400}}>*/}
+            <MediaQuery minWidth={501}>
+                <DesktopUI mapsApiKey={maps_api_key} />
+            </MediaQuery>
+            {/*<MediaQuery maxDeviceWidth={800} values={{deviceWidth:1400}}>*/}
+            <MediaQuery maxWidth={500}>
+                <MobileUI mapsApiKey={maps_api_key} />
+            </MediaQuery>
+        </div>
+    )
+}

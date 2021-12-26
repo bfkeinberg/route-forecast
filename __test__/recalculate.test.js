@@ -6,9 +6,12 @@ import React from 'react'
 import { configure, shallow } from 'enzyme'
 import Adapter from '@wojtekmaj/enzyme-adapter-react-17';
 import { DateTime } from 'luxon';
-import { Recalculate } from '../src/jsx/ForecastSettings/Recalculate';
+import { useRecalcRoute } from '../src/utils/hooks';
 
 configure({ adapter: new Adapter() });
+
+// tests will need to function fundamentally differently now, probably require mocking dispatch since
+// useRecalcRoute doesn't take recalcRoute() as an input anymore
 
 describe('<Recalculate />', () => {
     it('verify recalc is called', () => {

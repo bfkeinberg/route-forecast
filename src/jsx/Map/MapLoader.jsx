@@ -22,6 +22,9 @@ MapLoader.propTypes = {
 
 const mapStateToProps = (state) =>
     ({
+        // TODO
+        // this condition is not quite right -- it doesn't catch cases where we're in strava mode but no strava activity data has loaded
+        // should change this and probably move it to a higher level component, when replacing the existing placeholder text with a splash screen or w/e
         hasMap: (state.forecast.forecast.length > 0 || state.uiInfo.routeParams.routeLoadingMode === routeLoadingModes.STRAVA)
     });
 

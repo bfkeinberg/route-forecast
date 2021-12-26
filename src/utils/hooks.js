@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from "react"
-import { useSelector } from "react-redux"
+import { useSelector, useDispatch } from "react-redux"
 import stravaRouteParser from "./stravaRouteParser"
 import { milesToMeters } from "./util"
+import { recalcRoute } from "../redux/actions"
 
 const useValueHasChanged = (value) => {
   const [initialValue] = useState(value)
@@ -43,4 +44,20 @@ const useFormatSpeed = () => {
     `${speed.toFixed(1)} mph`;
 }
 
-export { useValueHasChanged, useActualPace, useActualFinishTime, useActualArrivalTimes, usePrevious, useFormatSpeed }
+const useRecalcRoute = () => {
+  const start = useSelector(state => state.uiInfo.routeParams.start)
+  const pace = useSelector(state => state.uiInfo.routeParams.pace)
+  const interval = useSelector(state => state.uiInfo.routeParams.interval)
+  const metric = useSelector(state => state.controls.metric)
+  const controls = useSelector(state => state.controls.userControlPoints)
+  const rwgpsRoute = useSelector(state => state.uiInfo.routeParams.rwgpsRoute)
+  const gpxRouteData = useSelector(state => state.routeInfo.gpxRouteData)
+
+  const dispatch = useDispatch()
+  if (!(rwgpsRoute === '' && gpxRouteData === null) && start !== null) {
+    dispatch(recalcRoute)
+  }
+}
+
+
+export { useValueHasChanged, useActualPace, useActualFinishTime, useActualArrivalTimes, usePrevious, useFormatSpeed, useRecalcRoute }

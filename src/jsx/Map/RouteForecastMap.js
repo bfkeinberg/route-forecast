@@ -5,7 +5,6 @@ import {connect} from 'react-redux';
 import ErrorBoundary from "../shared/ErrorBoundary";
 import circus_tent from 'Images/circus tent.png';
 import {Map, InfoWindow, Marker, GoogleApiWrapper, Polyline} from 'google-maps-react-17';
-import { createSelector } from 'reselect';
 import {formatTemperature} from "../resultsTables/ForecastTable";
 // import {withRouter} from 'react-router-dom';
 import {setMapViewed} from "../../redux/actions";
@@ -107,7 +106,7 @@ class RouteForecastMap extends Component {
         return <Marker key={latitude+longitude} position={{lat: latitude, lng: longitude}} title={value} icon={controlIcon}/>;
     }
 
-    getMapBounds(bounds, zoomToRange) {
+    getMapBounds(points, bounds, zoomToRange) {
         let southWest = { lat:bounds.min_latitude, lng:bounds.min_longitude };
         let northEast = { lat:bounds.max_latitude, lng:bounds.max_longitude };
         if (isNaN(bounds.min_latitude) || isNaN(bounds.max_latitude)) {
@@ -117,7 +116,7 @@ class RouteForecastMap extends Component {
         const defaultBounds = new google.maps.LatLngBounds(southWest,northEast);
         if (zoomToRange && this.props.subrange.length === 2 && !isNaN(this.props.subrange[1])) {
             let bounds = new google.maps.LatLngBounds();
-            this.props.points.filter(point => (point.dist !== undefined) && (point.dist >= this.props.subrange[0] &&
+            points.filter(point => (point.dist !== undefined) && (point.dist >= this.props.subrange[0] &&
                 (isNaN(this.props.subrange[1]) || point.dist <= this.props.subrange[1])))
                 .forEach(point => bounds.extend(point));
             if (bounds.isEmpty()) {
@@ -159,8 +158,42 @@ class RouteForecastMap extends Component {
         );
     }
 
+    // shouldComponentUpdate(nextProps, nextState) {
+    //     Object.keys(nextProps).forEach(prop => {
+    //         console.log(prop)
+    //         console.log(nextProps[prop] === this.props[prop])
+    //     })
+    //     return true
+    // }
+
     render() {
-        let highlight = this.getHighlight(this.props.points, this.props.subrange);
+        const bounds = getBounds(
+            this.props.rwgpsRouteData,
+            this.props.routeStartTime,
+            this.props.routePace,
+            this.props.forecastInterval,
+            this.props.userControlPoints,
+            this.props.timeZoneId,
+            this.props.stravaActivityStream,
+            this.props.routeLoadingMode,
+            this.props.metric
+        )
+
+        const points = getPoints(
+            this.props.rwgpsRouteData,
+            this.props.routeStartTime,
+            this.props.routePace,
+            this.props.forecastInterval,
+            this.props.userControlPoints,
+            this.props.timeZoneId,
+            this.props.stravaActivityStream,
+            this.props.routeLoadingMode,
+            this.props.metric
+        )
+
+        const controlNames = this.props.userControlPoints.map(control => control.name)
+
+        let highlight = this.getHighlight(points, this.props.subrange);
         let markedInfo = this.findMarkerInfo(this.props.forecast, this.props.subrange);
         let infoPosition = {lat:0, lng:0};
         let infoVisible = false;
@@ -170,19 +203,19 @@ class RouteForecastMap extends Component {
             infoContents = `Temperature ${markedInfo[0].tempStr} Wind speed ${markedInfo[0].windSpeed} Wind bearing ${markedInfo[0].windBearing}`;
             infoVisible = true;
         }
-        const mapBounds = this.props.bounds !== null ? this.getMapBounds(this.props.bounds, this.props.zoomToRange) : null;
+        const mapBounds = bounds !== null ? this.getMapBounds(points, bounds, this.props.zoomToRange) : null;
         const mapCenter = (mapBounds !== null && mapBounds !== undefined) ? mapBounds.getCenter() : null;
         return (
             <ErrorBoundary>
                 <div id="map" style={{'height':'95%'}}>
-                    {(this.props.forecast.length > 0 || this.props.routeLoadingMode === routeLoadingModes.STRAVA) && this.props.bounds !== null ?
+                    {(this.props.forecast.length > 0 || this.props.routeLoadingMode === routeLoadingModes.STRAVA) && bounds !== null ?
                         <Map google={this.props.google}
                              mapType={'ROADMAP'} scaleControl={true} bounds={mapBounds}
                              initialCenter={(mapCenter === null || mapCenter === undefined) ? undefined : mapCenter.toJSON()}
                              onReady={(mapProps, map) => {map.fitBounds(mapBounds)}}>
-                            <Polyline path={this.getRoutePoints(this.props.points)} strokeColor={'#ff0000'} strokeWeight={2} strokeOpacity={1.0}/>
+                            <Polyline path={this.getRoutePoints(points)} strokeColor={'#ff0000'} strokeWeight={2} strokeOpacity={1.0}/>
                             {highlight}
-                            {this.buildMarkers(this.props.forecast, this.props.controls, this.props.controlNames, this.props.subrange)}
+                            {this.buildMarkers(this.props.forecast, this.props.controls, controlNames, this.props.subrange)}
                             <InfoWindow position={infoPosition} visible={infoVisible}>
                                 <div>{infoContents}</div>
                             </InfoWindow>
@@ -196,35 +229,67 @@ class RouteForecastMap extends Component {
 
 }
 
-const getBounds = state => {
-    const stravaMode = state.uiInfo.routeParams.routeLoadingMode === routeLoadingModes.STRAVA
+const getBounds = (
+    rwgpsRouteData,
+    routeStartTime,
+    routePace,
+    forecastInterval,
+    userControlPoints,
+    timeZoneId,
+    stravaActivityStream,
+    routeLoadingMode,
+    metric
+) => {
+    const fakeStateObject = {
+        routeInfo: { rwgpsRouteData, timeZoneId },
+        uiInfo: { routeParams: { start: routeStartTime, pace: routePace, interval: forecastInterval } },
+        controls: { userControlPoints, metric },
+    }
+    
+    const stravaMode = routeLoadingMode === routeLoadingModes.STRAVA
     return stravaMode ? 
-        (state.strava.activityStream !== null ? stravaRouteParser.computePointsAndBounds(state.strava.activityStream).bounds : null)
-    : getRouteInfo(state).bounds
+        (stravaActivityStream !== null ? stravaRouteParser.computePointsAndBounds(stravaActivityStream).bounds : null)
+    : getRouteInfo(fakeStateObject).bounds
 }
 
-const getPoints = state => {
-    const stravaMode = state.uiInfo.routeParams.routeLoadingMode === routeLoadingModes.STRAVA
+const getPoints = (
+    rwgpsRouteData,
+    routeStartTime,
+    routePace,
+    forecastInterval,
+    userControlPoints,
+    timeZoneId,
+    stravaActivityStream,
+    routeLoadingMode,
+    metric
+) => {
+    const fakeStateObject = {
+        routeInfo: { rwgpsRouteData, timeZoneId },
+        uiInfo: { routeParams: { start: routeStartTime, pace: routePace, interval: forecastInterval } },
+        controls: { userControlPoints, metric },
+    }
+
+    const stravaMode = routeLoadingMode === routeLoadingModes.STRAVA
     const points = stravaMode ?
-        (state.strava.activityStream !== null ? stravaRouteParser.computePointsAndBounds(state.strava.activityStream).points : [])
-    : getRouteInfo(state).points
+        (stravaActivityStream !== null ? stravaRouteParser.computePointsAndBounds(stravaActivityStream).points : [])
+    : getRouteInfo(fakeStateObject).points
 
     return points.filter(point => point.lat !== undefined && point.lon !== undefined).map((point) =>
     { return { lat: point.lat, lng: point.lon, dist: point.dist } })
 };
 
-export const getPointsState = createSelector(
-    [getPoints],
-    (points) => points
-);
-
 const mapStateToProps = (state) =>
     ({
+        rwgpsRouteData: state.routeInfo.rwgpsRouteData,
+        routeStartTime: state.uiInfo.routeParams.start,
+        routePace: state.uiInfo.routeParams.pace,
+        forecastInterval: state.uiInfo.routeParams.interval,
+        userControlPoints: state.controls.userControlPoints,
+        timeZoneId: state.routeInfo.timeZoneId,
+        stravaActivityStream: state.strava.activityStream,
+
         forecast: state.forecast.forecast,
-        bounds:getBounds(state),
-        points:getPointsState(state),
         controls: state.controls.calculatedControlValues,
-        controlNames: state.controls.userControlPoints.map(control => control.name),
         subrange: state.uiInfo.routeParams.routeLoadingMode === routeLoadingModes.STRAVA ? state.strava.subrange : state.forecast.range,
         routeLoadingMode: state.uiInfo.routeParams.routeLoadingMode,
         metric: state.controls.metric,

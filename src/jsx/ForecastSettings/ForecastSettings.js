@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { ControlTableContainer } from './ControlTableContainer';
 import { toggleMetric } from "../../redux/actions";
-import Recalculate from "./Recalculate";
 import ForecastInterval from "./ForecastInterval";
 import RidingPace from "./RidingPace";
 import { useSelector } from "react-redux";
@@ -35,7 +34,6 @@ export const ForecastSettings = () => {
                 {showProvider && (
                     <WeatherProviderSelector />
                 )}
-                <Recalculate />
             </div>
             <ToggleButton icon={"chevron-down"} active={showControlPoints} onClick={() => setShowControlPoints(!showControlPoints)}>Add Control Points</ToggleButton>
             {showControlPoints && <ControlTableContainer/>}
