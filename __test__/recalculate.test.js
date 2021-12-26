@@ -6,7 +6,7 @@ import React from 'react'
 import { configure, shallow } from 'enzyme'
 import Adapter from '@wojtekmaj/enzyme-adapter-react-17';
 import { DateTime } from 'luxon';
-import Recalculate from '../src/jsx/ForecastSettings/Recalculate';
+import { Recalculate } from '../src/jsx/ForecastSettings/Recalculate';
 
 configure({ adapter: new Adapter() });
 
