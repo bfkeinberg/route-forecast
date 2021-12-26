@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { useSelector } from "react-redux"
 import stravaRouteParser from "./stravaRouteParser"
 
@@ -27,4 +27,12 @@ const useActualArrivalTimes = () => {
   return activityData !== null ? stravaRouteParser.computeControlPointArrivalTimes(activityData, activityStream, controls) : null
 }
 
-export { useValueHasChanged, useActualPace, useActualFinishTime, useActualArrivalTimes }
+const usePrevious = (value) => {
+  const ref = useRef();
+  useEffect(() => {
+    ref.current = value;
+  });
+  return ref.current;
+}
+
+export { useValueHasChanged, useActualPace, useActualFinishTime, useActualArrivalTimes, usePrevious }

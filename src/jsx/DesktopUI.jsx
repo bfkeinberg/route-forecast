@@ -2,12 +2,14 @@ import ErrorBoundary from "./shared/ErrorBoundary";
 import ForecastTable from "./resultsTables/ForecastTable";
 import MapLoader from "./Map/MapLoader";
 import PropTypes from "prop-types";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import RouteInfoForm from "./RouteInfoForm/RouteInfoForm";
 import { ForecastSettings } from "./ForecastSettings/ForecastSettings";
 import { TopBar } from "./TopBar/TopBar";
 import PaceTable from "./resultsTables/PaceTable";
 import { useSelector } from "react-redux";
+import { usePrevious } from "../utils/hooks";
+import { TransitionWrapper } from "./shared/TransitionWrapper";
 
 const DesktopUI = ({mapsApiKey}) => {
     const sidePaneOptions = [
@@ -23,7 +25,6 @@ const DesktopUI = ({mapsApiKey}) => {
     const routeData = useSelector(state => state.routeInfo.rwgpsRouteData)
     const stravaActivityData = useSelector(state => state.strava.activityData)
     const forecastData = useSelector(state => state.forecast.forecast)
-    // this is comically ugly but w/e
 
     const panesVisible = new Set()
     panesVisible.add("Route Info")
@@ -36,6 +37,32 @@ const DesktopUI = ({mapsApiKey}) => {
     if (stravaActivityData !== null) {
         panesVisible.add("Pace Analysis")
     }
+
+    // these three are a bit repetitive, could probably abstract somehow
+    // however, i am lazy
+    const previousRouteData = usePrevious(routeData)
+    const newRouteData = previousRouteData !== routeData && routeData !== null
+    useEffect(() => {
+        if (newRouteData) {
+            setActiveSidePane(sidePaneOptions.findIndex(option => option.title === "Forecast Settings"))
+        }
+    }, [newRouteData])
+
+    const previousForecastData = usePrevious(forecastData)
+    const newForecastData = previousForecastData !== forecastData && forecastData.length > 0
+    useEffect(() => {
+        if (newForecastData) {
+            setActiveSidePane(sidePaneOptions.findIndex(option => option.title === "Forecast"))
+        }
+    }, [newForecastData])
+
+    const previousStravaActivityData = usePrevious(stravaActivityData)
+    const newStravaActivityData = previousStravaActivityData !== stravaActivityData && stravaActivityData !== null
+    useEffect(() => {
+        if (newStravaActivityData) {
+            setActiveSidePane(sidePaneOptions.findIndex(option => option.title === "Pace Analysis"))
+        }
+    }, [newStravaActivityData])
     
     return (
         <div>
@@ -61,11 +88,12 @@ DesktopUI.propTypes = {
 export default DesktopUI;
 
 const Sidebar = ({sidePaneOptions, activeSidePane, sidebarWidth}) => {
+    const previousActivePane = usePrevious(activeSidePane)
     return (
-        sidePaneOptions.map(({title, content}, index) =>
-            <div key={title} style={{display: index !== activeSidePane ? "none" : "", width: `${sidebarWidth}px`}}>
-                {content}
+        <TransitionWrapper diffData={activeSidePane} transitionTime={1} transitionType={previousActivePane < activeSidePane ? "slideLeft" : "slideRight"} width={sidebarWidth}>
+            <div style={{width: `${sidebarWidth}px`}}>
+                {sidePaneOptions[activeSidePane].content}
             </div>
-        )
+        </TransitionWrapper>
     )
 }
