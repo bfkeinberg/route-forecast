@@ -5,8 +5,8 @@
 import React from 'react'
 import { configure } from 'enzyme'
 import Adapter from '@wojtekmaj/enzyme-adapter-react-17';
-import {dateToShortDate, makeQuery} from '../src/jsx/queryString';
 import { DateTime } from 'luxon';
+import { dateToShortDate, makeQuery } from '../src/jsx/app/QueryString';
 
 configure({ adapter: new Adapter() });
 

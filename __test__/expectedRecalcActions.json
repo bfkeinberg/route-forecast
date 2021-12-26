@@ -7,6 +7,12 @@
   {
     "type": "SET_ROUTE_INFO",
     "routeInfo": {
+      "bounds": {
+        "max_latitude": 43.39056,
+        "max_longitude": -1.58309,
+        "min_latitude": 43.28036,
+        "min_longitude": -1.90248
+      },
       "forecastRequest": [
         {
           "lat": 43.314594,

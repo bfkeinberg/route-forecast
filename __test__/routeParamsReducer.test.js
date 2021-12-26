@@ -5,9 +5,10 @@
 import React from 'react'
 import { configure } from 'enzyme'
 import Adapter from '@wojtekmaj/enzyme-adapter-react-17';
-import {routeParams} from '../src/jsx/reducers/reducer.js';
-import {SET_START} from '../src/jsx/actions/actions';
+import {routeParams} from '../src/redux/reducer.js';
+import {SET_START} from '../src/redux/actions';
 import { DateTime } from 'luxon';
+import { routeLoadingModes } from '../src/data/enums.js';
 
 configure({ adapter: new Adapter() });
 
@@ -19,7 +20,8 @@ describe('route params reducer', () => {
                 interval:1,pace:'D',rwgpsRoute:'',
                 rwgpsRouteIsTrip:false,
                 start: expect.any(DateTime),
-                initialStart: expect.any(DateTime)
+                initialStart: expect.any(DateTime),
+                routeLoadingMode: routeLoadingModes.RWGPS
             }
         );
     });

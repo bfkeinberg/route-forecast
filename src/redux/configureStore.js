@@ -24,7 +24,7 @@ const bannedActionKeys = [
  * @param {boolean }mode development or production
  * @returns {any[]} array of middleware to be used
  */
-export const selectMiddleware = mode => {
+export const selectMiddleware = (mode, logging = false) => {
     const middleware = [thunkMiddleware]
     if (mode !== 'development') {
         middleware.push(
@@ -40,8 +40,7 @@ export const selectMiddleware = mode => {
             })
         )
     }
-    const logging = false
-    if (logging && mode === development) {
+    if (logging && mode === "development") {
         middleware.push(loggerMiddleware)
     }
     return middleware

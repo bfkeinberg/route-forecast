@@ -4,7 +4,7 @@
 
 import configureMockStore from 'redux-mock-store';
 import thunk from 'redux-thunk';
-import {recalcRoute} from '../src/jsx/actions/actions';
+import {recalcRoute} from '../src/redux/actions';
 import fetchMock from 'fetch-mock';
 import { DateTime } from 'luxon';
 

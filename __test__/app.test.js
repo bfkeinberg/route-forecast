@@ -5,9 +5,9 @@
 import React from 'react'
 import { configure, shallow } from 'enzyme'
 import Adapter from '@wojtekmaj/enzyme-adapter-react-17';
-import {RouteWeatherUI} from '../src/jsx/main';
-import ForecastTable from "../src/jsx/forecastTable";
+import {RouteWeatherUI} from '../src/jsx/app/main';
 import fetchMock from 'fetch-mock';
+import ForecastTable from '../src/jsx/resultsTables/ForecastTable';
 
 configure({ adapter: new Adapter() });
 beforeAll(() => {

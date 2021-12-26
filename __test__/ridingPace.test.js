@@ -12,7 +12,7 @@ const mockStore = configureMockStore(middlewares);
 import React from 'react'
 import { configure, shallow, mount, render } from 'enzyme'
 import Adapter from '@wojtekmaj/enzyme-adapter-react-17';
-import RidingPace from '../src/jsx/RouteInfoForm/RidingPace';
+import RidingPace from '../src/jsx/ForecastSettings/RidingPace';
 configure({ adapter: new Adapter() });
 
 const ridingPaceState = {
@@ -38,6 +38,11 @@ const ridingPaceState = {
         }
     },
     "strava": {
+        activityData: {
+            average_speed: 10,
+            total_elevation_gain: 10,
+            distance: 10,
+        }
     },
     "controls": {
         "metric": false

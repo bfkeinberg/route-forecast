@@ -5,8 +5,8 @@
 import configureMockStore from 'redux-mock-store';
 import thunk from 'redux-thunk';
 import fetchMock from 'fetch-mock';
-import * as actions from '../src/jsx/actions/actions';
-import rootReducer from "../src/jsx/reducers/reducer";
+import * as actions from '../src/redux/actions';
+import rootReducer from "../src/redux/reducer";
 import { routeLoadingModes } from '../src/data/enums';
 
 const middlewares = [thunk];

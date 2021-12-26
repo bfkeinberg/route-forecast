@@ -5,8 +5,8 @@
 import React from 'react'
 import { configure } from 'enzyme'
 import Adapter from '@wojtekmaj/enzyme-adapter-react-17';
-import {controls} from '../src/jsx/reducers/reducer.js';
-import {SET_ROUTE_INFO, UPDATE_CALCULATED_VALUES} from '../src/jsx/actions/actions';
+import {controls} from '../src/redux/reducer.js';
+import {SET_ROUTE_INFO, UPDATE_CALCULATED_VALUES} from '../src/redux/actions';
 
 configure({ adapter: new Adapter() });
 

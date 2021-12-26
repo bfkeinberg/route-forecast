@@ -5,8 +5,8 @@
 import configureMockStore from 'redux-mock-store';
 import thunk from 'redux-thunk';
 import fetchMock from 'fetch-mock';
-import * as actions from '../src/jsx/actions/actions';
-import {shortenUrl} from "../src/jsx/actions/actions";
+import * as actions from '../src/redux/actions';
+import {shortenUrl} from "../src/redux/actions";
 import { routeLoadingModes } from '../src/data/enums';
 require('isomorphic-fetch');
 const middlewares = [thunk];
