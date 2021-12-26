@@ -54,7 +54,8 @@ const TopBarItem = ({children, active, onClick, visible}) => {
     backgroundColor: active ? "" : "#00000030",
     justifyContent: "center",
     transition: "background-color 0.3s",
-    width: "0px"
+    width: "0px",
+    fontSize: "15px"
   }
 
   const newlyVisible = useValueHasChanged(visible)
