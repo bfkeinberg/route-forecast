@@ -1,5 +1,5 @@
 import { Spinner } from '@blueprintjs/core';
-import {Alert, Form, Card, CardBody, CardTitle} from 'reactstrap';
+import {Alert, Form} from 'reactstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import React, { useEffect } from 'react';
 import ShortUrl from '../TopBar/ShortUrl';
@@ -34,28 +34,21 @@ const RouteInfoForm = ({ controlPoints, fetchingRoute, errorDetails, routeInfo, 
         }
     }, [routeInfo.name, firstUse, controlPoints])
 
-    const header = (<div style={{textAlign:"center",'fontSize':'90%'}}>Load Route</div>);
-
     return (
-        <div>
-            <Card style={{borderTop: "none"}}>
-                <CardBody>
-                    <CardTitle className='dlgTitle' tag='h6'>{header}</CardTitle>
-                    <Form inline id="forecast_form">
-                        <RouteLoadingModeSelector mode={mode} setMode={setRouteLoadingMode} modeSwitched={modeSwitched}/>
-                        {mode === routeLoadingModes.RWGPS ?
-                            <RouteInfoInputRWGPS/> :
-                            <RouteInfoInputStrava/>}
-                        {errorDetails !== null && <Alert style={{ padding: '10px' }} color="danger">{errorDetails}</Alert>}
-                        {fetchingRoute && <Spinner/>}
-                    </Form>
-                    <MediaQuery maxDeviceWidth={500}>
-                        <div style={{marginTop: "10px", textAlign: "center"}}>
-                            <ShortUrl/>
-                        </div>
-                    </MediaQuery>
-                </CardBody>
-            </Card>
+        <div style={{padding: "16px"}}>
+            <Form inline id="forecast_form">
+                <RouteLoadingModeSelector mode={mode} setMode={setRouteLoadingMode} modeSwitched={modeSwitched}/>
+                {mode === routeLoadingModes.RWGPS ?
+                    <RouteInfoInputRWGPS/> :
+                    <RouteInfoInputStrava/>}
+                {errorDetails !== null && <Alert style={{ padding: '10px' }} color="danger">{errorDetails}</Alert>}
+                {fetchingRoute && <Spinner/>}
+            </Form>
+            <MediaQuery maxDeviceWidth={500}>
+                <div style={{marginTop: "10px", textAlign: "center"}}>
+                    <ShortUrl/>
+                </div>
+            </MediaQuery>
         </div>
     );
 }

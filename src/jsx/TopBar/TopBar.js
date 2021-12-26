@@ -46,7 +46,7 @@ const TopBarItem = ({children, active, onClick, visible}) => {
   const style = {
     cursor: "pointer",
     borderRight: "1px solid #00000050",
-    borderBottom: active ? "" : "1px solid #00000030",
+    borderBottom: active ? "1px solid #00000000" : "1px solid #00000030",
     height: "100%",
     display: "flex",
     alignItems: "center",
