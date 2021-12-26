@@ -51,7 +51,7 @@ const Cell = ({value, transformFunction, editable, onCellValueChanged}) => {
     </div>
     :
     <div style={{cursor: editable ? "pointer" : "", width: "100%", height: "100%"}} onClick={() => { if (editable) { setEditing(true) } }}>
-      {transformFunction(value)}
+      {value !== undefined && transformFunction(value)}
     </div>
   )
 }
