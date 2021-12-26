@@ -147,7 +147,7 @@ export class ForecastTable extends Component {
 
     render() {
         const windHeader = this.state.showGusts ? 'Wind gust' : 'Wind speed';
-        const distHeader = this.props.metric ? 'Kilometer' : 'Mile';
+        const distHeader = this.props.metric ? 'KM' : 'Mile';
         const weatherId = (this.props.gustSpeed > gustySpeed) ? 'gustyWeather' : 'weatherCorrections';
         return (
             <div className="animated slideInLeft">
