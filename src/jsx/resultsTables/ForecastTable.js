@@ -15,8 +15,9 @@ import { Icon } from '@blueprintjs/core';
 import cookie from 'react-cookies';
 import { ToggleButton } from '../shared/ToggleButton';
 import { WeatherCorrections } from './WeatherCorrections';
+import { milesToMeters } from '../../utils/util';
+import { useFormatSpeed } from '../../utils/hooks';
 
-const milesToMeters = 1609.34;
 const gustySpeed = 25;
 
 export class ForecastTable extends Component {
@@ -86,10 +87,6 @@ export class ForecastTable extends Component {
 
     toggleApparentDisplay = () => this.setState({showApparentTemp:!this.state.showApparentTemp});
 
-    static formatSpeed = (speed, isMetric) => {
-        return isMetric ? `${((speed*milesToMeters)/1000).toFixed(0)} kph` : `${speed} mph`;
-    };
-
     showTime = (index, length, time) => {
             if (index === length-1) {
                 return DateTime.fromFormat(this.props.finishTime, finishTimeFormat).toFormat('h:mma');
@@ -135,10 +132,9 @@ export class ForecastTable extends Component {
                             <td>{point.cloudCover}</td>
                         </MediaQuery>
                         <td>{point.aqi!==undefined?point.aqi:'N/A'}</td>
-                        <td className={ForecastTable.windStyle(point)}>{this.state.showGusts?
-                            <i>{
-                            ForecastTable.formatSpeed(point.gust, this.props.metric)}</i>:
-                            ForecastTable.formatSpeed(point.windSpeed, this.props.metric)}</td>
+                        <td className={ForecastTable.windStyle(point)}>
+                            <WindSpeed gust={point.gust} windSpeed={point.windSpeed} showGusts={this.state.showGusts}/>
+                        </td>
                         <MediaQuery minWidth={501}>
                             <td>{point.windBearing}</td>
                         </MediaQuery>
@@ -216,3 +212,12 @@ const mapDispatchToProps = {
 
 export const formatTemperature = ForecastTable.formatTemperature;
 export default connect(mapStateToProps,mapDispatchToProps)(ForecastTable);
+
+const WindSpeed = ({gust, windSpeed, showGusts}) => {
+    const formatSpeed = useFormatSpeed()
+    return (
+        showGusts ?
+            <i>{formatSpeed(gust)}</i> :
+            formatSpeed(windSpeed)
+    )
+}

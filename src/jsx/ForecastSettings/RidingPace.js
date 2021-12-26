@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import {Label, Input, FormGroup, UncontrolledTooltip} from 'reactstrap';
 import {connect} from 'react-redux';
 import {saveCookie, setPace} from "../../redux/actions";
-import { useActualPace } from '../../utils/hooks';
+import { useActualPace, useFormatSpeed } from '../../utils/hooks';
 import { inputPaceToSpeed, paceToSpeed } from '../../utils/util';
 
 const paceValues = {
@@ -76,6 +76,8 @@ const RidingPace = ({ pace, setPace, metric }) => {
 
     const actualPace = useActualPace()
 
+    const formatSpeed = useFormatSpeed()
+
     pace = correctPaceValue(pace, setPace);
     let pace_mph = paceToSpeed[pace];
     let pace_text;
@@ -84,7 +86,7 @@ const RidingPace = ({ pace, setPace, metric }) => {
         pace_text = `Speed on flat ground, which will be reduced by climbing`;
     } else {
         pace_tooltip_class = getPaceTooltipId(actualPace,pace_mph);
-        pace_text = `Actual riding pace was ${getAlphaPace(Math.round(actualPace))} (${actualPace.toFixed(1)})`;
+        pace_text = `Actual riding pace was ${getAlphaPace(Math.round(actualPace))} (${formatSpeed(actualPace)})`;
     }
     
     const dropdownValues = metric ? paceValues.metric : paceValues.imperialLikeAPenguin

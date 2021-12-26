@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react"
 import { useSelector } from "react-redux"
 import stravaRouteParser from "./stravaRouteParser"
+import { milesToMeters } from "./util"
 
 const useValueHasChanged = (value) => {
   const [initialValue] = useState(value)
@@ -35,4 +36,11 @@ const usePrevious = (value) => {
   return ref.current;
 }
 
-export { useValueHasChanged, useActualPace, useActualFinishTime, useActualArrivalTimes, usePrevious }
+const useFormatSpeed = () => {
+  const metric = useSelector(state => state.controls.metric)
+  return speed => metric ?
+    `${((speed * milesToMeters) / 1000).toFixed(1)} kph` :
+    `${speed.toFixed(1)} mph`;
+}
+
+export { useValueHasChanged, useActualPace, useActualFinishTime, useActualArrivalTimes, usePrevious, useFormatSpeed }

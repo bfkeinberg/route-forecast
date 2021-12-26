@@ -7,7 +7,7 @@ import 'animate.css/animate.min.css';
 import { setSubrange, toggleMapRange } from '../../redux/actions';
 import stravaRouteParser from '../../utils/stravaRouteParser';
 import StravaAnalysisIntervalInput from '../ForecastSettings/StravaAnalysisIntervalInput';
-import { useActualPace } from '../../utils/hooks';
+import { useActualPace, useFormatSpeed } from '../../utils/hooks';
 
 const PaceTable = ({activityData, activityStream, analysisInterval, setSubrange, toggleMapRange}) =>  {
 
@@ -27,6 +27,8 @@ const PaceTable = ({activityData, activityStream, analysisInterval, setSubrange,
         }
     };
 
+    const formatSpeed = useFormatSpeed()
+
     const expandTable = (paces) => {
         return (
             <tbody>
@@ -34,7 +36,7 @@ const PaceTable = ({activityData, activityStream, analysisInterval, setSubrange,
                 <tr key={pace.distance+Math.random().toString(10)} start={pace.start} end={pace.end}
                     onClick={toggleRange} onMouseEnter={updateSubrange}>
                     <td>{pace.time}</td>
-                    <td>{pace.pace.toFixed(1)}</td>
+                    <td>{formatSpeed(pace.pace)}</td>
                     <td>{pace.alphaPace}</td>
                     <td>{pace.distance.toFixed(0)}</td>
                     <td>{pace.climb.toFixed(0)}</td>
@@ -55,8 +57,10 @@ const PaceTable = ({activityData, activityStream, analysisInterval, setSubrange,
     return (
             <div className="animated slideInRight">
                 <ErrorBoundary>
-                    <StravaAnalysisIntervalInput />
-                    <div id="paceSpan">Overall climb-adjusted pace was {actualPace.toFixed(1)}</div>
+                    <div style={{padding: "16px", display: "flex", flexFlow: "column", alignItems: "center"}}>
+                        <StravaAnalysisIntervalInput />
+                        <div id="paceSpan" style={{fontSize: "14px", marginTop: "10px"}}>Overall climb-adjusted pace was <span style={{fontWeight: "bold"}}>{formatSpeed(actualPace)}</span>.</div>
+                    </div>
                     <Table striped responsive hover bordered>
                         <thead>
                         <tr>
@@ -65,6 +69,7 @@ const PaceTable = ({activityData, activityStream, analysisInterval, setSubrange,
                             <th style={{'fontSize':'80%'}}>WW Pace</th>
                             <th style={{'fontSize':'80%'}}>Distance</th>
                             <th style={{'fontSize':'80%'}}>Climb</th>
+                            <th style={{'fontSize':'80%'}}>Time Stopped</th>
                         </tr>
                         </thead>
                         {expandTable(paceOverTime)}
