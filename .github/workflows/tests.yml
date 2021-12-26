@@ -1,6 +1,6 @@
 # This workflow will run tests on all commits to feature branches
 
-name: Publish to Google app Engine
+name: Run tests on feature branch
 
 # Controls when the action will run. 
 on:
