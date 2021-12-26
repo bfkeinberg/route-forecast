@@ -61,9 +61,8 @@ const RideWithGpsId = ({setRwgpsRoute,loadingSource,loadingSuccess,rwgpsRoute,ne
     return (
         <FormGroup inline>
             <Label for='rwgps_route' size='sm' tag='b'>Route ID</Label>
-            <UncontrolledTooltip placement="bottom" target='rwgps_route'>The number for a route on Ride with GPS</UncontrolledTooltip>
             <Input id={'rwgps_route'} className={firstUse?'ridewithgps_init':''}
-                   size="9" bsSize='xsm' tabIndex='5' type="text"
+                   autoFocus tabIndex='5' type="text"
                    {...decideValidationStateFor('rwgps',loadingSource,loadingSuccess)}
                  onBlur={event => {handleRwgpsRoute(event.target.value)}}
                  onKeyPress={isNumberKey}
