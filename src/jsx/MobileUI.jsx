@@ -12,11 +12,6 @@ import {IconNames} from "@blueprintjs/icons";
 import {connect} from 'react-redux';
 import RouteInfoForm from "./RouteInfoForm/RouteInfoForm";
 import { ForecastSettings } from "./ForecastSettings/ForecastSettings";
-import { routeLoadingModes } from "../data/enums";
-
-const DataTable = (props) => {
-    return (props.routeLoadingMode === routeLoadingModes.STRAVA ? <PaceTable/> : <ForecastTable/>);
-};
 
 const MobileUI = (props) => {
     return <MemoryRouter>
@@ -42,8 +37,13 @@ const MobileUI = (props) => {
                 </Link>
             </NavItem>
             <NavItem>
-                <Link to={"/table/"} className={'nav-link'}>
+                <Link to={"/forecastTable/"} className={'nav-link'}>
                     <Icon icon={IconNames.TH} iconSize={Icon.SIZE_STANDARD} intent={props.needToViewTable?Intent.DANGER:Intent.NONE} />
+                </Link>
+            </NavItem>
+            <NavItem>
+                <Link to={"/paceTable/"} className={'nav-link'}>
+                    <Icon color="orange" icon={IconNames.TH} iconSize={Icon.SIZE_STANDARD} intent={props.needToViewTable?Intent.DANGER:Intent.NONE} />
                 </Link>
             </NavItem>
         </Nav>
@@ -51,7 +51,8 @@ const MobileUI = (props) => {
         <Route path="/" exact render={(routeProps) => <RouteInfoForm routeProps={routeProps} />}/>
         <Route path="/controlPoints/" exact component={ForecastSettings} />
         <Route path="/map/" exact render={(routeProps) => <MapLoader maps_api_key={props.mapsApiKey} />} />
-        <Route path="/table/" exact component={DataTable} />
+        <Route path="/forecastTable/" exact component={ForecastTable} />
+        <Route path="/paceTable/" exact component={PaceTable} />
 
     </MemoryRouter>;
 };

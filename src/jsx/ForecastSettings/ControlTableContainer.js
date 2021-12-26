@@ -2,7 +2,7 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Button } from "@blueprintjs/core";
-import { Card, CardBody, CardTitle } from "reactstrap";
+import { Card, CardBody } from "reactstrap";
 import { addControl } from "../../redux/actions";
 import ErrorBoundary from '../shared/ErrorBoundary';
 import { ControlTable } from './ControlTable';
@@ -11,24 +11,16 @@ import { Tooltip2 } from "@blueprintjs/popover2";
 import { ToggleButton } from '../shared/ToggleButton';
 
 export const ControlTableContainer = () => {
+  // TODO -- make this do anything. automatically open control table if URL with control points is loaded?
   const hasControls = useSelector(state => state.controls.userControlPoints.length > 0)
-  const name = useSelector(state => state.routeInfo.name)
   const displayBanked = useSelector(state => state.controls.displayBanked)
   const dispatch = useDispatch()
-
-  let title;
-  if (name === '') {
-      title = (<div id={'controlListTitle'}>Control point list</div>);
-  } else {
-      title = (<div id={'controlListTitle'}>Control point list for <i>{name}</i></div>);
-  }
   
   return (
     <>
       <ErrorBoundary>
         <Card style={{ margin: '10px' }}>
           <CardBody style={{display: "flex", flexFlow: "column", alignItems: "center"}}>
-            <CardTitle className="cpListTitle" tag='h6'>{title}</CardTitle>
             <ErrorBoundary>
               <ControlTable />
               <AddRowButton/>

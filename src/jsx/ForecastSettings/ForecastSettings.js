@@ -14,13 +14,15 @@ import { TimeFields } from "./TimeFields";
 export const ForecastSettings = () => {
     const showProvider = useSelector(state => state.controls.showWeatherProvider)
     const metric = useSelector(state => state.controls.metric)
+    const routeName = useSelector(state => state.routeInfo.name)
     const dispatch = useDispatch()
 
     const [showControlPoints, setShowControlPoints] = useState(false)
     
     return (
-        <div style={{display: "flex", flexFlow: "column", alignItems: "center"}}> 
+        <div style={{display: "flex", flexFlow: "column", alignItems: "center"}}>
             <div style={{ padding: "10px" }}>
+                <div style={{fontStyle: "oblique", color: "rgba(64, 111, 140, 0.87)", fontSize: "20px", textAlign: "center"}}>{routeName}</div>
                 <TimeFields />
                 <div style={{ display: "flex" }}>
                     <RidingPace />

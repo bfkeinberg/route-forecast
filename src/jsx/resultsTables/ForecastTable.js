@@ -217,7 +217,7 @@ const WindSpeed = ({gust, windSpeed, showGusts}) => {
     const formatSpeed = useFormatSpeed()
     return (
         showGusts ?
-            <i>{formatSpeed(gust)}</i> :
-            formatSpeed(windSpeed)
+            <i>{formatSpeed(parseInt(gust, 10))}</i> :
+            formatSpeed(parseInt(windSpeed, 10))
     )
 }
