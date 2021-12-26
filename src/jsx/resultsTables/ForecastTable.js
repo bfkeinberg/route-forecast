@@ -14,6 +14,7 @@ import { DateTime } from 'luxon';
 import { Icon } from '@blueprintjs/core';
 import cookie from 'react-cookies';
 import { ToggleButton } from '../shared/ToggleButton';
+import { WeatherCorrections } from './WeatherCorrections';
 
 const milesToMeters = 1609.34;
 const gustySpeed = 25;
@@ -149,62 +150,52 @@ export class ForecastTable extends Component {
     }
 
     render() {
-        let weatherCorrections;
-        if (this.props.weatherCorrectionMinutes !== null) {
-            if (this.props.weatherCorrectionMinutes >= 0) {
-                weatherCorrections = Math.round(this.props.weatherCorrectionMinutes) + " minutes lost to wind";
-            }
-            else {
-                weatherCorrections = -Math.round(this.props.weatherCorrectionMinutes) + " minutes gained from wind";
-            }
-        }
-        else {
-            weatherCorrections = null;
-        }
         const windHeader = this.state.showGusts ? 'Wind gust' : 'Wind speed';
         const distHeader = this.props.metric ? 'Kilometer' : 'Mile';
         const temperatureHeader = this.state.showApparentTemp ? 'Apparent temp' : <Icon icon="temperature"/>;
         const weatherId = (this.props.gustSpeed > gustySpeed) ? 'gustyWeather' : 'weatherCorrections';
         return (
-                <div className="animated slideInLeft">
-                    <ErrorBoundary>
-                        <Row>
-                            <Col>
-                                {this.displayBacklink(this.props.provider)}
-                            </Col>
-                            <Col>
-                                <span id={weatherId}>{weatherCorrections}</span>
-                            </Col>
-                            <Col>
-                                <ToggleButton active={this.props.zoomToRange} onClick={this.toggleZoom}>Zoom to Segment</ToggleButton>
-                            </Col>
-                        </Row>
-                    <Table size='sm' hover bordered style={{fontSize: "12px"}}>
+            <div className="animated slideInLeft">
+                <ErrorBoundary>
+                    <Row style={{padding: "16px"}}>
+                        <Col>
+                            {this.displayBacklink(this.props.provider)}
+                        </Col>
+                        <Col>
+                            <span id={weatherId} style={{fontSize: "13px"}}>
+                                <WeatherCorrections minutesLost={this.props.weatherCorrectionMinutes}/>
+                            </span>
+                        </Col>
+                        <Col>
+                            <ToggleButton active={this.props.zoomToRange} onClick={this.toggleZoom}>Zoom to Segment</ToggleButton>
+                        </Col>
+                    </Row>
+                    <Table size='sm' hover bordered style={{ fontSize: "12px" }}>
                         <thead>
-                        <tr>
-                            <th className={'headerCell'}>Time</th>
-                            <th id={'dist'} className={'headerCell'}>{distHeader}</th>
+                            <tr>
+                                <th className={'headerCell'}>Time</th>
+                                <th id={'dist'} className={'headerCell'}>{distHeader}</th>
                                 <th className={'headerCell'}>Summary</th>
-                            <th id={'temp'} className={'headerCell'} onClick={this.toggleApparentDisplay}>{temperatureHeader}</th>
-                            <th className={'headerCell'}>Chance of rain</th>
-                            <MediaQuery minWidth={501}>
-                                <th className={'headerCell'}>Cloud cover</th>
-                            </MediaQuery>
-                            <th className={'headerCell'} id={'aqi'}>AQI</th>
-                            <th id={'wind'} className={'headerCell'} onClick={this.toggleGustDisplay}>{windHeader}</th>
-                            <MediaQuery minWidth={501}>
-                                <th className={'headerCell'}>Wind bearing</th>
-                            </MediaQuery>
-                        </tr>
+                                <th id={'temp'} className={'headerCell'} onClick={this.toggleApparentDisplay}>{temperatureHeader}</th>
+                                <th className={'headerCell'}>Chance of rain</th>
+                                <MediaQuery minWidth={501}>
+                                    <th className={'headerCell'}>Cloud cover</th>
+                                </MediaQuery>
+                                <th className={'headerCell'} id={'aqi'}>AQI</th>
+                                <th id={'wind'} className={'headerCell'} onClick={this.toggleGustDisplay}>{windHeader}</th>
+                                <MediaQuery minWidth={501}>
+                                    <th className={'headerCell'}>Wind bearing</th>
+                                </MediaQuery>
+                            </tr>
                         </thead>
                         {this.expandTable(this.props.forecast, this.props.metric)}
                     </Table>
-                    </ErrorBoundary>
-                    <UncontrolledTooltip placement={'top'} target={'dist'}>Distance at start of segment</UncontrolledTooltip>
-                    <UncontrolledTooltip placement={'top'} target={'temp'}>Click to toggle between temperature and apparent temperature</UncontrolledTooltip>
-                    <UncontrolledTooltip placement={'top'} target={'wind'}>Click to toggle between average wind speed and wind gusts</UncontrolledTooltip>
-                    <UncontrolledTooltip placement={'top'} target={'aqi'}>Current conditions, not forecasted</UncontrolledTooltip>
-                </div>
+                </ErrorBoundary>
+                <UncontrolledTooltip placement={'top'} target={'dist'}>Distance at start of segment</UncontrolledTooltip>
+                <UncontrolledTooltip placement={'top'} target={'temp'}>Click to toggle between temperature and apparent temperature</UncontrolledTooltip>
+                <UncontrolledTooltip placement={'top'} target={'wind'}>Click to toggle between average wind speed and wind gusts</UncontrolledTooltip>
+                <UncontrolledTooltip placement={'top'} target={'aqi'}>Current conditions, not forecasted</UncontrolledTooltip>
+            </div>
         );
     }
 }
