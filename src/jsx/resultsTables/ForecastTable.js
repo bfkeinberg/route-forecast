@@ -152,7 +152,6 @@ export class ForecastTable extends Component {
     render() {
         const windHeader = this.state.showGusts ? 'Wind gust' : 'Wind speed';
         const distHeader = this.props.metric ? 'Kilometer' : 'Mile';
-        const temperatureHeader = this.state.showApparentTemp ? 'Apparent temp' : <Icon icon="temperature"/>;
         const weatherId = (this.props.gustSpeed > gustySpeed) ? 'gustyWeather' : 'weatherCorrections';
         return (
             <div className="animated slideInLeft">
@@ -176,13 +175,13 @@ export class ForecastTable extends Component {
                                 <th className={'headerCell'}>Time</th>
                                 <th id={'dist'} className={'headerCell'}>{distHeader}</th>
                                 <th className={'headerCell'}>Summary</th>
-                                <th id={'temp'} className={'headerCell'} onClick={this.toggleApparentDisplay}>{temperatureHeader}</th>
+                                <th id={'temp'} className={'headerCell'} onClick={this.toggleApparentDisplay} style={{cursor: "pointer"}}><Icon icon="temperature"/></th>
                                 <th className={'headerCell'}>Chance of rain</th>
                                 <MediaQuery minWidth={501}>
                                     <th className={'headerCell'}>Cloud cover</th>
                                 </MediaQuery>
                                 <th className={'headerCell'} id={'aqi'}>AQI</th>
-                                <th id={'wind'} className={'headerCell'} onClick={this.toggleGustDisplay}>{windHeader}</th>
+                                <th id={'wind'} className={'headerCell'} onClick={this.toggleGustDisplay} style={{cursor: "pointer"}}>{windHeader}</th>
                                 <MediaQuery minWidth={501}>
                                     <th className={'headerCell'}>Wind bearing</th>
                                 </MediaQuery>
