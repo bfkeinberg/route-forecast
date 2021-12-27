@@ -14,12 +14,15 @@ import DateSelect from "./DateSelect";
 // };
 
 export const TimeFields = () => {
-  let predictedFinishTime = useSelector(state => state.routeInfo.finishTime)
+  const predictedFinishTime = useSelector(state => state.routeInfo.finishTime)
+  const predictedFinishTimeExists = predictedFinishTime !== ""
   const actualFinishTime = useActualFinishTime()
 
   // to match datepicker displayed format
   const newDateFormat = 'MMMM dd, yyyy h:mm a';
-  predictedFinishTime = DateTime.fromFormat(predictedFinishTime, finishTimeFormat).toFormat(newDateFormat)
+  const displayPredictedFinishTime = predictedFinishTimeExists ?
+    DateTime.fromFormat(predictedFinishTime, finishTimeFormat).toFormat(newDateFormat) :
+    "Load forecast to create"
 
   const timeFieldStyle = {
     width: "240px",
@@ -37,8 +40,8 @@ export const TimeFields = () => {
         <div style={{ display: "flex", alignItems: "center", justifyContent: "center", margin: "10px 0px" }}>
           <span style={{ fontSize: ".875rem", fontWeight: "bolder", flex: 1, padding: "0px 5px" }}>Projected finish time</span>
             <span style={{flex: 2.5}}>
-              <div style={{...timeFieldStyle, backgroundColor: "rgba(0, 0, 0, 0.05)",}}>
-                {predictedFinishTime}
+              <div style={{...timeFieldStyle, backgroundColor: "rgba(0, 0, 0, 0.05)", fontStyle: predictedFinishTimeExists ? "" : "oblique", color: predictedFinishTimeExists ? "" : "rgba(0, 0, 0, 0.5)"}}>
+                {displayPredictedFinishTime}
               </div>
             </span>
         </div>
