@@ -232,6 +232,7 @@ const strava = function (state = {
         expires_at: null,
         fetching: false,
         activityData: null,
+        activityStream: null,
         errorDetails: null,
         subrange:[]
     }, action) {
