@@ -22,7 +22,7 @@ export const TimeFields = () => {
   const newDateFormat = 'MMMM dd, yyyy h:mm a';
   const displayPredictedFinishTime = predictedFinishTimeExists ?
     DateTime.fromFormat(predictedFinishTime, finishTimeFormat).toFormat(newDateFormat) :
-    "Load forecast to create"
+    "Find forecast to create"
 
   const timeFieldStyle = {
     width: "240px",
