@@ -1,7 +1,5 @@
-import React, {Component} from 'react';
-import PropTypes from 'prop-types';
+import React, { useEffect } from 'react';
 import rainCloud from "Images/rainCloud.png";
-import {connect} from 'react-redux';
 import ErrorBoundary from "../shared/ErrorBoundary";
 import circus_tent from 'Images/circus tent.png';
 import {Map, InfoWindow, Marker, GoogleApiWrapper, Polyline} from 'google-maps-react-17';
@@ -11,105 +9,35 @@ import { routeLoadingModes } from '../../data/enums';
 import { milesToMeters } from '../../utils/util';
 import { usePointsAndBounds } from '../../utils/hooks';
 import { useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 
 /*global google*/
 const arrow = "M16.317,32.634c-0.276,0-0.5-0.224-0.5-0.5V0.5c0-0.276,0.224-0.5,0.5-0.5s0.5,0.224,0.5,0.5v31.634\n" +
     "\t\tC16.817,32.41,16.594,32.634,16.317,32.634z,M28.852,13.536c-0.128,0-0.256-0.049-0.354-0.146L16.319,1.207L4.135,13.39c-0.195,0.195-0.512,0.195-0.707,0 s-0.195-0.512,0-0.707L15.966,0.146C16.059,0.053,16.186,0,16.319,0l0,0c0.133,0,0.26,0.053,0.354,0.146l12.533,12.536 c0.195,0.195,0.195,0.512,0,0.707C29.108,13.487,28.98,13.536,28.852,13.536z";
 
-class RouteForecastMap extends Component {
-    static propTypes = {
-        forecast:PropTypes.arrayOf(PropTypes.object).isRequired,
-        bounds:PropTypes.shape({
-            min_latitude:PropTypes.number.isRequired, max_latitude:PropTypes.number.isRequired,
-            min_longitude:PropTypes.number.isRequired, max_longitude:PropTypes.number.isRequired}),
-        points:PropTypes.arrayOf(PropTypes.shape({
-            lat:PropTypes.number.isRequired, lon:PropTypes.number,elevation:PropTypes.number,
-            dist:PropTypes.number})),
-        maps_api_key:PropTypes.string.isRequired,
-        controls:PropTypes.arrayOf(PropTypes.shape({lat:PropTypes.number,lon:PropTypes.number})),
-        controlNames:PropTypes.arrayOf(PropTypes.string),
-        subrange:PropTypes.arrayOf(PropTypes.number),
-        google:PropTypes.object,
-        metric:PropTypes.bool.isRequired,
-        routeLoadingMode:PropTypes.number.isRequired,
-        setMapViewed:PropTypes.func.isRequired,
-        zoomToRange:PropTypes.bool.isRequired
-    };
+const RouteForecastMap = ({google}) => {
+    const userControlPoints = useSelector(state => state.controls.userControlPoints)
+    const forecast = useSelector(state => state.forecast.forecast)
+    const controls = useSelector(state => state.controls.calculatedControlValues)
+    const subrange = useSelector(state => state.uiInfo.routeParams.routeLoadingMode === routeLoadingModes.STRAVA ? state.strava.subrange : state.forecast.range)
+    const routeLoadingMode = useSelector(state => state.uiInfo.routeParams.routeLoadingMode)
+    const metric = useSelector(state => state.controls.metric)
+    const zoomToRange = useSelector(state => state.forecast.zoomToRange)
 
-    constructor(props) {
-        super(props);
-        this.map = null;
-        // this.onDesktop = window.matchMedia("(min-width: 1000px)").matches;
-        props.setMapViewed();
+    const dispatch = useDispatch()
+    useEffect(() => { dispatch(setMapViewed()) }, [])
+
+    const controlNames = userControlPoints.map(control => control.name)
+
+    let markedInfo = findMarkerInfo(forecast, subrange);
+    let infoPosition = {lat:0, lng:0};
+    let infoVisible = false;
+    let infoContents = '';
+    if (markedInfo.length > 0) {
+        infoPosition = {lat:markedInfo[0].lat, lng:markedInfo[0].lon};
+        infoContents = `Temperature ${markedInfo[0].tempStr} Wind speed ${markedInfo[0].windSpeed} Wind bearing ${markedInfo[0].windBearing}`;
+        infoVisible = true;
     }
-
-    findMarkerInfo(forecast, subrange) {
-        if (subrange.length!==2) {
-            return [];
-        }
-        return forecast.filter((point) => point.distance*milesToMeters > subrange[0] && point.distance*milesToMeters < subrange[1] );
-    }
-
-    render() {
-        const controlNames = this.props.userControlPoints.map(control => control.name)
-
-        let markedInfo = this.findMarkerInfo(this.props.forecast, this.props.subrange);
-        let infoPosition = {lat:0, lng:0};
-        let infoVisible = false;
-        let infoContents = '';
-        if (markedInfo.length > 0) {
-            infoPosition = {lat:markedInfo[0].lat, lng:markedInfo[0].lon};
-            infoContents = `Temperature ${markedInfo[0].tempStr} Wind speed ${markedInfo[0].windSpeed} Wind bearing ${markedInfo[0].windBearing}`;
-            infoVisible = true;
-        }
-        return (
-            <MapFunctionalComponentForFunAndGames
-                forecast={this.props.forecast}
-                routeLoadingMode={this.props.routeLoadingMode}
-                google={this.props.google}
-                controls={this.props.controls}
-                subrange={this.props.subrange}
-                infoPosition={infoPosition}
-                infoVisible={infoVisible}
-                infoContents={infoContents}
-                controlNames={controlNames}
-                zoomToRange={this.props.zoomToRange}
-            />
-        );
-    }
-
-}
-
-const mapStateToProps = (state) =>
-    ({
-        userControlPoints: state.controls.userControlPoints,
-        forecast: state.forecast.forecast,
-        controls: state.controls.calculatedControlValues,
-        subrange: state.uiInfo.routeParams.routeLoadingMode === routeLoadingModes.STRAVA ? state.strava.subrange : state.forecast.range,
-        routeLoadingMode: state.uiInfo.routeParams.routeLoadingMode,
-        metric: state.controls.metric,
-        zoomToRange: state.forecast.zoomToRange
-    });
-
-const mapDispatchToProps = {
-    setMapViewed
-};
-
-// eslint-disable-next-line new-cap
-/*
-export default RouteForecastMap.onDesktop ? connect(mapStateToProps)(GoogleApiWrapper((props) => (
-    {apiKey: props.maps_api_key}
-))(RouteForecastMap)) :
-    withRouter(connect(mapStateToProps)(GoogleApiWrapper((props) => (
-        {apiKey: props.maps_api_key}
-    ))(RouteForecastMap)));
-*/
-// eslint-disable-next-line new-cap
-export default connect(mapStateToProps, mapDispatchToProps)(GoogleApiWrapper((props) => (
-    {apiKey: props.maps_api_key}
-))(RouteForecastMap));
-
-const MapFunctionalComponentForFunAndGames = ({forecast, routeLoadingMode, google, controls, subrange, infoPosition, infoVisible, infoContents, controlNames, zoomToRange}) => {
 
     const getHighlight = (points,subrange) => {
         if (subrange.length !== 2) {
@@ -131,7 +59,7 @@ const MapFunctionalComponentForFunAndGames = ({forecast, routeLoadingMode, googl
     // console.log(mapCenter)
     // console.log(initialCenter)
 
-    console.log(subrange)
+    // console.log(subrange)
 
     return (
         <ErrorBoundary>
@@ -148,7 +76,7 @@ const MapFunctionalComponentForFunAndGames = ({forecast, routeLoadingMode, googl
                         <Polyline path={points} strokeColor={'#ff0000'} strokeWeight={2} strokeOpacity={1.0} />
                         {/* <MapHighlight points={points} subrange={subrange}/> */}
                         {getHighlight(points, subrange)}
-                        <MapMarkers forecast={forecast} controls={controls} controlNames={controlNames} subrange={subrange} />
+                        <MapMarkers forecast={forecast} controls={controls} controlNames={controlNames} subrange={subrange} metric={metric}/>
                         <InfoWindow position={infoPosition} visible={infoVisible}>
                             <div>{infoContents}</div>
                         </InfoWindow>
@@ -164,10 +92,7 @@ const cvtDistance = (distance, metric) => {
     return (metric ? ((distance * milesToMeters)/1000).toFixed(0) : distance);
 };
 
-const MapMarkers = ({forecast, controls, controlNames, subrange}) => {
-
-    const metric = useSelector(state => state.controls.metric)
-    
+const MapMarkers = ({forecast, controls, controlNames, subrange, metric}) => {
     // marker title now contains both temperature and mileage
     return (forecast.map((point) =>
         <RainIcon
@@ -293,3 +218,14 @@ const getMapBounds = (points, bounds, zoomToRange, subrange) => {
     }
     return defaultBounds;
 }
+
+const findMarkerInfo = (forecast, subrange) => {
+    if (subrange.length!==2) {
+        return [];
+    }
+    return forecast.filter((point) => point.distance*milesToMeters > subrange[0] && point.distance*milesToMeters < subrange[1] );
+}
+
+export default GoogleApiWrapper((props) => (
+    {apiKey: props.maps_api_key}
+))(RouteForecastMap);
