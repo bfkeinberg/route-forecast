@@ -1,4 +1,3 @@
-import { Spinner } from '@blueprintjs/core';
 import {Alert, Form} from 'reactstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import React from 'react';
@@ -12,12 +11,14 @@ import { RouteInfoInputRWGPS } from './RouteInfoInputRWGPS';
 import { RouteInfoInputStrava } from './RouteInfoInputStrava';
 import { routeLoadingModes } from '../../data/enums';
 
-const RouteInfoForm = ({ controlPoints, fetchingRoute, errorDetails, routeInfo, firstUse, needToViewTable, routeProps, routeLoadingMode, setRouteLoadingMode }) => {
+const RouteInfoForm = ({ controlPoints, errorDetails, routeInfo, firstUse, needToViewTable, routeProps, routeLoadingMode, setRouteLoadingMode }) => {
     const mode = routeLoadingMode
     const modeSwitched = (event) => {
         setRouteLoadingMode(event.target.checked ? routeLoadingModes.STRAVA : routeLoadingModes.RWGPS)
     }
     
+    // TODO
+    // mobile magic
     // useEffect(() => {
     //     if (routeProps != null && routeProps.history != null && needToViewTable) {
     //         routeProps.history.replace('/table/')
@@ -32,7 +33,6 @@ const RouteInfoForm = ({ controlPoints, fetchingRoute, errorDetails, routeInfo, 
                     <RouteInfoInputRWGPS/> :
                     <RouteInfoInputStrava/>}
                 {errorDetails !== null && <Alert style={{ padding: '10px' }} color="danger">{errorDetails}</Alert>}
-                {fetchingRoute && <Spinner/>}
             </Form>
             <MediaQuery maxDeviceWidth={500}>
                 <div style={{marginTop: "10px", textAlign: "center"}}>
@@ -61,7 +61,6 @@ const RouteLoadingModeSelector = ({mode, setMode, modeSwitched}) => {
 
 const mapStateToProps = (state) =>
     ({
-        fetchingRoute: state.uiInfo.dialogParams.fetchingRoute,
         errorDetails: state.uiInfo.dialogParams.errorDetails,
         routeInfo: state.routeInfo,
         controlPoints: state.controls.userControlPoints,
@@ -76,7 +75,6 @@ const mapDispatchToProps = {
 
 RouteInfoForm.propTypes = {
     controlPoints: PropTypes.arrayOf(PropTypes.object).isRequired,
-    fetchingRoute: PropTypes.bool,
     errorDetails: PropTypes.string,
     routeInfo: PropTypes.shape({ name: PropTypes.string }),
     firstUse: PropTypes.bool.isRequired,

@@ -6,7 +6,7 @@ import {connect} from 'react-redux';
 import 'animate.css/animate.min.css';
 import { setSubrange, toggleMapRange } from '../../redux/actions';
 import stravaRouteParser from '../../utils/stravaRouteParser';
-import StravaAnalysisIntervalInput from '../ForecastSettings/StravaAnalysisIntervalInput';
+import StravaAnalysisIntervalInput from './StravaAnalysisIntervalInput';
 import { useActualPace, useFormatSpeed } from '../../utils/hooks';
 
 const PaceTable = ({activityData, activityStream, analysisInterval, setSubrange, toggleMapRange}) =>  {

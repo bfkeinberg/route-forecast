@@ -5,8 +5,9 @@ import RideWithGpsId from './RideWithGpsId';
 import PinnedRouteLoader from './PinnedRouteLoader.jsx';
 import ErrorBoundary from "../shared/ErrorBoundary";
 import { Button } from 'reactstrap';
-import { connect } from 'react-redux';
 import { loadFromRideWithGps } from '../../redux/actions';
+import { Spinner } from '@blueprintjs/core';
+import { useSelector, useDispatch } from 'react-redux';
 
 export const RouteInfoInputRWGPS = () => {
   const [showPinnedRoutes, setShowPinnedRoutes] = useState(false)
@@ -35,12 +36,13 @@ export const RouteInfoInputRWGPS = () => {
   )
 }
 
-const RWGPSLoadRouteButton = connect(state => ({}), {loadFromRideWithGps})(
-  ({loadFromRideWithGps}) => {
-    return (
-      <Button style={{backgroundColor: "#137cbd", borderColor: "#137cbd", marginTop: "10px", width: "100%"}} onClick={() => loadFromRideWithGps()}>
-        Load Route
-      </Button>
-    )
-  }
-)
+const RWGPSLoadRouteButton = () => {
+  const loading = useSelector(state => state.uiInfo.dialogParams.fetchingRoute)
+  const dispatch = useDispatch()
+  return (
+    <Button disabled={loading} style={{ backgroundColor: "#137cbd", borderColor: "#137cbd", marginTop: "10px", width: "100%" }} onClick={() => dispatch(loadFromRideWithGps())}>
+      {loading ? "Loading..." : "Load Route"}
+      {loading && <Spinner />}
+    </Button>
+  )
+}

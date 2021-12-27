@@ -4,6 +4,7 @@ import {Button, UncontrolledTooltip} from 'reactstrap';
 import {connect} from 'react-redux';
 import {requestForecast} from "../../redux/actions";
 import { useMediaQuery } from 'react-responsive';
+import { Spinner } from '@blueprintjs/core';
 
 const ForecastButton = ({fetchingForecast,requestForecast,routeInfo,submitDisabled}) => {
     let forecast_tooltip = submitDisabled ?
@@ -29,7 +30,8 @@ const ForecastButton = ({fetchingForecast,requestForecast,routeInfo,submitDisabl
                 disabled={submitDisabled || fetchingForecast}
                 size={smallScreen ? "sm" : ""}
             >
-                {fetchingForecast ? 'Updating...' : 'Find Forecast'}
+                {fetchingForecast ? 'Creating forecast...' : 'Find Forecast'}
+                {fetchingForecast && <Spinner />}
             </Button>
 
         </div>

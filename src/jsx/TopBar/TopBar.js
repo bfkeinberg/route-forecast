@@ -11,7 +11,14 @@ export const TopBar = ({sidePaneOptions, activeSidePane, setActiveSidePane, side
     <div style={{display: "flex"}}>
       <div style={{height: "50px", display: "flex", alignItems: "center", width: `${sidebarWidth}px`}}>
         {sidePaneOptions.map((option, index) =>
-          <TopBarItem active={activeSidePane === index} key={option} onClick={() => setActiveSidePane(index)} visible={panesVisible.has(option)}>
+          <TopBarItem
+            index={index}
+            activeSidePane={activeSidePane}
+            key={option}
+            onClick={() => setActiveSidePane(index)}
+            visible={panesVisible.has(option)}
+            last={index === panesVisible.size - 1}
+          >
             <div style={{fontWeight: "bold", textAlign: "center"}}>
               {option}
             </div>
@@ -42,10 +49,15 @@ const NonexistentLogo = () => {
   )
 }
 
-const TopBarItem = ({children, active, onClick, visible}) => {
+const TopBarItem = ({children, index, activeSidePane, last, onClick, visible}) => {
+  const active = index === activeSidePane
+  const leftNeighborActive = activeSidePane === index - 1
+  const rightNeighborActive = activeSidePane === index + 1
+
   const style = {
     cursor: "pointer",
-    borderRight: "1px solid #00000050",
+    borderLeft: `1px solid #000000${leftNeighborActive ? "50" : "00"}`,
+    borderRight: `1px solid #000000${rightNeighborActive || (!active && !last) ? "50" : "00"}`,
     borderBottom: active ? "1px solid #00000000" : "1px solid #00000030",
     height: "100%",
     display: "flex",
@@ -55,7 +67,8 @@ const TopBarItem = ({children, active, onClick, visible}) => {
     justifyContent: "center",
     transition: "background-color 0.3s",
     width: "0px",
-    fontSize: "15px"
+    fontSize: "15px",
+    borderRadius: `0px 0px ${rightNeighborActive ? 5 : 0}px ${leftNeighborActive ? 5 : 0}px`
   }
 
   const newlyVisible = useValueHasChanged(visible)
