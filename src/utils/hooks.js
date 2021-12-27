@@ -1,8 +1,10 @@
 import { useEffect, useRef, useState } from "react"
-import { useSelector, useDispatch } from "react-redux"
+import { useSelector } from "react-redux"
 import stravaRouteParser from "./stravaRouteParser"
 import { formatControlsForUrl, milesToMeters } from "./util"
-import { recalcRoute, saveCookie } from "../redux/actions"
+import { saveCookie } from "../redux/actions"
+import gpxParser from "./gpxParser"
+import { routeLoadingModes } from "../data/enums"
 
 const useValueHasChanged = (value) => {
   const [initialValue] = useState(value)
@@ -44,21 +46,6 @@ const useFormatSpeed = () => {
     `${speed.toFixed(1)} mph`;
 }
 
-const useRecalcRoute = () => {
-  const start = useSelector(state => state.uiInfo.routeParams.start)
-  const pace = useSelector(state => state.uiInfo.routeParams.pace)
-  const interval = useSelector(state => state.uiInfo.routeParams.interval)
-  const metric = useSelector(state => state.controls.metric)
-  const controls = useSelector(state => state.controls.userControlPoints)
-  const rwgpsRoute = useSelector(state => state.uiInfo.routeParams.rwgpsRoute)
-  const gpxRouteData = useSelector(state => state.routeInfo.gpxRouteData)
-
-  const dispatch = useDispatch()
-  if (!(rwgpsRoute === '' && gpxRouteData === null) && start !== null) {
-    dispatch(recalcRoute)
-  }
-}
-
 const useSaveControlsToCookie = () => {
 
   const controlPoints = useSelector(state => state.controls.userControlPoints)
@@ -75,5 +62,35 @@ const useSaveControlsToCookie = () => {
   }, [routeInfo.name, firstUse, controlPoints])
 }
 
+const usePointsAndBounds = () => {
+  const rwgpsRouteData = useSelector(state => state.routeInfo.rwgpsRouteData)
+  const gpxRouteData = useSelector(state => state.routeInfo.gpxRouteData)
 
-export { useValueHasChanged, useActualPace, useActualFinishTime, useActualArrivalTimes, usePrevious, useFormatSpeed, useRecalcRoute, useSaveControlsToCookie }
+  const routeLoadingMode = useSelector(state => state.uiInfo.routeParams.routeLoadingMode)
+  const stravaActivityStream = useSelector(state => state.strava.activityStream)
+  const stravaMode = routeLoadingMode === routeLoadingModes.STRAVA
+
+  let pointsAndBounds = { bounds: null, points: null }
+
+
+  if (stravaMode) {
+    if (stravaActivityStream !== null) {
+      pointsAndBounds = stravaRouteParser.computePointsAndBounds(stravaActivityStream)
+    }
+  } else if (rwgpsRouteData !== null) {
+    pointsAndBounds = gpxParser.computePointsAndBounds(rwgpsRouteData, "rwgps")
+  } else if (gpxRouteData !== null) {
+    pointsAndBounds = gpxParser.computePointsAndBounds(gpxRouteData, "gpx")
+  }
+
+  if (pointsAndBounds.points !== null) {
+    pointsAndBounds.points = pointsAndBounds.points
+      .filter(point => point.lat !== undefined && point.lon !== undefined)
+      .map(point => ({ lat: point.lat, lng: point.lon, dist: point.dist }))
+  }
+
+  return pointsAndBounds
+}
+
+
+export { useValueHasChanged, useActualPace, useActualFinishTime, useActualArrivalTimes, usePrevious, useFormatSpeed, useSaveControlsToCookie, usePointsAndBounds }

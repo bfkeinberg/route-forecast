@@ -584,7 +584,6 @@ describe('request forecast', () => {
                     }
                 ],
                 "calculatedControlValues": calculatedControls,
-                "initialControlValues": calculatedControls,
                 "queryString": null
             },
             uiInfo:{
@@ -594,7 +593,6 @@ describe('request forecast', () => {
                     "rwgpsRoute": 27904106,
                     "rwgpsRouteIsTrip": false,
                     "start": DateTime.fromSeconds(1531566000, {zone:'America/Los_Angeles'}),
-                    "timeZoneId": 'America/Los_Angeles',
                     "loadingSource": null,
                     "succeeded": null,
                     "routeLoadingMode": routeLoadingModes.RWGPS

@@ -3,6 +3,7 @@ import {combineReducers} from 'redux';
 import { DateTime } from 'luxon';
 import { getRouteNumberFromValue } from '../jsx/RouteInfoForm/RideWithGpsId';
 import { routeLoadingModes } from '../data/enums';
+import { getRouteName } from '../utils/util';
 
 export const finishTimeFormat = 'EEE, MMM dd yyyy h:mma';
 
@@ -134,35 +135,22 @@ loadingSource:null,fetchingForecast:false,fetchingRoute:false}, action) {
             return state;
     }
 };
-
-const routeInfo = function(state = {finishTime:'',initialFinishTime:'',weatherCorrectionMinutes:null,
-    forecastRequest:null, fetchAfterLoad:false,name:'',rwgpsRouteData:null,totalTimeInHours:null,
-    gpxRouteData:null, maxGustSpeed:0, timeZoneOffset:0, timeZoneId:'America/Los_Angeles'}, action) {
+const routeInfo = function(state = {finishTime:'',weatherCorrectionMinutes:null,
+    fetchAfterLoad:false,name:'',rwgpsRouteData:null,
+    gpxRouteData:null, maxGustSpeed:0}, action) {
     switch (action.type) {
-        case Actions.SET_TIME_ZONE:
-            return {...state,timeZoneOffset:action.offset,timeZoneId:action.id};
         case Actions.RWGPS_ROUTE_LOADING_SUCCESS:
-            return {...state,rwgpsRouteData:action.routeData,gpxRouteData:null};
+            return { ...state, rwgpsRouteData: action.routeData, gpxRouteData: null, name: getRouteName(action.routeData, "rwgps") };
         case Actions.GPX_ROUTE_LOADING_SUCCESS:
-            return {...state,gpxRouteData:action.gpxRouteData,rwgpsRouteData:null};
-        case Actions.SET_ROUTE_INFO:
-            if (action.routeInfo===null) {
-                return {...state,rwgpsRouteData:null,gpxRouteData:null,name:'',
-                    forecastRequest:null,totalTimeInHours:null};
-            }
-            return {...state,name:action.routeInfo.name,
-                finishTime:action.routeInfo.finishTime,initialFinishTime:action.routeInfo.finishTime,
-                forecastRequest:action.routeInfo.forecastRequest,totalTimeInHours:action.routeInfo.timeInHours};
+            return { ...state, gpxRouteData: action.gpxRouteData, rwgpsRouteData: null, name: getRouteName(action.gpxRouteData, "gpx") };
         case Actions.CLEAR_ROUTE_DATA:
-            return {...state,rwgpsRouteData:null,gpxRouteData:null,name:'',forecastRequest:null};
+            return {...state,rwgpsRouteData:null,gpxRouteData:null,name:''};
         // clear when the route is changed
         case Actions.SET_RWGPS_ROUTE:
-            return {...state,rwgpsRouteData:null,gpxRouteData:null,name:'',forecastRequest:null,
-                maxGustSpeed: 0, totalTimeInHours:null};
+            return {...state,rwgpsRouteData:null,gpxRouteData:null,name:'',
+                maxGustSpeed: 0};
         case Actions.ADD_WEATHER_CORRECTION:
             return {...state,weatherCorrectionMinutes:action.weatherCorrectionMinutes,finishTime:action.finishTime,maxGustSpeed:action.maxGustSpeed};
-        case Actions.SET_FETCH_AFTER_LOAD:
-            return {...state, fetchAfterLoad:action.fetchAfterLoad};
         default:
             return state;
     }
@@ -173,7 +161,6 @@ export const controls = function (state = {
     displayBanked: false,
     userControlPoints: [],
     calculatedControlValues: [],
-    initialControlValues: [],
     queryString: null,
     showWeatherProvider: false
     }, action) {
@@ -192,9 +179,6 @@ export const controls = function (state = {
             return {...state, userControlPoints: action.controls};
         case Actions.UPDATE_CALCULATED_VALUES:
             return {...state, calculatedControlValues: action.values};
-        case Actions.SET_ROUTE_INFO:
-            return {...state, calculatedControlValues: action.routeInfo.values,
-                initialControlValues: action.routeInfo.values};
         case Actions.ADD_CONTROL:
             return {...state, userControlPoints: [...state.userControlPoints, { name: "", distance: 0, duration: 0 }] };
         case Actions.SET_QUERY:
@@ -304,6 +288,7 @@ const strava = function (state = {
         case Actions.SET_ANALYSIS_INTERVAL:
             return {...state, analysisInterval:parseInt(action.interval),subrange:[]};
         case Actions.SUBRANGE_MAP:
+            console.log(action)
             return {...state,subrange:
                 [
                     parseFloat(action.start),
@@ -312,8 +297,11 @@ const strava = function (state = {
             };
         case Actions.TOGGLE_MAP_RANGE:
             return toggleMapRange();
-        case Actions.SET_ROUTE_INFO:
-            return {...state, analysisInterval: getAnalysisIntervalFromRouteDuration(action.routeInfo.timeInHours)};
+            // TODO
+            // some fancy bullshit involving auto-setting strava interval from rwgps route length.
+            // restore this later
+        // case Actions.SET_ROUTE_INFO:
+        //     return {...state, analysisInterval: getAnalysisIntervalFromRouteDuration(action.routeInfo.timeInHours)};
         default:
             return state;
     }

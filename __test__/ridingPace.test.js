@@ -23,7 +23,6 @@ const ridingPaceState = {
             "rwgpsRoute": 2798,
             "rwgpsRouteIsTrip": false,
             "start": "2018-07-30T14:00:00.403Z",
-            "timeZoneId": "Europe/Madrid",
             "loadingSource": null,
             "succeeded": null
         },

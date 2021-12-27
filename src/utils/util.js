@@ -19,17 +19,21 @@ export const setMinMaxCoords = (trackPoint,bounds) => {
   return bounds;
 };
 
-export const getRouteInfo = state => {
-  return gpxParser.walkRwgpsRoute(
-      state.routeInfo.rwgpsRouteData,
-      state.uiInfo.routeParams.start,
-      state.uiInfo.routeParams.pace,
-      state.uiInfo.routeParams.interval,
-      state.controls.userControlPoints,
-      state.controls.metric,
-      state.routeInfo.timeZoneId
+export const getRouteInfo = (state, type, timeZoneId) => {
+  const routeData = state.routeInfo[type === "rwgps" ? "rwgpsRouteData" : "gpxRouteData"]
+  const walkFunction = type === "rwgps" ? gpxParser.walkRwgpsRoute : gpxParser.walkGpxRoute
+  return walkFunction(
+    routeData,
+    state.uiInfo.routeParams.start,
+    state.uiInfo.routeParams.pace,
+    state.uiInfo.routeParams.interval,
+    state.controls.userControlPoints,
+    state.controls.metric,
+    timeZoneId
   )
 }
+
+export const getRouteName = (route, type) => type === "rwgps" ? route[route.type].name : route.tracks[0].name;
 
 export const milesToMeters = 1609.34;
 

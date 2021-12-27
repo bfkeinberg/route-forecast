@@ -55,9 +55,7 @@ describe('Call URL shortener', () => {
             },
             "routeInfo": {
                 "finishTime": "",
-                "initialFinishTime": "",
                 "weatherCorrectionMinutes": null,
-                "forecastRequest": null,
                 "fetchAfterLoad": true,
                 "name": "",
                 "rwgpsRouteData": null,
@@ -68,7 +66,6 @@ describe('Call URL shortener', () => {
                 "displayBanked": false,
                 "userControlPoints": [],
                 "calculatedControlValues": [],
-                "initialControlValues": [],
                 "queryString": null
             },
             "strava": {

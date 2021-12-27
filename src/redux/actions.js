@@ -1,6 +1,5 @@
 import cookie from 'react-cookies';
-import * as Sentry from '@sentry/browser';
-import { getRouteInfo } from '../utils/util';
+import { doForecastShit } from '../utils/forecastUtilities';
 
 export const componentLoader = (lazyComponent, attemptsLeft) => {
     return new Promise((resolve, reject) => {
@@ -179,12 +178,6 @@ export const loadControlsFromCookie = function(routeData) {
     };
 };
 
-export const SET_FETCH_AFTER_LOAD = 'SET_FETCH_AFTER_LOAD';
-export const setFetchAfterLoad = (fetchAfterLoad) => {return {
-    type: SET_FETCH_AFTER_LOAD,
-    fetchAfterLoad: fetchAfterLoad
-}};
-
 export const ADD_WEATHER_CORRECTION = 'ADD_WEATHER_CORRECTION';
 export const addWeatherCorrection = function(weatherCorrection,updatedFinishTime,maxGustSpeed) {
     return {
@@ -218,84 +211,20 @@ const forecastFetchFailure = function(error) {
     }
 };
 
-export const requestForecast = function(routeInfo) {
-    return function(dispatch,getState) {
+export const requestForecast = function() {
+    return async function(dispatch,getState) {
         dispatch(beginFetchingForecast());
-        let formdata = new FormData();
-        formdata.append('locations', JSON.stringify(routeInfo.forecastRequest));
-        formdata.append('timezone', getState().routeInfo.timeZoneId);
-        formdata.append('service', getState().forecast.weatherProvider);
-        formdata.append('routeName', routeInfo.name);
-        formdata.append('routeNumber', getState().uiInfo.routeParams.rwgpsRoute);
-        return fetch(getState().params.action,
-            {
-                method:'POST',
-                body:formdata
-            })
-            .then(async response => {
-                if (response.ok) {
-                    return response.json();
-                } else {
-                    let details = await response.json();
-                    if (details !== undefined) {
-                        if (details.details !== undefined) {
-                            throw new Error(details.details);
-                        } else {
-                            throw new Error(details.status);
-                        }
-                    }
-                    let error = response.statusText !== undefined ? response.statusText : response['status'];
-                    throw new Error(error);
-                }
-            })
-            .then(async response => {
-                dispatch(forecastFetchSuccess(response));
-                let userControls = getState().controls.userControlPoints;
-                let calculatedValues = getState().controls.initialControlValues;
-                const parser = await getRouteParser();
-                const routeInfo = getRouteInfo(getState())
-                let {time:weatherCorrectionMinutes,values:recalculatedValues,gustSpeed,finishTime} = parser.adjustForWind(
-                    response.forecast,
-                    routeInfo.points,
-                    getState().uiInfo.routeParams.pace,
-                    userControls, calculatedValues,
-                    getState().uiInfo.routeParams.start,
-                    getState().controls.metric,
-                    getState().routeInfo.initialFinishTime,
-                    getState().routeInfo.timeZoneId);
-                dispatch(addWeatherCorrection(weatherCorrectionMinutes,finishTime,gustSpeed));
-                dispatch(updateCalculatedValues(recalculatedValues));
-            }).catch (error => {
-                let errorMessage = error.message !== undefined ? error.message : error;
-                dispatch(forecastFetchFailure(errorMessage));
-            }
-        )
-    }
-};
-
-export const SET_ROUTE_INFO = 'SET_ROUTE_INFO';
-const setRouteInfo = (routeInfo) => {
-    return (dispatch,getState) => {
-        if (getState().routeInfo.fetchAfterLoad && routeInfo.forecastRequest !== null) {
-            // TODO
-            // disable magic for now
-            // dispatch(requestForecast(routeInfo));
-            // dispatch(setFetchAfterLoad(false));
+        const { result, value, error } = await doForecastShit(getState())
+        if (result === "success") {
+            const { forecast, weatherCorrection, calculatedValues } = value
+            const { weatherCorrectionMinutes, finishTime, gustSpeed } = weatherCorrection
+            dispatch(forecastFetchSuccess(forecast));
+            dispatch(addWeatherCorrection(weatherCorrectionMinutes, finishTime, gustSpeed));
+            dispatch(updateCalculatedValues(calculatedValues));
+        } else {
+            dispatch(forecastFetchFailure(error));
         }
-        return dispatch({
-            type: SET_ROUTE_INFO,
-            routeInfo: routeInfo
-        });
-    };
-};
-
-export const SET_TIME_ZONE = 'SET_TIME_ZONE';
-export const setTimeZone = function(id,offset) {
-    return {
-        type: SET_TIME_ZONE,
-        id: id,
-        offset: offset
-    };
+    }
 };
 
 export const SET_ERROR_DETAILS = 'SET_ERROR_DETAILS';
@@ -306,90 +235,8 @@ export const setErrorDetails = function(details) {
     };
 };
 
-export const fetchTimeZone = (point, parser, rwgpsRouteData) => {
-  return (dispatch, getState) => {
-      let timeZonePromise = parser.findTimezoneForPoint(point.y, point.x,
-          getState().uiInfo.routeParams.start, getState().params.timezone_api_key);
-      return timeZonePromise.then(timeZoneResult => {
-          dispatch(setTimeZone(timeZoneResult.zoneId,timeZoneResult.offset));
-          dispatch(setRouteInfo(
-              parser.walkRwgpsRoute(
-                  rwgpsRouteData,
-                  getState().uiInfo.routeParams.start,
-                  getState().uiInfo.routeParams.pace,
-                  getState().uiInfo.routeParams.interval,
-                  getState().controls.userControlPoints,
-                  getState().controls.metric,
-                  timeZoneResult.zoneId)));
-      }, error => {
-          dispatch(setErrorDetails(error));
-      });
-  }
-};
-
 export const INVALIDATE_FORECAST = 'INVALIDATE_FORECAST';
 export const invalidateForecast = () => { return {type:INVALIDATE_FORECAST}};
-
-export const recalcRoute = function() {
-    return async function(dispatch, getState) {
-        const parser = await getRouteParser();
-        // need to get the time zone here, once we know our chosen start time
-        // this may be called before we have chosen a route, in which case it's a noop
-        let rwgpsRouteData = getState().routeInfo.rwgpsRouteData;
-        if (rwgpsRouteData !== null) {
-            let type = rwgpsRouteData.trip === undefined ? 'route' : 'trip';
-            let rwgpsRouteDatum = rwgpsRouteData[type];
-            let point = rwgpsRouteDatum['track_points'][0];
-            //TODO: create another action for this section
-            let timeZonePromise = parser.findTimezoneForPoint(point.y, point.x,
-                getState().uiInfo.routeParams.start, getState().params.timezone_api_key);
-            return timeZonePromise.then(timeZoneResult => {
-                dispatch(setTimeZone(timeZoneResult.zoneId,timeZoneResult.offset));
-                const routeInfo = getRouteInfo({...getState(), routeInfo: {...getState().routeInfo, timeZoneId: timeZoneResult.zoneId}})
-                dispatch(setRouteInfo(routeInfo));
-                if (getState().forecast.forecast !== []) {
-                    let {time:weatherCorrectionMinutes,values:recalculatedValues,gustSpeed,finishTime} = parser.adjustForWind(
-                        getState().forecast.forecast,
-                        routeInfo.points,
-                        getState().uiInfo.routeParams.pace,
-                        getState().controls.userControlPoints,
-                        getState().controls.initialControlValues,
-                        getState().uiInfo.routeParams.start,
-                        getState().controls.metric,
-                        getState().routeInfo.initialFinishTime,
-                        getState().routeInfo.timeZoneId);
-                    dispatch(addWeatherCorrection(weatherCorrectionMinutes,finishTime,gustSpeed));
-                    dispatch(updateCalculatedValues(recalculatedValues));
-                }
-            }, error => {
-                dispatch(setErrorDetails(error));
-            });
-
-        } else if (getState().routeInfo.gpxRouteData !== null) {
-            if (getState().routeInfo.gpxRouteData.tracks[0] === undefined) {
-                Sentry.captureMessage(JSON.stringify(getState().routeInfo.gpxRouteData));
-                return dispatch(setErrorDetails("GPX route missing tracks"));
-            }
-            let point = getState().routeInfo.gpxRouteData.tracks[0].segments[0][0];
-            let timeZonePromise = parser.findTimezoneForPoint(point.lat, point.lon,
-                getState().uiInfo.routeParams.start, getState().params.timezone_api_key);
-            return timeZonePromise.then(timeZoneResult => {
-                dispatch(setTimeZone(timeZoneResult.zoneId,timeZoneResult.offset));
-                dispatch(setRouteInfo(
-                    parser.walkGpxRoute(
-                        getState().routeInfo.gpxRouteData,
-                        getState().uiInfo.routeParams.start,
-                        getState().uiInfo.routeParams.pace,
-                        getState().uiInfo.routeParams.interval,
-                        getState().controls.userControlPoints,
-                        getState().controls.metric,
-                        timeZoneResult.zoneId)));
-            }, error => {
-                return dispatch(setErrorDetails(error));
-            });
-        }
-    }
-};
 
 export const loadFromRideWithGps = function(routeNumber, isTrip) {
     return async function(dispatch, getState) {
@@ -404,7 +251,6 @@ export const loadFromRideWithGps = function(routeNumber, isTrip) {
         return parser.loadRwgpsRoute(routeNumber, isTrip).then( (routeData) => {
                 dispatch(rwgpsRouteLoadingSuccess(routeData));
                 dispatch(loadControlsFromCookie(routeData));
-                dispatch(recalcRoute());
             }, error => {return dispatch(rwgpsRouteLoadingFailure(error))}
         );
     };
@@ -445,7 +291,6 @@ export const loadGpxRoute = function(event) {
             }
             parser.loadGpxFile(gpxFiles[0]).then( gpxData => {
                     dispatch(gpxRouteLoadingSuccess(gpxData));
-                    dispatch(recalcRoute());
                 }, error => dispatch(gpxRouteLoadingFailure(error))
             );
         }

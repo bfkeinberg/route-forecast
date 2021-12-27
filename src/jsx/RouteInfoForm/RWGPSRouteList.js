@@ -3,7 +3,7 @@ import { Select } from "@blueprintjs/select";
 import { Button, MenuItem } from "@blueprintjs/core";
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
-import {setRwgpsRoute, setFetchAfterLoad, setRouteIsTrip} from "../../redux/actions";
+import {setRwgpsRoute, setRouteIsTrip} from "../../redux/actions";
 
 const renderFavorite = (favorite, { handleClick, modifiers }) => {
     if (!modifiers.matchesPredicate) {
@@ -20,7 +20,7 @@ const renderFavorite = (favorite, { handleClick, modifiers }) => {
     );
 };
 
-const RWGPSRouteList = ({pinnedRoutes, setRwgpsRoute, route_id, setFetchAfterLoad, setRouteIsTrip}) => {
+const RWGPSRouteList = ({pinnedRoutes, setRwgpsRoute, route_id, setRouteIsTrip}) => {
     return (
             <Select
                         items={pinnedRoutes}
@@ -29,7 +29,6 @@ const RWGPSRouteList = ({pinnedRoutes, setRwgpsRoute, route_id, setFetchAfterLoa
                         filterable={false}
                         itemsEqual="associated_object_id"
                         onItemSelect={(selected) => {
-                            setFetchAfterLoad(true);
                             setRouteIsTrip(selected.associated_object_type=="trip");
                             setRwgpsRoute(selected.associated_object_id);
                         }}
@@ -49,7 +48,6 @@ RWGPSRouteList.propTypes = {
         PropTypes.number,
         PropTypes.string
     ]),
-    setFetchAfterLoad:PropTypes.func.isRequired,
     setRouteIsTrip:PropTypes.func.isRequired
 };
 
@@ -60,7 +58,7 @@ const mapStateToProps = (state) =>
 });
 
 const mapDispatchToProps = {
-    setRwgpsRoute, setFetchAfterLoad, setRouteIsTrip
+    setRwgpsRoute, setRouteIsTrip
 };
 
 export default connect(mapStateToProps,mapDispatchToProps)(RWGPSRouteList);

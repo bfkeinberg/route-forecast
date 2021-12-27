@@ -23,9 +23,7 @@
   },
   "routeInfo": {
     "finishTime": "",
-    "initialFinishTime": "",
     "weatherCorrectionMinutes": null,
-    "forecastRequest": null,
     "fetchAfterLoad": false,
     "name": "",
     "rwgpsRouteData": {
@@ -8092,14 +8090,12 @@
     },
     "gpxRouteData": null,
     "timeZoneOffset": 7200,
-    "timeZoneId": "Europe/Madrid"
   },
   "controls": {
     "metric": false,
     "displayBanked": false,
     "userControlPoints": [],
     "calculatedControlValues": [],
-    "initialControlValues": [],
     "queryString": null
   },
   "strava": {

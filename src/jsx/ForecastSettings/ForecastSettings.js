@@ -19,7 +19,7 @@ export const ForecastSettings = () => {
     const [showControlPoints, setShowControlPoints] = useState(false)
     
     return (
-        <div style={{display: "flex", flexFlow: "column", alignItems: "center"}}>
+        <div style={{display: "flex", flexFlow: "column", alignItems: "center", marginBottom: "5px"}}>
             <div style={{ padding: "10px" }}>
                 <div style={{fontStyle: "oblique", color: "rgba(64, 111, 140, 0.87)", fontSize: "20px", textAlign: "center"}}>{routeName}</div>
                 <TimeFields />

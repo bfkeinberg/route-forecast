@@ -18,7 +18,6 @@ import {
     saveCookie,
     setActionUrl,
     setApiKeys,
-    setFetchAfterLoad,
     setInitialStart,
     setInterval,
     setMetric,
@@ -38,7 +37,7 @@ import {
 } from "../../redux/actions";
 import QueryString from './QueryString';
 import { routeLoadingModes } from '../../data/enums';
-import { useRecalcRoute, useSaveControlsToCookie } from '../../utils/hooks';
+import { useSaveControlsToCookie } from '../../utils/hooks';
 
 const demoRoute = 1797453;
 const demoControls = [
@@ -67,7 +66,6 @@ export class RouteWeatherUI extends Component {
         setActionUrl:PropTypes.func.isRequired,
         setApiKeys:PropTypes.func.isRequired,
         updateControls:PropTypes.func.isRequired,
-        setFetchAfterLoad:PropTypes.func.isRequired,
         setRouteLoadingMode: PropTypes.func.isRequired,
         loadFromRideWithGps: PropTypes.func.isRequired,
         rwgpsRouteIsTrip: PropTypes.bool.isRequired,
@@ -183,7 +181,6 @@ export class RouteWeatherUI extends Component {
 
     static loadCannedData(props) {
         props.setRwgpsRoute(demoRoute);
-        props.setFetchAfterLoad(true);
         props.updateControls(demoControls);
     }
 
@@ -208,7 +205,9 @@ export class RouteWeatherUI extends Component {
         props.setRwgpsRoute(queryParams.rwgpsRoute);
         // force forecast fetch when our initial url contains a route number
         if (queryParams.rwgpsRoute !== undefined) {
-            props.setFetchAfterLoad(true);
+            // TODO
+            // implement this in a different way
+            // props.setFetchAfterLoad(true);
         }
         RouteWeatherUI.getStravaToken(queryParams,props);
         if (queryParams.startTimestamp !== undefined) {
@@ -257,7 +256,7 @@ export class RouteWeatherUI extends Component {
 
 const mapDispatchToProps = {
     setStravaToken, setActionUrl, setRwgpsRoute, setApiKeys, setStravaError, setInitialStart, setPace, setInterval, setMetric,
-    setStravaActivity, updateControls:updateUserControls, setFetchAfterLoad, setRouteLoadingMode, setStravaRefreshToken,
+    setStravaActivity, updateControls:updateUserControls, setRouteLoadingMode, setStravaRefreshToken,
     loadFromRideWithGps, reset, newUserMode, setWeatherProvider, showWeatherProvider, setRwgpsCredentials, setStartTimestamp,
     setZoomToRange
 };
@@ -271,7 +270,6 @@ const mapStateToProps = (state) =>
 export default connect(mapStateToProps, mapDispatchToProps)(RouteWeatherUI);
 
 const FunAppWrapperThingForHooksUsability = ({maps_api_key}) => {
-    useRecalcRoute()
     useSaveControlsToCookie()
     
     return (

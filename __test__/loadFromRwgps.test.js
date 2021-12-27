@@ -54,9 +54,7 @@ describe('load route from Ride with GPS', () => {
             },
             "routeInfo": {
                 "finishTime": "",
-                "initialFinishTime": "",
                 "weatherCorrectionMinutes": null,
-                "forecastRequest": null,
                 "fetchAfterLoad": true,
                 "name": "",
                 "rwgpsRouteData": null,
@@ -67,7 +65,6 @@ describe('load route from Ride with GPS', () => {
                 "displayBanked": false,
                 "userControlPoints": [],
                 "calculatedControlValues": [],
-                "initialControlValues": [],
                 "queryString": null
             },
             "strava": {

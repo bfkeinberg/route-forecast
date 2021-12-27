@@ -115,7 +115,27 @@ class AnalyzeRoute {
         });
     };
 
-    analyzeRoute(trackName, stream, userStartTime, pace, intervalInHours, controls, metric, timeZoneId) {
+    parseRouteStream = (routeData, type) => 
+        type === "rwgps" ?
+        routeData[routeData.type]['track_points'].map(point => ({ lat: point.y, lon: point.x, elevation: point.e, dist: point.d })) :
+        routeData.tracks.reduce((accum,current) => accum.concat(current.segments.reduce((accum,current) => accum.concat(current),[])),[])
+    
+
+    computePointsAndBounds = (routeData, type) => {
+        const stream = this.parseRouteStream(routeData, type)
+
+        let bounds = { min_latitude: 90, min_longitude: 180, max_latitude: -90, max_longitude: -180 };
+        
+        stream
+            .filter(point => point.lat !== undefined && point.lon !== undefined)
+            .forEach(point => {
+                bounds = setMinMaxCoords(point, bounds);
+            })
+
+        return {points: stream, bounds}
+    };
+
+    analyzeRoute(stream, userStartTime, pace, intervalInHours, controls, metric, timeZoneId) {
 
         let nextControl = 0;
 
@@ -149,7 +169,6 @@ class AnalyzeRoute {
 
         let forecastRequests = [];
         let baseSpeed = inputPaceToSpeed[pace];
-        let bounds = {min_latitude:90, min_longitude:180, max_latitude:-90, max_longitude:-180};
         let first = true;
         let previousPoint = null;
         let forecastPoint = null;
@@ -164,7 +183,6 @@ class AnalyzeRoute {
         let startTime = DateTime.fromISO(userStartTime.toFormat("yyyy-MM-dd'T'HH:mm"), {zone:timeZoneId});
         let bearings = [];
         stream.filter(point => point.lat!==undefined && point.lon!==undefined).forEach(point => {
-            bounds = setMinMaxCoords(point,bounds);
             if (first) {
                 forecastRequests.push(AnalyzeRoute.addToForecast(point, startTime, accumulatedTime, accumulatedDistanceKm * kmToMiles));
                 forecastPoint = point;
@@ -207,8 +225,8 @@ class AnalyzeRoute {
         calculatedValues.sort((a,b) => a.val-b.val);
         forecastRequests.forEach(request => request.bearing = bearings.shift());
         return {forecastRequest:forecastRequests,
-            points:stream,name:trackName,values:calculatedValues,
-            bounds:bounds, finishTime: finishTime, timeInHours:accumulatedTime + idlingTime};
+            points:stream,values:calculatedValues,
+            finishTime: finishTime, timeInHours:accumulatedTime + idlingTime};
     }
 
     static getRelativeBearing(point1,point2) {
@@ -242,17 +260,15 @@ class AnalyzeRoute {
     walkRwgpsRoute(routeData,startTime,pace,interval,controls,metric,timeZoneId) {
         let modifiedControls = controls.slice();
         modifiedControls.sort((a,b) => a['distance']-b['distance']);
-        let stream = routeData[routeData.type]['track_points'].map(point => ({lat:point.y,lon:point.x,elevation:point.e, dist:point.d}));
-        let trackName = routeData[routeData.type].name;
-        return this.analyzeRoute(trackName, stream, startTime, pace, interval, modifiedControls, metric, timeZoneId);
+        const stream = this.parseRouteStream(routeData, "rwgps")
+        return this.analyzeRoute(stream, startTime, pace, interval, modifiedControls, metric, timeZoneId);
     }
 
     walkGpxRoute(routeData,startTime,pace,interval,controls,metric,timeZoneId) {
         let modifiedControls = controls.slice();
         modifiedControls.sort((a,b) => a['distance']-b['distance']);
-        let stream = routeData.tracks.reduce((accum,current) => accum.concat(current.segments.reduce((accum,current) => accum.concat(current),[])),[]);
-        let trackName = routeData.tracks[0].name;
-        return this.analyzeRoute(trackName, stream, startTime, pace, interval, modifiedControls, metric, timeZoneId);
+        const stream = this.parseRouteStream(routeData, "gpx")
+        return this.analyzeRoute(stream, startTime, pace, interval, modifiedControls, metric, timeZoneId);
     }
 
     findTimezoneForPoint(lat, lon, time, maps_api_key) {
