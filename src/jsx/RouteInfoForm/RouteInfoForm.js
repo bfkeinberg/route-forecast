@@ -1,13 +1,12 @@
 import { Spinner } from '@blueprintjs/core';
 import {Alert, Form} from 'reactstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import React, { useEffect } from 'react';
+import React from 'react';
 import ShortUrl from '../TopBar/ShortUrl';
 import MediaQuery from 'react-responsive';
 import PropTypes from 'prop-types';
-import {saveCookie, setRouteLoadingMode} from '../../redux/actions';
+import {setRouteLoadingMode} from '../../redux/actions';
 import {connect} from 'react-redux';
-import { formatControlsForUrl } from '../../utils/util';
 import { AlwaysFilledSwitch } from './AlwaysFilledSwitch';
 import { RouteInfoInputRWGPS } from './RouteInfoInputRWGPS';
 import { RouteInfoInputStrava } from './RouteInfoInputStrava';
@@ -24,15 +23,6 @@ const RouteInfoForm = ({ controlPoints, fetchingRoute, errorDetails, routeInfo, 
     //         routeProps.history.replace('/table/')
     //     }
     // }, [routeProps, needToViewTable])
-
-    useEffect(() => {
-        if (routeInfo.name !== '') {
-            document.title = `Forecast for ${routeInfo.name}`;
-            if (!firstUse && controlPoints !== '' && controlPoints.length !== 0) {
-                saveCookie(routeInfo.name, formatControlsForUrl(controlPoints));
-            }
-        }
-    }, [routeInfo.name, firstUse, controlPoints])
 
     return (
         <div style={{padding: "16px"}}>

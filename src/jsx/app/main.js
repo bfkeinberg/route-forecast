@@ -38,7 +38,7 @@ import {
 } from "../../redux/actions";
 import QueryString from './QueryString';
 import { routeLoadingModes } from '../../data/enums';
-import { useRecalcRoute } from '../../utils/hooks';
+import { useRecalcRoute, useSaveControlsToCookie } from '../../utils/hooks';
 
 const demoRoute = 1797453;
 const demoControls = [
@@ -272,6 +272,7 @@ export default connect(mapStateToProps, mapDispatchToProps)(RouteWeatherUI);
 
 const FunAppWrapperThingForHooksUsability = ({maps_api_key}) => {
     useRecalcRoute()
+    useSaveControlsToCookie()
     
     return (
         <div>

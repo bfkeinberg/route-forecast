@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from "react"
 import { useSelector, useDispatch } from "react-redux"
 import stravaRouteParser from "./stravaRouteParser"
-import { milesToMeters } from "./util"
-import { recalcRoute } from "../redux/actions"
+import { formatControlsForUrl, milesToMeters } from "./util"
+import { recalcRoute, saveCookie } from "../redux/actions"
 
 const useValueHasChanged = (value) => {
   const [initialValue] = useState(value)
@@ -59,5 +59,21 @@ const useRecalcRoute = () => {
   }
 }
 
+const useSaveControlsToCookie = () => {
 
-export { useValueHasChanged, useActualPace, useActualFinishTime, useActualArrivalTimes, usePrevious, useFormatSpeed, useRecalcRoute }
+  const controlPoints = useSelector(state => state.controls.userControlPoints)
+  const routeInfo = useSelector(state => state.routeInfo)
+  const firstUse = useSelector(state => state.params.newUserMode)
+
+  useEffect(() => {
+    if (routeInfo.name !== '') {
+      document.title = `Forecast for ${routeInfo.name}`;
+      if (!firstUse && controlPoints !== '' && controlPoints.length !== 0) {
+        saveCookie(routeInfo.name, formatControlsForUrl(controlPoints));
+      }
+    }
+  }, [routeInfo.name, firstUse, controlPoints])
+}
+
+
+export { useValueHasChanged, useActualPace, useActualFinishTime, useActualArrivalTimes, usePrevious, useFormatSpeed, useRecalcRoute, useSaveControlsToCookie }
