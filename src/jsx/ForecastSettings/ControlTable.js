@@ -2,7 +2,6 @@ import React from 'react';
 import { Icon } from '@blueprintjs/core';
 import { useSelector } from 'react-redux';
 import { updateUserControls } from '../../redux/actions';
-import { routeLoadingModes } from '../../data/enums';
 import { Table } from "./Table"
 import { useDispatch } from 'react-redux';
 import { useActualArrivalTimes } from '../../utils/hooks';
@@ -25,7 +24,8 @@ export const ControlTable = () => {
     // }
 
     const displayBanked = useSelector(state => state.controls.displayBanked)
-    const compare = useSelector(state => state.uiInfo.routeParams.routeLoadingMode === routeLoadingModes.STRAVA)
+    const stravaActivityData = useSelector(state => state.strava.activityData)
+    const compare = stravaActivityData !== null
     const metric = useSelector(state => state.controls.metric)
     const controls = useSelector(state => state.controls.userControlPoints)
     const calculatedValues = useSelector(state => state.controls.calculatedControlValues)
@@ -63,7 +63,13 @@ export const ControlTable = () => {
     if (displayBanked) {
         tableData.columns.splice(4, 0, bankedColumn)
     }
-    const actualArrivalTimeColumn = { name: "actual", render: "Actual Arrival Time", width: 80 }
+    const actualArrivalTimeColumn = {
+        name: "actual",
+        render: "Actual Arrival Time",
+        headerStyle: {backgroundColor: "rgba(234, 89, 41, 0.8)", color: "white"},
+        width: 80,
+        cellStyle: {backgroundColor: "rgba(234, 89, 41, 0.8)", color: "white"}
+    }
     if (compare) {
         tableData.columns.splice(5, 0, actualArrivalTimeColumn)
     }

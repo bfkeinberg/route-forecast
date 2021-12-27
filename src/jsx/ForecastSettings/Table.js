@@ -21,8 +21,8 @@ export const Table = ({data, onCellValueChanged}) => {
       gridAutoRows: "minmax(20px, auto)",
       fontSize: "10px"
     }}>
-      {columns.map(({render: columnTitle, name}, index) =>
-        <div key={name} style={{...headerStyle, gridColumn: index + 1, gridRow: 1}}>
+      {columns.map(({render: columnTitle, name, headerStyle: customHeaderStyle}, index) =>
+        <div key={name} style={{...headerStyle, ...customHeaderStyle, gridColumn: index + 1, gridRow: 1}}>
           <div>
             {columnTitle}
           </div>
@@ -31,7 +31,7 @@ export const Table = ({data, onCellValueChanged}) => {
       {rows.map((row, rowIndex) =>
         <React.Fragment key={rowIndex}>
           {columns.map((column, columnIndex) => 
-            <div key={column.name} style={{...baseStyle, gridColumn: columnIndex + 1, gridRow: rowIndex + 2}}>
+            <div key={column.name} style={{...baseStyle, ...column.cellStyle, gridColumn: columnIndex + 1, gridRow: rowIndex + 2}}>
               <Cell value={row[column.name]} transformFunction={column.valueTransformFunction} editable={column.editable} onCellValueChanged={(value) => onCellValueChanged(rowIndex, column.name, value)} />
             </div>
           )}
