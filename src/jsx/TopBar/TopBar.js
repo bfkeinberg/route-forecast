@@ -10,20 +10,25 @@ export const TopBar = ({sidePaneOptions, activeSidePane, setActiveSidePane, side
   return (
     <div style={{display: "flex"}}>
       <div style={{height: "50px", display: "flex", alignItems: "center", width: `${sidebarWidth}px`}}>
-        {sidePaneOptions.map((option, index) =>
-          <TopBarItem
-            index={index}
-            activeSidePane={activeSidePane}
-            key={option}
-            onClick={() => setActiveSidePane(index)}
-            visible={panesVisible.has(option)}
-            last={index === panesVisible.size - 1}
-          >
-            <div style={{fontWeight: "bold", textAlign: "center"}}>
-              {option}
-            </div>
-          </TopBarItem>
-        )}
+        {sidePaneOptions.map((option, index) => {
+          const displayIndex = Array.from(panesVisible).indexOf(option)
+          const activeDisplayIndex = Array.from(panesVisible).indexOf(sidePaneOptions[activeSidePane])
+          return (
+            <TopBarItem
+              active={activeSidePane === index}
+              leftNeighborActive={activeDisplayIndex === displayIndex - 1}
+              rightNeighborActive={activeDisplayIndex === displayIndex + 1}
+              last={index === panesVisible.size - 1}
+              onClick={() => setActiveSidePane(index)}
+              visible={panesVisible.has(option)}
+              key={option}
+            >
+              <div style={{fontWeight: "bold", textAlign: "center"}}>
+                {option}
+              </div>
+            </TopBarItem>
+          )
+        })}
       </div>
       <div style={{display: "flex", flexGrow: 1, alignItems: "center", padding: "0px 20px"}}>
         <PaceExplanation/>
@@ -49,11 +54,7 @@ const NonexistentLogo = () => {
   )
 }
 
-const TopBarItem = ({children, index, activeSidePane, last, onClick, visible}) => {
-  const active = index === activeSidePane
-  const leftNeighborActive = activeSidePane === index - 1
-  const rightNeighborActive = activeSidePane === index + 1
-
+const TopBarItem = ({children, active, leftNeighborActive, rightNeighborActive, last, onClick, visible}) => {
   const style = {
     cursor: "pointer",
     borderLeft: `1px solid #000000${leftNeighborActive ? "50" : "00"}`,
