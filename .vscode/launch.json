@@ -39,7 +39,7 @@
             "internalConsoleOptions": "neverOpen",
             "disableOptimisticBPs": true,
             "cwd": "${workspaceFolder}",
-            "runtimeExecutable": "npm",
+            "runtimeExecutable": "/usr/local/bin/npm",
             "args": [
                 "run",
                 "test",

@@ -154,6 +154,7 @@ describe("Test forecast", () => {
   });
 
   test("Forecast with no AQI returned", async () => {
+    jest.resetAllMocks();
     return await request(app)
       .post("/forecast").send({
         locations:
