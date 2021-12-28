@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { ControlTableContainer } from './ControlTableContainer';
-import { toggleMetric } from "../../redux/actions";
+import { setDisplayControlTableUI, toggleMetric } from "../../redux/actions";
 import ForecastInterval from "./ForecastInterval";
 import RidingPace from "./RidingPace";
 import { useSelector } from "react-redux";
@@ -16,7 +16,8 @@ export const ForecastSettings = () => {
     const routeName = useSelector(state => state.routeInfo.name)
     const dispatch = useDispatch()
 
-    const [showControlPoints, setShowControlPoints] = useState(false)
+    const showControlPoints = useSelector(state => state.controls.displayControlTableUI)
+    const setShowControlPoints = () => dispatch(setDisplayControlTableUI(!showControlPoints))
     
     return (
         <div style={{display: "flex", flexFlow: "column", alignItems: "center", marginBottom: "5px"}}>

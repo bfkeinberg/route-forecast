@@ -578,6 +578,9 @@ export const setWeatherProvider = (weatherProvider) => {return {type:SET_WEATHER
 export const SET_SHOW_WEATHER_PROVIDER = 'SET_SHOW_WEATHER_PROVIDER';
 export const showWeatherProvider = (showProvider) => {return {type:SET_SHOW_WEATHER_PROVIDER, showProvider:showProvider}}
 
+export const SET_DISPLAY_CONTROL_TABLE_UI = 'SET_DISPLAY_CONTROL_TABLE_UI';
+export const setDisplayControlTableUI = (display) => { return { type: SET_DISPLAY_CONTROL_TABLE_UI, displayControlTableUI: display } }
+
 export const SET_RWGPS_CREDENTIALS = 'SET_RWGPS_CREDENTIALS';
 export const setRwgpsCredentials = (username, password) => {
         return {type:SET_RWGPS_CREDENTIALS, username:username, password:password}};

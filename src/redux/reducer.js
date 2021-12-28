@@ -162,7 +162,8 @@ export const controls = function (state = {
     userControlPoints: [],
     calculatedControlValues: [],
     queryString: null,
-    showWeatherProvider: false
+    showWeatherProvider: false,
+    displayControlTableUI: false,
     }, action) {
     switch (action.type) {
         case Actions.SET_METRIC:
@@ -195,6 +196,8 @@ export const controls = function (state = {
         }
         case Actions.SET_SHOW_WEATHER_PROVIDER:
             return {...state, showWeatherProvider:action.showProvider};
+        case Actions.SET_DISPLAY_CONTROL_TABLE_UI:
+            return {...state, displayControlTableUI:action.displayControlTableUI};
         default:
             return state;
     }
