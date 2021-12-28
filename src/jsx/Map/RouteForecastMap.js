@@ -54,13 +54,6 @@ const RouteForecastMap = ({google}) => {
     const mapCenter = (mapBounds !== null && mapBounds !== undefined) ? mapBounds.getCenter() : null;
     const initialCenter = (mapCenter === null || mapCenter === undefined) ? undefined : mapCenter.toJSON()
 
-    // console.log(zoomToRange)
-    // console.log(mapBounds)
-    // console.log(mapCenter)
-    // console.log(initialCenter)
-
-    // console.log(subrange)
-
     return (
         <ErrorBoundary>
             <div id="map" style={{ 'height': '95%' }}>
