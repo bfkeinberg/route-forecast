@@ -49,7 +49,7 @@ export const TimeFields = () => {
           <div style={{ display: "flex", alignItems: "center", justifyContent: "center", margin: "10px 0px" }}>
             <span style={{ fontSize: ".875rem", fontWeight: "bolder", flex: 1, padding: "0px 5px" }}>Actual finish time</span>
             <span style={{flex: 2.5}}>
-              <div style={{...timeFieldStyle, backgroundColor: "rgb(234, 89, 41)", color: "white"}}>
+              <div style={{...timeFieldStyle, backgroundColor: "rgba(234, 89, 41, 0.8)", color: "white"}}>
                 {actualFinishTime}
               </div>
             </span>

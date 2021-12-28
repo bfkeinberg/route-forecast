@@ -5,6 +5,7 @@ import {connect} from 'react-redux';
 import {saveCookie, setPace} from "../../redux/actions";
 import { useActualPace, useFormatSpeed } from '../../utils/hooks';
 import { inputPaceToSpeed, paceToSpeed } from '../../utils/util';
+import "./RidingPace.css"
 
 const paceValues = {
     imperialLikeAPenguin: {
