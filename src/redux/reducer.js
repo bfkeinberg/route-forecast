@@ -14,7 +14,7 @@ const defaultAnalysisIntervalInHours = 1;
 
 const initialStartTime = function() {
     let now = DateTime.now();
-    if (now.hours > startHour) {
+    if (now.hour > startHour) {
         now = now.set({day:now.day+1, hour:startHour, minutes:0, seconds:0});
     }
     return now;
