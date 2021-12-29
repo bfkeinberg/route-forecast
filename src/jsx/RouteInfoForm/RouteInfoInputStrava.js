@@ -17,7 +17,6 @@ export const RouteInfoInputStrava = () => {
     dispatch(loadStravaActivity())
   }
 
-  const stravaError = useSelector(state => state.strava.errorDetails)
   const fetchingFromStrava = useSelector(state => state.strava.fetching)
   const accessToken = useSelector(state => state.strava.access_token)
 
@@ -44,7 +43,6 @@ export const RouteInfoInputStrava = () => {
               </Button>
             </div>
           }
-          <Alert isOpen={stravaError !== null && stravaError !== ""} color='danger'>Error loading route from Strava: {stravaError}</Alert>
         </div>
       </ErrorBoundary>
       <img style={{marginTop: "10px"}} id='stravaImage' src={stravaImage}/>

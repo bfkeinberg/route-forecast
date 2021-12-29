@@ -131,6 +131,17 @@ loadingSource:null,fetchingForecast:false,fetchingRoute:false}, action) {
             return {...state, shortUrl: action.url};
         case Actions.SET_PINNED_ROUTES:
             return {...state, errorDetails: null};
+        case Actions.STRAVA_FETCH_SUCCESS:
+            return {...state, errorDetails: null};
+        case Actions.STRAVA_FETCH_FAILURE:
+            const errorMessage = typeof action.error === 'object' ? action.error.message : action.error
+            return {...state, errorDetails: `Error loading route from Strava: ${errorMessage}`};
+        case Actions.SET_STRAVA_ERROR:
+            if (action.error !== undefined) {
+                return { ...state, errorDetails:  `Error loading route from Strava: ${action.error}` };
+            } else {
+                return state;
+            }
         default:
             return state;
     }
@@ -244,7 +255,6 @@ const strava = function (state = {
         fetching: false,
         activityData: null,
         activityStream: null,
-        errorDetails: null,
         subrange:[]
     }, action) {
     let setNewActivity = function () {
@@ -286,17 +296,13 @@ const strava = function (state = {
         case Actions.SET_STRAVA_ACTIVITY: {
             return setNewActivity();
         }
-        case Actions.SET_STRAVA_ERROR:
-            if (action.error !== undefined) {
-                return {...state, errorDetails:action.error};
-            } else {return state;}
         case Actions.BEGIN_STRAVA_FETCH:
             return {...state, fetching:true};
         case Actions.STRAVA_FETCH_SUCCESS:
-            return {...state, fetching: false, errorDetails: null, activityData: action.data.activity, activityStream: action.data.stream};
+            return {...state, fetching: false, activityData: action.data.activity, activityStream: action.data.stream};
         case Actions.STRAVA_FETCH_FAILURE:
             const errorMessage = typeof action.error === 'object' ? action.error.message : action.error
-            return {...state, fetching: false, errorDetails: errorMessage, access_token: errorMessage === "Authorization Error" ? null : state.access_token};
+            return {...state, fetching: false, access_token: errorMessage === "Authorization Error" ? null : state.access_token};
         case Actions.SET_ANALYSIS_INTERVAL:
             return {...state, analysisInterval:parseInt(action.interval),subrange:[]};
         case Actions.SUBRANGE_MAP:

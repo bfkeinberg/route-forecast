@@ -73,7 +73,6 @@ describe('Call URL shortener', () => {
                 "token": "31ca57912cae10ec928f146afb86f31a54d9ea2a",
                 "fetching": false,
                 "activityData": null,
-                "errorDetails": null,
                 "subrange": [],
                 "activityStream": null
             },
