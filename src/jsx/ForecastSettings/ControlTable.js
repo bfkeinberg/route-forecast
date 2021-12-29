@@ -1,7 +1,7 @@
 import React from 'react';
 import { Icon } from '@blueprintjs/core';
 import { useSelector } from 'react-redux';
-import { updateUserControls } from '../../redux/actions';
+import { removeControl as removeControlAction, updateUserControls } from '../../redux/actions';
 import { Table } from "./Table"
 import { useDispatch } from 'react-redux';
 import { useActualArrivalTimes } from '../../utils/hooks';
@@ -33,10 +33,9 @@ export const ControlTable = () => {
     const calculatedValues = useSelector(state => state.controls.calculatedControlValues)
 
     const actualArrivalTimes = useActualArrivalTimes()
-
     const dispatch = useDispatch()
     const updateControls = controls => dispatch(updateUserControls(controls))
-    const removeControl = indexToRemove => dispatch(updateUserControls(controls.filter((control, index) => index !== indexToRemove)))
+    const removeControl = indexToRemove => dispatch(removeControlAction(indexToRemove))
 
     const onCellValueChanged = (rowIndex, field, value) => {
         updateControls(controls.map((control, index) => index === rowIndex ? {...control, [field]: value} : control))

@@ -17,6 +17,40 @@ const useDelay = (delay, startCondition = true) => {
   return ready
 }
 
+const useReusableDelay = (delay, startCondition = true) => {
+  const [ready, setReady] = useState(false)
+  const [restartedAt, setRestartedAt] = useState(null)
+  const timeout = useRef(null)
+
+  const cancel = () => {
+    if (timeout.current !== null) {
+      clearTimeout(timeout.current)
+    }
+  }
+
+  useEffect(() => {
+    if (timeout.current !== null) {
+      clearTimeout(timeout.current)
+    }
+    if (startCondition) {
+      timeout.current = setTimeout(() => {
+        setReady(true)
+        timeout.current = null
+      }, delay)
+    } else {
+      setReady(false)
+    }
+
+    return cancel
+  }, [delay, startCondition, restartedAt])
+
+  const restart = () => {
+    setReady(false)
+    setRestartedAt(Date.now())
+  }
+  return [ready, restart, cancel]
+}
+
 const useValueHasChanged = (value, startValue) => {
   const [oldValue, setOldValue] = useState(value)
   const [hasChanged, setHasChanged] = useState(false)
@@ -30,6 +64,17 @@ const useValueHasChanged = (value, startValue) => {
     }
   }, [value])
   return hasChanged
+}
+
+const usePreviousPersistent = (value) => {
+  const [oldValue, setOldValue] = useState(null)
+  const [newValue, setNewValue] = useState(value)
+  useEffect(() => {
+    setOldValue(newValue)
+    setNewValue(value)
+  }, [value])
+
+  return oldValue
 }
 
 const useActualPace = () => {
@@ -95,4 +140,4 @@ const usePointsAndBounds = () => {
   return pointsAndBounds
 }
 
-export { useValueHasChanged, useActualPace, useActualFinishTime, useActualArrivalTimes, usePrevious, useFormatSpeed, usePointsAndBounds, useDelay }
+export { useValueHasChanged, useActualPace, useActualFinishTime, useActualArrivalTimes, usePrevious, useFormatSpeed, usePointsAndBounds, useDelay, useReusableDelay, usePreviousPersistent }

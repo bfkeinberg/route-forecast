@@ -306,8 +306,6 @@ const useLoadControlPointsFromURL = (queryParams) => {
     
     const dispatch = useDispatch()
     useEffect(() => {
-        window.controlPoints = queryParams.controlPoints
-        console.log(queryParams.controlPoints)
         if (queryParams.controlPoints === undefined || queryParams.controlPoints === "") {
             dispatch(updateUserControls([]))
         } else {

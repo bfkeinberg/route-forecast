@@ -4,7 +4,7 @@ import BugReportButton from "./BugReportButton";
 import PaceExplanation from "./PaceExplanation";
 import ShortUrl from "./ShortUrl";
 import "./TopBar.css"
-import { useValueHasChanged } from "../../utils/hooks";
+import { usePreviousPersistent, useReusableDelay, useValueHasChanged } from "../../utils/hooks";
 import { useLoadingFromURLStatus } from "../DesktopUI";
 
 export const TopBar = ({sidePaneOptions, activeSidePane, setActiveSidePane, sidebarWidth, panesVisible}) => {
@@ -90,15 +90,19 @@ const TopBarItem = ({children, active, leftNeighborActive, rightNeighborActive, 
     borderRadius: `0px 0px ${rightNeighborActive ? 5 : 0}px ${leftNeighborActive ? 5 : 0}px`
   }
 
-  const newlyVisible = useValueHasChanged(visible)
+  const wasEverVisible = useValueHasChanged(visible) || visible
+  const previouslyVisible = usePreviousPersistent(visible)
+  const newlyVisible = !previouslyVisible && visible
+  const newlyNonvisible = previouslyVisible && !visible
+  const [exitAnimationFinished] = useReusableDelay(1500, newlyNonvisible)
 
-  if (!visible) {
+  if (exitAnimationFinished || !wasEverVisible) {
     return null
   }
 
 
   return (
-    <div onClick={onClick} style={style} className={"top-bar-item" + (newlyVisible ? " animated-entry" : "")}>
+    <div onClick={onClick} style={style} className={"top-bar-item" + (newlyVisible ? " animated-entry" : "") + (newlyNonvisible ? " animated-exit" : "")}>
       {children}
     </div>
   )

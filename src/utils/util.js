@@ -64,6 +64,14 @@ export const parseControls = function (controlPointString, deleteFirstElement) {
 
 export const getRouteName = (route, type) => type === "rwgps" ? route[route.type].name : route.tracks[0].name;
 
+export const controlsMeaningfullyDifferent = (controls1, controls2) => {
+  return controls1.length !== controls2.length ||
+    controls1.some(
+      (control, index) => control.distance !== controls2[index].distance ||
+                          control.duration !== controls2[index].duration
+    )
+}
+
 export const milesToMeters = 1609.34;
 
 export const paceToSpeed = {'Q':3, 'R':4, 'S':5, 'T':6, 'A-':9, 'A':10, 'A+':11, 'B':12, 'B+':13, 'C':14, 'C+':15, 'D':16, 'D+':17, 'E':18, 'E+':19};

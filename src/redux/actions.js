@@ -1,6 +1,7 @@
 import cookie from 'react-cookies';
 import { doForecastShit } from '../utils/forecastUtilities';
-import { parseControls } from '../utils/util';
+import { loadRwgpsRoute } from '../utils/rwgpsUtilities';
+import { controlsMeaningfullyDifferent, parseControls } from '../utils/util';
 
 export const componentLoader = (lazyComponent, attemptsLeft) => {
     return new Promise((resolve, reject) => {
@@ -43,14 +44,21 @@ export const setRwgpsRoute = function(route) {
     }
 };
 
-export const SET_START = 'SET_START';
-export const setStart = function (start, zone) {
+export const SET_START_TIME = 'SET_START_TIME';
+const setStartUnthunky = (start, zone) => {
     return {
-        type: SET_START,
+        type: SET_START_TIME,
         start: start,
         zone: zone
     }
+}
+export const setStart = function (start, zone) {
+    return async function(dispatch,getState) {
+        dispatch(setStartUnthunky(start, zone))
+        dispatch(cancelForecast())
+    }
 };
+
 
 export const SET_INITIAL_START = 'SET_INITIAL_START';
 export const setInitialStart = function (start, zone) {
@@ -61,28 +69,40 @@ export const setInitialStart = function (start, zone) {
     }
 };
 
- export const SET_START_TIMESTAMP = 'SET_START_TIMESTAMP';
- export const setStartTimestamp = function (start, zone) {
-     return {
-         type: SET_START_TIMESTAMP,
-         start: Number.parseInt(start),
-         zone: zone
-     }
- };
+export const SET_START_TIMESTAMP = 'SET_START_TIMESTAMP';
+export const setStartTimestamp = function (start, zone) {
+    return {
+        type: SET_START_TIMESTAMP,
+        start: Number.parseInt(start),
+        zone: zone
+    }
+};
 
 export const SET_PACE = 'SET_PACE';
-export const setPace = function(pace) {
+const setPaceUnthunky = function(pace) {
     return {
         type: SET_PACE,
         pace: pace
     }
 };
+export const setPace = function (pace) {
+    return async function(dispatch,getState) {
+        dispatch(setPaceUnthunky(pace))
+        dispatch(cancelForecast())
+    }
+};
 
 export const SET_INTERVAL = 'SET_INTERVAL';
-export const setInterval = function(interval) {
+const setIntervalUnthunky = function(interval) {
     return {
         type: SET_INTERVAL,
         interval: interval
+    }
+};
+export const setInterval = function (interval) {
+    return async function(dispatch,getState) {
+        dispatch(setIntervalUnthunky(interval))
+        dispatch(cancelForecast())
     }
 };
 
@@ -140,11 +160,20 @@ const getRouteName = function(routeData) {
 };
 
 export const UPDATE_USER_CONTROLS = 'UPDATE_USER_CONTROLS';
-export const updateUserControls = function(controls) {
+const updateUserControlsUnthunky = function(controls) {
     return {
         type: UPDATE_USER_CONTROLS,
         controls: controls
     };
+};
+export const updateUserControls = function(controls) {
+    return async function(dispatch,getState) {
+        const different = controlsMeaningfullyDifferent(controls, getState().controls.userControlPoints)
+        dispatch(updateUserControlsUnthunky(controls))
+        if (different) {
+            dispatch(cancelForecast())
+        }
+    }
 };
 
 export const UPDATE_CALCULATED_VALUES = 'UPDATE_CALCULATED_VALUES';
@@ -178,9 +207,10 @@ export const addWeatherCorrection = function(weatherCorrection,updatedFinishTime
 };
 
 export const BEGIN_FETCHING_FORECAST = 'BEGIN_FETCHING_FORECAST';
-const beginFetchingForecast = function() {
+const beginFetchingForecast = function(abortMethod) {
     return {
-        type: BEGIN_FETCHING_FORECAST
+        type: BEGIN_FETCHING_FORECAST,
+        abortMethod
     }
 };
 
@@ -200,18 +230,30 @@ const forecastFetchFailure = function(error) {
     }
 };
 
+export const FORECAST_FETCH_CANCELED = 'FORECAST_FETCH_CANCELED';
+const forecastFetchCanceled = function(error) {
+    return {
+        type: FORECAST_FETCH_CANCELED,
+        error:error
+    }
+};
+
 export const requestForecast = function() {
     return async function(dispatch,getState) {
-        dispatch(beginFetchingForecast());
-        const { result, value, error } = await doForecastShit(getState())
+        const fetchController = new AbortController()
+        const abortMethod = fetchController.abort.bind(fetchController)
+        dispatch(beginFetchingForecast(abortMethod));
+        const { result, value, error } = await doForecastShit(getState(), fetchController.signal)
         if (result === "success") {
             const { forecast, weatherCorrection, calculatedValues } = value
             const { weatherCorrectionMinutes, finishTime, gustSpeed } = weatherCorrection
             dispatch(forecastFetchSuccess(forecast));
             dispatch(addWeatherCorrection(weatherCorrectionMinutes, finishTime, gustSpeed));
             dispatch(updateCalculatedValues(calculatedValues));
-        } else {
+        } else if (result === "error") {
             dispatch(forecastFetchFailure(error));
+        } else {
+            dispatch(forecastFetchCanceled());
         }
     }
 };
@@ -225,7 +267,19 @@ export const setErrorDetails = function(details) {
 };
 
 export const INVALIDATE_FORECAST = 'INVALIDATE_FORECAST';
-export const invalidateForecast = () => { return {type:INVALIDATE_FORECAST}};
+const invalidateForecast = () => {
+    return { type: INVALIDATE_FORECAST }
+};
+
+export const cancelForecast = () => {
+    return async function(dispatch, getState) {
+        const cancel = getState().uiInfo.dialogParams.cancelActiveFetchMethod
+        if (cancel !== null) {
+            cancel()
+        }
+        dispatch(invalidateForecast())
+    }
+};
 
 export const SET_LOADING_FROM_URL = 'SET_LOADING_FROM_URL';
 const setLoadingFromURL = (loading) => {
@@ -246,18 +300,12 @@ export const loadRouteFromURL = () => {
         dispatch(setLoadingFromURL(false))
     }
 }
-
 export const loadFromRideWithGps = function(routeNumber, isTrip) {
     return async function(dispatch, getState) {
         routeNumber = routeNumber || getState().uiInfo.routeParams.rwgpsRoute
         isTrip = isTrip || getState().uiInfo.routeParams.rwgpsRouteIsTrip
         dispatch(beginLoadingRoute('rwgps'));
-        const parser = await getRouteParser().catch((err) => {dispatch(rwgpsRouteLoadingFailure(err));return null});
-        // handle failed load, error has already been dispatched
-        if (parser == null) {
-            return Promise.resolve(Error('Cannot load parser'));
-        }
-        return parser.loadRwgpsRoute(routeNumber, isTrip).then( (routeData) => {
+        return loadRwgpsRoute(routeNumber, isTrip).then( (routeData) => {
                 dispatch(rwgpsRouteLoadingSuccess(routeData));
                 dispatch(loadControlsFromCookie(routeData));
             }, error => {return dispatch(rwgpsRouteLoadingFailure(error))}
@@ -359,11 +407,15 @@ export const clearQueryString = function() {
     };
 };
 
-export const ADD_CONTROL = 'ADD_CONTROL';
 export const addControl = function() {
-    return {
-        type: ADD_CONTROL
-    };
+    return async function (dispatch, getState) {
+        dispatch(updateUserControls([...getState().controls.userControlPoints, { name: "", distance: 0, duration: 0 }]))
+    }
+};
+export const removeControl = function(indexToRemove) {
+    return async function (dispatch, getState) {
+        dispatch(updateUserControls(getState().controls.userControlPoints.filter((control, index) => index !== indexToRemove)))
+    }
 };
 
 export const SET_METRIC = 'SET_METRIC';

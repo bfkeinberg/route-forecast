@@ -90,31 +90,6 @@ class AnalyzeRoute {
         }
     }
 
-    loadRwgpsRoute = (route, isTrip) => {
-        return new Promise((resolve, reject) => {
-            fetch('/rwgps_route?route=' + route + '&trip=' + isTrip).then(response => {
-                    if (response.status === 200) {
-                        return response.json();
-                    }
-                }
-            ).then(response => {
-                if (response === undefined) {
-                    reject(new Error("Private or non-existent Ride with GPS route"));
-                    return;
-                }
-                let rwgpsRouteDatum = response[response['trip'] === undefined ? 'route' : 'trip'];
-                if (rwgpsRouteDatum === undefined) {
-                    reject(new Error('RWGPS route info unavailable'));
-                    return;
-                }
-                resolve(response);
-            },
-            error => {
-                reject(error.message);
-            });
-        });
-    };
-
     parseRouteStream = (routeData, type) => 
         type === "rwgps" ?
         routeData[routeData.type]['track_points'].map(point => ({ lat: point.y, lon: point.x, elevation: point.e, dist: point.d })) :
@@ -269,23 +244,6 @@ class AnalyzeRoute {
         modifiedControls.sort((a,b) => a['distance']-b['distance']);
         const stream = this.parseRouteStream(routeData, "gpx")
         return this.analyzeRoute(stream, startTime, pace, interval, modifiedControls, metric, timeZoneId);
-    }
-
-    findTimezoneForPoint(lat, lon, time, maps_api_key) {
-        return fetch(`https://maps.googleapis.com/maps/api/timezone/json?location=${lat},${lon}&timestamp=${time.toSeconds()}&key=${maps_api_key}`).then( response => {
-            if (response.ok) {
-                return response.json();
-            }
-            throw Error(response.error());
-        }).then (body => {
-            // check for error in body of message
-            if (body.errorMessage !== undefined) {
-                throw Error(body.errorMessage);
-            }
-            // determine total timezone offset in seconds
-            let tzOffset = body.dstOffset + body.rawOffset;
-            return ({offset:tzOffset,zoneId:body.timeZoneId});
-        });
     }
 
     static rusa_time(accumulatedDistanceInKm, elapsedTimeInHours) {

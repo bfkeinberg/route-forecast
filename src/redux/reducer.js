@@ -41,7 +41,7 @@ export const routeParams = function(state = {
                 };
             }
             return state;
-        case Actions.SET_START:
+        case Actions.SET_START_TIME:
             if (action.start !== undefined && action.start !== null) {
                 const start =  DateTime.fromISO(action.start);
                 if (!start.isValid) {
@@ -91,6 +91,8 @@ export const routeParams = function(state = {
         case Actions.SET_ROUTE_IS_TRIP:
             return {...state,rwgpsRouteIsTrip:action.isTrip}
         case Actions.BEGIN_FETCHING_FORECAST:
+            // TODO
+            // suspect this is vestigial
             return {...state,initialStart:state.start}
         case Actions.SET_ROUTE_LOADING_MODE:
             return {...state, routeLoadingMode: action.newMode};
@@ -100,18 +102,22 @@ export const routeParams = function(state = {
 };
 
 const dialogParams = function(state = {errorDetails:null, succeeded:true, shortUrl:' ',
-loadingSource:null,fetchingForecast:false,fetchingRoute:false}, action) {
+loadingSource:null,fetchingForecast:false,fetchingRoute:false, cancelActiveFetchMethod: null}, action) {
     switch (action.type) {
         case Actions.CLEAR_ROUTE_DATA:
             return {...state, loadingSource: null, succeeded: null};
         case Actions.BEGIN_LOADING_ROUTE:
             return {...state, fetchingRoute: true, loadingSource: action.source};
         case Actions.BEGIN_FETCHING_FORECAST:
-            return {...state, fetchingForecast: true};
+            return {...state, fetchingForecast: true, cancelActiveFetchMethod: action.abortMethod};
         case Actions.FORECAST_FETCH_SUCCESS:
-            return {...state, fetchingForecast: false, errorDetails: null};
+            return {...state, fetchingForecast: false, cancelActiveFetchMethod: null, errorDetails: null};
         case Actions.FORECAST_FETCH_FAILURE:
-            return {...state, fetchingForecast: false, errorDetails: typeof action.error === 'object' ? action.error.message : action.error};
+            return {...state, fetchingForecast: false, cancelActiveFetchMethod: null, errorDetails: typeof action.error === 'object' ? action.error.message : action.error};
+        case Actions.FORECAST_FETCH_CANCELED:
+            return {...state, fetchingForecast: false, cancelActiveFetchMethod: null}
+        case Actions.INVALIDATE_FORECAST:
+            return { ...state, cancelActiveFetchMethod: null };
         case Actions.RWGPS_ROUTE_LOADING_SUCCESS:
             return {...state, fetchingRoute: false, errorDetails: null, succeeded: true};
         case Actions.GPX_ROUTE_LOADING_SUCCESS:
@@ -199,8 +205,6 @@ export const controls = function (state = {
             return {...state, userControlPoints: action.controls};
         case Actions.UPDATE_CALCULATED_VALUES:
             return {...state, calculatedControlValues: action.values};
-        case Actions.ADD_CONTROL:
-            return {...state, userControlPoints: [...state.userControlPoints, { name: "", distance: 0, duration: 0 }] };
         case Actions.SET_QUERY:
             // here because it encodes the user entered controls
             return {...state, queryString:action.queryString};
@@ -324,8 +328,15 @@ const strava = function (state = {
     }
 };
 
-const forecast = function(state = {forecast:[],valid:false,range:[], tableViewed:false, mapViewed:false,
-    weatherProvider:'darksky', zoomToRange:true}, action) {
+const forecast = function(state = {
+    forecast: [],
+    valid: false,
+    range: [],
+    tableViewed: false,
+    mapViewed: false,
+    weatherProvider: 'darksky',
+    zoomToRange: true
+}, action) {
     switch (action.type) {
         case Actions.FORECAST_FETCH_SUCCESS:
             return {...state,forecast:action.forecastInfo.forecast,valid:true,tableViewed:false,mapViewed:false,range:[]};
@@ -334,7 +345,7 @@ const forecast = function(state = {forecast:[],valid:false,range:[], tableViewed
         case Actions.GPX_ROUTE_LOADING_SUCCESS:
             return {...state,valid:false};
         case Actions.INVALIDATE_FORECAST:
-            return {...state,valid:false, forecast:[]};
+            return { ...state, valid: false, forecast: [], range: [] };
         case Actions.GPX_ROUTE_LOADING_FAILURE:
             return {...state,valid:false};
         case Actions.SET_WEATHER_RANGE:
