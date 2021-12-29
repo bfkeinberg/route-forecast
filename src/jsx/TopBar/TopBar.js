@@ -6,11 +6,35 @@ import ShortUrl from "./ShortUrl";
 import "./TopBar.css"
 import { useValueHasChanged } from "../../utils/hooks";
 
-export const TopBar = ({sidePaneOptions, activeSidePane, setActiveSidePane, sidebarWidth, panesVisible}) => {
+export const TopBar = ({sidePaneOptions, activeSidePane, setActiveSidePane, sidebarWidth, panesVisible, loadingFromURL}) => {
   return (
     <div style={{display: "flex"}}>
-      <div style={{height: "50px", display: "flex", alignItems: "center", width: `${sidebarWidth}px`}}>
-        {sidePaneOptions.map((option, index) => {
+      <Tabs 
+        sidePaneOptions={sidePaneOptions}
+        activeSidePane={activeSidePane}
+        setActiveSidePane={setActiveSidePane}
+        sidebarWidth={sidebarWidth}
+        panesVisible={panesVisible}
+        loadingFromURL={loadingFromURL}
+      />
+      <div style={{display: "flex", flexGrow: 1, alignItems: "center", padding: "0px 20px"}}>
+        <PaceExplanation/>
+        <div style={{flexGrow: 1, display: "flex", justifyContent: "flex-end", alignItems: "center"}}>
+          <ShortUrl/>
+          <DonationRequest wacky/>
+          <div style={{margin: "0px 10px", flexShrink: 0}}><BugReportButton/></div>
+          <NonexistentLogo/>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+const Tabs = ({sidePaneOptions, activeSidePane, setActiveSidePane, sidebarWidth, panesVisible, loadingFromURL}) => {
+  return (
+    <div style={{height: "50px", display: "flex", alignItems: "center", width: `${sidebarWidth}px`}}>
+      {!loadingFromURL ?
+        sidePaneOptions.map((option, index) => {
           const displayIndex = Array.from(panesVisible).indexOf(option)
           const activeDisplayIndex = Array.from(panesVisible).indexOf(sidePaneOptions[activeSidePane])
           return (
@@ -23,22 +47,14 @@ export const TopBar = ({sidePaneOptions, activeSidePane, setActiveSidePane, side
               visible={panesVisible.has(option)}
               key={option}
             >
-              <div style={{fontWeight: "bold", textAlign: "center"}}>
+              <div style={{ fontWeight: "bold", textAlign: "center" }}>
                 {option}
               </div>
             </TopBarItem>
           )
-        })}
-      </div>
-      <div style={{display: "flex", flexGrow: 1, alignItems: "center", padding: "0px 20px"}}>
-        <PaceExplanation/>
-        <div style={{flexGrow: 1, display: "flex", justifyContent: "flex-end", alignItems: "center"}}>
-          <ShortUrl/>
-          <DonationRequest wacky/>
-          <div style={{margin: "0px 10px", flexShrink: 0}}><BugReportButton/></div>
-          <NonexistentLogo/>
-        </div>
-      </div>
+        })
+        : null
+      }
     </div>
   )
 }

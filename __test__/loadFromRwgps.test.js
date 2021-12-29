@@ -55,7 +55,6 @@ describe('load route from Ride with GPS', () => {
             "routeInfo": {
                 "finishTime": "",
                 "weatherCorrectionMinutes": null,
-                "fetchAfterLoad": true,
                 "name": "",
                 "rwgpsRouteData": null,
                 "gpxRouteData": null

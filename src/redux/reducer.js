@@ -135,9 +135,15 @@ loadingSource:null,fetchingForecast:false,fetchingRoute:false}, action) {
             return state;
     }
 };
-const routeInfo = function(state = {finishTime:'',weatherCorrectionMinutes:null,
-    fetchAfterLoad:false,name:'',rwgpsRouteData:null,
-    gpxRouteData:null, maxGustSpeed:0}, action) {
+const routeInfo = function(state = {
+    finishTime: '',
+    weatherCorrectionMinutes: null,
+    name: '',
+    rwgpsRouteData: null,
+    gpxRouteData: null,
+    maxGustSpeed:0,
+    loadingFromURL: false
+    }, action) {
     switch (action.type) {
         case Actions.RWGPS_ROUTE_LOADING_SUCCESS:
             return { ...state, rwgpsRouteData: action.routeData, gpxRouteData: null, name: getRouteName(action.routeData, "rwgps") };
@@ -151,6 +157,8 @@ const routeInfo = function(state = {finishTime:'',weatherCorrectionMinutes:null,
                 maxGustSpeed: 0};
         case Actions.ADD_WEATHER_CORRECTION:
             return {...state,weatherCorrectionMinutes:action.weatherCorrectionMinutes,finishTime:action.finishTime,maxGustSpeed:action.maxGustSpeed};
+        case Actions.SET_LOADING_FROM_URL:
+            return {...state, loadingFromURL: action.loading};
         default:
             return state;
     }

@@ -238,6 +238,26 @@ export const setErrorDetails = function(details) {
 export const INVALIDATE_FORECAST = 'INVALIDATE_FORECAST';
 export const invalidateForecast = () => { return {type:INVALIDATE_FORECAST}};
 
+export const SET_LOADING_FROM_URL = 'SET_LOADING_FROM_URL';
+const setLoadingFromURL = (loading) => {
+    return {
+        type: SET_LOADING_FROM_URL,
+        loading
+    };
+}
+
+export const loadRouteFromURL = () => {
+    return async function(dispatch, getState) {
+        await dispatch(setLoadingFromURL(true))
+        await dispatch(loadFromRideWithGps())
+        const error = getState().uiInfo.dialogParams.errorDetails
+        if (error === null) {
+            await dispatch(requestForecast())
+        }
+        dispatch(setLoadingFromURL(false))
+    }
+}
+
 export const loadFromRideWithGps = function(routeNumber, isTrip) {
     return async function(dispatch, getState) {
         routeNumber = routeNumber || getState().uiInfo.routeParams.rwgpsRoute

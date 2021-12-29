@@ -31,7 +31,7 @@ const RouteInfoForm = ({ controlPoints, errorDetails, routeInfo, firstUse, needT
             {mode === routeLoadingModes.RWGPS ?
                 <RouteInfoInputRWGPS/> :
                 <RouteInfoInputStrava/>}
-            {errorDetails !== null && <Alert style={{ padding: '10px' }} color="danger">{errorDetails}</Alert>}
+            {errorDetails !== null && <Alert style={{ padding: '10px', marginTop: "10px" }} color="danger">{errorDetails}</Alert>}
             <MediaQuery maxDeviceWidth={500}>
                 <div style={{marginTop: "10px", textAlign: "center"}}>
                     <ShortUrl/>

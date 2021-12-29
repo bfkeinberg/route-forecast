@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React, {Component, useEffect} from 'react';
 import MediaQuery from 'react-responsive';
 import '@blueprintjs/core/lib/css/blueprint.css';
 import 'Images/style.css';
@@ -33,11 +33,13 @@ import {
     showWeatherProvider,
     setRwgpsCredentials,
     setStartTimestamp,
-    setZoomToRange
+    setZoomToRange,
+    loadRouteFromURL
 } from "../../redux/actions";
 import QueryString from './QueryString';
 import { routeLoadingModes } from '../../data/enums';
 import { useSaveControlsToCookie } from '../../utils/hooks';
+import { useDispatch } from 'react-redux';
 
 const demoRoute = 1797453;
 const demoControls = [
@@ -203,12 +205,6 @@ export class RouteWeatherUI extends Component {
             return;
         }
         props.setRwgpsRoute(queryParams.rwgpsRoute);
-        // force forecast fetch when our initial url contains a route number
-        if (queryParams.rwgpsRoute !== undefined) {
-            // TODO
-            // implement this in a different way
-            // props.setFetchAfterLoad(true);
-        }
         RouteWeatherUI.getStravaToken(queryParams,props);
         if (queryParams.startTimestamp !== undefined) {
             if (queryParams.zone !== undefined) {
@@ -249,7 +245,7 @@ export class RouteWeatherUI extends Component {
 
     render() {
         return (
-            <FunAppWrapperThingForHooksUsability maps_api_key={this.props.maps_api_key}/>
+            <FunAppWrapperThingForHooksUsability maps_api_key={this.props.maps_api_key} queryParams={queryString.parse(this.props.search)}/>
         );
     }
 }
@@ -269,8 +265,9 @@ const mapStateToProps = (state) =>
 
 export default connect(mapStateToProps, mapDispatchToProps)(RouteWeatherUI);
 
-const FunAppWrapperThingForHooksUsability = ({maps_api_key}) => {
+const FunAppWrapperThingForHooksUsability = ({maps_api_key, queryParams}) => {
     useSaveControlsToCookie()
+    useLoadRouteFromURL(queryParams)
     
     return (
         <div>
@@ -288,4 +285,13 @@ const FunAppWrapperThingForHooksUsability = ({maps_api_key}) => {
             </MediaQuery>
         </div>
     )
+}
+
+const useLoadRouteFromURL = (queryParams) => {
+    const dispatch = useDispatch()
+    useEffect(() => {
+        if (queryParams.rwgpsRoute !== undefined) {
+            dispatch(loadRouteFromURL())
+        }
+    }, [queryParams])
 }

@@ -56,7 +56,6 @@ describe('Call URL shortener', () => {
             "routeInfo": {
                 "finishTime": "",
                 "weatherCorrectionMinutes": null,
-                "fetchAfterLoad": true,
                 "name": "",
                 "rwgpsRouteData": null,
                 "gpxRouteData": null

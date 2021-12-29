@@ -10,6 +10,10 @@ import PaceTable from "./resultsTables/PaceTable";
 import { useSelector } from "react-redux";
 import { usePrevious } from "../utils/hooks";
 import { TransitionWrapper } from "./shared/TransitionWrapper";
+import { TitleScreen } from "./TitleScreen";
+import { routeLoadingModes } from "../data/enums";
+import { Spinner } from "@blueprintjs/core";
+import "./DesktopUI.css"
 
 const DesktopUI = ({mapsApiKey}) => {
     const sidePaneOptions = [
@@ -63,6 +67,11 @@ const DesktopUI = ({mapsApiKey}) => {
             setActiveSidePane(sidePaneOptions.findIndex(option => option.title === "Pace Analysis"))
         }
     }, [newStravaActivityData])
+
+    const routeLoadingMode = useSelector(state => state.uiInfo.routeParams.routeLoadingMode)
+    const mapDataExists = (routeLoadingMode === routeLoadingModes.RWGPS) ? (forecastData.length > 0) : stravaActivityData !== null
+
+    const loadingFromURL = useSelector(state => state.routeInfo.loadingFromURL)
     
     return (
         <div>
@@ -72,10 +81,11 @@ const DesktopUI = ({mapsApiKey}) => {
                 setActiveSidePane={setActiveSidePane}
                 sidebarWidth={sidebarWidth}
                 panesVisible={panesVisible}
+                loadingFromURL={loadingFromURL}
             />
             <div style={{display: "flex"}}>
-                <Sidebar sidePaneOptions={sidePaneOptions} activeSidePane={activeSidePane} sidebarWidth={sidebarWidth}/>
-                <MapLoader maps_api_key={mapsApiKey}/>
+                <Sidebar sidePaneOptions={sidePaneOptions} activeSidePane={activeSidePane} sidebarWidth={sidebarWidth} loadingFromURL={loadingFromURL}/>
+                {mapDataExists ? <MapLoader maps_api_key={mapsApiKey}/> : <TitleScreen/>}
             </div>
         </div>
     );
@@ -87,13 +97,26 @@ DesktopUI.propTypes = {
 
 export default DesktopUI;
 
-const Sidebar = ({sidePaneOptions, activeSidePane, sidebarWidth}) => {
+const Sidebar = ({sidePaneOptions, activeSidePane, sidebarWidth, loadingFromURL}) => {
     const previousActivePane = usePrevious(activeSidePane)
     return (
+        !loadingFromURL ? 
         <TransitionWrapper diffData={activeSidePane} transitionTime={1} transitionType={previousActivePane < activeSidePane ? "slideLeft" : "slideRight"} width={sidebarWidth}>
             <div style={{width: `${sidebarWidth}px`}}>
                 {sidePaneOptions[activeSidePane].content}
             </div>
-        </TransitionWrapper>
+        </TransitionWrapper> :
+        <div style={{width: `${sidebarWidth - 25 * 2}px`, display: "flex", flexFlow: "column", alignItems: "center", padding: "25px", backgroundColor: "rgb(19, 124, 189)", height: "fit-content", borderRadius: "5px", margin: "25px"}}>
+            <LoadingFromURLOverlay/>
+        </div>
+    )
+}
+
+const LoadingFromURLOverlay = () => {
+    return (
+        <>
+            <div style={{fontSize: "24px", color: "white", marginBottom: "10px"}}>Loading forecast...</div>
+            <Spinner style={{color: "white"}}/>
+        </>
     )
 }

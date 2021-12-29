@@ -24,7 +24,6 @@
   "routeInfo": {
     "finishTime": "",
     "weatherCorrectionMinutes": null,
-    "fetchAfterLoad": false,
     "name": "",
     "rwgpsRouteData": {
       "type": "route",
