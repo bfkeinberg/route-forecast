@@ -61,7 +61,7 @@ const Cell = ({value, transformFunction, editable, onCellValueChanged, editValid
   }
 
   const valueEdited = (value) => {
-    if (editValidateFunction(value)) {
+    if (editValidateFunction === undefined || editValidateFunction(value)) {
       setEditingValue(value)
     }
   }
