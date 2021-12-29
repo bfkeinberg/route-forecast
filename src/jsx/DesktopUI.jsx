@@ -14,6 +14,7 @@ import { TitleScreen } from "./TitleScreen";
 import { routeLoadingModes } from "../data/enums";
 import { Spinner } from "@blueprintjs/core";
 import "./DesktopUI.css"
+import { RouteTitle } from "./shared/RouteTitle";
 
 const DesktopUI = ({mapsApiKey}) => {
     const sidePaneOptions = [
@@ -92,9 +93,6 @@ DesktopUI.propTypes = {
     mapsApiKey: PropTypes.string
 };
 
-export default DesktopUI;
-
-
 const Sidebar = ({sidePaneOptions, activeSidePane, sidebarWidth}) => {
 
     const [loadingFromURLStarted, loadingFromURLFinished, displayContent] = useLoadingFromURLStatus()
@@ -126,8 +124,11 @@ const Sidebar = ({sidePaneOptions, activeSidePane, sidebarWidth}) => {
 }
 
 const LoadingFromURLOverlay = () => {
+    const routeData = useSelector(state => state.routeInfo.rwgpsRouteData)
+
     return (
         <>
+            <RouteTitle style={{color: "white"}} className={routeData !== null ? "fade-in" : ""}/>
             <div style={{fontSize: "24px", color: "white", marginBottom: "10px"}}>Loading forecast...</div>
             <Spinner style={{color: "white"}}/>
         </>
@@ -144,3 +145,5 @@ export const useLoadingFromURLStatus = () => {
 
     return [started, finished, delayFinished]
 }
+
+export default DesktopUI;
