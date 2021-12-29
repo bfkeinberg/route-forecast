@@ -32,7 +32,13 @@ export const Table = ({data, onCellValueChanged}) => {
         <React.Fragment key={rowIndex}>
           {columns.map((column, columnIndex) => 
             <div key={column.name} style={{...baseStyle, ...column.cellStyle, gridColumn: columnIndex + 1, gridRow: rowIndex + 2}}>
-              <Cell value={row[column.name]} transformFunction={column.valueTransformFunction} editable={column.editable} onCellValueChanged={(value) => onCellValueChanged(rowIndex, column.name, value)} />
+              <Cell
+                value={row[column.name]}
+                transformFunction={column.valueTransformFunction}
+                editable={column.editable}
+                onCellValueChanged={(value) => onCellValueChanged(rowIndex, column.name, value)}
+                editValidateFunction={column.editValidateFunction}
+              />
             </div>
           )}
         </React.Fragment>
@@ -42,7 +48,7 @@ export const Table = ({data, onCellValueChanged}) => {
   )
 }
 
-const Cell = ({value, transformFunction, editable, onCellValueChanged}) => {
+const Cell = ({value, transformFunction, editable, onCellValueChanged, editValidateFunction}) => {
   const beginEditing = () => {
     if (editable) {
       setEditingValue(value)
@@ -54,11 +60,17 @@ const Cell = ({value, transformFunction, editable, onCellValueChanged}) => {
     setEditingValue(null)
   }
 
+  const valueEdited = (value) => {
+    if (editValidateFunction(value)) {
+      setEditingValue(value)
+    }
+  }
+
   const [editingValue, setEditingValue] = useState(null)
   return (
     editingValue !== null ? 
     <div>
-      <input autoFocus onKeyPress={(event) => console.log(event.key)} value={editingValue} style={{width: "40px"}} onChange={(event) => setEditingValue(event.target.value)} onBlur={endEditing}/>
+      <input autoFocus onKeyPress={(event) => {}/*console.log(event.key)*/} value={editingValue} style={{width: "40px"}} onChange={(event) => valueEdited(event.target.value)} onBlur={endEditing}/>
     </div>
     :
     <div style={{cursor: editable ? "pointer" : "", width: "100%", height: "100%"}} onClick={beginEditing}>

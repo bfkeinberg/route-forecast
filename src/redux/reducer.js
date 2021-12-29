@@ -292,7 +292,6 @@ const strava = function (state = {
         case Actions.SET_ANALYSIS_INTERVAL:
             return {...state, analysisInterval:parseInt(action.interval),subrange:[]};
         case Actions.SUBRANGE_MAP:
-            console.log(action)
             return {...state,subrange:
                 [
                     parseFloat(action.start),
