@@ -33,9 +33,8 @@ export const TopBar = ({sidePaneOptions, activeSidePane, setActiveSidePane, side
 const Tabs = ({sidePaneOptions, activeSidePane, setActiveSidePane, sidebarWidth, panesVisible}) => {
 
   const [loadingFromURLStarted, loadingFromURLFinished, displayContent] = useLoadingFromURLStatus()
-
   return (
-    <div style={{height: "50px", display: "flex", alignItems: "center", width: `${sidebarWidth}px`}} className={displayContent ? "fade-in" : ""}>
+    <div style={{height: "50px", display: "flex", alignItems: "center", width: `${sidebarWidth}px`}} className={(loadingFromURLStarted && displayContent) ? "fade-in" : ""}>
       {displayContent ?
         sidePaneOptions.map((option, index) => {
           const displayIndex = Array.from(panesVisible).indexOf(option)
