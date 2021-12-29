@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from "react"
-import { useSelector } from "react-redux"
+import { useDispatch, useSelector } from "react-redux"
 import stravaRouteParser from "./stravaRouteParser"
 import { formatControlsForUrl, milesToMeters } from "./util"
-import { saveCookie } from "../redux/actions"
+import { loadRouteFromURL, saveCookie } from "../redux/actions"
 import gpxParser from "./gpxParser"
 import { routeLoadingModes } from "../data/enums"
 
@@ -46,22 +46,6 @@ const useFormatSpeed = () => {
     `${speed.toFixed(1)} mph`;
 }
 
-const useSaveControlsToCookie = () => {
-
-  const controlPoints = useSelector(state => state.controls.userControlPoints)
-  const routeInfo = useSelector(state => state.routeInfo)
-  const firstUse = useSelector(state => state.params.newUserMode)
-
-  useEffect(() => {
-    if (routeInfo.name !== '') {
-      document.title = `Forecast for ${routeInfo.name}`;
-      if (!firstUse && controlPoints !== '' && controlPoints.length !== 0) {
-        saveCookie(routeInfo.name, formatControlsForUrl(controlPoints));
-      }
-    }
-  }, [routeInfo.name, firstUse, controlPoints])
-}
-
 const usePointsAndBounds = () => {
   const rwgpsRouteData = useSelector(state => state.routeInfo.rwgpsRouteData)
   const gpxRouteData = useSelector(state => state.routeInfo.gpxRouteData)
@@ -92,5 +76,29 @@ const usePointsAndBounds = () => {
   return pointsAndBounds
 }
 
+const useSaveControlsToCookie = () => {
 
-export { useValueHasChanged, useActualPace, useActualFinishTime, useActualArrivalTimes, usePrevious, useFormatSpeed, useSaveControlsToCookie, usePointsAndBounds }
+  const controlPoints = useSelector(state => state.controls.userControlPoints)
+  const routeInfo = useSelector(state => state.routeInfo)
+  const firstUse = useSelector(state => state.params.newUserMode)
+
+  useEffect(() => {
+    if (routeInfo.name !== '') {
+      document.title = `Forecast for ${routeInfo.name}`;
+      if (!firstUse && controlPoints !== '' && controlPoints.length !== 0) {
+        saveCookie(routeInfo.name, formatControlsForUrl(controlPoints));
+      }
+    }
+  }, [routeInfo.name, firstUse, controlPoints])
+}
+
+const useLoadRouteFromURL = (queryParams) => {
+  const dispatch = useDispatch()
+  useEffect(() => {
+      if (queryParams.rwgpsRoute !== undefined) {
+          dispatch(loadRouteFromURL())
+      }
+  }, [queryParams])
+}
+
+export { useValueHasChanged, useActualPace, useActualFinishTime, useActualArrivalTimes, usePrevious, useFormatSpeed, useSaveControlsToCookie, usePointsAndBounds, useLoadRouteFromURL }

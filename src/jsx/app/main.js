@@ -1,4 +1,4 @@
-import React, {Component, useEffect} from 'react';
+import React, {Component} from 'react';
 import MediaQuery from 'react-responsive';
 import '@blueprintjs/core/lib/css/blueprint.css';
 import 'Images/style.css';
@@ -33,13 +33,11 @@ import {
     showWeatherProvider,
     setRwgpsCredentials,
     setStartTimestamp,
-    setZoomToRange,
-    loadRouteFromURL
+    setZoomToRange
 } from "../../redux/actions";
 import QueryString from './QueryString';
 import { routeLoadingModes } from '../../data/enums';
-import { useSaveControlsToCookie } from '../../utils/hooks';
-import { useDispatch } from 'react-redux';
+import { useLoadRouteFromURL, useSaveControlsToCookie } from '../../utils/hooks';
 
 const demoRoute = 1797453;
 const demoControls = [
@@ -285,13 +283,4 @@ const FunAppWrapperThingForHooksUsability = ({maps_api_key, queryParams}) => {
             </MediaQuery>
         </div>
     )
-}
-
-const useLoadRouteFromURL = (queryParams) => {
-    const dispatch = useDispatch()
-    useEffect(() => {
-        if (queryParams.rwgpsRoute !== undefined) {
-            dispatch(loadRouteFromURL())
-        }
-    }, [queryParams])
 }
