@@ -5,8 +5,9 @@ import PaceExplanation from "./PaceExplanation";
 import ShortUrl from "./ShortUrl";
 import "./TopBar.css"
 import { useValueHasChanged } from "../../utils/hooks";
+import { useLoadingFromURLStatus } from "../DesktopUI";
 
-export const TopBar = ({sidePaneOptions, activeSidePane, setActiveSidePane, sidebarWidth, panesVisible, loadingFromURL}) => {
+export const TopBar = ({sidePaneOptions, activeSidePane, setActiveSidePane, sidebarWidth, panesVisible}) => {
   return (
     <div style={{display: "flex"}}>
       <Tabs 
@@ -15,7 +16,6 @@ export const TopBar = ({sidePaneOptions, activeSidePane, setActiveSidePane, side
         setActiveSidePane={setActiveSidePane}
         sidebarWidth={sidebarWidth}
         panesVisible={panesVisible}
-        loadingFromURL={loadingFromURL}
       />
       <div style={{display: "flex", flexGrow: 1, alignItems: "center", padding: "0px 20px"}}>
         <PaceExplanation/>
@@ -30,10 +30,13 @@ export const TopBar = ({sidePaneOptions, activeSidePane, setActiveSidePane, side
   )
 }
 
-const Tabs = ({sidePaneOptions, activeSidePane, setActiveSidePane, sidebarWidth, panesVisible, loadingFromURL}) => {
+const Tabs = ({sidePaneOptions, activeSidePane, setActiveSidePane, sidebarWidth, panesVisible}) => {
+
+  const [loadingFromURLStarted, loadingFromURLFinished, displayContent] = useLoadingFromURLStatus()
+
   return (
-    <div style={{height: "50px", display: "flex", alignItems: "center", width: `${sidebarWidth}px`}}>
-      {!loadingFromURL ?
+    <div style={{height: "50px", display: "flex", alignItems: "center", width: `${sidebarWidth}px`}} className={displayContent ? "fade-in" : ""}>
+      {displayContent ?
         sidePaneOptions.map((option, index) => {
           const displayIndex = Array.from(panesVisible).indexOf(option)
           const activeDisplayIndex = Array.from(panesVisible).indexOf(sidePaneOptions[activeSidePane])

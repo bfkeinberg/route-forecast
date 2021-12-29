@@ -6,10 +6,30 @@ import { loadRouteFromURL, saveCookie } from "../redux/actions"
 import gpxParser from "./gpxParser"
 import { routeLoadingModes } from "../data/enums"
 
-const useValueHasChanged = (value) => {
-  const [initialValue] = useState(value)
+const useDelay = (delay, startCondition = true) => {
+  const [ready, setReady] = useState(false)
+  useEffect(() => {
+    if (startCondition) {
+      setTimeout(() => {
+        setReady(true)
+      }, delay)
+    }
+  }, [delay, startCondition])
+  return ready
+}
+
+const useValueHasChanged = (value, startValue) => {
+  const [oldValue, setOldValue] = useState(value)
   const [hasChanged, setHasChanged] = useState(false)
-  useEffect(() => { if (initialValue !== value) setHasChanged(true) }, [value])
+  useEffect(() => {
+    if (oldValue !== value) {
+      if (startValue === oldValue || startValue === undefined) {
+        setHasChanged(true)
+      } else {
+        setOldValue(value)
+      }
+    }
+  }, [value])
   return hasChanged
 }
 
@@ -101,4 +121,4 @@ const useLoadRouteFromURL = (queryParams) => {
   }, [queryParams])
 }
 
-export { useValueHasChanged, useActualPace, useActualFinishTime, useActualArrivalTimes, usePrevious, useFormatSpeed, useSaveControlsToCookie, usePointsAndBounds, useLoadRouteFromURL }
+export { useValueHasChanged, useActualPace, useActualFinishTime, useActualArrivalTimes, usePrevious, useFormatSpeed, useSaveControlsToCookie, usePointsAndBounds, useLoadRouteFromURL, useDelay }

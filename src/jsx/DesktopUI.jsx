@@ -8,7 +8,7 @@ import { ForecastSettings } from "./ForecastSettings/ForecastSettings";
 import { TopBar } from "./TopBar/TopBar";
 import PaceTable from "./resultsTables/PaceTable";
 import { useSelector } from "react-redux";
-import { usePrevious } from "../utils/hooks";
+import { useDelay, usePrevious, useValueHasChanged } from "../utils/hooks";
 import { TransitionWrapper } from "./shared/TransitionWrapper";
 import { TitleScreen } from "./TitleScreen";
 import { routeLoadingModes } from "../data/enums";
@@ -70,8 +70,6 @@ const DesktopUI = ({mapsApiKey}) => {
 
     const routeLoadingMode = useSelector(state => state.uiInfo.routeParams.routeLoadingMode)
     const mapDataExists = (routeLoadingMode === routeLoadingModes.RWGPS) ? (forecastData.length > 0) : stravaActivityData !== null
-
-    const loadingFromURL = useSelector(state => state.routeInfo.loadingFromURL)
     
     return (
         <div>
@@ -81,10 +79,9 @@ const DesktopUI = ({mapsApiKey}) => {
                 setActiveSidePane={setActiveSidePane}
                 sidebarWidth={sidebarWidth}
                 panesVisible={panesVisible}
-                loadingFromURL={loadingFromURL}
             />
             <div style={{display: "flex"}}>
-                <Sidebar sidePaneOptions={sidePaneOptions} activeSidePane={activeSidePane} sidebarWidth={sidebarWidth} loadingFromURL={loadingFromURL}/>
+                <Sidebar sidePaneOptions={sidePaneOptions} activeSidePane={activeSidePane} sidebarWidth={sidebarWidth}/>
                 {mapDataExists ? <MapLoader maps_api_key={mapsApiKey}/> : <TitleScreen/>}
             </div>
         </div>
@@ -97,16 +94,32 @@ DesktopUI.propTypes = {
 
 export default DesktopUI;
 
-const Sidebar = ({sidePaneOptions, activeSidePane, sidebarWidth, loadingFromURL}) => {
+
+const Sidebar = ({sidePaneOptions, activeSidePane, sidebarWidth}) => {
+
+    const [loadingFromURLStarted, loadingFromURLFinished, displayContent] = useLoadingFromURLStatus()
+
     const previousActivePane = usePrevious(activeSidePane)
     return (
-        !loadingFromURL ? 
+        displayContent ? 
         <TransitionWrapper diffData={activeSidePane} transitionTime={1} transitionType={previousActivePane < activeSidePane ? "slideLeft" : "slideRight"} width={sidebarWidth}>
-            <div style={{width: `${sidebarWidth}px`}}>
+            <div style={{width: `${sidebarWidth}px`}} className={loadingFromURLStarted ? "fade-in" : ""}>
                 {sidePaneOptions[activeSidePane].content}
             </div>
         </TransitionWrapper> :
-        <div style={{width: `${sidebarWidth - 25 * 2}px`, display: "flex", flexFlow: "column", alignItems: "center", padding: "25px", backgroundColor: "rgb(19, 124, 189)", height: "fit-content", borderRadius: "5px", margin: "25px"}}>
+        <div style={{
+            width: `${sidebarWidth - 25 * 2}px`,
+            display: "flex",
+            flexFlow: "column",
+            alignItems: "center",
+            padding: "25px",
+            backgroundColor: "rgb(19,124,189)",
+            height: "fit-content",
+            borderRadius: "5px",
+            margin: "25px",
+            opacity: loadingFromURLFinished ? 0 : 1,
+            transition: loadingFromURLFinished ? "opacity 1s ease-in" : ""
+        }}>
             <LoadingFromURLOverlay/>
         </div>
     )
@@ -119,4 +132,15 @@ const LoadingFromURLOverlay = () => {
             <Spinner style={{color: "white"}}/>
         </>
     )
+}
+
+export const useLoadingFromURLStatus = () => {
+    const delay = 1000
+
+    const loadingFromURL = useSelector(state => state.routeInfo.loadingFromURL)
+    const started = useValueHasChanged(loadingFromURL, false)
+    const finished = useValueHasChanged(loadingFromURL, true)
+    const delayFinished = useDelay(delay, finished) || !started
+
+    return [started, finished, delayFinished]
 }
