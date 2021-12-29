@@ -28,7 +28,7 @@ export const TimeFields = () => {
     width: "240px",
     fontSize: "16px",
     border: "1px solid #00000050",
-    padding: "5px 13px",
+    padding: "5px 15px",
     borderRadius: "3px",
     whiteSpace: "nowrap"
   }
