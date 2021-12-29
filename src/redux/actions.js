@@ -1,5 +1,6 @@
 import cookie from 'react-cookies';
 import { doForecastShit } from '../utils/forecastUtilities';
+import { parseControls } from '../utils/util';
 
 export const componentLoader = (lazyComponent, attemptsLeft) => {
     return new Promise((resolve, reject) => {
@@ -128,18 +129,6 @@ const rwgpsRouteLoadingFailure = function(status) {
     }
 };
 
-export const parseControls = function(controlPointString) {
-    let controlPointList = controlPointString.split(":");
-    let controlPoints =
-        controlPointList.map((point,index) => {
-            let controlPointValues = point.split(",");
-            return ({name:controlPointValues[0],distance:Number(controlPointValues[1]),duration:Number(controlPointValues[2]),id:index});
-        });
-    // delete dummy first element
-    controlPoints.splice(0,1);
-    return controlPoints;
-};
-
 const getRouteName = function(routeData) {
     if (routeData.route !== undefined) {
         return routeData.route.name;
@@ -172,7 +161,7 @@ export const loadControlsFromCookie = function(routeData) {
         if (routeName !== null) {
             let savedControlPoints = loadCookie(routeName);
             if (savedControlPoints !== undefined && savedControlPoints.length > 0) {
-                dispatch(updateUserControls(parseControls(savedControlPoints)));
+                dispatch(updateUserControls(parseControls(savedControlPoints, true)));
             }
         }
     };

@@ -1,8 +1,7 @@
 import { useEffect, useRef, useState } from "react"
-import { useDispatch, useSelector } from "react-redux"
+import { useSelector } from "react-redux"
 import stravaRouteParser from "./stravaRouteParser"
-import { formatControlsForUrl, milesToMeters } from "./util"
-import { loadRouteFromURL, saveCookie } from "../redux/actions"
+import { milesToMeters } from "./util"
 import gpxParser from "./gpxParser"
 import { routeLoadingModes } from "../data/enums"
 
@@ -96,29 +95,4 @@ const usePointsAndBounds = () => {
   return pointsAndBounds
 }
 
-const useSaveControlsToCookie = () => {
-
-  const controlPoints = useSelector(state => state.controls.userControlPoints)
-  const routeInfo = useSelector(state => state.routeInfo)
-  const firstUse = useSelector(state => state.params.newUserMode)
-
-  useEffect(() => {
-    if (routeInfo.name !== '') {
-      document.title = `Forecast for ${routeInfo.name}`;
-      if (!firstUse && controlPoints !== '' && controlPoints.length !== 0) {
-        saveCookie(routeInfo.name, formatControlsForUrl(controlPoints));
-      }
-    }
-  }, [routeInfo.name, firstUse, controlPoints])
-}
-
-const useLoadRouteFromURL = (queryParams) => {
-  const dispatch = useDispatch()
-  useEffect(() => {
-      if (queryParams.rwgpsRoute !== undefined) {
-          dispatch(loadRouteFromURL())
-      }
-  }, [queryParams])
-}
-
-export { useValueHasChanged, useActualPace, useActualFinishTime, useActualArrivalTimes, usePrevious, useFormatSpeed, useSaveControlsToCookie, usePointsAndBounds, useLoadRouteFromURL, useDelay }
+export { useValueHasChanged, useActualPace, useActualFinishTime, useActualArrivalTimes, usePrevious, useFormatSpeed, usePointsAndBounds, useDelay }

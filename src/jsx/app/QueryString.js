@@ -4,18 +4,7 @@ import {setShortUrl, shortenUrl} from "../../redux/actions";
 require('isomorphic-fetch');
 import queryString from 'query-string';
 import { DateTime } from 'luxon';
-
-const formatOneControl = function(controlPoint) {
-    if (typeof controlPoint === 'string') {
-        return controlPoint;
-    }
-    return controlPoint.name + "," + controlPoint.distance + "," + controlPoint.duration;
-};
-
-const formatControlsForUrl = function(controlPoints) {
-    return controlPoints.filter(point => point.name !== '').filter(point => {return !isNaN(point.distance) && !isNaN(point.duration)}).reduce((queryParam,point) => {
-        return `${formatOneControl(queryParam)}:${formatOneControl(point)}`},'');
-};
+import { formatControlsForUrl } from '../../utils/util';
 
 // this function exists to let us preserve the user's specified start time and share the url for this route
 // with someone in another time zone
@@ -25,9 +14,14 @@ export const dateToShortDate = function(date) {
 
 export const makeQuery = (routeNumber, pace,interval,metric,controls, strava_activity,
                           provider, showProvider) => {
-    return {pace:pace,interval:interval,metric:metric,
-        rwgpsRoute:routeNumber,controlPoints:formatControlsForUrl(controls),
-        strava_activity:strava_activity, provider:provider, showProvider:showProvider};
+    const query = {
+        pace, interval, metric, rwgpsRoute: routeNumber, strava_activity, provider, showProvider
+    }
+    const formattedControls = formatControlsForUrl(controls, true)
+    if (formattedControls !== "") {
+        query.controlPoints = formattedControls
+    }
+    return query;
 };
 
 const QueryStringUpdater = ({routeNumber,start,pace,interval,metric,controls,/*setQueryString,*/

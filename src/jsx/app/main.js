@@ -1,10 +1,10 @@
-import React, {Component} from 'react';
+import React, {Component, useEffect} from 'react';
 import MediaQuery from 'react-responsive';
 import '@blueprintjs/core/lib/css/blueprint.css';
 import 'Images/style.css';
 import queryString from 'query-string';
 import PropTypes from 'prop-types';
-import {connect} from 'react-redux';
+import { connect, useDispatch, useSelector } from 'react-redux';
 // import cookie from 'react-cookies';
 import LocationContext from '../locationContext';
 import DesktopUI from '../DesktopUI';
@@ -33,11 +33,13 @@ import {
     showWeatherProvider,
     setRwgpsCredentials,
     setStartTimestamp,
-    setZoomToRange
+    setZoomToRange,
+    loadRouteFromURL,
+    setDisplayControlTableUI
 } from "../../redux/actions";
 import QueryString from './QueryString';
 import { routeLoadingModes } from '../../data/enums';
-import { useLoadRouteFromURL, useSaveControlsToCookie } from '../../utils/hooks';
+import { formatControlsForUrl, parseControls } from '../../utils/util';
 
 const demoRoute = 1797453;
 const demoControls = [
@@ -101,7 +103,6 @@ export class RouteWeatherUI extends Component {
         props.setActionUrl(props.action);
         props.setApiKeys(props.maps_api_key,props.timezone_api_key, props.bitly_token);
         RouteWeatherUI.setupRideWithGps(props);
-        this.props.updateControls(queryParams.controlPoints==undefined?[]:this.parseControls(queryParams.controlPoints));
         if (newUserMode) {
             RouteWeatherUI.loadCannedData(this.props);
         }
@@ -115,10 +116,12 @@ export class RouteWeatherUI extends Component {
                 if (event.state === null) {
                     this.props.reset();
                 } else {
-                    RouteWeatherUI.updateFromQueryParams(this.props, event.state);
-                    if (event.state.rwgpsRoute !== undefined) {
-                        this.props.loadFromRideWithGps(event.state.rwgpsRoute,this.props.rwgpsRouteIsTrip);
-                    }
+                    // TODO
+                    // don't think this is necessary (anymore?) -- but check with father
+                    // RouteWeatherUI.updateFromQueryParams(this.props, event.state);
+                    // if (event.state.rwgpsRoute !== undefined) {
+                    //     this.props.loadFromRideWithGps(event.state.rwgpsRoute,this.props.rwgpsRouteIsTrip);
+                    // }
                 }
             }
         }
@@ -182,20 +185,6 @@ export class RouteWeatherUI extends Component {
     static loadCannedData(props) {
         props.setRwgpsRoute(demoRoute);
         props.updateControls(demoControls);
-    }
-
-    parseControls(controlPointString) {
-        let controlPointList = controlPointString.split(":");
-        let controlPoints =
-        controlPointList.filter(item => item.length > 0).
-        filter(point => {const values = point.split(","); return !isNaN(values[1]) && !isNaN(values[2])}).
-        map((point,index) => {
-            let controlPointValues = point.split(",");
-            return ({name:controlPointValues[0],distance:Number(controlPointValues[1]),duration:Number(controlPointValues[2]), id:index});
-            });
-        // delete dummy first element
-        // controlPoints.splice(0,1);
-        return controlPoints;
     }
 
     static updateFromQueryParams(props, queryParams) {
@@ -264,8 +253,11 @@ const mapStateToProps = (state) =>
 export default connect(mapStateToProps, mapDispatchToProps)(RouteWeatherUI);
 
 const FunAppWrapperThingForHooksUsability = ({maps_api_key, queryParams}) => {
-    useSaveControlsToCookie()
+    // TODO
+    // this is causing obnoxious bugs -- can we just cut it?
+    // useSaveControlsToCookie()
     useLoadRouteFromURL(queryParams)
+    useLoadControlPointsFromURL(queryParams)
     
     return (
         <div>
@@ -283,4 +275,44 @@ const FunAppWrapperThingForHooksUsability = ({maps_api_key, queryParams}) => {
             </MediaQuery>
         </div>
     )
+}
+
+const useSaveControlsToCookie = () => {
+
+    const controlPoints = useSelector(state => state.controls.userControlPoints)
+    const routeInfo = useSelector(state => state.routeInfo)
+    const firstUse = useSelector(state => state.params.newUserMode)
+  
+    useEffect(() => {
+      if (routeInfo.name !== '') {
+        document.title = `Forecast for ${routeInfo.name}`;
+        if (!firstUse && controlPoints !== '' && controlPoints.length !== 0) {
+          saveCookie(routeInfo.name, formatControlsForUrl(controlPoints, false));
+        }
+      }
+    }, [routeInfo.name, firstUse, controlPoints])
+  }
+  
+  const useLoadRouteFromURL = (queryParams) => {
+    const dispatch = useDispatch()
+    useEffect(() => {
+        if (queryParams.rwgpsRoute !== undefined) {
+            dispatch(loadRouteFromURL())
+        }
+    }, [queryParams])
+  }
+
+const useLoadControlPointsFromURL = (queryParams) => {
+    
+    const dispatch = useDispatch()
+    useEffect(() => {
+        window.controlPoints = queryParams.controlPoints
+        console.log(queryParams.controlPoints)
+        if (queryParams.controlPoints === undefined || queryParams.controlPoints === "") {
+            dispatch(updateUserControls([]))
+        } else {
+            dispatch(updateUserControls(parseControls(queryParams.controlPoints, false)))
+            dispatch(setDisplayControlTableUI(true))
+        }
+    }, [queryParams])
 }
