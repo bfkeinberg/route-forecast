@@ -271,7 +271,7 @@ const invalidateForecast = () => {
     return { type: INVALIDATE_FORECAST }
 };
 
-export const cancelForecast = () => {
+const cancelForecast = () => {
     return async function(dispatch, getState) {
         const cancel = getState().uiInfo.dialogParams.cancelActiveFetchMethod
         if (cancel !== null) {
@@ -305,6 +305,7 @@ export const loadFromRideWithGps = function(routeNumber, isTrip) {
         routeNumber = routeNumber || getState().uiInfo.routeParams.rwgpsRoute
         isTrip = isTrip || getState().uiInfo.routeParams.rwgpsRouteIsTrip
         dispatch(beginLoadingRoute('rwgps'));
+        dispatch(cancelForecast())
         return loadRwgpsRoute(routeNumber, isTrip).then( (routeData) => {
                 dispatch(rwgpsRouteLoadingSuccess(routeData));
                 dispatch(loadControlsFromCookie(routeData));
