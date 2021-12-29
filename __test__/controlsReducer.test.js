@@ -16,7 +16,7 @@ describe('controls reducer', () => {
             {
                 metric:false,displayBanked:false,
                 userControlPoints:[], calculatedControlValues:[],queryString:null,
-                showWeatherProvider:false
+                showWeatherProvider:false,displayControlTableUI: false
             }
         );
     });

@@ -511,14 +511,16 @@ describe('request forecast', () => {
         const dir = process.cwd();
         const routeInfo = require(`${dir}/__test__/routeInfo.json`);
 
-        const initialState = {routeInfo:routeInfo, params:{
+        const initialState = {
+            routeInfo:routeInfo,
+            params:{
                 "newUserMode": false,
                 "action": "/forecast"
             },
-        forecast:{
-          weatherProvider:'darksky'
-        },
-            controls:{
+            forecast: {
+                weatherProvider: 'darksky'
+            },
+            controls: {
                 "metric": false,
                 "displayBanked": false,
                 "userControlPoints": [
@@ -586,13 +588,13 @@ describe('request forecast', () => {
                 "calculatedControlValues": calculatedControls,
                 "queryString": null
             },
-            uiInfo:{
+            uiInfo: {
                 "routeParams": {
                     "interval": 1,
                     "pace": "B+",
                     "rwgpsRoute": 27904106,
                     "rwgpsRouteIsTrip": false,
-                    "start": DateTime.fromSeconds(1531566000, {zone:'America/Los_Angeles'}),
+                    "start": DateTime.fromSeconds(1531566000, { zone: 'America/Los_Angeles' }),
                     "loadingSource": null,
                     "succeeded": null,
                     "routeLoadingMode": routeLoadingModes.RWGPS
@@ -606,16 +608,17 @@ describe('request forecast', () => {
                     "fetchingForecast": false,
                     "fetchingRoute": false
                 }
-            }};
+            }
+        };
         let store = mockStore(initialState);
-        let v = await(store.dispatch(actions.requestForecast(routeInfo)));
+        let v = await(store.dispatch(actions.requestForecast()));
         expect(store.getActions()).toEqual(expectedActions);
 
         let newState = expectedActions.reduce((previousValue, currentValue) => rootReducer(previousValue,currentValue),initialState);
         expect(newState.controls.calculatedControlValues).toEqual(nextControlValues);
 
         store = mockStore(newState);
-        await(store.dispatch(actions.requestForecast(routeInfo)));
+        await(store.dispatch(actions.requestForecast()));
         expect(store.getActions()).toEqual(expectedActions);
 
         })
