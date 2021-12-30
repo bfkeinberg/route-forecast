@@ -83,7 +83,15 @@ const DesktopUI = ({mapsApiKey}) => {
             />
             <div style={{display: "flex"}}>
                 <Sidebar sidePaneOptions={sidePaneOptions} activeSidePane={activeSidePane} sidebarWidth={sidebarWidth}/>
-                {mapDataExists ? <MapLoader maps_api_key={mapsApiKey}/> : <TitleScreen/>}
+                <div style={{
+                    flexGrow: 1,
+                    height: "calc(100vh - 50px)",
+                    borderLeft: "1px solid transparent",
+                    borderImage: "linear-gradient(to bottom, grey , transparent)",
+                    borderImageSlice: 1
+                }}>
+                    {mapDataExists ? <MapLoader maps_api_key={mapsApiKey}/> : <TitleScreen/>}
+                </div>
             </div>
         </div>
     );

@@ -17,7 +17,7 @@ export const TopBar = ({sidePaneOptions, activeSidePane, setActiveSidePane, side
         sidebarWidth={sidebarWidth}
         panesVisible={panesVisible}
       />
-      <div style={{display: "flex", flexGrow: 1, alignItems: "center", padding: "0px 20px"}}>
+      <div style={{display: "flex", flexGrow: 1, alignItems: "center", padding: "0px 20px", borderWidth: "0px 0px 0px 1px", borderStyle: "solid", borderColor: "grey"}}>
         <PaceExplanation/>
         <div style={{flexGrow: 1, display: "flex", justifyContent: "flex-end", alignItems: "center"}}>
           <ShortUrl/>

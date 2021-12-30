@@ -177,7 +177,7 @@ export const updateUserControls = function(controls) {
 };
 
 export const UPDATE_CALCULATED_VALUES = 'UPDATE_CALCULATED_VALUES';
-export const updateCalculatedValues = function(values) {
+const updateCalculatedValues = function(values) {
     return {
         type: UPDATE_CALCULATED_VALUES,
         values: values
