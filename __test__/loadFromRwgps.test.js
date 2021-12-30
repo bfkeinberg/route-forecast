@@ -27,8 +27,9 @@ describe('load route from Ride with GPS', () => {
 
         const expectedActions = [
             { type: actions.BEGIN_LOADING_ROUTE, source:"rwgps" },
-            { type: actions.RWGPS_ROUTE_LOADING_SUCCESS, routeData: routeData},
-            ];
+            { type: actions.INVALIDATE_FORECAST},
+            { type: actions.RWGPS_ROUTE_LOADING_SUCCESS, routeData: routeData}
+        ]
 
         const initialState = {
             "uiInfo": {
@@ -49,7 +50,8 @@ describe('load route from Ride with GPS', () => {
                     "shortUrl": "https://goo.gl/Cy7Var",
                     "loadingSource": "rwgps",
                     "fetchingForecast": false,
-                    "fetchingRoute": true
+                    "fetchingRoute": true,
+                    cancelActiveFetchMethod: null
                 }
             },
             "routeInfo": {
