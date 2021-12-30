@@ -47,7 +47,7 @@ const RouteForecastMap = ({google}) => {
 
     return (
         <ErrorBoundary>
-            <div id="map" style={{ 'height': '95%' }}>
+            <div id="map" style={{height: "calc(100vh - 50px)", position: "relative"}}>
                 {(forecast.length > 0 || routeLoadingMode === routeLoadingModes.STRAVA) && bounds !== null ?
                     <Map
                         google={google}
