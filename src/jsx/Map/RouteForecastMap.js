@@ -60,7 +60,7 @@ const RouteForecastMap = ({google}) => {
                     >
                         <Polyline path={points} strokeColor={'#ff0000'} strokeWeight={2} strokeOpacity={1.0} />
                         <MapHighlight points={points} subrange={subrange}/>
-                        <MapMarkers forecast={forecast} controls={controls} controlNames={controlNames} subrange={subrange} metric={metric}/>
+                        {controls !== null && <MapMarkers forecast={forecast} controls={controls} controlNames={controlNames} subrange={subrange} metric={metric}/>}
                         <InfoWindow position={infoPosition} visible={infoVisible}>
                             <div>{infoContents}</div>
                         </InfoWindow>
