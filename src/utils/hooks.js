@@ -150,22 +150,24 @@ const useForecastDependentValues = () => {
 
   const stateStuff = {routeInfo, uiInfo: {routeParams}, controls}
 
-  const { forecastRequest, points, values, finishTime, timeInHours} = getRouteInfo(stateStuff, routeInfo.rwgpsRouteData !== null ? "rwgps" : "gpx", timeZoneId)
+  if (forecast.length > 0) {
+    const { forecastRequest, points, values, finishTime, timeInHours} = getRouteInfo(stateStuff, routeInfo.rwgpsRouteData !== null ? "rwgps" : "gpx", timeZoneId)
 
-  const  { time, values: calculatedControlPointValues, gustSpeed, finishTime: adjustedFinishTime } = forecast.length > 0 ? gpxParser.adjustForWind(
-      forecast,
-      points,
-      routeParams.pace,
-      controls.userControlPoints,
-      values,
-      routeParams.start,
-      controls.metric,
-      finishTime,
-      timeZoneId
-  ) :
-  {time: null, values: null, gustSpeed: null, finishTime: null}
-
-  return { weatherCorrectionMinutes: time, calculatedControlPointValues: calculatedControlPointValues, maxGustSpeed: gustSpeed, finishTime: adjustedFinishTime}
+    const { time, values: calculatedControlPointValues, gustSpeed, finishTime: adjustedFinishTime } = gpxParser.adjustForWind(
+        forecast,
+        points,
+        routeParams.pace,
+        controls.userControlPoints,
+        values,
+        routeParams.start,
+        controls.metric,
+        finishTime,
+        timeZoneId
+    )
+    return { weatherCorrectionMinutes: time, calculatedControlPointValues: calculatedControlPointValues, maxGustSpeed: gustSpeed, finishTime: adjustedFinishTime}
+  } else {
+    return { weatherCorrectionMinutes: null, calculatedControlPointValues: null, maxGustSpeed: null, finishTime: null }
+  }
 }
 
 export { useValueHasChanged, useActualPace, useActualFinishTime, useActualArrivalTimes, usePrevious, useFormatSpeed, usePointsAndBounds, useDelay, useReusableDelay, usePreviousPersistent, useForecastDependentValues }
