@@ -5,10 +5,9 @@ import { removeControl as removeControlAction, updateUserControls } from '../../
 import { Table } from "./Table"
 import { useDispatch } from 'react-redux';
 import { useActualArrivalTimes, useForecastDependentValues } from '../../utils/hooks';
+import { stringIsOnlyNumeric } from '../../utils/util';
 
 const minSuffixFunction = value => `${value} min`
-
-const editValidateFunction = value => value.match(/^[0-9]*$/) !== null
 
 export const ControlTable = () => {
 
@@ -58,8 +57,8 @@ export const ControlTable = () => {
             ({name, distance, duration, arrival, banked, actual, delete: <Icon icon="delete" style={{cursor: "pointer"}} onClick={() => removeControl(index)}/>})),
         columns: [
             {name: "name", render: "Name", width: 40, editable: true},
-            {name: "distance", render: metric ? "Kilometers" : "Miles", width: 40, editable: true, editValidateFunction},
-            {name: "duration", render: "Expected Time Spent", valueTransformFunction: minSuffixFunction, width: 80, editable: true, editValidateFunction},
+            {name: "distance", render: metric ? "Kilometers" : "Miles", width: 40, editable: true, editValidateFunction: stringIsOnlyNumeric},
+            {name: "duration", render: "Expected Time Spent", valueTransformFunction: minSuffixFunction, width: 80, editable: true, editValidateFunction: stringIsOnlyNumeric},
             {name: "arrival", render: "Estimated Arrival Time", width: 80},
             {name: "delete", render: "Delete", width: 60}
         ]

@@ -4,6 +4,7 @@ import {Label, Input, FormGroup, UncontrolledTooltip} from 'reactstrap';
 import {connect} from 'react-redux';
 import {setRwgpsRoute} from "../../redux/actions";
 import cookie from 'react-cookies';
+import { stringIsOnlyNumeric } from '../../utils/util';
 
 export const getRouteNumberFromValue = (value) => {
     if (value !== '' && value !== null) {
@@ -53,7 +54,9 @@ const RideWithGpsId = ({setRwgpsRoute,loadingSource,loadingSuccess,rwgpsRoute}) 
     };
 
     const settingRoute = (route) => {
-        setRwgpsRoute(route);
+        if (stringIsOnlyNumeric(route)) {
+            setRwgpsRoute(route);
+        }
     };
 
     return (
