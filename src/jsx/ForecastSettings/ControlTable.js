@@ -52,6 +52,8 @@ export const ControlTable = () => {
         return controlObject
     })
 
+    const rwgpsCellStyle = calculatedValues !== null ? {backgroundColor: "rgb(19, 124, 189)", color: "white"} : {}
+
     const tableData = {
         rows: controlsData.map(({name, distance, duration, arrival, banked, actual}, index) =>
             ({name, distance, duration, arrival, banked, actual, delete: <Icon icon="delete" style={{cursor: "pointer"}} onClick={() => removeControl(index)}/>})),
@@ -59,13 +61,13 @@ export const ControlTable = () => {
             {name: "name", render: "Name", width: 40, editable: true},
             {name: "distance", render: metric ? "Kilometers" : "Miles", width: 40, editable: true, editValidateFunction: stringIsOnlyNumeric},
             {name: "duration", render: "Expected Time Spent", valueTransformFunction: minSuffixFunction, width: 80, editable: true, editValidateFunction: stringIsOnlyNumeric},
-            {name: "arrival", render: "Estimated Arrival Time", width: 80},
+            {name: "arrival", render: "Estimated Arrival Time", width: 80, cellStyle: rwgpsCellStyle, headerStyle: rwgpsCellStyle},
             {name: "delete", render: "Delete", width: 60}
         ]
     }
     const bankedColumn = {name: "banked", render: "Banked Time", valueTransformFunction: minSuffixFunction, width: 80}
     if (displayBanked) {
-        tableData.columns.splice(4, 0, bankedColumn)
+        tableData.columns.splice(tableData.columns.length - 1, 0, bankedColumn)
     }
     const actualArrivalTimeColumn = {
         name: "actual",
@@ -75,7 +77,7 @@ export const ControlTable = () => {
         cellStyle: {backgroundColor: "rgba(234, 89, 41, 0.8)", color: "white"}
     }
     if (compare) {
-        tableData.columns.splice(5, 0, actualArrivalTimeColumn)
+        tableData.columns.splice(tableData.columns.length - 1, 0, actualArrivalTimeColumn)
     }
 
     return <Table data={tableData} onCellValueChanged={onCellValueChanged}/>

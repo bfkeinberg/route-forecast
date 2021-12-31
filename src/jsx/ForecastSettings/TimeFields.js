@@ -42,7 +42,7 @@ export const TimeFields = () => {
         <div style={{ display: "flex", alignItems: "center", justifyContent: "center", margin: "10px 0px" }}>
           <span style={{ fontSize: ".875rem", fontWeight: "bolder", flex: 1, padding: "0px 5px" }}>Projected finish time</span>
             <span style={{flex: 2.5}}>
-              <div style={{...timeFieldStyle, backgroundColor: "rgba(0, 0, 0, 0.05)", fontStyle: predictedFinishTimeExists ? "" : "oblique", color: predictedFinishTimeExists ? "" : "rgba(0, 0, 0, 0.5)"}}>
+              <div style={{...timeFieldStyle, backgroundColor: predictedFinishTimeExists ? "rgb(19, 124, 189)" : "rgba(0, 0, 0, 0.05)", fontStyle: predictedFinishTimeExists ? "" : "oblique", color: predictedFinishTimeExists ? "white" : "rgba(0, 0, 0, 0.5)"}}>
                 {displayPredictedFinishTime}
               </div>
             </span>
