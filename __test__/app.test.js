@@ -29,7 +29,6 @@ describe('<RouteWeatherUI />', () => {
     const setRouteLoadingMode=jest.fn();
     const loadFromRideWithGps=jest.fn();
     const reset=jest.fn();
-    const newUserMode=jest.fn();
     const setRwgpsRoute=jest.fn();
     const setStravaToken=jest.fn();
     const setStart=jest.fn();
@@ -50,7 +49,7 @@ describe('<RouteWeatherUI />', () => {
         const wrapper = shallow(<RouteWeatherUI action={'/forecast'} search={''} setActionUrl={setActionUrl} setApiKeys={setApiKeys} updateControls={updateControls}
                                                 formVisible={true} showForm={showForm}
                                                 setRouteLoadingMode={setRouteLoadingMode} loadFromRideWithGps={loadFromRideWithGps}
-                                                rwgpsRouteIsTrip={false} reset={reset} newUserMode={newUserMode} firstUse={false}
+                                                rwgpsRouteIsTrip={false} reset={reset}
                                                 setRwgpsRoute={setRwgpsRoute} setStravaToken={setStravaToken} setStart={setStart}
                                                 setInterval={setInterval} setPace={setPace} setMetric={setMetric} setStravaActivity={setStravaActivity}setStravaError={setStravaError}
                                                 setStartTimestamp={setStartTimestamp} setZoomToRange={setZoomToRange}

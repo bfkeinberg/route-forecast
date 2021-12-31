@@ -7,7 +7,7 @@ import {formatTemperature} from "../resultsTables/ForecastTable";
 import {setMapViewed} from "../../redux/actions";
 import { routeLoadingModes } from '../../data/enums';
 import { milesToMeters } from '../../utils/util';
-import { usePointsAndBounds } from '../../utils/hooks';
+import { useForecastDependentValues, usePointsAndBounds } from '../../utils/hooks';
 import { useSelector } from 'react-redux';
 import { useDispatch } from 'react-redux';
 
@@ -18,11 +18,12 @@ const arrow = "M16.317,32.634c-0.276,0-0.5-0.224-0.5-0.5V0.5c0-0.276,0.224-0.5,0
 const RouteForecastMap = ({google}) => {
     const userControlPoints = useSelector(state => state.controls.userControlPoints)
     const forecast = useSelector(state => state.forecast.forecast)
-    const controls = useSelector(state => state.controls.calculatedControlValues)
     const subrange = useSelector(state => state.uiInfo.routeParams.routeLoadingMode === routeLoadingModes.STRAVA ? state.strava.subrange : state.forecast.range)
     const routeLoadingMode = useSelector(state => state.uiInfo.routeParams.routeLoadingMode)
     const metric = useSelector(state => state.controls.metric)
     const zoomToRange = useSelector(state => state.forecast.zoomToRange)
+
+    const { weatherCorrectionMinutes, calculatedControlPointValues: controls, maxGustSpeed, finishTime } = useForecastDependentValues()
 
     const dispatch = useDispatch()
     useEffect(() => { dispatch(setMapViewed()) }, [])

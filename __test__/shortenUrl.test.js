@@ -54,8 +54,6 @@ describe('Call URL shortener', () => {
                 }
             },
             "routeInfo": {
-                "finishTime": "",
-                "weatherCorrectionMinutes": null,
                 "name": "",
                 "rwgpsRouteData": null,
                 "gpxRouteData": null
@@ -64,7 +62,6 @@ describe('Call URL shortener', () => {
                 "metric": false,
                 "displayBanked": false,
                 "userControlPoints": [],
-                "calculatedControlValues": [],
                 "queryString": null
             },
             "strava": {
@@ -82,7 +79,6 @@ describe('Call URL shortener', () => {
                 "range": []
             },
             "params": {
-                "newUserMode": false,
                 "action": "/forecast",
                 "maps_api_key": process.env.MAPS_KEY,
                 "timezone_api_key": process.env.TIMEZONE_API_KEY,

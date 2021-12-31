@@ -4,7 +4,7 @@ import { useSelector } from 'react-redux';
 import { removeControl as removeControlAction, updateUserControls } from '../../redux/actions';
 import { Table } from "./Table"
 import { useDispatch } from 'react-redux';
-import { useActualArrivalTimes } from '../../utils/hooks';
+import { useActualArrivalTimes, useForecastDependentValues } from '../../utils/hooks';
 
 const minSuffixFunction = value => `${value} min`
 
@@ -30,7 +30,8 @@ export const ControlTable = () => {
     const compare = stravaActivityData !== null
     const metric = useSelector(state => state.controls.metric)
     const controls = useSelector(state => state.controls.userControlPoints)
-    const calculatedValues = useSelector(state => state.controls.calculatedControlValues)
+
+    const { weatherCorrectionMinutes, calculatedControlPointValues: calculatedValues, maxGustSpeed, finishTime } = useForecastDependentValues()
 
     const actualArrivalTimes = useActualArrivalTimes()
     const dispatch = useDispatch()
@@ -42,7 +43,10 @@ export const ControlTable = () => {
     }
 
     const controlsData = controls.map((control, index) => {
-        const controlObject = {...control, ...calculatedValues[index]}
+        const controlObject = {...control}
+        if (calculatedValues !== null) {
+            Object.assign(controlObject, calculatedValues[index])
+        }
         if (actualArrivalTimes !== null) {
             controlObject.actual = actualArrivalTimes[index].time
         }

@@ -55,8 +55,6 @@ describe('load route from Ride with GPS', () => {
                 }
             },
             "routeInfo": {
-                "finishTime": "",
-                "weatherCorrectionMinutes": null,
                 "name": "",
                 "rwgpsRouteData": null,
                 "gpxRouteData": null
@@ -65,7 +63,6 @@ describe('load route from Ride with GPS', () => {
                 "metric": false,
                 "displayBanked": false,
                 "userControlPoints": [],
-                "calculatedControlValues": [],
                 "queryString": null
             },
             "strava": {
@@ -83,7 +80,6 @@ describe('load route from Ride with GPS', () => {
                 "range": []
             },
             "params": {
-                "newUserMode": false,
                 "action": "/forecast",
                 "maps_api_key": "AIzaSyDLmXz6JFen9Y9ZfwFcuJWdrRmq-kBjnKs",
                 "timezone_api_key": "AIzaSyBS_wyxfIuLDEJWNOKs4w1NqbmwSDjLqCE"

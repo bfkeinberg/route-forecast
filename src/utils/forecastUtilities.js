@@ -1,6 +1,5 @@
 import * as Sentry from '@sentry/browser';
 import { getRouteInfo } from '../utils/util';
-import gpxParser from './gpxParser';
 
 const findTimezoneForPoint = (lat, lon, time, maps_api_key, abortSignal) => {
     return fetch(`https://maps.googleapis.com/maps/api/timezone/json?location=${lat},${lon}&timestamp=${time.toSeconds()}&key=${maps_api_key}`, {signal: abortSignal}).then( response => {
@@ -65,23 +64,6 @@ const doForecastShitFetch = async (path, formData, abortSignal) => {
   }
 }
 
-const getForecastDependentValues = (state, parsedRouteInfo, forecast, timeZoneId) => {
-
-  const { forecastRequest, points, values, finishTime, timeInHours} = parsedRouteInfo
-
-  return gpxParser.adjustForWind(
-      forecast,
-      points,
-      state.uiInfo.routeParams.pace,
-      state.controls.userControlPoints,
-      values,
-      state.uiInfo.routeParams.start,
-      state.controls.metric,
-      finishTime,
-      timeZoneId
-  );
-}
-
 export const doForecastShit = async (state, abortSignal) => {
   const type = state.routeInfo.rwgpsRouteData !== null ? "rwgps" : "gpx"
   const {result, value, error} = await getTimeZoneId(state.routeInfo, state.uiInfo.routeParams.start, state.params.timezone_api_key, type, abortSignal)
@@ -102,10 +84,7 @@ export const doForecastShit = async (state, abortSignal) => {
 
   const forecastResults = await doForecastShitFetch(state.params.action, formdata, abortSignal)
   if (forecastResults.result === "success") {
-      const forecastDependentValues = getForecastDependentValues(state, parsedRouteInfo, forecastResults.value.forecast, timeZoneId)
-      const { time: weatherCorrectionMinutes, values: calculatedValues, gustSpeed, finishTime } = forecastDependentValues
-      const weatherCorrection = { weatherCorrectionMinutes, finishTime, gustSpeed }
-      return { result: "success", value: { forecast: forecastResults.value, weatherCorrection, calculatedValues } }
+      return { result: "success", value: { forecast: forecastResults.value, timeZoneId } }
   } else {
       if (forecastResults.error === "The user aborted a request.") {
         return { result: "canceled"}

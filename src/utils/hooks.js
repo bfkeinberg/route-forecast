@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react"
 import { useSelector } from "react-redux"
 import stravaRouteParser from "./stravaRouteParser"
-import { milesToMeters } from "./util"
+import { getRouteInfo, milesToMeters } from "./util"
 import gpxParser from "./gpxParser"
 import { routeLoadingModes } from "../data/enums"
 
@@ -140,4 +140,32 @@ const usePointsAndBounds = () => {
   return pointsAndBounds
 }
 
-export { useValueHasChanged, useActualPace, useActualFinishTime, useActualArrivalTimes, usePrevious, useFormatSpeed, usePointsAndBounds, useDelay, useReusableDelay, usePreviousPersistent }
+const useForecastDependentValues = () => {
+
+  const routeInfo = useSelector(state => state.routeInfo)
+  const routeParams = useSelector(state => state.uiInfo.routeParams)
+  const controls = useSelector(state => state.controls)
+  const timeZoneId = useSelector(state => state.forecast.timeZoneId)
+  const forecast = useSelector(state => state.forecast.forecast)
+
+  const stateStuff = {routeInfo, uiInfo: {routeParams}, controls}
+
+  const { forecastRequest, points, values, finishTime, timeInHours} = getRouteInfo(stateStuff, routeInfo.rwgpsRouteData !== null ? "rwgps" : "gpx", timeZoneId)
+
+  const  { time, values: calculatedControlPointValues, gustSpeed, finishTime: adjustedFinishTime } = forecast.length > 0 ? gpxParser.adjustForWind(
+      forecast,
+      points,
+      routeParams.pace,
+      controls.userControlPoints,
+      values,
+      routeParams.start,
+      controls.metric,
+      finishTime,
+      timeZoneId
+  ) :
+  {time: null, values: null, gustSpeed: null, finishTime: null}
+
+  return { weatherCorrectionMinutes: time, calculatedControlPointValues: calculatedControlPointValues, maxGustSpeed: gustSpeed, finishTime: adjustedFinishTime}
+}
+
+export { useValueHasChanged, useActualPace, useActualFinishTime, useActualArrivalTimes, usePrevious, useFormatSpeed, usePointsAndBounds, useDelay, useReusableDelay, usePreviousPersistent, useForecastDependentValues }

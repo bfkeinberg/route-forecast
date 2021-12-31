@@ -153,12 +153,9 @@ loadingSource:null,fetchingForecast:false,fetchingRoute:false, cancelActiveFetch
     }
 };
 const routeInfo = function(state = {
-    finishTime: '',
-    weatherCorrectionMinutes: null,
     name: '',
     rwgpsRouteData: null,
     gpxRouteData: null,
-    maxGustSpeed:0,
     loadingFromURL: false
     }, action) {
     switch (action.type) {
@@ -170,10 +167,7 @@ const routeInfo = function(state = {
             return {...state,rwgpsRouteData:null,gpxRouteData:null,name:''};
         // clear when the route is changed
         case Actions.SET_RWGPS_ROUTE:
-            return {...state,rwgpsRouteData:null,gpxRouteData:null,name:'',
-                maxGustSpeed: 0};
-        case Actions.ADD_WEATHER_CORRECTION:
-            return {...state,weatherCorrectionMinutes:action.weatherCorrectionMinutes,finishTime:action.finishTime,maxGustSpeed:action.maxGustSpeed};
+            return {...state,rwgpsRouteData:null,gpxRouteData:null,name:''};
         case Actions.SET_LOADING_FROM_URL:
             return {...state, loadingFromURL: action.loading};
         default:
@@ -185,7 +179,6 @@ export const controls = function (state = {
     metric: false,
     displayBanked: false,
     userControlPoints: [],
-    calculatedControlValues: [],
     queryString: null,
     showWeatherProvider: false,
     displayControlTableUI: false,
@@ -203,20 +196,11 @@ export const controls = function (state = {
             return {...state, displayBanked: !state.displayBanked};
         case Actions.UPDATE_USER_CONTROLS:
             return {...state, userControlPoints: action.controls};
-        case Actions.UPDATE_CALCULATED_VALUES:
-            return {...state, calculatedControlValues: action.values};
         case Actions.SET_QUERY:
             // here because it encodes the user entered controls
             return {...state, queryString:action.queryString};
         case Actions.CLEAR_QUERY:
             return {...state, queryString:null};
-        case Actions.NEW_USER_MODE:
-        {
-            if (action.value === false) {
-                return {...state, userControlPoints: []};
-            }
-            return state;
-        }
         case Actions.SET_SHOW_WEATHER_PROVIDER:
             return {...state, showWeatherProvider:action.showProvider};
         case Actions.SET_DISPLAY_CONTROL_TABLE_UI:
@@ -330,6 +314,7 @@ const strava = function (state = {
 
 const forecast = function(state = {
     forecast: [],
+    timeZoneId: null,
     valid: false,
     range: [],
     tableViewed: false,
@@ -339,13 +324,13 @@ const forecast = function(state = {
 }, action) {
     switch (action.type) {
         case Actions.FORECAST_FETCH_SUCCESS:
-            return {...state,forecast:action.forecastInfo.forecast,valid:true,tableViewed:false,mapViewed:false,range:[]};
+            return {...state,forecast:action.forecastInfo.forecast, timeZoneId: action.timeZoneId, valid:true,tableViewed:false,mapViewed:false,range:[]};
         case Actions.SET_RWGPS_ROUTE:
             return {...state,valid:false,tableViewed:false,mapViewed:false,range:[],forecast:[]};
         case Actions.GPX_ROUTE_LOADING_SUCCESS:
             return {...state,valid:false};
         case Actions.INVALIDATE_FORECAST:
-            return { ...state, valid: false, forecast: [], range: [] };
+            return { ...state, valid: false, forecast: [], timeZoneId: null, range: [] };
         case Actions.GPX_ROUTE_LOADING_FAILURE:
             return {...state,valid:false};
         case Actions.SET_WEATHER_RANGE:
@@ -381,14 +366,12 @@ const forecast = function(state = {
     }
 };
 
-const params = function(state = {newUserMode:false}, action) {
+const params = function(state = {}, action) {
     switch (action.type) {
         case Actions.SET_ACTION_URL:
             return {...state, action: action.action};
         case Actions.SET_API_KEYS:
             return {...state, maps_api_key: action.mapsKey, timezone_api_key:action.timezoneKey, bitly_token: action.bitlyToken};
-        case Actions.NEW_USER_MODE:
-            return {...state, newUserMode:action.value};
         default:
             return state;
     }

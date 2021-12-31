@@ -13,7 +13,6 @@ import MobileUI from '../MobileUI';
 import {
     loadCookie,
     loadFromRideWithGps,
-    newUserMode,
     reset,
     saveCookie,
     setActionUrl,
@@ -41,28 +40,6 @@ import QueryString from './QueryString';
 import { routeLoadingModes } from '../../data/enums';
 import { formatControlsForUrl, parseControls } from '../../utils/util';
 
-const demoRoute = 1797453;
-const demoControls = [
-    {
-        "name": "Petaluma",
-        "distance": 43.7,
-        "duration": 20,
-        "id": 0
-    },
-    {
-        "name": "Valley Ford",
-        "distance": 62.2,
-        "duration": 20,
-        "id": 1
-    },
-    {
-        "name": "Point Reyes Station",
-        "distance": 87.8,
-        "duration": 20,
-        "id": 2
-    }
-];
-
 export class RouteWeatherUI extends Component {
     static propTypes = {
         setActionUrl:PropTypes.func.isRequired,
@@ -72,8 +49,6 @@ export class RouteWeatherUI extends Component {
         loadFromRideWithGps: PropTypes.func.isRequired,
         rwgpsRouteIsTrip: PropTypes.bool.isRequired,
         reset: PropTypes.func.isRequired,
-        firstUse: PropTypes.bool.isRequired,
-        newUserMode: PropTypes.func.isRequired,
         setRwgpsRoute: PropTypes.func.isRequired,
         setStravaToken: PropTypes.func.isRequired,
         setInitialStart: PropTypes.func.isRequired,
@@ -96,16 +71,11 @@ export class RouteWeatherUI extends Component {
     constructor(props) {
         super(props);
 
-        const newUserMode = RouteWeatherUI.isNewUserMode(props.search);
-        this.props.newUserMode(newUserMode);
         let queryParams = queryString.parse(props.search);
         RouteWeatherUI.updateFromQueryParams(this.props, queryParams);
         props.setActionUrl(props.action);
         props.setApiKeys(props.maps_api_key,props.timezone_api_key, props.bitly_token);
         RouteWeatherUI.setupRideWithGps(props);
-        if (newUserMode) {
-            RouteWeatherUI.loadCannedData(this.props);
-        }
         const zoomToRange = loadCookie('zoomToRange');
         if (zoomToRange !== undefined) {
             this.props.setZoomToRange(zoomToRange);
@@ -177,16 +147,6 @@ export class RouteWeatherUI extends Component {
         }
     }
 
-    static isNewUserMode(/*search*/) {
-        return false;
-        // return (search === '' && cookie.load('initialized') === undefined);
-    }
-
-    static loadCannedData(props) {
-        props.setRwgpsRoute(demoRoute);
-        props.updateControls(demoControls);
-    }
-
     static updateFromQueryParams(props, queryParams) {
         if (queryParams === undefined) {
             return;
@@ -240,14 +200,13 @@ export class RouteWeatherUI extends Component {
 const mapDispatchToProps = {
     setStravaToken, setActionUrl, setRwgpsRoute, setApiKeys, setStravaError, setInitialStart, setPace, setInterval, setMetric,
     setStravaActivity, updateControls:updateUserControls, setRouteLoadingMode, setStravaRefreshToken,
-    loadFromRideWithGps, reset, newUserMode, setWeatherProvider, showWeatherProvider, setRwgpsCredentials, setStartTimestamp,
+    loadFromRideWithGps, reset, setWeatherProvider, showWeatherProvider, setRwgpsCredentials, setStartTimestamp,
     setZoomToRange
 };
 
 const mapStateToProps = (state) =>
     ({
         rwgpsRouteIsTrip: state.uiInfo.routeParams.rwgpsRouteIsTrip,
-        firstUse: state.params.newUserMode
     });
 
 export default connect(mapStateToProps, mapDispatchToProps)(RouteWeatherUI);
@@ -281,26 +240,25 @@ const useSaveControlsToCookie = () => {
 
     const controlPoints = useSelector(state => state.controls.userControlPoints)
     const routeInfo = useSelector(state => state.routeInfo)
-    const firstUse = useSelector(state => state.params.newUserMode)
-  
+
     useEffect(() => {
-      if (routeInfo.name !== '') {
-        document.title = `Forecast for ${routeInfo.name}`;
-        if (!firstUse && controlPoints !== '' && controlPoints.length !== 0) {
-          saveCookie(routeInfo.name, formatControlsForUrl(controlPoints, false));
+        if (routeInfo.name !== '') {
+            document.title = `Forecast for ${routeInfo.name}`;
+            if (controlPoints !== '' && controlPoints.length !== 0) {
+                saveCookie(routeInfo.name, formatControlsForUrl(controlPoints, false));
+            }
         }
-      }
-    }, [routeInfo.name, firstUse, controlPoints])
-  }
-  
-  const useLoadRouteFromURL = (queryParams) => {
+    }, [routeInfo.name, controlPoints])
+}
+
+const useLoadRouteFromURL = (queryParams) => {
     const dispatch = useDispatch()
     useEffect(() => {
         if (queryParams.rwgpsRoute !== undefined) {
             dispatch(loadRouteFromURL())
         }
     }, [queryParams])
-  }
+}
 
 const useLoadControlPointsFromURL = (queryParams) => {
     

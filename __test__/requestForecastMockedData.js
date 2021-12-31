@@ -282,7 +282,6 @@ const routeData = require(`${dir}/__test__/routeData.json`);
 export const initialState = {
   routeInfo: { rwgpsRouteData: routeData },
   params: {
-    "newUserMode": false,
     "action": "/forecast"
   },
   forecast: {
@@ -353,7 +352,6 @@ export const initialState = {
         "id": 10
       }
     ],
-    "calculatedControlValues": [],
     "queryString": null
   },
   uiInfo: {

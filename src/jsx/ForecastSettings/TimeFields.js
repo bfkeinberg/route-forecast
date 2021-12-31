@@ -1,6 +1,6 @@
 import React from "react";
 import { useSelector } from 'react-redux';
-import { useActualFinishTime } from '../../utils/hooks';
+import { useActualFinishTime, useForecastDependentValues } from '../../utils/hooks';
 import { DateTime } from "luxon";
 import { finishTimeFormat } from "../../redux/reducer.js";
 import DateSelect from "./DateSelect";
@@ -14,8 +14,9 @@ import DateSelect from "./DateSelect";
 // };
 
 export const TimeFields = () => {
-  const predictedFinishTime = useSelector(state => state.routeInfo.finishTime)
-  const predictedFinishTimeExists = predictedFinishTime !== ""
+  const { weatherCorrectionMinutes, calculatedControlPointValues, maxGustSpeed, finishTime: predictedFinishTime } = useForecastDependentValues()
+
+  const predictedFinishTimeExists = predictedFinishTime !== null
   const actualFinishTime = useActualFinishTime()
 
   // to match datepicker displayed format

@@ -11,7 +11,7 @@ import { RouteInfoInputRWGPS } from './RouteInfoInputRWGPS';
 import { RouteInfoInputStrava } from './RouteInfoInputStrava';
 import { routeLoadingModes } from '../../data/enums';
 
-const RouteInfoForm = ({ controlPoints, errorDetails, routeInfo, firstUse, needToViewTable, routeProps, routeLoadingMode, setRouteLoadingMode }) => {
+const RouteInfoForm = ({ controlPoints, errorDetails, routeInfo, needToViewTable, routeProps, routeLoadingMode, setRouteLoadingMode }) => {
     const mode = routeLoadingMode
     const modeSwitched = (event) => {
         setRouteLoadingMode(event.target.checked ? routeLoadingModes.STRAVA : routeLoadingModes.RWGPS)
@@ -62,7 +62,6 @@ const mapStateToProps = (state) =>
         errorDetails: state.uiInfo.dialogParams.errorDetails,
         routeInfo: state.routeInfo,
         controlPoints: state.controls.userControlPoints,
-        firstUse: state.params.newUserMode,
         needToViewTable: state.forecast.valid && !state.forecast.tableViewed,
         routeLoadingMode: state.uiInfo.routeParams.routeLoadingMode
     });
@@ -75,7 +74,6 @@ RouteInfoForm.propTypes = {
     controlPoints: PropTypes.arrayOf(PropTypes.object).isRequired,
     errorDetails: PropTypes.string,
     routeInfo: PropTypes.shape({ name: PropTypes.string }),
-    firstUse: PropTypes.bool.isRequired,
     needToViewTable: PropTypes.bool.isRequired,
     routeProps: PropTypes.object,
     routeLoadingMode: PropTypes.number,

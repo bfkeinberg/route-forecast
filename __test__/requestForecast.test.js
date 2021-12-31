@@ -36,8 +36,7 @@ describe('request forecast', () => {
         
         const expectedActions = [
             { type: actions.BEGIN_FETCHING_FORECAST },
-            { type: actions.FORECAST_FETCH_SUCCESS, forecastInfo: {forecast:forecast}},
-            { type: actions.ADD_WEATHER_CORRECTION, finishTime: "Thu, Dec 30 2021 4:25PM", weatherCorrectionMinutes: 3.1912859550070225, maxGustSpeed: 12 },
+            { type: actions.FORECAST_FETCH_SUCCESS, forecastInfo: {forecast:forecast}, finishTime: "Thu, Dec 30 2021 4:25PM", weatherCorrectionMinutes: 3.1912859550070225, maxGustSpeed: 12},
             { type: actions.UPDATE_CALCULATED_VALUES, values:calculatedControls }
         ];
 

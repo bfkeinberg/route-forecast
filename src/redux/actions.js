@@ -176,14 +176,6 @@ export const updateUserControls = function(controls) {
     }
 };
 
-export const UPDATE_CALCULATED_VALUES = 'UPDATE_CALCULATED_VALUES';
-const updateCalculatedValues = function(values) {
-    return {
-        type: UPDATE_CALCULATED_VALUES,
-        values: values
-    };
-};
-
 export const loadControlsFromCookie = function(routeData) {
     return function(dispatch) {
         let routeName = getRouteName(routeData);
@@ -196,16 +188,6 @@ export const loadControlsFromCookie = function(routeData) {
     };
 };
 
-export const ADD_WEATHER_CORRECTION = 'ADD_WEATHER_CORRECTION';
-export const addWeatherCorrection = function(weatherCorrection,updatedFinishTime,maxGustSpeed) {
-    return {
-        type: ADD_WEATHER_CORRECTION,
-        weatherCorrectionMinutes: weatherCorrection,
-        finishTime:updatedFinishTime,
-        maxGustSpeed:maxGustSpeed
-    };
-};
-
 export const BEGIN_FETCHING_FORECAST = 'BEGIN_FETCHING_FORECAST';
 const beginFetchingForecast = function(abortMethod) {
     return {
@@ -215,10 +197,11 @@ const beginFetchingForecast = function(abortMethod) {
 };
 
 export const FORECAST_FETCH_SUCCESS = 'FORECAST_FETCH_SUCCESS';
-const forecastFetchSuccess = function(forecastInfo) {
+const forecastFetchSuccess = function(forecastInfo, timeZoneId) {
     return {
         type: FORECAST_FETCH_SUCCESS,
-        forecastInfo: forecastInfo
+        forecastInfo: forecastInfo,
+        timeZoneId
     }
 };
 
@@ -245,11 +228,8 @@ export const requestForecast = function() {
         dispatch(beginFetchingForecast(abortMethod));
         const { result, value, error } = await doForecastShit(getState(), fetchController.signal)
         if (result === "success") {
-            const { forecast, weatherCorrection, calculatedValues } = value
-            const { weatherCorrectionMinutes, finishTime, gustSpeed } = weatherCorrection
-            dispatch(forecastFetchSuccess(forecast));
-            dispatch(addWeatherCorrection(weatherCorrectionMinutes, finishTime, gustSpeed));
-            dispatch(updateCalculatedValues(calculatedValues));
+            const { forecast, timeZoneId } = value
+            dispatch(forecastFetchSuccess(forecast, timeZoneId));
         } else if (result === "error") {
             dispatch(forecastFetchFailure(error));
         } else {
@@ -624,9 +604,6 @@ export const toggleWeatherRange = function(start,finish) {
 
 export const RESET = 'RESET';
 export const reset = () => {return {type:RESET}};
-
-export const NEW_USER_MODE = 'NEW_USER_MODE';
-export const newUserMode = (value) => {return {type:NEW_USER_MODE,value:value}};
 
 export const SET_TABLE_VIEWED = 'SET_TABLE_VIEWED';
 export const setTableViewed = () => {return {type:SET_TABLE_VIEWED}};
