@@ -106,7 +106,7 @@ RideWithGpsId.propTypes = {
     loadingSuccess:PropTypes.bool,
     rwgpsRoute:PropTypes.oneOfType([
         PropTypes.number,
-        PropTypes.oneOf([''])
+        PropTypes.string
     ]),
 };
 

@@ -60,7 +60,7 @@ const QueryStringUpdater = ({routeNumber,start,pace,interval,metric,controls,/*s
 QueryStringUpdater.propTypes = {
     routeNumber:PropTypes.oneOfType([
         PropTypes.number,
-        PropTypes.oneOf([''])
+        PropTypes.string
     ]),
     strava_activity:PropTypes.oneOfType([
         PropTypes.number,
