@@ -1,11 +1,11 @@
 import React from 'react';
 import { Icon } from '@blueprintjs/core';
 import { useSelector } from 'react-redux';
-import { updateUserControls } from '../../redux/actions';
-import { routeLoadingModes } from '../../data/enums';
+import { removeControl as removeControlAction, updateUserControls } from '../../redux/actions';
 import { Table } from "./Table"
 import { useDispatch } from 'react-redux';
-import { useActualArrivalTimes } from '../../utils/hooks';
+import { useActualArrivalTimes, useForecastDependentValues } from '../../utils/hooks';
+import { stringIsOnlyNumeric } from '../../utils/util';
 
 const minSuffixFunction = value => `${value} min`
 
@@ -25,47 +25,59 @@ export const ControlTable = () => {
     // }
 
     const displayBanked = useSelector(state => state.controls.displayBanked)
-    const compare = useSelector(state => state.uiInfo.routeParams.routeLoadingMode === routeLoadingModes.STRAVA)
+    const stravaActivityData = useSelector(state => state.strava.activityData)
+    const compare = stravaActivityData !== null
     const metric = useSelector(state => state.controls.metric)
     const controls = useSelector(state => state.controls.userControlPoints)
-    const calculatedValues = useSelector(state => state.controls.calculatedControlValues)
+
+    const { weatherCorrectionMinutes, calculatedControlPointValues: calculatedValues, maxGustSpeed, finishTime } = useForecastDependentValues()
 
     const actualArrivalTimes = useActualArrivalTimes()
-
     const dispatch = useDispatch()
     const updateControls = controls => dispatch(updateUserControls(controls))
-    const removeControl = indexToRemove => dispatch(updateUserControls(controls.filter((control, index) => index !== indexToRemove)))
+    const removeControl = indexToRemove => dispatch(removeControlAction(indexToRemove))
 
     const onCellValueChanged = (rowIndex, field, value) => {
         updateControls(controls.map((control, index) => index === rowIndex ? {...control, [field]: value} : control))
     }
 
     const controlsData = controls.map((control, index) => {
-        const controlObject = {...control, ...calculatedValues[index]}
+        const controlObject = {...control}
+        if (calculatedValues !== null) {
+            Object.assign(controlObject, calculatedValues[index])
+        }
         if (actualArrivalTimes !== null) {
             controlObject.actual = actualArrivalTimes[index].time
         }
         return controlObject
     })
 
+    const rwgpsCellStyle = calculatedValues !== null ? {backgroundColor: "rgb(19, 124, 189)", color: "white"} : {}
+
     const tableData = {
         rows: controlsData.map(({name, distance, duration, arrival, banked, actual}, index) =>
             ({name, distance, duration, arrival, banked, actual, delete: <Icon icon="delete" style={{cursor: "pointer"}} onClick={() => removeControl(index)}/>})),
         columns: [
             {name: "name", render: "Name", width: 40, editable: true},
-            {name: "distance", render: metric ? "Kilometers" : "Miles", width: 40, editable: true},
-            {name: "duration", render: "Expected Time Spent", valueTransformFunction: minSuffixFunction, width: 80, editable: true},
-            {name: "arrival", render: "Estimated Arrival Time", width: 80},
+            {name: "distance", render: metric ? "Kilometers" : "Miles", width: 40, editable: true, editValidateFunction: stringIsOnlyNumeric},
+            {name: "duration", render: "Expected Time Spent", valueTransformFunction: minSuffixFunction, width: 80, editable: true, editValidateFunction: stringIsOnlyNumeric},
+            {name: "arrival", render: "Estimated Arrival Time", width: 80, cellStyle: rwgpsCellStyle, headerStyle: rwgpsCellStyle},
             {name: "delete", render: "Delete", width: 60}
         ]
     }
     const bankedColumn = {name: "banked", render: "Banked Time", valueTransformFunction: minSuffixFunction, width: 80}
     if (displayBanked) {
-        tableData.columns.splice(4, 0, bankedColumn)
+        tableData.columns.splice(tableData.columns.length - 1, 0, bankedColumn)
     }
-    const actualArrivalTimeColumn = { name: "actual", render: "Actual Arrival Time", width: 80 }
+    const actualArrivalTimeColumn = {
+        name: "actual",
+        render: "Actual Arrival Time",
+        headerStyle: {backgroundColor: "rgba(234, 89, 41, 0.8)", color: "white"},
+        width: 80,
+        cellStyle: {backgroundColor: "rgba(234, 89, 41, 0.8)", color: "white"}
+    }
     if (compare) {
-        tableData.columns.splice(5, 0, actualArrivalTimeColumn)
+        tableData.columns.splice(tableData.columns.length - 1, 0, actualArrivalTimeColumn)
     }
 
     return <Table data={tableData} onCellValueChanged={onCellValueChanged}/>

@@ -1,16 +1,80 @@
 import { useEffect, useRef, useState } from "react"
 import { useSelector } from "react-redux"
 import stravaRouteParser from "./stravaRouteParser"
-import { formatControlsForUrl, milesToMeters } from "./util"
-import { saveCookie } from "../redux/actions"
+import { getRouteInfo, milesToMeters } from "./util"
 import gpxParser from "./gpxParser"
 import { routeLoadingModes } from "../data/enums"
 
-const useValueHasChanged = (value) => {
-  const [initialValue] = useState(value)
+const useDelay = (delay, startCondition = true) => {
+  const [ready, setReady] = useState(false)
+  useEffect(() => {
+    if (startCondition) {
+      setTimeout(() => {
+        setReady(true)
+      }, delay)
+    }
+  }, [delay, startCondition])
+  return ready
+}
+
+const useReusableDelay = (delay, startCondition = true) => {
+  const [ready, setReady] = useState(false)
+  const [restartedAt, setRestartedAt] = useState(null)
+  const timeout = useRef(null)
+
+  const cancel = () => {
+    if (timeout.current !== null) {
+      clearTimeout(timeout.current)
+    }
+  }
+
+  useEffect(() => {
+    if (timeout.current !== null) {
+      clearTimeout(timeout.current)
+    }
+    if (startCondition) {
+      timeout.current = setTimeout(() => {
+        setReady(true)
+        timeout.current = null
+      }, delay)
+    } else {
+      setReady(false)
+    }
+
+    return cancel
+  }, [delay, startCondition, restartedAt])
+
+  const restart = () => {
+    setReady(false)
+    setRestartedAt(Date.now())
+  }
+  return [ready, restart, cancel]
+}
+
+const useValueHasChanged = (value, startValue) => {
+  const [oldValue, setOldValue] = useState(value)
   const [hasChanged, setHasChanged] = useState(false)
-  useEffect(() => { if (initialValue !== value) setHasChanged(true) }, [value])
+  useEffect(() => {
+    if (oldValue !== value) {
+      if (startValue === oldValue || startValue === undefined) {
+        setHasChanged(true)
+      } else {
+        setOldValue(value)
+      }
+    }
+  }, [value])
   return hasChanged
+}
+
+const usePreviousPersistent = (value) => {
+  const [oldValue, setOldValue] = useState(null)
+  const [newValue, setNewValue] = useState(value)
+  useEffect(() => {
+    setOldValue(newValue)
+    setNewValue(value)
+  }, [value])
+
+  return oldValue
 }
 
 const useActualPace = () => {
@@ -46,22 +110,6 @@ const useFormatSpeed = () => {
     `${speed.toFixed(1)} mph`;
 }
 
-const useSaveControlsToCookie = () => {
-
-  const controlPoints = useSelector(state => state.controls.userControlPoints)
-  const routeInfo = useSelector(state => state.routeInfo)
-  const firstUse = useSelector(state => state.params.newUserMode)
-
-  useEffect(() => {
-    if (routeInfo.name !== '') {
-      document.title = `Forecast for ${routeInfo.name}`;
-      if (!firstUse && controlPoints !== '' && controlPoints.length !== 0) {
-        saveCookie(routeInfo.name, formatControlsForUrl(controlPoints));
-      }
-    }
-  }, [routeInfo.name, firstUse, controlPoints])
-}
-
 const usePointsAndBounds = () => {
   const rwgpsRouteData = useSelector(state => state.routeInfo.rwgpsRouteData)
   const gpxRouteData = useSelector(state => state.routeInfo.gpxRouteData)
@@ -92,5 +140,34 @@ const usePointsAndBounds = () => {
   return pointsAndBounds
 }
 
+const useForecastDependentValues = () => {
 
-export { useValueHasChanged, useActualPace, useActualFinishTime, useActualArrivalTimes, usePrevious, useFormatSpeed, useSaveControlsToCookie, usePointsAndBounds }
+  const routeInfo = useSelector(state => state.routeInfo)
+  const routeParams = useSelector(state => state.uiInfo.routeParams)
+  const controls = useSelector(state => state.controls)
+  const timeZoneId = useSelector(state => state.forecast.timeZoneId)
+  const forecast = useSelector(state => state.forecast.forecast)
+
+  const stateStuff = {routeInfo, uiInfo: {routeParams}, controls}
+
+  if (forecast.length > 0) {
+    const { forecastRequest, points, values, finishTime, timeInHours} = getRouteInfo(stateStuff, routeInfo.rwgpsRouteData !== null ? "rwgps" : "gpx", timeZoneId)
+
+    const { time, values: calculatedControlPointValues, gustSpeed, finishTime: adjustedFinishTime } = gpxParser.adjustForWind(
+        forecast,
+        points,
+        routeParams.pace,
+        controls.userControlPoints,
+        values,
+        routeParams.start,
+        controls.metric,
+        finishTime,
+        timeZoneId
+    )
+    return { weatherCorrectionMinutes: time, calculatedControlPointValues: calculatedControlPointValues, maxGustSpeed: gustSpeed, finishTime: adjustedFinishTime}
+  } else {
+    return { weatherCorrectionMinutes: null, calculatedControlPointValues: null, maxGustSpeed: null, finishTime: null }
+  }
+}
+
+export { useValueHasChanged, useActualPace, useActualFinishTime, useActualArrivalTimes, usePrevious, useFormatSpeed, usePointsAndBounds, useDelay, useReusableDelay, usePreviousPersistent, useForecastDependentValues }

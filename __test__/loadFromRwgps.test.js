@@ -27,8 +27,9 @@ describe('load route from Ride with GPS', () => {
 
         const expectedActions = [
             { type: actions.BEGIN_LOADING_ROUTE, source:"rwgps" },
-            { type: actions.RWGPS_ROUTE_LOADING_SUCCESS, routeData: routeData},
-            ];
+            { type: actions.INVALIDATE_FORECAST},
+            { type: actions.RWGPS_ROUTE_LOADING_SUCCESS, routeData: routeData}
+        ]
 
         const initialState = {
             "uiInfo": {
@@ -49,13 +50,11 @@ describe('load route from Ride with GPS', () => {
                     "shortUrl": "https://goo.gl/Cy7Var",
                     "loadingSource": "rwgps",
                     "fetchingForecast": false,
-                    "fetchingRoute": true
+                    "fetchingRoute": true,
+                    cancelActiveFetchMethod: null
                 }
             },
             "routeInfo": {
-                "finishTime": "",
-                "weatherCorrectionMinutes": null,
-                "fetchAfterLoad": true,
                 "name": "",
                 "rwgpsRouteData": null,
                 "gpxRouteData": null
@@ -64,7 +63,6 @@ describe('load route from Ride with GPS', () => {
                 "metric": false,
                 "displayBanked": false,
                 "userControlPoints": [],
-                "calculatedControlValues": [],
                 "queryString": null
             },
             "strava": {
@@ -73,7 +71,6 @@ describe('load route from Ride with GPS', () => {
                 "token": "31ca57912cae10ec928f146afb86f31a54d9ea2a",
                 "fetching": false,
                 "activityData": null,
-                "errorDetails": null,
                 "subrange": [],
                 "activityStream": null
             },
@@ -83,7 +80,6 @@ describe('load route from Ride with GPS', () => {
                 "range": []
             },
             "params": {
-                "newUserMode": false,
                 "action": "/forecast",
                 "maps_api_key": "AIzaSyDLmXz6JFen9Y9ZfwFcuJWdrRmq-kBjnKs",
                 "timezone_api_key": "AIzaSyBS_wyxfIuLDEJWNOKs4w1NqbmwSDjLqCE"

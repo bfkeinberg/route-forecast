@@ -22,9 +22,6 @@
     }
   },
   "routeInfo": {
-    "finishTime": "",
-    "weatherCorrectionMinutes": null,
-    "fetchAfterLoad": false,
     "name": "",
     "rwgpsRouteData": {
       "type": "route",
@@ -8095,7 +8092,6 @@
     "metric": false,
     "displayBanked": false,
     "userControlPoints": [],
-    "calculatedControlValues": [],
     "queryString": null
   },
   "strava": {
@@ -8104,7 +8100,6 @@
     "token": "31ca57912cae10ec928f146afb86f31a54d9ea2a",
     "fetching": false,
     "activityData": null,
-    "errorDetails": null,
     "subrange": []
   },
   "forecast": {
@@ -8113,7 +8108,6 @@
     "range": []
   },
   "params": {
-    "newUserMode": false,
     "action": "/forecast",
     "maps_api_key": "AIzaSyDLmXz6JFen9Y9ZfwFcuJWdrRmq-kBjnKs",
     "timezone_api_key": "AIzaSyBS_wyxfIuLDEJWNOKs4w1NqbmwSDjLqCE"

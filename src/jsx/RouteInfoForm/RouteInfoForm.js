@@ -11,7 +11,7 @@ import { RouteInfoInputRWGPS } from './RouteInfoInputRWGPS';
 import { RouteInfoInputStrava } from './RouteInfoInputStrava';
 import { routeLoadingModes } from '../../data/enums';
 
-const RouteInfoForm = ({ controlPoints, errorDetails, routeInfo, firstUse, needToViewTable, routeProps, routeLoadingMode, setRouteLoadingMode }) => {
+const RouteInfoForm = ({ controlPoints, errorDetails, routeInfo, needToViewTable, routeProps, routeLoadingMode, setRouteLoadingMode }) => {
     const mode = routeLoadingMode
     const modeSwitched = (event) => {
         setRouteLoadingMode(event.target.checked ? routeLoadingModes.STRAVA : routeLoadingModes.RWGPS)
@@ -27,13 +27,11 @@ const RouteInfoForm = ({ controlPoints, errorDetails, routeInfo, firstUse, needT
 
     return (
         <div style={{padding: "16px"}}>
-            <Form inline id="forecast_form">
-                <RouteLoadingModeSelector mode={mode} setMode={setRouteLoadingMode} modeSwitched={modeSwitched}/>
-                {mode === routeLoadingModes.RWGPS ?
-                    <RouteInfoInputRWGPS/> :
-                    <RouteInfoInputStrava/>}
-                {errorDetails !== null && <Alert style={{ padding: '10px' }} color="danger">{errorDetails}</Alert>}
-            </Form>
+            <RouteLoadingModeSelector mode={mode} setMode={setRouteLoadingMode} modeSwitched={modeSwitched}/>
+            {mode === routeLoadingModes.RWGPS ?
+                <RouteInfoInputRWGPS/> :
+                <RouteInfoInputStrava/>}
+            {errorDetails !== null && <Alert style={{ padding: '10px', marginTop: "10px" }} color="danger">{errorDetails}</Alert>}
             <MediaQuery maxDeviceWidth={500}>
                 <div style={{marginTop: "10px", textAlign: "center"}}>
                     <ShortUrl/>
@@ -50,7 +48,7 @@ const RouteLoadingModeSelector = ({mode, setMode, modeSwitched}) => {
                 <div style={{width: "fit-content", borderBottom: mode === routeLoadingModes.RWGPS ? "1px solid #106ba3" : "1px solid #0000"}}>Ride with GPS</div>
                 <div style={{fontSize: "10px", color: "grey", opacity: mode === routeLoadingModes.RWGPS ? 1 : 0, transition: "opacity 0.3s", marginTop: "3px", textAlign: "end"}}>Load a route from Ride with GPS, and create a weather and arrival time forecast for the ride.</div>
             </div>
-            <AlwaysFilledSwitch checked={mode === routeLoadingModes.STRAVA} onChange={modeSwitched} />
+            <AlwaysFilledSwitch tabIndex={1} checked={mode === routeLoadingModes.STRAVA} onChange={modeSwitched} />
             <div style={{flex: 1, cursor: "pointer", display: "flex", flexFlow: "column"}} onClick={() => setMode(routeLoadingModes.STRAVA)}>
                 <div style={{width: "fit-content", borderBottom: mode === routeLoadingModes.STRAVA ? "1px solid rgb(234, 89, 41)" : "1px solid #0000"}}>Strava</div>
                 <div style={{fontSize: "10px", color: "grey", opacity: mode === routeLoadingModes.STRAVA ? 1 : 0, transition: "opacity 0.3s", marginTop: "3px"}}>Load an activity from Strava, and analyze your pace over the ride.</div>
@@ -64,7 +62,6 @@ const mapStateToProps = (state) =>
         errorDetails: state.uiInfo.dialogParams.errorDetails,
         routeInfo: state.routeInfo,
         controlPoints: state.controls.userControlPoints,
-        firstUse: state.params.newUserMode,
         needToViewTable: state.forecast.valid && !state.forecast.tableViewed,
         routeLoadingMode: state.uiInfo.routeParams.routeLoadingMode
     });
@@ -77,7 +74,6 @@ RouteInfoForm.propTypes = {
     controlPoints: PropTypes.arrayOf(PropTypes.object).isRequired,
     errorDetails: PropTypes.string,
     routeInfo: PropTypes.shape({ name: PropTypes.string }),
-    firstUse: PropTypes.bool.isRequired,
     needToViewTable: PropTypes.bool.isRequired,
     routeProps: PropTypes.object,
     routeLoadingMode: PropTypes.number,

@@ -23,7 +23,6 @@ describe('<QueryString />', () => {
             "interval": 0.5,
             "metric": false,
             "rwgpsRoute": 201276,
-            "controlPoints": "",
             "strava_activity": ""
         })
     });

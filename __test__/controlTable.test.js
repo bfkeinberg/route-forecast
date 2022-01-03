@@ -6,6 +6,9 @@ import React from 'react'
 import { configure, shallow, mount } from 'enzyme'
 import Adapter from '@wojtekmaj/enzyme-adapter-react-17';
 import {ControlTable} from '../src/jsx/ForecastSettings/ControlTable';
+import configureMockStore from 'redux-mock-store';
+import { Provider } from 'react-redux';
+const mockStore = configureMockStore([]);
 // import quixote from "quixote";
 
 Object.defineProperty(window, 'matchMedia', {
@@ -24,6 +27,15 @@ Object.defineProperty(window, 'matchMedia', {
 
 configure({ adapter: new Adapter() });
 
+const initialState = {routeInfo:{}, uiInfo:{
+    "routeParams": {
+    },
+    "dialogParams": {
+    }
+}};
+
+let store = mockStore(initialState);
+
 describe('<ControlTable />', () => {
     let frame;
 /*
@@ -39,9 +51,9 @@ describe('<ControlTable />', () => {
 
 */
     it('should render the table of controls', () => {
-        const wrapper = shallow(<ControlTable displayBanked={false} compare={false} metric={false} updateControls={jest.fn()} controls={[]} calculatedValues={[]}/>);
+        const wrapper = shallow(<Provider store={store}><ControlTable displayBanked={false} compare={false} metric={false} updateControls={jest.fn()} controls={[]} calculatedValues={[]}/></Provider>);
         // let container = frame.add(wrapper.getText());
-        expect(wrapper.find('Table').length).toBe(1);
+        expect(wrapper.find('ControlTable').length).toBe(1);
     });
 });
 

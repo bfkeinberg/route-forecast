@@ -5,10 +5,13 @@ const formatOneControl = (controlPoint) => {
     return controlPoint;
   }
   return controlPoint.name + "," + controlPoint.distance + "," + controlPoint.duration;
-}
+};
 
-export const formatControlsForUrl = (controlPoints) => {
-  return controlPoints.reduce((queryParam,point) => {return formatOneControl(queryParam) + ':' + formatOneControl(point)},'');
+// TODO
+// ask wtf is up with this & parseControls()
+export const formatControlsForUrl = (controlPoints, filter) => {
+  const filteredControlPoints = filter ? controlPoints.filter(point => point.name !== '').filter(point => {return !isNaN(point.distance) && !isNaN(point.duration)}) : controlPoints
+  return filteredControlPoints.reduce((queryParam,point) => {return formatOneControl(queryParam) + ':' + formatOneControl(point)},'');
 };
 
 export const setMinMaxCoords = (trackPoint,bounds) => {
@@ -33,7 +36,43 @@ export const getRouteInfo = (state, type, timeZoneId) => {
   )
 }
 
+export const parseControls = function (controlPointString, deleteFirstElement) {
+  if (deleteFirstElement) {
+    let controlPointList = controlPointString.split(":");
+    let controlPoints =
+        controlPointList.filter(item => item.length > 0).
+            filter(point => { const values = point.split(","); return !isNaN(values[1]) && !isNaN(values[2]) }).
+            map((point, index) => {
+                let controlPointValues = point.split(",");
+                return ({ name: controlPointValues[0], distance: Number(controlPointValues[1]), duration: Number(controlPointValues[2]), id: index });
+            });
+    // delete dummy first element
+    // controlPoints.splice(0,1);
+    return controlPoints;
+  } else {
+    let controlPointList = controlPointString.split(":");
+    let controlPoints =
+        controlPointList.map((point, index) => {
+            let controlPointValues = point.split(",");
+            return ({ name: controlPointValues[0], distance: Number(controlPointValues[1]), duration: Number(controlPointValues[2]), id: index });
+        });
+    // delete dummy first element
+    controlPoints.splice(0, 1);
+    return controlPoints;
+  }
+}
+
 export const getRouteName = (route, type) => type === "rwgps" ? route[route.type].name : route.tracks[0].name;
+
+export const controlsMeaningfullyDifferent = (controls1, controls2) => {
+  return controls1.length !== controls2.length ||
+    controls1.some(
+      (control, index) => control.distance !== controls2[index].distance ||
+                          control.duration !== controls2[index].duration
+    )
+}
+
+export const stringIsOnlyNumeric = string => string.match(/^[0-9]*$/) !== null
 
 export const milesToMeters = 1609.34;
 

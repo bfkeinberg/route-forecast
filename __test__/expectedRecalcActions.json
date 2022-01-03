@@ -7588,12 +7588,6 @@
     }
   },
   {
-    "finishTime": "",
-    "maxGustSpeed": 0,
-    "type": "ADD_WEATHER_CORRECTION",
-    "weatherCorrectionMinutes": 0
-  },
-  {
     "type": "UPDATE_CALCULATED_VALUES",
     "values": []
   }

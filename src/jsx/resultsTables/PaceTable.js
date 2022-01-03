@@ -14,7 +14,12 @@ const PaceTable = ({activityData, activityStream, analysisInterval, setSubrange,
     const [selectedRow, setSelectedRow] = useState(null)
 
     const updateSubrange = (event) => {
-        setSubrange(event.currentTarget.getAttribute('start'), event.currentTarget.getAttribute('end'));
+        // TODO
+        // for inexplicable reasons, broken if a forecast is also loaded. so disabling this entirely for now
+        // setSubrange(
+        //     parseInt(event.currentTarget.getAttribute('start'), 10),
+        //     parseInt(event.currentTarget.getAttribute('end'), 10)
+        // );
     };
 
     const toggleRange = (event) => {

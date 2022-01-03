@@ -16,20 +16,15 @@ import cookie from 'react-cookies';
 import { ToggleButton } from '../shared/ToggleButton';
 import { WeatherCorrections } from './WeatherCorrections';
 import { milesToMeters } from '../../utils/util';
-import { useFormatSpeed } from '../../utils/hooks';
-
-const gustySpeed = 25;
+import { useForecastDependentValues, useFormatSpeed } from '../../utils/hooks';
 
 export class ForecastTable extends Component {
     static propTypes = {
-        weatherCorrectionMinutes:PropTypes.number,
         forecast:PropTypes.arrayOf(PropTypes.object).isRequired,
         setWeatherRange:PropTypes.func.isRequired,
         toggleWeatherRange:PropTypes.func.isRequired,
         setTableViewed:PropTypes.func.isRequired,
         metric:PropTypes.bool.isRequired,
-        gustSpeed: PropTypes.number,
-        finishTime: PropTypes.string.isRequired,
         provider: PropTypes.string.isRequired,
         toggleZoomToRange:PropTypes.func.isRequired,
         zoomToRange:PropTypes.bool.isRequired
@@ -87,14 +82,6 @@ export class ForecastTable extends Component {
 
     toggleApparentDisplay = () => this.setState({showApparentTemp:!this.state.showApparentTemp});
 
-    showTime = (index, length, time) => {
-            if (index === length-1) {
-                return DateTime.fromFormat(this.props.finishTime, finishTimeFormat).toFormat('h:mma');
-            } else {
-                return time;
-            }
-        }
-
     displayBacklink = (provider) => {
             switch (provider) {
                 case 'darksky':
@@ -121,7 +108,7 @@ export class ForecastTable extends Component {
                         end={index!==forecast.length-1?forecast[index+1].distance*milesToMeters:null}
                         className={this.state.selectedRow===parseInt(point.distance*milesToMeters)?'highlighted':null}
                         onClick={this.toggleRange} onMouseEnter={this.updateWeatherRange}>
-                        <td>{this.showTime(index, forecast.length, point.time)}</td>
+                        <td><Time time={index === forecast.length ? null : point.time}/></td>
                         <td>{metric ? ((point.distance*milesToMeters)/1000).toFixed(0) : point.distance}</td>
                         <td>{point.summary}</td>
                         <td>{this.state.showApparentTemp?
@@ -148,7 +135,6 @@ export class ForecastTable extends Component {
     render() {
         const windHeader = this.state.showGusts ? 'Wind gust' : 'Wind speed';
         const distHeader = this.props.metric ? 'KM' : 'Mile';
-        const weatherId = (this.props.gustSpeed > gustySpeed) ? 'gustyWeather' : 'weatherCorrections';
         return (
             <div className="animated slideInLeft">
                 <ErrorBoundary>
@@ -157,9 +143,7 @@ export class ForecastTable extends Component {
                             {this.displayBacklink(this.props.provider)}
                         </Col>
                         <Col>
-                            <span id={weatherId} style={{fontSize: "13px"}}>
-                                <WeatherCorrections minutesLost={this.props.weatherCorrectionMinutes}/>
-                            </span>
+                            <WeatherCorrections/>
                         </Col>
                         <Col>
                             <ToggleButton active={this.props.zoomToRange} onClick={this.toggleZoom}>Zoom to Segment</ToggleButton>
@@ -199,10 +183,8 @@ const mapStateToProps = (state) =>
     ({
         forecast: state.forecast.forecast,
         provider: state.forecast.weatherProvider,
-        weatherCorrectionMinutes: state.routeInfo.weatherCorrectionMinutes,
-        gustSpeed: state.routeInfo.maxGustSpeed,
+
         metric: state.controls.metric,
-        finishTime: state.routeInfo.finishTime,
         zoomToRange: state.forecast.zoomToRange
     });
 
@@ -219,5 +201,13 @@ const WindSpeed = ({gust, windSpeed, showGusts}) => {
         showGusts ?
             <i>{formatSpeed(parseInt(gust, 10))}</i> :
             formatSpeed(parseInt(windSpeed, 10))
+    )
+}
+
+const Time = ({time}) => {
+    const { weatherCorrectionMinutes, calculatedControlPointValues, maxGustSpeed, finishTime } = useForecastDependentValues()
+
+    return (
+        time || DateTime.fromFormat(finishTime, finishTimeFormat).toFormat('h:mma')
     )
 }

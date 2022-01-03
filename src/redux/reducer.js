@@ -14,7 +14,7 @@ const defaultAnalysisIntervalInHours = 1;
 
 const initialStartTime = function() {
     let now = DateTime.now();
-    if (now.hours > startHour) {
+    if (now.hour > startHour) {
         now = now.set({day:now.day+1, hour:startHour, minutes:0, seconds:0});
     }
     return now;
@@ -41,7 +41,7 @@ export const routeParams = function(state = {
                 };
             }
             return state;
-        case Actions.SET_START:
+        case Actions.SET_START_TIME:
             if (action.start !== undefined && action.start !== null) {
                 const start =  DateTime.fromISO(action.start);
                 if (!start.isValid) {
@@ -91,6 +91,8 @@ export const routeParams = function(state = {
         case Actions.SET_ROUTE_IS_TRIP:
             return {...state,rwgpsRouteIsTrip:action.isTrip}
         case Actions.BEGIN_FETCHING_FORECAST:
+            // TODO
+            // suspect this is vestigial
             return {...state,initialStart:state.start}
         case Actions.SET_ROUTE_LOADING_MODE:
             return {...state, routeLoadingMode: action.newMode};
@@ -100,18 +102,22 @@ export const routeParams = function(state = {
 };
 
 const dialogParams = function(state = {errorDetails:null, succeeded:true, shortUrl:' ',
-loadingSource:null,fetchingForecast:false,fetchingRoute:false}, action) {
+loadingSource:null,fetchingForecast:false,fetchingRoute:false, cancelActiveFetchMethod: null}, action) {
     switch (action.type) {
         case Actions.CLEAR_ROUTE_DATA:
             return {...state, loadingSource: null, succeeded: null};
         case Actions.BEGIN_LOADING_ROUTE:
             return {...state, fetchingRoute: true, loadingSource: action.source};
         case Actions.BEGIN_FETCHING_FORECAST:
-            return {...state, fetchingForecast: true};
+            return {...state, fetchingForecast: true, cancelActiveFetchMethod: action.abortMethod};
         case Actions.FORECAST_FETCH_SUCCESS:
-            return {...state, fetchingForecast: false, errorDetails: null};
+            return {...state, fetchingForecast: false, cancelActiveFetchMethod: null, errorDetails: null};
         case Actions.FORECAST_FETCH_FAILURE:
-            return {...state, fetchingForecast: false, errorDetails: typeof action.error === 'object' ? action.error.message : action.error};
+            return {...state, fetchingForecast: false, cancelActiveFetchMethod: null, errorDetails: typeof action.error === 'object' ? action.error.message : action.error};
+        case Actions.FORECAST_FETCH_CANCELED:
+            return {...state, fetchingForecast: false, cancelActiveFetchMethod: null}
+        case Actions.INVALIDATE_FORECAST:
+            return { ...state, cancelActiveFetchMethod: null };
         case Actions.RWGPS_ROUTE_LOADING_SUCCESS:
             return {...state, fetchingRoute: false, errorDetails: null, succeeded: true};
         case Actions.GPX_ROUTE_LOADING_SUCCESS:
@@ -131,13 +137,27 @@ loadingSource:null,fetchingForecast:false,fetchingRoute:false}, action) {
             return {...state, shortUrl: action.url};
         case Actions.SET_PINNED_ROUTES:
             return {...state, errorDetails: null};
+        case Actions.STRAVA_FETCH_SUCCESS:
+            return {...state, errorDetails: null};
+        case Actions.STRAVA_FETCH_FAILURE:
+            const errorMessage = typeof action.error === 'object' ? action.error.message : action.error
+            return {...state, errorDetails: `Error loading route from Strava: ${errorMessage}`};
+        case Actions.SET_STRAVA_ERROR:
+            if (action.error !== undefined) {
+                return { ...state, errorDetails:  `Error loading route from Strava: ${action.error}` };
+            } else {
+                return state;
+            }
         default:
             return state;
     }
 };
-const routeInfo = function(state = {finishTime:'',weatherCorrectionMinutes:null,
-    fetchAfterLoad:false,name:'',rwgpsRouteData:null,
-    gpxRouteData:null, maxGustSpeed:0}, action) {
+const routeInfo = function(state = {
+    name: '',
+    rwgpsRouteData: null,
+    gpxRouteData: null,
+    loadingFromURL: false
+    }, action) {
     switch (action.type) {
         case Actions.RWGPS_ROUTE_LOADING_SUCCESS:
             return { ...state, rwgpsRouteData: action.routeData, gpxRouteData: null, name: getRouteName(action.routeData, "rwgps") };
@@ -147,10 +167,9 @@ const routeInfo = function(state = {finishTime:'',weatherCorrectionMinutes:null,
             return {...state,rwgpsRouteData:null,gpxRouteData:null,name:''};
         // clear when the route is changed
         case Actions.SET_RWGPS_ROUTE:
-            return {...state,rwgpsRouteData:null,gpxRouteData:null,name:'',
-                maxGustSpeed: 0};
-        case Actions.ADD_WEATHER_CORRECTION:
-            return {...state,weatherCorrectionMinutes:action.weatherCorrectionMinutes,finishTime:action.finishTime,maxGustSpeed:action.maxGustSpeed};
+            return {...state,rwgpsRouteData:null,gpxRouteData:null,name:''};
+        case Actions.SET_LOADING_FROM_URL:
+            return {...state, loadingFromURL: action.loading};
         default:
             return state;
     }
@@ -160,9 +179,9 @@ export const controls = function (state = {
     metric: false,
     displayBanked: false,
     userControlPoints: [],
-    calculatedControlValues: [],
     queryString: null,
-    showWeatherProvider: false
+    showWeatherProvider: false,
+    displayControlTableUI: false,
     }, action) {
     switch (action.type) {
         case Actions.SET_METRIC:
@@ -177,24 +196,15 @@ export const controls = function (state = {
             return {...state, displayBanked: !state.displayBanked};
         case Actions.UPDATE_USER_CONTROLS:
             return {...state, userControlPoints: action.controls};
-        case Actions.UPDATE_CALCULATED_VALUES:
-            return {...state, calculatedControlValues: action.values};
-        case Actions.ADD_CONTROL:
-            return {...state, userControlPoints: [...state.userControlPoints, { name: "", distance: 0, duration: 0 }] };
         case Actions.SET_QUERY:
             // here because it encodes the user entered controls
             return {...state, queryString:action.queryString};
         case Actions.CLEAR_QUERY:
             return {...state, queryString:null};
-        case Actions.NEW_USER_MODE:
-        {
-            if (action.value === false) {
-                return {...state, userControlPoints: []};
-            }
-            return state;
-        }
         case Actions.SET_SHOW_WEATHER_PROVIDER:
             return {...state, showWeatherProvider:action.showProvider};
+        case Actions.SET_DISPLAY_CONTROL_TABLE_UI:
+            return {...state, displayControlTableUI:action.displayControlTableUI};
         default:
             return state;
     }
@@ -233,7 +243,6 @@ const strava = function (state = {
         fetching: false,
         activityData: null,
         activityStream: null,
-        errorDetails: null,
         subrange:[]
     }, action) {
     let setNewActivity = function () {
@@ -275,21 +284,16 @@ const strava = function (state = {
         case Actions.SET_STRAVA_ACTIVITY: {
             return setNewActivity();
         }
-        case Actions.SET_STRAVA_ERROR:
-            if (action.error !== undefined) {
-                return {...state, errorDetails:action.error};
-            } else {return state;}
         case Actions.BEGIN_STRAVA_FETCH:
             return {...state, fetching:true};
         case Actions.STRAVA_FETCH_SUCCESS:
-            return {...state, fetching: false, errorDetails: null, activityData: action.data.activity, activityStream: action.data.stream};
+            return {...state, fetching: false, activityData: action.data.activity, activityStream: action.data.stream};
         case Actions.STRAVA_FETCH_FAILURE:
             const errorMessage = typeof action.error === 'object' ? action.error.message : action.error
-            return {...state, fetching: false, errorDetails: errorMessage, access_token: errorMessage === "Authorization Error" ? null : state.access_token};
+            return {...state, fetching: false, access_token: errorMessage === "Authorization Error" ? null : state.access_token};
         case Actions.SET_ANALYSIS_INTERVAL:
             return {...state, analysisInterval:parseInt(action.interval),subrange:[]};
         case Actions.SUBRANGE_MAP:
-            console.log(action)
             return {...state,subrange:
                 [
                     parseFloat(action.start),
@@ -308,17 +312,25 @@ const strava = function (state = {
     }
 };
 
-const forecast = function(state = {forecast:[],valid:false,range:[], tableViewed:false, mapViewed:false,
-    weatherProvider:'darksky', zoomToRange:true}, action) {
+const forecast = function(state = {
+    forecast: [],
+    timeZoneId: null,
+    valid: false,
+    range: [],
+    tableViewed: false,
+    mapViewed: false,
+    weatherProvider: 'darksky',
+    zoomToRange: true
+}, action) {
     switch (action.type) {
         case Actions.FORECAST_FETCH_SUCCESS:
-            return {...state,forecast:action.forecastInfo.forecast,valid:true,tableViewed:false,mapViewed:false,range:[]};
+            return {...state,forecast:action.forecastInfo.forecast, timeZoneId: action.timeZoneId, valid:true,tableViewed:false,mapViewed:false,range:[]};
         case Actions.SET_RWGPS_ROUTE:
             return {...state,valid:false,tableViewed:false,mapViewed:false,range:[],forecast:[]};
         case Actions.GPX_ROUTE_LOADING_SUCCESS:
             return {...state,valid:false};
         case Actions.INVALIDATE_FORECAST:
-            return {...state,valid:false, forecast:[]};
+            return { ...state, valid: false, forecast: [], timeZoneId: null, range: [] };
         case Actions.GPX_ROUTE_LOADING_FAILURE:
             return {...state,valid:false};
         case Actions.SET_WEATHER_RANGE:
@@ -354,14 +366,12 @@ const forecast = function(state = {forecast:[],valid:false,range:[], tableViewed
     }
 };
 
-const params = function(state = {newUserMode:false}, action) {
+const params = function(state = {}, action) {
     switch (action.type) {
         case Actions.SET_ACTION_URL:
             return {...state, action: action.action};
         case Actions.SET_API_KEYS:
             return {...state, maps_api_key: action.mapsKey, timezone_api_key:action.timezoneKey, bitly_token: action.bitlyToken};
-        case Actions.NEW_USER_MODE:
-            return {...state, newUserMode:action.value};
         default:
             return state;
     }

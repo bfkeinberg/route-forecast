@@ -1,9 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {Label, Input, FormGroup, UncontrolledTooltip} from 'reactstrap';
+import {Label, Input, FormGroup} from 'reactstrap';
 import {connect} from 'react-redux';
-import {setRwgpsRoute, newUserMode} from "../../redux/actions";
-import cookie from 'react-cookies';
+import {setRwgpsRoute} from "../../redux/actions";
 
 export const getRouteNumberFromValue = (value) => {
     if (value !== '' && value !== null) {
@@ -29,7 +28,7 @@ export const decideValidationStateFor = (type, methodUsed, loadingSuccess) => {
     }
 }
 
-const RideWithGpsId = ({setRwgpsRoute,loadingSource,loadingSuccess,rwgpsRoute,newUserMode,firstUse}) => {
+const RideWithGpsId = ({setRwgpsRoute,loadingSource,loadingSuccess,rwgpsRoute}) => {
     const handleRwgpsRoute = function(value) {
         let route = getRouteNumberFromValue(value);
         if (route !== '') {
@@ -54,15 +53,13 @@ const RideWithGpsId = ({setRwgpsRoute,loadingSource,loadingSuccess,rwgpsRoute,ne
 
     const settingRoute = (route) => {
         setRwgpsRoute(route);
-        cookie.save('initialized', true);
-        newUserMode(false);
     };
 
     return (
         <FormGroup inline>
             <Label for='rwgps_route' size='sm' tag='b'>Route ID</Label>
-            <Input id={'rwgps_route'} className={firstUse?'ridewithgps_init':''}
-                   autoFocus tabIndex='5' type="text"
+            <Input id={'rwgps_route'}
+                   autoFocus tabIndex='2' type="text"
                    {...decideValidationStateFor('rwgps',loadingSource,loadingSuccess)}
                  onBlur={event => {handleRwgpsRoute(event.target.value)}}
                  onKeyPress={isNumberKey}
@@ -109,10 +106,8 @@ RideWithGpsId.propTypes = {
     loadingSuccess:PropTypes.bool,
     rwgpsRoute:PropTypes.oneOfType([
         PropTypes.number,
-        PropTypes.oneOf([''])
+        PropTypes.string
     ]),
-    firstUse:PropTypes.bool.isRequired,
-    newUserMode:PropTypes.func.isRequired
 };
 
 const mapStateToProps = (state) =>
@@ -120,11 +115,10 @@ const mapStateToProps = (state) =>
         loadingSource: state.uiInfo.dialogParams.loadingSource,
         loadingSuccess: state.uiInfo.dialogParams.succeeded,
         rwgpsRoute:state.uiInfo.routeParams.rwgpsRoute,
-        firstUse: state.params.newUserMode
     });
 
 const mapDispatchToProps = {
-    setRwgpsRoute,newUserMode
+    setRwgpsRoute
 };
 
 export default connect(mapStateToProps,mapDispatchToProps)(RideWithGpsId);

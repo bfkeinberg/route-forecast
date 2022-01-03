@@ -33,7 +33,8 @@ const ridingPaceState = {
             "shortUrl": "https://goo.gl/oNtVgM",
             "loadingSource": "rwgps",
             "fetchingForecast": false,
-            "fetchingRoute": false
+            "fetchingRoute": false,
+            cancelActiveFetchMethod: null
         }
     },
     "strava": {

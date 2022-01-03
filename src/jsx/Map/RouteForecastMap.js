@@ -7,7 +7,7 @@ import {formatTemperature} from "../resultsTables/ForecastTable";
 import {setMapViewed} from "../../redux/actions";
 import { routeLoadingModes } from '../../data/enums';
 import { milesToMeters } from '../../utils/util';
-import { usePointsAndBounds } from '../../utils/hooks';
+import { useForecastDependentValues, usePointsAndBounds } from '../../utils/hooks';
 import { useSelector } from 'react-redux';
 import { useDispatch } from 'react-redux';
 
@@ -18,11 +18,12 @@ const arrow = "M16.317,32.634c-0.276,0-0.5-0.224-0.5-0.5V0.5c0-0.276,0.224-0.5,0
 const RouteForecastMap = ({google}) => {
     const userControlPoints = useSelector(state => state.controls.userControlPoints)
     const forecast = useSelector(state => state.forecast.forecast)
-    const controls = useSelector(state => state.controls.calculatedControlValues)
     const subrange = useSelector(state => state.uiInfo.routeParams.routeLoadingMode === routeLoadingModes.STRAVA ? state.strava.subrange : state.forecast.range)
     const routeLoadingMode = useSelector(state => state.uiInfo.routeParams.routeLoadingMode)
     const metric = useSelector(state => state.controls.metric)
     const zoomToRange = useSelector(state => state.forecast.zoomToRange)
+
+    const { weatherCorrectionMinutes, calculatedControlPointValues: controls, maxGustSpeed, finishTime } = useForecastDependentValues()
 
     const dispatch = useDispatch()
     useEffect(() => { dispatch(setMapViewed()) }, [])
@@ -39,31 +40,15 @@ const RouteForecastMap = ({google}) => {
         infoVisible = true;
     }
 
-    const getHighlight = (points,subrange) => {
-        if (subrange.length !== 2) {
-            return null;
-        }
-        const highlightPoints = points.filter(point => point.dist >= subrange[0] &&
-            (isNaN(subrange[1]) || point.dist <= subrange[1]));
-        return <Polyline path={highlightPoints} strokeColor={'#67ff99'} strokeOpacity={0.9} strokeWeight={3}/>;
-    }
-
     const { points, bounds } = usePointsAndBounds()
 
     const mapBounds = bounds !== null ? getMapBounds(points, bounds, zoomToRange, subrange) : null;
     const mapCenter = (mapBounds !== null && mapBounds !== undefined) ? mapBounds.getCenter() : null;
     const initialCenter = (mapCenter === null || mapCenter === undefined) ? undefined : mapCenter.toJSON()
 
-    // console.log(zoomToRange)
-    // console.log(mapBounds)
-    // console.log(mapCenter)
-    // console.log(initialCenter)
-
-    // console.log(subrange)
-
     return (
         <ErrorBoundary>
-            <div id="map" style={{ 'height': '95%' }}>
+            <div id="map" style={{height: "calc(100vh - 50px)", position: "relative"}}>
                 {(forecast.length > 0 || routeLoadingMode === routeLoadingModes.STRAVA) && bounds !== null ?
                     <Map
                         google={google}
@@ -74,9 +59,8 @@ const RouteForecastMap = ({google}) => {
                         onReady={(mapProps, map) => { map.fitBounds(mapBounds) }}
                     >
                         <Polyline path={points} strokeColor={'#ff0000'} strokeWeight={2} strokeOpacity={1.0} />
-                        {/* <MapHighlight points={points} subrange={subrange}/> */}
-                        {getHighlight(points, subrange)}
-                        <MapMarkers forecast={forecast} controls={controls} controlNames={controlNames} subrange={subrange} metric={metric}/>
+                        <MapHighlight points={points} subrange={subrange}/>
+                        {controls !== null && <MapMarkers forecast={forecast} controls={controls} controlNames={controlNames} subrange={subrange} metric={metric}/>}
                         <InfoWindow position={infoPosition} visible={infoVisible}>
                             <div>{infoContents}</div>
                         </InfoWindow>
@@ -92,7 +76,7 @@ const cvtDistance = (distance, metric) => {
     return (metric ? ((distance * milesToMeters)/1000).toFixed(0) : distance);
 };
 
-const MapMarkers = ({forecast, controls, controlNames, subrange, metric}) => {
+const MapMarkers = ({forecast, controls, controlNames, subrange, metric, map, google, mapCenter}) => {
     // marker title now contains both temperature and mileage
     return (forecast.map((point) =>
         <RainIcon
@@ -102,6 +86,7 @@ const MapMarkers = ({forecast, controls, controlNames, subrange, metric}) => {
             title={`${point.fullTime}\n${formatTemperature(point.temp, metric)}`}
             isRainy={point.rainy}
             key={`${point.lat}${point.lon}${cvtDistance(point.distance, metric)}rain`}
+            map={map} google={google} mapCenter={mapCenter}
         />))
         .concat(
             forecast.map((point) =>
@@ -113,6 +98,7 @@ const MapMarkers = ({forecast, controls, controlNames, subrange, metric}) => {
                     windSpeed={point.windSpeed}
                     subrange={subrange}
                     key={`${point.lat}${point.lon}${cvtDistance(point.distance, metric)}temp`}
+                    map={map} google={google} mapCenter={mapCenter}
                 />
             )
         ).concat(
@@ -124,12 +110,13 @@ const MapMarkers = ({forecast, controls, controlNames, subrange, metric}) => {
                         longitude={control.lon}
                         value={controlNames[index]}
                         key={`${control.lat}${control.lon}${controlNames[index]}${index}control`}
+                        map={map} google={google} mapCenter={mapCenter}
                     />
                 )
         )
 }
 
-const RainIcon = ({latitude, longitude, value, title, isRainy}) => {
+const RainIcon = ({latitude, longitude, value, title, isRainy, map, google, mapCenter}) => {
     const markerIcon = {
         url: rainCloud,
         size: new google.maps.Size(320, 320),
@@ -138,7 +125,7 @@ const RainIcon = ({latitude, longitude, value, title, isRainy}) => {
         anchor: new google.maps.Point(-15, -15)
     };
     if (isRainy) {
-        return <Marker position={{ lat: latitude, lng: longitude }} label={value.toString()} icon={markerIcon} title={title} />;
+        return <Marker position={{ lat: latitude, lng: longitude }} label={value.toString()} icon={markerIcon} title={title} map={map} google={google} mapCenter={mapCenter} />;
     }
     return null;
 }
@@ -151,7 +138,7 @@ const pickArrowColor = (distance, subrange) => {
     return (distanceInMeters >= subrange[0] && distanceInMeters <= subrange[1]) ? 'deeppink' : 'blue';
 }
 
-const TempMarker = ({latitude, longitude, value, title, bearing, windSpeed, subrange}) => {
+const TempMarker = ({latitude, longitude, value, title, bearing, windSpeed, subrange, map, google, mapCenter}) => {
     // Add the marker at the specified location
     if (parseInt(windSpeed) > 3) {
         const flippedBearing = (bearing > 180) ? bearing - 180 : bearing + 180;
@@ -173,11 +160,11 @@ const TempMarker = ({latitude, longitude, value, title, bearing, windSpeed, subr
         />
     }
     else {
-        return <Marker position={{ lat: latitude, lng: longitude }} label={value.toString()} title={title} />
+        return <Marker position={{ lat: latitude, lng: longitude }} label={value.toString()} title={title} map={map} google={google} mapCenter={mapCenter} />
     }
 }
 
-const ControlMarker = ({latitude, longitude, value = ''}) => {
+const ControlMarker = ({latitude, longitude, value = '', map, google, mapCenter}) => {
     const controlIcon = {
         url: circus_tent,
         size: new google.maps.Size(225, 225),
@@ -185,17 +172,16 @@ const ControlMarker = ({latitude, longitude, value = ''}) => {
         labelOrigin: new google.maps.Point(22, 15),
         anchor: new google.maps.Point(0, 0)
     };
-    return <Marker position={{ lat: latitude, lng: longitude }} title={value} icon={controlIcon} />;
+    return <Marker position={{ lat: latitude, lng: longitude }} title={value} icon={controlIcon} map={map} google={google} mapCenter={mapCenter} />;
 }
 
-const MapHighlight = ({points, subrange}) => {
-    console.log(points, subrange)
+const MapHighlight = ({points, subrange, map, google, mapCenter}) => {
     if (subrange.length !== 2) {
         return null;
     }
     const highlightPoints = points.filter(point => point.dist >= subrange[0] &&
         (isNaN(subrange[1]) || point.dist <= subrange[1]));
-    return <Polyline path={highlightPoints} strokeColor={'#67ff99'} strokeOpacity={0.9} strokeWeight={3}/>;
+    return <Polyline path={highlightPoints} strokeColor={'#67ff99'} strokeOpacity={0.9} strokeWeight={3} map={map} google={google} mapCenter={mapCenter}/>;
 }
 
 const getMapBounds = (points, bounds, zoomToRange, subrange) => {

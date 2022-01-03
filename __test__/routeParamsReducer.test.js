@@ -6,7 +6,7 @@ import React from 'react'
 import { configure } from 'enzyme'
 import Adapter from '@wojtekmaj/enzyme-adapter-react-17';
 import {routeParams} from '../src/redux/reducer.js';
-import {SET_START} from '../src/redux/actions';
+import {SET_START_TIME} from '../src/redux/actions';
 import { DateTime } from 'luxon';
 import { routeLoadingModes } from '../src/data/enums.js';
 
@@ -26,7 +26,7 @@ describe('route params reducer', () => {
         );
     });
 
-    it('should handle SET_START', () => {
+    it('should handle SET_START_TIME', () => {
         const routeParamsState = {
             "interval": 0.5,
             "pace": "C",
@@ -39,7 +39,7 @@ describe('route params reducer', () => {
         };
         expect(routeParams( routeParamsState,
             {
-                type:SET_START,
+                type:SET_START_TIME,
                 start:DateTime.fromISO('2018-08-01T15:00:00.000Z')
         })).toEqual(
             {
@@ -55,7 +55,7 @@ describe('route params reducer', () => {
         )
     });
 
-    it('SET_START with bad data', () => {
+    it('SET_START_TIME with bad data', () => {
         const routeParamsState = {
             "interval": 0.5,
             "pace": "C",
@@ -67,7 +67,7 @@ describe('route params reducer', () => {
         };
         expect(routeParams( routeParamsState,
             {
-                type:SET_START,
+                type:SET_START_TIME,
                 start:'Invalid date'
         })).toEqual(
             {

@@ -1,6 +1,6 @@
 import React from "react";
 import { useSelector } from 'react-redux';
-import { useActualFinishTime } from '../../utils/hooks';
+import { useActualFinishTime, useForecastDependentValues } from '../../utils/hooks';
 import { DateTime } from "luxon";
 import { finishTimeFormat } from "../../redux/reducer.js";
 import DateSelect from "./DateSelect";
@@ -14,20 +14,25 @@ import DateSelect from "./DateSelect";
 // };
 
 export const TimeFields = () => {
-  let predictedFinishTime = useSelector(state => state.routeInfo.finishTime)
+  const { weatherCorrectionMinutes, calculatedControlPointValues, maxGustSpeed, finishTime: predictedFinishTime } = useForecastDependentValues()
+
+  const predictedFinishTimeExists = predictedFinishTime !== null
   const actualFinishTime = useActualFinishTime()
 
   // to match datepicker displayed format
   const newDateFormat = 'MMMM dd, yyyy h:mm a';
-  predictedFinishTime = DateTime.fromFormat(predictedFinishTime, finishTimeFormat).toFormat(newDateFormat)
+  const displayPredictedFinishTime = predictedFinishTimeExists ?
+    DateTime.fromFormat(predictedFinishTime, finishTimeFormat).toFormat(newDateFormat) :
+    "Find forecast to create"
 
   const timeFieldStyle = {
     width: "240px",
     fontSize: "16px",
     border: "1px solid #00000050",
-    padding: "5px 13px",
+    padding: "5px 0px",
     borderRadius: "3px",
-    whiteSpace: "nowrap"
+    whiteSpace: "nowrap",
+    textAlign: "center"
   }
 
   return (
@@ -37,8 +42,8 @@ export const TimeFields = () => {
         <div style={{ display: "flex", alignItems: "center", justifyContent: "center", margin: "10px 0px" }}>
           <span style={{ fontSize: ".875rem", fontWeight: "bolder", flex: 1, padding: "0px 5px" }}>Projected finish time</span>
             <span style={{flex: 2.5}}>
-              <div style={{...timeFieldStyle, backgroundColor: "rgba(0, 0, 0, 0.05)",}}>
-                {predictedFinishTime}
+              <div style={{...timeFieldStyle, backgroundColor: predictedFinishTimeExists ? "rgb(19, 124, 189)" : "rgba(0, 0, 0, 0.05)", fontStyle: predictedFinishTimeExists ? "" : "oblique", color: predictedFinishTimeExists ? "white" : "rgba(0, 0, 0, 0.5)"}}>
+                {displayPredictedFinishTime}
               </div>
             </span>
         </div>
@@ -46,7 +51,7 @@ export const TimeFields = () => {
           <div style={{ display: "flex", alignItems: "center", justifyContent: "center", margin: "10px 0px" }}>
             <span style={{ fontSize: ".875rem", fontWeight: "bolder", flex: 1, padding: "0px 5px" }}>Actual finish time</span>
             <span style={{flex: 2.5}}>
-              <div style={{...timeFieldStyle, backgroundColor: "rgb(234, 89, 41)", color: "white"}}>
+              <div style={{...timeFieldStyle, backgroundColor: "rgba(234, 89, 41, 0.8)", color: "white"}}>
                 {actualFinishTime}
               </div>
             </span>

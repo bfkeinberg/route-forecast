@@ -8,6 +8,10 @@
   animation: slide-in 1.5s ease-out forwards;
 }
 
+.top-bar-item.animated-exit {
+  animation: slide-in 1.5s ease-in-out forwards reverse;
+}
+
 @keyframes slide-in {
   0% {
     opacity: 0;
