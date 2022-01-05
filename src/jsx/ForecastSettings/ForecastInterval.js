@@ -1,17 +1,24 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {Label, Input, FormGroup, UncontrolledTooltip} from 'reactstrap';
+import { FormGroup } from "@blueprintjs/core";
+import { Tooltip2 } from "@blueprintjs/popover2";
+import {Slider} from "@blueprintjs/core";
 import {connect} from 'react-redux';
 import {setInterval} from "../../redux/actions";
 
 const ForecastInterval = ({interval,setInterval}) => {
     return (
-        <FormGroup style={{flex: 1}}>
-            <UncontrolledTooltip target='interval' placement='bottom'>How often to generate weather forecast, in hours</UncontrolledTooltip>
-            <Label for='interval' size='sm' tag='b'>Forecast Frequency</Label>
-            <Input size="5" bsSize='xsm' id='interval' tabIndex='2' type="number"
-                   min={0.5} max={2} step={0.5} name="interval"
-                 value={interval} onChange={event => {setInterval(event.target.value)}}/>
+        <FormGroup style={{flex: 1}} label='Forecast Interval'>
+            <Tooltip2 usePortal={true} placement='bottom' content='How often to generate weather forecast, in hours'>
+                <Slider
+                    initialValue={interval}
+                    labelPrecision={1}
+                    labelStepSize={0.5}
+                    min={0.5}
+                    max={2.0}
+                    labelRenderer={value=>`${value*30} minutes`}
+                    onRelease={selected => {setInterval(selected)}}/>
+            </Tooltip2>
         </FormGroup>
     );
 };

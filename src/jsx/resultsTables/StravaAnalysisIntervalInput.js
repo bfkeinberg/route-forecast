@@ -18,6 +18,7 @@ const StravaAnalysisIntervalInput = ({ interval, setInterval }) => {
                 onChange={event => { setInterval(event.target.value); }}
                 style={{cursor: "pointer"}}
             >
+                <option value="0.5">Half hour</option>
                 <option value="1">1 hour</option>
                 <option value="2">2 hours</option>
                 <option value="4">4 hours</option>

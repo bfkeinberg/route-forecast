@@ -30,6 +30,8 @@ export const ForecastSettings = () => {
                 </div>
                 <div style={{ display: "flex", margin: "30px 0px" }}>
                     <ForecastInterval />
+                </div>
+                <div style={{ display: "flex", margin: "30px 0px" }}>
                     <ForecastButton />
                 </div>
                 {showProvider && (
