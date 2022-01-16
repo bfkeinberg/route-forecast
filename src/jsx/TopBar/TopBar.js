@@ -6,8 +6,10 @@ import ShortUrl from "./ShortUrl";
 import "./TopBar.css"
 import { usePreviousPersistent, useReusableDelay, useValueHasChanged } from "../../utils/hooks";
 import { useLoadingFromURLStatus } from "../DesktopUI";
+import { useMediaQuery } from "react-responsive";
 
 export const TopBar = ({sidePaneOptions, activeSidePane, setActiveSidePane, sidebarWidth, panesVisible}) => {
+  const smallScreen = useMediaQuery({ query: '(max-width: 800px)' })
   return (
     <div style={{display: "flex"}}>
       <Tabs 
@@ -23,7 +25,7 @@ export const TopBar = ({sidePaneOptions, activeSidePane, setActiveSidePane, side
           <ShortUrl/>
           <DonationRequest wacky/>
           <div style={{margin: "0px 10px", flexShrink: 0}}><BugReportButton/></div>
-          <NonexistentLogo/>
+          {!smallScreen && <NonexistentLogo/>}
         </div>
       </div>
     </div>
@@ -67,7 +69,6 @@ const NonexistentLogo = () => {
       <span style={{fontSize: "30px"}}>
         Randoplan
       </span>
-      <span style={{fontSize: "6px"}}>(pretend this is a logo)</span>
     </div>
   )
 }
