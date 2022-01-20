@@ -9,15 +9,17 @@ import {setInterval} from "../../redux/actions";
 const ForecastInterval = ({interval,setInterval}) => {
     return (
         <FormGroup style={{flex: 1}} label='Forecast Interval'>
-            <Tooltip2 usePortal={true} placement='bottom' content='How often to generate weather forecast, in hours'>
+            <Tooltip2 usePortal={true} placement='bottom' content='How often to generate weather forecast'>
                 <Slider
-                    initialValue={interval}
+                    value={interval}
                     labelPrecision={1}
                     labelStepSize={0.5}
+                    stepSize={0.05}
                     min={0.5}
                     max={2.0}
-                    labelRenderer={value=>`${value*30} minutes`}
-                    onRelease={selected => {setInterval(selected)}}/>
+                    labelRenderer={value=>`${(value*60).toFixed()} minutes`}
+                    intent="primary"
+                    onRelease={selected => setInterval(selected)}/>
             </Tooltip2>
         </FormGroup>
     );
