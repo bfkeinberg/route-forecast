@@ -1,7 +1,6 @@
 import React from "react";
 import DonationRequest from "./DonationRequest";
 import BugReportButton from "./BugReportButton";
-import PaceExplanation from "./PaceExplanation";
 import ShortUrl from "./ShortUrl";
 import "./TopBar.css"
 import { usePreviousPersistent, useReusableDelay, useValueHasChanged } from "../../utils/hooks";
@@ -20,7 +19,6 @@ export const TopBar = ({sidePaneOptions, activeSidePane, setActiveSidePane, side
         panesVisible={panesVisible}
       />
       <div style={{display: "flex", flexGrow: 1, alignItems: "center", padding: "0px 20px", borderWidth: "0px 0px 0px 1px", borderStyle: "solid", borderColor: "grey"}}>
-        <PaceExplanation/>
         <div style={{flexGrow: 1, display: "flex", justifyContent: "flex-end", alignItems: "center"}}>
           <ShortUrl/>
           <DonationRequest wacky/>

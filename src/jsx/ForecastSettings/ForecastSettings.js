@@ -38,7 +38,7 @@ export const ForecastSettings = () => {
                     <WeatherProviderSelector />
                 )}
             </div>
-            <ToggleButton icon={"chevron-down"} active={showControlPoints} onClick={() => setShowControlPoints(!showControlPoints)}>Add Control Points</ToggleButton>
+            <ToggleButton icon={"chevron-down"} active={showControlPoints} onClick={() => setShowControlPoints(!showControlPoints)}>Add Stops</ToggleButton>
             {showControlPoints && <ControlTableContainer/>}
         </div>
     );
