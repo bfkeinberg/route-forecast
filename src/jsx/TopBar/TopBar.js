@@ -8,7 +8,7 @@ import { useLoadingFromURLStatus } from "../DesktopUI";
 import { useMediaQuery } from "react-responsive";
 
 export const TopBar = ({sidePaneOptions, activeSidePane, setActiveSidePane, sidebarWidth, panesVisible}) => {
-  const smallScreen = useMediaQuery({ query: '(max-width: 800px)' })
+  const smallScreen = useMediaQuery({ query: '(max-width: 900px)' })
   return (
     <div style={{display: "flex"}}>
       <Tabs 

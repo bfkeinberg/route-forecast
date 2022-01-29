@@ -57,7 +57,7 @@ export default function configureStore(preloadedState,mode) {
     const store = createStore(
         rootReducer,
         preloadedState,
-        applyMiddleware(...selectMiddleware(mode))
+        applyMiddleware(...selectMiddleware(mode, true))
     );
 
     return store;

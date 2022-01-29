@@ -170,4 +170,14 @@ const useForecastDependentValues = () => {
   }
 }
 
-export { useValueHasChanged, useActualPace, useActualFinishTime, useActualArrivalTimes, usePrevious, useFormatSpeed, usePointsAndBounds, useDelay, useReusableDelay, usePreviousPersistent, useForecastDependentValues }
+const useWhenChanged = (value, callback) => {
+  const previousValue = usePrevious(value)
+  const valueChanged = previousValue !== undefined && previousValue !== value && value !== null
+  useEffect(() => {
+      if (valueChanged) {
+          callback()
+      }
+  }, [value])
+}
+
+export { useValueHasChanged, useActualPace, useActualFinishTime, useActualArrivalTimes, usePrevious, useFormatSpeed, usePointsAndBounds, useDelay, useReusableDelay, usePreviousPersistent, useForecastDependentValues, useWhenChanged }

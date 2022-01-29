@@ -8,7 +8,7 @@ import { ForecastSettings } from "./ForecastSettings/ForecastSettings";
 import { TopBar } from "./TopBar/TopBar";
 import PaceTable from "./resultsTables/PaceTable";
 import { useSelector } from "react-redux";
-import { useDelay, usePrevious, useValueHasChanged } from "../utils/hooks";
+import { useDelay, usePrevious, useValueHasChanged, useWhenChanged } from "../utils/hooks";
 import { TransitionWrapper } from "./shared/TransitionWrapper";
 import { TitleScreen } from "./TitleScreen";
 import { routeLoadingModes } from "../data/enums";
@@ -43,31 +43,9 @@ const DesktopUI = ({mapsApiKey}) => {
         panesVisible.add("Pace Analysis")
     }
 
-    // these three are a bit repetitive, could probably abstract somehow
-    // however, i am lazy
-    const previousRouteData = usePrevious(routeData)
-    const newRouteData = previousRouteData !== routeData && routeData !== null
-    useEffect(() => {
-        if (newRouteData) {
-            setActiveSidePane(sidePaneOptions.findIndex(option => option.title === "Forecast Settings"))
-        }
-    }, [newRouteData])
-
-    const previousForecastData = usePrevious(forecastData)
-    const newForecastData = previousForecastData !== forecastData && forecastData.length > 0
-    useEffect(() => {
-        if (newForecastData) {
-            setActiveSidePane(sidePaneOptions.findIndex(option => option.title === "Forecast"))
-        }
-    }, [newForecastData])
-
-    const previousStravaActivityData = usePrevious(stravaActivityData)
-    const newStravaActivityData = previousStravaActivityData !== stravaActivityData && stravaActivityData !== null
-    useEffect(() => {
-        if (newStravaActivityData) {
-            setActiveSidePane(sidePaneOptions.findIndex(option => option.title === "Pace Analysis"))
-        }
-    }, [newStravaActivityData])
+    useWhenChanged(routeData, () => setActiveSidePane(sidePaneOptions.findIndex(option => option.title === "Forecast Settings")))
+    useWhenChanged(forecastData, () => setActiveSidePane(sidePaneOptions.findIndex(option => option.title === "Forecast")))
+    useWhenChanged(stravaActivityData, () => setActiveSidePane(sidePaneOptions.findIndex(option => option.title === "Pace Analysis")))
 
     const routeLoadingMode = useSelector(state => state.uiInfo.routeParams.routeLoadingMode)
     const mapDataExists = (routeLoadingMode === routeLoadingModes.RWGPS) ? (forecastData.length > 0) : stravaActivityData !== null
