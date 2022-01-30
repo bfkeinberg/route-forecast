@@ -44,7 +44,7 @@ const MobileUITabs = (props) => {
     const stravaActivityData = useSelector(state => state.strava.activityData)
     const forecastData = useSelector(state => state.forecast.forecast)
     useWhenChanged(routeData, () => history.replace("/controlPoints"))
-    useWhenChanged(forecastData, () => history.replace("/forecastTable"))
+    useWhenChanged(forecastData, () => history.replace("/forecastTable"), forecastData.length > 0)
     useWhenChanged(stravaActivityData, () => history.replace("/paceTable"))
     return (
         <>
