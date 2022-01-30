@@ -44,7 +44,7 @@ const DesktopUI = ({mapsApiKey}) => {
     }
 
     useWhenChanged(routeData, () => setActiveSidePane(sidePaneOptions.findIndex(option => option.title === "Forecast Settings")))
-    useWhenChanged(forecastData, () => setActiveSidePane(sidePaneOptions.findIndex(option => option.title === "Forecast")))
+    useWhenChanged(forecastData, () => setActiveSidePane(sidePaneOptions.findIndex(option => option.title === "Forecast")), forecastData.length > 0)
     useWhenChanged(stravaActivityData, () => setActiveSidePane(sidePaneOptions.findIndex(option => option.title === "Pace Analysis")))
 
     const routeLoadingMode = useSelector(state => state.uiInfo.routeParams.routeLoadingMode)
