@@ -170,7 +170,7 @@ const useForecastDependentValues = () => {
   }
 }
 
-const useWhenChanged = (value, callback, changedCondition) => {
+const useWhenChanged = (value, callback, changedCondition = true) => {
   const previousValue = usePrevious(value)
   const valueChanged = previousValue !== undefined && previousValue !== value && value !== null && changedCondition
   useEffect(() => {
