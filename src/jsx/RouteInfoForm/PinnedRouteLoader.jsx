@@ -62,7 +62,7 @@ const setRoutes = async (rwgpsUsername, rwgpsPassword, setError, setPinnedRoutes
 }
 
 const PinnedRouteLoader = ({rwgpsUsername, rwgpsPassword, credentialsValid, setPinnedRoutes, setErrorDetails, hasRoutes,
-    loadingPinnedRoutes, setRwgpsCredentials, setLoadingPinned, setUsePinnedRoutes, usingPinnedRoutes}) => {
+    loadingPinnedRoutes, setRwgpsCredentials, setLoadingPinned, setUsePinnedRoutes, setShowPinnedRoutes, usingPinnedRoutes}) => {
 
     useEffect(() => {
         setRoutes(rwgpsUsername, rwgpsPassword, setErrorDetails, setPinnedRoutes,
@@ -79,7 +79,7 @@ const PinnedRouteLoader = ({rwgpsUsername, rwgpsPassword, credentialsValid, setP
                 loading={loadingPinnedRoutes}
                 text={usingPinnedRoutes ? "Don't use pinned routes" : "Use pinned routes"}
                 style={{fontSize: "13px"}}
-                onClick={() => setUsePinnedRoutes(!usingPinnedRoutes)}
+                onClick={() => {setUsePinnedRoutes(!usingPinnedRoutes); setShowPinnedRoutes(!usingPinnedRoutes)}}
             />
             {credentialsValid ? (
                 hasRoutes && (
