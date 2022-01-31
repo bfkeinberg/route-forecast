@@ -48,8 +48,9 @@ const getPinnedRoutes = async (rwgpsUsername, rwgpsPassword, setErrorDetails, se
     }
 }
 
-const setRoutes = async (rwgpsUsername, rwgpsPassword, setError, setPinnedRoutes, setRwgpsCredentials, setLoadingPinned) => {
-    if (rwgpsUsername ==='' || rwgpsPassword === '') {
+const setRoutes = async (rwgpsUsername, rwgpsPassword, setError, setPinnedRoutes,
+    setRwgpsCredentials, setLoadingPinned, usingPinnedRoutes, hasRoutes) => {
+    if (rwgpsUsername ==='' || rwgpsPassword === '' || !usingPinnedRoutes || hasRoutes) {
         return null;
     }
     setLoadingPinned(true);
@@ -64,8 +65,9 @@ const PinnedRouteLoader = ({rwgpsUsername, rwgpsPassword, credentialsValid, setP
     loadingPinnedRoutes, setRwgpsCredentials, setLoadingPinned, setUsePinnedRoutes, usingPinnedRoutes}) => {
 
     useEffect(() => {
-        setRoutes(rwgpsUsername, rwgpsPassword, setErrorDetails, setPinnedRoutes, setRwgpsCredentials, setLoadingPinned);
-    }, [rwgpsUsername, rwgpsPassword]);
+        setRoutes(rwgpsUsername, rwgpsPassword, setErrorDetails, setPinnedRoutes,
+            setRwgpsCredentials, setLoadingPinned, usingPinnedRoutes, hasRoutes);
+    }, [rwgpsUsername, rwgpsPassword, usingPinnedRoutes]);
 
     return (
         <>
