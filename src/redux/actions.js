@@ -643,3 +643,8 @@ export const SET_ZOOM_TO_RANGE = 'SET_ZOOM_TO_RANGE';
 export const setZoomToRange = (value) => {
         return {type:SET_ZOOM_TO_RANGE, zoom:value};
 }
+
+export const SET_USE_PINNED_ROUTES = 'SET_USE_PINNED_ROUTES'
+export const setUsePinnedRoutes = (value) => {
+    return {type:SET_USE_PINNED_ROUTES, value:value};
+}

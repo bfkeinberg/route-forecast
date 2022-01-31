@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 import RideWithGpsCreds from './RideWithGpsCreds.jsx';
 import axios from 'axios';
-import {setPinnedRoutes, setErrorDetails, setRwgpsCredentials, setLoadingPinned} from "../../redux/actions";
+import {setPinnedRoutes, setErrorDetails, setRwgpsCredentials, setLoadingPinned, setUsePinnedRoutes} from "../../redux/actions";
 import cookie from 'react-cookies';
 import {lazy} from '@loadable/component';
 import { Button } from '@blueprintjs/core';
@@ -61,7 +61,7 @@ const setRoutes = async (rwgpsUsername, rwgpsPassword, setError, setPinnedRoutes
 }
 
 const PinnedRouteLoader = ({rwgpsUsername, rwgpsPassword, credentialsValid, setPinnedRoutes, setErrorDetails, hasRoutes,
-    loadingPinnedRoutes, setRwgpsCredentials, setLoadingPinned, showPinnedRoutes, setShowPinnedRoutes}) => {
+    loadingPinnedRoutes, setRwgpsCredentials, setLoadingPinned, setUsePinnedRoutes, usingPinnedRoutes}) => {
 
     useEffect(() => {
         setRoutes(rwgpsUsername, rwgpsPassword, setErrorDetails, setPinnedRoutes, setRwgpsCredentials, setLoadingPinned);
@@ -71,13 +71,13 @@ const PinnedRouteLoader = ({rwgpsUsername, rwgpsPassword, credentialsValid, setP
         <>
             <Button intent="primary"
                 small={true}
-                outlined={showPinnedRoutes}
-                active={showPinnedRoutes}
+                outlined={usingPinnedRoutes}
+                active={usingPinnedRoutes}
                 icon="star"
                 loading={loadingPinnedRoutes}
-                text={showPinnedRoutes ? "Don't use pinned routes" : "Use pinned routes"}
+                text={usingPinnedRoutes ? "Don't use pinned routes" : "Use pinned routes"}
                 style={{fontSize: "13px"}}
-                onClick={() => setShowPinnedRoutes(!showPinnedRoutes)}
+                onClick={() => setUsePinnedRoutes(!usingPinnedRoutes)}
             />
             {credentialsValid ? (
                 hasRoutes && (
@@ -86,7 +86,7 @@ const PinnedRouteLoader = ({rwgpsUsername, rwgpsPassword, credentialsValid, setP
                     </Suspense>
                 )
             ) : (
-                showPinnedRoutes && <RideWithGpsCreds dialogClosed={() => setShowPinnedRoutes(false)} />
+                usingPinnedRoutes && <RideWithGpsCreds dialogClosed={() => setUsePinnedRoutes(false)} />
             )}
         </>
     )
@@ -104,7 +104,9 @@ PinnedRouteLoader.propTypes = {
     loadingPinnedRoutes:PropTypes.bool.isRequired,
     setLoadingPinned:PropTypes.func.isRequired,
     showPinnedRoutes:PropTypes.bool.isRequired,
-    setShowPinnedRoutes:PropTypes.func.isRequired
+    setShowPinnedRoutes:PropTypes.func.isRequired,
+    setUsePinnedRoutes:PropTypes.func.isRequired,
+    usingPinnedRoutes:PropTypes.bool.isRequired
 };
 
 const isValid = (field) => {return (field !== undefined && field !== null && field !== '')};
@@ -115,11 +117,12 @@ const mapStateToProps = (state) =>
     rwgpsPassword:state.rideWithGpsInfo.password,
     credentialsValid:isValid(state.rideWithGpsInfo.username) && isValid(state.rideWithGpsInfo.password),
     hasRoutes:Array.isArray(state.rideWithGpsInfo.pinnedRoutes) && state.rideWithGpsInfo.pinnedRoutes.length > 0,
-    loadingPinnedRoutes:state.rideWithGpsInfo.loadingRoutes
+    loadingPinnedRoutes:state.rideWithGpsInfo.loadingRoutes,
+    usingPinnedRoutes:state.rideWithGpsInfo.usePinnedRoutes
 });
 
 const mapDispatchToProps = {
-    setPinnedRoutes, setErrorDetails, setRwgpsCredentials, setLoadingPinned
+    setPinnedRoutes, setErrorDetails, setRwgpsCredentials, setLoadingPinned, setUsePinnedRoutes
 };
 
 export default connect(mapStateToProps,mapDispatchToProps)(PinnedRouteLoader);
