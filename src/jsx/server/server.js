@@ -5,7 +5,7 @@ require('source-map-support').install();
 const expressStaticGzip = require("express-static-gzip");
 
 const path = require('path');
-const fetch = require('node-fetch');
+const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
 const bodyParser = require('body-parser');
 const multer = require('multer'); // v1.0.5
 const upload = multer({

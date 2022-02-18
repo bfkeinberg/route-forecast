@@ -1,6 +1,7 @@
 import React, {Component, useEffect} from 'react';
 import MediaQuery from 'react-responsive';
 import '@blueprintjs/core/lib/css/blueprint.css';
+import "@blueprintjs/icons/lib/css/blueprint-icons.css";
 import 'Images/style.css';
 import queryString from 'query-string';
 import PropTypes from 'prop-types';

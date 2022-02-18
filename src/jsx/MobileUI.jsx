@@ -39,13 +39,13 @@ const mapStateToProps = (state) =>
 export default connect(mapStateToProps)(MobileUI);
 
 const MobileUITabs = (props) => {
-    const history = useHistory()
+    const navigate = useNavigate()
     const routeData = useSelector(state => state.routeInfo.rwgpsRouteData)
     const stravaActivityData = useSelector(state => state.strava.activityData)
     const forecastData = useSelector(state => state.forecast.forecast)
-    useWhenChanged(routeData, () => history.replace("/controlPoints"))
-    useWhenChanged(forecastData, () => history.replace("/forecastTable"), forecastData.length > 0)
-    useWhenChanged(stravaActivityData, () => history.replace("/paceTable"))
+    useWhenChanged(routeData, () => navigate("/controlPoints", {replace:true}))
+    useWhenChanged(forecastData, () => navigate("/forecastTable", {replace:true}), forecastData.length > 0)
+    useWhenChanged(stravaActivityData, () => navigate("/paceTable", {replace:true}))
     return (
         <>
             <Nav tabs>
