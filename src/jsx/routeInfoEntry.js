@@ -167,7 +167,7 @@ class RouteInfoForm extends Component {
                                             loading={this.props.loadingPinnedRoutes}
                                             text={this.state.showPinnedRoutes?"Don't use pinned routes":"Use pinned routes"}
                                             onClick={()=>this.setState({showPinnedRoutes:!this.state.showPinnedRoutes})}/>
-                                {this.state.showPinnedRoutes?<PinnedRouteLoader/>:null}
+                                <PinnedRouteLoader showPinnedRoutes={this.state.showPinnedRoutes}/>
                                 </ErrorBoundary>
                             </Col>
                             {providerButton}

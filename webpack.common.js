@@ -58,7 +58,8 @@ module.exports = (env,argv) => {
                           {loader: "source-map-loader"}
                     ],
                     "exclude": [
-                        path.join(process.cwd(), 'node_modules/react-responsive')
+                        path.join(process.cwd(), 'node_modules/react-responsive'),
+                        path.join(process.cwd(), 'node_modules/@blueprintjs')
                     ],
                 },
                 {

@@ -33,33 +33,11 @@ import {
     setStravaRefreshToken,
     setWeatherProvider,
     showWeatherProvider,
-    setRwgpsCredentials,
     setStartTimestamp,
-    setZoomToRange
+    setZoomToRange,
+    setRwgpsToken
 } from "./actions/actions";
 import QueryString from './queryString';
-
-const demoRoute = 1797453;
-const demoControls = [
-    {
-        "name": "Petaluma",
-        "distance": 43.7,
-        "duration": 20,
-        "id": 0
-    },
-    {
-        "name": "Valley Ford",
-        "distance": 62.2,
-        "duration": 20,
-        "id": 1
-    },
-    {
-        "name": "Point Reyes Station",
-        "distance": 87.8,
-        "duration": 20,
-        "id": 2
-    }
-];
 
 export class RouteWeatherUI extends Component {
     static propTypes = {
@@ -89,7 +67,7 @@ export class RouteWeatherUI extends Component {
         maps_api_key: PropTypes.string.isRequired,
         timezone_api_key: PropTypes.string.isRequired,
         bitly_token: PropTypes.string.isRequired,
-        setRwgpsCredentials:PropTypes.func.isRequired,
+        setRwgpsToken:PropTypes.func.isRequired,
         setZoomToRange:PropTypes.func.isRequired
     };
 
@@ -104,9 +82,6 @@ export class RouteWeatherUI extends Component {
         props.setApiKeys(props.maps_api_key,props.timezone_api_key, props.bitly_token);
         RouteWeatherUI.setupRideWithGps(props);
         this.props.updateControls(queryParams.controlPoints==undefined?[]:this.parseControls(queryParams.controlPoints));
-        if (newUserMode) {
-            RouteWeatherUI.loadCannedData(this.props);
-        }
         const zoomToRange = loadCookie('zoomToRange');
         if (zoomToRange !== undefined) {
             this.props.setZoomToRange(zoomToRange);
@@ -132,30 +107,27 @@ export class RouteWeatherUI extends Component {
             try {
                 credentials = await navigator.credentials.get({password:true,mediation:"silent"});
                 if (credentials === null) {
-                    const user = loadCookie("rwgpsUsername");
-                    const password = loadCookie("rwgpsPassword");
+                    const token = loadCookie("rwgpsToken");
                     console.info('credentials retrieved from cookie');
-                    if (user !== undefined && password !== undefined) {
-                        props.setRwgpsCredentials(user,password);
+                    if (token !== undefined) {
+                        props.setRwgpsToken(token);
                     }
                 } else {
                     console.info('credentials retrieved from credential manager');
-                    props.setRwgpsCredentials(credentials.name, credentials.password);
+                    props.setRwgpsToken(credentials.password);
                 }
             } catch (err) {
                 console.info(`failed to load credentials with ${err}`);
-                const user = loadCookie("rwgpsUsername");
-                const password = loadCookie("rwgpsPassword");
-                if (user !== undefined && password !== undefined) {
-                    props.setRwgpsCredentials(user,password);
+                const token = loadCookie("rwgpsToken");
+                if (token !== undefined) {
+                    props.setRwgpsToken(token);
                 }
-            }
+        }
         } else {
-            const user = loadCookie("rwgpsUsername");
-            const password = loadCookie("rwgpsPassword");
+            const token = loadCookie("rwgpsToken");
             console.info('credentials manager not supported, retrieved from cookie');
-            if (user !== undefined && password !== undefined) {
-                props.setRwgpsCredentials(user,password);
+            if (token !== undefined) {
+                props.setRwgpsToken(token);
             }
         }
     }
@@ -190,12 +162,6 @@ export class RouteWeatherUI extends Component {
     static isNewUserMode(/*search*/) {
         return false;
         // return (search === '' && cookie.load('initialized') === undefined);
-    }
-
-    static loadCannedData(props) {
-        props.setRwgpsRoute(demoRoute);
-        props.setFetchAfterLoad(true);
-        props.updateControls(demoControls);
     }
 
     parseControls(controlPointString) {
@@ -257,6 +223,9 @@ export class RouteWeatherUI extends Component {
         if (queryParams.showProvider !== undefined) {
             props.showWeatherProvider(queryParams.showProvider==="true");
         }
+        if (queryParams.rwgpsToken !== undefined) {
+            props.setRwgpsToken(queryParams.rwgpsToken);
+        }
     }
 
     render() {
@@ -283,8 +252,8 @@ export class RouteWeatherUI extends Component {
 const mapDispatchToProps = {
     setStravaToken, setActionUrl, setRwgpsRoute, setApiKeys, setStravaError, setInitialStart, setPace, setInterval, setMetric,
     setStravaActivity, updateControls:updateUserControls, setFetchAfterLoad, toggleStravaAnalysis, setStravaRefreshToken,
-    loadFromRideWithGps, reset, newUserMode, setWeatherProvider, showWeatherProvider, setRwgpsCredentials, setStartTimestamp,
-    setZoomToRange
+    loadFromRideWithGps, reset, newUserMode, setWeatherProvider, showWeatherProvider, setStartTimestamp,
+    setZoomToRange, setRwgpsToken
 };
 
 const mapStateToProps = (state) =>
