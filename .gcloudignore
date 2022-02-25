@@ -32,4 +32,10 @@ TODOS
 *sh
 .shelf/
 __test__/
+.vscode/
+.github/
 !route-forecast-c4075d06140e.json
+.sentryclirc
+.eslintrc
+README.md
+sample_output/

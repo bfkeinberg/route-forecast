@@ -51,12 +51,13 @@ class RouteInfoForm extends Component {
         needToViewTable: PropTypes.bool.isRequired,
         showProvider: PropTypes.bool.isRequired,
         routeProps:PropTypes.object,
-        loadingPinnedRoutes:PropTypes.bool.isRequired
+        loadingPinnedRoutes:PropTypes.bool.isRequired,
+        rwgpsToken:PropTypes.string
     };
 
     constructor(props) {
         super(props);
-        this.state = {showPinnedRoutes:false};
+        this.state = {showPinnedRoutes:props.rwgpsToken !== null};
     }
 
     componentDidMount() {
@@ -222,7 +223,8 @@ const mapStateToProps = (state) =>
         routeSelected: state.uiInfo.dialogParams.loadingSource !== null,
         needToViewTable:state.forecast.valid && !state.forecast.tableViewed,
         showProvider:state.controls.showWeatherProvider,
-        loadingPinnedRoutes:state.rideWithGpsInfo.loadingRoutes
+        loadingPinnedRoutes:state.rideWithGpsInfo.loadingRoutes,
+        rwgpsToken:state.rideWithGpsInfo.token
     });
 
 const mapDispatchToProps = {
