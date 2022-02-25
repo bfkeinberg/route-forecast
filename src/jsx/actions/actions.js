@@ -842,9 +842,10 @@ export const setWeatherProvider = (weatherProvider) => {return {type:SET_WEATHER
 export const SET_SHOW_WEATHER_PROVIDER = 'SET_SHOW_WEATHER_PROVIDER';
 export const showWeatherProvider = (showProvider) => {return {type:SET_SHOW_WEATHER_PROVIDER, showProvider:showProvider}}
 
-export const SET_RWGPS_CREDENTIALS = 'SET_RWGPS_CREDENTIALS';
-export const setRwgpsCredentials = (username, password) => {
-        return {type:SET_RWGPS_CREDENTIALS, username:username, password:password}};
+export const SET_RWGPS_TOKEN = 'SET_RWGPS_TOKEN';
+export const setRwgpsToken = (token) => {
+        return {type:SET_RWGPS_TOKEN, token:token}
+};
 
 export const SET_PINNED_ROUTES = 'SET_PINNED_ROUTES';
 export const setPinnedRoutes = (pinned) => {

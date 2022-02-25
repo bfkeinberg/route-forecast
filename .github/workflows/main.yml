@@ -61,6 +61,8 @@ jobs:
           VISUAL_CROSSING_KEY: ${{ secrets.VISUAL_CROSSING_KEY }}
           PURPLE_AIR_KEY: ${{ secrets.PURPLE_AIR_KEY }}
           IQAIR_KEY: ${{ secrets.IQAIR_KEY }}
+          RWGPS_OAUTH_CLIENT_ID: ${{ secrets.RWGPS_OAUTH_CLIENT_ID }}
+          RWGPS_OAUTH_SECRET: ${{ secrets.RWGPS_OAUTH_SECRET }}
       - name: Deploy
         uses: google-github-actions/deploy-appengine@main
         with:
