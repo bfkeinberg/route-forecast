@@ -42,7 +42,7 @@ describe('<RouteWeatherUI />', () => {
     const setStravaError=jest.fn();
     const setStravaRefreshToken=jest.fn();
     const setWeatherProvider=jest.fn();
-    const setRwgpsCredentials=jest.fn();
+    const setRwgpsToken=jest.fn();
     const setStartTimestamp=jest.fn();
     const setZoomToRange=jest.fn();
 
@@ -56,7 +56,7 @@ describe('<RouteWeatherUI />', () => {
                                                 setInterval={setInterval} setPace={setPace} setMetric={setMetric} setStravaActivity={setStravaActivity}setStravaError={setStravaError}
                                                 setStartTimestamp={setStartTimestamp} setZoomToRange={setZoomToRange}
                                                 setStravaRefreshToken={setStravaRefreshToken}
-                                setInitialStart={setInitialStart} setWeatherProvider={setWeatherProvider} setRwgpsCredentials={setRwgpsCredentials}
+                                setInitialStart={setInitialStart} setWeatherProvider={setWeatherProvider} setRwgpsToken={setRwgpsToken}
                                 maps_api_key={'zzzz'} bitly_token={'ddd'} timezone_api_key={'lll'}/>);
         expect(wrapper.find(ForecastTable).length).toEqual(0);
     });

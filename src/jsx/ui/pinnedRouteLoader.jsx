@@ -62,23 +62,18 @@ const setRoutes = async (rwgpsToken, setError, setPinnedRoutes, setLoadingPinned
 }
 
 const PinnedRouteLoader = ({rwgpsToken, credentialsValid, setPinnedRoutes, setErrorDetails, hasRoutes, setLoadingPinned, showPinnedRoutes}) => {
-    
+    useEffect(() => {if (showPinnedRoutes && !rwgpsToken) {window.location.href = `/rwgpsAuthReq?state=${JSON.stringify(queryString.parse(location.search))}`}}, [showPinnedRoutes]);
     useEffect(() => {
         setRoutes(rwgpsToken, setErrorDetails, setPinnedRoutes, setLoadingPinned);
     }, [credentialsValid]);
-    if (credentialsValid) {
-        if (!hasRoutes || !showPinnedRoutes) {
-            return null;
-        } else {
-            return (
-                <Suspense fallback={<p>Loading pinned routes</p>}>
-                    <LoadableRouteList/>
-                </Suspense>
-            );
-        }
+    if (!hasRoutes || !showPinnedRoutes || !credentialsValid) {
+        return null;
     } else {
-        window.location.href = `/rwgpsAuthReq?state=${JSON.stringify(queryString.parse(location.search))}`;
-        return <div/>;
+        return (
+            <Suspense fallback={<p>Loading pinned routes</p>}>
+                <LoadableRouteList/>
+            </Suspense>
+        );
     }
 };
 
