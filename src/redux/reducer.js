@@ -306,8 +306,8 @@ const strava = function (state = {
             // TODO
             // some fancy bullshit involving auto-setting strava interval from rwgps route length.
             // restore this later
-        case Actions.SET_ROUTE_INFO:
-            return {...state, analysisInterval: getAnalysisIntervalFromRouteDuration(action.routeInfo.timeInHours)};
+        // case Actions.SET_ROUTE_INFO:
+            // return {...state, analysisInterval: getAnalysisIntervalFromRouteDuration(action.routeInfo.timeInHours)};
         default:
             return state;
     }
