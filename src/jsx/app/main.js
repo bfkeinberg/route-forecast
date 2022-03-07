@@ -99,7 +99,7 @@ export class RouteWeatherUI extends Component {
         props.setActionUrl(props.action);
         props.setApiKeys(props.maps_api_key,props.timezone_api_key, props.bitly_token);
         RouteWeatherUI.setupRideWithGps(props);
-        this.props.updateControls(queryParams.controlPoints==undefined?[]:this.parseControls(queryParams.controlPoints));
+        props.updateControls(queryParams.controlPoints==undefined?[]:parseControls(queryParams.controlPoints));
         const zoomToRange = loadCookie('zoomToRange');
         if (zoomToRange !== undefined) {
             this.props.setZoomToRange(zoomToRange);
