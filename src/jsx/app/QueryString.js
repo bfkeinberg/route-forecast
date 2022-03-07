@@ -7,11 +7,13 @@ import { formatControlsForUrl } from '../../utils/util';
 
 // this function exists to let us preserve the user's specified start time and share the url for this route
 // with someone in another time zone
-const dateToShortDate = function(date) {
+// export is ony for the test method
+export const dateToShortDate = function(date) {
     return Number.parseInt(date.toSeconds().toFixed(0));
 };
 
-const makeQuery = (routeNumber, pace,interval,metric,controls, strava_activity,
+// as above export is for benefit of test code
+export const makeQuery = (routeNumber, pace,interval,metric,controls, strava_activity,
                           provider, showProvider) => {
     const query = {
         pace, interval, metric, rwgpsRoute: routeNumber, strava_activity, provider, showProvider

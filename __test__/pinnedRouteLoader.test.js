@@ -3,27 +3,33 @@
  */
 
  import React from 'react'
- import { configure } from 'enzyme'
+ import { configure, mount } from 'enzyme'
  import Adapter from '@wojtekmaj/enzyme-adapter-react-17';
- import {saveRwgpsCredentials} from '../src/jsx/RouteInfoForm/PinnedRouteLoader';
- import { DateTime } from 'luxon';
- import PasswordCredential from '../__mocks__/PasswordCredential';
- 
- jest.mock('../__mocks__/PasswordCredential');
-
+ import PinnedRouteLoader from '../src/jsx/RouteInfoForm/PinnedRouteLoader';
  configure({ adapter: new Adapter() });
- 
- const credentials = {
-    store: jest.fn()
-  };
-  
-  global.navigator.credentials = credentials;
+ import configureMockStore from 'redux-mock-store';
+ import thunk from 'redux-thunk';
+ import { Provider } from 'react-redux';
+ import { Button } from '@blueprintjs/core';
+
+ const initialState = {
+    rideWithGpsInfo:{
+        token:"IAmAToken",
+        pinnedRoutes:[],
+        loadingRoutes:false,
+        usingPinnedRoutes:false
+    },
+
+ };
+ const middlewares = [thunk];
+ const mockStore = configureMockStore(middlewares);
+
+ let store = mockStore(initialState);
 
  describe('<PinnedRouteLoader />', () => {
-     it('save password', () => {
-         expect(saveRwgpsCredentials("user","password")).toEqual(undefined);
+     it('is rendered', () => {
+        const wrapper = mount(<Provider store={store}><PinnedRouteLoader/></Provider>);
+        expect(wrapper.find(Button).length).toBe(1);
      });
- 
+
  });
- 
- 
