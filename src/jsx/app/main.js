@@ -274,12 +274,9 @@ const FunAppWrapperThingForHooksUsability = ({maps_api_key, queryParams}) => {
             <LocationContext.Consumer>
                 {value => <QueryString href={value.href} origin={value.origin} />}
             </LocationContext.Consumer>
-            {/*TODO: values is needed for SSR, but messes up real device detection, seemingly*/}
-            {/*<MediaQuery minDeviceWidth={1000} values={{deviceWidth:1400}}>*/}
             <MediaQuery minWidth={501}>
                 <DesktopUI mapsApiKey={maps_api_key} />
             </MediaQuery>
-            {/*<MediaQuery maxDeviceWidth={800} values={{deviceWidth:1400}}>*/}
             <MediaQuery maxWidth={500}>
                 <MobileUI mapsApiKey={maps_api_key} />
             </MediaQuery>

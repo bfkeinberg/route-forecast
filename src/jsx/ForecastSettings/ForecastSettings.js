@@ -33,7 +33,7 @@ export const ForecastSettings = () => {
                 </div>
                 <div style={{ display: "flex", margin: "30px 0px" }}>
                     <LocationContext.Consumer>
-                        <ForecastButton />
+                        {value => <ForecastButton href={value.href} origin={value.origin} />}
                     </LocationContext.Consumer>
             </div>
                 {showProvider && (
