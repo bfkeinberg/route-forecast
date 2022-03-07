@@ -5,7 +5,7 @@
 import React from 'react'
 import { configure } from 'enzyme'
 import Adapter from '@wojtekmaj/enzyme-adapter-react-17';
-import {getRouteNumberFromValue} from '../src/jsx/routeInfoEntry';
+import { getRouteNumberFromValue } from '../src/jsx/RouteInfoForm/RideWithGpsId';
 
 configure({ adapter: new Adapter() });
 

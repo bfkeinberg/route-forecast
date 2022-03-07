@@ -1,9 +1,7 @@
 const moment = require('moment-timezone');
-const fetch = require('node-fetch');
+const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
 
 //
-//
-// const fetch = require('node-fetch');
 //
 /* eslint-disable max-params*/
 

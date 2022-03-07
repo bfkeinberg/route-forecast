@@ -1,0 +1,29 @@
+.top-bar-item {
+  opacity: 1;
+  padding: 10px;
+  flex: 1;
+}
+
+.top-bar-item.animated-entry {
+  animation: slide-in 1.5s ease-out forwards;
+}
+
+.top-bar-item.animated-exit {
+  animation: slide-in 1.5s ease-in-out forwards reverse;
+}
+
+@keyframes slide-in {
+  0% {
+    opacity: 0;
+    padding: 0px;
+    flex: 0;
+  }
+  20% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+    padding: 10px;
+    flex: 1;
+  }
+}

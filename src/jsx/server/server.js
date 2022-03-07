@@ -5,7 +5,7 @@ require('source-map-support').install();
 const expressStaticGzip = require("express-static-gzip");
 
 const path = require('path');
-const fetch = require('node-fetch');
+const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
 const bodyParser = require('body-parser');
 const multer = require('multer'); // v1.0.5
 const upload = multer({
@@ -191,7 +191,7 @@ app.get('/get_redirects', cors(), async (req, res) => {
         .end();
 });
 
-app.use(async (req, res, next) => {
+app.use((req, res, next) => {
     // Switch to randoplan.com
     var host = req.hostname;
     // const originalHost = req.header('host');
@@ -223,9 +223,9 @@ app.get('/rwgps_route', (req, res) => {
     }
 
     const rwgpsUrl = `https://ridewithgps.com/${routeType}/${routeNumber}.json?apikey=${rwgpsApiKey}&version=2`;
-    fetch(rwgpsUrl).then(fetchResult => { if (!fetchResult.ok) { throw Error(fetchResult.status) } return fetchResult.text() })
-        .then(body => { if (!isValidRouteResult(body, routeType)) { res.status(401).send(body) } else { res.status(200).send(body) } })
-        .catch(err => { res.status(err.message).json({ 'status': JSON.stringify(err) }) });
+    fetch(rwgpsUrl).then(fetchResult => {if (!fetchResult.ok) {throw Error(fetchResult.status)} return fetchResult.text()})
+        .then(body => {if (!isValidRouteResult(body, routeType)) {res.status(401).send(body)} else {res.status(200).send(body)}})
+        .catch(err => {res.status(err.message).json({ 'status': JSON.stringify(err) })});
 });
 
 app.post('/forecast', upload.none(), async (req, res) => {
@@ -262,6 +262,8 @@ app.post('/forecast', upload.none(), async (req, res) => {
             const result = await callWeatherService(service, point.lat, point.lon, point.time, point.distance, zone, point.bearing).catch(error => {
                 throw error;
             });
+            // we explicitly do not want to parallelize to avoid swamping the servers we are calling and being throttled
+            // eslint-disable-next-line no-await-in-loop
             result.aqi = await getPurpleAirAQI(point.lat, point.lon);
             results.push(result);
         }
@@ -336,7 +338,7 @@ const getStravaAuthUrl = (baseUrl, state) => {
 const getStravaToken = (code) => {
     process.env.STRAVA_ACCESS_TOKEN = 'fake';
     return new Promise((resolve, reject) => {
-        strava.oauth.getToken(code, (err, payload) => { if (err !== null) { reject(err.msg) } else { resolve(payload) } });
+        strava.oauth.getToken(code, (err, payload) => {if (err !== null) {reject(err.msg)} else {resolve(payload)}});
     });
 };
 
@@ -353,7 +355,7 @@ const insertFeatureRecord = (record, featureName, user) => {
 const randoplan_uri='https://www.randoplan.com/rwgpsAuthReply';
 // const randoplan_uri='http://localhost:8080/rwgpsAuthReply';
 
-app.get('/rwgpsAuthReq',  (req, res) => {
+app.get('/rwgpsAuthReq', (req, res) => {
     const state = req.query.state;
     if (state === undefined) {
         res.status(400).json({ 'status': 'Missing keys' });
@@ -366,7 +368,7 @@ app.get('/rwgpsAuthReq',  (req, res) => {
     res.redirect(rwgpsUrl);
 });
 
-const getRwgpsTokenFromCode = async (code, state) => {
+const getRwgpsTokenFromCode = async (code) => {
     let response = await axios.post('https://ridewithgps.com/oauth/token.json',{
         grant_type: 'authorization_code',
         code: code,
@@ -432,7 +434,7 @@ app.get('/stravaAuthReply', async (req, res) => {
     if (error === undefined) {
         process.env.STRAVA_CLIENT_SECRET = process.env.STRAVA_API_KEY;
         const token = await getStravaToken(code)
-            .catch(error => { console.log('got bad auth reply'); res.status(400).json({ 'status': `Bad Strava auth reply ${error}` }) });
+            .catch(error => {console.log('got bad auth reply');res.status(400).json({ 'status': `Bad Strava auth reply ${error}` })});
         // process.env.STRAVA_ACCESS_TOKEN = token.body.access_token;
         restoredState.strava_access_token = token.body.access_token;
         restoredState.strava_refresh_token = token.body.refresh_token;
@@ -496,10 +498,10 @@ const fetchRouteName = async (id, type) => {
         });
         if (response.data !== undefined) {
             return response.data[type].name;
-        } else {
-            console.warn(`No data returned for a pinned route - ${JSON.stringify(Object.keys(response))}`);
-            return '';
         }
+        console.warn(`No data returned for a pinned route - ${JSON.stringify(Object.keys(response))}`);
+        return '';
+
     } catch (err) {
         console.error(err);
         return '';
@@ -508,7 +510,7 @@ const fetchRouteName = async (id, type) => {
 
 const retrieveNames = (pinned) => {
     pinned.sort((el1, el2) => Number(el2.id) - Number(el1.id));
-    return pinned.map(async fav => { fav.name = await fetchRouteName(fav.associated_object_id, fav.associated_object_type); return fav });
+    return pinned.map(async fav => {fav.name = await fetchRouteName(fav.associated_object_id, fav.associated_object_type);return fav});
 };
 
 app.get('/pinned_routes', async (req, res) => {
@@ -530,10 +532,8 @@ app.get('/pinned_routes', async (req, res) => {
         res.status(500).json({ 'details': 'Missing rwgps API key' });
         return;
     }
-    let url;
-    let options = {};
     if (token === undefined) {
-        url = `https://ridewithgps.com/users/current.json?apikey=${rwgpsApiKey}&version=2&email=${req.query.username}&password=${req.query.password}`;
+        let url = `https://ridewithgps.com/users/current.json?apikey=${rwgpsApiKey}&version=2&email=${req.query.username}&password=${req.query.password}`;
         try {
             const response = await axios.get(url).catch(error => {
                 console.error(`Error fetching pinned routes for ${req.query.username} ${error.response.data.error}`);
@@ -552,8 +552,8 @@ app.get('/pinned_routes', async (req, res) => {
         }
     }
     else {
-        url = `https://ridewithgps.com/users/current.json`;
-        options = {headers:{'Authorization':`Bearer ${token}`}};
+        let url = `https://ridewithgps.com/users/current.json`;
+        let options = {headers:{'Authorization':`Bearer ${token}`}};
         try {
             const response = await axios.get(url, options).catch(error => {
                 console.error(`Error fetching pinned routes for ${req.query.username} ${error.response.data.error}`);
@@ -567,7 +567,7 @@ app.get('/pinned_routes', async (req, res) => {
                 console.warn(`Favorites error ${error}`);
                 res.status(error.response.status).json(error.response.data);
             });
-            const favorites = favoritesReply.data.results.map(fav => {return {name:fav.route.name,
+            const favorites = favoritesReply.data.results.map(fav => {return {id:fav.favid, name:fav.route.name,
                 associated_object_id:fav.route.id, associated_object_type:fav.type, key:fav.favid}});
             res.status(200).json(favorites);
         } catch (err) {

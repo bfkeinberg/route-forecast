@@ -13,7 +13,7 @@ import Flatpickr from 'react-flatpickr'
 import React from 'react'
 import { configure, shallow, mount, render } from 'enzyme'
 import Adapter from '@wojtekmaj/enzyme-adapter-react-17';
-import DateSelect, {setDateOnly} from '../src/jsx/ui/dateSelect';
+import DateSelect, { setDateOnly } from '../src/jsx/ForecastSettings/DateSelect';
 configure({ adapter: new Adapter() });
 
 const dir = process.cwd();

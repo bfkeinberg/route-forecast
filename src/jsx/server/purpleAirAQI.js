@@ -1,5 +1,5 @@
 const axios = require('axios');
-const fetch = require('node-fetch');
+const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
 
 const iqAirHandler = (lat, lon) => {
 
@@ -17,10 +17,10 @@ const iqAirHandler = (lat, lon) => {
             if (body.status === 'success') {
                 const aqi = body.data.current.pollution.aqius;
                 return aqi;
-            } else {
-                console.error(`Error, status : ${body.status}`);
-                throw Error(400);
             }
+            console.error(`Error, status : ${body.status}`);
+            throw Error(400);
+
         })
         .catch(err => {
             console.error(`NO IQAir results because of ${err}`);
@@ -37,9 +37,16 @@ const makeUrl = (lat, lon, rangeInKm) => {
     // console.info(`purpleAir url for ${lat},${lon} at ${rangeInKm}km is ${purpleAirUrl}`);
     return purpleAirUrl;
 };
-  
+
 const getPurpleAirAQI = async function (lat, lon) {
-    let ranges = [0.5, 2, 5, 10, 20, 40];
+    let ranges = [
+        0.5,
+        2,
+        5,
+        10,
+        20,
+        40
+    ];
     try {
         for (let range of ranges) {
             let purpleAirUrl = makeUrl(lat, lon, range);
@@ -64,7 +71,7 @@ const getPurpleAirAQI = async function (lat, lon) {
         console.error(`No Purple Air results for ${lat} ${lon} because : ${err}`);
     }
     console.error(`No conditions returned from Purple Air`);
-    return undefined; //iqAirHandler(lat, lon);
+    return undefined; // iqAirHandler(lat, lon);
 }
 
 const toRad = function (val) {
@@ -133,12 +140,12 @@ const usEPAfromPm = (pm, rh) => {
     return aqi;
 };
 
-function aqiFromPM(pm) {
+function aqiFromPM (pm) {
 
-    if (isNaN(pm)) { return "-"; }
-    if (pm == undefined) { return "-"; }
-    if (pm < 0) { return pm; }
-    if (pm > 1000) { return "-"; }
+    if (isNaN(pm)) {return "-";}
+    if (pm == undefined) {return "-";}
+    if (pm < 0) {return pm;}
+    if (pm > 1000) {return "-";}
 
     //
     //       Good                              0 - 50         0.0 - 15.0         0.0 – 12.0
@@ -168,10 +175,10 @@ function aqiFromPM(pm) {
 
 
 }
-function bplFromPM(pm) {
-    if (isNaN(pm)) { return 0; }
-    if (pm == undefined) { return 0; }
-    if (pm < 0) { return 0; }
+function bplFromPM (pm) {
+    if (isNaN(pm)) {return 0;}
+    if (pm == undefined) {return 0;}
+    if (pm < 0) {return 0;}
 
     //
     //       Good                              0 - 50         0.0 - 15.0         0.0 – 12.0
@@ -201,11 +208,11 @@ function bplFromPM(pm) {
 
 
 }
-function bphFromPM(pm) {
+function bphFromPM (pm) {
     // return 0;
-    if (isNaN(pm)) { return 0; }
-    if (pm == undefined) { return 0; }
-    if (pm < 0) { return 0; }
+    if (isNaN(pm)) {return 0;}
+    if (pm == undefined) {return 0;}
+    if (pm < 0) {return 0;}
 
     //
     //       Good                              0 - 50         0.0 - 15.0         0.0 – 12.0
@@ -236,7 +243,7 @@ function bphFromPM(pm) {
 
 }
 
-function calcAQI(Cp, Ih, Il, BPh, BPl) {
+function calcAQI (Cp, Ih, Il, BPh, BPl) {
 
     var a = Ih - Il;
     var b = BPh - BPl;

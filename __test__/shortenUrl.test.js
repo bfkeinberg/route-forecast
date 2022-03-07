@@ -5,8 +5,9 @@
 import configureMockStore from 'redux-mock-store';
 import thunk from 'redux-thunk';
 import fetchMock from 'fetch-mock';
-import * as actions from '../src/jsx/actions/actions';
-import {shortenUrl} from "../src/jsx/actions/actions";
+import * as actions from '../src/redux/actions';
+import {shortenUrl} from "../src/redux/actions";
+import { routeLoadingModes } from '../src/data/enums';
 require('isomorphic-fetch');
 const middlewares = [thunk];
 const mockStore = configureMockStore(middlewares);
@@ -39,7 +40,8 @@ describe('Call URL shortener', () => {
                     "rwgpsRouteIsTrip": false,
                     "start": "2018-08-04T14:00:00.000Z",
                     "loadingSource": null,
-                    "succeeded": null
+                    "succeeded": null,
+                    "routeLoadingMode": routeLoadingModes.RWGPS
                 },
                 "dialogParams": {
                     "formVisible": true,
@@ -52,13 +54,6 @@ describe('Call URL shortener', () => {
                 }
             },
             "routeInfo": {
-                "finishTime": "",
-                "initialFinishTime": "",
-                "weatherCorrectionMinutes": null,
-                "forecastRequest": null,
-                "points": [],
-                "fetchAfterLoad": true,
-                "bounds": null,
                 "name": "",
                 "rwgpsRouteData": null,
                 "gpxRouteData": null
@@ -66,12 +61,7 @@ describe('Call URL shortener', () => {
             "controls": {
                 "metric": false,
                 "displayBanked": false,
-                "stravaAnalysis": false,
                 "userControlPoints": [],
-                "calculatedControlValues": [],
-                "initialControlValues": [],
-                "count": 0,
-                "displayedFinishTime": "",
                 "queryString": null
             },
             "strava": {
@@ -80,8 +70,6 @@ describe('Call URL shortener', () => {
                 "token": "31ca57912cae10ec928f146afb86f31a54d9ea2a",
                 "fetching": false,
                 "activityData": null,
-                "calculatedPaces": null,
-                "errorDetails": null,
                 "subrange": [],
                 "activityStream": null
             },
@@ -91,7 +79,6 @@ describe('Call URL shortener', () => {
                 "range": []
             },
             "params": {
-                "newUserMode": false,
                 "action": "/forecast",
                 "maps_api_key": process.env.MAPS_KEY,
                 "timezone_api_key": process.env.TIMEZONE_API_KEY,
