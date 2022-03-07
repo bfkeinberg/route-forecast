@@ -287,7 +287,8 @@ const strava = function (state = {
         case Actions.BEGIN_STRAVA_FETCH:
             return {...state, fetching:true};
         case Actions.STRAVA_FETCH_SUCCESS:
-            return {...state, fetching: false, activityData: action.data.activity, activityStream: action.data.stream};
+            return {...state, fetching: false, activityData: action.data.activity, activityStream: action.data.stream,
+                analysisInterval:getAnalysisIntervalFromRouteDuration(action.data.activity.elapsed_time/3600)};
         case Actions.STRAVA_FETCH_FAILURE:
             const errorMessage = typeof action.error === 'object' ? action.error.message : action.error
             return {...state, fetching: false, access_token: errorMessage === "Authorization Error" ? null : state.access_token};
