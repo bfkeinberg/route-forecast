@@ -8108,8 +8108,6 @@
     "range": []
   },
   "params": {
-    "action": "/forecast",
-    "maps_api_key": "AIzaSyDLmXz6JFen9Y9ZfwFcuJWdrRmq-kBjnKs",
-    "timezone_api_key": "AIzaSyBS_wyxfIuLDEJWNOKs4w1NqbmwSDjLqCE"
+    "action": "/forecast"
   }
 }
