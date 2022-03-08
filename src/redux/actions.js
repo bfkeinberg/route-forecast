@@ -68,7 +68,7 @@ const cancelForecast = () => {
 };
 
 export const setStart = function (start, zone) {
-    return function(dispatch,getState) {
+    return function(dispatch) {
         dispatch(setStartUnthunky(start, zone))
         dispatch(cancelForecast())
     }
@@ -100,7 +100,7 @@ const setPaceUnthunky = function(pace) {
     }
 };
 export const setPace = function (pace) {
-    return function(dispatch,getState) {
+    return function(dispatch) {
         dispatch(setPaceUnthunky(pace))
         dispatch(cancelForecast())
     }
@@ -114,7 +114,7 @@ const setIntervalUnthunky = function(interval) {
     }
 };
 export const setInterval = function (interval) {
-    return async function(dispatch,getState) {
+    return function(dispatch) {
         dispatch(setIntervalUnthunky(interval))
         dispatch(cancelForecast())
     }
@@ -181,7 +181,7 @@ const updateUserControlsUnthunky = function(controls) {
     };
 };
 export const updateUserControls = function(controls) {
-    return async function(dispatch,getState) {
+    return function(dispatch,getState) {
         const different = controlsMeaningfullyDifferent(controls, getState().controls.userControlPoints)
         dispatch(updateUserControlsUnthunky(controls))
         if (different) {
@@ -280,7 +280,7 @@ export const loadRouteFromURL = () => {
     }
 }
 export const loadFromRideWithGps = function(routeNumber, isTrip) {
-    return async function(dispatch, getState) {
+    return function(dispatch, getState) {
         routeNumber = routeNumber || getState().uiInfo.routeParams.rwgpsRoute
         isTrip = isTrip || getState().uiInfo.routeParams.rwgpsRouteIsTrip
         dispatch(beginLoadingRoute('rwgps'));

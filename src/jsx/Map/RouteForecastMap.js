@@ -100,6 +100,10 @@ const RouteForecastMap = ({google}) => {
     )
 }
 
+RouteForecastMap.propTypes = {
+    google:PropTypes.object
+};
+
 const cvtDistance = (distance, metric) => {
     return (metric ? ((distance * milesToMeters)/1000).toFixed(0) : distance);
 };
@@ -159,12 +163,12 @@ const RainIcon = ({latitude, longitude, value, title, isRainy, map, google, mapC
 }
 
 RainIcon.propTypes = {
-    latitude: PropTypes.string.isRequired,
-    longitude: PropTypes.string.isRequired,
+    latitude: PropTypes.number.isRequired,
+    longitude: PropTypes.number.isRequired,
     value: PropTypes.number.isRequired,
     title: PropTypes.string.isRequired,
     isRainy: PropTypes.bool.isRequired,
-    map: PropTypes.object.isRequired,
+    map: PropTypes.object,
     google: PropTypes.object.isRequired,
     mapCenter: PropTypes.object.isRequired
 };
@@ -185,6 +189,7 @@ const TempMarker = ({latitude, longitude, value, title, bearing, windSpeed, subr
         // const anchor = new google.maps.Point(16.317-19*Math.cos((Math.PI / 180)*bearing),16.317+(25*Math.sin((Math.PI / 180)*bearing)));
         const anchor = new google.maps.Point(16.317, 16.317);
         return <Marker
+            key={latitude+longitude+Math.random().toString(10)}
             position={{ lat: latitude, lng: longitude }}
             label={value.toString()}
             icon={{
@@ -207,11 +212,11 @@ const TempMarker = ({latitude, longitude, value, title, bearing, windSpeed, subr
 TempMarker.propTypes = {
     latitude:PropTypes.number.isRequired,
     longitude:PropTypes.number.isRequired,
-    value:PropTypes.string,
+    value:PropTypes.number,
     title:PropTypes.string,
     bearing:PropTypes.number.isRequired,
     windSpeed:PropTypes.string.isRequired,
-    subrange:PropTypes.object,
+    subrange:PropTypes.arrayOf(PropTypes.number),
     map:PropTypes.object,
     google:PropTypes.object,
     mapCenter:PropTypes.object
@@ -228,6 +233,15 @@ const ControlMarker = ({latitude, longitude, value = '', map, google, mapCenter}
     return <Marker position={{ lat: latitude, lng: longitude }} title={value} icon={controlIcon} map={map} google={google} mapCenter={mapCenter} />;
 }
 
+ControlMarker.propTypes = {
+    latitude:PropTypes.number.isRequired,
+    longitude:PropTypes.number.isRequired,
+    value:PropTypes.string.isRequired,
+    map:PropTypes.object.isRequired,
+    google:PropTypes.object.isRequired,
+    mapCenter:PropTypes.object
+};
+
 const MapHighlight = ({points, subrange, map, google, mapCenter}) => {
     if (subrange.length !== 2) {
         return null;
@@ -237,6 +251,14 @@ const MapHighlight = ({points, subrange, map, google, mapCenter}) => {
     return <Polyline path={highlightPoints} strokeColor={'#67ff99'} strokeOpacity={0.9} strokeWeight={3} map={map} google={google} mapCenter={mapCenter}/>;
 }
 
+MapHighlight.propTypes = {
+    points:PropTypes.array.isRequired,
+    subrange:PropTypes.arrayOf(PropTypes.number),
+    map:PropTypes.object,
+    google:PropTypes.object,
+    mapCenter:PropTypes.object
+}
+// eslint-disable-next-line new-cap
 export default GoogleApiWrapper((props) => (
     {apiKey: props.maps_api_key}
 ))(RouteForecastMap);

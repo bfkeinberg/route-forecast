@@ -49,7 +49,8 @@ RWGPSRouteList.propTypes = {
         PropTypes.number,
         PropTypes.string
     ]),
-    setRouteIsTrip:PropTypes.func.isRequired
+    setRouteIsTrip:PropTypes.func.isRequired,
+    loadFromRideWithGps:PropTypes.func.isRequired
 };
 
 const mapStateToProps = (state) =>
