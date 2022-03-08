@@ -92,6 +92,8 @@ PaceTable.propTypes = {
     setSubrange:PropTypes.func.isRequired,
     toggleMapRange:PropTypes.func.isRequired,
     activityData:PropTypes.object,
+    activityStream:PropTypes.object,
+    analysisInterval:PropTypes.number
 };
 
 const mapStateToProps = (state) =>
