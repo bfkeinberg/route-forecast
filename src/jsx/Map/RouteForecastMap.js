@@ -173,7 +173,6 @@ RainIcon.propTypes = {
     mapCenter: PropTypes.object.isRequired
 };
 
-
 const pickArrowColor = (distance, subrange) => {
     if (subrange.length!==2) {
         return 'blue';
@@ -201,6 +200,9 @@ const TempMarker = ({latitude, longitude, value, title, bearing, windSpeed, subr
                 strokeOpacity: 0.9
             }}
             title={title}
+            map={map}
+            google={google}
+            mapCenter={mapCenter}
         />
     }
     else {
