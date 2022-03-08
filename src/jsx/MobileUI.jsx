@@ -4,7 +4,7 @@ import ForecastTable from "./resultsTables/ForecastTable";
 import MapLoader from "./Map/MapLoader";
 import PropTypes from "prop-types";
 import React from "react";
-import { Router, Route, Link, MemoryRouter, useHistory } from "react-router-dom";
+import { Router, Route, Link, MemoryRouter, useNavigate } from "react-router-dom";
 import {createMemoryHistory} from 'history';
 import {Nav, NavItem, NavbarBrand} from "reactstrap";
 import { Icon, Intent } from "@blueprintjs/core";
