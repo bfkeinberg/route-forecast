@@ -11,6 +11,6 @@ export const RouteTitle = ({style, className}) => {
 }
 
 RouteTitle.propTypes = {
-  className:PropTypes.string.isRequired,
-  style:PropTypes.object.isRequired
+  className:PropTypes.string,
+  style:PropTypes.object
 };

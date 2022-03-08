@@ -1,4 +1,5 @@
 import React, {useState, useEffect} from 'react';
+import PropTypes from 'prop-types';
 
 export const TransitionWrapper = ({diffData, children, transitionTime, transitionType, width}) => {
 
@@ -53,6 +54,10 @@ setTransitionState
   );
 }
 
+TransitionWrapper.propTypes = {
+  diffData:PropTypes.object
+};
+
 const TransitioningContent = ({children, transitionTime, transitioning, transitionType, width}) => {
   const translateOrigin = transitioning ? 0 : (transitionType === "slideRight" ? width * -1 : width)
   const translateTarget = transitioning ? width * (transitionType === "slideRight" ? 1 : -1) : 0
@@ -100,3 +105,7 @@ setInitial
     </div>
   )
 }
+
+TransitioningContent.propTypes = {
+
+};

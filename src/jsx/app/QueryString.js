@@ -28,7 +28,7 @@ export const makeQuery = (routeNumber, pace,interval,metric,controls, strava_act
 export const updateHistory = (url, query) => {
     if (typeof window !== 'undefined' && !(/HeadlessChrome/).test(window.navigator.userAgent) && query !== null) {
         let oldState = history.state;
-        if (oldState !== null && oldState.rwgpsRoute === query.rwgpsRoute) {
+        if (oldState !== undefined && oldState.rwgpsRoute === query.rwgpsRoute) {
             history.replaceState(query, 'nothing', url);
         } else {
             history.pushState(query, 'nothing', url);

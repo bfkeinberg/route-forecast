@@ -4,7 +4,7 @@ import ForecastTable from "./resultsTables/ForecastTable";
 import MapLoader from "./Map/MapLoader";
 import PropTypes from "prop-types";
 import React from "react";
-import { Router, Route, Link, MemoryRouter, useNavigate } from "react-router-dom";
+import { Route, Routes, Link, MemoryRouter, useNavigate } from "react-router-dom";
 import {createMemoryHistory} from 'history';
 import {Nav, NavItem, NavbarBrand} from "reactstrap";
 import { Icon, Intent } from "@blueprintjs/core";
@@ -80,12 +80,19 @@ const MobileUITabs = (props) => {
                     </Link>
                 </NavItem>
             </Nav>
-
-            <Route path="/" exact render={(routeProps) => <RouteInfoForm routeProps={routeProps} />} />
-            <Route path="/controlPoints/" exact component={ForecastSettings} />
-            <Route path="/map/" exact render={(routeProps) => <MapLoader maps_api_key={props.mapsApiKey} />} />
-            <Route path="/forecastTable/" exact component={ForecastTable} />
-            <Route path="/paceTable/" exact component={PaceTable} />
+            <Routes>
+                <Route path="/" element={<RouteInfoForm/>} />
+                <Route path="/controlPoints/" element={<ForecastSettings/>} />
+                <Route path="/map/" element={<MapLoader maps_api_key={props.mapsApiKey} />} />
+                <Route path="/forecastTable/" element={<ForecastTable/>} />
+                <Route path="/paceTable/" element={<PaceTable/>} />
+            </Routes>
         </>
     )
 }
+
+MobileUITabs.propTypes = {
+    mapsApiKey:PropTypes.string.isRequired,
+    needToViewTable:PropTypes.bool.isRequired,
+    needToViewMap:PropTypes.bool.isRequired
+};
