@@ -189,7 +189,6 @@ const TempMarker = ({latitude, longitude, value, title, bearing, windSpeed, subr
         // const anchor = new google.maps.Point(16.317-19*Math.cos((Math.PI / 180)*bearing),16.317+(25*Math.sin((Math.PI / 180)*bearing)));
         const anchor = new google.maps.Point(16.317, 16.317);
         return <Marker
-            key={latitude+longitude+Math.random().toString(10)}
             position={{ lat: latitude, lng: longitude }}
             label={value.toString()}
             icon={{

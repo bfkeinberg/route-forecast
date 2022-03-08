@@ -268,17 +268,6 @@ const setLoadingFromURL = (loading) => {
     };
 }
 
-export const loadRouteFromURL = () => {
-    return async function(dispatch, getState) {
-        await dispatch(setLoadingFromURL(true))
-        await dispatch(loadFromRideWithGps())
-        const error = getState().uiInfo.dialogParams.errorDetails
-        if (error === null) {
-            await dispatch(requestForecast())
-        }
-        dispatch(setLoadingFromURL(false))
-    }
-}
 export const loadFromRideWithGps = function(routeNumber, isTrip) {
     return function(dispatch, getState) {
         routeNumber = routeNumber || getState().uiInfo.routeParams.rwgpsRoute
@@ -292,6 +281,18 @@ export const loadFromRideWithGps = function(routeNumber, isTrip) {
         );
     };
 };
+
+export const loadRouteFromURL = () => {
+    return async function(dispatch, getState) {
+        await dispatch(setLoadingFromURL(true))
+        await dispatch(loadFromRideWithGps())
+        const error = getState().uiInfo.dialogParams.errorDetails
+        if (error === null) {
+            await dispatch(requestForecast())
+        }
+        dispatch(setLoadingFromURL(false))
+    }
+}
 
 export const GPX_ROUTE_LOADING_SUCCESS = 'GPX_ROUTE_LOADING_SUCCESS';
 const gpxRouteLoadingSuccess = function(result) {
