@@ -107,7 +107,7 @@ export class RouteWeatherUI extends Component {
         this.state = {};
         if (typeof window !== 'undefined') {
             window.onpopstate = (event) => {
-                if (event.state === null) {
+                if (event.state == null) {
                     this.props.reset();
                 } else {
                     // TODO
