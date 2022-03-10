@@ -45,7 +45,7 @@ const DateSelect = ({start, setStart, setInitialStart}) => {
                         altInputClass: 'dateDisplay',
                         maxDate: later,
                         defaultDate: start.toJSDate(),
-                        dateFormat: 'Y-m-d H:i',
+                        dateFormat: 'Z',
                         onParseConfig:(dates,datestr,instance) =>
                             instance.config.onClose.push((dates) =>
                                 {setStart(DateTime.fromJSDate(dates[0]))})
