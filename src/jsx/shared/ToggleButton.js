@@ -1,6 +1,7 @@
 import { Icon } from "@blueprintjs/core";
 import React from "react";
 import { Button } from "reactstrap";
+import PropTypes from 'prop-types';
 
 export const ToggleButton = ({children, active, onClick, icon = null, style = {}}) => {
 
@@ -15,3 +16,11 @@ export const ToggleButton = ({children, active, onClick, icon = null, style = {}
     </Button>
   )
 }
+
+ToggleButton.propTypes = {
+  children:PropTypes.string,
+  active:PropTypes.bool,
+  onClick:PropTypes.func,
+  icon:PropTypes.string,
+  style:PropTypes.object
+};

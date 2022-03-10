@@ -2,6 +2,7 @@ import cookie from 'react-cookies';
 import { doForecastShit } from '../utils/forecastUtilities';
 import { loadRwgpsRoute } from '../utils/rwgpsUtilities';
 import { controlsMeaningfullyDifferent, parseControls } from '../utils/util';
+import ReactGA from "react-ga4";
 
 export const componentLoader = (lazyComponent, attemptsLeft) => {
     return new Promise((resolve, reject) => {
@@ -237,6 +238,7 @@ const forecastFetchCanceled = function(error) {
 
 export const requestForecast = function() {
     return async function(dispatch,getState) {
+        ReactGA.send({ hitType: "pageview", page: "/forecast" });
         const fetchController = new AbortController()
         const abortMethod = fetchController.abort.bind(fetchController)
         dispatch(beginFetchingForecast(abortMethod));
@@ -270,6 +272,7 @@ const setLoadingFromURL = (loading) => {
 
 export const loadFromRideWithGps = function(routeNumber, isTrip) {
     return function(dispatch, getState) {
+        ReactGA.send({ hitType: "pageview", page: "/loadRoute" });
         routeNumber = routeNumber || getState().uiInfo.routeParams.rwgpsRoute
         isTrip = isTrip || getState().uiInfo.routeParams.rwgpsRouteIsTrip
         dispatch(beginLoadingRoute('rwgps'));
@@ -284,6 +287,7 @@ export const loadFromRideWithGps = function(routeNumber, isTrip) {
 
 export const loadRouteFromURL = () => {
     return async function(dispatch, getState) {
+        ReactGA.send({ hitType: "pageview", page: "/loadRoute" });
         await dispatch(setLoadingFromURL(true))
         await dispatch(loadFromRideWithGps())
         const error = getState().uiInfo.dialogParams.errorDetails

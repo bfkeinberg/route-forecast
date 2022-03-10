@@ -30,7 +30,7 @@ const getTimeZoneId = async (routeInfo, routeStart, timezoneApiKey, type, abortS
           Sentry.captureMessage(JSON.stringify(routeInfo.gpxRouteData));
           return { result: "error", error: "GPX route missing tracks" }
       }
-      const point = getState().routeInfo.gpxRouteData.tracks[0].segments[0][0];
+      const point = routeInfo.gpxRouteData.tracks[0].segments[0][0];
       return { result: "success", value: await findTimezoneForPoint(point.lat, point.lon, routeStart, timezoneApiKey, abortSignal) }
   } else {
       return { result: "error", error: "GPX route data missing" }

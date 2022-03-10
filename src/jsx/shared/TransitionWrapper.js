@@ -55,7 +55,7 @@ setTransitionState
 }
 
 TransitionWrapper.propTypes = {
-  diffData:PropTypes.object
+  diffData:PropTypes.number
 };
 
 const TransitioningContent = ({children, transitionTime, transitioning, transitionType, width}) => {

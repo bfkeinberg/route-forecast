@@ -3,6 +3,10 @@ import ReactDOM from 'react-dom';
 import TopLevel from './topLevel';
 import LocationContext from '../locationContext';
 import * as Sentry from '@sentry/browser';
+import ReactGA from "react-ga4";
+
+ReactGA.initialize("GA4-280062874");
+ReactGA.send("pageview");
 
 /* global SENTRY_RELEASE */
 if (!window.origin.startsWith('http://localhost')) {
