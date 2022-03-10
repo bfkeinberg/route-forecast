@@ -74,7 +74,7 @@ export const doForecastShit = async (state, abortSignal) => {
 
   const parsedRouteInfo = getRouteInfo(state, type, timeZoneId)
 
-  const { forecastRequest, points, values, finishTime, timeInHours} = parsedRouteInfo
+  const { forecastRequest} = parsedRouteInfo
   const formdata = new FormData();
   formdata.append('locations', JSON.stringify(forecastRequest));
   formdata.append('timezone', timeZoneId);

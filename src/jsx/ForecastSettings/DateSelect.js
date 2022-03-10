@@ -1,8 +1,8 @@
-import React, {useRef} from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import Flatpickr from 'react-flatpickr'
 import {Icon} from '@blueprintjs/core';
-import {Label, UncontrolledTooltip, Row, Col} from 'reactstrap';
+import {UncontrolledTooltip} from 'reactstrap';
 import {connect} from 'react-redux';
 import {setStart, setInitialStart} from "../../redux/actions";
 import 'flatpickr/dist/themes/confetti.css';

@@ -5,7 +5,7 @@ import LocationContext from '../locationContext';
 import * as Sentry from '@sentry/browser';
 import ReactGA from "react-ga4";
 
-ReactGA.initialize("GA4-280062874");
+ReactGA.initialize("G-0R3J1W9ECC");
 ReactGA.send("pageview");
 
 /* global SENTRY_RELEASE */
