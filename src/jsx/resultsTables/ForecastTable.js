@@ -155,13 +155,13 @@ export class ForecastTable extends Component {
                                 <th className={'headerCell'}>Time</th>
                                 <th id={'dist'} className={'headerCell'}>{distHeader}</th>
                                 <th className={'headerCell'}>Summary</th>
-                                <th id={'temp'} className={'headerCell'} onClick={this.toggleApparentDisplay} style={{cursor: "pointer"}}><Icon icon="temperature"/></th>
+                                <th id={'temp'} className={'clickableHeaderCell'} onClick={this.toggleApparentDisplay} style={{cursor: "pointer"}}><Icon icon="temperature"/></th>
                                 <th className={'headerCell'}>Chance of rain</th>
                                 <MediaQuery minWidth={501}>
                                     <th className={'headerCell'}>Cloud cover</th>
                                 </MediaQuery>
                                 <th className={'headerCell'} id={'aqi'}>AQI</th>
-                                <th id={'wind'} className={'headerCell'} onClick={this.toggleGustDisplay} style={{cursor: "pointer"}}>{windHeader}</th>
+                                <th id={'wind'} className={'clickableHeaderCell'} onClick={this.toggleGustDisplay} style={{cursor: "pointer"}}>{windHeader}</th>
                                 <MediaQuery minWidth={501}>
                                     <th className={'headerCell'}>Wind bearing</th>
                                 </MediaQuery>
@@ -211,7 +211,7 @@ WindSpeed.propTypes = {
 };
 
 const Time = ({time}) => {
-    const { weatherCorrectionMinutes, calculatedControlPointValues, maxGustSpeed, finishTime } = useForecastDependentValues()
+    const { finishTime } = useForecastDependentValues()
 
     return (
         time || DateTime.fromFormat(finishTime, finishTimeFormat).toFormat('h:mma')

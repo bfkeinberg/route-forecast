@@ -58,9 +58,9 @@ const RouteLoadingModeSelector = ({mode, setMode, modeSwitched}) => {
 }
 
 RouteLoadingModeSelector.propTypes = {
-    mode:PropTypes.string.isRequired,
+    mode:PropTypes.number.isRequired,
     setMode:PropTypes.func.isRequired,
-    modeSwitched:PropTypes.bool.isRequired
+    modeSwitched:PropTypes.func.isRequired
 };
 
 const mapStateToProps = (state) =>

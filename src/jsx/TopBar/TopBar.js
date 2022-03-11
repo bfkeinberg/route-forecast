@@ -36,7 +36,7 @@ TopBar.propTypes = {
   activeSidePane:PropTypes.number,
   setActiveSidePane:PropTypes.func,
   sidebarWidth:PropTypes.number,
-  panesVisible:PropTypes.bool
+  panesVisible:PropTypes.object.isRequired
 };
 
 const Tabs = ({sidePaneOptions, activeSidePane, setActiveSidePane, sidebarWidth, panesVisible}) => {
@@ -74,11 +74,11 @@ displayContent
   )
 }
 Tabs.propTypes = {
-  sidePaneOptions:PropTypes.object,
-  activeSidePane:PropTypes.object,
+  sidePaneOptions:PropTypes.array.isRequired,
+  activeSidePane:PropTypes.number.isRequired,
   setActiveSidePane:PropTypes.func.isRequired,
   sidebarWidth:PropTypes.number.isRequired,
-  panesVisible:PropTypes.number.isRequired
+  panesVisible:PropTypes.object.isRequired
 };
 
 const NonexistentLogo = () => {

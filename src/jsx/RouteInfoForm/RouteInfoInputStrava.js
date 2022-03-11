@@ -1,14 +1,13 @@
 
 import React from 'react';
 import stravaImage from 'Images/api_logo_pwrdBy_strava_stack_light.png';
-import { Alert, Button } from 'reactstrap';
+import { Button } from 'reactstrap';
 import ErrorBoundary from '../shared/ErrorBoundary';
 import { Spinner } from '@blueprintjs/core';
 import StravaRouteIdInput from './StravaRouteIdInput';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { loadStravaActivity } from "../../redux/actions";
 import stravaRouteParser from '../../utils/stravaRouteParser';
-import { useDispatch } from 'react-redux';
 
 export const RouteInfoInputStrava = () => {
   const dispatch = useDispatch()

@@ -74,6 +74,11 @@ img#bugImage {
     font-size: 80%;
 }
 
+.clickableHeaderCell {
+    font-size: 80%;
+    color: #0000EE
+}
+
 .redText {
     color:red;
 }

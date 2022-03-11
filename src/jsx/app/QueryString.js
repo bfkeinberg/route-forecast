@@ -4,6 +4,7 @@ import {setShortUrl, shortenUrl, setQueryString} from "../../redux/actions";
 import queryString from 'query-string';
 import { DateTime } from 'luxon';
 import { formatControlsForUrl } from '../../utils/util';
+import * as Sentry from '@sentry/browser';
 
 // this function exists to let us preserve the user's specified start time and share the url for this route
 // with someone in another time zone
@@ -26,9 +27,15 @@ export const makeQuery = (routeNumber, pace,interval,metric,controls, strava_act
 };
 
 export const updateHistory = (url, query) => {
+    Sentry.addBreadcrumb({
+        category:'history',
+        level: Sentry.Severity.Info,
+        data:query,
+        message:url
+    });
     if (typeof window !== 'undefined' && !(/HeadlessChrome/).test(window.navigator.userAgent) && query !== null) {
         let oldState = history.state;
-        if (oldState != undefined && oldState.rwgpsRoute === query.rwgpsRoute) {
+        if (oldState && query && oldState.rwgpsRoute === query.rwgpsRoute) {
             history.replaceState(query, 'nothing', url);
         } else {
             history.pushState(query, 'nothing', url);

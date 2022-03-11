@@ -82,6 +82,21 @@ DesktopUI.propTypes = {
     mapsApiKey: PropTypes.string
 };
 
+export const useLoadingFromURLStatus = () => {
+    const delay = 1000
+
+    const loadingFromURL = useSelector(state => state.routeInfo.loadingFromURL)
+    const started = useValueHasChanged(loadingFromURL, false)
+    const finished = useValueHasChanged(loadingFromURL, true)
+    const delayFinished = useDelay(delay, finished) || !started
+
+    return [
+        started,
+         finished,
+        delayFinished
+    ]
+}
+
 const Sidebar = ({sidePaneOptions, activeSidePane, sidebarWidth}) => {
 
     const [
@@ -117,8 +132,8 @@ const Sidebar = ({sidePaneOptions, activeSidePane, sidebarWidth}) => {
 }
 
 Sidebar.propTypes = {
-    sidePaneOptions:PropTypes.object,
-    activeSidePane:PropTypes.object.isRequired,
+    sidePaneOptions:PropTypes.array.isRequired,
+    activeSidePane:PropTypes.number.isRequired,
     sidebarWidth:PropTypes.number.isRequired
 };
 
@@ -132,21 +147,6 @@ const LoadingFromURLOverlay = () => {
             <Spinner style={{color: "white"}}/>
         </>
     )
-}
-
-export const useLoadingFromURLStatus = () => {
-    const delay = 1000
-
-    const loadingFromURL = useSelector(state => state.routeInfo.loadingFromURL)
-    const started = useValueHasChanged(loadingFromURL, false)
-    const finished = useValueHasChanged(loadingFromURL, true)
-    const delayFinished = useDelay(delay, finished) || !started
-
-    return [
-        started,
-         finished,
-        delayFinished
-    ]
 }
 
 export default DesktopUI;
