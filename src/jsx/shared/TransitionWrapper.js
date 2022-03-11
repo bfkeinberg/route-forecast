@@ -111,5 +111,9 @@ setInitial
 }
 
 TransitioningContent.propTypes = {
-  children:PropTypes.object
+  children:PropTypes.object,
+  transitionTime:PropTypes.number,
+  transitioning:PropTypes.bool,
+  transitionType:PropTypes.string,
+  width:PropTypes.number
 };

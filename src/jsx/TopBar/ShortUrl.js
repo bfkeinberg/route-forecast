@@ -2,6 +2,7 @@ import React from 'react';
 import {Input, FormGroup} from 'reactstrap';
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
+import ReactGA from "react-ga4";
 
 const ShortUrl = ({shortUrl}) => {
     return (
@@ -10,7 +11,9 @@ const ShortUrl = ({shortUrl}) => {
                 <div>Shareable link:</div>
             </div>
             <Input size='20' bsSize="sm" readOnly type="text" value={shortUrl}
-                   onFocus={event => {event.target.select();document.execCommand('copy')}}/>
+                   onFocus={event => {event.target.select();
+                    navigator.clipboard.writeText(document.getSelection.toString());
+                   ReactGA.event('share', {item_id:document.getSelection.toString()})}}/>
         </FormGroup>
     );
 };

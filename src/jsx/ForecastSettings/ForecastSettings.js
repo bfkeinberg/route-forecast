@@ -10,6 +10,7 @@ import { ToggleButton } from "../shared/ToggleButton";
 import { TimeFields } from "./TimeFields";
 import { RouteTitle } from '../shared/RouteTitle';
 import LocationContext from '../locationContext';
+import ReactGA from "react-ga4";
 
 export const ForecastSettings = () => {
     const showProvider = useSelector(state => state.controls.showWeatherProvider)
@@ -17,7 +18,7 @@ export const ForecastSettings = () => {
     const dispatch = useDispatch()
 
     const showControlPoints = useSelector(state => state.controls.displayControlTableUI)
-    const setShowControlPoints = () => dispatch(setDisplayControlTableUI(!showControlPoints))
+    const setShowControlPoints = () => {ReactGA.event('select_content', {content_type:'controls'});return dispatch(setDisplayControlTableUI(!showControlPoints))}
 
     return (
         <div style={{display: "flex", flexFlow: "column", alignItems: "center", marginBottom: "5px"}}>

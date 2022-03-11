@@ -6,6 +6,7 @@ import "./TopBar.css"
 import { usePreviousPersistent, useReusableDelay, useValueHasChanged } from "../../utils/hooks";
 import { useLoadingFromURLStatus } from "../DesktopUI";
 import { useMediaQuery } from "react-responsive";
+import PropTypes from 'prop-types';
 
 export const TopBar = ({sidePaneOptions, activeSidePane, setActiveSidePane, sidebarWidth, panesVisible}) => {
   const smallScreen = useMediaQuery({ query: '(max-width: 900px)' })
@@ -29,6 +30,14 @@ export const TopBar = ({sidePaneOptions, activeSidePane, setActiveSidePane, side
     </div>
   )
 }
+
+TopBar.propTypes = {
+  sidePaneOptions:PropTypes.array,
+  activeSidePane:PropTypes.number,
+  setActiveSidePane:PropTypes.func,
+  sidebarWidth:PropTypes.number,
+  panesVisible:PropTypes.bool
+};
 
 const Tabs = ({sidePaneOptions, activeSidePane, setActiveSidePane, sidebarWidth, panesVisible}) => {
 
