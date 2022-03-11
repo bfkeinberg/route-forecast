@@ -73,6 +73,10 @@ displayContent
     </div>
   )
 }
+Tabs.propTypes = {
+  sidePaneOptions:PropTypes.object,
+  activeSidePane:PropTypes.object
+};
 
 const NonexistentLogo = () => {
   return (
