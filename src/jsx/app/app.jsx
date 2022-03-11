@@ -12,6 +12,10 @@ ReactGA.send("pageview");
 if (!window.origin.startsWith('http://localhost')) {
     Sentry.init({ dsn: 'https://ea4c472ff9054dab8c18d594b95d8da2@sentry.io/298059',
         release:SENTRY_RELEASE, environment:'production',
+        autoSessionTracking:true,
+        initialScope:{
+            user:{ip_address:"{{auto}}"}
+        }
         /*,
         beforeBreadcrumb(breadcrumb) {
             if (breadcrumb.category==='console') {return null} else {return breadcrumb}

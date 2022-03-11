@@ -1,6 +1,7 @@
 import { UncontrolledTooltip } from 'reactstrap';
 import React, { useEffect, useState } from 'react';
 import { AnchorButton } from "@blueprintjs/core";
+import PropTypes from 'prop-types';
 
 const DonationRequest = ({wacky}) =>  {
     const [
@@ -33,6 +34,10 @@ setFilter
         </div>
     );
 }
+
+DonationRequest.propTypes = {
+    wacky:PropTypes.bool.isRequired
+};
 
 export default DonationRequest;
 

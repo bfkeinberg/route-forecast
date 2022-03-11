@@ -38,7 +38,7 @@ const setRoutes = async (rwgpsToken, setRwgpsToken, setError, setPinnedRoutes, s
     setLoadingPinned(false);
 }
 
-const PinnedRouteLoader = ({rwgpsToken, setRwgpsToken, credentialsValid, setPinnedRoutes, setErrorDetails, hasRoutes, loadingPinnedRoutes, setLoadingPinned, setUsePinnedRoutes, usingPinnedRoutes}) => {
+const PinnedRouteLoader = ({rwgpsToken, setRwgpsToken, credentialsValid, setPinnedRoutes, setErrorDetails, hasRoutes, loadingPinnedRoutes, setLoadingPinned, setUsePinnedRoutes, setShowPinnedRoutes, usingPinnedRoutes}) => {
     useEffect(() => {if (usingPinnedRoutes && !rwgpsToken) {window.location.href = `/rwgpsAuthReq?state=${JSON.stringify(queryString.parse(location.search))}`}}, [
         usingPinnedRoutes,
          credentialsValid
@@ -59,7 +59,7 @@ const PinnedRouteLoader = ({rwgpsToken, setRwgpsToken, credentialsValid, setPinn
                 loading={loadingPinnedRoutes}
                 text={usingPinnedRoutes ? "Don't use pinned routes" : "Use pinned routes"}
                 style={{fontSize: "13px"}}
-                onClick={() => {setUsePinnedRoutes(!usingPinnedRoutes)}}
+                onClick={() => {setUsePinnedRoutes(!usingPinnedRoutes);setShowPinnedRoutes(!usingPinnedRoutes)}}
             />
             {credentialsValid ?
             (
@@ -87,7 +87,8 @@ PinnedRouteLoader.propTypes = {
     setLoadingPinned:PropTypes.func.isRequired,
     showPinnedRoutes:PropTypes.bool.isRequired,
     setUsePinnedRoutes:PropTypes.func.isRequired,
-    usingPinnedRoutes:PropTypes.bool.isRequired
+    usingPinnedRoutes:PropTypes.bool.isRequired,
+    setShowPinnedRoutes:PropTypes.func.isRequired
 };
 
 const isValid = (field) => {return (field !== undefined && field !== null && field !== '')};

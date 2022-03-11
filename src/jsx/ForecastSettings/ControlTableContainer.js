@@ -3,10 +3,9 @@ import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Button } from "@blueprintjs/core";
 import { Card, CardBody } from "reactstrap";
-import { addControl } from "../../redux/actions";
+import { addControl, toggleDisplayBanked } from "../../redux/actions";
 import ErrorBoundary from '../shared/ErrorBoundary';
 import { ControlTable } from './ControlTable';
-import { toggleDisplayBanked } from "../../redux/actions";
 import { Tooltip2 } from "@blueprintjs/popover2";
 import { ToggleButton } from '../shared/ToggleButton';
 
