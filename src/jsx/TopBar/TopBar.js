@@ -75,7 +75,10 @@ displayContent
 }
 Tabs.propTypes = {
   sidePaneOptions:PropTypes.object,
-  activeSidePane:PropTypes.object
+  activeSidePane:PropTypes.object,
+  setActiveSidePane:PropTypes.func.isRequired,
+  sidebarWidth:PropTypes.number.isRequired,
+  panesVisible:PropTypes.number.isRequired
 };
 
 const NonexistentLogo = () => {
@@ -123,3 +126,13 @@ const TopBarItem = ({children, active, leftNeighborActive, rightNeighborActive, 
     </div>
   )
 }
+
+TopBarItem.propTypes = {
+  children:PropTypes.object.isRequired,
+  active:PropTypes.bool.isRequired,
+  leftNeighborActive:PropTypes.bool.isRequired,
+  rightNeighborActive:PropTypes.bool.isRequired,
+  last:PropTypes.bool,
+  onClick:PropTypes.func,
+  visible:PropTypes.bool.isRequired
+};

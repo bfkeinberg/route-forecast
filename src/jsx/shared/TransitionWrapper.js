@@ -97,11 +97,13 @@ setInitial
 
   const easingFunction = "cubic-bezier(.39,1.38,.78,1)"
 
-  const wrapperStyle = transitionType !== undefined ? {
+  const wrapperStyle = transitionType !== undefined ?
+  {
     transform: `translateX(${position}px)`,
     // this below is very hacky but i don't care
     transition: (teleporting && transitionType !== "slideLeftRight") ? "none" : `transform ${transitionTime / 2}s ${easingFunction}`
-  } : {}
+  } :
+  {}
 
   return (
     <div style={wrapperStyle}>

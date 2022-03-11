@@ -6,6 +6,7 @@ import {setPinnedRoutes, setErrorDetails, setRwgpsToken, setLoadingPinned, setUs
 import {lazy} from '@loadable/component';
 import queryString from 'query-string';
 import { Button } from '@blueprintjs/core';
+import ReactGA from "react-ga4";
 
 const LoadableRouteList = lazy(() => import(/* webpackChunkName: "RouteList" */ './RWGPSRouteList'));
 
@@ -25,6 +26,7 @@ const getPinnedRoutes = async (rwgpsToken, setErrorDetails, setRwgpsToken) => {
 }
 
 const setRoutes = async (rwgpsToken, setRwgpsToken, setError, setPinnedRoutes, setLoadingPinned, usingPinnedRoutes, hasRoutes) => {
+    ReactGA.event('join_group', {group_id:'pinned_routes'});
     if (rwgpsToken === '' || rwgpsToken === null || !usingPinnedRoutes || hasRoutes) {
         return null;
     }
@@ -57,7 +59,7 @@ const PinnedRouteLoader = ({rwgpsToken, setRwgpsToken, credentialsValid, setPinn
                 loading={loadingPinnedRoutes}
                 text={usingPinnedRoutes ? "Don't use pinned routes" : "Use pinned routes"}
                 style={{fontSize: "13px"}}
-                onClick={() => {setUsePinnedRoutes(!usingPinnedRoutes);setUsePinnedRoutes(!usingPinnedRoutes)}}
+                onClick={() => {setUsePinnedRoutes(!usingPinnedRoutes)}}
             />
             {credentialsValid ?
             (

@@ -43,7 +43,7 @@ const callVisualCrossing = async function (lat, lon, currentTime, distance, zone
     const relativeBearing = hasWind && windBearing !== undefined ? getBearingDifference(bearing, windBearing) : null;
     const rainy = current.precip !== 0;
     const precip = current.precipprob !== undefined ? current.precipprob : 0;
-    return new Promise((resolve, reject) => {resolve({
+    return new Promise((resolve) => {resolve({
         'time':now.format('h:mmA'),
         'distance':distance,
         'summary':forecast.days[0].conditions,

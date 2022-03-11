@@ -23,7 +23,10 @@ const DesktopUI = ({mapsApiKey}) => {
         {title: "Forecast", content: <ErrorBoundary>{<ForecastTable/>}</ErrorBoundary>},
         {title: "Pace Analysis", content: <ErrorBoundary>{<PaceTable/>}</ErrorBoundary>}
     ]
-    const [activeSidePane, setActiveSidePane] = useState(0)
+    const [
+        activeSidePane,
+        setActiveSidePane
+    ] = useState(0)
 
     const sidebarWidth = 400
 
@@ -49,7 +52,7 @@ const DesktopUI = ({mapsApiKey}) => {
 
     const routeLoadingMode = useSelector(state => state.uiInfo.routeParams.routeLoadingMode)
     const mapDataExists = (routeLoadingMode === routeLoadingModes.RWGPS) ? (forecastData.length > 0) : stravaActivityData !== null
-    
+
     return (
         <div>
             <TopBar
@@ -81,11 +84,15 @@ DesktopUI.propTypes = {
 
 const Sidebar = ({sidePaneOptions, activeSidePane, sidebarWidth}) => {
 
-    const [loadingFromURLStarted, loadingFromURLFinished, displayContent] = useLoadingFromURLStatus()
+    const [
+        loadingFromURLStarted,
+        loadingFromURLFinished,
+         displayContent
+        ] = useLoadingFromURLStatus()
 
     const previousActivePane = usePrevious(activeSidePane)
     return (
-        displayContent ? 
+        displayContent ?
         <TransitionWrapper diffData={activeSidePane} transitionTime={1} transitionType={previousActivePane < activeSidePane ? "slideLeft" : "slideRight"} width={sidebarWidth}>
             <div style={{width: `${sidebarWidth}px`}} className={loadingFromURLStarted ? "fade-in" : ""}>
                 {sidePaneOptions[activeSidePane].content}
@@ -109,6 +116,12 @@ const Sidebar = ({sidePaneOptions, activeSidePane, sidebarWidth}) => {
     )
 }
 
+Sidebar.propTypes = {
+    sidePaneOptions:PropTypes.object,
+    activeSidePane:PropTypes.object.isRequired,
+    sidebarWidth:PropTypes.number.isRequired
+};
+
 const LoadingFromURLOverlay = () => {
     const routeData = useSelector(state => state.routeInfo.rwgpsRouteData)
 
@@ -129,7 +142,11 @@ export const useLoadingFromURLStatus = () => {
     const finished = useValueHasChanged(loadingFromURL, true)
     const delayFinished = useDelay(delay, finished) || !started
 
-    return [started, finished, delayFinished]
+    return [
+        started,
+         finished,
+        delayFinished
+    ]
 }
 
 export default DesktopUI;

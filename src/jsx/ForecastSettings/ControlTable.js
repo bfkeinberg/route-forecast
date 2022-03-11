@@ -1,9 +1,8 @@
 import React from 'react';
 import { Icon } from '@blueprintjs/core';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { removeControl as removeControlAction, updateUserControls } from '../../redux/actions';
 import { Table } from "./Table"
-import { useDispatch } from 'react-redux';
 import { useActualArrivalTimes, useForecastDependentValues } from '../../utils/hooks';
 import { stringIsOnlyNumeric } from '../../utils/util';
 

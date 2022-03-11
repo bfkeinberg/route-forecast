@@ -57,6 +57,12 @@ const RouteLoadingModeSelector = ({mode, setMode, modeSwitched}) => {
     )
 }
 
+RouteLoadingModeSelector.propTypes = {
+    mode:PropTypes.string.isRequired,
+    setMode:PropTypes.func.isRequired,
+    modeSwitched:PropTypes.bool.isRequired
+};
+
 const mapStateToProps = (state) =>
     ({
         errorDetails: state.uiInfo.dialogParams.errorDetails,

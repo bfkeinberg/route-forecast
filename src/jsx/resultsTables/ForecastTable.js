@@ -204,6 +204,12 @@ const WindSpeed = ({gust, windSpeed, showGusts}) => {
     )
 }
 
+WindSpeed.propTypes = {
+    gust:PropTypes.string.isRequired,
+    windSpeed:PropTypes.string.isRequired,
+    showGusts:PropTypes.bool.isRequired
+};
+
 const Time = ({time}) => {
     const { weatherCorrectionMinutes, calculatedControlPointValues, maxGustSpeed, finishTime } = useForecastDependentValues()
 
