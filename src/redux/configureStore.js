@@ -22,6 +22,7 @@ const bannedActionKeys = [
 /**
  *
  * @param {boolean }mode development or production
+ * @param {boolean }logging whether to log redux updates to the console
  * @returns {any[]} array of middleware to be used
  */
 export const selectMiddleware = (mode, logging = false) => {

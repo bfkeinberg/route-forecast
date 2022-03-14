@@ -5,7 +5,7 @@ import "@blueprintjs/icons/lib/css/blueprint-icons.css";
 import 'Images/style.css';
 import queryString from 'query-string';
 import PropTypes from 'prop-types';
-import { connect, useDispatch, useSelector } from 'react-redux';
+import { connect, useDispatch, /*useSelector*/ } from 'react-redux';
 import cookie from 'react-cookies';
 import LocationContext from '../locationContext';
 import DesktopUI from '../DesktopUI';
@@ -40,7 +40,7 @@ import {
 } from "../../redux/actions";
 import QueryString from './QueryString';
 import { routeLoadingModes } from '../../data/enums';
-import { formatControlsForUrl, parseControls } from '../../utils/util';
+import { /*formatControlsForUrl, */parseControls } from '../../utils/util';
 
 export const saveRwgpsCredentials = (token) => {
     if ("credentials" in navigator && "PasswordCredential" in window) {
@@ -293,20 +293,21 @@ FunAppWrapperThingForHooksUsability.propTypes = {
         queryParams: PropTypes.object.isRequired
 };
 
-const useSaveControlsToCookie = () => {
+// Commented out below because evaluating permanently removing the feature of saving off controls
+// const useSaveControlsToCookie = () => {
 
-    const controlPoints = useSelector(state => state.controls.userControlPoints)
-    const routeInfo = useSelector(state => state.routeInfo)
+//     const controlPoints = useSelector(state => state.controls.userControlPoints)
+//     const routeInfo = useSelector(state => state.routeInfo)
 
-    useEffect(() => {
-        if (routeInfo.name !== '') {
-            document.title = `Forecast for ${routeInfo.name}`;
-            if (controlPoints !== '' && controlPoints.length !== 0) {
-                saveCookie(routeInfo.name, formatControlsForUrl(controlPoints, false));
-            }
-        }
-    }, [
-routeInfo.name,
-controlPoints
-])
-}
+//     useEffect(() => {
+//         if (routeInfo.name !== '') {
+//             document.title = `Forecast for ${routeInfo.name}`;
+//             if (controlPoints !== '' && controlPoints.length !== 0) {
+//                 saveCookie(routeInfo.name, formatControlsForUrl(controlPoints, false));
+//             }
+//         }
+//     }, [
+// routeInfo.name,
+// controlPoints
+// ])
+// }

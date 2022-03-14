@@ -135,6 +135,7 @@ export class ForecastTable extends Component {
     render() {
         const windHeader = this.state.showGusts ? 'Wind gust' : 'Wind speed';
         const distHeader = this.props.metric ? 'KM' : 'Mile';
+        const temperatureHeader = this.state.showApparentTemp ? "Feels like" : <Icon icon="temperature"/>;
         return (
             <div className="animated slideInLeft">
                 <ErrorBoundary>
@@ -155,7 +156,7 @@ export class ForecastTable extends Component {
                                 <th className={'headerCell'}>Time</th>
                                 <th id={'dist'} className={'headerCell'}>{distHeader}</th>
                                 <th className={'headerCell'}>Summary</th>
-                                <th id={'temp'} className={'clickableHeaderCell'} onClick={this.toggleApparentDisplay} style={{cursor: "pointer"}}><Icon icon="temperature"/></th>
+                                <th id={'temp'} className={'clickableHeaderCell'} onClick={this.toggleApparentDisplay} style={{cursor: "pointer"}}>{temperatureHeader}</th>
                                 <th className={'headerCell'}>Chance of rain</th>
                                 <MediaQuery minWidth={501}>
                                     <th className={'headerCell'}>Cloud cover</th>

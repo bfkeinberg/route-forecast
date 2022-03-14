@@ -14,13 +14,6 @@ const greatCircleRadius = {
         km: 6367
 };
 
-if (!Number.prototype.toRad) {
-        Number.prototype.toRad = function() {
-                return this * Math.PI / 180;
-        };
-
-}
-
 class AnalyzeRoute {
     constructor() {
         this.walkRwgpsRoute = this.walkRwgpsRoute.bind(this);
@@ -56,6 +49,8 @@ class AnalyzeRoute {
 //        });
 //    }
 
+    toRad = (num) => num * Math.PI / 180;
+
     /**
      * Calculates the distance between the two points using the haversine method.
      * @param {number} lat1 The latitude of the first point.
@@ -65,11 +60,11 @@ class AnalyzeRoute {
      * @returns {number} The distance in miles between the two points.
     **/
     calculateDistance(lat1, lon1, lat2, lon2) {
-            var dLat = (lat2 - lat1).toRad(),
-                    dLon = (lon2 - lon1).toRad();
+            var dLat = this.toRad((lat2 - lat1)),
+                    dLon = this.toRad((lon2 - lon1));
 
-            lat1 = lat1.toRad();
-            lat2 = lat2.toRad();
+            lat1 = this.toRad(lat1);
+            lat2 = this.toRad(lat2);
 
             var a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
                     Math.sin(dLon / 2) * Math.sin(dLon / 2) * Math.cos(lat1) * Math.cos(lat2);
