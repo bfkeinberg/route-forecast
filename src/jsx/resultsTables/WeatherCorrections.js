@@ -4,7 +4,7 @@ import { useForecastDependentValues } from '../../utils/hooks';
 const gustySpeedThreshold = 25;
 
 export const WeatherCorrections = () => {
-  const { weatherCorrectionMinutes, calculatedControlPointValues, maxGustSpeed, finishTime } = useForecastDependentValues()
+  const { weatherCorrectionMinutes, maxGustSpeed } = useForecastDependentValues()
 
   const weatherId = (maxGustSpeed > gustySpeedThreshold) ? 'gustyWeather' : 'weatherCorrections';
 

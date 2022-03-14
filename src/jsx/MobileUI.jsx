@@ -5,7 +5,6 @@ import MapLoader from "./Map/MapLoader";
 import PropTypes from "prop-types";
 import React from "react";
 import { Route, Routes, Link, MemoryRouter, useNavigate } from "react-router-dom";
-import {createMemoryHistory} from 'history';
 import {Nav, NavItem, NavbarBrand} from "reactstrap";
 import { Icon, Intent } from "@blueprintjs/core";
 import {IconNames} from "@blueprintjs/icons";

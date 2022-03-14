@@ -28,89 +28,6 @@ const iqAirHandler = (lat, lon) => {
         });
 };
 
-const makeUrl = (lat, lon, rangeInKm) => {
-    let boundingBox = calcBoundingBox(parseFloat(lat), parseFloat(lon), rangeInKm);
-
-    const purpleAirKey = process.env.PURPLE_AIR_KEY;
-    let purpleAirUrl =
-        `https://api.purpleair.com/v1/sensors?fields=pm2.5_cf_1,ozone1,humidity,latitude,longitude&location_type=0&nwlng=${boundingBox[0]}&nwlat=${boundingBox[2]}&selng=${boundingBox[1]}&selat=${boundingBox[3]}&api_key=${purpleAirKey}`;
-    // console.info(`purpleAir url for ${lat},${lon} at ${rangeInKm}km is ${purpleAirUrl}`);
-    return purpleAirUrl;
-};
-
-const getPurpleAirAQI = async function (lat, lon) {
-    let ranges = [
-        0.5,
-        2,
-        5,
-        10,
-        20,
-        40
-    ];
-    try {
-        for (let range of ranges) {
-            let purpleAirUrl = makeUrl(lat, lon, range);
-            let purpleairResult = await axios.get(purpleAirUrl).catch(async error => {
-                if (error.response !== undefined) {
-                    console.error(`[AXIOS] error at ${lat} ${lon}`, error.response.data);
-                }
-                else {
-                    console.error(`[AXIOS] error at ${lat} ${lon}`, error);
-                }
-                return undefined;
-            });
-            // if (purpleairResult !== undefined) {
-            //     console.info(`Purple Air result ${JSON.stringify(purpleairResult.data)}`);
-            // }
-            if (purpleairResult !== undefined && purpleairResult.data !== undefined && purpleairResult.data.data[0] !== undefined) {
-                const aqi = processPurpleResults(lat, lon, purpleairResult.data);
-                return aqi;
-            }
-        }
-    } catch (err) {
-        console.error(`No Purple Air results for ${lat} ${lon} because : ${err}`);
-    }
-    console.error(`No conditions returned from Purple Air`);
-    return undefined; // iqAirHandler(lat, lon);
-}
-
-const toRad = function (val) {
-    return val * Math.PI / 180;
-};
-
-const greatCircleRadius = {
-    miles: 3956,
-    km: 6367
-};
-
-const calculateDistance = (lat1, lon1, lat2, lon2) => {
-    var dLat = toRad(lat2 - lat1),
-        dLon = toRad(lon2 - lon1);
-
-    lat1 = toRad(lat1);
-    lat2 = toRad(lat2);
-
-    var a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-        Math.sin(dLon / 2) * Math.sin(dLon / 2) * Math.cos(lat1) * Math.cos(lat2);
-    var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-    return greatCircleRadius.km * c;
-};
-
-// sort the results so that we take aqi from the closest sensor
-const processPurpleResults = (lat, lon, results) => {
-    let pm25index = results.fields.indexOf('pm2.5_cf_1');
-    let humidityIndex = results.fields.indexOf('humidity');
-    let sensorLatitude = results.fields.indexOf('latitude');
-    let sensorLongitude = results.fields.indexOf('longitude');
-    const data = results.data.sort((first, second) => {
-        return calculateDistance(lat, lon, first[sensorLatitude], first[sensorLongitude]) - calculateDistance(lat, lon, second[sensorLatitude], second[sensorLongitude])
-    });
-    if (data[0] === undefined) {
-        return undefined;       // if all the PM2.5 entries are zero
-    }
-    return usEPAfromPm(data[0][pm25index], data[0][humidityIndex]);
-};
-
 const toDegrees = (radians) => radians * 180 / Math.PI;
 const toRadians = (degrees) => degrees * Math.PI / 180;
 
@@ -130,15 +47,45 @@ const calcBoundingBox = (lat, lon, distInKm) => {
         y2
     ];
 }
-
-const usEPAfromPm = (pm, rh) => {
-    const aqi = aqiFromPM(0.534 * pm - 0.0844 * rh + 5.604);
-    if (aqi < 0) {
-        console.warn(`weird AQI: PM=${pm} humidity=${rh}`);
-        return pm;
-    }
-    return aqi;
+const greatCircleRadius = {
+    miles: 3956,
+    km: 6367
 };
+const toRad = function (val) {
+    return val * Math.PI / 180;
+};
+
+const calculateDistance = (lat1, lon1, lat2, lon2) => {
+    var dLat = toRad(lat2 - lat1),
+        dLon = toRad(lon2 - lon1);
+
+    lat1 = toRad(lat1);
+    lat2 = toRad(lat2);
+
+    var a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+        Math.sin(dLon / 2) * Math.sin(dLon / 2) * Math.cos(lat1) * Math.cos(lat2);
+    var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return greatCircleRadius.km * c;
+};
+
+const makeUrl = (lat, lon, rangeInKm) => {
+    let boundingBox = calcBoundingBox(parseFloat(lat), parseFloat(lon), rangeInKm);
+
+    const purpleAirKey = process.env.PURPLE_AIR_KEY;
+    let purpleAirUrl =
+        `https://api.purpleair.com/v1/sensors?fields=pm2.5_cf_1,ozone1,humidity,latitude,longitude&location_type=0&nwlng=${boundingBox[0]}&nwlat=${boundingBox[2]}&selng=${boundingBox[1]}&selat=${boundingBox[3]}&api_key=${purpleAirKey}`;
+    // console.info(`purpleAir url for ${lat},${lon} at ${rangeInKm}km is ${purpleAirUrl}`);
+    return purpleAirUrl;
+};
+
+function calcAQI (Cp, Ih, Il, BPh, BPl) {
+
+    var a = Ih - Il;
+    var b = BPh - BPl;
+    var c = Cp - BPl;
+    return Math.round(a / b * c + Il);
+
+}
 
 function aqiFromPM (pm) {
 
@@ -172,9 +119,8 @@ function aqiFromPM (pm) {
         return calcAQI(pm, 50, 0, 12, 0);
     }
     return undefined;
-
-
 }
+
 function bplFromPM (pm) {
     if (isNaN(pm)) {return 0;}
     if (pm == undefined) {return 0;}
@@ -208,6 +154,67 @@ function bplFromPM (pm) {
 
 
 }
+const usEPAfromPm = (pm, rh) => {
+    const aqi = aqiFromPM(0.534 * pm - 0.0844 * rh + 5.604);
+    if (aqi < 0) {
+        console.warn(`weird AQI: PM=${pm} humidity=${rh}`);
+        return pm;
+    }
+    return aqi;
+};
+
+// sort the results so that we take aqi from the closest sensor
+const processPurpleResults = (lat, lon, results) => {
+    let pm25index = results.fields.indexOf('pm2.5_cf_1');
+    let humidityIndex = results.fields.indexOf('humidity');
+    let sensorLatitude = results.fields.indexOf('latitude');
+    let sensorLongitude = results.fields.indexOf('longitude');
+    const data = results.data.sort((first, second) => {
+        return calculateDistance(lat, lon, first[sensorLatitude], first[sensorLongitude]) - calculateDistance(lat, lon, second[sensorLatitude], second[sensorLongitude])
+    });
+    if (data[0] === undefined) {
+        return undefined;       // if all the PM2.5 entries are zero
+    }
+    return usEPAfromPm(data[0][pm25index], data[0][humidityIndex]);
+};
+
+
+const getPurpleAirAQI = async function (lat, lon) {
+    let ranges = [
+        0.5,
+        2,
+        5,
+        10,
+        20,
+        40
+    ];
+    try {
+        for (let range of ranges) {
+            let purpleAirUrl = makeUrl(lat, lon, range);
+            let purpleairResult = await axios.get(purpleAirUrl).catch(error => {
+                if (error.response !== undefined) {
+                    console.error(`[AXIOS] error at ${lat} ${lon}`, error.response.data);
+                }
+                else {
+                    console.error(`[AXIOS] error at ${lat} ${lon}`, error);
+                }
+                return undefined;
+            });
+            // if (purpleairResult !== undefined) {
+            //     console.info(`Purple Air result ${JSON.stringify(purpleairResult.data)}`);
+            // }
+            if (purpleairResult !== undefined && purpleairResult.data !== undefined && purpleairResult.data.data[0] !== undefined) {
+                const aqi = processPurpleResults(lat, lon, purpleairResult.data);
+                return aqi;
+            }
+        }
+    } catch (err) {
+        console.error(`No Purple Air results for ${lat} ${lon} because : ${err}`);
+    }
+    console.error(`No conditions returned from Purple Air`);
+    return undefined; // iqAirHandler(lat, lon);
+}
+
 function bphFromPM (pm) {
     // return 0;
     if (isNaN(pm)) {return 0;}
@@ -243,13 +250,5 @@ function bphFromPM (pm) {
 
 }
 
-function calcAQI (Cp, Ih, Il, BPh, BPl) {
-
-    var a = Ih - Il;
-    var b = BPh - BPl;
-    var c = Cp - BPl;
-    return Math.round(a / b * c + Il);
-
-}
 
 module.exports = getPurpleAirAQI;

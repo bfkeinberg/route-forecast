@@ -57,6 +57,7 @@ const PinnedRouteLoader = ({rwgpsToken, setRwgpsToken, credentialsValid, setPinn
                 active={usingPinnedRoutes}
                 icon="star"
                 loading={loadingPinnedRoutes}
+                className={'glowing_input'}
                 text={usingPinnedRoutes ? "Don't use pinned routes" : "Use pinned routes"}
                 style={{fontSize: "13px"}}
                 onClick={() => {setUsePinnedRoutes(!usingPinnedRoutes);setShowPinnedRoutes(!usingPinnedRoutes)}}

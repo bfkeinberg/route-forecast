@@ -6,7 +6,7 @@ import * as Sentry from '@sentry/browser';
 import ReactGA from "react-ga4";
 
 ReactGA.initialize("G-0R3J1W9ECC");
-ReactGA.send("pageview");
+//ReactGA.send("pageview");
 
 /* global SENTRY_RELEASE */
 if (!window.origin.startsWith('http://localhost')) {

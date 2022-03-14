@@ -29,7 +29,7 @@ export const ControlTable = () => {
     const metric = useSelector(state => state.controls.metric)
     const controls = useSelector(state => state.controls.userControlPoints)
 
-    const { weatherCorrectionMinutes, calculatedControlPointValues: calculatedValues, maxGustSpeed, finishTime } = useForecastDependentValues()
+    const { calculatedControlPointValues: calculatedValues } = useForecastDependentValues()
 
     const actualArrivalTimes = useActualArrivalTimes()
     const dispatch = useDispatch()

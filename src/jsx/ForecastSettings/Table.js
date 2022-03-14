@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import PropTypes from "prop-types";
 
 export const Table = ({data, onCellValueChanged}) => {
   let {columns, rows} = data
@@ -48,6 +49,11 @@ export const Table = ({data, onCellValueChanged}) => {
   )
 }
 
+Table.propTypes = {
+  data: PropTypes.object.isRequired,
+  onCellValueChanged:PropTypes.func.isRequired
+};
+
 const Cell = ({value, transformFunction, editable, onCellValueChanged, editValidateFunction}) => {
   const beginEditing = () => {
     if (editable) {
@@ -80,3 +86,11 @@ setEditingValue
     </div>
   )
 }
+
+Cell.propTypes = {
+  value:PropTypes.string.isRequired,
+  transformFunction:PropTypes.func,
+  editable:PropTypes.bool.isRequired,
+  onCellValueChanged:PropTypes.func.isRequired,
+  editValidateFunction:PropTypes.func
+};

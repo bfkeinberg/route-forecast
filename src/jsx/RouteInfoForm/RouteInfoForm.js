@@ -11,19 +11,11 @@ import { RouteInfoInputRWGPS } from './RouteInfoInputRWGPS';
 import { RouteInfoInputStrava } from './RouteInfoInputStrava';
 import { routeLoadingModes } from '../../data/enums';
 
-const RouteInfoForm = ({ controlPoints, errorDetails, routeInfo, needToViewTable, routeProps, routeLoadingMode, setRouteLoadingMode }) => {
+const RouteInfoForm = ({ controlPoints, errorDetails, routeInfo, routeLoadingMode, setRouteLoadingMode }) => {
     const mode = routeLoadingMode
     const modeSwitched = (event) => {
         setRouteLoadingMode(event.target.checked ? routeLoadingModes.STRAVA : routeLoadingModes.RWGPS)
     }
-
-    // TODO
-    // mobile magic
-    // useEffect(() => {
-    //     if (routeProps != null && routeProps.history != null && needToViewTable) {
-    //         routeProps.history.replace('/table/')
-    //     }
-    // }, [routeProps, needToViewTable])
 
     return (
         <div style={{padding: "16px"}}>

@@ -2,7 +2,7 @@ import ErrorBoundary from "./shared/ErrorBoundary";
 import ForecastTable from "./resultsTables/ForecastTable";
 import MapLoader from "./Map/MapLoader";
 import PropTypes from "prop-types";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import RouteInfoForm from "./RouteInfoForm/RouteInfoForm";
 import { ForecastSettings } from "./ForecastSettings/ForecastSettings";
 import { TopBar } from "./TopBar/TopBar";
