@@ -10,10 +10,12 @@ import { Spinner } from '@blueprintjs/core';
 import { useSelector, useDispatch } from 'react-redux';
 
 export const RouteInfoInputRWGPS = () => {
+  const usingPinnedRoutes = useSelector(state => state.rideWithGpsInfo.usePinnedRoutes)
+
   const [
 showPinnedRoutes,
 setShowPinnedRoutes
-] = useState(false)
+] = useState(usingPinnedRoutes)
 
   return (
     <>

@@ -32,12 +32,12 @@ const toDegrees = (radians) => radians * 180 / Math.PI;
 const toRadians = (degrees) => degrees * Math.PI / 180;
 
 const calcBoundingBox = (lat, lon, distInKm) => {
-    const R = 6371;   // radius of Earth in km
+    const Radius = 6371;   // radius of Earth in km
 
-    let widthInDegrees = toDegrees(distInKm / R / Math.cos(toRadians(lat)));
+    let widthInDegrees = toDegrees(distInKm / Radius / Math.cos(toRadians(lat)));
     let x1 = lon - widthInDegrees;
     let x2 = lon + widthInDegrees;
-    let heightInDegrees = toDegrees(distInKm / R);
+    let heightInDegrees = toDegrees(distInKm / Radius);
     let y1 = lat + heightInDegrees;
     let y2 = lat - heightInDegrees;
     return [
@@ -55,15 +55,16 @@ const toRad = function (val) {
     return val * Math.PI / 180;
 };
 
+// eslint-disable-next-line max-params
 const calculateDistance = (lat1, lon1, lat2, lon2) => {
     var dLat = toRad(lat2 - lat1),
         dLon = toRad(lon2 - lon1);
 
-    lat1 = toRad(lat1);
-    lat2 = toRad(lat2);
+    const lat1_rad = toRad(lat1);
+    const lat2_rad = toRad(lat2);
 
     var a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-        Math.sin(dLon / 2) * Math.sin(dLon / 2) * Math.cos(lat1) * Math.cos(lat2);
+        Math.sin(dLon / 2) * Math.sin(dLon / 2) * Math.cos(lat1_rad) * Math.cos(lat2_rad);
     var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
     return greatCircleRadius.km * c;
 };
@@ -78,16 +79,17 @@ const makeUrl = (lat, lon, rangeInKm) => {
     return purpleAirUrl;
 };
 
-function calcAQI (Cp, Ih, Il, BPh, BPl) {
+// eslint-disable-next-line max-params
+const calcAQI = function (Cp, Ih, Il, BPh, BPl) {
 
-    var a = Ih - Il;
-    var b = BPh - BPl;
-    var c = Cp - BPl;
-    return Math.round(a / b * c + Il);
+    var a_var = Ih - Il;
+    var b_var = BPh - BPl;
+    var c_var = Cp - BPl;
+    return Math.round(a_var / b_var * c_var + Il);
 
-}
+};
 
-function aqiFromPM (pm) {
+const aqiFromPM = function (pm) {
 
     if (isNaN(pm)) {return "-";}
     if (pm == undefined) {return "-";}

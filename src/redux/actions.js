@@ -238,7 +238,7 @@ const forecastFetchCanceled = function(error) {
 
 export const requestForecast = function() {
     return async function(dispatch,getState) {
-        ReactGA.send({ hitType: "pageview", page: "/forecast" });
+        // ReactGA.send({ hitType: "pageview", page: "/forecast" });
         ReactGA.event('unlock_achievement', {achievement_id:getRouteName(getState().routeInfo.rwgpsRouteData)});
         const fetchController = new AbortController()
         const abortMethod = fetchController.abort.bind(fetchController)
@@ -273,7 +273,7 @@ const setLoadingFromURL = (loading) => {
 
 export const loadFromRideWithGps = function(routeNumber, isTrip) {
     return function(dispatch, getState) {
-        ReactGA.send({ hitType: "pageview", page: "/loadRoute" });
+        // ReactGA.send({ hitType: "pageview", page: "/loadRoute" });
         routeNumber = routeNumber || getState().uiInfo.routeParams.rwgpsRoute
         ReactGA.event('login', {method:routeNumber});
         isTrip = isTrip || getState().uiInfo.routeParams.rwgpsRouteIsTrip
@@ -289,7 +289,7 @@ export const loadFromRideWithGps = function(routeNumber, isTrip) {
 
 export const loadRouteFromURL = () => {
     return async function(dispatch, getState) {
-        ReactGA.send({ hitType: "pageview", page: "/loadRoute" });
+        // ReactGA.send({ hitType: "pageview", page: "/loadRoute" });
         ReactGA.event('login', {method:getState().uiInfo.routeParams.rwgpsRoute});
         await dispatch(setLoadingFromURL(true))
         await dispatch(loadFromRideWithGps())

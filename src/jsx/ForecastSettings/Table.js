@@ -55,6 +55,10 @@ Table.propTypes = {
 };
 
 const Cell = ({value, transformFunction, editable, onCellValueChanged, editValidateFunction}) => {
+  const [
+    editingValue,
+    setEditingValue
+    ] = useState(null)
   const beginEditing = () => {
     if (editable) {
       setEditingValue(value)
@@ -72,10 +76,7 @@ const Cell = ({value, transformFunction, editable, onCellValueChanged, editValid
     }
   }
 
-  const [
-editingValue,
-setEditingValue
-] = useState(null)
+
   return (
     editingValue !== null ?
     <div>

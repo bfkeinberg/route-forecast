@@ -34,7 +34,7 @@ const RWGPSRouteList = ({pinnedRoutes, setRwgpsRoute, route_id, setRouteIsTrip, 
                             loadFromRideWithGps(selected.associated_object_id, selected.associated_object_type=="trip");
                         }}
             >
-        <Button icon="route" text={route_id} rightIcon="double-caret-vertical" />
+        <Button icon="route" text={route_id} rightIcon="double-caret-vertical" className={'glowing_input'}/>
     </Select>)
 }
 

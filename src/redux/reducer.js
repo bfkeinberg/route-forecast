@@ -20,6 +20,7 @@ const initialStartTime = function() {
     return now;
 };
 
+// eslint-disable-next-line complexity
 export const routeParams = function(state = {
     interval: defaultIntervalInHours,
     pace: defaultPace,
@@ -101,6 +102,7 @@ export const routeParams = function(state = {
     }
 };
 
+// eslint-disable-next-line complexity
 const dialogParams = function(state = {errorDetails:null, succeeded:true, shortUrl:' ',
 loadingSource:null,fetchingForecast:false,fetchingRoute:false, cancelActiveFetchMethod: null}, action) {
     switch (action.type) {
@@ -139,9 +141,10 @@ loadingSource:null,fetchingForecast:false,fetchingRoute:false, cancelActiveFetch
             return {...state, errorDetails: null};
         case Actions.STRAVA_FETCH_SUCCESS:
             return {...state, errorDetails: null};
-        case Actions.STRAVA_FETCH_FAILURE:
+        case Actions.STRAVA_FETCH_FAILURE: {
             const errorMessage = typeof action.error === 'object' ? action.error.message : action.error
             return {...state, errorDetails: `Error loading route from Strava: ${errorMessage}`};
+        }
         case Actions.SET_STRAVA_ERROR:
             if (action.error !== undefined) {
                 return { ...state, errorDetails:  `Error loading route from Strava: ${action.error}` };
@@ -289,9 +292,10 @@ const strava = function (state = {
         case Actions.STRAVA_FETCH_SUCCESS:
             return {...state, fetching: false, activityData: action.data.activity, activityStream: action.data.stream,
                 analysisInterval:getAnalysisIntervalFromRouteDuration(action.data.activity.elapsed_time/3600)};
-        case Actions.STRAVA_FETCH_FAILURE:
+        case Actions.STRAVA_FETCH_FAILURE: {
             const errorMessage = typeof action.error === 'object' ? action.error.message : action.error
             return {...state, fetching: false, access_token: errorMessage === "Authorization Error" ? null : state.access_token};
+        }
         case Actions.SET_ANALYSIS_INTERVAL:
             return {...state, analysisInterval:parseInt(action.interval),subrange:[]};
         case Actions.SUBRANGE_MAP:

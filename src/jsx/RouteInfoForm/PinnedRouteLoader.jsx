@@ -49,6 +49,7 @@ const PinnedRouteLoader = ({rwgpsToken, setRwgpsToken, credentialsValid, setPinn
         rwgpsToken,
         usingPinnedRoutes
     ]);
+    let button_class = usingPinnedRoutes ? null : 'glowing_input'
     return (
         <>
             <Button intent="primary"
@@ -57,21 +58,21 @@ const PinnedRouteLoader = ({rwgpsToken, setRwgpsToken, credentialsValid, setPinn
                 active={usingPinnedRoutes}
                 icon="star"
                 loading={loadingPinnedRoutes}
-                className={'glowing_input'}
+                className={button_class}
                 text={usingPinnedRoutes ? "Don't use pinned routes" : "Use pinned routes"}
                 style={{fontSize: "13px"}}
                 onClick={() => {setUsePinnedRoutes(!usingPinnedRoutes);setShowPinnedRoutes(!usingPinnedRoutes)}}
             />
             {credentialsValid ?
             (
-                hasRoutes && (
+                usingPinnedRoutes && hasRoutes && (
                     <Suspense fallback={<p>Loading pinned routes</p>}>
                         <LoadableRouteList/>
                     </Suspense>
                 )
             ) :
              (
-                usingPinnedRoutes && /*(window.location.href = `/rwgpsAuthReq?state=${JSON.stringify(queryString.parse(location.search))}`) &&*/ <div/>
+                <div/>
             )}
         </>
     )
