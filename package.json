@@ -133,7 +133,7 @@
   },
   "scripts": {
     "prod": "./node_modules/.bin/webpack --mode production --config webpack.prod.js --env sentryRelease",
-    "prod-local": "./node_modules/.bin/webpack --mode production --config webpack.prod-nosentry.js --env sentryRelease",
+    "prod-local": "./node_modules/.bin/webpack --mode production --config webpack.prod-nosentry.js",
     "dev": "./node_modules/.bin/webpack --mode development --progress --color --stats-error-details --config webpack.dev.js --env sentryRelease",
     "dev:watch": "./node_modules/.bin/webpack --mode development --progress --color --config webpack.dev.js --env sentryRelease --watch",
     "deploy": "./buildRelease.sh",

@@ -488,93 +488,39 @@ const makeFeatureRecord = (response) => {
     };
 }
 
-const fetchRouteName = async (id, type) => {
-    const rwgpsApiKey = process.env.RWGPS_API_KEY;
-    const url = `https://ridewithgps.com/${type}s/${id}.json?apikey=${rwgpsApiKey}&version=2`;
-    try {
-        const response = await axios.get(url).catch(error => {
-            console.error(`Error fetching pinned route ${id} ${JSON.stringify(error.response.data)}`);
-            return '';
-        });
-        if (response.data !== undefined) {
-            return response.data[type].name;
-        }
-        console.warn(`No data returned for a pinned route - ${JSON.stringify(Object.keys(response))}`);
-        return '';
-
-    } catch (err) {
-        console.error(err);
-        return '';
-    }
-};
-
-const retrieveNames = (pinned) => {
-    pinned.sort((el1, el2) => Number(el2.id) - Number(el1.id));
-    return pinned.map(async fav => {fav.name = await fetchRouteName(fav.associated_object_id, fav.associated_object_type);return fav});
-};
-
 app.get('/pinned_routes', async (req, res) => {
     const rwgpsApiKey = process.env.RWGPS_API_KEY;
-    const username = req.query.username;
-    const password = req.query.password;
     const token = req.query.token;
     if (token === undefined) {
-        if (username === undefined || username === '') {
-            res.status(400).json("{'status': 'Missing username'}");
-            return;
-        }
-        if (password === undefined || password === '') {
-            res.status(400).json("{'status': 'Missing password'}");
-            return;
-        }
+        res.status(400).json("{'status': 'Missing authentication token'}");
+        return;
     }
     if (rwgpsApiKey === undefined) {
         res.status(500).json({ 'details': 'Missing rwgps API key' });
         return;
     }
-    if (token === undefined) {
-        let url = `https://ridewithgps.com/users/current.json?apikey=${rwgpsApiKey}&version=2&email=${req.query.username}&password=${req.query.password}`;
-        try {
-            const response = await axios.get(url).catch(error => {
-                console.error(`Error fetching pinned routes for ${req.query.username} ${error.response.data.error}`);
-                res.status(error.response.status).json(error.response.data.error);
-            });
-            if (response === undefined) {
-                return;
-            }
-            insertFeatureRecord(makeFeatureRecord(response), "pinned", response.data.user.email);
-            res.status(200).json(await Promise.all(await retrieveNames(response.data.user.slim_favorites)));
-        } catch (err) {
-            if (err !== undefined) {
-                console.log(`EXCEPTION: ${err}`);
-                res.status(err.response.status).json(err.response.data);
-            }
+    let url = `https://ridewithgps.com/users/current.json`;
+    let options = {headers:{'Authorization':`Bearer ${token}`}};
+    try {
+        const response = await axios.get(url, options).catch(error => {
+            console.error(`Error fetching pinned routes for ${req.query.username} ${error.response.data.error}`);
+            res.status(error.response.status).json(error.response.data.error);
+        });
+        if (response === undefined) {
+            return;
         }
-    }
-    else {
-        let url = `https://ridewithgps.com/users/current.json`;
-        let options = {headers:{'Authorization':`Bearer ${token}`}};
-        try {
-            const response = await axios.get(url, options).catch(error => {
-                console.error(`Error fetching pinned routes for ${req.query.username} ${error.response.data.error}`);
-                res.status(error.response.status).json(error.response.data.error);
-            });
-            if (response === undefined) {
-                return;
-            }
-            insertFeatureRecord(makeFeatureRecord(response), "pinned", response.data.user.email);
-            const favoritesReply = await axios.get(`https://ridewithgps.com/users/${response.data.user.id}/favorites.json?version=2&apikey=${rwgpsApiKey}`, options).catch(error => {
-                console.warn(`Favorites error ${error}`);
-                res.status(error.response.status).json(error.response.data);
-            });
-            const favorites = favoritesReply.data.results.map(fav => {return {id:fav.favid, name:fav.route.name,
-                associated_object_id:fav.route.id, associated_object_type:fav.type, key:fav.favid}});
-            res.status(200).json(favorites);
-        } catch (err) {
-            if (err !== undefined) {
-                console.log(`EXCEPTION: ${err}`);
-                res.status(err.response.status).json(err.response.data);
-            }
+        insertFeatureRecord(makeFeatureRecord(response), "pinned", response.data.user.email);
+        const favoritesReply = await axios.get(`https://ridewithgps.com/users/${response.data.user.id}/favorites.json?version=2&apikey=${rwgpsApiKey}`, options).catch(error => {
+            console.warn(`Favorites error ${error}`);
+            res.status(error.response.status).json(error.response.data);
+        });
+        const favorites = favoritesReply.data.results.map(fav => {return {id:fav.favid, name:fav.route.name,
+            associated_object_id:fav.route.id, associated_object_type:fav.type, key:fav.favid}});
+        res.status(200).json(favorites);
+    } catch (err) {
+        if (err !== undefined) {
+            console.log(`EXCEPTION: ${err}`);
+            res.status(err.response.status).json(err.response.data);
         }
     }
 

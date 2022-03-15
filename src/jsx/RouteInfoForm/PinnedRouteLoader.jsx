@@ -5,7 +5,7 @@ import axios from 'axios';
 import {setPinnedRoutes, setErrorDetails, setRwgpsToken, setLoadingPinned, setUsePinnedRoutes} from "../../redux/actions";
 import {lazy} from '@loadable/component';
 import queryString from 'query-string';
-import { Button } from '@blueprintjs/core';
+import { Button, Spinner } from '@blueprintjs/core';
 import ReactGA from "react-ga4";
 
 const LoadableRouteList = lazy(() => import(/* webpackChunkName: "RouteList" */ './RWGPSRouteList'));
@@ -74,6 +74,7 @@ const PinnedRouteLoader = ({rwgpsToken, setRwgpsToken, credentialsValid, setPinn
              (
                 <div/>
             )}
+            {usingPinnedRoutes && !hasRoutes && <Spinner/>}
         </>
     )
 };
