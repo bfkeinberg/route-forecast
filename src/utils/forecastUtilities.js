@@ -37,7 +37,7 @@ const getTimeZoneId = async (routeInfo, routeStart, timezoneApiKey, type, abortS
   }
 }
 
-const doForecastShitFetch = async (path, formData, abortSignal) => {
+const doForecastFetch = async (path, formData, abortSignal) => {
   try {
       const response = await fetch(path, {
           method: 'POST',
@@ -64,13 +64,13 @@ const doForecastShitFetch = async (path, formData, abortSignal) => {
   }
 }
 
-export const doForecastShit = async (state, abortSignal) => {
+export const doForecast = async (state, abortSignal) => {
   const type = state.routeInfo.rwgpsRouteData !== null ? "rwgps" : "gpx"
   const {result, value, error} = await getTimeZoneId(state.routeInfo, state.uiInfo.routeParams.start, state.params.timezone_api_key, type, abortSignal)
   if (result === "error") {
       return { result: "error", error}
   }
-  const {zoneId: timeZoneId, offset: timeZoneOffset} = value
+  const {zoneId: timeZoneId} = value
 
   const parsedRouteInfo = getRouteInfo(state, type, timeZoneId)
 
@@ -82,7 +82,7 @@ export const doForecastShit = async (state, abortSignal) => {
   formdata.append('routeName', state.routeInfo.name);
   formdata.append('routeNumber', state.uiInfo.routeParams.rwgpsRoute);
 
-  const forecastResults = await doForecastShitFetch(state.params.action, formdata, abortSignal)
+  const forecastResults = await doForecastFetch(state.params.action, formdata, abortSignal)
   if (forecastResults.result === "success") {
       return { result: "success", value: { forecast: forecastResults.value, timeZoneId } }
   } else {

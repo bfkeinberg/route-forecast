@@ -1,5 +1,5 @@
 import cookie from 'react-cookies';
-import { doForecastShit } from '../utils/forecastUtilities';
+import { doForecast } from '../utils/forecastUtilities';
 import { loadRwgpsRoute } from '../utils/rwgpsUtilities';
 import { controlsMeaningfullyDifferent, parseControls } from '../utils/util';
 import ReactGA from "react-ga4";
@@ -243,7 +243,7 @@ export const requestForecast = function() {
         const fetchController = new AbortController()
         const abortMethod = fetchController.abort.bind(fetchController)
         dispatch(beginFetchingForecast(abortMethod));
-        const { result, value, error } = await doForecastShit(getState(), fetchController.signal)
+        const { result, value, error } = await doForecast(getState(), fetchController.signal)
         if (result === "success") {
             const { forecast, timeZoneId } = value
             dispatch(forecastFetchSuccess(forecast, timeZoneId));
