@@ -32,9 +32,9 @@ export const TopBar = ({sidePaneOptions, activeSidePane, setActiveSidePane, side
 }
 
 TopBar.propTypes = {
-  sidePaneOptions:PropTypes.array,
-  activeSidePane:PropTypes.number,
-  setActiveSidePane:PropTypes.func,
+  sidePaneOptions:PropTypes.array.isRequired,
+  activeSidePane:PropTypes.number.isRequired,
+  setActiveSidePane:PropTypes.func.isRequired,
   sidebarWidth:PropTypes.number,
   panesVisible:PropTypes.object.isRequired
 };

@@ -11,10 +11,11 @@ const ShortUrl = ({shortUrl}) => {
                 <div>Shareable link:</div>
             </div>
             <Input size='20' bsSize="sm" readOnly type="text" value={shortUrl}
-                   onFocus={async event => {
+                   onClick={async event => {
                        try {
                             await navigator.clipboard.writeText(event.target.value);
                        } catch (err) {
+                           console.warn(err);
                             event.target.select();document.execCommand('copy');
                        }
                     ReactGA.event('share', {item_id:event.target.value})}}/>
