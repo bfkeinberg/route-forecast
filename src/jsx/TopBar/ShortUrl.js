@@ -11,9 +11,9 @@ const ShortUrl = ({shortUrl}) => {
                 <div>Shareable link:</div>
             </div>
             <Input size='20' bsSize="sm" readOnly type="text" value={shortUrl}
-                   onFocus={event => {
+                   onFocus={async event => {
                        try {
-                            navigator.clipboard.writeText(event.target.value);
+                            await navigator.clipboard.writeText(event.target.value);
                        } catch (err) {
                             event.target.select();document.execCommand('copy');
                        }
