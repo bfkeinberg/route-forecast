@@ -6,11 +6,19 @@ import configureMockStore from 'redux-mock-store';
 import thunk from 'redux-thunk';
 import fetchMock from 'fetch-mock';
 import * as actions from '../src/redux/actions';
-import rootReducer from "../src/redux/reducer";
 import { routeLoadingModes } from '../src/data/enums';
-
+import * as Sentry from "@sentry/react";
+jest.mock('@sentry/react');
 const middlewares = [thunk];
 const mockStore = configureMockStore(middlewares);
+Sentry.startTransaction = jest.fn().mockImplementation(() => {
+    return {
+        startChild: () => {return {
+            finish: () => {return null}
+        }},
+        finish: () => {return null}
+    }
+    });
 
 describe('load route from Ride with GPS', () => {
     afterEach(() => {

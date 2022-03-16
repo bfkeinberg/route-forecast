@@ -43,6 +43,7 @@ describe('<RouteWeatherUI />', () => {
     const setRwgpsToken=jest.fn();
     const setStartTimestamp=jest.fn();
     const setZoomToRange=jest.fn();
+    const setUsePinnedRoutes=jest.fn();
 
     it('renders without crashing', () => {
 
@@ -55,6 +56,7 @@ describe('<RouteWeatherUI />', () => {
                                                 setStartTimestamp={setStartTimestamp} setZoomToRange={setZoomToRange}
                                                 setStravaRefreshToken={setStravaRefreshToken}
                                 setInitialStart={setInitialStart} setWeatherProvider={setWeatherProvider} setRwgpsToken={setRwgpsToken}
+                                setUsePinnedRoutes={setUsePinnedRoutes} 
                                 maps_api_key={'zzzz'} bitly_token={'ddd'} timezone_api_key={'lll'}/>);
         expect(wrapper.find(ForecastTable).length).toEqual(0);
     });

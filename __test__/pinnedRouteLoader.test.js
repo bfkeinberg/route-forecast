@@ -17,7 +17,7 @@
         token:"IAmAToken",
         pinnedRoutes:[],
         loadingRoutes:false,
-        usingPinnedRoutes:false
+        usePinnedRoutes:false
     },
 
  };
@@ -27,8 +27,10 @@
  let store = mockStore(initialState);
 
  describe('<PinnedRouteLoader />', () => {
+     const setShowPinnedRoutes = jest.fn();
+
      it('is rendered', () => {
-        const wrapper = mount(<Provider store={store}><PinnedRouteLoader/></Provider>);
+        const wrapper = mount(<Provider store={store}><PinnedRouteLoader showPinnedRoutes={true} setShowPinnedRoutes={setShowPinnedRoutes}/></Provider>);
         expect(wrapper.find(Button).length).toBe(1);
      });
 
