@@ -7,7 +7,7 @@ import { usePreviousPersistent, useReusableDelay, useValueHasChanged } from "../
 import { useLoadingFromURLStatus } from "../DesktopUI";
 import { useMediaQuery } from "react-responsive";
 import PropTypes from 'prop-types';
-
+import { RouteTitle } from "../shared/RouteTitle";
 export const TopBar = ({sidePaneOptions, activeSidePane, setActiveSidePane, sidebarWidth, panesVisible}) => {
   const smallScreen = useMediaQuery({ query: '(max-width: 900px)' })
   return (
@@ -20,6 +20,7 @@ export const TopBar = ({sidePaneOptions, activeSidePane, setActiveSidePane, side
         panesVisible={panesVisible}
       />
       <div style={{display: "flex", flexGrow: 1, alignItems: "center", padding: "0px 20px", borderWidth: "0px 0px 0px 1px", borderStyle: "solid", borderColor: "grey"}}>
+        <RouteTitle/>
         <div style={{flexGrow: 1, display: "flex", justifyContent: "flex-end", alignItems: "center"}}>
           <ShortUrl/>
           <DonationRequest wacky/>
