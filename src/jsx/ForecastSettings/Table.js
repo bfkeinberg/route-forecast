@@ -80,7 +80,7 @@ const Cell = ({value, transformFunction, editable, onCellValueChanged, editValid
   return (
     editingValue !== null ?
     <div>
-      <input autoFocus onKeyPress={(event) => {}/*console.log(event.key)*/} value={editingValue} style={{width: "40px"}} onChange={(event) => valueEdited(event.target.value)} onBlur={endEditing}/>
+      <input autoFocus onKeyPress={(/*event*/) => {}/*console.log(event.key)*/} value={editingValue} style={{width: "40px"}} onChange={(event) => valueEdited(event.target.value)} onBlur={endEditing}/>
     </div>    :
     <div style={{cursor: editable ? "pointer" : "", width: "100%", height: "100%"}} onClick={beginEditing}>
       {value !== undefined && transformFunction(value)}
