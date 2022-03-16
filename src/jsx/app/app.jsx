@@ -2,8 +2,10 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import TopLevel from './topLevel';
 import LocationContext from '../locationContext';
-import * as Sentry from '@sentry/browser';
+// import * as Sentry from '@sentry/browser';
 import ReactGA from "react-ga4";
+import { BrowserTracing } from "@sentry/tracing";
+import * as Sentry from "@sentry/react";
 
 ReactGA.initialize("G-0R3J1W9ECC");
 //ReactGA.send("pageview");
@@ -15,7 +17,13 @@ if (!window.origin.startsWith('http://localhost')) {
         autoSessionTracking:true,
         initialScope:{
             user:{ip_address:"{{auto}}"}
-        }
+        },
+        // This enables automatic instrumentation (highly recommended), but is not
+        // necessary for purely manual usage
+        integrations: [new BrowserTracing()],
+
+        // To set a uniform sample rate
+        tracesSampleRate: 0.2
         /*,
         beforeBreadcrumb(breadcrumb) {
             if (breadcrumb.category==='console') {return null} else {return breadcrumb}

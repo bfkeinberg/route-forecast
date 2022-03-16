@@ -11,6 +11,16 @@ import { calculatedControls, forecast, initialState, timezoneData } from './requ
 
 const middlewares = [thunk];
 const mockStore = configureMockStore(middlewares);
+import * as Sentry from "@sentry/react";
+jest.mock('@sentry/react');
+Sentry.startTransaction = jest.fn().mockImplementation(() => {
+    return {
+        startChild: () => {return {
+            finish: () => {return null}
+        }},
+        finish: () => {return null}
+    }
+    });
 
 describe('request forecast', () => {
 
