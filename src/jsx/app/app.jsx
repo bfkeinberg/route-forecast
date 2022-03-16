@@ -3,11 +3,19 @@ import ReactDOM from 'react-dom';
 import TopLevel from './topLevel';
 import LocationContext from '../locationContext';
 import * as Sentry from '@sentry/browser';
+import ReactGA from "react-ga4";
+
+ReactGA.initialize("G-0R3J1W9ECC");
+//ReactGA.send("pageview");
 
 /* global SENTRY_RELEASE */
 if (!window.origin.startsWith('http://localhost')) {
     Sentry.init({ dsn: 'https://ea4c472ff9054dab8c18d594b95d8da2@sentry.io/298059',
         release:SENTRY_RELEASE, environment:'production',
+        autoSessionTracking:true,
+        initialScope:{
+            user:{ip_address:"{{auto}}"}
+        }
         /*,
         beforeBreadcrumb(breadcrumb) {
             if (breadcrumb.category==='console') {return null} else {return breadcrumb}

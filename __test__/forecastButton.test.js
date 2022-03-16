@@ -3,15 +3,15 @@
  */
 
 import React from 'react'
-import { configure, shallow, mount } from 'enzyme'
+import { configure, mount } from 'enzyme'
 import Adapter from '@wojtekmaj/enzyme-adapter-react-17';
-import ForecastButton from '../src/jsx/ui/forecastButton';
 import { Provider } from 'react-redux';
 import configureMockStore from 'redux-mock-store';
 import thunk from 'redux-thunk';
 import { DateTime } from 'luxon';
 import {Button} from 'reactstrap';
 import { Context as ResponsiveContext } from 'react-responsive'
+import ForecastButton from '../src/jsx/ForecastSettings/ForecastButton';
 
 const middlewares = [thunk];
 const mockStore = configureMockStore(middlewares);
@@ -20,7 +20,11 @@ configure({ adapter: new Adapter() });
 
 const dir = process.cwd();
 const routeInfo = require(`${dir}/__test__/routeInfo.json`);
-const initialState = {routeInfo:routeInfo, uiInfo:{
+const initialState = {routeInfo:routeInfo,
+    controls: {
+        "queryString":"foo"
+    },
+    uiInfo:{
     "routeParams": {
         "interval": 1,
         "pace": "B+",

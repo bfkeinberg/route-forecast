@@ -12,7 +12,7 @@ const mockStore = configureMockStore(middlewares);
 import React from 'react'
 import { configure, shallow, mount, render } from 'enzyme'
 import Adapter from '@wojtekmaj/enzyme-adapter-react-17';
-import RidingPace from '../src/jsx/ui/ridingPace';
+import RidingPace from '../src/jsx/ForecastSettings/RidingPace';
 configure({ adapter: new Adapter() });
 
 const ridingPaceState = {
@@ -23,7 +23,6 @@ const ridingPaceState = {
             "rwgpsRoute": 2798,
             "rwgpsRouteIsTrip": false,
             "start": "2018-07-30T14:00:00.403Z",
-            "timeZoneId": "Europe/Madrid",
             "loadingSource": null,
             "succeeded": null
         },
@@ -34,11 +33,16 @@ const ridingPaceState = {
             "shortUrl": "https://goo.gl/oNtVgM",
             "loadingSource": "rwgps",
             "fetchingForecast": false,
-            "fetchingRoute": false
+            "fetchingRoute": false,
+            cancelActiveFetchMethod: null
         }
     },
     "strava": {
-        "actualPace": 0
+        activityData: {
+            average_speed: 10,
+            total_elevation_gain: 10,
+            distance: 10,
+        }
     },
     "controls": {
         "metric": false
@@ -52,7 +56,7 @@ describe('<RidingPace />', () => {
         const div = document.createElement('div');
         div.setAttribute("id", "paceInput")
         document.body.appendChild(div)
-        const wrapper = mount((<Provider store={store}><RidingPace /></Provider>));
+        const wrapper = mount((<Provider store={store}><RidingPace/></Provider>));
         expect(wrapper.find(Input).length).toBe(1);
         expect((wrapper.find(Input).children().children()).length).toBe(13);
         expect(wrapper.find('Input').prop('value')).toBe('D');

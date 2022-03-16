@@ -1,0 +1,16 @@
+.bp3-spinner-head, .bp3-spinner {
+  filter: brightness(1.5)
+}
+
+.fade-in {
+  animation: fade-in 1s ease-in
+}
+
+@keyframes fade-in {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}

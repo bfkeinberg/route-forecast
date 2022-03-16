@@ -8,7 +8,8 @@
       "start": "2018-07-30T14:00:00.403Z",
       "timeZoneId":"Europe/Madrid",
       "loadingSource": null,
-      "succeeded": null
+      "succeeded": null,
+      "routeLoadingMode": 1
     },
     "dialogParams": {
       "formVisible": true,
@@ -21,13 +22,6 @@
     }
   },
   "routeInfo": {
-    "finishTime": "",
-    "initialFinishTime": "",
-    "weatherCorrectionMinutes": null,
-    "forecastRequest": null,
-    "points": [],
-    "fetchAfterLoad": false,
-    "bounds": null,
     "name": "",
     "rwgpsRouteData": {
       "type": "route",
@@ -8093,17 +8087,11 @@
     },
     "gpxRouteData": null,
     "timeZoneOffset": 7200,
-    "timeZoneId": "Europe/Madrid"
   },
   "controls": {
     "metric": false,
     "displayBanked": false,
-    "stravaAnalysis": false,
     "userControlPoints": [],
-    "calculatedControlValues": [],
-    "initialControlValues": [],
-    "count": 0,
-    "displayedFinishTime": "",
     "queryString": null
   },
   "strava": {
@@ -8112,8 +8100,6 @@
     "token": "31ca57912cae10ec928f146afb86f31a54d9ea2a",
     "fetching": false,
     "activityData": null,
-    "calculatedPaces": null,
-    "errorDetails": null,
     "subrange": []
   },
   "forecast": {
@@ -8122,9 +8108,6 @@
     "range": []
   },
   "params": {
-    "newUserMode": false,
-    "action": "/forecast",
-    "maps_api_key": "AIzaSyDLmXz6JFen9Y9ZfwFcuJWdrRmq-kBjnKs",
-    "timezone_api_key": "AIzaSyBS_wyxfIuLDEJWNOKs4w1NqbmwSDjLqCE"
+    "action": "/forecast"
   }
 }

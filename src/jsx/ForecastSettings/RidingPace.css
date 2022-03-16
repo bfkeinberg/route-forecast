@@ -1,0 +1,20 @@
+.red-tooltip {
+  background-color: #ff363d;
+  color: #000;
+  border: 1px solid #062e56;
+}
+
+.red-tooltip ~ .arrow:before {
+  /*border-top: 5px solid #062e56;*/
+  border-bottom-color: #ff363d;
+}
+
+.green-tooltip {
+  background-color: #40ff23;
+  color: #000;
+  border: 1px solid #062e56;
+}
+
+.green-tooltip ~ .arrow:before {
+  border-bottom-color: #40ff23;
+}

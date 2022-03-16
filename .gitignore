@@ -7,3 +7,7 @@ dist/
 .DS_Store
 *.xcuserstate
 randoplan/
+route-forecast-c4075d06140e.json
+nodejs.yaml
+sample_output/
+.vscode/launch_full.json
