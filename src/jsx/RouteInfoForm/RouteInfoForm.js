@@ -10,11 +10,13 @@ import { AlwaysFilledSwitch } from './AlwaysFilledSwitch';
 import { RouteInfoInputRWGPS } from './RouteInfoInputRWGPS';
 import { RouteInfoInputStrava } from './RouteInfoInputStrava';
 import { routeLoadingModes } from '../../data/enums';
+import ReactGA from "react-ga4";
 
 const RouteInfoForm = ({ errorDetails, routeLoadingMode, setRouteLoadingMode }) => {
     const mode = routeLoadingMode
     const modeSwitched = (event) => {
-        setRouteLoadingMode(event.target.checked ? routeLoadingModes.STRAVA : routeLoadingModes.RWGPS)
+        setRouteLoadingMode(event.target.checked ? routeLoadingModes.STRAVA : routeLoadingModes.RWGPS);
+        if (event.target.checked) {ReactGA.event('select_content', {content_type:'strava'})}
     }
 
     return (

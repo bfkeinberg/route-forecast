@@ -8,11 +8,14 @@ import StravaRouteIdInput from './StravaRouteIdInput';
 import { useSelector, useDispatch } from 'react-redux';
 import { loadStravaActivity } from "../../redux/actions";
 import stravaRouteParser from '../../utils/stravaRouteParser';
+import ReactGA from "react-ga4";
 
 export const RouteInfoInputStrava = () => {
   const dispatch = useDispatch()
 
+  const strava_activity_id = useSelector(state => state.strava.activity);
   const fetchRoute = () => {
+    ReactGA.event('post_score', {score:strava_activity_id, character:'strava'});
     dispatch(loadStravaActivity())
   }
 
