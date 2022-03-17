@@ -37,6 +37,9 @@ export const getRouteInfo = (state, type, timeZoneId) => {
 }
 
 export const parseControls = function (controlPointString, deleteFirstElement) {
+  if (controlPointString === null || controlPointString === undefined) {
+    return [];
+  }
   if (deleteFirstElement) {
     let controlPointList = controlPointString.split(":");
     let controlPoints =
