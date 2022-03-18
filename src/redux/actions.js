@@ -240,7 +240,7 @@ const forecastFetchCanceled = function(error) {
 export const requestForecast = function() {
     return async function(dispatch,getState) {
         // ReactGA.send({ hitType: "pageview", page: "/forecast" });
-        const transaction = Sentry.startTransaction({ name: "requestForecastTx" });
+        const transaction = Sentry.startTransaction({ name: "requestForecast" });
         const span = transaction.startChild({ op: "forecast" }); // This function returns a Span
         ReactGA.event('unlock_achievement', {achievement_id:getRouteName(getState().routeInfo.rwgpsRouteData)});
         const fetchController = new AbortController()
@@ -279,7 +279,7 @@ const setLoadingFromURL = (loading) => {
 export const loadFromRideWithGps = function(routeNumber, isTrip) {
     return function(dispatch, getState) {
         // ReactGA.send({ hitType: "pageview", page: "/loadRoute" });
-        const transaction = Sentry.startTransaction({ name: "loadingRwgpsRouteTx" });
+        const transaction = Sentry.startTransaction({ name: "loadingRwgpsRoute" });
         const span = transaction.startChild({ op: "load" }); // This function returns a Span
         routeNumber = routeNumber || getState().uiInfo.routeParams.rwgpsRoute
         ReactGA.event('login', {method:routeNumber});
@@ -368,6 +368,8 @@ export const setShortUrl = function(url) {
  */
 export const shortenUrl = function(url) {
     return function (dispatch) {
+        const transaction = Sentry.startTransaction({ name: "shortenUrl" });
+        const span = transaction.startChild({ op: "load" }); // This function returns a Span
         return fetch("/bitly",
             {
                 headers: {
@@ -380,6 +382,8 @@ export const shortenUrl = function(url) {
             .then(response => response.json())
             .catch( error => {return setErrorDetails(error)})
             .then(responseJson => {
+                span.finish(); // Remember that only finished spans will be sent with the transaction
+                transaction.finish(); // Finishing the transaction will send it to Sentry
                 if (responseJson.error === null) {
                     return dispatch(setShortUrl(responseJson.url));
                 } else {
