@@ -93,6 +93,8 @@ export class ForecastTable extends Component {
                 case 'visualcrossing':
                    return <a href="https://www.visualcrossing.com/weather-data"><img src={visualcrossing}/></a>;
                     // return <div><a href="https://www.visualcrossing.com/weather-data">Powered by Visual Crossing Weather</a><p/></div>;
+                case 'nws':
+                    return <img src={"https://www.weather.gov/images/gjt/newsletter/NWSLogo.png"} width={100} height={100}/>;
                 default: return <div/>;
             }
     }

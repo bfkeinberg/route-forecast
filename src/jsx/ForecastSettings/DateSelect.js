@@ -23,11 +23,11 @@ export const setDateOnly = (start, setInitialStart) => {
 };
 
 //"EEE MMM dd yyyy HH:mm:ss 'GMT'ZZZ"
-const DateSelect = ({start, setStart, setInitialStart}) => {
+const DateSelect = ({start, setStart, setInitialStart, maxDaysInFuture, canForecastPast}) => {
     // allow us to continue to show the start time if the route was forecast for a time before the present
     const now = new Date();
     let later = new Date();
-    const daysToAdd = 14;
+    const daysToAdd = maxDaysInFuture;
     later.setDate(now.getDate() + daysToAdd);
 
     return (
@@ -43,6 +43,7 @@ const DateSelect = ({start, setStart, setInitialStart}) => {
                     options={{enableTime: true,
                         altInput: true, altFormat: 'F j, Y h:i K',
                         altInputClass: 'dateDisplay',
+                        minDate: canForecastPast ? null : now,
                         maxDate: later,
                         defaultDate: start.toJSDate(),
                         dateFormat: 'Z',
@@ -59,12 +60,16 @@ const DateSelect = ({start, setStart, setInitialStart}) => {
 DateSelect.propTypes = {
     start:PropTypes.instanceOf(DateTime).isRequired,
     setStart:PropTypes.func.isRequired,
-    setInitialStart:PropTypes.func.isRequired
+    setInitialStart:PropTypes.func.isRequired,
+    maxDaysInFuture:PropTypes.number.isRequired,
+    canForecastPast:PropTypes.bool.isRequired
 };
 
 const mapStateToProps = (state) =>
     ({
-        start: state.uiInfo.routeParams.initialStart
+        start: state.uiInfo.routeParams.initialStart,
+        maxDaysInFuture:state.uiInfo.routeParams.maxDaysInFuture,
+        canForecastPast:state.uiInfo.routeParams.canForecastPast
     });
 
 const mapDispatchToProps = {
