@@ -299,7 +299,7 @@ export const loadFromRideWithGps = function(routeNumber, isTrip) {
 export const loadRouteFromURL = () => {
     return async function(dispatch, getState) {
         // ReactGA.send({ hitType: "pageview", page: "/loadRoute" });
-        ReactGA.event('login', {method:getState().uiInfo.routeParams.rwgpsRoute});
+        // ReactGA.event('login', {method:getState().uiInfo.routeParams.rwgpsRoute});
         await dispatch(setLoadingFromURL(true))
         await dispatch(loadFromRideWithGps())
         const error = getState().uiInfo.dialogParams.errorDetails
