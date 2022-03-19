@@ -27,7 +27,9 @@ module.exports = (env, argv) => merge(common(env, argv), {
                 'node_modules',
                 'webpack.prod.js',
                 'webpack.common.js',
-                'webpack.dev.js'
+                'webpack.dev.js',
+                'dist/server',
+                'setupFile.js'
             ],
             configFile: 'sentry.properties',
             rewrite: true,
