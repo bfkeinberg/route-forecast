@@ -40,8 +40,22 @@ const extractForecast = (forecastGridData, currentTime) => {
 
 const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
+const getForecastFromNws = async (forecastUrl) => {
+    let timeout = 200;
+    do {
+        // eslint-disable-next-line no-await-in-loop
+        const forecastGridData = await axios.get(forecastUrl).catch(
+            error => {console.error(`Failed to get NWS forecast from ${forecastUrl}:${JSON.stringify(error.response.data)}`)});
+        if (forecastGridData !== undefined) {
+            return forecastGridData;
+        }
+        // eslint-disable-next-line no-await-in-loop
+        await sleep(timeout);
+        timeout += 100;
+    } while (timeout < 1000);
+    throw Error(`Failed to get NWS forecast from ${forecastUrl}`);
+};
 /* eslint-disable max-params, max-lines-per-function */
-
 /**
  *
  * @param {number} lat latitude
@@ -56,14 +70,8 @@ const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
  * vectorBearing: *, gust: string} | never>} a promise to evaluate to get the forecast results
  */
 const callNWS = async function (lat, lon, currentTime, distance, zone, bearing, getBearingDifference) {
-    await sleep(300);
     const forecastUrl = await getForecastUrl(lat, lon);
-    const forecastGridData = await axios.get(forecastUrl).catch(
-        error => {console.error(Error(`Failed to get NWS forecast from ${forecastUrl}:${JSON.stringify(error.response.data)}`));
-            throw Error(`Failed to get NWS forecast from ${forecastUrl}:${JSON.stringify(error.response.data)}`)});
-    if (forecastGridData === null) {
-        throw Error("Failed to get NWS forecast");
-    }
+    const forecastGridData = await getForecastFromNws(forecastUrl);
     const startTime = DateTime.fromISO(currentTime);
     const forecastValues = extractForecast(forecastGridData, startTime, bearing, getBearingDifference);
     const rainy = forecastValues.precip > 30;
