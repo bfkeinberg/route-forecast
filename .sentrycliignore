@@ -6,3 +6,6 @@ webpack.prod-nosentry.js
 crittest.js
 phtest.js
 routeWeather.*
+__test__
+coverage
+server

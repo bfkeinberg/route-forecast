@@ -17,10 +17,11 @@ describe('route params reducer', () => {
         const routeParamsState = routeParams(undefined,{});
         expect(routeParamsState).toEqual(
             {
-                interval:1,pace:'D',rwgpsRoute:'',
-                rwgpsRouteIsTrip:false,
+                interval:1,min_interval:0.25,pace:'D',rwgpsRoute:'',
+                rwgpsRouteIsTrip:false,canForecastPast:true,
                 start: expect.any(DateTime),
                 initialStart: expect.any(DateTime),
+                maxDaysInFuture:14,
                 routeLoadingMode: routeLoadingModes.RWGPS
             }
         );
@@ -28,7 +29,10 @@ describe('route params reducer', () => {
 
     it('should handle SET_START_TIME', () => {
         const routeParamsState = {
+            "canForecastPast":true,
             "interval": 0.5,
+            "min_interval":0.25,
+            "maxDaysInFuture":14,
             "pace": "C",
             "rwgpsRoute": 201276,
             "rwgpsRouteIsTrip": false,
@@ -43,7 +47,10 @@ describe('route params reducer', () => {
                 start:DateTime.fromISO('2018-08-01T15:00:00.000Z')
         })).toEqual(
             {
+                "canForecastPast":true,
                 "interval": 0.5,
+                "min_interval":0.25,
+                "maxDaysInFuture":14,
                 "pace": "C",
                 "rwgpsRoute": 201276,
                 "rwgpsRouteIsTrip": false,

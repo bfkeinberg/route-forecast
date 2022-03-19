@@ -11,6 +11,16 @@ import { routeLoadingModes } from '../src/data/enums';
 require('isomorphic-fetch');
 const middlewares = [thunk];
 const mockStore = configureMockStore(middlewares);
+import * as Sentry from "@sentry/react";
+jest.mock('@sentry/react');
+Sentry.startTransaction = jest.fn().mockImplementation(() => {
+    return {
+        startChild: () => {return {
+            finish: () => {return null}
+        }},
+        finish: () => {return null}
+    }
+    });
 
 describe('Call URL shortener', () => {
     afterEach(() => {

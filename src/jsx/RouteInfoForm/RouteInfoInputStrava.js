@@ -15,7 +15,7 @@ export const RouteInfoInputStrava = () => {
 
   const strava_activity_id = useSelector(state => state.strava.activity);
   const fetchRoute = () => {
-    ReactGA.event('post_score', {score:strava_activity_id, character:'strava'});
+    ReactGA.event('earn_virtual_currency', {virtual_currency_name:strava_activity_id});
     dispatch(loadStravaActivity())
   }
 

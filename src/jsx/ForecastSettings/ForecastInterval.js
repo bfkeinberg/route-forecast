@@ -7,14 +7,14 @@ import Slider from "@mui/material/Slider"
 import {connect} from 'react-redux';
 import {setInterval} from "../../redux/actions";
 
-const ForecastInterval = ({interval,setInterval}) => {
+const ForecastInterval = ({min_interval,interval,setInterval}) => {
     return (
         <FormGroup style={{flex: 1}} label='Forecast Interval'>
             <Tooltip2 usePortal={true} placement='bottom' content='How often to generate weather forecast in minutes'>
                 <Slider
                     value={interval}
                     step={0.25}
-                    min={0.25}
+                    min={min_interval}
                     max={2.0}
                     marks={[
 {value:0.25,label:'15'},
@@ -34,12 +34,14 @@ const ForecastInterval = ({interval,setInterval}) => {
 };
 
 ForecastInterval.propTypes = {
+    min_interval:PropTypes.number.isRequired,
     interval:PropTypes.number.isRequired,
     setInterval:PropTypes.func.isRequired
 };
 
 const mapStateToProps = (state) =>
     ({
+        min_interval: state.uiInfo.routeParams.min_interval,
         interval: state.uiInfo.routeParams.interval
     });
 

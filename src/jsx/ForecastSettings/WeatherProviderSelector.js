@@ -12,9 +12,10 @@ const WeatherProviderSelector = ({weatherProvider,setWeatherProvider}) => {
                     name="provider"
                     value={weatherProvider} onChange={event => {setWeatherProvider(event.target.value)}}>
                     <option value="darksky">Dark Sky</option>
-                    <option value="climacell">Climacell</option>
+                    <option value="climacell">Tomorrow.io</option>
                     <option value="weatherapi">WeatherAPI</option>
                     <option value="visualcrossing">Visual Crossing</option>
+                    <option value="nws">National Weather Service</option>
                 </Input>
             </FormGroup>
     );

@@ -20,17 +20,33 @@ const initialStartTime = function() {
     return now;
 };
 
+const providerValues = {
+    darksky:{min_interval:0.25,max_days:14, canForecastPast:true},
+    climacell:{min_interval:0.25,max_days:14, canForecastPast:false},
+    weatherapi:{min_interval:1,max_days:10, canForecastPast:true},
+    visualcrossing:{min_interval:0.25,max_days:14, canForecastPast:true},
+    nws:{min_interval:1,max_days:3, canForecastPast:false}
+    };
+
 // eslint-disable-next-line complexity
 export const routeParams = function(state = {
     interval: defaultIntervalInHours,
+    min_interval:providerValues.darksky.min_interval,
+    canForecastPast:providerValues.darksky.canForecastPast,
     pace: defaultPace,
     rwgpsRoute: '',
     rwgpsRouteIsTrip: false,
     start: initialStartTime(),
     initialStart: initialStartTime(),
-    routeLoadingMode: routeLoadingModes.RWGPS
+    routeLoadingMode: routeLoadingModes.RWGPS,
+    maxDaysInFuture: providerValues['darksky'].max_days
 }, action) {
     switch (action.type) {
+        case Actions.SET_WEATHER_PROVIDER:
+            return {...state, interval:Math.max(state.interval,providerValues[action.weatherProvider].min_interval),
+                min_interval:providerValues[action.weatherProvider].min_interval,
+                maxDaysInFuture:providerValues[action.weatherProvider].max_days,
+            canForecastPast:providerValues[action.weatherProvider].canForecastPast}
         case Actions.SET_RWGPS_ROUTE:
             if (action.route !== undefined) {
                 let route = getRouteNumberFromValue(action.route);

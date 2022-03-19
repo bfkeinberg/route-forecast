@@ -96,9 +96,12 @@ module.exports = (env,argv) => {
         },
         plugins: [
             new CleanWebpackPlugin({}),
-            new webpack.DefinePlugin({SENTRY_RELEASE: JSON.stringify(env.sentryRelease), "process.env": "{}"}),
+            // new webpack.DefinePlugin({SENTRY_RELEASE: JSON.stringify(env.sentryRelease), "process.env": "{}"}),
             new webpack.ProvidePlugin({
-                Buffer: ['buffer', 'Buffer']
+                Buffer: [
+                    'buffer',
+                 'Buffer'
+                ]
             }),
             new MiniCssExtractPlugin({
                 // Options similar to the same options in webpackOptions.output

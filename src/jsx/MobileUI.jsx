@@ -6,8 +6,8 @@ import PropTypes from "prop-types";
 import React from "react";
 import { Route, Routes, Link, MemoryRouter, useNavigate } from "react-router-dom";
 import {Nav, NavItem, NavbarBrand} from "reactstrap";
-import { Icon, Intent } from "@blueprintjs/core";
-import {IconNames} from "@blueprintjs/icons";
+import { Icon, IconSize, Intent } from "@blueprintjs/core";
+import {IconNames } from "@blueprintjs/icons";
 import {connect, useSelector} from 'react-redux';
 import RouteInfoForm from "./RouteInfoForm/RouteInfoForm";
 import { ForecastSettings } from "./ForecastSettings/ForecastSettings";
@@ -65,17 +65,17 @@ const MobileUITabs = (props) => {
                 </NavItem>
                 <NavItem>
                     <Link to={"/map/"} className={'nav-link'}>
-                        <Icon icon={IconNames.GLOBE} iconSize={Icon.SIZE_STANDARD} intent={props.needToViewMap ? Intent.DANGER : Intent.NONE} />
+                        <Icon icon={IconNames.GLOBE} iconSize={IconSize.STANDARD} intent={props.needToViewMap ? Intent.DANGER : Intent.NONE} />
                     </Link>
                 </NavItem>
                 <NavItem>
                     <Link to={"/forecastTable/"} className={'nav-link'}>
-                        <Icon icon={IconNames.TH} iconSize={Icon.SIZE_STANDARD} intent={props.needToViewTable ? Intent.DANGER : Intent.NONE} />
+                        <Icon icon={IconNames.TH} iconSize={IconSize.STANDARD} intent={props.needToViewTable ? Intent.DANGER : Intent.NONE} />
                     </Link>
                 </NavItem>
                 <NavItem>
                     <Link to={"/paceTable/"} className={'nav-link'}>
-                        <Icon color="orange" icon={IconNames.TH} iconSize={Icon.SIZE_STANDARD} intent={props.needToViewTable ? Intent.DANGER : Intent.NONE} />
+                        <Icon color="orange" icon={IconNames.HEAT_GRID} iconSize={IconSize.STANDARD} intent={props.needToViewTable ? Intent.DANGER : Intent.NONE} />
                     </Link>
                 </NavItem>
             </Nav>

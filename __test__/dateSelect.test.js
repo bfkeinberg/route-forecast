@@ -11,7 +11,7 @@ const mockStore = configureMockStore(middlewares);
 import Flatpickr from 'react-flatpickr'
 
 import React from 'react'
-import { configure, shallow, mount, render } from 'enzyme'
+import { configure, mount } from 'enzyme'
 import Adapter from '@wojtekmaj/enzyme-adapter-react-17';
 import DateSelect, { setDateOnly } from '../src/jsx/ForecastSettings/DateSelect';
 configure({ adapter: new Adapter() });
@@ -22,6 +22,8 @@ const routeInfo = require(`${dir}/__test__/routeInfo.json`);
 const initialState = {routeInfo:routeInfo, uiInfo:{
     "routeParams": {
         "interval": 1,
+        "maxDaysInFuture":14,
+        "canForecastPast":false,
         "pace": "B+",
         "rwgpsRoute": 27904106,
         "rwgpsRouteIsTrip": false,
