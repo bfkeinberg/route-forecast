@@ -74,7 +74,7 @@ const PinnedRouteLoader = ({rwgpsToken, setRwgpsToken, credentialsValid, setPinn
              (
                 <div/>
             )}
-            {usingPinnedRoutes && !hasRoutes && <Spinner/>}
+            {usingPinnedRoutes && !hasRoutes && !loadingPinnedRoutes && <Spinner/>}
         </>
     )
 };
