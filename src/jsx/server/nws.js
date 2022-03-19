@@ -56,10 +56,11 @@ const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
  * vectorBearing: *, gust: string} | never>} a promise to evaluate to get the forecast results
  */
 const callNWS = async function (lat, lon, currentTime, distance, zone, bearing, getBearingDifference) {
-    await sleep(150);
+    await sleep(300);
     const forecastUrl = await getForecastUrl(lat, lon);
     const forecastGridData = await axios.get(forecastUrl).catch(
-        error => {throw Error(`Failed to get NWS forecast from ${forecastUrl}:${JSON.stringify(error.response.data)}`)});
+        error => {console.error(Error(`Failed to get NWS forecast from ${forecastUrl}:${JSON.stringify(error.response.data)}`));
+            throw Error(`Failed to get NWS forecast from ${forecastUrl}:${JSON.stringify(error.response.data)}`)});
     if (forecastGridData === null) {
         throw Error("Failed to get NWS forecast");
     }
@@ -68,6 +69,8 @@ const callNWS = async function (lat, lon, currentTime, distance, zone, bearing, 
     const rainy = forecastValues.precip > 30;
     // eslint-disable-next-line no-mixed-operators
     const temperatureInF = forecastValues.temperatureInC * 9/5 + 32;
+    // eslint-disable-next-line no-mixed-operators
+    const apparentTemperatureInF = forecastValues.apparentTemperatureInC * 9/5 + 32;
     return new Promise((resolve) => {resolve({
         'time':startTime.toLocaleString(DateTime.TIME_SIMPLE),
         'distance':distance,
@@ -85,7 +88,7 @@ const callNWS = async function (lat, lon, currentTime, distance, zone, bearing, 
         'windBearing':Math.round(forecastValues.windBearing),
         'vectorBearing':bearing,
         'gust':`${Math.round(forecastValues.gust)}`,
-        'feel':Math.round(forecastValues.feelslike)
+        'feel':Math.round(apparentTemperatureInF)
     }
     )
     }
