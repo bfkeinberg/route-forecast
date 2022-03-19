@@ -175,6 +175,16 @@ const getRouteName = function(routeData) {
     }
 };
 
+const getRouteDistanceInKm = function(routeData) {
+    if (routeData.route !== undefined) {
+        return routeData.route.distance/1000;
+    } else if (routeData.trip !== undefined) {
+        return routeData.trip.distance/1000;
+    } else {
+        return null;
+    }
+};
+
 export const UPDATE_USER_CONTROLS = 'UPDATE_USER_CONTROLS';
 const updateUserControlsUnthunky = function(controls) {
     return {
@@ -242,7 +252,7 @@ export const requestForecast = function() {
         // ReactGA.send({ hitType: "pageview", page: "/forecast" });
         const transaction = Sentry.startTransaction({ name: "requestForecast" });
         const span = transaction.startChild({ op: "forecast" }); // This function returns a Span
-        ReactGA.event('unlock_achievement', {achievement_id:getRouteName(getState().routeInfo.rwgpsRouteData)});
+        ReactGA.event('post_score', {character:getRouteName(getState().routeInfo.rwgpsRouteData), level:getRouteDistanceInKm(getState().routeInfo.rwgpsRouteData)});
         const fetchController = new AbortController()
         const abortMethod = fetchController.abort.bind(fetchController)
         dispatch(beginFetchingForecast(abortMethod));
