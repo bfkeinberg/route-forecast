@@ -34,7 +34,7 @@ export const ForecastSettings = () => {
                 <div style={{ display: "flex", margin: "30px 0px" }}>
                     <ForecastInterval />
                 </div>
-                {errorDetails !== null && <Toast message={errorDetails} timeout={3000} onDismiss={() => dispatch(setErrorDetails(null))} intent="danger"></Toast>}
+                {errorDetails !== null && <Toast message={errorDetails} timeout={0} onDismiss={() => dispatch(setErrorDetails(null))} intent="danger"></Toast>}
                 <div style={{ display: "flex", margin: "30px 0px" }}>
                     <LocationContext.Consumer>
                         {value => <ForecastButton href={value.href} origin={value.origin} />}
