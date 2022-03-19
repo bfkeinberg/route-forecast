@@ -1,6 +1,6 @@
 import React from 'react';
 import { ControlTableContainer } from './ControlTableContainer';
-import { setDisplayControlTableUI, toggleMetric } from "../../redux/actions";
+import { setDisplayControlTableUI, toggleMetric, setErrorDetails } from "../../redux/actions";
 import ForecastInterval from "./ForecastInterval";
 import RidingPace from "./RidingPace";
 import { useSelector, useDispatch } from "react-redux";
@@ -11,11 +11,13 @@ import { TimeFields } from "./TimeFields";
 import { RouteTitle } from '../shared/RouteTitle';
 import LocationContext from '../locationContext';
 import ReactGA from "react-ga4";
+import {Toast} from '@blueprintjs/core';
 
 export const ForecastSettings = () => {
     const showProvider = useSelector(state => state.controls.showWeatherProvider)
     const metric = useSelector(state => state.controls.metric)
     const dispatch = useDispatch()
+    const errorDetails = useSelector(state => state.uiInfo.dialogParams.errorDetails)
 
     const showControlPoints = useSelector(state => state.controls.displayControlTableUI)
     const setShowControlPoints = () => {ReactGA.event('select_content', {content_type:'controls'});return dispatch(setDisplayControlTableUI(!showControlPoints))}
@@ -32,6 +34,7 @@ export const ForecastSettings = () => {
                 <div style={{ display: "flex", margin: "30px 0px" }}>
                     <ForecastInterval />
                 </div>
+                {errorDetails !== null && <Toast message={errorDetails} timeout={3000} onDismiss={() => dispatch(setErrorDetails(null))} intent="danger"></Toast>}
                 <div style={{ display: "flex", margin: "30px 0px" }}>
                     <LocationContext.Consumer>
                         {value => <ForecastButton href={value.href} origin={value.origin} />}
