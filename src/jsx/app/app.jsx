@@ -18,7 +18,7 @@ if (!window.origin.startsWith('http://localhost')) {
         integrations: [new BrowserTracing()],
 
         // To set a uniform sample rate
-        tracesSampleRate: 0.4
+        tracesSampleRate: 0.3
         /*,
         beforeBreadcrumb(breadcrumb) {
             if (breadcrumb.category==='console') {return null} else {return breadcrumb}
