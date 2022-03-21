@@ -23,7 +23,6 @@ const callVisualCrossing = async function (lat, lon, currentTime, distance, zone
     endTime.add(1, 'hours');
     const startTimeString = startTime.unix();
     const url = `https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/${lat},${lon}/${startTimeString}?unitGroup=us&include=current&options=nonulls&key=${visualCrossingKey}`;
-//    console.info(`url is ${url} for ${currentTime}`);
     const weatherResult = await axios.get(url).catch(error => {console.error('axios error',error.response.data);
         throw error.response.data});
     const forecast = weatherResult.data;
@@ -36,8 +35,7 @@ const callVisualCrossing = async function (lat, lon, currentTime, distance, zone
         console.error(`Throwing error because no current conditions were returned`);
         throw Error({details:"No current conditions"});
     }
-    const now = moment.unix(current.datetimeEpoch).tz(zone)
-//    console.log(`now is ${now}`);
+    const now = moment.unix(current.datetimeEpoch).tz(zone);
     const hasWind = current.windspeed !== undefined;
     const windBearing = current.winddir;
     const relativeBearing = hasWind && windBearing !== undefined ? getBearingDifference(bearing, windBearing) : null;
@@ -59,7 +57,7 @@ const callVisualCrossing = async function (lat, lon, currentTime, distance, zone
         'rainy':rainy,
         'windBearing':Math.round(windBearing),
         'vectorBearing':bearing,
-        'gust':current.windgust===undefined?'<unavailable>':`${Math.round(current.windgust)}`,
+        'gust':current.windgust===undefined?`${Math.round(current.windspeed)}`:`${Math.round(current.windgust)}`,
         'feel':current.feelslike===undefined?Math.round(current.temperature):Math.round(current.feelslike)
     })})
 };
