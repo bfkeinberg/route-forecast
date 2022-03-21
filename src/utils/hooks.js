@@ -182,7 +182,7 @@ const useForecastDependentValues = () => {
 
   const stateStuff = {routeInfo, uiInfo: {routeParams}, controls}
 
-  if (forecast.length > 0) {
+  if (forecast.length > 0 && routeInfo.rwgpsRouteData) {
     const { points, values, finishTime} = getRouteInfo(stateStuff, routeInfo.rwgpsRouteData !== null ? "rwgps" : "gpx", timeZoneId)
 
     const { time, values: calculatedControlPointValues, gustSpeed, finishTime: adjustedFinishTime } = gpxParser.adjustForWind(
