@@ -10,6 +10,7 @@ import cookie from 'react-cookies';
 import LocationContext from '../locationContext';
 import DesktopUI from '../DesktopUI';
 import MobileUI from '../MobileUI';
+import * as Sentry from "@sentry/react";
 
 import {
     loadCookie,
@@ -109,6 +110,13 @@ export class RouteWeatherUI extends Component {
         this.state = {};
         if (typeof window !== 'undefined') {
             window.onpopstate = (event) => {
+                Sentry.addBreadcrumb({
+                    category:'history',
+                    level: Sentry.Severity.Info,
+                    data:JSON.stringify(event.state),
+                    message:document.location
+                });
+
                 if (event.state == null) {
                     this.props.reset();
                 } else {
@@ -151,7 +159,7 @@ export class RouteWeatherUI extends Component {
         } else {
             const token = loadCookie("rwgpsToken");
             console.info('credentials manager not supported, retrieved from cookie');
-            if (token !== undefined) {
+        if (token !== undefined) {
                 props.setRwgpsToken(token);
                 saveRwgpsCredentials(token);
             }
