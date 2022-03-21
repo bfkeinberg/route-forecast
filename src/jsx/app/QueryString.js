@@ -4,7 +4,7 @@ import {setShortUrl, shortenUrl, setQueryString} from "../../redux/actions";
 import queryString from 'query-string';
 import { DateTime } from 'luxon';
 import { formatControlsForUrl } from '../../utils/util';
-import * as Sentry from '@sentry/browser';
+import * as Sentry from '@sentry/react';
 
 // this function exists to let us preserve the user's specified start time and share the url for this route
 // with someone in another time zone
