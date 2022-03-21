@@ -72,7 +72,7 @@ const getForecastFromNws = async (forecastUrl) => {
 const callNWS = async function (lat, lon, currentTime, distance, zone, bearing, getBearingDifference) {
     const forecastUrl = await getForecastUrl(lat, lon);
     const forecastGridData = await getForecastFromNws(forecastUrl);
-    const startTime = DateTime.fromISO(currentTime);
+    const startTime = DateTime.fromISO(currentTime, {zone:zone});
     const forecastValues = extractForecast(forecastGridData, startTime, bearing, getBearingDifference);
     const rainy = forecastValues.precip > 30;
     // eslint-disable-next-line no-mixed-operators
