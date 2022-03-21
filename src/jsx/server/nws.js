@@ -80,7 +80,7 @@ const callNWS = async function (lat, lon, currentTime, distance, zone, bearing, 
     // eslint-disable-next-line no-mixed-operators
     const apparentTemperatureInF = forecastValues.apparentTemperatureInC * 9/5 + 32;
     return new Promise((resolve) => {resolve({
-        'time':startTime.toLocaleString(DateTime.TIME_SIMPLE),
+        'time':startTime.toFormat('h:mm a'),
         'distance':distance,
         'summary':forecastValues.summary,
         'tempStr':`${Math.round(temperatureInF)}F`,
