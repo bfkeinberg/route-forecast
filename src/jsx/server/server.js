@@ -48,8 +48,8 @@ if (!process.env.NO_LOGGING) {
         // version: 'dev'
         // }
     });
+    require('@google-cloud/debug-agent').start({serviceContext: {enableCanary: true}});
 }
-require('@google-cloud/debug-agent').start({serviceContext: {enableCanary: true}});
 
 var compression = require('compression');
 
