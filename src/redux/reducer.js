@@ -313,7 +313,7 @@ const strava = function (state = {
             return {...state, fetching: false, access_token: errorMessage === "Authorization Error" ? null : state.access_token};
         }
         case Actions.SET_ANALYSIS_INTERVAL:
-            return {...state, analysisInterval:parseInt(action.interval),subrange:[]};
+            return {...state, analysisInterval:parseFloat(action.interval),subrange:[]};
         case Actions.SUBRANGE_MAP:
             return {...state,subrange:
                 [
@@ -323,11 +323,6 @@ const strava = function (state = {
             };
         case Actions.TOGGLE_MAP_RANGE:
             return toggleMapRange();
-            // TODO
-            // some fancy bullshit involving auto-setting strava interval from rwgps route length.
-            // restore this later
-        // case Actions.SET_ROUTE_INFO:
-            // return {...state, analysisInterval: getAnalysisIntervalFromRouteDuration(action.routeInfo.timeInHours)};
         default:
             return state;
     }
