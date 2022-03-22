@@ -19,6 +19,17 @@ const cors = require('cors');
 const axios = require('axios');
 const getPurpleAirAQI = require('./purpleAirAQI');
 const querystring = require('querystring');
+const Sentry = require('@sentry/node');
+// eslint-disable-next-line no-unused-vars
+const Tracing = require("@sentry/tracing");
+Sentry.init({
+    dsn: 'https://ea4c472ff9054dab8c18d594b95d8da2@sentry.io/298059',
+    integrations: [
+        // enable HTTP calls tracing
+        new Sentry.Integrations.Http({ tracing: true }),
+    ],
+    tracesSampleRate: 0.1
+});
 let winston = null;
 let expressWinston = null;
 let logger = console;
