@@ -49,6 +49,7 @@ if (!process.env.NO_LOGGING) {
         // }
     });
 }
+require('@google-cloud/debug-agent').start({serviceContext: {enableCanary: true}});
 
 var compression = require('compression');
 
@@ -327,10 +328,12 @@ app.post('/bitly', async (req, res) => {
 });
 
 const getStravaAuthUrl = (baseUrl, state) => {
-    if (baseUrl === 'http://www.route-forecast.appspot.com' || baseUrl === 'https://www.route-forecast.appspot.com') {
-        process.env.STRAVA_REDIRECT_URI = 'https://www.randoplan.com/stravaAuthReply';
-    } else {
+    console.log(baseUrl);
+    if (baseUrl === 'http://localhost:8080') {
         process.env.STRAVA_REDIRECT_URI = baseUrl + '/stravaAuthReply';
+    }
+    else {
+        process.env.STRAVA_REDIRECT_URI = 'https://www.randoplan.com/stravaAuthReply';
     }
     return strava.oauth.getRequestAccessURL({ scope: 'activity:read_all', state: encodeURIComponent(state) });
 };
