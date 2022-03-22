@@ -14,7 +14,7 @@ const WeatherProviderSelector = ({weatherProvider,setWeatherProvider}) => {
                     <option value="darksky">Dark Sky</option>
                     <option value="climacell">Tomorrow.io</option>
                     <option value="weatherapi">WeatherAPI</option>
-                    <option value="visualcrossing">Visual Crossing</option>
+                    {/* <option value="visualcrossing">Visual Crossing</option> */}
                     <option value="nws">National Weather Service</option>
                 </Input>
             </FormGroup>
