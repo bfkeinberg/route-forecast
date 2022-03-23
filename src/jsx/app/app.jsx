@@ -15,7 +15,15 @@ if (!window.origin.startsWith('http://localhost')) {
         autoSessionTracking:true,
         // This enables automatic instrumentation (highly recommended), but is not
         // necessary for purely manual usage
-        integrations: [new BrowserTracing()],
+        integrations: [
+            new BrowserTracing({
+            tracingOrigins: [
+                'localhost',
+                /^\//,
+                "www.randoplan.com"
+        ]
+        })
+    ],
 
         // To set a uniform sample rate
         tracesSampleRate: 0.3

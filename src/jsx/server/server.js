@@ -26,9 +26,9 @@ Sentry.init({
     dsn: 'https://ea4c472ff9054dab8c18d594b95d8da2@sentry.io/298059',
     integrations: [
         // enable HTTP calls tracing
-        new Sentry.Integrations.Http({ tracing: true }),
+        new Sentry.Integrations.Http({ tracing: true })
     ],
-    tracesSampleRate: 0.1
+    tracesSampleRate: 0.2
 });
 let winston = null;
 let expressWinston = null;
@@ -66,6 +66,7 @@ var compression = require('compression');
 
 const colorize = process.env.NODE_ENV !== 'production';
 
+app.use(Sentry.Handlers.requestHandler());
 app.use(compression());
 app.set('trust proxy', true);
 // Instantiate a datastore client
@@ -487,6 +488,9 @@ app.get('/', (req, res) => {
         console.info(err);
     }
 });
+
+app.use(Sentry.Handlers.errorHandler());
+
 if (!process.env.NO_LOGGING) {
     app.use(errorLogger);
 }
