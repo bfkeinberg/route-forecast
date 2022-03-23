@@ -5,7 +5,7 @@ import "@blueprintjs/icons/lib/css/blueprint-icons.css";
 import 'Images/style.css';
 import queryString from 'query-string';
 import PropTypes from 'prop-types';
-import { connect, useDispatch, /*useSelector*/ } from 'react-redux';
+import { connect, useDispatch, useSelector } from 'react-redux';
 import cookie from 'react-cookies';
 import LocationContext from '../locationContext';
 import DesktopUI from '../DesktopUI';
@@ -274,10 +274,22 @@ const useLoadControlPointsFromURL = (queryParams) => {
     }, [queryParams])
 }
 
+const useSetPageTitle = () => {
+
+    const routeInfo = useSelector(state => state.routeInfo)
+
+    useEffect(() => {
+        if (routeInfo.name !== '') {
+            document.title = `Forecast for ${routeInfo.name}`;
+        }
+    }, [routeInfo.name])
+}
+
 const FunAppWrapperThingForHooksUsability = ({maps_api_key, queryParams}) => {
     // TODO
     // this is causing obnoxious bugs -- can we just cut it?
     // useSaveControlsToCookie()
+    useSetPageTitle()
     useLoadRouteFromURL(queryParams)
     useLoadControlPointsFromURL(queryParams)
 
