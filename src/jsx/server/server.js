@@ -66,7 +66,9 @@ var compression = require('compression');
 
 const colorize = process.env.NODE_ENV !== 'production';
 
-app.use(Sentry.Handlers.requestHandler());
+if (process.env.JEST_WORKER_ID === undefined) {
+    app.use(Sentry.Handlers.requestHandler());
+}
 app.use(compression());
 app.set('trust proxy', true);
 // Instantiate a datastore client
