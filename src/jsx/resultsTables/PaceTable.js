@@ -76,7 +76,9 @@ setSelectedRow
                         <StravaAnalysisIntervalInput />
                         <div id="paceSpan" style={{fontSize: "14px", marginTop: "10px"}}>Overall climb-adjusted pace was <span style={{fontWeight: "bold"}}>{formatSpeed(actualPace)}</span>.</div>
                     </div>
-                    <ToggleButton active={zoomToRange} onClick={toggleZoom}>Zoom to Segment</ToggleButton>
+                    <div style={{padding: "16px", display: "flex", flexFlow: "column", alignItems: "end"}}>
+                        <ToggleButton active={zoomToRange} onClick={toggleZoom}>Zoom to Segment</ToggleButton>
+                    </div>
                     <Table striped responsive hover bordered>
                         <thead>
                         <tr>
