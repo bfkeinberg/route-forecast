@@ -4,12 +4,14 @@ import ErrorBoundary from "../shared/ErrorBoundary";
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 import 'animate.css/animate.min.css';
-import { setSubrange, toggleMapRange } from '../../redux/actions';
+import { setSubrange, toggleMapRange, toggleZoomToRange } from '../../redux/actions';
 import stravaRouteParser from '../../utils/stravaRouteParser';
 import StravaAnalysisIntervalInput from './StravaAnalysisIntervalInput';
 import { useActualPace, useFormatSpeed } from '../../utils/hooks';
+import { ToggleButton } from '../shared/ToggleButton';
+import cookie from 'react-cookies';
 
-const PaceTable = ({activityData, activityStream, analysisInterval, setSubrange, toggleMapRange}) =>  {
+const PaceTable = ({activityData, activityStream, analysisInterval, setSubrange, toggleMapRange, zoomToRange, toggleZoomToRange}) =>  {
 
     const [
 selectedRow,
@@ -23,6 +25,11 @@ setSelectedRow
             parseInt(event.currentTarget.getAttribute('start'), 10),
             parseInt(event.currentTarget.getAttribute('end'), 10)
         );
+    };
+
+    const toggleZoom = () => {
+        toggleZoomToRange();
+        cookie.save('zoomToRange', !zoomToRange, { path: '/' });
     };
 
     const toggleRange = (event) => {
@@ -69,6 +76,7 @@ setSelectedRow
                         <StravaAnalysisIntervalInput />
                         <div id="paceSpan" style={{fontSize: "14px", marginTop: "10px"}}>Overall climb-adjusted pace was <span style={{fontWeight: "bold"}}>{formatSpeed(actualPace)}</span>.</div>
                     </div>
+                    <ToggleButton active={zoomToRange} onClick={toggleZoom}>Zoom to Segment</ToggleButton>
                     <Table striped responsive hover bordered>
                         <thead>
                         <tr>
@@ -93,18 +101,21 @@ PaceTable.propTypes = {
     toggleMapRange:PropTypes.func.isRequired,
     activityData:PropTypes.object,
     activityStream:PropTypes.object,
-    analysisInterval:PropTypes.number
+    analysisInterval:PropTypes.number,
+    zoomToRange:PropTypes.bool.isRequired,
+    toggleZoomToRange:PropTypes.func.isRequired
 };
 
 const mapStateToProps = (state) =>
     ({
         activityData: state.strava.activityData,
         activityStream: state.strava.activityStream,
-        analysisInterval: state.strava.analysisInterval
+        analysisInterval: state.strava.analysisInterval,
+        zoomToRange: state.forecast.zoomToRange
     });
 
 const mapDispatchToProps = {
-    setSubrange, toggleMapRange
+    setSubrange, toggleMapRange, toggleZoomToRange
 };
 
 export default connect(mapStateToProps,mapDispatchToProps)(PaceTable);
