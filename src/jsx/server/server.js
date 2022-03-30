@@ -493,7 +493,7 @@ app.get('/', (req, res) => {
 
 app.use(Sentry.Handlers.errorHandler());
 
-if (!process.env.NO_LOGGING) {
+if (!process.env.NO_LOGGING && process.env.GOOGLE_CLOUD_PROJECT !== undefined) {
     app.use(errorLogger);
 }
 
