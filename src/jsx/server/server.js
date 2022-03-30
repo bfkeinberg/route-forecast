@@ -540,7 +540,11 @@ app.get('/pinned_routes', async (req, res) => {
     } catch (err) {
         if (err !== undefined) {
             console.log(`EXCEPTION: ${err}`);
-            res.status(err.response.status).json(err.response.data);
+            if (err.response !== undefined) {
+                res.status(err.response.status).json(err.response.data);
+            } else {
+                res.status(500).json(err);
+            }
         }
     }
 
