@@ -145,7 +145,8 @@
     "testUTC": "TZ=utc nyc jest",
     "testDbg": "node --inspect-brk node_modules/.bin/jest",
     "testUTCDbg": "TZ=utc node --inspect-brk node_modules/.bin/jest",
-    "start": "node dist/server/index.js"
+    "start": "node dist/server/index.js",
+    "build": "webpack --mode production --config webpack.prod.js"
   },
   "repository": {
     "type": "git",
