@@ -34,7 +34,7 @@ let winston = null;
 let expressWinston = null;
 let logger = console;
 let StackdriverTransport = null;
-if (!process.env.NO_LOGGING) {
+if (!process.env.NO_LOGGING && process.env.GOOGLE_CLOUD_PROJECT !== undefined) {
     require('./logging');
     winston = require('winston');
     expressWinston = require('express-winston');
@@ -76,7 +76,7 @@ const datastore = new Datastore();
 
 let requestLogger = null;
 let errorLogger = null;
-if (!process.env.NO_LOGGING) {
+if (!process.env.NO_LOGGING && process.env.GOOGLE_CLOUD_PROJECT !== undefined) {
     // Logger to capture all requests and output them to the console.
     // [START requests]
 
