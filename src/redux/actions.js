@@ -252,7 +252,9 @@ export const requestForecast = function() {
         // ReactGA.send({ hitType: "pageview", page: "/forecast" });
         const transaction = Sentry.startTransaction({ name: "requestForecast" });
         const span = transaction.startChild({ op: "forecast" }); // This function returns a Span
-        ReactGA.event('post_score', {character:getRouteName(getState().routeInfo.rwgpsRouteData), level:getRouteDistanceInKm(getState().routeInfo.rwgpsRouteData)});
+        ReactGA.event('view_cart', {currency:getRouteName(getState().routeInfo.rwgpsRouteData),
+            value:getRouteDistanceInKm(getState().routeInfo.rwgpsRouteData)
+        });
         const fetchController = new AbortController()
         const abortMethod = fetchController.abort.bind(fetchController)
         dispatch(beginFetchingForecast(abortMethod));
