@@ -26,7 +26,6 @@ const getPinnedRoutes = async (rwgpsToken, setErrorDetails, setRwgpsToken) => {
 }
 
 const setRoutes = async (rwgpsToken, setRwgpsToken, setError, setPinnedRoutes, setLoadingPinned, usingPinnedRoutes, hasRoutes) => {
-    ReactGA.event('join_group', {group_id:'pinned_routes'});
     if (rwgpsToken === '' || rwgpsToken === null || !usingPinnedRoutes || hasRoutes) {
         return null;
     }
@@ -37,6 +36,15 @@ const setRoutes = async (rwgpsToken, setRwgpsToken, setError, setPinnedRoutes, s
     }
     setLoadingPinned(false);
 }
+
+const togglePinnedRoutes = (setUsePinnedRoutes, setShowPinnedRoutes, usingPinnedRoutes) => {
+    // if usingPinnedRoutes is false then we're about to turn it on
+    if (!usingPinnedRoutes) {
+        ReactGA.event('join_group', {group_id:'pinned_routes'});
+    }
+    setUsePinnedRoutes(!usingPinnedRoutes);
+    setShowPinnedRoutes(!usingPinnedRoutes);
+};
 
 const PinnedRouteLoader = ({rwgpsToken, setRwgpsToken, credentialsValid, setPinnedRoutes, setErrorDetails, hasRoutes, loadingPinnedRoutes, setLoadingPinned, setUsePinnedRoutes, setShowPinnedRoutes, usingPinnedRoutes}) => {
     useEffect(() => {if (usingPinnedRoutes && !rwgpsToken) {window.location.href = `/rwgpsAuthReq?state=${JSON.stringify(queryString.parse(location.search))}`}}, [
@@ -61,7 +69,7 @@ const PinnedRouteLoader = ({rwgpsToken, setRwgpsToken, credentialsValid, setPinn
                 className={button_class}
                 text={usingPinnedRoutes ? "Don't use pinned routes" : "Use pinned routes"}
                 style={{fontSize: "13px"}}
-                onClick={() => {setUsePinnedRoutes(!usingPinnedRoutes);setShowPinnedRoutes(!usingPinnedRoutes)}}
+                onClick={() => {togglePinnedRoutes(setUsePinnedRoutes, setShowPinnedRoutes, usingPinnedRoutes)}}
             />
             {credentialsValid ?
             (
