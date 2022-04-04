@@ -247,13 +247,13 @@ const forecastFetchCanceled = function(error) {
     }
 };
 
-export const requestForecast = function() {
+export const requestForecast = function(routeInfo) {
     return async function(dispatch,getState) {
         // ReactGA.send({ hitType: "pageview", page: "/forecast" });
         const transaction = Sentry.startTransaction({ name: "requestForecast" });
         const span = transaction.startChild({ op: "forecast" }); // This function returns a Span
-        ReactGA.event('view_cart', {currency:getRouteName(getState().routeInfo.rwgpsRouteData),
-            value:getRouteDistanceInKm(getState().routeInfo.rwgpsRouteData)
+        ReactGA.event('view_cart', {currency:getRouteName(routeInfo.rwgpsRouteData),
+            value:getRouteDistanceInKm(routeInfo.rwgpsRouteData)
         });
         const fetchController = new AbortController()
         const abortMethod = fetchController.abort.bind(fetchController)
