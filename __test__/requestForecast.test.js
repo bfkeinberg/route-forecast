@@ -38,19 +38,19 @@ describe('request forecast', () => {
                     "forecast": forecast
                 },
                 headers: { 'content-type': 'application/json' } });
-        
+
         fetchMock
             .get("https://maps.googleapis.com/maps/api/timezone/json?location=37.80605,-122.45043&timestamp=1640876400&key=undefined", {
                 body: timezoneData
             })
-        
+
         const expectedActions = [
             { type: actions.BEGIN_FETCHING_FORECAST, abortMethod:expect.any(Function) },
             { type: actions.FORECAST_FETCH_SUCCESS, forecastInfo: {forecast:forecast}, timeZoneId: "America/Los_Angeles"}
         ];
 
         let store = mockStore(initialState);
-        let v = await(store.dispatch(actions.requestForecast()));
+        let v = await (store.dispatch(actions.requestForecast(initialState.routeInfo)));
         let actual = store.getActions();
         expect(store.getActions()).toEqual(expectedActions);
 
@@ -58,7 +58,7 @@ describe('request forecast', () => {
         expect(newState.forecast.forecast).toEqual(forecast);
 
         store = mockStore(newState);
-        await(store.dispatch(actions.requestForecast()));
+        await (store.dispatch(actions.requestForecast(initialState.routeInfo)));
         expect(store.getActions()).toEqual(expectedActions);
 
     })
