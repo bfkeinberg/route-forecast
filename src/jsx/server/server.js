@@ -243,6 +243,15 @@ app.get('/rwgps_route', (req, res) => {
         .catch(err => {res.status(err.message).json({ 'status': JSON.stringify(err) })});
 });
 
+const getTransaction = () => {
+    let transaction = Sentry.getCurrentHub().getScope().
+        getTransaction();
+    if (!transaction) {
+        transaction = Sentry.startTransaction({ name: "purpleair" });
+    }
+    return transaction;
+}
+
 app.post('/forecast', upload.none(), async (req, res) => {
     if (req.body.locations === undefined) {
         res.status(400).json({ 'status': 'Missing location key' });
@@ -278,8 +287,12 @@ app.post('/forecast', upload.none(), async (req, res) => {
                 throw error;
             });
             // we explicitly do not want to parallelize to avoid swamping the servers we are calling and being throttled
+            const transaction = getTransaction();
+            const span = transaction.startChild({ op: "aqi" });
             // eslint-disable-next-line no-await-in-loop
             result.aqi = await getPurpleAirAQI(point.lat, point.lon);
+            span.finish();
+            transaction.finish();
             results.push(result);
         }
         res.status(200).json({ 'forecast': results });
