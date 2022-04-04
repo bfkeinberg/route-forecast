@@ -316,7 +316,7 @@ export const loadRouteFromURL = () => {
         await dispatch(loadFromRideWithGps())
         const error = getState().uiInfo.dialogParams.errorDetails
         if (error === null) {
-            await dispatch(requestForecast())
+            await dispatch(requestForecast(getState().routeInfo))
         }
         dispatch(setLoadingFromURL(false))
     }
