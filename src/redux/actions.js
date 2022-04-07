@@ -251,16 +251,21 @@ export const requestForecast = function(routeInfo) {
     return async function(dispatch,getState) {
         // ReactGA.send({ hitType: "pageview", page: "/forecast" });
         const transaction = Sentry.startTransaction({ name: "requestForecast" });
-        const span = transaction.startChild({ op: "forecast" }); // This function returns a Span
+        let span;
+        if (transaction) {
+            span = transaction.startChild({ op: "forecast" }); // This function returns a Span
+        }
         ReactGA.event('view_cart', {currency:getRouteName(routeInfo.rwgpsRouteData),
             value:getRouteDistanceInKm(routeInfo.rwgpsRouteData)
         });
         const fetchController = new AbortController()
         const abortMethod = fetchController.abort.bind(fetchController)
         dispatch(beginFetchingForecast(abortMethod));
-        const { result, value, error } = await doForecast(getState(), fetchController.signal)
-        span.finish(); // Remember that only finished spans will be sent with the transaction
-        transaction.finish(); // Finishing the transaction will send it to Sentry
+        const { result, value, error } = await doForecast(getState(), fetchController.signal);
+        if (transaction) {
+            span.finish(); // Remember that only finished spans will be sent with the transaction
+            transaction.finish(); // Finishing the transaction will send it to Sentry
+        }
         if (result === "success") {
             const { forecast, timeZoneId } = value
             dispatch(forecastFetchSuccess(forecast, timeZoneId));
@@ -292,7 +297,10 @@ export const loadFromRideWithGps = function(routeNumber, isTrip) {
     return function(dispatch, getState) {
         // ReactGA.send({ hitType: "pageview", page: "/loadRoute" });
         const transaction = Sentry.startTransaction({ name: "loadingRwgpsRoute" });
-        const span = transaction.startChild({ op: "load" }); // This function returns a Span
+        let span;
+        if (transaction) {
+            span = transaction.startChild({ op: "load" }); // This function returns a Span
+        }
         routeNumber = routeNumber || getState().uiInfo.routeParams.rwgpsRoute
         ReactGA.event('login', {method:routeNumber});
         isTrip = isTrip || getState().uiInfo.routeParams.rwgpsRouteIsTrip
@@ -301,8 +309,10 @@ export const loadFromRideWithGps = function(routeNumber, isTrip) {
         return loadRwgpsRoute(routeNumber, isTrip).then( (routeData) => {
                 dispatch(rwgpsRouteLoadingSuccess(routeData));
                 dispatch(loadControlsFromCookie(routeData));
-                span.finish(); // Remember that only finished spans will be sent with the transaction
-                transaction.finish(); // Finishing the transaction will send it to Sentry
+                if (transaction) {
+                    span.finish(); // Remember that only finished spans will be sent with the transaction
+                    transaction.finish(); // Finishing the transaction will send it to Sentry
+                }
             }, error => {return dispatch(rwgpsRouteLoadingFailure(error))}
         );
     };
