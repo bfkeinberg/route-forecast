@@ -391,7 +391,10 @@ export const setShortUrl = function(url) {
 export const shortenUrl = function(url) {
     return function (dispatch) {
         const transaction = Sentry.startTransaction({ name: "shortenUrl" });
-        const span = transaction.startChild({ op: "load" }); // This function returns a Span
+        let span;
+        if (transaction) {
+            span = transaction.startChild({ op: "load" }); // This function returns a Span
+        }
         return fetch("/bitly",
             {
                 headers: {
@@ -404,8 +407,10 @@ export const shortenUrl = function(url) {
             .then(response => response.json())
             .catch( error => {return setErrorDetails(error)})
             .then(responseJson => {
-                span.finish(); // Remember that only finished spans will be sent with the transaction
-                transaction.finish(); // Finishing the transaction will send it to Sentry
+                if (transaction) {
+                    span.finish(); // Remember that only finished spans will be sent with the transaction
+                    transaction.finish(); // Finishing the transaction will send it to Sentry
+                }
                 if (responseJson.error === null) {
                     return dispatch(setShortUrl(responseJson.url));
                 } else {
