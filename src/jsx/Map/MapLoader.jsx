@@ -1,17 +1,19 @@
 import React, {Suspense} from 'react';
-import {lazy} from '@loadable/component';
 import {connect} from 'react-redux';
 import PropTypes from 'prop-types';
 import { routeLoadingModes } from '../../data/enums';
+import ErrorBoundary from "../shared/ErrorBoundary";
 
-const LoadableMap = lazy(() => import(/* webpackChunkName: "Map" */ './RouteForecastMap'));
+const LoadableMap = React.lazy(() => import(/* webpackChunkName: "Map" */ './RouteForecastMap'));
 
 const MapLoader = (props) => {
     if (props.hasMap) {
-         return <Suspense fallback={<div>Loading Map...</div>}>
-            <LoadableMap {...props}/>
-         </Suspense>;
-     } else {
+        return <ErrorBoundary>
+            <Suspense fallback={<div>Loading Map...</div>}>
+                <LoadableMap {...props} />
+            </Suspense>
+        </ErrorBoundary>;
+    } else {
         return <div>Map for forecast</div>
     }
 };
