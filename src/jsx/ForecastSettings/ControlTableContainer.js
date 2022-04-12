@@ -10,8 +10,6 @@ import { Tooltip2 } from "@blueprintjs/popover2";
 import { ToggleButton } from '../shared/ToggleButton';
 
 export const ControlTableContainer = () => {
-  // TODO -- make this do anything. automatically open control table if URL with control points is loaded?
-  const hasControls = useSelector(state => state.controls.userControlPoints.length > 0)
   const displayBanked = useSelector(state => state.controls.displayBanked)
   const dispatch = useDispatch()
 
