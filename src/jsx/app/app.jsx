@@ -10,20 +10,25 @@ ReactGA.initialize("G-0R3J1W9ECC");
 //ReactGA.send("pageview");
 
 if (!window.origin.startsWith('http://localhost')) {
-    Sentry.init({ dsn: 'https://ea4c472ff9054dab8c18d594b95d8da2@sentry.io/298059',
-        environment:'production',
-        autoSessionTracking:true,
+    Sentry.init({
+        dsn: 'https://ea4c472ff9054dab8c18d594b95d8da2@sentry.io/298059',
+        environment: 'production',
+        autoSessionTracking: true,
+        ignoreErrors: [
+            "Non-Error exception captured",
+            "Non-Error promise rejection captured"
+        ],
         // This enables automatic instrumentation (highly recommended), but is not
         // necessary for purely manual usage
         integrations: [
             new BrowserTracing({
-            tracingOrigins: [
-                'localhost',
-                /^\//,
-                "www.randoplan.com"
-        ]
-        })
-    ],
+                tracingOrigins: [
+                    'localhost',
+                    /^\//,
+                    "www.randoplan.com"
+                ]
+            })
+        ],
 
         // To set a uniform sample rate
         tracesSampleRate: 0.3
