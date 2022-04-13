@@ -4,6 +4,7 @@ import { loadRwgpsRoute } from '../utils/rwgpsUtilities';
 import { controlsMeaningfullyDifferent, parseControls } from '../utils/util';
 import ReactGA from "react-ga4";
 import * as Sentry from "@sentry/react";
+import { updateHistory } from "../jsx/app/updateHistory";
 
 export const componentLoader = (lazyComponent, attemptsLeft) => {
     return new Promise((resolve, reject) => {
@@ -318,6 +319,14 @@ export const loadFromRideWithGps = function(routeNumber, isTrip) {
     };
 };
 
+export const SET_QUERY = 'SET_QUERY';
+export const setQueryString = function(query) {
+    return {
+        type: SET_QUERY,
+        queryString: query
+    };
+};
+
 export const loadRouteFromURL = () => {
     return async function(dispatch, getState) {
         // ReactGA.send({ hitType: "pageview", page: "/loadRoute" });
@@ -326,7 +335,8 @@ export const loadRouteFromURL = () => {
         await dispatch(loadFromRideWithGps())
         const error = getState().uiInfo.dialogParams.errorDetails
         if (error === null) {
-            await dispatch(requestForecast(getState().routeInfo))
+            await dispatch(requestForecast(getState().routeInfo));
+            updateHistory(getState().controls.queryString);
         }
         dispatch(setLoadingFromURL(false))
     }
@@ -418,14 +428,6 @@ export const shortenUrl = function(url) {
                 }
             })
     }
-};
-
-export const SET_QUERY = 'SET_QUERY';
-export const setQueryString = function(query) {
-    return {
-        type: SET_QUERY,
-        queryString: query
-    };
 };
 
 export const CLEAR_QUERY = 'CLEAR_QUERY';
