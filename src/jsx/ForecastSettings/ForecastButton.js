@@ -5,7 +5,7 @@ import {connect} from 'react-redux';
 import {requestForecast} from "../../redux/actions";
 import { useMediaQuery } from 'react-responsive';
 import { Spinner } from '@blueprintjs/core';
-import { updateHistory } from '../app/QueryString';
+import { updateHistory } from "../app/updateHistory";
 
 const ForecastButton = ({fetchingForecast,requestForecast,routeInfo,submitDisabled,queryString}) => {
     let forecast_tooltip = submitDisabled ?
