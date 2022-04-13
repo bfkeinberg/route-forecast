@@ -1,6 +1,15 @@
 import React, { useState } from 'react';
 import PropTypes from "prop-types";
 
+const pickTabIndex = (column) => {
+  if (!column.editable) return "-1";
+  return "0"
+};
+
+const shouldAutoFocus = (row, column) => {
+  return (column.name==='name' && row[column.name] === '');
+};
+
 export const Table = ({data, onCellValueChanged}) => {
   let {columns, rows} = data
   columns = columns.map(column => ({...column, valueTransformFunction: column.valueTransformFunction || (value => value)}))
@@ -14,7 +23,7 @@ export const Table = ({data, onCellValueChanged}) => {
     textAlign: "center",
   }
   const headerStyle = {...baseStyle, fontWeight: "bold"}
-
+  
   return (
     <div style={{
       display: "grid",
@@ -37,6 +46,8 @@ export const Table = ({data, onCellValueChanged}) => {
                 value={row[column.name]}
                 transformFunction={column.valueTransformFunction}
                 editable={column.editable}
+                tabIndex={pickTabIndex(column)}
+                autoFocus={shouldAutoFocus(row, column)}
                 onCellValueChanged={(value) => onCellValueChanged(rowIndex, column.name, value)}
                 editValidateFunction={column.editValidateFunction}
               />
@@ -54,7 +65,7 @@ Table.propTypes = {
   onCellValueChanged:PropTypes.func.isRequired
 };
 
-const Cell = ({value, transformFunction, editable, onCellValueChanged, editValidateFunction}) => {
+const Cell = ({value, transformFunction, editable, tabIndex, autoFocus, onCellValueChanged, editValidateFunction}) => {
   const [
     editingValue,
     setEditingValue
@@ -80,18 +91,24 @@ const Cell = ({value, transformFunction, editable, onCellValueChanged, editValid
   return (
     editingValue !== null ?
     <div>
-      <input autoFocus onKeyPress={(/*event*/) => {}/*console.log(event.key)*/} value={editingValue} style={{width: "40px"}} onChange={(event) => valueEdited(event.target.value)} onBlur={endEditing}/>
+      <input autoFocus value={editingValue} style={{width: "40px"}} onFocus={(event) => event.target.select()} onChange={(event) => valueEdited(event.target.value)} onBlur={endEditing}/>
     </div>    :
-    <div style={{cursor: editable ? "pointer" : "", width: "100%", height: "100%"}} onClick={beginEditing}>
+    <div autoFocus={autoFocus} ref={field => field && autoFocus && field.focus()} style={{cursor: editable ? "pointer" : "", width: "100%", height: "100%"}} tabIndex={tabIndex} onClick={beginEditing} onFocus={beginEditing}>
       {value !== undefined && transformFunction(value)}
     </div>
   )
 }
 
 Cell.propTypes = {
-  value:PropTypes.string.isRequired,
-  transformFunction:PropTypes.func,
-  editable:PropTypes.bool.isRequired,
+  value:PropTypes.oneOfType([
+    PropTypes.string,
+    PropTypes.number,
+    PropTypes.object
+  ]),
+  transformFunction:PropTypes.func.isRequired,
+  editable:PropTypes.bool,
+  autoFocus:PropTypes.bool,
   onCellValueChanged:PropTypes.func.isRequired,
-  editValidateFunction:PropTypes.func
+  editValidateFunction:PropTypes.func,
+  tabIndex:PropTypes.string
 };

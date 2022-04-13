@@ -76,6 +76,7 @@ export const controlsMeaningfullyDifferent = (controls1, controls2) => {
 }
 
 export const stringIsOnlyNumeric = string => string.match(/^[0-9]*$/) !== null
+export const stringIsOnlyDecimal = string => string.match(/^[0-9.]*$/) !== null
 
 export const milesToMeters = 1609.34;
 

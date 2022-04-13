@@ -30,7 +30,7 @@ export const ControlTableContainer = () => {
       </ErrorBoundary>
       <div tabIndex="98" onFocus={() => {
         let button = document.getElementById('addButton');
-        if (button !== undefined) {
+        if (button !== undefined && button !== null) {
           button.focus();
         }
       }} />
@@ -42,7 +42,7 @@ const AddRowButton = () => {
   const dispatch = useDispatch()
   return (
     <div style={{border: "1px solid black", width: "100%"}} onClick={() => dispatch(addControl())}>
-      <Button style={{width: "100%"}} minimal={true} tabIndex='10' icon={"add"}>Add</Button>
+      <Button id={'addButton'} style={{width: "100%"}} minimal={true} tabIndex={0} icon={"add"}>Add</Button>
     </div>
   )
 }

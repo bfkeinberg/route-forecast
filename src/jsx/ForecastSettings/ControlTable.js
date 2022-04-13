@@ -4,7 +4,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { removeControl as removeControlAction, updateUserControls } from '../../redux/actions';
 import { Table } from "./Table"
 import { useActualArrivalTimes, useForecastDependentValues } from '../../utils/hooks';
-import { stringIsOnlyNumeric } from '../../utils/util';
+import { stringIsOnlyNumeric, stringIsOnlyDecimal } from '../../utils/util';
 
 const minSuffixFunction = value => `${value} min`
 
@@ -58,9 +58,9 @@ export const ControlTable = () => {
             ({name, distance, duration, arrival, banked, actual, delete: <Icon icon="delete" style={{cursor: "pointer"}} onClick={() => removeControl(index)}/>})),
         columns: [
             {name: "name", render: "Name", width: 40, editable: true},
-            {name: "distance", render: metric ? "Kilometers" : "Miles", width: 40, editable: true, editValidateFunction: stringIsOnlyNumeric},
+            {name: "distance", render: metric ? "Kilometers" : "Miles", width: 40, editable: true, editValidateFunction: stringIsOnlyDecimal},
             {name: "duration", render: "Expected Time Spent", valueTransformFunction: minSuffixFunction, width: 80, editable: true, editValidateFunction: stringIsOnlyNumeric},
-            {name: "arrival", render: "Estimated Arrival Time", width: 80, cellStyle: rwgpsCellStyle, headerStyle: rwgpsCellStyle},
+            {name: "arrival", render: "Estimated Arrival Time", width: 80, editable: false, cellStyle: rwgpsCellStyle, headerStyle: rwgpsCellStyle},
             {name: "delete", render: "Delete", width: 60}
         ]
     }
