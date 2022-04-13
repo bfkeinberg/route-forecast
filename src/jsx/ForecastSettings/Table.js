@@ -23,7 +23,7 @@ export const Table = ({data, onCellValueChanged}) => {
     textAlign: "center",
   }
   const headerStyle = {...baseStyle, fontWeight: "bold"}
-  
+
   return (
     <div style={{
       display: "grid",
@@ -77,7 +77,7 @@ const Cell = ({value, transformFunction, editable, tabIndex, autoFocus, onCellVa
   }
 
   const endEditing = () => {
-    onCellValueChanged(editingValue)
+    onCellValueChanged(editingValue !== '' ? editingValue : '-----')
     setEditingValue(null)
   }
 
