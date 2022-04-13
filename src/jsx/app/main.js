@@ -41,7 +41,7 @@ import {
 } from "../../redux/actions";
 import QueryString from './QueryString';
 import { routeLoadingModes } from '../../data/enums';
-import { /*formatControlsForUrl, */parseControls } from '../../utils/util';
+import { /*formatControlsForUrl, */parseControls, inputPaceToSpeed } from '../../utils/util';
 
 export const saveRwgpsCredentials = (token) => {
     if ("credentials" in navigator && "PasswordCredential" in window) {
@@ -202,7 +202,7 @@ export class RouteWeatherUI extends Component {
                 props.setInitialStart(queryParams.start);
             }
         }
-        if (queryParams.pace !== undefined) {
+        if (queryParams.pace !== undefined && inputPaceToSpeed[queryParams.pace.trim()] !== undefined) {
             props.setPace(queryParams.pace.trim());
         } else {
             let lastPace = loadCookie("pace");
