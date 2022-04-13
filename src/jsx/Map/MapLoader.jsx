@@ -3,8 +3,9 @@ import {connect} from 'react-redux';
 import PropTypes from 'prop-types';
 import { routeLoadingModes } from '../../data/enums';
 import ErrorBoundary from "../shared/ErrorBoundary";
+import lazyRetry from "@tdotcode/react-lazy-retry";
 
-const LoadableMap = React.lazy(() => import(/* webpackChunkName: "Map" */ './RouteForecastMap'));
+const LoadableMap = lazyRetry(() => import(/* webpackChunkName: "Map" */ './RouteForecastMap'));
 
 const MapLoader = (props) => {
     if (props.hasMap) {

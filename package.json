@@ -21,6 +21,7 @@
     "@sentry/node": "^6.19.1",
     "@sentry/react": "^6.18.2",
     "@sentry/tracing": "^6.18.2",
+    "@tdotcode/react-lazy-retry": "^1.0.5",
     "animate.css": "^4.1.1",
     "axios": "^0.26.0",
     "body-parser": "^1.18.3",
