@@ -186,6 +186,16 @@ const getRouteDistanceInKm = function(routeData) {
     }
 };
 
+const getRouteId = function(routeData) {
+    if (routeData.route !== undefined) {
+        return routeData.route.id;
+    } else if (routeData.trip !== undefined) {
+        return routeData.trip.id;
+    } else {
+        return null;
+    }
+};
+
 export const UPDATE_USER_CONTROLS = 'UPDATE_USER_CONTROLS';
 const updateUserControlsUnthunky = function(controls) {
     return {
@@ -256,8 +266,10 @@ export const requestForecast = function(routeInfo) {
         if (transaction) {
             span = transaction.startChild({ op: "forecast" }); // This function returns a Span
         }
-        ReactGA.event('view_cart', {currency:getRouteName(routeInfo.rwgpsRouteData),
-            value:getRouteDistanceInKm(routeInfo.rwgpsRouteData)
+        ReactGA.event('add_to_cart', {
+            value:getRouteDistanceInKm(routeInfo.rwgpsRouteData),
+            items:[{item_id:getRouteId(routeInfo.rwgpsRouteData),item_name:getRouteName(routeInfo.rwgpsRouteData)}]
+
         });
         const fetchController = new AbortController()
         const abortMethod = fetchController.abort.bind(fetchController)
