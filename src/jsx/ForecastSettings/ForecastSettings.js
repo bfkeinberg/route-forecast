@@ -7,6 +7,7 @@ import { useSelector, useDispatch } from "react-redux";
 import WeatherProviderSelector from "./WeatherProviderSelector";
 import ForecastButton from "./ForecastButton";
 import { ToggleButton } from "../shared/ToggleButton";
+import { ToggleButtonOpaque } from "../shared/ToggleButtonOpaque";
 import { TimeFields } from "./TimeFields";
 import { RouteTitle } from '../shared/RouteTitle';
 import LocationContext from '../locationContext';
@@ -44,7 +45,7 @@ export const ForecastSettings = () => {
                     <WeatherProviderSelector />
                 )}
             </div>
-            <ToggleButton icon={"chevron-down"} active={showControlPoints} onClick={() => setShowControlPoints(!showControlPoints)}>Add Stops</ToggleButton>
+            <ToggleButtonOpaque icon={"chevron-down"} active={showControlPoints} onClick={() => setShowControlPoints(!showControlPoints)}>Add Stops</ToggleButtonOpaque>
             {showControlPoints && <ControlTableContainer/>}
         </div>
     );
