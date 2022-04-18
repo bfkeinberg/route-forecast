@@ -59,8 +59,8 @@ jobs:
           IQAIR_KEY: ${{ secrets.IQAIR_KEY }}
           RWGPS_OAUTH_CLIENT_ID: ${{ secrets.RWGPS_OAUTH_CLIENT_ID }}
           RWGPS_OAUTH_SECRET: ${{ secrets.RWGPS_OAUTH_SECRET }}
-      - name: Deploy
-        uses: google-github-actions/deploy-appengine@main
-        with:
-          project_id: ${{ secrets.PROJECT_ID }}  
-          version: current
+#      - name: Deploy
+#        uses: google-github-actions/deploy-appengine@main
+#        with:
+#          project_id: ${{ secrets.PROJECT_ID }}  
+#          version: current
