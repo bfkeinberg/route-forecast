@@ -37,28 +37,28 @@ jobs:
         run: npm run test -- --detectOpenHandles --coverage=false
       - name: Build page
         run: npm run prod
-      - name: Initialize Google Cloud SDK
-        uses: google-github-actions/setup-gcloud@v0
-        with:
-          service_account_key: ${{ secrets.GCP_SA_KEY }}
-          export_default_credentials: true        
-      - name: Secrets
-        uses: ikuanyshbekov/app-yaml-env-compiler@v1.0
-        env:
-          MAPS_KEY: ${{ secrets.GOOGLE_MAPS_API_KEY }}
-          DARKSKY_KEY: ${{ secrets.DARKSKY_API_KEY }}  
-          RWGPS_KEY: ${{ secrets.RWGPS_API_KEY }}  
-          STRAVA_KEY: ${{ secrets.STRAVA_API_KEY }}  
-          TIMEZONE_KEY: ${{ secrets.TIMEZONE_API_KEY }}  
-          CLIMACELL_KEY: ${{ secrets.CLIMACELL_KEY }}  
-          WEATHERAPI_KEY: ${{ secrets.WEATHER_API_KEY }}  
-          BITLY_TOKEN: ${{ secrets.BITLY_TOKEN }}  
-          STRAVA_CLIENT_ID:  ${{ secrets.STRAVA_CLIENT_ID }}  
-          VISUAL_CROSSING_KEY: ${{ secrets.VISUAL_CROSSING_KEY }}
-          PURPLE_AIR_KEY: ${{ secrets.PURPLE_AIR_KEY }}
-          IQAIR_KEY: ${{ secrets.IQAIR_KEY }}
-          RWGPS_OAUTH_CLIENT_ID: ${{ secrets.RWGPS_OAUTH_CLIENT_ID }}
-          RWGPS_OAUTH_SECRET: ${{ secrets.RWGPS_OAUTH_SECRET }}
+#      - name: Initialize Google Cloud SDK
+#        uses: google-github-actions/setup-gcloud@v0
+#        with:
+#          service_account_key: ${{ secrets.GCP_SA_KEY }}
+#          export_default_credentials: true        
+#      - name: Secrets
+#        uses: ikuanyshbekov/app-yaml-env-compiler@v1.0
+#        env:
+#          MAPS_KEY: ${{ secrets.GOOGLE_MAPS_API_KEY }}
+#          DARKSKY_KEY: ${{ secrets.DARKSKY_API_KEY }}  
+#          RWGPS_KEY: ${{ secrets.RWGPS_API_KEY }}  
+#          STRAVA_KEY: ${{ secrets.STRAVA_API_KEY }}  
+#          TIMEZONE_KEY: ${{ secrets.TIMEZONE_API_KEY }}  
+#          CLIMACELL_KEY: ${{ secrets.CLIMACELL_KEY }}  
+#          WEATHERAPI_KEY: ${{ secrets.WEATHER_API_KEY }}  
+#          BITLY_TOKEN: ${{ secrets.BITLY_TOKEN }}  
+#          STRAVA_CLIENT_ID:  ${{ secrets.STRAVA_CLIENT_ID }}  
+#          VISUAL_CROSSING_KEY: ${{ secrets.VISUAL_CROSSING_KEY }}
+#          PURPLE_AIR_KEY: ${{ secrets.PURPLE_AIR_KEY }}
+#          IQAIR_KEY: ${{ secrets.IQAIR_KEY }}
+#          RWGPS_OAUTH_CLIENT_ID: ${{ secrets.RWGPS_OAUTH_CLIENT_ID }}
+#          RWGPS_OAUTH_SECRET: ${{ secrets.RWGPS_OAUTH_SECRET }}
 #      - name: Deploy
 #        uses: google-github-actions/deploy-appengine@main
 #        with:
