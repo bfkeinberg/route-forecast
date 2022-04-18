@@ -35,8 +35,8 @@ jobs:
         run: npm install
       - name: Run tests
         run: npm run test -- --detectOpenHandles --coverage=false
-      - name: Build page
-        run: npm run prod
+#      - name: Build page
+#        run: npm run prod
 #      - name: Initialize Google Cloud SDK
 #        uses: google-github-actions/setup-gcloud@v0
 #        with:
