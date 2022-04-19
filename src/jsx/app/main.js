@@ -11,6 +11,8 @@ import LocationContext from '../locationContext';
 import DesktopUI from '../DesktopUI';
 import MobileUI from '../MobileUI';
 import * as Sentry from "@sentry/react";
+import {providerValues} from "../../redux/reducer";
+import {Info} from "luxon";
 
 import {
     loadCookie,
@@ -182,6 +184,16 @@ export class RouteWeatherUI extends Component {
         }
     }
 
+    static hasZone(zone) {
+        return zone !== undefined && Info.isValidIANAZone(zone);
+    }
+
+    static hasProvider(provider) {
+        return provider !== undefined &&
+            Object.keys(providerValues).includes(provider)
+
+    }
+
     static updateFromQueryParams(props, queryParams) {
         if (queryParams === undefined) {
             return;
@@ -189,14 +201,14 @@ export class RouteWeatherUI extends Component {
         props.setRwgpsRoute(queryParams.rwgpsRoute);
         RouteWeatherUI.getStravaToken(queryParams,props);
         if (queryParams.startTimestamp !== undefined) {
-            if (queryParams.zone !== undefined) {
+            if (RouteWeatherUI.hasZone(queryParams.zone)) {
                 props.setStartTimestamp(queryParams.startTimestamp, queryParams.zone);
             } else {
                 props.setStartTimestamp(queryParams.startTimestamp);
             }
         }
         else if (queryParams.start !== undefined) {
-            if (queryParams.zone !== undefined) {
+            if (RouteWeatherUI.hasZone(queryParams.zone)) {
                 props.setInitialStart(queryParams.start, queryParams.zone);
             } else {
                 props.setInitialStart(queryParams.start);
@@ -217,7 +229,7 @@ export class RouteWeatherUI extends Component {
         if (queryParams.strava_analysis !== undefined) {
             props.setRouteLoadingMode(routeLoadingModes.STRAVA);
         }
-        if (queryParams.provider !== undefined) {
+        if (RouteWeatherUI.hasProvider(queryParams.provider)) {
             props.setWeatherProvider(queryParams.provider);
         }
         if (queryParams.showProvider !== undefined) {

@@ -20,7 +20,7 @@ const initialStartTime = function() {
     return now;
 };
 
-const providerValues = {
+export const providerValues = {
     darksky:{min_interval:0.25,max_days:14, canForecastPast:true},
     climacell:{min_interval:0.25,max_days:14, canForecastPast:false},
     weatherapi:{min_interval:1,max_days:10, canForecastPast:true},
@@ -99,7 +99,10 @@ export const routeParams = function(state = {
             }
         case Actions.SET_INTERVAL:
             if (action.interval !== undefined) {
-                return {...state, interval: parseFloat(action.interval)};
+                // protect against garbage in url
+                const interval = parseFloat(action.interval);
+                if (isNaN(interval) || interval < 0.25 || interval > 2.0) return state;
+                return {...state, interval: interval};
             } else {
                 return state;
             }
