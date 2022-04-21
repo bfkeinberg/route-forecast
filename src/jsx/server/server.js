@@ -252,6 +252,15 @@ const getTransaction = () => {
     return transaction;
 }
 
+const getAQI = async (result, point) => {
+    const transaction = getTransaction();
+    const span = transaction.startChild({ op: "aqi" });
+    // eslint-disable-next-line no-await-in-loop
+    result.aqi = await getPurpleAirAQI(point.lat, point.lon);
+    span.finish();
+    transaction.finish();
+}
+
 app.post('/forecast', upload.none(), async (req, res) => {
     if (req.body.locations === undefined) {
         res.status(400).json({ 'status': 'Missing location key' });
@@ -278,6 +287,7 @@ app.post('/forecast', upload.none(), async (req, res) => {
         insertRecord(dbRecord, req.body.routeName);
     }
     const zone = req.body.timezone;
+    const lookupAqi = forecastPoints.length < 26;
     try {
         let results = [];
         while (forecastPoints.length > 0) {
@@ -287,12 +297,10 @@ app.post('/forecast', upload.none(), async (req, res) => {
                 throw error;
             });
             // we explicitly do not want to parallelize to avoid swamping the servers we are calling and being throttled
-            const transaction = getTransaction();
-            const span = transaction.startChild({ op: "aqi" });
-            // eslint-disable-next-line no-await-in-loop
-            result.aqi = await getPurpleAirAQI(point.lat, point.lon);
-            span.finish();
-            transaction.finish();
+            if (lookupAqi) {
+                // eslint-disable-next-line no-await-in-loop
+                await getAQI(result, point);
+            }
             results.push(result);
         }
         res.status(200).json({ 'forecast': results });
