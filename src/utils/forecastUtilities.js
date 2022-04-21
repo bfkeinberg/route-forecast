@@ -1,13 +1,15 @@
 import * as Sentry from '@sentry/browser';
 import { getRouteInfo } from '../utils/util';
 
-const findTimezoneForPoint = (lat, lon, time, maps_api_key, abortSignal) => {
-    return fetch(`https://maps.googleapis.com/maps/api/timezone/json?location=${lat},${lon}&timestamp=${time.toSeconds()}&key=${maps_api_key}`, {signal: abortSignal}).then( response => {
+const findTimezoneForPoint = (lat, lon, time, timezone_api_key, abortSignal) => {
+    return fetch(`https://maps.googleapis.com/maps/api/timezone/json?location=${lat},${lon}&timestamp=${time.toSeconds()}&key=${timezone_api_key}`, {signal: abortSignal})
+    .then( response => {
         if (response.ok) {
             return response.json();
         }
         throw Error(response.error());
-    }).then (body => {
+    })
+    .then (body => {
         // check for error in body of message
         if (body.errorMessage !== undefined) {
             throw Error(body.errorMessage);
@@ -15,7 +17,8 @@ const findTimezoneForPoint = (lat, lon, time, maps_api_key, abortSignal) => {
         // determine total timezone offset in seconds
         let tzOffset = body.dstOffset + body.rawOffset;
         return ({offset:tzOffset,zoneId:body.timeZoneId});
-    });
+    })
+    .catch(error => {error.message += " time zone";return error});
 }
 
 const getTimeZoneId = async (routeInfo, routeStart, timezoneApiKey, type, abortSignal) => {
@@ -24,7 +27,11 @@ const getTimeZoneId = async (routeInfo, routeStart, timezoneApiKey, type, abortS
       const type = rwgpsRouteData.trip === undefined ? 'route' : 'trip';
       const rwgpsRouteDatum = rwgpsRouteData[type];
       const point = rwgpsRouteDatum['track_points'][0];
-      return { result: "success", value: await findTimezoneForPoint(point.y, point.x, routeStart, timezoneApiKey, abortSignal) }
+      const zoneInfo = await findTimezoneForPoint(point.y, point.x, routeStart, timezoneApiKey, abortSignal);
+      if (zoneInfo instanceof Error) {
+          return { result : "error", error : zoneInfo}
+      }
+      return { result: "success", value: zoneInfo}
   } else if (routeInfo.gpxRouteData !== null) {
       if (routeInfo.gpxRouteData.tracks[0] === undefined) {
           Sentry.captureMessage(JSON.stringify(routeInfo.gpxRouteData));
