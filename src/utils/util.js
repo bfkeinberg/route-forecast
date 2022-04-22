@@ -82,4 +82,4 @@ export const milesToMeters = 1609.34;
 
 export const paceToSpeed = {'Q':3, 'R':4, 'S':5, 'T':6, 'A-':9, 'A':10, 'A+':11, 'B':12, 'B+':13, 'C':14, 'C+':15, 'D':16, 'D+':17, 'E':18, 'E+':19, "F":20, "F+":21};
 export const inputPaceToSpeed = {'Q':3, 'R':4, 'S':5, 'T':6, 'A-':9, 'A':10, 'A+':11, 'B':12, 'B+':13, 'C-':13, 'C':14, 'C+':15, 'D-':15, 'D':16, 'D+':17, 'E':18, 'E+':19, "F":20, "F+":21};
-export const metricPaceToSpeed = {'A-':15, 'A':16, 'B-':18, 'B':19, 'C-':21, 'C':22, 'C+':24, 'D-':24, 'D':26, 'D+':27, 'E-':27, 'E':29, "F":32, "F+":34};
+export const metricPaceToSpeed = {'A-':15, 'A':16, 'B-':18, 'B':19, 'C-':21, 'C':22, 'C+':24, 'D-':24, 'D':26, 'D+':27, 'E-':27, 'E':29, "E+":31, "F":32, "F+":34};

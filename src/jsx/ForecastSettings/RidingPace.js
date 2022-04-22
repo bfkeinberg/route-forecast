@@ -23,6 +23,9 @@ const paceValues = {
             {name: "D", number: 16},
             {name: "D+", number: 17},
             {name: "E", number: 18},
+            {name: "E+", number: 19},
+            {name: "F", number: 20},
+            {name: "F+", number: 21}
         ],
         label: "mph"
     },
@@ -41,6 +44,10 @@ const paceValues = {
             {name: "D", number: 26},
             {name: "D+", number: 27},
             {name: "E", number: 29},
+            {name: "E+", number: 31},
+            {name: "F", number: 32},
+            {name: "F+", number: 34}
+
         ],
         label: "kph"
     }
