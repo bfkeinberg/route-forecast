@@ -185,12 +185,18 @@ const useForecastDependentValues = () => {
   if (forecast.length > 0 && routeInfo.rwgpsRouteData) {
     const { points, values, finishTime} = getRouteInfo(stateStuff, routeInfo.rwgpsRouteData !== null ? "rwgps" : "gpx", timeZoneId)
 
+    let sortedControls = controls.userControlPoints.slice();
+    sortedControls.sort((a,b) => a['distance']-b['distance']);
+
+    let sortedValues = values.slice();
+    sortedValues.sort((a,b) => a['distance']-b['distance']);
+
     const { time, values: calculatedControlPointValues, gustSpeed, finishTime: adjustedFinishTime } = gpxParser.adjustForWind(
         forecast,
         points,
         routeParams.pace,
-        controls.userControlPoints,
-        values,
+        sortedControls,
+        sortedValues,
         routeParams.start,
         controls.metric,
         finishTime,

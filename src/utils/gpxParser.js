@@ -131,7 +131,8 @@ class AnalyzeRoute {
             let banked = Math.round(AnalyzeRoute.rusa_time(distanceInKm, elapsedTimeInHours));
             calculatedValues.push({arrival:arrivalTime.toFormat(finishTimeFormat),
                 banked: banked,
-                val:controls[nextControl].id, lat:point.lat, lon:point.lon
+                val:controls[nextControl].id, lat:point.lat, lon:point.lon,
+                distance:controls[nextControl].distance
             });
             nextControl++;
             return delayInMinutes/60;      // convert from minutes to hours
@@ -372,6 +373,7 @@ class AnalyzeRoute {
             previousPoint = currentPoint;
         });
 
+        calculatedValues.sort((a,b) => a.val-b.val);
         return {time:totalMinutesLost,values:calculatedValues, gustSpeed:maxGustSpeed,
                 finishTime:DateTime.fromFormat(finishTime,finishTimeFormat).plus({minutes:totalMinutesLost}).toFormat(finishTimeFormat)};
     };
