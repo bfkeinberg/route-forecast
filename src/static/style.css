@@ -79,8 +79,6 @@ img#bugImage {
     color: #0000EE
 }
 
-.glowing_input {}
-
 @keyframes glowing {
     0% {
         box-shadow: 0 0 5px #0000EE;
