@@ -238,7 +238,7 @@ ControlMarker.propTypes = {
     latitude:PropTypes.number.isRequired,
     longitude:PropTypes.number.isRequired,
     value:PropTypes.string.isRequired,
-    map:PropTypes.object.isRequired,
+    map:PropTypes.object,
     google:PropTypes.object.isRequired,
     mapCenter:PropTypes.object
 };
