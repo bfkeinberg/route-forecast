@@ -51,6 +51,12 @@ export const ControlTable = () => {
         return controlObject
     })
 
+    const sortOurStuffByDistance = () => {
+        const sortedControls = Array.from(controls)
+        sortedControls.sort((control1, control2) => control2.distance - control1.distance)
+        updateControls(sortedControls)
+    }
+
     const rwgpsCellStyle = calculatedValues !== null ? {backgroundColor: "rgb(19, 124, 189)", color: "white"} : {}
 
     const tableData = {
@@ -58,7 +64,7 @@ export const ControlTable = () => {
             ({name, distance, duration, arrival, banked, actual, delete: <Icon icon="delete" style={{cursor: "pointer"}} onClick={() => removeControl(index)}/>})),
         columns: [
             {name: "name", render: "Name", width: 40, editable: true},
-            {name: "distance", render: metric ? "Kilometers" : "Miles", width: 40, editable: true, editValidateFunction: stringIsOnlyDecimal},
+            {name: "distance", render: <div onClick={updateControls}>{metric ? "Kilometers" : "Miles"}</div>, width: 40, editable: true, editValidateFunction: stringIsOnlyDecimal},
             {name: "duration", render: "Expected Time Spent", valueTransformFunction: minSuffixFunction, width: 80, editable: true, editValidateFunction: stringIsOnlyNumeric},
             {name: "arrival", render: "Estimated Arrival Time", width: 80, editable: false, cellStyle: rwgpsCellStyle, headerStyle: rwgpsCellStyle},
             {name: "delete", render: "Delete", width: 60}
