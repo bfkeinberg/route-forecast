@@ -10,7 +10,7 @@ const middlewares = [thunk];
 const mockStore = configureMockStore(middlewares);
 
 import React from 'react'
-import { configure, shallow, mount, render } from 'enzyme'
+import { configure, mount } from 'enzyme'
 import Adapter from '@wojtekmaj/enzyme-adapter-react-17';
 import RidingPace from '../src/jsx/ForecastSettings/RidingPace';
 configure({ adapter: new Adapter() });
@@ -58,7 +58,7 @@ describe('<RidingPace />', () => {
         document.body.appendChild(div)
         const wrapper = mount((<Provider store={store}><RidingPace/></Provider>));
         expect(wrapper.find(Input).length).toBe(1);
-        expect((wrapper.find(Input).children().children()).length).toBe(13);
+        expect((wrapper.find(Input).children().children()).length).toBe(16);
         expect(wrapper.find('Input').prop('value')).toBe('D');
     });
 
@@ -70,7 +70,7 @@ describe('<RidingPace />', () => {
         document.body.appendChild(div)
         const wrapper = mount((<Provider store={store}><RidingPace /></Provider>));
         expect(wrapper.find(Input).length).toBe(1);
-        expect((wrapper.find(Input).children().children()).length).toBe(13);
+        expect((wrapper.find(Input).children().children()).length).toBe(16);
         expect(wrapper.find('Input').prop('value')).toBe('B+');
     });
 
