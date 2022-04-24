@@ -9,7 +9,7 @@ import { Provider } from 'react-redux';
 import configureMockStore from 'redux-mock-store';
 import thunk from 'redux-thunk';
 import { DateTime } from 'luxon';
-import {Button} from 'reactstrap';
+import {Button} from '@blueprintjs/core';
 import { Context as ResponsiveContext } from 'react-responsive'
 import ForecastButton from '../src/jsx/ForecastSettings/ForecastButton';
 

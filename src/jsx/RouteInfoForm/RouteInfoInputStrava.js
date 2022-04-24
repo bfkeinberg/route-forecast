@@ -1,9 +1,8 @@
 
 import React from 'react';
 import stravaImage from 'Images/api_logo_pwrdBy_strava_stack_light.png';
-import { Button } from 'reactstrap';
+import { Button, Spinner } from '@blueprintjs/core';
 import ErrorBoundary from '../shared/ErrorBoundary';
-import { Spinner } from '@blueprintjs/core';
 import StravaRouteIdInput from './StravaRouteIdInput';
 import { useSelector, useDispatch } from 'react-redux';
 import { loadStravaActivity } from "../../redux/actions";
@@ -33,9 +32,9 @@ export const RouteInfoInputStrava = () => {
             <div>
               <StravaRouteIdInput/>
               <Button
-                id='forecast'
-                tabIndex='6'
-                color="primary"
+                id='analyze'
+                tabIndex='0'
+                intent="primary"
                 onClick={fetchRoute}
                 disabled={fetchingFromStrava || !validRouteId}
                 style={{backgroundColor: "rgb(234, 89, 41)", borderColor: "rgb(234, 89, 41)", width: "100%", marginTop: "10px"}}
