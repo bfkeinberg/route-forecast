@@ -3,7 +3,7 @@ import React from 'react';
 import ShortUrl from '../TopBar/ShortUrl';
 import MediaQuery from 'react-responsive';
 import PropTypes from 'prop-types';
-import {setRouteLoadingMode} from '../../redux/actions';
+import {setRouteLoadingMode, setErrorDetails} from '../../redux/actions';
 import {connect, useDispatch} from 'react-redux';
 import { AlwaysFilledSwitch } from './AlwaysFilledSwitch';
 import { RouteInfoInputRWGPS } from './RouteInfoInputRWGPS';
@@ -12,7 +12,7 @@ import { routeLoadingModes } from '../../data/enums';
 import ReactGA from "react-ga4";
 import {Toast} from '@blueprintjs/core';
 
-const RouteInfoForm = ({ errorDetails, routeLoadingMode, setRouteLoadingMode }) => {
+const RouteInfoForm = ({ errorDetails, setErrorDetails, routeLoadingMode, setRouteLoadingMode }) => {
     const mode = routeLoadingMode
     const dispatch = useDispatch()
 
@@ -69,7 +69,7 @@ const mapStateToProps = (state) =>
     });
 
 const mapDispatchToProps = {
-    setRouteLoadingMode
+    setRouteLoadingMode, setErrorDetails
 };
 
 RouteInfoForm.propTypes = {
@@ -80,6 +80,7 @@ RouteInfoForm.propTypes = {
     routeProps: PropTypes.object,
     routeLoadingMode: PropTypes.number,
     setRouteLoadingMode: PropTypes.func.isRequired,
+    setErrorDetails:PropTypes.func.isRequired
 };
 
 export default connect(mapStateToProps, mapDispatchToProps, null, {pure:true})(RouteInfoForm);
