@@ -72,10 +72,12 @@ img#bugImage {
 
 .headerCell {
     font-size: 80%;
+    width: 60%
 }
 
 .clickableHeaderCell {
     font-size: 80%;
+    width: 60%;
     color: #0000EE
 }
 

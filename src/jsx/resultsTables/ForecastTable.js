@@ -1,17 +1,19 @@
 import React, {Component} from 'react';
-import {Table, UncontrolledTooltip, Row, Col} from 'reactstrap';
+import {Row, Col} from 'reactstrap';
+import { Tooltip2 } from "@blueprintjs/popover2";
+
 import ErrorBoundary from "../shared/ErrorBoundary";
 import darkSky from 'Images/darkSkySmall.png';
 import climacell from 'Images/Powered_by_Tomorrow-Black.png';
 //too large
-import visualcrossing from 'Images/visualCrossing.png';
+// import visualcrossing from 'Images/visualCrossing.png';
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 import {setWeatherRange, toggleWeatherRange, setTableViewed, toggleZoomToRange} from '../../redux/actions';
 import MediaQuery from 'react-responsive';
 import {finishTimeFormat} from '../../redux/reducer';
 import { DateTime } from 'luxon';
-import { Icon } from '@blueprintjs/core';
+import { Icon, HTMLTable } from '@blueprintjs/core';
 import cookie from 'react-cookies';
 import { ToggleButton } from '../shared/ToggleButton';
 import { WeatherCorrections } from './WeatherCorrections';
@@ -90,8 +92,8 @@ export class ForecastTable extends Component {
                     return <a tabIndex='-1' href="https://www.tomorrow.io/"><img src={climacell}/></a>;
                 case 'weatherapi':
                     return <a href="https://www.weatherapi.com/" title="Free Weather API"><img src='//cdn.weatherapi.com/v4/images/weatherapi_logo.png' alt="Weather data by WeatherAPI.com" border="0"/></a>;
-                case 'visualcrossing':
-                   return <a href="https://www.visualcrossing.com/weather-data"><img src={visualcrossing}/></a>;
+                // case 'visualcrossing':
+                //    return <a href="https://www.visualcrossing.com/weather-data"><img src={visualcrossing}/></a>;
                     // return <div><a href="https://www.visualcrossing.com/weather-data">Powered by Visual Crossing Weather</a><p/></div>;
                 case 'nws':
                     return <img src={"https://www.weather.gov/images/gjt/newsletter/NWSLogo.png"} width={100} height={100}/>;
@@ -135,9 +137,15 @@ export class ForecastTable extends Component {
     }
 
     render() {
-        const windHeader = this.state.showGusts ? 'Wind gust' : 'Wind speed';
-        const distHeader = this.props.metric ? 'KM' : 'Mile';
-        const temperatureHeader = this.state.showApparentTemp ? "Feels like" : <Icon icon="temperature"/>;
+        const windHeaderText = <span className={'clickableHeaderCell'}>{this.state.showGusts ? 'Wind gust' : 'Wind speed'}</span>;
+        const windHeader = <Tooltip2 content={'Click to toggle between average wind speed and wind gusts'} placement={'top'}>{windHeaderText}</Tooltip2>
+
+        const distHeaderText = this.props.metric ? 'KM' : 'Mile';
+        const distHeader = <Tooltip2 content={'Distance at start of segment'} placement={'top'}>{distHeaderText}</Tooltip2>
+
+        const temperatureHeaderText = <span className={'clickableHeaderCell'}>{this.state.showApparentTemp ? "Feels like" : <Icon icon="temperature"/>}</span>;
+        const temperatureHeader = <Tooltip2 content={'Click to toggle between temperature and apparent temperature'} placement={'top'}>{temperatureHeaderText}</Tooltip2>
+
         return (
             <div className="animated slideInLeft">
                 <ErrorBoundary>
@@ -152,31 +160,31 @@ export class ForecastTable extends Component {
                             <ToggleButton active={this.props.zoomToRange} onClick={this.toggleZoom}>Zoom to Segment</ToggleButton>
                         </Col>
                     </Row>
-                    <Table size='sm' hover bordered style={{ fontSize: "12px" }}>
+                    <HTMLTable bordered interactive striped style={{ fontSize: "12px" }}>
                         <thead>
                             <tr>
-                                <th className={'headerCell'}>Time</th>
-                                <th id={'dist'} className={'headerCell'}>{distHeader}</th>
-                                <th className={'headerCell'}>Summary</th>
-                                <th id={'temp'} className={'clickableHeaderCell'} onClick={this.toggleApparentDisplay} style={{cursor: "pointer"}}>{temperatureHeader}</th>
-                                <th className={'headerCell'}>Chance of rain</th>
+                                <th><span className={'headerCell'}>Time</span></th>
+                                <th><span className={'headerCell'}>{distHeader}</span></th>
+                                <th><span className={'headerCell'}>Summary</span></th>
+                                <th id={'temp'} className={'clickableHeaderCell'} onClick={this.toggleApparentDisplay} style={{ cursor: "pointer" }}>{temperatureHeader}</th>
+                                <th><span className={'headerCell'}>Chance of rain</span></th>
                                 <MediaQuery minWidth={501}>
-                                    <th className={'headerCell'}>Cloud cover</th>
+                                    <th><span className={'headerCell'}>Cloud cover</span></th>
                                 </MediaQuery>
-                                <th className={'headerCell'} id={'aqi'}>AQI</th>
-                                <th id={'wind'} className={'clickableHeaderCell'} onClick={this.toggleGustDisplay} style={{cursor: "pointer"}}>{windHeader}</th>
+                                <th className={'headerCell'} id={'aqi'}>
+                                    <Tooltip2 content={'Air quality shows current conditions, not forecasted'} placement={'top'}>
+                                        AQI
+                                    </Tooltip2>
+                                </th>
+                                <th id={'wind'} onClick={this.toggleGustDisplay} style={{ cursor: "pointer" }}>{windHeader}</th>
                                 <MediaQuery minWidth={501}>
-                                    <th className={'headerCell'}>Wind bearing</th>
+                                    <th><span className={'headerCell'}>Wind bearing</span></th>
                                 </MediaQuery>
                             </tr>
                         </thead>
                         {this.expandTable(this.props.forecast, this.props.metric)}
-                    </Table>
+                    </HTMLTable>
                 </ErrorBoundary>
-                <UncontrolledTooltip placement={'top'} target={'dist'}>Distance at start of segment</UncontrolledTooltip>
-                <UncontrolledTooltip placement={'top'} target={'temp'}>Click to toggle between temperature and apparent temperature</UncontrolledTooltip>
-                <UncontrolledTooltip placement={'top'} target={'wind'}>Click to toggle between average wind speed and wind gusts</UncontrolledTooltip>
-                <UncontrolledTooltip placement={'top'} target={'aqi'}>Current conditions, not forecasted</UncontrolledTooltip>
             </div>
         );
     }
