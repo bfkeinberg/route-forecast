@@ -1,4 +1,3 @@
-import 'bootstrap/dist/css/bootstrap.min.css';
 import React from 'react';
 import ShortUrl from '../TopBar/ShortUrl';
 import MediaQuery from 'react-responsive';

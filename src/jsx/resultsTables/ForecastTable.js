@@ -1,5 +1,4 @@
 import React, {Component} from 'react';
-import {Row, Col} from 'reactstrap';
 import { Tooltip2 } from "@blueprintjs/popover2";
 
 import ErrorBoundary from "../shared/ErrorBoundary";
@@ -149,17 +148,9 @@ export class ForecastTable extends Component {
         return (
             <div className="animated slideInLeft">
                 <ErrorBoundary>
-                    <Row style={{padding: "16px"}}>
-                        <Col>
-                            {this.displayBacklink(this.props.provider)}
-                        </Col>
-                        <Col>
-                            <WeatherCorrections/>
-                        </Col>
-                        <Col>
-                            <ToggleButton active={this.props.zoomToRange} onClick={this.toggleZoom}>Zoom to Segment</ToggleButton>
-                        </Col>
-                    </Row>
+                    {this.displayBacklink(this.props.provider)}
+                    <WeatherCorrections/>
+                    <ToggleButton active={this.props.zoomToRange} onClick={this.toggleZoom}>Zoom to Segment</ToggleButton>
                     <HTMLTable bordered interactive striped style={{ fontSize: "12px" }}>
                         <thead>
                             <tr>
