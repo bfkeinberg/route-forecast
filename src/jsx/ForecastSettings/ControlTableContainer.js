@@ -1,8 +1,7 @@
 
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Button } from "@blueprintjs/core";
-import { Card, CardBody } from "reactstrap";
+import { Button, Card, Elevation } from "@blueprintjs/core";
 import { addControl, toggleDisplayBanked } from "../../redux/actions";
 import ErrorBoundary from '../shared/ErrorBoundary';
 import { ControlTable } from './ControlTable';
@@ -16,8 +15,7 @@ export const ControlTableContainer = () => {
   return (
     <>
       <ErrorBoundary>
-        <Card style={{ margin: '10px' }}>
-          <CardBody style={{display: "flex", flexFlow: "column", alignItems: "center"}}>
+        <Card interactive={true} elevation={Elevation.TWO} style={{ margin: '10px', display: "flex", flexFlow: "column", alignItems: "center" }} >
             <ErrorBoundary>
               <ControlTable />
               <AddRowButton/>
@@ -25,7 +23,6 @@ export const ControlTableContainer = () => {
                   <ToggleButton style={{marginTop: "10px"}} active={displayBanked} onClick={() => dispatch(toggleDisplayBanked())}>Display banked time</ToggleButton>
               </Tooltip2>
             </ErrorBoundary>
-          </CardBody>
         </Card>
       </ErrorBoundary>
       <div tabIndex="98" onFocus={() => {

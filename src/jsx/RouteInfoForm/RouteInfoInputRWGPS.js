@@ -1,12 +1,10 @@
 
 import React, { useState } from 'react';
-import RwGpsTypeSelector from './RwGpsTypeSelector';
 import RideWithGpsId from './RideWithGpsId';
 import PinnedRouteLoader from './PinnedRouteLoader.jsx';
 import ErrorBoundary from "../shared/ErrorBoundary";
-import { Button } from 'reactstrap';
 import { loadFromRideWithGps } from '../../redux/actions';
-import { Spinner } from '@blueprintjs/core';
+import { Spinner, Button } from '@blueprintjs/core';
 import { useSelector, useDispatch } from 'react-redux';
 
 export const RouteInfoInputRWGPS = () => {
@@ -35,7 +33,6 @@ null :
             />
           </div>
         </ErrorBoundary>
-        <RwGpsTypeSelector visible={false}/>
       </div>
       <RWGPSLoadRouteButton/>
     </>

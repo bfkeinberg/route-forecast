@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import Flatpickr from 'react-flatpickr'
 import {Icon} from '@blueprintjs/core';
-import {UncontrolledTooltip} from 'reactstrap';
+import {Tooltip2} from '@blueprintjs/popover2';
 import {connect} from 'react-redux';
 import {setStart, setInitialStart} from "../../redux/actions";
 import 'flatpickr/dist/themes/confetti.css';
@@ -32,26 +32,27 @@ const DateSelect = ({start, setStart, setInitialStart, maxDaysInFuture, canForec
 
     return (
         <div style={{display: "flex", alignItems: "center", justifyContent: "center"}}>
-            <UncontrolledTooltip placement='bottom' target="startingTime">When you plan to begin riding</UncontrolledTooltip>
             <span id={"startingTime"} style={{fontSize: ".875rem", fontWeight: "bolder", padding: "0px 5px", flex: 1}}>
                 <Icon icon="calendar" onClick={() => setDateOnly(start, setInitialStart)} style={{cursor: "pointer", marginRight: "3px"}}/>
                 Starting time
             </span>
-            <div style={{flex: 2.5}}>
-                <Flatpickr key={start.seconds} id='calendar'
-                    value={start.toJSDate()}
-                    options={{enableTime: true,
-                        altInput: true, altFormat: 'F j, Y h:i K',
-                        altInputClass: 'dateDisplay',
-                        minDate: canForecastPast ? null : now,
-                        maxDate: later,
-                        defaultDate: start.toJSDate(),
-                        dateFormat: 'Z',
-                        onParseConfig:(dates,datestr,instance) =>
-                            instance.config.onClose.push((dates) =>
-                                {setStart(DateTime.fromJSDate(dates[0]))})
-                    }}
-                />
+            <div style={{ flex: 2.5 }}>
+                <Tooltip2 content={'When you plan to begin riding'} placement={'bottom'}>
+                    <Flatpickr key={start.seconds} id='calendar'
+                        value={start.toJSDate()}
+                        options={{
+                            enableTime: true,
+                            altInput: true, altFormat: 'F j, Y h:i K',
+                            altInputClass: 'dateDisplay',
+                            minDate: canForecastPast ? null : now,
+                            maxDate: later,
+                            defaultDate: start.toJSDate(),
+                            dateFormat: 'Z',
+                            onParseConfig: (dates, datestr, instance) =>
+                                instance.config.onClose.push((dates) => { setStart(DateTime.fromJSDate(dates[0])) })
+                        }}
+                    />
+                </Tooltip2>
             </div>
         </div>
     );

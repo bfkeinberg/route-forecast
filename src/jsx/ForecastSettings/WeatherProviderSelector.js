@@ -1,23 +1,44 @@
 import React from 'react';
-import PropTypes from 'prop-types';
-import {Input, FormGroup, UncontrolledTooltip} from 'reactstrap';
+import {FormGroup, Button, MenuItem} from "@blueprintjs/core";
+import { Select } from "@blueprintjs/select";
+import { Tooltip2 } from "@blueprintjs/popover2";
 import {connect} from 'react-redux';
 import {setWeatherProvider} from "../../redux/actions";
+import {providerValues} from "../../redux/reducer";
+import PropTypes from 'prop-types';
+
+const renderProvider = (provider, { handleClick, modifiers }) => {
+    if (!modifiers.matchesPredicate) {
+        return null;
+    }
+    return (
+        <MenuItem
+            active={modifiers.active}
+            key={provider.key}
+            onClick={handleClick}
+            text={provider.name}
+        />
+    );
+};
 
 const WeatherProviderSelector = ({weatherProvider,setWeatherProvider}) => {
     return (
-            <FormGroup size='sm'>
-                <UncontrolledTooltip target='provider' placement='bottom'>The weather provider to use for forecasts</UncontrolledTooltip>
-                <Input type="select" bsSize="sm" id='provider' tabIndex='2'
-                    name="provider"
-                    value={weatherProvider} onChange={event => {setWeatherProvider(event.target.value)}}>
-                    <option value="darksky">Dark Sky</option>
-                    <option value="climacell">Tomorrow.io</option>
-                    <option value="weatherapi">WeatherAPI</option>
-                    {/* <option value="visualcrossing">Visual Crossing</option> */}
-                    <option value="nws">National Weather Service</option>
-                </Input>
-            </FormGroup>
+        <FormGroup>
+            <Tooltip2 content={"The weather provider to use for forecasts"} placement={"bottom"}>
+                <Select tabIndex="0"
+                    id='provider'
+                    items={Object.entries(providerValues).map(element => { return { key: element[0], ...element[1] } })}
+                    itemsEqual={"name"}
+                    itemRenderer={renderProvider}
+                    filterable={false}
+                    fill={true}
+                    activeItem={{ key: weatherProvider, ...providerValues[weatherProvider] }}
+                    onItemSelect={(selected) => { setWeatherProvider(selected.key) }}
+                >
+                    <Button text={providerValues[weatherProvider].name} rightIcon="symbol-triangle-down" />
+                </Select>
+            </Tooltip2>
+        </FormGroup>
     );
 };
 

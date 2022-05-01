@@ -1,19 +1,20 @@
-import {Alert} from 'reactstrap';
-import 'bootstrap/dist/css/bootstrap.min.css';
 import React from 'react';
 import ShortUrl from '../TopBar/ShortUrl';
 import MediaQuery from 'react-responsive';
 import PropTypes from 'prop-types';
-import {setRouteLoadingMode} from '../../redux/actions';
-import {connect} from 'react-redux';
+import {setRouteLoadingMode, setErrorDetails} from '../../redux/actions';
+import {connect, useDispatch} from 'react-redux';
 import { AlwaysFilledSwitch } from './AlwaysFilledSwitch';
 import { RouteInfoInputRWGPS } from './RouteInfoInputRWGPS';
 import { RouteInfoInputStrava } from './RouteInfoInputStrava';
 import { routeLoadingModes } from '../../data/enums';
 import ReactGA from "react-ga4";
+import {Toast} from '@blueprintjs/core';
 
-const RouteInfoForm = ({ errorDetails, routeLoadingMode, setRouteLoadingMode }) => {
+const RouteInfoForm = ({ errorDetails, setErrorDetails, routeLoadingMode, setRouteLoadingMode }) => {
     const mode = routeLoadingMode
+    const dispatch = useDispatch()
+
     const modeSwitched = (event) => {
         setRouteLoadingMode(event.target.checked ? routeLoadingModes.STRAVA : routeLoadingModes.RWGPS);
         if (event.target.checked) {ReactGA.event('select_content', {content_type:'strava'})}
@@ -25,7 +26,7 @@ const RouteInfoForm = ({ errorDetails, routeLoadingMode, setRouteLoadingMode }) 
             {mode === routeLoadingModes.RWGPS ?
                 <RouteInfoInputRWGPS/> :
                 <RouteInfoInputStrava/>}
-            {errorDetails !== null && <Alert style={{ padding: '10px', marginTop: "10px" }} color="danger">{errorDetails}</Alert>}
+            {errorDetails !== null && <Toast style={{ padding: '10px', marginTop: "10px" }} message={errorDetails} timeout={0} onDismiss={() => dispatch(setErrorDetails(null))} intent="danger"></Toast>}
             <MediaQuery maxDeviceWidth={500}>
                 <div style={{marginTop: "10px", textAlign: "center"}}>
                     <ShortUrl/>
@@ -67,7 +68,7 @@ const mapStateToProps = (state) =>
     });
 
 const mapDispatchToProps = {
-    setRouteLoadingMode
+    setRouteLoadingMode, setErrorDetails
 };
 
 RouteInfoForm.propTypes = {
@@ -78,6 +79,7 @@ RouteInfoForm.propTypes = {
     routeProps: PropTypes.object,
     routeLoadingMode: PropTypes.number,
     setRouteLoadingMode: PropTypes.func.isRequired,
+    setErrorDetails:PropTypes.func.isRequired
 };
 
 export default connect(mapStateToProps, mapDispatchToProps, null, {pure:true})(RouteInfoForm);

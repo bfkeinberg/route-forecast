@@ -72,10 +72,12 @@ img#bugImage {
 
 .headerCell {
     font-size: 80%;
+    width: 60%
 }
 
 .clickableHeaderCell {
     font-size: 80%;
+    width: 60%;
     color: #0000EE
 }
 
@@ -242,4 +244,9 @@ select#pace.form-control {
 
 #gustyWeather {
     color: #CC0000;
+}
+
+table.bp4-html-table.bp4-html-table-bordered.bp4-html-table-striped.bp4-interactive td,
+table.bp4-html-table.bp4-html-table-bordered.bp4-html-table-striped.bp4-interactive th {
+    padding: 0.25rem; 
 }

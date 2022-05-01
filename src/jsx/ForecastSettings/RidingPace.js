@@ -1,6 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {Label, Input, FormGroup, UncontrolledTooltip} from 'reactstrap';
+import { Select } from "@blueprintjs/select";
+import { Tooltip2 } from "@blueprintjs/popover2";
+import { Button, MenuItem, FormGroup } from "@blueprintjs/core";
 import {connect} from 'react-redux';
 import {saveCookie, setPace} from "../../redux/actions";
 import { useActualPace, useFormatSpeed } from '../../utils/hooks';
@@ -80,6 +82,20 @@ const correctPaceValue = (paceAlpha, setPace) => {
     }
 }
 
+const renderPace = (pace, { handleClick, modifiers }) => {
+    if (!modifiers.matchesPredicate) {
+        return null;
+    }
+    return (
+        <MenuItem
+            active={modifiers.active}
+            key={pace.number}
+            onClick={handleClick}
+            text={`${pace.number} mph`}
+        />
+    );
+};
+
 const RidingPace = ({ pace, setPace, metric }) => {
 
     const actualPace = useActualPace()
@@ -100,15 +116,21 @@ const RidingPace = ({ pace, setPace, metric }) => {
     const dropdownValues = metric ? paceValues.metric : paceValues.imperialLikeAPenguin
 
     return (
-        <FormGroup style={{flex: 3}}>
-            <Label size='sm' tag='b' for='paceInput'>Pace on flat</Label>
-            <UncontrolledTooltip innerClassName={pace_tooltip_class} target='paceInput' placement="bottom">{pace_text}</UncontrolledTooltip>
-            <Input tabIndex='3' type="select" value={pace} name="pace"
-                id='paceInput' onChange={event => {saveCookie("pace",event.target.value);setPace(event.target.value)}}>
-                {dropdownValues.values.map(({name, number}) =>
-                    <option key={name} value={name}>{number} {dropdownValues.label}</option>
-                )}
-            </Input>
+        <FormGroup style={{ flex: 3, fontSize: "90%" }} label={<span><b>Pace on flat</b></span>} labelFor={'paceInput'}>
+            <Tooltip2 content={pace_text} className={pace_tooltip_class} placement="bottom" minimal={true}>
+                <Select tabIndex="0"
+                    id='paceInput'
+                    items={dropdownValues.values}
+                    itemsEqual={"number"}
+                    itemRenderer={renderPace}
+                    filterable={false}
+                    fill={true}
+                    activeItem={{name:pace, number:paceToSpeed[pace]}}
+                    onItemSelect={(selected) => { saveCookie("pace", selected.name);setPace(selected.name) }}
+                >
+                    <Button text={paceToSpeed[pace] + " mph"} rightIcon="symbol-triangle-down"/>
+                </Select>
+            </Tooltip2>
         </FormGroup>
     );
 };
