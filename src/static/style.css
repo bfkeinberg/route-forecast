@@ -245,3 +245,8 @@ select#pace.form-control {
 #gustyWeather {
     color: #CC0000;
 }
+
+table.bp4-html-table.bp4-html-table-bordered.bp4-html-table-striped.bp4-interactive td,
+table.bp4-html-table.bp4-html-table-bordered.bp4-html-table-striped.bp4-interactive th {
+    padding: 0.25rem; 
+}

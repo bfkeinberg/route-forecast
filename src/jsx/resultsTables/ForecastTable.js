@@ -61,7 +61,7 @@ export class ForecastTable extends Component {
 
     static windStyle(point) {
         if (point.relBearing <90) {
-            if (Math.cos((Math.PI / 180) * point.relBearing) * parseInt(point.windSpeed) > 10) {
+            if (Math.cos((Math.PI / 180) * point.relBearing) * parseInt(point.windSpeed) >= 10) {
                 return 'redText';
             } else {
                 return 'orangeText';
@@ -148,10 +148,18 @@ export class ForecastTable extends Component {
         return (
             <div className="animated slideInLeft">
                 <ErrorBoundary>
-                    {this.displayBacklink(this.props.provider)}
-                    <WeatherCorrections/>
-                    <ToggleButton active={this.props.zoomToRange} onClick={this.toggleZoom}>Zoom to Segment</ToggleButton>
-                    <HTMLTable bordered interactive striped style={{ fontSize: "12px" }}>
+                    <div style={{ display: 'flex', padding: '16px' }}>
+                        <div style={{ flex: 1 }}>
+                            {this.displayBacklink(this.props.provider)}
+                        </div>
+                        <div style={{ flex: 1 }}>
+                            <WeatherCorrections />
+                        </div>
+                        <div style={{ flex: 1 }}>
+                            <ToggleButton active={this.props.zoomToRange} onClick={this.toggleZoom}>Zoom to Segment</ToggleButton>
+                        </div>
+                    </div>
+                    <HTMLTable bordered interactive striped style={{ fontSize: "12px"}}>
                         <thead>
                             <tr>
                                 <th><span className={'headerCell'}>Time</span></th>
