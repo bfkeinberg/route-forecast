@@ -31,7 +31,7 @@ if (!window.origin.startsWith('http://localhost')) {
         ],
 
         // To set a uniform sample rate
-        tracesSampleRate: 0.5
+        tracesSampleRate: 0.4
         /*,
         beforeBreadcrumb(breadcrumb) {
             if (breadcrumb.category==='console') {return null} else {return breadcrumb}

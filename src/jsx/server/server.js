@@ -28,7 +28,7 @@ Sentry.init({
         // enable HTTP calls tracing
         new Sentry.Integrations.Http({ tracing: true })
     ],
-    tracesSampleRate: 0.5
+    tracesSampleRate: 0.4
 });
 let winston = null;
 let expressWinston = null;
