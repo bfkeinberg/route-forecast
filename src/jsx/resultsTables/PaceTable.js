@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { Table, UncontrolledTooltip } from 'reactstrap';
 import ErrorBoundary from "../shared/ErrorBoundary";
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
@@ -10,6 +9,8 @@ import StravaAnalysisIntervalInput from './StravaAnalysisIntervalInput';
 import { useActualPace, useFormatSpeed } from '../../utils/hooks';
 import { ToggleButton } from '../shared/ToggleButton';
 import cookie from 'react-cookies';
+import { Tooltip2 } from "@blueprintjs/popover2";
+import { HTMLTable } from '@blueprintjs/core';
 
 const PaceTable = ({activityData, activityStream, analysisInterval, setSubrange, toggleMapRange, zoomToRange, toggleZoomToRange}) =>  {
 
@@ -79,11 +80,13 @@ setSelectedRow
                     <div style={{padding: "16px", display: "flex", flexFlow: "column", alignItems: "end"}}>
                         <ToggleButton active={zoomToRange} onClick={toggleZoom}>Zoom to Segment</ToggleButton>
                     </div>
-                    <Table striped responsive hover bordered>
+                    <HTMLTable bordered interactive striped >
                         <thead>
                         <tr>
                             <th style={{'fontSize':'80%'}}>Time</th>
-                            <th id={'pace'} style={{'fontSize':'80%'}}>Pace</th>
+                            <Tooltip2 content={'Pace is average speed adjusted for climb'} placement={"top"}>
+                                <th id={'pace'} style={{'fontSize':'80%'}}>Pace</th>
+                            </Tooltip2>
                             <th style={{'fontSize':'80%'}}>WW Pace</th>
                             <th style={{'fontSize':'80%'}}>Distance</th>
                             <th style={{'fontSize':'80%'}}>Climb</th>
@@ -91,9 +94,8 @@ setSelectedRow
                         </tr>
                         </thead>
                         {expandTable(paceOverTime)}
-                    </Table>
+                    </HTMLTable>
                 </ErrorBoundary>
-                <UncontrolledTooltip placement={'top'} target={'pace'}>Pace is average speed adjusted for climb</UncontrolledTooltip>
             </div>
     );
 }

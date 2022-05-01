@@ -5,7 +5,7 @@
 import configureMockStore from 'redux-mock-store';
 import thunk from 'redux-thunk';
 import { Provider } from 'react-redux';
-import { Input } from 'reactstrap';
+import { Select } from '@blueprintjs/select';
 const middlewares = [thunk];
 const mockStore = configureMockStore(middlewares);
 
@@ -57,9 +57,9 @@ describe('<RidingPace />', () => {
         div.setAttribute("id", "paceInput")
         document.body.appendChild(div)
         const wrapper = mount((<Provider store={store}><RidingPace/></Provider>));
-        expect(wrapper.find(Input).length).toBe(1);
-        expect((wrapper.find(Input).children().children()).length).toBe(16);
-        expect(wrapper.find('Input').prop('value')).toBe('D');
+        expect(wrapper.find(Select).length).toBe(1);
+        expect(wrapper.find(Select).prop("items").length).toBe(16);
+        expect(wrapper.find(Select).prop('activeItem').name).toBe('D');
     });
 
     it('handling of obsolete pace values' , () => {
@@ -69,9 +69,9 @@ describe('<RidingPace />', () => {
         div.setAttribute("id", "paceInput")
         document.body.appendChild(div)
         const wrapper = mount((<Provider store={store}><RidingPace /></Provider>));
-        expect(wrapper.find(Input).length).toBe(1);
-        expect((wrapper.find(Input).children().children()).length).toBe(16);
-        expect(wrapper.find('Input').prop('value')).toBe('B+');
+        expect(wrapper.find(Select).length).toBe(1);
+        expect(wrapper.find(Select).prop("items").length).toBe(16);
+        expect(wrapper.find(Select).prop('activeItem').name).toBe('B+');
     });
 
 });

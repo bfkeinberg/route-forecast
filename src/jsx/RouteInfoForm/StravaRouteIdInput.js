@@ -1,14 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Label, Input, FormGroup } from 'reactstrap';
+import { InputGroup, FormGroup } from '@blueprintjs/core'
 import { connect } from 'react-redux';
 import { setStravaActivity } from "../../redux/actions";
 
 const StravaRouteIdInput = ({ setStravaActivity, strava_activity, canAnalyze }) => {
     return (
-        <FormGroup>
-            <Label for='stravaRoute' size='sm' tag='b'>Strava Activity Id</Label>
-            <Input autoFocus id='stravaRoute' tabIndex='2' type="text"
+        <FormGroup label={<span><b>Strava Activity Id</b></span>} labelFor={"stravaRoute"}>
+            <InputGroup autoFocus id='stravaRoute' tabIndex='0' type="text"
                 onDrop={event => {
                     let dt = event.dataTransfer;
                     if (dt.items) {

@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {Label, Input, FormGroup} from 'reactstrap';
+import {InputGroup, FormGroup} from '@blueprintjs/core';
 import {connect} from 'react-redux';
 import {setRwgpsRoute} from "../../redux/actions";
 
@@ -56,10 +56,9 @@ const RideWithGpsId = ({setRwgpsRoute,loadingSource,loadingSuccess,rwgpsRoute}) 
     };
 
     return (
-        <FormGroup inline>
-            <Label for='rwgps_route' size='sm' tag='b'>Route ID</Label>
-            <Input id={'rwgps_route'} className={'glowing_input'}
-                   autoFocus tabIndex='2' type="text"
+        <FormGroup inline={false} style={{fontSize:"90%"}} label={<span><b>Route ID</b></span>} labelFor={'rwgps_route'} >
+            <InputGroup id={'rwgps_route'} className={'glowing_input'}
+                   autoFocus tabIndex='0' type="text"
                    {...decideValidationStateFor('rwgps',loadingSource,loadingSuccess)}
                  onBlur={event => {handleRwgpsRoute(event.target.value)}}
                  onKeyPress={isNumberKey}

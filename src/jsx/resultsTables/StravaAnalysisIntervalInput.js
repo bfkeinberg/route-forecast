@@ -1,32 +1,54 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Input, FormGroup, UncontrolledTooltip } from 'reactstrap';
+import {FormGroup, Button, MenuItem} from "@blueprintjs/core";
+import { Select } from "@blueprintjs/select";
+import { Tooltip2 } from "@blueprintjs/popover2";
 import { connect } from 'react-redux';
 import { setAnalysisInterval } from "../../redux/actions";
+
+const analysisIntervals = [
+    {number: "0.5", text: "Half hour"},
+    {number: "1", text: "1 hour"},
+    {number:"2", text:"2 hours"},
+    {number:"4", text:"4 hours"},
+    {number:"6", text:"6 hours"},
+    {number:"8", text:"8 hours"},
+    {number:"12", text:"12 hours"},
+    {number:"24", text:"24 hours"}
+];
+
+const renderInterval = (interval, { handleClick, modifiers }) => {
+    if (!modifiers.matchesPredicate) {
+        return null;
+    }
+    return (
+        <MenuItem
+            active={modifiers.active}
+            key={interval.number}
+            onClick={handleClick}
+            text={interval.text}
+        />
+    );
+};
 
 const StravaAnalysisIntervalInput = ({ interval, setInterval }) => {
     const interval_tooltip_text = 'Interval in hours at which to calculate effective pace';
     return (
         <FormGroup size='sm' style={{ flex: '1' }}>
-            <UncontrolledTooltip placement="bottom" target='analysisInterval'>{interval_tooltip_text}</UncontrolledTooltip>
             <div style={{fontSize: "14px", fontWeight: "bold"}}>Analysis Interval</div>
-            <Input
-                id='analysisInterval'
-                type="select"
-                value={interval}
-                name="analysisInterval"
-                onChange={event => { setInterval(event.target.value); }}
-                style={{cursor: "pointer"}}
+            <Tooltip2 placement="bottom" content={interval_tooltip_text}>
+            <Select
+                items={analysisIntervals}
+                itemsEqual={"number"}
+                itemRenderer={renderInterval}
+                filterable={false}
+                fill={true}
+                activeItem={{ number: interval.toString(), text:analysisIntervals.find(elem => elem.number == interval).text }}
+                onItemSelect={(selected) => { setInterval(selected.number) }}
             >
-                <option value="0.5">Half hour</option>
-                <option value="1">1 hour</option>
-                <option value="2">2 hours</option>
-                <option value="4">4 hours</option>
-                <option value="6">6 hours</option>
-                <option value="8">8 hours</option>
-                <option value="12">12 hours</option>
-                <option value="24">24 hours</option>
-            </Input>
+            <Button text={analysisIntervals.find(elem => elem.number == interval).text} rightIcon="symbol-triangle-down" />
+            </Select>
+            </Tooltip2>
         </FormGroup>
     );
 };

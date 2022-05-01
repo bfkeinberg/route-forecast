@@ -5,8 +5,7 @@ import MapLoader from "./Map/MapLoader";
 import PropTypes from "prop-types";
 import React from "react";
 import { Route, Routes, Link, MemoryRouter, useNavigate } from "react-router-dom";
-import {Nav, NavItem, NavbarBrand} from "reactstrap";
-import { Icon, IconSize, Intent } from "@blueprintjs/core";
+import { Button, Icon, IconSize, Intent, Navbar, Alignment } from "@blueprintjs/core";
 import {IconNames } from "@blueprintjs/icons";
 import {connect, useSelector} from 'react-redux';
 import RouteInfoForm from "./RouteInfoForm/RouteInfoForm";
@@ -47,44 +46,36 @@ const MobileUITabs = (props) => {
     useWhenChanged(stravaActivityData, () => navigate("/paceTable", {replace:true}))
     return (
         <>
-            <Nav tabs>
-                <NavbarBrand>Route plan</NavbarBrand>
-                <NavItem>
+            <Navbar>
+                <Navbar.Group align={Alignment.LEFT}>
+                    <Navbar.Heading>Route plan</Navbar.Heading>
                     <ErrorBoundary>
                         <Link to={"/"} className={'nav-link'}>
-                            <Icon icon={IconNames.HOME} iconSize={Icon.SIZE_STANDARD} intent={Intent.PRIMARY} />
+                            <Button minimal icon={IconNames.HOME} intent={Intent.PRIMARY}></Button>
                         </Link>
                     </ErrorBoundary>
-                </NavItem>
-                <NavItem>
                     <ErrorBoundary>
                         <Link to={"/controlPoints/"} className={'nav-link'}>
                             <Icon icon={IconNames.SHOP} iconSize={Icon.SIZE_STANDARD} intent={Intent.NONE} />
                         </Link>
                     </ErrorBoundary>
-                </NavItem>
-                <NavItem>
                     <Link to={"/map/"} className={'nav-link'}>
                         <Icon icon={IconNames.GLOBE} iconSize={IconSize.STANDARD} intent={props.needToViewMap ? Intent.DANGER : Intent.NONE} />
                     </Link>
-                </NavItem>
-                <NavItem>
                     <Link to={"/forecastTable/"} className={'nav-link'}>
                         <Icon icon={IconNames.TH} iconSize={IconSize.STANDARD} intent={props.needToViewTable ? Intent.DANGER : Intent.NONE} />
                     </Link>
-                </NavItem>
-                <NavItem>
                     <Link to={"/paceTable/"} className={'nav-link'}>
                         <Icon color="orange" icon={IconNames.HEAT_GRID} iconSize={IconSize.STANDARD} intent={props.needToViewTable ? Intent.DANGER : Intent.NONE} />
                     </Link>
-                </NavItem>
-            </Nav>
+                </Navbar.Group>
+            </Navbar>
             <Routes>
-                <Route path="/" element={<RouteInfoForm/>} />
-                <Route path="/controlPoints/" element={<ForecastSettings/>} />
+                <Route path="/" element={<RouteInfoForm />} />
+                <Route path="/controlPoints/" element={<ForecastSettings />} />
                 <Route path="/map/" element={<MapLoader maps_api_key={props.mapsApiKey} />} />
-                <Route path="/forecastTable/" element={<ForecastTable/>} />
-                <Route path="/paceTable/" element={<PaceTable/>} />
+                <Route path="/forecastTable/" element={<ForecastTable />} />
+                <Route path="/paceTable/" element={<PaceTable />} />
             </Routes>
         </>
     )
