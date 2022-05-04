@@ -44,7 +44,7 @@ export const routeParams = function(state = {
 }, action) {
     switch (action.type) {
         case Actions.SET_STOP_AFTER_LOAD:
-            return {...state, stopAfterLoad:action.value};
+            return {...state, stopAfterLoad:action.value==="true"};
         case Actions.SET_WEATHER_PROVIDER:
             return {...state, interval:Math.max(state.interval,providerValues[action.weatherProvider].min_interval),
                 min_interval:providerValues[action.weatherProvider].min_interval,
