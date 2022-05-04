@@ -40,7 +40,8 @@ import {
     loadRouteFromURL,
     setDisplayControlTableUI,
     setRwgpsToken,
-    setUsePinnedRoutes
+    setUsePinnedRoutes,
+    setStopAfterLoad
 } from "../../redux/actions";
 import QueryString from './QueryString';
 import { routeLoadingModes } from '../../data/enums';
@@ -94,7 +95,8 @@ export class RouteWeatherUI extends Component {
         bitly_token: PropTypes.string.isRequired,
         setRwgpsToken:PropTypes.func.isRequired,
         setZoomToRange:PropTypes.func.isRequired,
-        setUsePinnedRoutes:PropTypes.func.isRequired
+        setUsePinnedRoutes:PropTypes.func.isRequired,
+        setStopAfterLoad:PropTypes.func.isRequired
     };
 
     constructor(props) {
@@ -242,6 +244,7 @@ export class RouteWeatherUI extends Component {
             props.setUsePinnedRoutes(true);
             saveRwgpsCredentials(queryParams.rwgpsToken);
         }
+        props.setStopAfterLoad(queryParams.stopAfterLoad);
     }
 
     render() {
@@ -255,7 +258,7 @@ const mapDispatchToProps = {
     setStravaToken, setActionUrl, setRwgpsRoute, setApiKeys, setStravaError, setInitialStart, setPace, setInterval, setMetric,
     setStravaActivity, updateControls:updateUserControls, setRouteLoadingMode, setStravaRefreshToken,
     loadFromRideWithGps, reset, setWeatherProvider, showWeatherProvider, setRwgpsToken, setStartTimestamp,
-    setZoomToRange, setUsePinnedRoutes
+    setZoomToRange, setUsePinnedRoutes, setStopAfterLoad
 };
 
 const mapStateToProps = (state) =>

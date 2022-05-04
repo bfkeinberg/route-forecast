@@ -346,13 +346,21 @@ export const loadRouteFromURL = () => {
         await dispatch(setLoadingFromURL(true))
         await dispatch(loadFromRideWithGps())
         const error = getState().uiInfo.dialogParams.errorDetails
-        if (error === null) {
+        if (error === null && !getState().uiInfo.routeParams.stopAfterLoad) {
             await dispatch(requestForecast(getState().routeInfo));
             updateHistory(getState().controls.queryString);
         }
         dispatch(setLoadingFromURL(false))
     }
 }
+
+export const SET_STOP_AFTER_LOAD = 'STOP_AFTER_LOAD';
+export const setStopAfterLoad = (stopAfterLoad) => {
+    return {
+        type: SET_STOP_AFTER_LOAD,
+        value: stopAfterLoad
+    }
+};
 
 export const GPX_ROUTE_LOADING_SUCCESS = 'GPX_ROUTE_LOADING_SUCCESS';
 const gpxRouteLoadingSuccess = function(result) {
