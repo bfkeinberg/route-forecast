@@ -17,7 +17,7 @@ beforeAll(() => {
     currentscript.setAttribute('timezome_api_key','timezoneKey');
     Object.defineProperty(document, 'currentScript', {
         value: currentscript,
-    });    
+    });
 }
 );
 
@@ -44,6 +44,7 @@ describe('<RouteWeatherUI />', () => {
     const setStartTimestamp=jest.fn();
     const setZoomToRange=jest.fn();
     const setUsePinnedRoutes=jest.fn();
+    const setStopAfterLoad=jest.fn()
 
     it('renders without crashing', () => {
 
@@ -56,7 +57,7 @@ describe('<RouteWeatherUI />', () => {
                                                 setStartTimestamp={setStartTimestamp} setZoomToRange={setZoomToRange}
                                                 setStravaRefreshToken={setStravaRefreshToken}
                                 setInitialStart={setInitialStart} setWeatherProvider={setWeatherProvider} setRwgpsToken={setRwgpsToken}
-                                setUsePinnedRoutes={setUsePinnedRoutes} 
+                                setUsePinnedRoutes={setUsePinnedRoutes} setStopAfterLoad={setStopAfterLoad}
                                 maps_api_key={'zzzz'} bitly_token={'ddd'} timezone_api_key={'lll'}/>);
         expect(wrapper.find(ForecastTable).length).toEqual(0);
     });

@@ -20,6 +20,7 @@ describe('route params reducer', () => {
                 interval:1,min_interval:0.25,pace:'D',rwgpsRoute:'',
                 rwgpsRouteIsTrip:false,canForecastPast:true,
                 start: expect.any(DateTime),
+                stopAfterLoad: expect.any(Boolean),
                 initialStart: expect.any(DateTime),
                 maxDaysInFuture:14,
                 routeLoadingMode: routeLoadingModes.RWGPS
@@ -37,6 +38,7 @@ describe('route params reducer', () => {
             "rwgpsRoute": 201276,
             "rwgpsRouteIsTrip": false,
             "start": DateTime.fromISO("2018-07-31T14:00:00.981Z"),
+            "stopAfterLoad": false,
             "initialStart": DateTime.fromISO("2018-07-31T14:00:00.981Z"),
             "loadingSource": null,
             "succeeded": null
@@ -55,6 +57,7 @@ describe('route params reducer', () => {
                 "rwgpsRoute": 201276,
                 "rwgpsRouteIsTrip": false,
                 "start": DateTime.fromISO('2018-08-01T15:00:00.000Z'),
+                "stopAfterLoad": false,
                 "initialStart": DateTime.fromISO('2018-07-31T14:00:00.981Z'),
                 "loadingSource": null,
                 "succeeded": null
@@ -69,6 +72,7 @@ describe('route params reducer', () => {
             "rwgpsRoute": 201276,
             "rwgpsRouteIsTrip": false,
             "start": "2018-07-31T14:00:00.981Z",
+            "stopAfterLoad": false,
             "loadingSource": null,
             "succeeded": null
         };
@@ -83,6 +87,7 @@ describe('route params reducer', () => {
                 "rwgpsRoute": 201276,
                 "rwgpsRouteIsTrip": false,
                 "start":'2018-07-31T14:00:00.981Z',
+                "stopAfterLoad": false,
                 "loadingSource": null,
                 "succeeded": null
             }

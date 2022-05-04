@@ -39,9 +39,12 @@ export const routeParams = function(state = {
     start: initialStartTime(),
     initialStart: initialStartTime(),
     routeLoadingMode: routeLoadingModes.RWGPS,
-    maxDaysInFuture: providerValues['darksky'].max_days
+    maxDaysInFuture: providerValues['darksky'].max_days,
+    stopAfterLoad: false
 }, action) {
     switch (action.type) {
+        case Actions.SET_STOP_AFTER_LOAD:
+            return {...state, stopAfterLoad:action.value==="true"};
         case Actions.SET_WEATHER_PROVIDER:
             return {...state, interval:Math.max(state.interval,providerValues[action.weatherProvider].min_interval),
                 min_interval:providerValues[action.weatherProvider].min_interval,
@@ -64,7 +67,7 @@ export const routeParams = function(state = {
                 if (!start.isValid) {
                     return state;
                 } else {
-                    return {...state, start: start};
+                    return {...state, start: start, stopAfterLoad: false};
                 }
             } else {
                 return state;
@@ -93,7 +96,7 @@ export const routeParams = function(state = {
             }
         case Actions.SET_PACE:
             if (action.pace !== undefined) {
-                return {...state, pace: action.pace};
+                return {...state, pace: action.pace, stopAfterLoad: false};
             } else {
                 return state;
             }
@@ -102,7 +105,7 @@ export const routeParams = function(state = {
                 // protect against garbage in url
                 const interval = parseFloat(action.interval);
                 if (isNaN(interval) || interval < 0.25 || interval > 2.0) return state;
-                return {...state, interval: interval};
+                return {...state, interval: interval, stopAfterLoad: false};
             } else {
                 return state;
             }

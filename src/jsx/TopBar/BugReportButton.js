@@ -15,11 +15,13 @@ const bugReportDialog = () => {
 
 const BugReportButton = () => {
     return (
-        <Button className="pt-intent-warning pt-small pt-minimal"
+        <Button className="pt-intent-warning"
                 onClick={bugReportDialog}
-                style={{height: "40px"}}
+                style={{height: "47px"}}
+                text={'Report a bug'}
+                small
         >
-                <img style={{height: "auto"}} id='bugImage' src={LadyBug}/>Report a bug
+                <img style={{height: "45", width: "32"}} id='bugImage' src={LadyBug}/>
         </Button>
         );
 };
