@@ -5,7 +5,7 @@ import MapLoader from "./Map/MapLoader";
 import PropTypes from "prop-types";
 import React from "react";
 import { Route, Routes, Link, MemoryRouter, useNavigate } from "react-router-dom";
-import { Button, Icon, IconSize, Intent, Navbar, Alignment } from "@blueprintjs/core";
+import { Button, Icon, IconSize, Intent, Navbar, NavbarGroup, NavbarDivider, NavbarHeading, Alignment } from "@blueprintjs/core";
 import {IconNames } from "@blueprintjs/icons";
 import {connect, useSelector} from 'react-redux';
 import RouteInfoForm from "./RouteInfoForm/RouteInfoForm";
@@ -47,28 +47,32 @@ const MobileUITabs = (props) => {
     return (
         <>
             <Navbar>
-                <Navbar.Group align={Alignment.LEFT}>
-                    <Navbar.Heading>Route plan</Navbar.Heading>
+                <NavbarGroup align={Alignment.CENTER}>
+                    <NavbarHeading>Randoplan</NavbarHeading>
                     <ErrorBoundary>
                         <Link to={"/"} className={'nav-link'}>
                             <Button minimal icon={IconNames.HOME} intent={Intent.PRIMARY}></Button>
                         </Link>
                     </ErrorBoundary>
+                    <NavbarDivider/>
                     <ErrorBoundary>
                         <Link to={"/controlPoints/"} className={'nav-link'}>
                             <Icon icon={IconNames.SHOP} iconSize={Icon.SIZE_STANDARD} intent={Intent.NONE} />
                         </Link>
                     </ErrorBoundary>
+                    <NavbarDivider/>
                     <Link to={"/map/"} className={'nav-link'}>
-                        <Icon icon={IconNames.GLOBE} iconSize={IconSize.STANDARD} intent={props.needToViewMap ? Intent.DANGER : Intent.NONE} />
+                        <Icon icon={IconNames.GLOBE} iconSize={IconSize.STANDARD} intent={props.needToViewMap ? Intent.DANGER : Intent.NONE}/>
                     </Link>
+                    <NavbarDivider/>
                     <Link to={"/forecastTable/"} className={'nav-link'}>
-                        <Icon icon={IconNames.TH} iconSize={IconSize.STANDARD} intent={props.needToViewTable ? Intent.DANGER : Intent.NONE} />
+                        <Icon icon={IconNames.TH} iconSize={IconSize.STANDARD} intent={props.needToViewTable ? Intent.DANGER : Intent.NONE}/>
                     </Link>
+                    <NavbarDivider/>
                     <Link to={"/paceTable/"} className={'nav-link'}>
                         <Icon color="orange" icon={IconNames.HEAT_GRID} iconSize={IconSize.STANDARD} intent={props.needToViewTable ? Intent.DANGER : Intent.NONE} />
                     </Link>
-                </Navbar.Group>
+                </NavbarGroup>
             </Navbar>
             <Routes>
                 <Route path="/" element={<RouteInfoForm />} />
