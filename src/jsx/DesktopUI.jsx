@@ -15,6 +15,7 @@ import { routeLoadingModes } from "../data/enums";
 import { Spinner } from "@blueprintjs/core";
 import "./DesktopUI.css"
 import { RouteTitle } from "./shared/RouteTitle";
+import { InstallExtensionButton } from "./InstallExtensionButton";
 
 const DesktopUI = ({mapsApiKey}) => {
     const sidePaneOptions = [
@@ -55,6 +56,7 @@ const DesktopUI = ({mapsApiKey}) => {
 
     return (
         <div>
+            <InstallExtensionButton/>
             <TopBar
                 sidePaneOptions={sidePaneOptions.map(({title}) => title)}
                 activeSidePane={activeSidePane}
