@@ -16,6 +16,9 @@ export const browserIsFirefox = () => {
 export const extensionIsInstalled = async () => {
     if (browserIsChrome()) {
         let hasExtension = false;
+        if (chrome === undefined || chrome.runtime === undefined || chrome.runtime.sendMessage == undefined) {
+            return false;
+        }
         await chrome.runtime.sendMessage('fmpjamnhdgmanehbfhffkmphobhabanb', { message: "version" },
             (reply) => {
                 if (chrome.runtime.lastError) {
@@ -36,4 +39,5 @@ export const extensionIsInstalled = async () => {
     } else if (browserIsFirefox()) {
         return (window.getRpExtVersion !== undefined);
     }
+    return false;
 }
