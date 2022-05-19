@@ -346,6 +346,9 @@ export const loadRouteFromURL = () => {
         await dispatch(setLoadingFromURL(true))
         await dispatch(loadFromRideWithGps())
         const error = getState().uiInfo.dialogParams.errorDetails
+        if (getState().uiInfo.routeParams.stopAfterLoad) {
+            ReactGA.event('search', {search_term:getState().uiInfo.routeParams.rwgpsRoute})
+        }
         if (error === null && !getState().uiInfo.routeParams.stopAfterLoad) {
             await dispatch(requestForecast(getState().routeInfo));
             updateHistory(getState().controls.queryString);
