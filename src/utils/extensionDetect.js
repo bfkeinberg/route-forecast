@@ -1,4 +1,4 @@
-const requiredVersion = '1.0';
+const requiredVersion = 1.0;
 
 export const browserIsChrome = () => {
     var isChromium = window.chrome;
@@ -13,31 +13,33 @@ export const browserIsFirefox = () => {
     return window.navigator.userAgent.match(/firefox|fxios/i);
 };
 
-export const extensionIsInstalled = async () => {
+/*global chrome*/
+export const extensionIsInstalled = () => {
     if (browserIsChrome()) {
-        let hasExtension = false;
-        if (chrome === undefined || chrome.runtime === undefined || chrome.runtime.sendMessage == undefined) {
-            return false;
+        if (chrome === undefined || chrome.runtime === undefined || chrome.runtime.sendMessage === undefined) {
+            return Promise.resolve(false);
         }
-        await chrome.runtime.sendMessage('fmpjamnhdgmanehbfhffkmphobhabanb', { message: "version" },
+        return new Promise((resolve => {
+            chrome.runtime.sendMessage('fmpjamnhdgmanehbfhffkmphobhabanb', { message: "version" },
             (reply) => {
                 if (chrome.runtime.lastError) {
-                    console.log(chrome.runtime.lastError);
+                    console.log(chrome.runtime.lastError.message);
+                    resolve(false);
                 }
                 if (reply) {
                     if (reply.version) {
                         if (reply.version >= requiredVersion) {
-                            hasExtension = true;
+                            resolve(true);
                         }
                     }
                 }
                 else {
-                    hasExtension = false;
+                    resolve(false);
                 }
-            });
-        return hasExtension;
+                });
+        }))
     } else if (browserIsFirefox()) {
-        return (window.getRpExtVersion !== undefined);
+        return Promise.resolve((window.getRpExtVersion !== undefined));
     }
-    return false;
+    return Promise.resolve(false);
 }
