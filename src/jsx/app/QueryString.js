@@ -25,7 +25,7 @@ export const makeQuery = (routeNumber, pace,interval,metric,controls, strava_act
     return query;
 };
 
-const QueryStringUpdater = ({routeNumber,start,pace,interval,metric,controls,setQueryString,
+const QueryStringUpdater = ({routeNumber,start,pace,interval,metric,controls,setQueryString,setShortUrl,
                          shortenUrl,urlIsShortened,strava_activity,origin,href,provider,showProvider}) => {
     let url = origin;
     let query = null;
@@ -62,6 +62,7 @@ QueryStringUpdater.propTypes = {
     start:PropTypes.instanceOf(DateTime).isRequired,
     pace:PropTypes.string.isRequired,
     interval:PropTypes.number.isRequired,
+    metric:PropTypes.bool.isRequired,
     setQueryString:PropTypes.func.isRequired,
     shortenUrl:PropTypes.func.isRequired,
     setShortUrl:PropTypes.func.isRequired,
