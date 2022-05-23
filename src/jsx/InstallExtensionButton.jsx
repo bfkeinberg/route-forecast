@@ -26,11 +26,11 @@ export const InstallExtensionButton = () => {
     if (isInstalled !== undefined) {
         if (browserIsChrome()) {
             console.info('Extension not installed');
-            return (null/*
+            return (
                 <ButtonGroup>
                     <AnchorButton text={"Install Chrome extension for randoplan"} href={"https://chrome.google.com/webstore/detail/randoplan-extension/bgodmjchmhnpgccglldbfddddignglep"}/>
                     <Button text="Nope" onClick={()=>cookie.save('muteExtensionInstallPrompt', true, { path: '/' } )}/>
-                </ButtonGroup>*/
+                </ButtonGroup>
             )
         }
         if (browserIsFirefox()) {

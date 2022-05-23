@@ -20,7 +20,7 @@ export const extensionIsInstalled = () => {
             return Promise.resolve(false);
         }
         return new Promise((resolve => {
-            chrome.runtime.sendMessage('fmpjamnhdgmanehbfhffkmphobhabanb', { message: "version" },
+            chrome.runtime.sendMessage('bgodmjchmhnpgccglldbfddddignglep', { message: "version" },
             (reply) => {
                 if (chrome.runtime.lastError) {
                     console.log(chrome.runtime.lastError.message);
