@@ -105,7 +105,7 @@ RouteForecastMap.propTypes = {
 };
 
 const cvtDistance = (distance, metric) => {
-    return (metric ? ((distance * milesToMeters)/1000).toFixed(0) : distance);
+    return (metric ? ((distance * milesToMeters)/1000) : distance);
 };
 
 const MapMarkers = ({forecast, controls, controlNames, subrange, metric, map, google, mapCenter}) => {
@@ -157,7 +157,7 @@ const RainIcon = ({latitude, longitude, value, title, isRainy, map, google, mapC
         anchor: new google.maps.Point(-15, -15)
     };
     if (isRainy) {
-        return <Marker position={{ lat: latitude, lng: longitude }} label={value.toString()} icon={markerIcon} title={title} map={map} google={google} mapCenter={mapCenter} />;
+        return <Marker position={{ lat: latitude, lng: longitude }} label={value.toFixed(0)} icon={markerIcon} title={title} map={map} google={google} mapCenter={mapCenter} />;
     }
     return null;
 }
@@ -189,7 +189,7 @@ const TempMarker = ({latitude, longitude, value, title, bearing, windSpeed, subr
         const anchor = new google.maps.Point(16.317, 16.317);
         return <Marker
             position={{ lat: latitude, lng: longitude }}
-            label={value.toString()}
+            label={value.toFixed(0)}
             icon={{
                 path: arrow,
                 rotation: flippedBearing,
@@ -206,7 +206,7 @@ const TempMarker = ({latitude, longitude, value, title, bearing, windSpeed, subr
         />
     }
     else {
-        return <Marker position={{ lat: latitude, lng: longitude }} label={value.toString()} title={title} map={map} google={google} mapCenter={mapCenter} />
+        return <Marker position={{ lat: latitude, lng: longitude }} label={value.toFixed(0)} title={title} map={map} google={google} mapCenter={mapCenter} />
     }
 }
 
