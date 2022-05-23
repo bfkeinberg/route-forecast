@@ -6,7 +6,7 @@ import { Button, MenuItem, FormGroup } from "@blueprintjs/core";
 import {connect} from 'react-redux';
 import {saveCookie, setPace} from "../../redux/actions";
 import { useActualPace, useFormatSpeed } from '../../utils/hooks';
-import { inputPaceToSpeed, paceToSpeed } from '../../utils/util';
+import { inputPaceToSpeed, metricPaceToSpeed, paceToSpeed } from '../../utils/util';
 import "./RidingPace.css"
 
 const paceValues = {
@@ -82,7 +82,7 @@ const correctPaceValue = (paceAlpha, setPace) => {
     }
 }
 
-const renderPace = (pace, { handleClick, modifiers }) => {
+const renderPaceImperial = (pace, { handleClick, modifiers }) => {
     if (!modifiers.matchesPredicate) {
         return null;
     }
@@ -96,6 +96,20 @@ const renderPace = (pace, { handleClick, modifiers }) => {
     );
 };
 
+const renderPaceMetric = (pace, { handleClick, modifiers }) => {
+    if (!modifiers.matchesPredicate) {
+        return null;
+    }
+    return (
+        <MenuItem
+            active={modifiers.active}
+            key={pace.number}
+            onClick={handleClick}
+            text={`${pace.number} kph`}
+        />
+    );
+};
+
 const RidingPace = ({ pace, setPace, metric }) => {
 
     const actualPace = useActualPace()
@@ -103,18 +117,17 @@ const RidingPace = ({ pace, setPace, metric }) => {
     const formatSpeed = useFormatSpeed()
 
     pace = correctPaceValue(pace, setPace);
-    let pace_mph = paceToSpeed[pace];
     let pace_text;
     let pace_tooltip_class = 'pace_tooltip';
+    const selectedSpeed = metric ? metricPaceToSpeed[pace] : paceToSpeed[pace];
     if (actualPace === null || actualPace === 0) {
         pace_text = `Speed on flat ground, which will be reduced by climbing`;
     } else {
-        pace_tooltip_class = getPaceTooltipId(actualPace,pace_mph);
+        pace_tooltip_class = getPaceTooltipId(actualPace,selectedSpeed);
         pace_text = `Actual riding pace was ${getAlphaPace(Math.round(actualPace))} (${formatSpeed(actualPace)})`;
     }
 
     const dropdownValues = metric ? paceValues.metric : paceValues.imperialLikeAPenguin
-
     return (
         <FormGroup style={{ flex: 3, fontSize: "90%" }} label={<span><b>Pace on flat</b></span>} labelFor={'paceInput'}>
             <Tooltip2 content={pace_text} className={pace_tooltip_class} placement="bottom" minimal={true}>
@@ -122,13 +135,13 @@ const RidingPace = ({ pace, setPace, metric }) => {
                     id='paceInput'
                     items={dropdownValues.values}
                     itemsEqual={"number"}
-                    itemRenderer={renderPace}
+                    itemRenderer={metric?renderPaceMetric:renderPaceImperial}
                     filterable={false}
                     fill={true}
-                    activeItem={{name:pace, number:paceToSpeed[pace]}}
+                    activeItem={{name:pace, number:selectedSpeed}}
                     onItemSelect={(selected) => { saveCookie("pace", selected.name);setPace(selected.name) }}
                 >
-                    <Button text={paceToSpeed[pace] + " mph"} rightIcon="symbol-triangle-down"/>
+                    <Button text={selectedSpeed + " " + dropdownValues.label} rightIcon="symbol-triangle-down"/>
                 </Select>
             </Tooltip2>
         </FormGroup>
