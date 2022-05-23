@@ -100,15 +100,15 @@ img#bugImage {
 }
 
 .redText {
-    color: red;
+    color: red !important;
 }
 
 .orangeText {
-    color: darkOrange;
+    color: darkOrange !important;
 }
 
 .skyBlueText {
-    color: deepSkyBlue;
+    color: deepSkyBlue !important;
 }
 
 input#finishTime.form-control {
