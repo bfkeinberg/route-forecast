@@ -59,15 +59,21 @@ export class ForecastTable extends Component {
         }
     };
 
+    orangeText = {color: 'darkOrange'};
+
+    skyBlueText = {color: 'deepSkyBlue'};
+
+    redText = {color: 'red'};
+
     static windStyle(point) {
         if (point.relBearing <90) {
             if (Math.cos((Math.PI / 180) * point.relBearing) * parseInt(point.windSpeed) >= 10) {
-                return 'redText';
+                return this.redText;
             } else {
-                return 'orangeText';
+                return this.orangeText;
             }
         } else {
-            return 'skyBlueText';
+            return this.skyBlueText;
         }
     }
 
@@ -122,7 +128,7 @@ export class ForecastTable extends Component {
                             <td>{point.cloudCover}</td>
                         </MediaQuery>
                         <td>{point.aqi!==undefined?point.aqi:'N/A'}</td>
-                        <td className={ForecastTable.windStyle(point)}>
+                        <td style={ForecastTable.windStyle(point)}>
                             <WindSpeed gust={point.gust} windSpeed={point.windSpeed} showGusts={this.state.showGusts}/>
                         </td>
                         <MediaQuery minWidth={501}>

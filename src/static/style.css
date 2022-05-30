@@ -99,18 +99,6 @@ img#bugImage {
     animation: glowing 1300ms infinite;
 }
 
-.redText {
-    color: red !important;
-}
-
-.orangeText {
-    color: darkOrange !important;
-}
-
-.skyBlueText {
-    color: deepSkyBlue !important;
-}
-
 input#finishTime.form-control {
     display: inline-flex;
     width: 17em;
