@@ -18,7 +18,7 @@ const findMarkerInfo = (forecast, subrange) => {
     if (subrange.length!==2) {
         return [];
     }
-    return forecast.filter((point) => point.distance*milesToMeters > subrange[0] && point.distance*milesToMeters < subrange[1] );
+    return forecast.filter((point) => Math.round(point.distance*milesToMeters) >= subrange[0] && Math.round(point.distance*milesToMeters) <= subrange[1] );
 }
 
 const getMapBounds = (points, bounds, zoomToRange, subrange) => {
