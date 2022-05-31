@@ -59,21 +59,21 @@ export class ForecastTable extends Component {
         }
     };
 
-    orangeText = {color: 'darkOrange'};
+    static orangeText = {color: 'darkOrange'};
 
-    skyBlueText = {color: 'deepSkyBlue'};
+    static skyBlueText = {color: 'deepSkyBlue'};
 
-    redText = {color: 'red'};
+    static redText = {color: 'red'};
 
     static windStyle(point) {
         if (point.relBearing <90) {
             if (Math.cos((Math.PI / 180) * point.relBearing) * parseInt(point.windSpeed) >= 10) {
-                return this.redText;
+                return ForecastTable.redText;
             } else {
-                return this.orangeText;
+                return ForecastTable.orangeText;
             }
         } else {
-            return this.skyBlueText;
+            return ForecastTable.skyBlueText;
         }
     }
 
