@@ -214,9 +214,12 @@ app.use((req, res, next) => {
     // if (originalHost === 'www.cyclerouteforecast.com' || originalHost === 'cyclerouteforecast.com') {
     //     await datastore.save({key:datastore.key('OldUrl'), data:{timestamp: new Date(), caller:req.header('x-forwarded-for')}});
     // }
-    if (host === 'www.cyclerouteforecast.com' || host === 'route-forecast.ue.r.appspot.com' ||
-        host === 'route-forecast.appspot.com' ||
-        host === 'cyclerouteforecast.com' || host === 'randoplan.com') {
+    if (host === 'www.cyclerouteforecast.com' ||
+        host === 'cyclerouteforecast.com') {
+        return res.send("<html xmlns='http://www.w3.org/1999/html'><head><title>URL has been deprecated</title></head><body><div>The <strong>www.cyclerouteforecast.com</strong> URL is going away. Please use <a href='https://www.randoplan.com'>www.randoplan.com</a>.</div></body></html>")
+    }
+    if (host === 'route-forecast.ue.r.appspot.com' ||
+        host === 'route-forecast.appspot.com' || host === 'randoplan.com') {
         console.info(`Redirected ${host} to randoplan.com`);
         return res.redirect(301, 'https://www.randoplan.com' + req.originalUrl);
     }
