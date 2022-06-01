@@ -39,7 +39,12 @@ export const extensionIsInstalled = () => {
                 });
         }))
     } else if (browserIsFirefox()) {
-        return Promise.resolve((window.getRpExtVersion !== undefined));
+        if (window.getRpExtVersion !== undefined) {
+            const version = window.getRpExtVersion();
+            return Promise.resolve(version >= requiredVersion);
+        } else {
+            return Promise.resolve(false);
+        }
     }
     return Promise.resolve(false);
 }
