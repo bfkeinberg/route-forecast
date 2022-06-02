@@ -94,7 +94,7 @@ export class ForecastTable extends Component {
                 case 'darksky':
                     return <a tabIndex='-1' href="https://darksky.net/poweredby/"><img src={darkSky}/></a>;
                 case 'climacell':
-                    return <a tabIndex='-1' href="https://www.tomorrow.io/"><img src={climacell}/></a>;
+                    return <a tabIndex='-1' href="https://www.tomorrow.io/"><img src={climacell} width={166} height={19}/></a>;
                 case 'weatherapi':
                     return <a href="https://www.weatherapi.com/" title="Free Weather API"><img src='//cdn.weatherapi.com/v4/images/weatherapi_logo.png' alt="Weather data by WeatherAPI.com" border="0"/></a>;
                 // case 'visualcrossing':
