@@ -8,6 +8,7 @@ import fetchMock from 'fetch-mock';
 import * as actions from '../src/redux/actions';
 import { routeLoadingModes } from '../src/data/enums';
 import * as Sentry from "@sentry/react";
+import { any } from 'prop-types';
 jest.mock('@sentry/react');
 const middlewares = [thunk];
 const mockStore = configureMockStore(middlewares);
@@ -34,9 +35,13 @@ describe('load route from Ride with GPS', () => {
             .get('/rwgps_route?route=6275002&trip=false', {body:routeData, headers: { 'content-type': 'application/json' }});
 
         const expectedActions = [
+            { type: actions.UPDATE_USER_CONTROLS, controls:[]},
             { type: actions.BEGIN_LOADING_ROUTE, source:"rwgps" },
             { type: actions.INVALIDATE_FORECAST},
-            { type: actions.RWGPS_ROUTE_LOADING_SUCCESS, routeData: routeData}
+            { type: actions.RWGPS_ROUTE_LOADING_SUCCESS, routeData: routeData},
+            { type: actions.UPDATE_USER_CONTROLS, controls:expect.any(Array)},
+            { type: actions.INVALIDATE_FORECAST},
+            { type: actions.SET_DISPLAY_CONTROL_TABLE_UI, displayControlTableUI:true}
         ]
 
         const initialState = {
@@ -95,7 +100,7 @@ describe('load route from Ride with GPS', () => {
         };
         let store = mockStore(initialState);
 
-        await(store.dispatch(actions.loadFromRideWithGps(6275002, false)));
+        await (store.dispatch(actions.loadFromRideWithGps(6275002, false)));
         expect(store.getActions()).toEqual(expectedActions);
 
         //let newState = expectedActions.reduce((previousValue, currentValue) => rootReducer(previousValue,currentValue),initialState);
