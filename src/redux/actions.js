@@ -1,7 +1,7 @@
 import cookie from 'react-cookies';
 import { doForecast } from '../utils/forecastUtilities';
 import { loadRwgpsRoute } from '../utils/rwgpsUtilities';
-import { controlsMeaningfullyDifferent, parseControls } from '../utils/util';
+import { controlsMeaningfullyDifferent, parseControls, extractControlsFromRoute } from '../utils/util';
 import ReactGA from "react-ga4";
 import * as Sentry from "@sentry/react";
 import { updateHistory } from "../jsx/app/updateHistory";
@@ -305,6 +305,8 @@ const setLoadingFromURL = (loading) => {
         loading
     };
 }
+export const SET_DISPLAY_CONTROL_TABLE_UI = 'SET_DISPLAY_CONTROL_TABLE_UI';
+export const setDisplayControlTableUI = (display) => { return { type: SET_DISPLAY_CONTROL_TABLE_UI, displayControlTableUI: display } }
 
 export const loadFromRideWithGps = function(routeNumber, isTrip) {
     return function(dispatch, getState) {
@@ -317,11 +319,16 @@ export const loadFromRideWithGps = function(routeNumber, isTrip) {
         routeNumber = routeNumber || getState().uiInfo.routeParams.rwgpsRoute
         ReactGA.event('login', {method:routeNumber});
         isTrip = isTrip || getState().uiInfo.routeParams.rwgpsRouteIsTrip
+        dispatch(updateUserControls([]));
         dispatch(beginLoadingRoute('rwgps'));
         dispatch(cancelForecast())
         return loadRwgpsRoute(routeNumber, isTrip).then( (routeData) => {
                 dispatch(rwgpsRouteLoadingSuccess(routeData));
-                dispatch(loadControlsFromCookie(routeData));
+                if (getState().controls.userControlPoints.length === 0) {
+                    dispatch(updateUserControls(extractControlsFromRoute(routeData)))
+                    dispatch(setDisplayControlTableUI(true))
+                }
+                // dispatch(loadControlsFromCookie(routeData));
                 if (transaction) {
                     span.finish(); // Remember that only finished spans will be sent with the transaction
                     transaction.finish(); // Finishing the transaction will send it to Sentry
@@ -691,9 +698,6 @@ export const setWeatherProvider = (weatherProvider) => {return {type:SET_WEATHER
 
 export const SET_SHOW_WEATHER_PROVIDER = 'SET_SHOW_WEATHER_PROVIDER';
 export const showWeatherProvider = (showProvider) => {return {type:SET_SHOW_WEATHER_PROVIDER, showProvider:showProvider}}
-
-export const SET_DISPLAY_CONTROL_TABLE_UI = 'SET_DISPLAY_CONTROL_TABLE_UI';
-export const setDisplayControlTableUI = (display) => { return { type: SET_DISPLAY_CONTROL_TABLE_UI, displayControlTableUI: display } }
 
 export const SET_RWGPS_TOKEN = 'SET_RWGPS_TOKEN';
 export const setRwgpsToken = (token) => {

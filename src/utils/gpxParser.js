@@ -85,6 +85,22 @@ class AnalyzeRoute {
         }
     }
 
+    parseCoursePoints = (routeData, type) =>
+        (type === "rwgps" ?
+        routeData[routeData.type]['course_points'] :
+        [])
+
+    isControl = (coursePoint) => {
+        const controlRegexp = /control|rest stop|regroup/i;
+        return coursePoint.t === 'Control' || coursePoint.n.match(controlRegexp);
+    }
+
+    controlFromCoursePoint = (coursePoint) =>
+        ({name:coursePoint.n, duration:1, distance:Math.round((coursePoint.d*kmToMiles)/1000)})
+
+    extractControlPoints = (routeData, type) =>
+        this.parseCoursePoints(routeData, type).filter(point => this.isControl(point)).map(point => this.controlFromCoursePoint(point))
+
     parseRouteStream = (routeData, type) =>
         (type === "rwgps" ?
         routeData[routeData.type]['track_points'].map(point => ({ lat: point.y, lon: point.x, elevation: point.e, dist: point.d })) :
