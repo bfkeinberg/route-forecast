@@ -75,6 +75,10 @@ export const controlsMeaningfullyDifferent = (controls1, controls2) => {
     )
 }
 
+export const extractControlsFromRoute = (routeData) => {
+  return gpxParser.extractControlPoints(routeData, 'rwgps');
+}
+
 export const stringIsOnlyNumeric = string => string.match(/^[0-9]*$/) !== null
 export const stringIsOnlyDecimal = string => string.match(/^[0-9.]*$/) !== null
 
