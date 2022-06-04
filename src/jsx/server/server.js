@@ -394,6 +394,7 @@ const insertFeatureRecord = (record, featureName, user) => {
 };
 
 const randoplan_uri='https://www.randoplan.com/rwgpsAuthReply';
+// uncomment the line below and comment the one above when testing pinned route functions locally
 // const randoplan_uri='http://localhost:8080/rwgpsAuthReply';
 
 app.get('/rwgpsAuthReq', (req, res) => {
@@ -558,8 +559,8 @@ app.get('/pinned_routes', async (req, res) => {
             console.warn(`Favorites error ${error}`);
             res.status(error.response.status).json(error.response.data);
         });
-        const favorites = favoritesReply.data.results.map(fav => {return {id:fav.favid, name:fav.route.name,
-            associated_object_id:fav.route.id, associated_object_type:fav.type, key:fav.favid}});
+        const favorites = favoritesReply.data.results.map(fav => {return {id:fav.favid, name:fav[fav.type].name,
+            associated_object_id:fav[fav.type].id, associated_object_type:fav.type, key:fav.favid}});
         res.status(200).json(favorites);
     } catch (err) {
         if (err !== undefined) {
