@@ -322,18 +322,21 @@ export const loadFromRideWithGps = function(routeNumber, isTrip) {
         dispatch(updateUserControls([]));
         dispatch(beginLoadingRoute('rwgps'));
         dispatch(cancelForecast())
-        return loadRwgpsRoute(routeNumber, isTrip).then( (routeData) => {
-                dispatch(rwgpsRouteLoadingSuccess(routeData));
-                if (getState().controls.userControlPoints.length === 0) {
-                    dispatch(updateUserControls(extractControlsFromRoute(routeData)))
+        return loadRwgpsRoute(routeNumber, isTrip).then((routeData) => {
+            dispatch(rwgpsRouteLoadingSuccess(routeData));
+            if (getState().controls.userControlPoints.length === 0) {
+                const extractedControls = extractControlsFromRoute(routeData);
+                if (extractedControls.length !== 0) {
+                    dispatch(updateUserControls(extractedControls))
                     dispatch(setDisplayControlTableUI(true))
                 }
-                // dispatch(loadControlsFromCookie(routeData));
-                if (transaction) {
-                    span.finish(); // Remember that only finished spans will be sent with the transaction
-                    transaction.finish(); // Finishing the transaction will send it to Sentry
-                }
-            }, error => {return dispatch(rwgpsRouteLoadingFailure(error))}
+            }
+            // dispatch(loadControlsFromCookie(routeData));
+            if (transaction) {
+                span.finish(); // Remember that only finished spans will be sent with the transaction
+                transaction.finish(); // Finishing the transaction will send it to Sentry
+            }
+        }, error => { return dispatch(rwgpsRouteLoadingFailure(error)) }
         );
     };
 };
