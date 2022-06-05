@@ -3,7 +3,7 @@ import * as Sentry from '@sentry/react';
 export const updateHistory = (url, query) => {
     Sentry.addBreadcrumb({
         category: 'history',
-        level: Sentry.Severity.Info,
+        level: "info",
         data: query,
         message: url
     });

@@ -117,7 +117,7 @@ export class RouteWeatherUI extends Component {
             window.onpopstate = (event) => {
                 Sentry.addBreadcrumb({
                     category:'history',
-                    level: Sentry.Severity.Info,
+                    level: "info",
                     data:JSON.stringify(event.state),
                     message:document.location
                 });
