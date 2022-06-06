@@ -218,9 +218,10 @@ app.use((req, res, next) => {
         host === 'cyclerouteforecast.com') {
         return res.send("<html xmlns='http://www.w3.org/1999/html'><head><title>URL has been deprecated</title></head><body><div>The <strong>www.cyclerouteforecast.com</strong> URL is going away. Please use <a href='https://www.randoplan.com'>www.randoplan.com</a>.</div></body></html>")
     }
+    logger.info(`Host is ${host}; original host is ${req.header?req.header('host'):'[unknown]'}`);
     if (host === 'route-forecast.ue.r.appspot.com' ||
         host === 'route-forecast.appspot.com' || host === 'randoplan.com') {
-        console.info(`Redirected ${host} to randoplan.com`);
+        logger.info(`Redirected ${host} to www.randoplan.com`);
         return res.redirect(301, 'https://www.randoplan.com' + req.originalUrl);
     }
     return next();
@@ -265,6 +266,7 @@ const getAQI = async (result, point) => {
 }
 
 app.post('/forecast', upload.none(), async (req, res) => {
+    logger.info(`Host is ${req.hostname}; original host is ${req.header?req.header('host'):'[unknown]'}`);
     if (req.body.locations === undefined) {
         res.status(400).json({ 'status': 'Missing location key' });
         return;
