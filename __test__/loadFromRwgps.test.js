@@ -35,7 +35,7 @@ describe('load route from Ride with GPS', () => {
             .get('/rwgps_route?route=6275002&trip=false', {body:routeData, headers: { 'content-type': 'application/json' }});
 
         const expectedActions = [
-            { type: actions.UPDATE_USER_CONTROLS, controls:[]},
+            // { type: actions.UPDATE_USER_CONTROLS, controls:[]},
             { type: actions.BEGIN_LOADING_ROUTE, source:"rwgps" },
             { type: actions.INVALIDATE_FORECAST},
             { type: actions.RWGPS_ROUTE_LOADING_SUCCESS, routeData: routeData},
