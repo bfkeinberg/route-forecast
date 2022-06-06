@@ -20,7 +20,7 @@ export const InstallExtensionButton = () => {
     })
 
     if (isInstalled) {
-        console.info('Extension is installed');
+        // console.info('Extension is installed');
         return null;
     }
     if (isInstalled !== undefined) {
