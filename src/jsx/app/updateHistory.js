@@ -10,9 +10,9 @@ export const updateHistory = (url, query) => {
     if (typeof window !== 'undefined' && !(/HeadlessChrome/).test(window.navigator.userAgent) && query !== null) {
         let oldState = history.state;
         if (oldState && query && oldState.rwgpsRoute === query.rwgpsRoute) {
-            history.replaceState(query, 'nothing', url);
+            history.replaceState(query, '', url);
         } else {
-            history.pushState(query, 'nothing', url);
+            history.pushState(query, '', url);
         }
     }
 };
