@@ -43,24 +43,24 @@ export const parseControls = function (controlPointString, deleteFirstElement) {
   if (deleteFirstElement) {
     let controlPointList = controlPointString.split(":");
     let controlPoints =
-        controlPointList.filter(item => item.length > 0)
-            .filter(point => { const values = point.split(",");return !isNaN(values[1]) && !isNaN(values[2]) })
-            .map((point, index) => {
-                let controlPointValues = point.split(",");
-                return ({ name: controlPointValues[0], distance: Number(controlPointValues[1]), duration: Number(controlPointValues[2]), id: index });
-            });
+      controlPointList.filter(item => item.length > 0)
+        .filter(point => { const values = point.split(","); return !isNaN(values[1]) && !isNaN(values[2]) })
+        .map((point, index) => {
+          let controlPointValues = point.split(",");
+          return ({ name: controlPointValues[0], distance: Number(controlPointValues[1]), duration: Number(controlPointValues[2]), id: index });
+        });
     // delete dummy first element
-    // controlPoints.splice(0,1);
+    // controlPoints.splice(0, 1);
     return controlPoints;
   } else {
     let controlPointList = controlPointString.split(":");
-    let controlPoints =
-        controlPointList.map((point, index) => {
-            let controlPointValues = point.split(",");
-            return ({ name: controlPointValues[0], distance: Number(controlPointValues[1]), duration: Number(controlPointValues[2]), id: index });
-        });
+    const controlPoints = controlPointList.filter(item => item.length > 0).filter(point => { const values = point.split(","); return !isNaN(values[1]) && !isNaN(values[2]) })
+      .map((point, index) => {
+        let controlPointValues = point.split(",");
+        return ({ name: controlPointValues[0], distance: Number(controlPointValues[1]), duration: Number(controlPointValues[2]), id: index });
+      });
     // delete dummy first element
-    controlPoints.splice(0, 1);
+    // controlPoints.splice(0, 1);
     return controlPoints;
   }
 }
