@@ -26,7 +26,7 @@ export const makeQuery = (routeNumber, pace,interval,metric,controls, strava_act
 };
 
 const QueryStringUpdater = ({routeNumber,start,pace,interval,metric,controls,setQueryString,setShortUrl,
-                         shortenUrl,urlIsShortened,strava_activity,origin,href,provider,showProvider}) => {
+                         shortenUrl,urlIsShortened,strava_activity,origin,href,provider,showProvider,hasForecast}) => {
     let url = origin;
     let query = null;
     if (routeNumber !== '') {
@@ -39,12 +39,12 @@ const QueryStringUpdater = ({routeNumber,start,pace,interval,metric,controls,set
         }
         url += `/?${queryString.stringify(query)}`;
         // don't shorten localhost with bitly
-        if (origin !== 'http://localhost:8080' && (url !== href || !urlIsShortened)) {
+        if (/*origin !== 'http://localhost:8080' && */hasForecast && (url !== href || !urlIsShortened)) {
             shortenUrl(url);
         }
     }
     else {
-        setShortUrl('');
+        setShortUrl(' ');
     }
     setQueryString(url);
     return null;
@@ -71,7 +71,8 @@ QueryStringUpdater.propTypes = {
     origin: PropTypes.string.isRequired,
     provider: PropTypes.string.isRequired,
     href: PropTypes.string.isRequired,
-    showProvider: PropTypes.bool.isRequired
+    showProvider: PropTypes.bool.isRequired,
+    hasForecast: PropTypes.bool.isRequired
 };
 
 const mapStateToProps = (state) =>
@@ -85,7 +86,8 @@ const mapStateToProps = (state) =>
         urlIsShortened: state.uiInfo.dialogParams.shortUrl !== ' ',
         strava_activity: state.strava.activity,
         provider: state.forecast.weatherProvider,
-        showProvider: state.controls.showWeatherProvider
+        showProvider: state.controls.showWeatherProvider,
+        hasForecast: state.forecast.forecast.length > 0
     });
 
 const mapDispatchToProps = {
