@@ -346,16 +346,13 @@ const getBitlyShortenedUrl = (accessToken, longUrl) => {
                     "group_guid": groupID
                 })
             }).then(response => {
-                if (response.ok) {
-                    return response.json();
-                }
-                throw Error(`Bitly link creation failed with ${response.status} ${response.statusText}`);
+                return response.json();
             }).
                 then(responseJson => {
                     if (responseJson.link) {
                         return { error: null, url: responseJson.link };
                     }
-                    throw Error(`Bitly is mad for some reason: ${responseJson.message}`);
+                    throw Error(`Bitly link creation failed with: ${responseJson.message} ${JSON.stringify(responseJson)}`);
                 })
         }).
         catch(error => ({ error: error.toString(), url: null }));
