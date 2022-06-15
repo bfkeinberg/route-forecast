@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
-import {connect, useDispatch} from 'react-redux';
-import {setShortUrl, shortenUrl, setQueryString, updateUserControls} from "../../redux/actions";
+import { connect, useDispatch } from 'react-redux';
+import { setShortUrl, shortenUrl, setQueryString, updateUserControls } from "../../redux/actions";
 import queryString from 'query-string';
 import { DateTime } from 'luxon';
 import { formatControlsForUrl } from '../../utils/util';
@@ -8,13 +8,13 @@ import { formatControlsForUrl } from '../../utils/util';
 // this function exists to let us preserve the user's specified start time and share the url for this route
 // with someone in another time zone
 // export is ony for the test method
-export const dateToShortDate = function(date) {
+export const dateToShortDate = function (date) {
     return Number.parseInt(date.toSeconds().toFixed(0));
 };
 
 // as above export is for benefit of test code
-export const makeQuery = (routeNumber, pace,interval,metric,controls, strava_activity,
-                          provider, showProvider) => {
+export const makeQuery = (routeNumber, pace, interval, metric, controls, strava_activity,
+    provider, showProvider) => {
     const query = {
         pace, interval, metric, rwgpsRoute: routeNumber, strava_activity, provider, showProvider
     }
@@ -30,19 +30,23 @@ const maxControlNameLength = 15;
 
 const shrinkControls = (controls) => {
     const dispatch = useDispatch();
-    const truncatedControls = controls.map( control => {return {name:control.name.slice(0,maxControlNameLength),
-        distance:control.distance, duration:control.duration}});
+    const truncatedControls = controls.map(control => {
+        return {
+            name: control.name.slice(0, maxControlNameLength),
+            distance: control.distance, duration: control.duration
+        }
+    });
     dispatch(updateUserControls(truncatedControls));
 }
 
-const QueryStringUpdater = ({routeNumber,start,pace,interval,metric,controls,setQueryString,setShortUrl,
-                         shortenUrl,urlIsShortened,strava_activity,origin,href,provider,showProvider,hasForecast}) => {
+const QueryStringUpdater = ({ routeNumber, start, pace, interval, metric, controls, setQueryString, setShortUrl,
+    shortenUrl, urlIsShortened, strava_activity, origin, href, provider, showProvider, hasForecast }) => {
     let url = origin;
     let query = null;
     if (routeNumber !== '') {
         const shortDate = dateToShortDate(start);
         query = makeQuery(routeNumber, pace, interval, metric, controls, strava_activity,
-                          provider, showProvider);
+            provider, showProvider);
         if (shortDate !== 'Invalid DateTime') {
             query.startTimestamp = shortDate;
             query.zone = start.zoneName;
@@ -64,22 +68,22 @@ const QueryStringUpdater = ({routeNumber,start,pace,interval,metric,controls,set
 };
 
 QueryStringUpdater.propTypes = {
-    routeNumber:PropTypes.oneOfType([
+    routeNumber: PropTypes.oneOfType([
         PropTypes.number,
         PropTypes.string
     ]),
-    strava_activity:PropTypes.oneOfType([
+    strava_activity: PropTypes.oneOfType([
         PropTypes.number,
         PropTypes.oneOf([''])
     ]),
-    start:PropTypes.instanceOf(DateTime).isRequired,
-    pace:PropTypes.string.isRequired,
-    interval:PropTypes.number.isRequired,
-    metric:PropTypes.bool.isRequired,
-    setQueryString:PropTypes.func.isRequired,
-    shortenUrl:PropTypes.func.isRequired,
-    setShortUrl:PropTypes.func.isRequired,
-    controls:PropTypes.arrayOf(PropTypes.object).isRequired,
+    start: PropTypes.instanceOf(DateTime).isRequired,
+    pace: PropTypes.string.isRequired,
+    interval: PropTypes.number.isRequired,
+    metric: PropTypes.bool.isRequired,
+    setQueryString: PropTypes.func.isRequired,
+    shortenUrl: PropTypes.func.isRequired,
+    setShortUrl: PropTypes.func.isRequired,
+    controls: PropTypes.arrayOf(PropTypes.object).isRequired,
     urlIsShortened: PropTypes.bool.isRequired,
     origin: PropTypes.string.isRequired,
     provider: PropTypes.string.isRequired,
@@ -89,23 +93,23 @@ QueryStringUpdater.propTypes = {
 };
 
 const mapStateToProps = (state) =>
-    ({
-        routeNumber: state.uiInfo.routeParams.rwgpsRoute,
-        start: state.uiInfo.routeParams.start,
-        pace: state.uiInfo.routeParams.pace,
-        interval: state.uiInfo.routeParams.interval,
-        metric: state.controls.metric,
-        controls: state.controls.userControlPoints,
-        urlIsShortened: state.uiInfo.dialogParams.shortUrl !== ' ',
-        strava_activity: state.strava.activity,
-        provider: state.forecast.weatherProvider,
-        showProvider: state.controls.showWeatherProvider,
-        hasForecast: state.forecast.forecast.length > 0
-    });
+({
+    routeNumber: state.uiInfo.routeParams.rwgpsRoute,
+    start: state.uiInfo.routeParams.start,
+    pace: state.uiInfo.routeParams.pace,
+    interval: state.uiInfo.routeParams.interval,
+    metric: state.controls.metric,
+    controls: state.controls.userControlPoints,
+    urlIsShortened: state.uiInfo.dialogParams.shortUrl !== ' ',
+    strava_activity: state.strava.activity,
+    provider: state.forecast.weatherProvider,
+    showProvider: state.controls.showWeatherProvider,
+    hasForecast: state.forecast.forecast.length > 0
+});
 
 const mapDispatchToProps = {
     setQueryString, shortenUrl, setShortUrl
 };
 
-export default connect(mapStateToProps,mapDispatchToProps)(QueryStringUpdater);
+export default connect(mapStateToProps, mapDispatchToProps)(QueryStringUpdater);
 
