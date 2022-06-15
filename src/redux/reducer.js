@@ -230,6 +230,8 @@ export const controls = function (state = {
             return {...state, showWeatherProvider:action.showProvider};
         case Actions.SET_DISPLAY_CONTROL_TABLE_UI:
             return {...state, displayControlTableUI:action.displayControlTableUI};
+        case Actions.SET_RWGPS_ROUTE:
+            return {...state, userControlPoints:[]}
         default:
             return state;
     }

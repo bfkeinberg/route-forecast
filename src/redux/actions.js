@@ -319,7 +319,6 @@ export const loadFromRideWithGps = function(routeNumber, isTrip) {
         routeNumber = routeNumber || getState().uiInfo.routeParams.rwgpsRoute
         ReactGA.event('login', {method:routeNumber});
         isTrip = isTrip || getState().uiInfo.routeParams.rwgpsRouteIsTrip
-        // dispatch(updateUserControls([]));
         dispatch(beginLoadingRoute('rwgps'));
         dispatch(cancelForecast())
         return loadRwgpsRoute(routeNumber, isTrip).then((routeData) => {
