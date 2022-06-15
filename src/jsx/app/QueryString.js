@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
-import {connect} from 'react-redux';
-import {setShortUrl, shortenUrl, setQueryString} from "../../redux/actions";
+import {connect, useDispatch} from 'react-redux';
+import {setShortUrl, shortenUrl, setQueryString, updateUserControls} from "../../redux/actions";
 import queryString from 'query-string';
 import { DateTime } from 'luxon';
 import { formatControlsForUrl } from '../../utils/util';
@@ -25,6 +25,16 @@ export const makeQuery = (routeNumber, pace,interval,metric,controls, strava_act
     return query;
 };
 
+const maxUrlLength = 2048;
+const maxControlNameLength = 15;
+
+const shrinkControls = (controls) => {
+    const dispatch = useDispatch();
+    const truncatedControls = controls.map( control => {return {name:control.name.slice(0,maxControlNameLength),
+        distance:control.distance, duration:control.duration}});
+    dispatch(updateUserControls(truncatedControls));
+}
+
 const QueryStringUpdater = ({routeNumber,start,pace,interval,metric,controls,setQueryString,setShortUrl,
                          shortenUrl,urlIsShortened,strava_activity,origin,href,provider,showProvider,hasForecast}) => {
     let url = origin;
@@ -47,6 +57,9 @@ const QueryStringUpdater = ({routeNumber,start,pace,interval,metric,controls,set
         setShortUrl(' ');
     }
     setQueryString(url);
+    if (url.length >= maxUrlLength) {
+        shrinkControls(controls);
+    }
     return null;
 };
 
