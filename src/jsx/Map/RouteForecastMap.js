@@ -22,6 +22,9 @@ const findMarkerInfo = (forecast, subrange) => {
 }
 
 const getMapBounds = (points, bounds, zoomToRange, subrange) => {
+    if (window.google === undefined) {
+        return;
+    }
     let southWest = { lat: bounds.min_latitude, lng: bounds.min_longitude };
     let northEast = { lat: bounds.max_latitude, lng: bounds.max_longitude };
     if (isNaN(bounds.min_latitude) || isNaN(bounds.max_latitude)) {
