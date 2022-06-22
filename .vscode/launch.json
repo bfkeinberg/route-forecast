@@ -16,9 +16,11 @@
             "remoteRoot": "${workspaceFolder}/dist/server",
             "sourceMaps": true,
             "trace": true,
-            "outFiles": ["${workspaceFolder}/dist/**/*.js"],
+            "outFiles": [
+                "${workspaceFolder}/dist/**/*.js"
+            ],
             "env": {
-                "GOOGLE_APPLICATION_CREDENTIALS":"/Users/brian/Documents/src/route-forecast/route-forecast-c4075d06140e.json"
+                "GOOGLE_APPLICATION_CREDENTIALS": "/Users/brian/Documents/src/route-forecast/route-forecast-c4075d06140e.json"
             }
         },
         {
@@ -37,6 +39,14 @@
                 "--runInBand",
                 "--watchAll=false"
             ]
+        },
+        {
+            "type": "pwa-chrome",
+            "name": "http://localhost:8080",
+            "request": "launch",
+            "url": "http://localhost:8080",
+            "trace":true,
+            "sourceMaps": true
         }
     ]
 }
