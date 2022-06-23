@@ -18,7 +18,7 @@ const findTimezoneForPoint = (lat, lon, time, timezone_api_key, abortSignal) => 
         let tzOffset = body.dstOffset + body.rawOffset;
         return ({offset:tzOffset,zoneId:body.timeZoneId});
     })
-    .catch(error => {error.message += " time zone";return error});
+    .catch(error => {return Error(error.message + " time zone")});
 }
 
 const getTimeZoneId = async (routeInfo, routeStart, timezoneApiKey, type, abortSignal) => {
