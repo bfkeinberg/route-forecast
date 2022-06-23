@@ -5,6 +5,7 @@ import { removeControl as removeControlAction, updateUserControls } from '../../
 import { Table } from "./Table"
 import { useActualArrivalTimes, useForecastDependentValues } from '../../utils/hooks';
 import { stringIsOnlyNumeric, stringIsOnlyDecimal } from '../../utils/util';
+import { milesToMeters } from '../../utils/util';
 
 const minSuffixFunction = value => `${value} min`
 
@@ -59,12 +60,16 @@ export const ControlTable = () => {
 
     const rwgpsCellStyle = calculatedValues !== null ? {backgroundColor: "rgb(19, 124, 189)", color: "white"} : {}
 
+    const transformDistance = distance => {
+        return metric ? ((distance * milesToMeters) / 1000).toFixed(1) : distance;
+    };
+
     const tableData = {
         rows: controlsData.map(({name, distance, duration, arrival, banked, actual}, index) =>
             ({name, distance, duration, arrival, banked, actual, delete: <Icon icon="delete" style={{cursor: "pointer"}} onClick={() => removeControl(index)}/>})),
         columns: [
             {name: "name", render: "Name", width: 40, editable: true},
-            {name: "distance", render: <div style={{color: '#0000EE', cursor:'pointer'}} onClick={sortOurStuffByDistance}>{metric ? "Kilometers" : "Miles"}</div>, width: 40, editable: true, editValidateFunction: stringIsOnlyDecimal},
+            {name: "distance", valueTransformFunction: transformDistance, render: <div style={{color: '#0000EE', cursor:'pointer'}} onClick={sortOurStuffByDistance}>{metric ? "Kilometers" : "Miles"}</div>, width: 40, editable: true, editValidateFunction: stringIsOnlyDecimal},
             {name: "duration", render: "Expected Time Spent", valueTransformFunction: minSuffixFunction, width: 80, editable: true, editValidateFunction: stringIsOnlyNumeric},
             {name: "arrival", render: "Estimated Arrival Time", width: 80, editable: false, cellStyle: rwgpsCellStyle, headerStyle: rwgpsCellStyle},
             {name: "delete", render: "Delete", width: 60}
