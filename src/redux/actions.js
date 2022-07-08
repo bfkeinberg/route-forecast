@@ -266,11 +266,12 @@ export const requestForecast = function(routeInfo) {
         if (transaction) {
             span = transaction.startChild({ op: "forecast" }); // This function returns a Span
         }
-        ReactGA.event('add_to_cart', {
-            value:getRouteDistanceInKm(routeInfo.rwgpsRouteData),
-            items:[{item_id:getRouteId(routeInfo.rwgpsRouteData),item_name:getRouteName(routeInfo.rwgpsRouteData)}]
-
-        });
+        if (routeInfo.rwgpsRouteData) {
+            ReactGA.event('add_to_cart', {
+                value:getRouteDistanceInKm(routeInfo.rwgpsRouteData),
+                items:[{item_id:getRouteId(routeInfo.rwgpsRouteData),item_name:getRouteName(routeInfo.rwgpsRouteData)}]
+            });
+        }
         const fetchController = new AbortController()
         const abortMethod = fetchController.abort.bind(fetchController)
         dispatch(beginFetchingForecast(abortMethod));
