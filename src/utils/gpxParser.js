@@ -130,17 +130,9 @@ class AnalyzeRoute {
             if (controls.length <= nextControl) {
                 return 0;
             }
-            if (metric)
-            {
-                if (distanceInKm < controls[nextControl].distance) {
-                    return 0
-                }
-            }
-            else {
-                let distanceInMiles = distanceInKm*kmToMiles;
-                if (distanceInMiles < controls[nextControl].distance) {
-                    return 0
-                }
+            let distanceInMiles = distanceInKm*kmToMiles;
+            if (distanceInMiles < controls[nextControl].distance) {
+                return 0
             }
             let delayInMinutes = controls[nextControl].duration;
             let arrivalTime = startTime.plus({hours:elapsedTimeInHours});
@@ -381,7 +373,8 @@ class AnalyzeRoute {
                     totalMinutesLost += AnalyzeRoute.windToTimeInMinutes(baseSpeed, distanceInMiles, modifiedVelocity);
                 }
 
-                let desiredDistance = metric ? totalDistanceInKm: totalDistanceInKm*kmToMiles;
+                // let desiredDistance = metric ? totalDistanceInKm: totalDistanceInKm*kmToMiles;
+                let desiredDistance = totalDistanceInKm*kmToMiles;   // because the controls always use miles internally
                 currentControl = AnalyzeRoute.calculateValuesForWind(controls, previouslyCalculatedValues,
                     calculatedValues, currentControl,
                     desiredDistance, totalMinutesLost, start, totalDistanceInKm*kmToMiles, timeZoneId);
