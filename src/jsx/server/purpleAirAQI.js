@@ -201,9 +201,19 @@ const getPurpleAirAQI = async function (lat, lon) {
             let purpleairResult = await axios.get(purpleAirUrl).catch(error => {
                 if (error.response !== undefined) {
                     console.error(`[AXIOS] error at ${lat} ${lon}`, error.response.data);
+                    if (error.response.data.error !== undefined) {
+                        if (error.response.data.error === "RateLimitExceededError") {
+                            throw Error(error.response.data)
+                        }
+                    }
                 }
                 else {
                     console.error(`[AXIOS] error at ${lat} ${lon}`, error);
+                    if (error.error !== undefined) {
+                        if (error.error === "RateLimitExceededError") {
+                            throw Error(error);
+                        }
+                    }
                 }
                 return undefined;
             });

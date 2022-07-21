@@ -292,7 +292,7 @@ app.post('/forecast', upload.none(), async (req, res) => {
         insertRecord(dbRecord, req.body.routeName);
     }
     const zone = req.body.timezone;
-    const lookupAqi = forecastPoints.length < 26;
+    const lookupAqi = forecastPoints.length < 22;
     try {
         let results = [];
         while (forecastPoints.length > 0) {
