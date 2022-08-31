@@ -117,7 +117,7 @@
     "jest-cli": "^29.0.1",
     "jest-enzyme": "^7.0.1",
     "jest-haste-map": "^27.0.5",
-    "jest-resolve": "^27.0.5",
+    "jest-resolve": "^29.0.1",
     "jsdom": "^19.0.0",
     "json-loader": "^0.5.4",
     "mini-css-extract-plugin": "^2.1.0",
