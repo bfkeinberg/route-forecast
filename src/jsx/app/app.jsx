@@ -6,8 +6,18 @@ import ReactGA from "react-ga4";
 import { BrowserTracing } from "@sentry/tracing";
 import * as Sentry from "@sentry/react";
 
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/worker.js').then((registration) => {
+        console.log(`Service worker registered! - ${registration.scope}`);
+        if (registration.active) {
+            console.log(`Worker details:${registration.active.state} ${registration.active.scriptURL}`);
+        }
+      }).catch((error) => {
+        console.warn('Error registering service worker:',error);
+      });
+}
+
 ReactGA.initialize("G-0R3J1W9ECC");
-//ReactGA.send("pageview");
 
 if (!window.origin.startsWith('http://localhost')) {
     Sentry.init({

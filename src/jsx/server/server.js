@@ -122,6 +122,14 @@ app.use('/static', expressStaticGzip(path.resolve(__dirname, '../'), {
 }));
 app.use('/static', publicPath);
 
+app.get('/worker.js', (req, res) => {
+    res.sendFile(path.resolve(__dirname,'../static/worker.js'));
+})
+
+app.get('/lib/localforage.js', (req, res) => {
+    res.sendFile(path.resolve(__dirname,'../static/lib/localforage.js'));
+})
+
 // ejs
 app.set('views', path.resolve(__dirname, 'views'));
 app.set('view engine', 'ejs');
@@ -218,7 +226,7 @@ app.use((req, res, next) => {
         host === 'cyclerouteforecast.com') {
         return res.send("<html xmlns='http://www.w3.org/1999/html'><head><title>URL has been deprecated</title></head><body><div>The <strong>www.cyclerouteforecast.com</strong> URL is going away. Please use <a href='https://www.randoplan.com'>www.randoplan.com</a>.</div></body></html>")
     }
-    logger.info(`Host is ${host}; original host is ${req.header?req.header('host'):'[unknown]'}`);
+    // logger.info(`Host is ${host}; original host is ${req.header?req.header('host'):'[unknown]'}`);
     if (host === 'route-forecast.ue.r.appspot.com' ||
         host === 'route-forecast.appspot.com' || host === 'randoplan.com') {
         logger.info(`Redirected ${host} to www.randoplan.com`);
