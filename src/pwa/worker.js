@@ -105,17 +105,23 @@ const serialize = (request) => {
 const getAndCacheGET = async (request) => {
     const cache = await caches.open(cacheName);
     const url = request.url;
-    let response = await fetch(request).catch(() => console.warn(`Could not GET, will try cache`));
+    let response = await fetch(request).catch(() => console.warn(`Could not GET, will try cache for ${url}`));
     if (response !== undefined) {
         console.info(`inserting item into cache with key ${url}`, response);
         cache.put(url, response.clone());
         return response;
     } else {
         // If the network is unavailable, get
-        const cachedResponse = await cache.match(url);
+        let cachedResponse = await cache.match(url);
         if (cachedResponse === undefined) {
-            console.warn(`No matching cache entry for GET for ${url}`);
-            return new Response('', {status: 503, statusText: 'Service Unavailable'});
+            // try while ignoring query parameters if /
+            if (url.startsWith("/?")) {
+                cachedResponse = await cache.match(url, {ignoreSearch:true});
+            }
+            if (cachedResponse == undefined) {
+                console.warn(`No matching cache entry for GET for ${url}`);
+                return new Response('', {status: 503, statusText: 'Service Unavailable'});
+            }
         }
         return cachedResponse;
     }

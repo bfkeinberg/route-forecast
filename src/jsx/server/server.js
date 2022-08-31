@@ -274,7 +274,7 @@ const getAQI = async (result, point) => {
 }
 
 app.post('/forecast', upload.none(), async (req, res) => {
-    logger.info(`Host is ${req.hostname}; original host is ${req.header?req.header('host'):'[unknown]'}`);
+    // logger.info(`Host is ${req.hostname}; original host is ${req.header?req.header('host'):'[unknown]'}`);
     if (req.body.locations === undefined) {
         res.status(400).json({ 'status': 'Missing location key' });
         return;
