@@ -1,7 +1,7 @@
 import React from 'react';
 import {FormGroup, Button, MenuItem} from "@blueprintjs/core";
 import { Select } from "@blueprintjs/select";
-import { Tooltip2 } from "@blueprintjs/popover2";
+import { DesktopTooltip } from '../shared/DesktopTooltip';
 import {connect} from 'react-redux';
 import {setWeatherProvider} from "../../redux/actions";
 import {providerValues} from "../../redux/reducer";
@@ -24,7 +24,7 @@ const renderProvider = (provider, { handleClick, modifiers }) => {
 const WeatherProviderSelector = ({weatherProvider,setWeatherProvider}) => {
     return (
         <FormGroup>
-            <Tooltip2 content={"The weather provider to use for forecasts"} placement={"bottom"}>
+            <DesktopTooltip content={"The weather provider to use for forecasts"} placement={"bottom"}>
                 <Select tabIndex="0"
                     id='provider'
                     items={Object.entries(providerValues).map(element => { return { key: element[0], ...element[1] } })}
@@ -37,7 +37,7 @@ const WeatherProviderSelector = ({weatherProvider,setWeatherProvider}) => {
                 >
                     <Button text={providerValues[weatherProvider].name} rightIcon="symbol-triangle-down" />
                 </Select>
-            </Tooltip2>
+            </DesktopTooltip>
         </FormGroup>
     );
 };

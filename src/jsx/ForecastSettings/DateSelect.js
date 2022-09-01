@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import Flatpickr from 'react-flatpickr'
 import {Icon} from '@blueprintjs/core';
-import {Tooltip2} from '@blueprintjs/popover2';
+import { DesktopTooltip } from '../shared/DesktopTooltip';
 import {connect} from 'react-redux';
 import {setStart, setInitialStart} from "../../redux/actions";
 import 'flatpickr/dist/themes/confetti.css';
@@ -37,7 +37,7 @@ const DateSelect = ({start, setStart, setInitialStart, maxDaysInFuture, canForec
                 Starting time
             </span>
             <div style={{ flex: 2.5 }}>
-                <Tooltip2 content={'When you plan to begin riding'} placement={'bottom'}>
+                <DesktopTooltip content={'When you plan to begin riding'} placement={'bottom'}>
                     <Flatpickr key={start.seconds} id='calendar'
                         value={start.toJSDate()}
                         options={{
@@ -52,7 +52,7 @@ const DateSelect = ({start, setStart, setInitialStart, maxDaysInFuture, canForec
                                 instance.config.onClose.push((dates) => { setStart(DateTime.fromJSDate(dates[0])) })
                         }}
                     />
-                </Tooltip2>
+                </DesktopTooltip>
             </div>
         </div>
     );
