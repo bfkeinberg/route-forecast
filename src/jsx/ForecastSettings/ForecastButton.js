@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {Tooltip2} from '@blueprintjs/popover2';
+import { DesktopTooltip } from '../shared/DesktopTooltip';
 import {connect} from 'react-redux';
 import {requestForecast} from "../../redux/actions";
 import { useMediaQuery } from 'react-responsive';
@@ -20,7 +20,7 @@ const ForecastButton = ({fetchingForecast,requestForecast,routeInfo,submitDisabl
     const smallScreen = useMediaQuery({query: "(max-width: 800px)"})
 
     return (
-        <Tooltip2 content={tooltipContent}>
+        <DesktopTooltip content={tooltipContent}>
             <div id='forecast' style={{ 'display': 'flex', width: '100%', justifyContent: "center", margin: "10px 0px 0px 10px", flex: 1.6 }} cursor='not-allowed'>
                 <Button
                     tabIndex='0'
@@ -36,7 +36,7 @@ const ForecastButton = ({fetchingForecast,requestForecast,routeInfo,submitDisabl
                     {fetchingForecast && <Spinner />}
                 </Button>
             </div>
-        </Tooltip2>
+        </DesktopTooltip>
     );
 };
 

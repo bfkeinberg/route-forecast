@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Select } from "@blueprintjs/select";
-import { Tooltip2 } from "@blueprintjs/popover2";
+import { DesktopTooltip } from '../shared/DesktopTooltip';
 import { Button, MenuItem, FormGroup } from "@blueprintjs/core";
 import {connect} from 'react-redux';
 import {saveCookie, setPace} from "../../redux/actions";
@@ -130,7 +130,7 @@ const RidingPace = ({ pace, setPace, metric }) => {
     const dropdownValues = metric ? paceValues.metric : paceValues.imperialLikeAPenguin
     return (
         <FormGroup style={{ flex: 3, fontSize: "90%" }} label={<span><b>Pace on flat</b></span>} labelFor={'paceInput'}>
-            <Tooltip2 content={pace_text} className={pace_tooltip_class} placement="bottom" minimal={true}>
+            <DesktopTooltip content={pace_text} className={pace_tooltip_class} placement="bottom" minimal={true}>
                 <Select tabIndex="0"
                     id='paceInput'
                     items={dropdownValues.values}
@@ -143,7 +143,7 @@ const RidingPace = ({ pace, setPace, metric }) => {
                 >
                     <Button text={selectedSpeed + " " + dropdownValues.label} rightIcon="symbol-triangle-down"/>
                 </Select>
-            </Tooltip2>
+            </DesktopTooltip>
         </FormGroup>
     );
 };

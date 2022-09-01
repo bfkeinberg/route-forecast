@@ -46,7 +46,7 @@ export const ControlTable = () => {
         if (calculatedValues !== null) {
             Object.assign(controlObject, calculatedValues[index])
         }
-        if (actualArrivalTimes !== null) {
+        if (actualArrivalTimes !== null && actualArrivalTimes[index] !== undefined) {
             controlObject.actual = actualArrivalTimes[index].time
         }
         return controlObject

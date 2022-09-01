@@ -252,7 +252,7 @@ app.get('/rwgps_route', (req, res) => {
     const rwgpsUrl = `https://ridewithgps.com/${routeType}/${routeNumber}.json?apikey=${rwgpsApiKey}&version=2`;
     fetch(rwgpsUrl).then(fetchResult => {if (!fetchResult.ok) {throw Error(fetchResult.status)} return fetchResult.text()})
         .then(body => {if (!isValidRouteResult(body, routeType)) {res.status(401).send(body)} else {res.status(200).send(body)}})
-        .catch(err => {res.status(Number.parseInt(err.message,10)).json({ 'status': JSON.stringify(err) })});
+        .catch(err => {const status = isNaN(Number.parseInt(err.message,10))?500:Number.parseInt(err.message,10);res.status(status).json({ 'status': JSON.stringify(err) })});
 });
 
 const getTransaction = () => {

@@ -90,7 +90,7 @@ module.exports = (env,argv) => {
                         }
                     } 
                 },
-                {test: /\.(jpg|ico|svg)$/, type: "asset/resource"},
+                {test: /\.(jpg|ico|svg|gif)$/, type: "asset/resource"},
                 {test: /\.htm$/, type: "asset/source"}
             ]
         },
