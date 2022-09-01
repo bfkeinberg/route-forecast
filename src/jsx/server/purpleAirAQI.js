@@ -228,7 +228,7 @@ const getPurpleAirAQI = async function (lat, lon) {
     } catch (err) {
         console.error(`No Purple Air results for ${lat} ${lon} because : ${err}`);
     }
-    console.error(`No conditions returned from Purple Air`);
+    console.warn(`No conditions returned from Purple Air`);
     return undefined; // iqAirHandler(lat, lon);
 }
 
