@@ -35,7 +35,6 @@ let expressWinston = null;
 let logger = console;
 let StackdriverTransport = null;
 if (!process.env.NO_LOGGING && process.env.GOOGLE_CLOUD_PROJECT !== undefined) {
-    require('./logging');
     winston = require('winston');
     expressWinston = require('express-winston');
     const { LoggingWinston } = require('@google-cloud/logging-winston');
