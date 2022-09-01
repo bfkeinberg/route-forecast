@@ -28,7 +28,8 @@ export class ForecastTable extends Component {
         metric:PropTypes.bool.isRequired,
         provider: PropTypes.string.isRequired,
         toggleZoomToRange:PropTypes.func.isRequired,
-        zoomToRange:PropTypes.bool.isRequired
+        zoomToRange:PropTypes.bool.isRequired,
+        routeName:PropTypes.string
     };
 
     constructor(props) {
@@ -153,6 +154,9 @@ export class ForecastTable extends Component {
 
         return (
             <div className="animated slideInLeft">
+            <MediaQuery maxWidth={500}>
+                <h2>{this.props.routeName}</h2>
+            </MediaQuery>
                 <ErrorBoundary>
                     <div style={{ display: 'flex', padding: '16px' }}>
                         <div style={{ flex: 1 }}>
@@ -201,7 +205,8 @@ const mapStateToProps = (state) =>
         provider: state.forecast.weatherProvider,
 
         metric: state.controls.metric,
-        zoomToRange: state.forecast.zoomToRange
+        zoomToRange: state.forecast.zoomToRange,
+        routeName: state.routeInfo.name
     });
 
 const mapDispatchToProps = {
