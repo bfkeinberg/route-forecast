@@ -10,9 +10,9 @@ import { RouteInfoInputStrava } from './RouteInfoInputStrava';
 import { routeLoadingModes } from '../../data/enums';
 import ReactGA from "react-ga4";
 import {Toast} from '@blueprintjs/core';
-import mobile_usage_demo from "Images/mobile_usage_demo.gif";
+// import mobile_usage_demo from "Images/mobile_usage_demo.gif";
 
-const RouteInfoForm = ({ errorDetails, setErrorDetails, routeLoadingMode, setRouteLoadingMode, routeInfo }) => {
+const RouteInfoForm = ({ errorDetails, setErrorDetails, routeLoadingMode, setRouteLoadingMode/* , routeInfo */ }) => {
     const mode = routeLoadingMode
     const dispatch = useDispatch()
 
@@ -32,7 +32,7 @@ const RouteInfoForm = ({ errorDetails, setErrorDetails, routeLoadingMode, setRou
                 <div style={{marginTop: "10px", textAlign: "center"}}>
                     <ShortUrl/>
                 </div>
-                {routeInfo.name === '' && <img src={mobile_usage_demo} style={{ position: "relative", width:"100%", height:"100%" }}/>}
+                {/* {routeInfo.name === '' && <img src={mobile_usage_demo} style={{ position: "relative", width:"100%", height:"100%" }}/>} */}
             </MediaQuery>
         </div>
     );
