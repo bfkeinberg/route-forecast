@@ -147,11 +147,12 @@ const getAndCachePOST = async (request) => {
         // If it does not work, return the cached response. If the cache does not
         // contain a response for our request, it will give us a 503-response
         const cacheKey = JSON.stringify(await serialize(request));
-        if (!postCache.getItem(cacheKey)) {
+        let cachedResponse = await postCache.getItem(cacheKey);
+        if (!cachedResponse) {
             console.warn('Returning 503 for POST');
-            return new Response('', {status: 503, statusText: 'Service Unavailable'});
+            return response;
         }
-        return deserializeResponse(await postCache.getItem(cacheKey));
+        return deserializeResponse(cachedResponse);
     }
 }
 
