@@ -41,7 +41,7 @@ import {
     setDisplayControlTableUI,
     setRwgpsToken,
     setUsePinnedRoutes,
-    setStopAfterLoad
+    setStopAfterLoad,
 } from "../../redux/actions";
 import QueryString from './QueryString';
 import { routeLoadingModes } from '../../data/enums';
@@ -235,8 +235,16 @@ export class RouteWeatherUI extends Component {
         if (RouteWeatherUI.hasProvider(queryParams.provider)) {
             props.setWeatherProvider(queryParams.provider);
         }
+        // make show weather provider "sticky"
         if (queryParams.showProvider !== undefined) {
             props.showWeatherProvider(queryParams.showProvider==="true");
+            saveCookie("showWeatherProvider", queryParams.showProvider==="true");
+        }
+        else {
+            let showWeatherProvider = loadCookie("showWeatherProvider");
+            if (showWeatherProvider !== undefined) {
+                props.showWeatherProvider(showWeatherProvider);
+            }
         }
         if (queryParams.rwgpsToken !== undefined) {
             props.setRwgpsToken(queryParams.rwgpsToken);
