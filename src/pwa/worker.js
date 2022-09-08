@@ -19,7 +19,9 @@ self.addEventListener('install', (event) => {
         // `Cache` instance for later use.
         return cache.addAll([
             '/static/main.css',
-            '/static/main.bundle.js'
+            '/static/main.bundle.js',
+            'static/favicon.ico',
+            'static/manifest.json'
         ]);
     }));
 });
