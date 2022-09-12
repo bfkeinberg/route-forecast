@@ -149,6 +149,13 @@ const getAndCachePOST = async (request) => {
         // If it does not work, return the cached response. If the cache does not
         // contain a response for our request, it will give us a 503-response
         const cacheKey = JSON.stringify(await serialize(request));
+        // don't know how this could happen, but evidently it can
+        if (postCache === undefined) {
+            postCache = localforage.createInstance({
+                name: indexed_db_app_name,
+                storeName: indexed_db_table_name
+            });
+        }
         let cachedResponse = await postCache.getItem(cacheKey);
         if (!cachedResponse) {
             console.warn('Returning 503 for POST');
