@@ -50,6 +50,8 @@ export const Table = ({data, onCellValueChanged}) => {
                 autoFocus={shouldAutoFocus(row, column)}
                 onCellValueChanged={(value) => onCellValueChanged(rowIndex, column.name, value)}
                 editValidateFunction={column.editValidateFunction}
+                editTransformFunction={column.editTransformFunction ? column.editTransformFunction : value => value}
+                editCompleteFunction={column.editCompleteFunction ? column.editCompleteFunction : value => value}
               />
             </div>
           )}
@@ -65,19 +67,19 @@ Table.propTypes = {
   onCellValueChanged:PropTypes.func.isRequired
 };
 
-const Cell = ({value, transformFunction, editable, tabIndex, autoFocus, onCellValueChanged, editValidateFunction}) => {
+const Cell = ({value, transformFunction, editTransformFunction, editCompleteFunction, editable, tabIndex, autoFocus, onCellValueChanged, editValidateFunction}) => {
   const [
     editingValue,
     setEditingValue
     ] = useState(null)
   const beginEditing = () => {
     if (editable) {
-      setEditingValue(value)
+      setEditingValue(editTransformFunction(value))
     }
   }
 
   const endEditing = () => {
-    onCellValueChanged(editingValue !== '' ? editingValue : '-----')
+    onCellValueChanged(editCompleteFunction(editingValue !== '' ? editingValue : '-----'))
     setEditingValue(null)
   }
 
@@ -106,6 +108,8 @@ Cell.propTypes = {
     PropTypes.object
   ]),
   transformFunction:PropTypes.func.isRequired,
+  editTransformFunction:PropTypes.func.isRequired,
+  editCompleteFunction:PropTypes.func.isRequired,
   editable:PropTypes.bool,
   autoFocus:PropTypes.bool,
   onCellValueChanged:PropTypes.func.isRequired,

@@ -4,8 +4,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { removeControl as removeControlAction, updateUserControls } from '../../redux/actions';
 import { Table } from "./Table"
 import { useActualArrivalTimes, useForecastDependentValues } from '../../utils/hooks';
-import { stringIsOnlyNumeric, stringIsOnlyDecimal } from '../../utils/util';
-import { milesToMeters } from '../../utils/util';
+import { stringIsOnlyNumeric, stringIsOnlyDecimal, milesToMeters } from '../../utils/util';
 
 const minSuffixFunction = value => `${value} min`
 
@@ -64,12 +63,16 @@ export const ControlTable = () => {
         return metric ? ((distance * milesToMeters) / 1000).toFixed(1) : distance;
     };
 
+    const reverseTransformDistance = distance => {
+        return metric ? ((distance * 1000) / milesToMeters).toFixed(1) : distance;
+    }
+
     const tableData = {
         rows: controlsData.map(({name, distance, duration, arrival, banked, actual}, index) =>
             ({name, distance, duration, arrival, banked, actual, delete: <Icon icon="delete" style={{cursor: "pointer"}} onClick={() => removeControl(index)}/>})),
         columns: [
             {name: "name", render: "Name", width: 40, editable: true},
-            {name: "distance", valueTransformFunction: transformDistance, render: <div style={{color: '#0000EE', cursor:'pointer'}} onClick={sortOurStuffByDistance}>{metric ? "Kilometers" : "Miles"}</div>, width: 40, editable: true, editValidateFunction: stringIsOnlyDecimal},
+            {name: "distance", editTransformFunction: transformDistance, editCompleteFunction: reverseTransformDistance,  valueTransformFunction: transformDistance, render: <div style={{color: '#0000EE', cursor:'pointer'}} onClick={sortOurStuffByDistance}>{metric ? "Kilometers" : "Miles"}</div>, width: 40, editable: true, editValidateFunction: stringIsOnlyDecimal},
             {name: "duration", render: "Expected Time Spent", valueTransformFunction: minSuffixFunction, width: 80, editable: true, editValidateFunction: stringIsOnlyNumeric},
             {name: "arrival", render: "Estimated Arrival Time", width: 80, editable: false, cellStyle: rwgpsCellStyle, headerStyle: rwgpsCellStyle},
             {name: "delete", render: "Delete", width: 60}
