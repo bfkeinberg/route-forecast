@@ -223,7 +223,7 @@ app.use((req, res, next) => {
     // }
     if (host === 'www.cyclerouteforecast.com' ||
         host === 'cyclerouteforecast.com') {
-        return res.send("<html xmlns='http://www.w3.org/1999/html'><head><title>URL has been deprecated</title></head><body><div>The <strong>www.cyclerouteforecast.com</strong> URL is going away. Please use <a href='https://www.randoplan.com'>www.randoplan.com</a>.</div></body></html>")
+        res.status(404).text("Cyclerouteforecast.com has been deprecated, use www.randoplan.com instead");
     }
     // logger.info(`Host is ${host}; original host is ${req.header?req.header('host'):'[unknown]'}`);
     if (host === 'route-forecast.ue.r.appspot.com' ||
