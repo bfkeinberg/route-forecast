@@ -406,7 +406,7 @@ const randoplan_uri='https://www.randoplan.com/rwgpsAuthReply';
 app.get('/rwgpsAuthReq', (req, res) => {
     const state = req.query.state;
     if (state === undefined) {
-        res.status(400).json({ 'status': 'Missing keys' });
+        res.status(400).json({ 'status': 'Missing OAuth keys for RideWithGPS auth' });
         return;
     }
     const rwgpsBaseOAuth = 'https://ridewithgps.com/oauth/authorize';
@@ -451,15 +451,19 @@ app.get('/rwgpsAuthReply', async (req, res) => {
 app.get('/stravaAuthReq', (req, res) => {
     const state = req.query.state;
     if (state === undefined) {
-        res.status(400).json({ 'status': 'Missing keys' });
+        res.status(400).json({ 'status': 'Missing OAuth state from Strava' });
         return;
     }
-    let restoredState = JSON.parse(decodeURIComponent(state));
-    insertFeatureRecord({
-        timestamp: new Date(),
-        routeNumber: restoredState.rwgpsRoute === undefined ? null : restoredState.rwgpsRoute
-    },
-        "strava");
+    try {
+        let restoredState = JSON.parse(decodeURIComponent(state));
+        insertFeatureRecord({
+            timestamp: new Date(),
+            routeNumber: restoredState.rwgpsRoute === undefined ? null : restoredState.rwgpsRoute
+        },
+            "strava");
+    } catch (error) {
+        res.status(400).json({'status':`${error} : Invalid OAuth state ${state}`});
+    }
     const baseUrl = url.format({
         protocol: req.protocol,
         host: req.get('host')
