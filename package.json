@@ -35,7 +35,7 @@
     "isomorphic-fetch": "^3.0.0",
     "jest-environment-jsdom": "^29.0.1",
     "localforage": "^1.10.0",
-    "luxon": "^2.0.1",
+    "luxon": "^2.5.2",
     "moment-timezone": "^0.5.35",
     "multer": "^1.4.5-lts.1",
     "node-fetch": "^2.6.7",
