@@ -1,5 +1,6 @@
 const { DateTime, Interval } = require("luxon");
 const axios = require('axios');
+const milesToMeters = 1609.34;
 
 const getForecastUrl = async (lat, lon) => {
     const url = `https://api.weather.gov/points/${lat},${lon}`;
@@ -31,8 +32,8 @@ const extractForecast = (forecastGridData, currentTime) => {
         apparentTemperatureInC:apparentTemperatureInC,
         cloudCover:cloudCover,
         windBearing:windBearing,
-        windSpeed:windSpeed,
-        gust:gust,
+        windSpeedInKph:windSpeed,
+        gustInKph:gust,
         precip:precip,
         summary:summary
     }
@@ -79,6 +80,8 @@ const callNWS = async function (lat, lon, currentTime, distance, zone, bearing, 
     const temperatureInF = forecastValues.temperatureInC * 9/5 + 32;
     // eslint-disable-next-line no-mixed-operators
     const apparentTemperatureInF = forecastValues.apparentTemperatureInC * 9/5 + 32;
+    const windSpeedInMph = forecastValues.windSpeedInKph * 1000/milesToMeters;
+    const windGustInMph = forecastValues.gustInKph * 1000/milesToMeters;
     return new Promise((resolve) => {resolve({
         'time':startTime.toFormat('h:mm a'),
         'distance':distance,
@@ -86,7 +89,7 @@ const callNWS = async function (lat, lon, currentTime, distance, zone, bearing, 
         'tempStr':`${Math.round(temperatureInF)}F`,
         'precip':`${forecastValues.precip.toFixed(1)}%`,
         'cloudCover':`${forecastValues.cloudCover.toFixed(1)}%`,
-        'windSpeed':`${Math.round(forecastValues.windSpeed)}`,
+        'windSpeed':`${Math.round(windSpeedInMph)}`,
         'lat':lat,
         'lon':lon,
         'temp':`${Math.round(temperatureInF)}`,
@@ -95,7 +98,7 @@ const callNWS = async function (lat, lon, currentTime, distance, zone, bearing, 
         'rainy':rainy,
         'windBearing':Math.round(forecastValues.windBearing),
         'vectorBearing':bearing,
-        'gust':`${Math.round(forecastValues.gust)}`,
+        'gust':`${Math.round(windGustInMph)}`,
         'feel':Math.round(apparentTemperatureInF)
     }
     )
