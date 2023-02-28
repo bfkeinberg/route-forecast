@@ -172,16 +172,22 @@ const usePointsAndBounds = () => {
   return pointsAndBounds
 }
 
-const useForecastDependentValues = () => {
-
-  const routeInfo = useSelector(state => state.routeInfo)
-  const routeParams = useSelector(state => state.uiInfo.routeParams)
-  const controls = useSelector(state => state.controls)
-  const timeZoneId = useSelector(state => state.forecast.timeZoneId)
-  const forecast = useSelector(state => state.forecast.forecast)
-
+const dependencies = [
+  'routeInfo',
+'routeParams',
+'controls',
+'timeZoneId',
+'forecast'
+]
+let lastWindResult = {result: null, dependencyValues: {}}
+const calculateWindResult = (inputs) => {
+  if (dependencies.every(dependency => inputs[dependency] === lastWindResult.dependencyValues[dependency]) ) {
+    return lastWindResult.result
+  }
+  const {routeInfo, routeParams, controls, timeZoneId, forecast} = inputs
   const stateStuff = {routeInfo, uiInfo: {routeParams}, controls}
 
+  let result
   if (forecast.length > 0 && routeInfo.rwgpsRouteData) {
     const { points, values, finishTime} = getRouteInfo(stateStuff, routeInfo.rwgpsRouteData !== null ? "rwgps" : "gpx", timeZoneId)
 
@@ -201,10 +207,23 @@ const useForecastDependentValues = () => {
         finishTime,
         timeZoneId
     )
-    return { weatherCorrectionMinutes: time, calculatedControlPointValues: calculatedControlPointValues, maxGustSpeed: gustSpeed, finishTime: adjustedFinishTime}
+    result = { weatherCorrectionMinutes: time, calculatedControlPointValues: calculatedControlPointValues, maxGustSpeed: gustSpeed, finishTime: adjustedFinishTime}
   } else {
-    return { weatherCorrectionMinutes: null, calculatedControlPointValues: [], maxGustSpeed: null, finishTime: null }
+    result = { weatherCorrectionMinutes: null, calculatedControlPointValues: [], maxGustSpeed: null, finishTime: null }
   }
+  lastWindResult = {result, dependencyValues: inputs}
+  return result
+}
+
+const useForecastDependentValues = () => {
+  const routeInfo = useSelector(state => state.routeInfo)
+  const routeParams = useSelector(state => state.uiInfo.routeParams)
+  const controls = useSelector(state => state.controls)
+  const timeZoneId = useSelector(state => state.forecast.timeZoneId)
+  const forecast = useSelector(state => state.forecast.forecast)
+
+  const windAdjustmentResult = calculateWindResult({routeInfo, routeParams, controls, timeZoneId, forecast})
+  return windAdjustmentResult
 }
 
 const useWhenChanged = (value, callback, changedCondition = true) => {

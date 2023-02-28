@@ -417,7 +417,7 @@ class AnalyzeRoute {
                                   totalMinutesLost, start, totalDistanceInMiles, timeZoneId) {
         if (controls.length > currentControl) {
             if (desiredDistance >= controls[currentControl].distance) {
-                console.info(`updating control ${currentControl} with delay ${totalMinutesLost} minutes`);
+                // console.info(`updating control ${currentControl} with delay ${totalMinutesLost} minutes`);
                 let previousArrivalTime = DateTime.fromFormat(previouslyCalculatedValues[currentControl].arrival, finishTimeFormat, {zone:timeZoneId});
                 let arrivalTime = previousArrivalTime.plus({minutes:totalMinutesLost});
                 let elapsedDuration = arrivalTime.diff(start);
