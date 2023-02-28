@@ -198,7 +198,6 @@ const useForecastDependentValues = () => {
         sortedControls,
         sortedValues,
         routeParams.start,
-        controls.metric,
         finishTime,
         timeZoneId
     )

@@ -31,7 +31,6 @@ export const getRouteInfo = (state, type, timeZoneId) => {
     state.uiInfo.routeParams.pace,
     state.uiInfo.routeParams.interval,
     state.controls.userControlPoints,
-    state.controls.metric,
     timeZoneId
   )
 }
@@ -44,7 +43,7 @@ export const parseControls = function (controlPointString, deleteFirstElement) {
     let controlPointList = controlPointString.split(":");
     let controlPoints =
       controlPointList.filter(item => item.length > 0)
-        .filter(point => { const values = point.split(","); return !isNaN(values[1]) && !isNaN(values[2]) })
+        .filter(point => { const values = point.split(",");return !isNaN(values[1]) && !isNaN(values[2]) })
         .map((point, index) => {
           let controlPointValues = point.split(",");
           return ({ name: controlPointValues[0], distance: Number(controlPointValues[1]), duration: Number(controlPointValues[2]), id: index });
@@ -54,7 +53,7 @@ export const parseControls = function (controlPointString, deleteFirstElement) {
     return controlPoints;
   } else {
     let controlPointList = controlPointString.split(":");
-    const controlPoints = controlPointList.filter(item => item.length > 0).filter(point => { const values = point.split(","); return !isNaN(values[1]) && !isNaN(values[2]) })
+    const controlPoints = controlPointList.filter(item => item.length > 0).filter(point => { const values = point.split(",");return !isNaN(values[1]) && !isNaN(values[2]) })
       .map((point, index) => {
         let controlPointValues = point.split(",");
         return ({ name: controlPointValues[0], distance: Number(controlPointValues[1]), duration: Number(controlPointValues[2]), id: index });

@@ -86,7 +86,7 @@
     "@babel/preset-env": "^7.11.5",
     "@babel/preset-react": "^7.10.4",
     "@sentry/webpack-plugin": "^1.15.1",
-    "@wojtekmaj/enzyme-adapter-react-17": "^0.7.0",
+    "@wojtekmaj/enzyme-adapter-react-17": "^0.8.0",
     "babel-core": "^6.26.3",
     "babel-jest": "^29.0.1",
     "babel-loader": "^9.1.0",

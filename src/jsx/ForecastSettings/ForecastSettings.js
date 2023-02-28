@@ -21,7 +21,7 @@ export const ForecastSettings = () => {
     const errorDetails = useSelector(state => state.uiInfo.dialogParams.errorDetails)
 
     const showControlPoints = useSelector(state => state.controls.displayControlTableUI)
-    const setShowControlPoints = () => { ReactGA.event('select_content', { content_type: 'controls' }); return dispatch(setDisplayControlTableUI(!showControlPoints)) }
+    const setShowControlPoints = () => { ReactGA.event('select_content', { content_type: 'controls' });return dispatch(setDisplayControlTableUI(!showControlPoints)) }
 
     return (
         <div style={{ display: "flex", flexFlow: "column", alignItems: "center", marginBottom: "5px" }}>

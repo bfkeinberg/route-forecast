@@ -14,40 +14,13 @@ const greatCircleRadius = {
         km: 6367
 };
 
+const desiredSeparationInMeters = 25;       // meters of distance desired between two points for grade calculation
 class AnalyzeRoute {
     constructor() {
         this.walkRwgpsRoute = this.walkRwgpsRoute.bind(this);
         this.walkGpxRoute = this.walkGpxRoute.bind(this);
         this.analyzeRoute = this.analyzeRoute.bind(this);
     }
-
-//    loadGpxFile(gpxFile) {
-//        let reader = new FileReader();
-//        const fileLoad = new Promise((resolve, reject) => {
-//            reader.onerror = event => reject(event.target.error.code);
-//            reader.onload = event => resolve(event.target.result);
-//        });
-//        reader.readAsText(gpxFile);
-//        return new Promise((resolve, reject) => {
-//            fileLoad.then(fileData => {
-//                const parseGpx = new Promise((resolve, reject) => {
-//                    gpxParse.parseGpx(fileData, (error, gpxData) => {
-//                        if (error !== null) {
-//                            reject(error);          // error in parsing the file
-//                        }
-//                        resolve(gpxData);
-//                    })
-//                });
-//                parseGpx.then(gpxData => {
-//                    resolve(gpxData);
-//                }, error => {
-//                    reject(error);      // error parsing gpx
-//                });
-//            }, error => {
-//                reject(error);      // errors in reading the file
-//            });
-//        });
-//    }
 
     toRad = (num) => num * Math.PI / 180;
 
@@ -72,10 +45,39 @@ class AnalyzeRoute {
             return greatCircleRadius.km * c;
     }
 
+    /**
+     * Return a point far enough behind to make grade calculation meaningful, a constant defined
+     * above specifies that distance. If the traversal hasn't progressed that far return the earliest point.
+     * @param {array} previousPoints The array of already encountered course points, may be empty
+     * @param {object} point The point for which we are searching for a predecessor
+     * @returns {object} the point at the specified distance behind or undefined if this is the first point
+     */
+    findPreviousPoint = (previousPoints, point) => {
+        if (previousPoints.length > 0) {
+            let discoveredPoint = previousPoints.slice().reverse().find(previous =>
+                (this.calculateDistance(previous.lat, previous.lon, point.lat, point.lon)*1000) > desiredSeparationInMeters);
+            return discoveredPoint == undefined ? previousPoints[0] : discoveredPoint;
+        }
+        return undefined;
+    }
 
-    // returns distance traveled in _miles_, and climb in meters
+    // get grade between two points
+    getGrade(previousPoints, currentPoint) {
+        let grade = 0;
+        let trailingPoint = this.findPreviousPoint(previousPoints,currentPoint);
+        let distanceFromPreviousInKm =
+            this.calculateDistance(trailingPoint.lat,trailingPoint.lon,currentPoint.lat,currentPoint.lon);
+        if (distanceFromPreviousInKm !== 0)
+        {
+            grade = (currentPoint.elevation - trailingPoint.elevation) / (distanceFromPreviousInKm*1000);
+        }
+        return grade;
+    }
+
+    // returns distance traveled in _miles_, and climb in meters, along with the grade between the two points
+    // in future we may want to expand this to calculate grade over a greater distance
     findDeltas(previousPoint, currentPoint) {
-        // calculate distance and elevation from last
+        // calculate distance and elevation from last at desired distance behind
         let distanceFromLast = this.calculateDistance(previousPoint.lat, previousPoint.lon,
             currentPoint.lat,currentPoint.lon);
         if (currentPoint.elevation > previousPoint.elevation) {
@@ -121,12 +123,12 @@ class AnalyzeRoute {
         return {points: stream, bounds}
     };
 
-    analyzeRoute(stream, userStartTime, pace, intervalInHours, controls, metric, timeZoneId) {
+    analyzeRoute(stream, userStartTime, pace, intervalInHours, controls, timeZoneId) {
 
         let nextControl = 0;
 
         const checkAndUpdateControls = function(distanceInKm, startTime, elapsedTimeInHours, controls,
-                                                calculatedValues, metric, point) {
+                                                calculatedValues, point) {
             if (controls.length <= nextControl) {
                 return 0;
             }
@@ -158,6 +160,7 @@ class AnalyzeRoute {
         let calculatedValues = [];
         let lastTime = 0;
         let previousAccumulatedTime = 0;
+
         // correct start time for time zone
         let startTime = DateTime.fromISO(userStartTime.toFormat("yyyy-MM-dd'T'HH:mm"), {zone:timeZoneId});
         let bearings = [];
@@ -179,7 +182,7 @@ class AnalyzeRoute {
                 );
             }
             idlingTime += checkAndUpdateControls(accumulatedDistanceKm, startTime, (accumulatedTime + idlingTime),
-                controls, calculatedValues, metric, point);
+                controls, calculatedValues, point);
             // see if it's time for forecast
             if (((accumulatedTime + idlingTime) - lastTime) >= intervalInHours) {
                 forecastRequests.push(AnalyzeRoute.addToForecast(point, startTime, (accumulatedTime + idlingTime),
@@ -199,6 +202,7 @@ class AnalyzeRoute {
             bearings.push(lastBearing);
         }
         let finishTime = AnalyzeRoute.formatFinishTime(startTime,accumulatedTime,idlingTime);
+        // console.info(`setting finish time ${finishTime} from start ${startTime} accumulated ${accumulatedTime} and idling ${idlingTime}`);
         AnalyzeRoute.fillLastControlPoint(finishTime, controls, nextControl, accumulatedTime + idlingTime,
             accumulatedDistanceKm, calculatedValues);
         calculatedValues.sort((a,b) => a.val-b.val);
@@ -236,18 +240,18 @@ class AnalyzeRoute {
             return startTime.plus({hours:accumulatedTime+restTime}).toFormat(finishTimeFormat);
     }
 
-    walkRwgpsRoute(routeData,startTime,pace,interval,controls,metric,timeZoneId) {
+    walkRwgpsRoute(routeData,startTime,pace,interval,controls,timeZoneId) {
         let modifiedControls = controls.slice();
         modifiedControls.sort((a,b) => a['distance']-b['distance']);
         const stream = this.parseRouteStream(routeData, "rwgps")
-        return this.analyzeRoute(stream, startTime, pace, interval, modifiedControls, metric, timeZoneId);
+        return this.analyzeRoute(stream, startTime, pace, interval, modifiedControls, timeZoneId);
     }
 
-    walkGpxRoute(routeData,startTime,pace,interval,controls,metric,timeZoneId) {
+    walkGpxRoute(routeData,startTime,pace,interval,controls,timeZoneId) {
         let modifiedControls = controls.slice();
         modifiedControls.sort((a,b) => a['distance']-b['distance']);
         const stream = this.parseRouteStream(routeData, "gpx")
-        return this.analyzeRoute(stream, startTime, pace, interval, modifiedControls, metric, timeZoneId);
+        return this.analyzeRoute(stream, startTime, pace, interval, modifiedControls, timeZoneId);
     }
 
     static rusa_time(accumulatedDistanceInKm, elapsedTimeInHours) {
@@ -277,6 +281,11 @@ class AnalyzeRoute {
         if (distanceInMiles < 1) {
             return 0;
         }
+        let effectiveSpeed = AnalyzeRoute.getHilliness(climbInFeet, distanceInMiles, baseSpeed);
+        return distanceInMiles / effectiveSpeed;     // hours
+    }
+
+    static getHilliness(climbInFeet, distanceInMiles, baseSpeed) {
         let hilliness = Math.min(((climbInFeet / distanceInMiles) / 25), 6);
         // handle edge case for walking speeds
         let effectiveSpeed = baseSpeed - hilliness;
@@ -292,7 +301,7 @@ class AnalyzeRoute {
         if (baseSpeed < 7) {
             effectiveSpeed = baseSpeed;
         }
-        return distanceInMiles / effectiveSpeed;     // hours
+        return effectiveSpeed;
     }
 
     static addToForecast(trackPoint, currentTime, elapsedTimeInHours, distanceInMiles) {
@@ -323,27 +332,31 @@ class AnalyzeRoute {
         return (distance*60)/modifiedVelocity-(distance*60)/baseSpeed;
     }
 
-    adjustForWind = (forecastInfo,stream,pace,controls,previouslyCalculatedValues,start,metric,finishTime,timeZoneId) => {
+    adjustForWind = (forecastInfo,stream,pace,controls,previouslyCalculatedValues,start,finishTime,timeZoneId) => {
         if (forecastInfo.length===0) {
             return {time:0,values:[],gustSpeed:0,finishTime:finishTime};
         }
+        const gustThreshold = 18;   // above this incorporate some of the gust into the effect on the rider
         let baseSpeed = inputPaceToSpeed[pace];
         let forecast = forecastInfo.slice().reverse();
         let currentForecast = forecast.pop();
         let currentControl = 0;
         let previousPoint = null;
+        let previousPoints = [];
         let totalMinutesLost = 0;
         let totalDistanceInKm = 0;
+        let accumulatedClimbMeters = 0;
         let calculatedValues = [];
         let maxGustSpeed = 0;
 
         stream.filter(point => point != null && point.lat !== undefined && point.lon !== undefined).forEach(currentPoint => {
             if (previousPoint !== null) {
-                let distanceInKm = this.calculateDistance(previousPoint.lat, previousPoint.lon,
-                    currentPoint.lat,currentPoint.lon);
-                totalDistanceInKm += distanceInKm;
+                let deltas = this.findDeltas(previousPoint,currentPoint);
+                totalDistanceInKm += deltas.distance;
+                // accumulate elevation gain
+                accumulatedClimbMeters += deltas.climb;
 
-                let distanceInMiles = distanceInKm*kmToMiles;
+                let distanceInMiles = deltas.distance*kmToMiles;
                 if (distanceInMiles === 0) {
                     return;
                 }
@@ -355,34 +368,46 @@ class AnalyzeRoute {
                 let trackBearing = AnalyzeRoute.getRelativeBearing(previousPoint,currentPoint);
                 let relativeBearing = AnalyzeRoute.getBearingBetween(trackBearing,currentForecast.windBearing);
                 // adjust speed
-                const averageWindSpeed = parseInt(currentForecast.windSpeed);
+                let averageWindSpeed = parseInt(currentForecast.windSpeed);
                 if (currentForecast.gust !== undefined) {
                     let gustSpeed = parseInt(currentForecast.gust);
                     if (gustSpeed > maxGustSpeed) {
                         maxGustSpeed = gustSpeed;
+                    }
+                    if (gustSpeed > gustThreshold) {
+                        averageWindSpeed += (gustSpeed - averageWindSpeed)/2;
                     }
                 }
                 let effectiveWindSpeed = Math.cos((Math.PI / 180)*relativeBearing)*averageWindSpeed;
 
                 // sometimes the route data is missing elevation, so don't try to compute with it
                 if (previousPoint.elevation!==undefined && currentPoint.elevation!==undefined) {
-                    const power = getPowerOrVelocity(distanceInKm, Math.abs(previousPoint.elevation-currentPoint.elevation)/2,
-                        0, 0, undefined, baseSpeed);
-                    const modifiedVelocity = getPowerOrVelocity(distanceInKm, Math.abs(previousPoint.elevation-currentPoint.elevation)/2,
-                        0, effectiveWindSpeed, power, baseSpeed);
-                    totalMinutesLost += AnalyzeRoute.windToTimeInMinutes(baseSpeed, distanceInMiles, modifiedVelocity);
+                    let grade = this.getGrade(previousPoints, currentPoint);
+                    if (grade < 0) {
+                        grade = 0;
+                    }
+                    let effectiveSpeed = baseSpeed;
+                    if (totalDistanceInKm > 0) {
+                        effectiveSpeed = AnalyzeRoute.getHilliness(accumulatedClimbMeters** 3.2808, totalDistanceInKm*kmToMiles, baseSpeed);
+                    }
+                    const power = getPowerOrVelocity(deltas.distance, Math.abs(previousPoint.elevation-currentPoint.elevation)/2,
+                        grade, 0, undefined, effectiveSpeed);
+                    const modifiedVelocity = getPowerOrVelocity(deltas.distance, Math.abs(previousPoint.elevation-currentPoint.elevation)/2,
+                        grade, effectiveWindSpeed, power, effectiveSpeed);
+                    // console.info(`grade was ${grade} power was ${power} wind:${effectiveWindSpeed} speed:${effectiveSpeed} modifiedVelocity was ${modifiedVelocity}`);
+                    totalMinutesLost += AnalyzeRoute.windToTimeInMinutes(effectiveSpeed, distanceInMiles, modifiedVelocity);
                 }
 
-                // let desiredDistance = metric ? totalDistanceInKm: totalDistanceInKm*kmToMiles;
                 let desiredDistance = totalDistanceInKm*kmToMiles;   // because the controls always use miles internally
                 currentControl = AnalyzeRoute.calculateValuesForWind(controls, previouslyCalculatedValues,
-                    calculatedValues, currentControl,
-                    desiredDistance, totalMinutesLost, start, totalDistanceInKm*kmToMiles, timeZoneId);
+                    calculatedValues, currentControl, desiredDistance, totalMinutesLost, start, totalDistanceInKm*kmToMiles, timeZoneId);
             }
             previousPoint = currentPoint;
+            previousPoints.push(currentPoint);
         });
 
         calculatedValues.sort((a,b) => a.val-b.val);
+        // console.info(`total minutes lost was ${totalMinutesLost}, original finish time:${finishTime}`);
         return {time:totalMinutesLost,values:calculatedValues, gustSpeed:maxGustSpeed,
                 finishTime:DateTime.fromFormat(finishTime,finishTimeFormat).plus({minutes:totalMinutesLost}).toFormat(finishTimeFormat)};
     };
@@ -392,6 +417,7 @@ class AnalyzeRoute {
                                   totalMinutesLost, start, totalDistanceInMiles, timeZoneId) {
         if (controls.length > currentControl) {
             if (desiredDistance >= controls[currentControl].distance) {
+                console.info(`updating control ${currentControl} with delay ${totalMinutesLost} minutes`);
                 let previousArrivalTime = DateTime.fromFormat(previouslyCalculatedValues[currentControl].arrival, finishTimeFormat, {zone:timeZoneId});
                 let arrivalTime = previousArrivalTime.plus({minutes:totalMinutesLost});
                 let elapsedDuration = arrivalTime.diff(start);
