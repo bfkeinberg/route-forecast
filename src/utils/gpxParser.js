@@ -336,7 +336,7 @@ class AnalyzeRoute {
         if (forecastInfo.length===0) {
             return {time:0,values:[],gustSpeed:0,finishTime:finishTime};
         }
-        const gustThreshold = 18;   // above this incorporate some of the gust into the effect on the rider
+        const gustThreshold = 50;   // above this incorporate some of the gust into the effect on the rider
         let baseSpeed = inputPaceToSpeed[pace];
         let forecast = forecastInfo.slice().reverse();
         let currentForecast = forecast.pop();
