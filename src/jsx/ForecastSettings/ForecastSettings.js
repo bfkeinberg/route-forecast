@@ -15,7 +15,8 @@ import ReactGA from "react-ga4";
 import { Toast } from '@blueprintjs/core';
 
 export const ForecastSettings = () => {
-    const showProvider = useSelector(state => state.controls.showWeatherProvider)
+    // always show weather provider
+    const showProvider = true; //useSelector(state => state.controls.showWeatherProvider)
     const metric = useSelector(state => state.controls.metric)
     const dispatch = useDispatch()
     const errorDetails = useSelector(state => state.uiInfo.dialogParams.errorDetails)

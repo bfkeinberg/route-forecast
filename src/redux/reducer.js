@@ -31,15 +31,15 @@ export const providerValues = {
 // eslint-disable-next-line complexity
 export const routeParams = function(state = {
     interval: defaultIntervalInHours,
-    min_interval:providerValues.darksky.min_interval,
-    canForecastPast:providerValues.darksky.canForecastPast,
+    min_interval:providerValues.nws.min_interval,
+    canForecastPast:providerValues.nws.canForecastPast,
     pace: defaultPace,
     rwgpsRoute: '',
     rwgpsRouteIsTrip: false,
     start: initialStartTime(),
     initialStart: initialStartTime(),
     routeLoadingMode: routeLoadingModes.RWGPS,
-    maxDaysInFuture: providerValues['darksky'].max_days,
+    maxDaysInFuture: providerValues['nws'].max_days,
     stopAfterLoad: false
 }, action) {
     switch (action.type) {
@@ -343,7 +343,7 @@ const forecast = function(state = {
     range: [],
     tableViewed: false,
     mapViewed: false,
-    weatherProvider: 'darksky',
+    weatherProvider: 'nws',
     zoomToRange: true
 }, action) {
     switch (action.type) {

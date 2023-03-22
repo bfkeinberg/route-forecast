@@ -22,7 +22,7 @@ const callDarkSky = function (lat, lon, currentTime, distance, zone, bearing, ge
     const darkSkyKey = process.env.DARKSKY_API_KEY;
     const url = `https://api.darksky.net/forecast/${darkSkyKey}/${lat},${lon},${currentTime}?exclude=hourly,daily,flags,minutely`;
     const forecastResult = fetch(url,{headers: {"Accept-Encoding": "gzip"}}).then(response => {
-        if (!response.ok) {throw response.errorText}
+        if (!response.ok) {throw response.errorText?response.errorText:`Error ${response.status}`}
         else {
             const result = response.json();
             result.apiCalls = response.headers.get('x-forecast-api-calls');
