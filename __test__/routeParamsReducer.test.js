@@ -37,16 +37,16 @@ describe('route params reducer', () => {
             "pace": "C",
             "rwgpsRoute": 201276,
             "rwgpsRouteIsTrip": false,
-            "start": DateTime.fromISO("2018-07-31T14:00:00.981Z"),
+            "start": DateTime.fromISO("2025-07-31T14:00:00.981Z"),
             "stopAfterLoad": false,
-            "initialStart": DateTime.fromISO("2018-07-31T14:00:00.981Z"),
+            "initialStart": DateTime.fromISO("2025-07-31T14:00:00.981Z"),
             "loadingSource": null,
             "succeeded": null
         };
         expect(routeParams( routeParamsState,
             {
                 type:SET_START_TIME,
-                start:DateTime.fromISO('2018-08-01T15:00:00.000Z')
+                start:DateTime.fromISO('2025-08-01T15:00:00.000Z')
         })).toEqual(
             {
                 "canForecastPast":false,
@@ -56,9 +56,9 @@ describe('route params reducer', () => {
                 "pace": "C",
                 "rwgpsRoute": 201276,
                 "rwgpsRouteIsTrip": false,
-                "start": DateTime.fromISO('2018-08-01T15:00:00.000Z'),
+                "start": DateTime.fromISO('2025-08-01T15:00:00.000Z'),
                 "stopAfterLoad": false,
-                "initialStart": DateTime.fromISO('2018-07-31T14:00:00.981Z'),
+                "initialStart": DateTime.fromISO('2025-07-31T14:00:00.981Z'),
                 "loadingSource": null,
                 "succeeded": null
             }
@@ -71,7 +71,7 @@ describe('route params reducer', () => {
             "pace": "C",
             "rwgpsRoute": 201276,
             "rwgpsRouteIsTrip": false,
-            "start": "2018-07-31T14:00:00.981Z",
+            "start": "2025-07-31T14:00:00.981Z",
             "stopAfterLoad": false,
             "loadingSource": null,
             "succeeded": null
@@ -86,7 +86,7 @@ describe('route params reducer', () => {
                 "pace": "C",
                 "rwgpsRoute": 201276,
                 "rwgpsRouteIsTrip": false,
-                "start":'2018-07-31T14:00:00.981Z',
+                "start":'2025-07-31T14:00:00.981Z',
                 "stopAfterLoad": false,
                 "loadingSource": null,
                 "succeeded": null
