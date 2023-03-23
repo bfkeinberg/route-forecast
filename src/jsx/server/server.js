@@ -317,7 +317,7 @@ app.post('/forecast', upload.none(), async (req, res) => {
         }
         res.status(200).json({ 'forecast': results });
     } catch (error) {
-        res.status(500).json({ 'details': `Error calling weather service : ${error}` });
+        res.status(500).json({ 'details': `Error calling weather service : ${JSON.stringify(error)}` });
     }
 });
 

@@ -21,12 +21,20 @@ const initialStartTime = function() {
 };
 
 export const providerValues = {
-    darksky:{min_interval:0.25,max_days:14, canForecastPast:true, name:"Dark Sky"},
+    // darksky:{min_interval:0.25,max_days:14, canForecastPast:true, name:"Dark Sky"},
     climacell:{min_interval:0.25,max_days:4, canForecastPast:false, name:"Tomorrow.io"},
     weatherapi:{min_interval:1,max_days:10, canForecastPast:true, name:"WeatherAPI"},
     // visualcrossing:{min_interval:0.25,max_days:14, canForecastPast:true, name:"Visual Crossing"},
     nws:{min_interval:1,max_days:3, canForecastPast:false, name:"National Weather Service"}
     };
+
+    const checkedStartDate = (startDate, canForecastPast) => {
+        if (canForecastPast) return startDate;
+        if (startDate < DateTime.now()) {
+            return DateTime.now().plus({hours:1});
+        }
+        return startDate;
+    }
 
 // eslint-disable-next-line complexity
 export const routeParams = function(state = {
@@ -67,7 +75,7 @@ export const routeParams = function(state = {
                 if (!start.isValid) {
                     return state;
                 } else {
-                    return {...state, start: start, stopAfterLoad: false};
+                    return {...state, start: checkedStartDate(start, state.canForecastPast), stopAfterLoad: false};
                 }
             } else {
                 return state;
@@ -78,7 +86,7 @@ export const routeParams = function(state = {
                 if (!start.isValid) {
                     return state;
                 } else {
-                    return {...state, start: start, initialStart: start};
+                    return {...state, start: checkedStartDate(start, state.canForecastPast), initialStart: start};
                 }
             } else {
                 return state;
@@ -89,7 +97,7 @@ export const routeParams = function(state = {
                 if (!start.isValid) {
                     return state;
                 } else {
-                    return {...state, start: start, initialStart: start};
+                    return {...state, start: checkedStartDate(start, state.canForecastPast), initialStart: start};
                 }
             } else {
                 return state;
