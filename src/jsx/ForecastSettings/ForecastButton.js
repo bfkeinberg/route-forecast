@@ -54,7 +54,7 @@ const mapStateToProps = (state) =>
         // can't request a forecast without a route loaded
         submitDisabled: state.uiInfo.routeParams.rwgpsRoute === '' && state.routeInfo.gpxRouteData === null,
         routeInfo: state.routeInfo,
-        queryString: state.controls.queryString
+        queryString: state.params.queryString
     });
 
 const mapDispatchToProps = {

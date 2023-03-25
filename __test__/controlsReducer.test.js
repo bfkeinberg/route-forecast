@@ -15,7 +15,7 @@ describe('controls reducer', () => {
         expect(controls(undefined,{})).toEqual(
             {
                 metric:false,displayBanked:false,
-                userControlPoints:[], queryString:null,
+                userControlPoints:[],
                 showWeatherProvider:false,displayControlTableUI: false
             }
         );
@@ -36,8 +36,7 @@ describe('controls reducer', () => {
                     }
                 ],
                 metric:false,
-                displayBanked:false,
-                queryString:null
+                displayBanked:false
             },
             {
                 type:UPDATE_USER_CONTROLS,
@@ -68,8 +67,7 @@ describe('controls reducer', () => {
                     }
                 ],
                 metric:false,
-                displayBanked:false,
-                queryString:null
+                displayBanked:false
             }
         )
     });

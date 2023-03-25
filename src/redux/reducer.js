@@ -25,7 +25,8 @@ export const providerValues = {
     climacell:{min_interval:0.25,max_days:4, canForecastPast:false, name:"Tomorrow.io"},
     weatherapi:{min_interval:1,max_days:10, canForecastPast:true, name:"WeatherAPI"},
     // visualcrossing:{min_interval:0.25,max_days:14, canForecastPast:true, name:"Visual Crossing"},
-    nws:{min_interval:1,max_days:3, canForecastPast:false, name:"National Weather Service"}
+    nws:{min_interval:1,max_days:3, canForecastPast:false, name:"National Weather Service"},
+    meteomatics:{min_interval:1,max_days:10,canForecastPast:false,name:"Meteomatics"}
     };
 
     const checkedStartDate = (startDate, canForecastPast) => {
@@ -212,7 +213,6 @@ export const controls = function (state = {
     metric: false,
     displayBanked: false,
     userControlPoints: [],
-    queryString: null,
     showWeatherProvider: false,
     displayControlTableUI: false,
     }, action) {
@@ -229,11 +229,6 @@ export const controls = function (state = {
             return {...state, displayBanked: !state.displayBanked};
         case Actions.UPDATE_USER_CONTROLS:
             return {...state, userControlPoints: action.controls};
-        case Actions.SET_QUERY:
-            // here because it encodes the user entered controls
-            return {...state, queryString:action.queryString};
-        case Actions.CLEAR_QUERY:
-            return {...state, queryString:null};
         case Actions.SET_SHOW_WEATHER_PROVIDER:
             return {...state, showWeatherProvider:action.showProvider};
         case Actions.SET_DISPLAY_CONTROL_TABLE_UI:
@@ -398,12 +393,17 @@ const forecast = function(state = {
     }
 };
 
-const params = function(state = {}, action) {
+const params = function (state = {queryString: null}, action) {
     switch (action.type) {
         case Actions.SET_ACTION_URL:
-            return {...state, action: action.action};
+            return { ...state, action: action.action };
         case Actions.SET_API_KEYS:
-            return {...state, maps_api_key: action.mapsKey, timezone_api_key:action.timezoneKey, bitly_token: action.bitlyToken};
+            return { ...state, maps_api_key: action.mapsKey, timezone_api_key: action.timezoneKey, bitly_token: action.bitlyToken };
+        case Actions.SET_QUERY:
+            // here because it encodes the user entered controls
+            return { ...state, queryString: action.queryString };
+        case Actions.CLEAR_QUERY:
+            return { ...state, queryString: null };
         default:
             return state;
     }

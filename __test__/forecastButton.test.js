@@ -21,7 +21,7 @@ configure({ adapter: new Adapter() });
 const dir = process.cwd();
 const routeInfo = require(`${dir}/__test__/routeInfo.json`);
 const initialState = {routeInfo:routeInfo,
-    controls: {
+    params: {
         "queryString":"foo"
     },
     uiInfo:{
