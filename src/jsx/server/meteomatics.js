@@ -11,8 +11,8 @@ const axiosConfig = {
     }
 }
 
-const getForecastUrl = (lat, lon) => {
-    const url = `https://api.meteomatics.com/2023-03-25T11:15:00.000-07:00/t_2m:F,wind_speed_FL10:mph,wind_dir_FL10:d,wind_gusts_10m_1h:mph,prob_precip_1h:p,low_cloud_cover_10y_mean:p,t_apparent:F,weather_code_1h:idx,weather_symbol_20min:idx/${lat},${lon}/json?model=mix`;
+const getForecastUrl = (lat, lon, time) => {
+    const url = `https://api.meteomatics.com/${time}/t_2m:F,wind_speed_FL10:mph,wind_dir_FL10:d,wind_gusts_10m_1h:mph,prob_precip_1h:p,low_cloud_cover_10y_mean:p,t_apparent:F,weather_code_1h:idx,weather_symbol_20min:idx/${lat},${lon}/json?model=mix`;
     return url;
 }
 
@@ -38,8 +38,6 @@ const extractForecast = (forecastGridData) => {
     }
 };
 
-const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
-
 const get_API_usage = async () => {
     const usageData = await axios.get("https://api.meteomatics.com/user_stats_json", axiosConfig).catch(
         error => {console.error(`Failed to get Meteomatics usage ${error}}`);return 0}
@@ -51,27 +49,20 @@ const get_API_usage = async () => {
 }
 
 const getForecastFromMeteomatics = async (forecastUrl) => {
-    const MAX_API_CALLS_PER_DAY = 800;
-    let timeout = 200;
+    const MAX_API_CALLS_PER_DAY = 850;
     const usage = await get_API_usage();
     console.log(`Meteomatics API usage ${usage}`);
     if (usage > MAX_API_CALLS_PER_DAY) {
         throw Error({'details':'Daily count exceeded'});
     }
-    do {
-        // eslint-disable-next-line no-await-in-loop
-        const forecastGridData = await axios.get(forecastUrl, axiosConfig).catch(
-            error => {console.error(`Failed to get Meteomatics forecast from ${forecastUrl}:${JSON.stringify(error.response.data)}`)});
-        if (forecastGridData !== undefined) {
-            if (forecastGridData.data !== undefined && forecastGridData.data.status === "OK") {
-                return forecastGridData.data;
-            }
-            throw Error(forecastGridData.data!==undefined?forecastGridData.data.messsage:`Failed to get Meteomatics forecast from ${forecastUrl}`);
+    const forecastGridData = await axios.get(forecastUrl, axiosConfig).catch(
+        error => {console.error(`Failed to get Meteomatics forecast from ${forecastUrl}:${JSON.stringify(error.response.data)}`);throw Error(JSON.stringify(error.response.data))});
+    if (forecastGridData !== undefined) {
+        if (forecastGridData.data !== undefined && forecastGridData.data.status === "OK") {
+            return forecastGridData.data;
         }
-        // eslint-disable-next-line no-await-in-loop
-        await sleep(timeout);
-        timeout += 100;
-    } while (timeout < 1000);
+        throw Error(forecastGridData.data!==undefined?forecastGridData.data.messsage:`Failed to get Meteomatics forecast from ${forecastUrl}`);
+    }
     throw Error(`Failed to get Meteomatics forecast from ${forecastUrl}`);
 };
 /* eslint-disable max-params */
@@ -89,9 +80,9 @@ const getForecastFromMeteomatics = async (forecastUrl) => {
  * vectorBearing: *, gust: string} | never>} a promise to evaluate to get the forecast results
  */
 const callMeteomatics = async function (lat, lon, currentTime, distance, zone, bearing, getBearingDifference) {
-    const forecastUrl = await getForecastUrl(lat, lon);
-    const forecastGridData = await getForecastFromMeteomatics(forecastUrl);
     const startTime = DateTime.fromISO(currentTime, {zone:zone});
+    const forecastUrl = await getForecastUrl(lat, lon, startTime);
+    const forecastGridData = await getForecastFromMeteomatics(forecastUrl);
     const forecastValues = extractForecast(forecastGridData.data);
     const rainy = forecastValues.precipitationProbability > 30;
     return new Promise((resolve) => {resolve({
