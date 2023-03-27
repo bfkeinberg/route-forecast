@@ -43,10 +43,18 @@ const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
 const getForecastFromNws = async (forecastUrl) => {
     let timeout = 200;
+    let lastError = "";
     do {
         // eslint-disable-next-line no-await-in-loop
         const forecastGridData = await axios.get(forecastUrl).catch(
-            error => {console.error(`Failed to get NWS forecast from ${forecastUrl}:${JSON.stringify(error.response.data)}`)});
+            error => {
+                try {
+                    lastError = JSON.stringify(error.response.data);
+                } catch (error) {
+                    lastError = "Error serializing NWS failure message";
+                }
+            }
+        );
         if (forecastGridData !== undefined) {
             return forecastGridData;
         }
@@ -54,7 +62,7 @@ const getForecastFromNws = async (forecastUrl) => {
         await sleep(timeout);
         timeout += 100;
     } while (timeout < 1000);
-    throw Error(`Failed to get NWS forecast from ${forecastUrl}`);
+    throw Error(`Failed to get NWS forecast from ${forecastUrl}:${lastError}`);
 };
 /* eslint-disable max-params, max-lines-per-function */
 /**
