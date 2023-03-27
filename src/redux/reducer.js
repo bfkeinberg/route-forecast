@@ -26,7 +26,7 @@ export const providerValues = {
     weatherapi:{min_interval:1,max_days:10, canForecastPast:true, name:"WeatherAPI"},
     // visualcrossing:{min_interval:0.25,max_days:14, canForecastPast:true, name:"Visual Crossing"},
     nws:{min_interval:1,max_days:3, canForecastPast:false, name:"National Weather Service"},
-    meteomatics:{min_interval:1,max_days:10,canForecastPast:false,name:"Meteomatics"}
+    meteomatics:{min_interval:1,max_days:10,canForecastPast:true,name:"Meteomatics"}
     };
 
     const checkedStartDate = (startDate, canForecastPast) => {
