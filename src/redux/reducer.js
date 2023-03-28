@@ -25,7 +25,7 @@ export const providerValues = {
     climacell:{min_interval:0.25,max_days:4, canForecastPast:false, name:"Tomorrow.io"},
     weatherapi:{min_interval:1,max_days:10, canForecastPast:true, name:"WeatherAPI"},
     // visualcrossing:{min_interval:0.25,max_days:14, canForecastPast:true, name:"Visual Crossing"},
-    nws:{min_interval:1,max_days:3, canForecastPast:false, name:"National Weather Service"},
+    nws:{min_interval:1,max_days:7, canForecastPast:false, name:"National Weather Service"},
     meteomatics:{min_interval:1,max_days:10,canForecastPast:true,name:"Meteomatics"}
     };
 
