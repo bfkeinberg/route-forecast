@@ -225,7 +225,6 @@ app.use((req, res, next) => {
         host === 'cyclerouteforecast.com') {
         res.status(404).text("Cyclerouteforecast.com has been deprecated, use www.randoplan.com instead");
     }
-    // logger.info(`Host is ${host}; original host is ${req.header?req.header('host'):'[unknown]'}`);
     if (host === 'route-forecast.ue.r.appspot.com' ||
         host === 'route-forecast.appspot.com' || host === 'randoplan.com') {
         logger.info(`Redirected ${host} to www.randoplan.com`);
@@ -240,6 +239,7 @@ app.get('/rwgps_route', (req, res) => {
         res.status(400).json("{'status': 'Missing route number'}");
         return;
     }
+    console.log(`request for route ${routeNumber}`);
     const isTrip = req.query.trip === "true";
     const routeType = isTrip === true ? 'trips' : 'routes';
     const rwgpsApiKey = process.env.RWGPS_API_KEY;
@@ -273,7 +273,6 @@ const getAQI = async (result, point) => {
 }
 
 app.post('/forecast', upload.none(), async (req, res) => {
-    // logger.info(`Host is ${req.hostname}; original host is ${req.header?req.header('host'):'[unknown]'}`);
     if (req.body.locations === undefined) {
         res.status(400).json({ 'status': 'Missing location key' });
         return;
@@ -299,7 +298,7 @@ app.post('/forecast', upload.none(), async (req, res) => {
         insertRecord(dbRecord, req.body.routeName);
     }
     const zone = req.body.timezone;
-    const lookupAqi = forecastPoints.length < 22;
+    const lookupAqi = forecastPoints.length < 18;
     try {
         let results = [];
         while (forecastPoints.length > 0) {
@@ -310,6 +309,7 @@ app.post('/forecast', upload.none(), async (req, res) => {
             });
             // we explicitly do not want to parallelize to avoid swamping the servers we are calling and being throttled
             if (lookupAqi) {
+                console.log('waiting for AQI');
                 // eslint-disable-next-line no-await-in-loop
                 await getAQI(result, point);
             }
@@ -519,6 +519,7 @@ app.get('/', (req, res) => {
         'reactDom': '',
         delimiter: '?'
     };
+    console.log(`request ${JSON.stringify(req.query)}`);
     try {
         res.render('index', ejsVariables)
     } catch (err) {

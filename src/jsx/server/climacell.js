@@ -61,11 +61,14 @@ const callClimacell = async function (lat, lon, currentTime, distance, zone, bea
     const url = `https://data.climacell.co/v4/timelines?location=${lat},${lon}&fields=windSpeed,precipitationProbability,windDirection,temperature,temperatureApparent,windGust,cloudCover,precipitationType,weatherCode&timezone=${zone}&startTime=${startTimeString}&endTime=${endTimeString}&timesteps=1h&units=imperial&apikey=${climacellKey}`;
     const forecastResult = fetch(url).then(response => {
         const result = response.json();
+
+/*
         result.apiCalls = response.headers.get('X-RateLimit-Remaining-day');
         result.apiCallsHour = response.headers.get('X-RateLimit-Remaining-hour');
         console.log(`${result.apiCalls}/${response.headers.get('X-RateLimit-Limit-day')} calls for today`);
         console.log(`${response.headers.get('X-RateLimit-Remaining-hour')}/${response.headers.get('X-RateLimit-Limit-hour')} calls remaining this hour`);
-        return result;
+ */        
+    return result;
     }).
     then(forecast => {
         if (forecast.code !== undefined) {
