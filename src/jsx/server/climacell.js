@@ -67,8 +67,8 @@ const callClimacell = async function (lat, lon, currentTime, distance, zone, bea
         result.apiCallsHour = response.headers.get('X-RateLimit-Remaining-hour');
         console.log(`${result.apiCalls}/${response.headers.get('X-RateLimit-Limit-day')} calls for today`);
         console.log(`${response.headers.get('X-RateLimit-Remaining-hour')}/${response.headers.get('X-RateLimit-Limit-hour')} calls remaining this hour`);
- */        
-    return result;
+ */
+        return result;
     }).
     then(forecast => {
         if (forecast.code !== undefined) {
