@@ -22,7 +22,7 @@ describe('route params reducer', () => {
                 start: expect.any(DateTime),
                 stopAfterLoad: expect.any(Boolean),
                 initialStart: expect.any(DateTime),
-                maxDaysInFuture:3,
+                maxDaysInFuture:7,
                 routeLoadingMode: routeLoadingModes.RWGPS
             }
         );
@@ -33,7 +33,7 @@ describe('route params reducer', () => {
             "canForecastPast":false,
             "interval": 1,
             "min_interval":1,
-            "maxDaysInFuture":3,
+            "maxDaysInFuture":7,
             "pace": "C",
             "rwgpsRoute": 201276,
             "rwgpsRouteIsTrip": false,
@@ -52,7 +52,7 @@ describe('route params reducer', () => {
                 "canForecastPast":false,
                 "interval": 1,
                 "min_interval":1,
-                "maxDaysInFuture":3,
+                "maxDaysInFuture":7,
                 "pace": "C",
                 "rwgpsRoute": 201276,
                 "rwgpsRouteIsTrip": false,
