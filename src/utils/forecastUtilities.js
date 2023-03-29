@@ -91,7 +91,16 @@ export const doForecast = async (state, abortSignal) => {
 
   const forecastResults = await doForecastFetch(state.params.action, formdata, abortSignal)
   if (forecastResults.result === "success") {
-      return { result: "success", value: { forecast: forecastResults.value, timeZoneId } }
+      let forecast = { result: "success", value: { forecast: forecastResults.value, timeZoneId } }
+      if (state.forecast.fetchAqi) {
+        const aqiResults = await doForecastFetch("/aqi", formdata, abortSignal)
+        if (aqiResults.result === "success") {
+            for (let indx = 0;indx < forecastResults.value.forecast.length;indx++) {
+                forecastResults.value.forecast[indx].aqi = aqiResults.value.forecast[indx].aqi;
+            }
+        }
+      }
+      return forecast;
   } else {
       if (forecastResults.error === "The user aborted a request.") {
         return { result: "canceled"}

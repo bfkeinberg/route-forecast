@@ -81,6 +81,12 @@ img#bugImage {
     color: #0000EE
 }
 
+.largerClickableHeaderCell {
+    font-size: 100%;
+    width: 90%;
+    color: #0000EE
+}
+
 @keyframes glowing {
     0% {
         box-shadow: 0 0 5px #0000EE;

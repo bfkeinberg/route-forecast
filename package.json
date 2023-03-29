@@ -4,7 +4,7 @@
   "description": "Forecast weather along a route from RideWithGps. Support for others may be added if there is demand",
   "main": "jsx/server/index.js",
   "engines": {
-    "node": "18.x"
+    "node": "19.x"
   },
   "dependencies": {
     "@babel/runtime": "^7.14.0",
@@ -39,7 +39,7 @@
     "isomorphic-fetch": "^3.0.0",
     "jest-environment-jsdom": "^29.0.1",
     "localforage": "^1.10.0",
-    "luxon": "^2.5.2",
+    "luxon": "^3.3.0",
     "moment-timezone": "^0.5.35",
     "multer": "^1.4.5-lts.1",
     "node-fetch": "^2.6.7",

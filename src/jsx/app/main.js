@@ -42,6 +42,7 @@ import {
     setRwgpsToken,
     setUsePinnedRoutes,
     setStopAfterLoad,
+    setFetchAqi
 } from "../../redux/actions";
 import QueryString from './QueryString';
 import { routeLoadingModes } from '../../data/enums';
@@ -96,7 +97,8 @@ export class RouteWeatherUI extends Component {
         setRwgpsToken:PropTypes.func.isRequired,
         setZoomToRange:PropTypes.func.isRequired,
         setUsePinnedRoutes:PropTypes.func.isRequired,
-        setStopAfterLoad:PropTypes.func.isRequired
+        setStopAfterLoad:PropTypes.func.isRequired,
+        setFetchAqi:PropTypes.func
     };
 
     constructor(props) {
@@ -111,6 +113,10 @@ export class RouteWeatherUI extends Component {
         const zoomToRange = loadCookie('zoomToRange');
         if (zoomToRange !== undefined) {
             this.props.setZoomToRange(zoomToRange);
+        }
+        const fetchAqi = loadCookie('fetchAqi');
+        if (fetchAqi !== undefined) {
+            this.props.setFetchAqi(fetchAqi);
         }
         this.state = {};
         if (typeof window !== 'undefined') {
@@ -266,7 +272,7 @@ const mapDispatchToProps = {
     setStravaToken, setActionUrl, setRwgpsRoute, setApiKeys, setStravaError, setInitialStart, setPace, setInterval, setMetric,
     setStravaActivity, updateControls:updateUserControls, setRouteLoadingMode, setStravaRefreshToken,
     loadFromRideWithGps, reset, setWeatherProvider, showWeatherProvider, setRwgpsToken, setStartTimestamp,
-    setZoomToRange, setUsePinnedRoutes, setStopAfterLoad
+    setZoomToRange, setUsePinnedRoutes, setStopAfterLoad, setFetchAqi
 };
 
 const mapStateToProps = (state) =>

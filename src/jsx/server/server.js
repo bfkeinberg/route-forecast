@@ -298,7 +298,6 @@ app.post('/forecast', upload.none(), async (req, res) => {
         insertRecord(dbRecord, req.body.routeName);
     }
     const zone = req.body.timezone;
-    const lookupAqi = forecastPoints.length < 18;
     try {
         let results = [];
         while (forecastPoints.length > 0) {
@@ -308,16 +307,37 @@ app.post('/forecast', upload.none(), async (req, res) => {
                 throw error;
             });
             // we explicitly do not want to parallelize to avoid swamping the servers we are calling and being throttled
-            if (lookupAqi) {
-                console.log('waiting for AQI');
-                // eslint-disable-next-line no-await-in-loop
-                await getAQI(result, point);
-            }
             results.push(result);
         }
         res.status(200).json({ 'forecast': results });
     } catch (error) {
         res.status(500).json({ 'details': `Error calling weather service : ${JSON.stringify(error)}` });
+    }
+});
+
+app.post('/aqi', upload.none(), async (req, res) => {
+    if (req.body.locations === undefined) {
+        res.status(400).json({ 'status': 'Missing location key' });
+        return;
+    }
+    const forecastPoints = JSON.parse(req.body.locations);
+    if (!process.env.NO_LOGGING) {
+        logger.info(`AQI request from ${req.ip} for ${forecastPoints.length} points`);
+    }
+    try {
+        let results = [];
+        while (forecastPoints.length > 0) {
+            let point = forecastPoints.shift();
+            // we explicitly do not want to parallelize to avoid swamping the servers we are calling and being throttled
+            console.log('waiting for AQI');
+            let result = {};
+            // eslint-disable-next-line no-await-in-loop
+            await getAQI(result, point);
+            results.push(result);
+        }
+        res.status(200).json({ 'forecast': results });
+    } catch (error) {
+        res.status(500).json({ 'details': `Error retrieving AQI : ${JSON.stringify(error)}` });
     }
 });
 

@@ -697,8 +697,15 @@ export const SET_MAP_VIEWED = 'SET_MAP_VIEWED';
 export const setMapViewed = () => {return {type:SET_MAP_VIEWED}};
 
 export const SET_WEATHER_PROVIDER = 'SET_WEATHER_PROVIDER';
-export const setWeatherProvider = (weatherProvider) => {return {type:SET_WEATHER_PROVIDER,
+export const setWeatherProviderUnthunky = (weatherProvider) => {return {type:SET_WEATHER_PROVIDER,
     weatherProvider:weatherProvider==='darksky'?'nws':weatherProvider}}
+
+export const setWeatherProvider = (weatherProvider) => {
+    return function(dispatch) {
+        dispatch(setWeatherProviderUnthunky(weatherProvider));
+        dispatch(cancelForecast());
+    }
+}
 
 export const SET_SHOW_WEATHER_PROVIDER = 'SET_SHOW_WEATHER_PROVIDER';
 export const showWeatherProvider = (showProvider) => {return {type:SET_SHOW_WEATHER_PROVIDER, showProvider:showProvider}}
@@ -725,6 +732,16 @@ export const toggleZoomToRange = () => {
 export const SET_ZOOM_TO_RANGE = 'SET_ZOOM_TO_RANGE';
 export const setZoomToRange = (value) => {
         return {type:SET_ZOOM_TO_RANGE, zoom:value};
+}
+
+export const TOGGLE_FETCH_AQI = 'TOGGLE_FETCH_AQI';
+export const toggleFetchAqi = () => {
+        return {type:TOGGLE_FETCH_AQI};
+}
+
+export const SET_FETCH_AQI = 'SET_FETCH_AQI';
+export const setFetchAqi = (value) => {
+        return {type:SET_FETCH_AQI, fetchAqi:value};
 }
 
 export const SET_USE_PINNED_ROUTES = 'SET_USE_PINNED_ROUTES'

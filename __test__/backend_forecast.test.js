@@ -68,8 +68,7 @@ describe("Test forecast", () => {
             "windBearing": 357,
             "vectorBearing": 284.8270466961735,
             "gust": "7",
-            "feel": 79,
-            "aqi": 13
+            "feel": 79
           },
           {
             "time": "12:00PM",
@@ -88,8 +87,7 @@ describe("Test forecast", () => {
             "windBearing": 347,
             "vectorBearing": 304.2881770410651,
             "gust": "9",
-            "feel": 81,
-            "aqi": 10
+            "feel": 81
           },
           {
             "time": "1:00PM",
@@ -108,8 +106,7 @@ describe("Test forecast", () => {
             "windBearing": 319,
             "vectorBearing": 115.59316344832101,
             "gust": "10",
-            "feel": 79,
-            "aqi": 15
+            "feel": 79
           },
           {
             "time": "2:00PM",
@@ -128,8 +125,7 @@ describe("Test forecast", () => {
             "windBearing": 343,
             "vectorBearing": 88.59001156082968,
             "gust": "11",
-            "feel": 86,
-            "aqi": 23
+            "feel": 86
           },
           {
             "time": "2:04PM",
@@ -148,8 +144,7 @@ describe("Test forecast", () => {
             "windBearing": 340,
             "vectorBearing": 88.59001156082968,
             "gust": "11",
-            "feel": 86,
-            "aqi": 15
+            "feel": 86
           }
         ]
       });

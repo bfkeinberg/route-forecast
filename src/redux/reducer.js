@@ -347,7 +347,8 @@ const forecast = function(state = {
     tableViewed: false,
     mapViewed: false,
     weatherProvider: 'nws',
-    zoomToRange: true
+    zoomToRange: true,
+    fetchAqi:false
 }, action) {
     switch (action.type) {
         case Actions.FORECAST_FETCH_SUCCESS:
@@ -388,6 +389,12 @@ const forecast = function(state = {
             return {...state, weatherProvider:action.weatherProvider}
         case Actions.TOGGLE_ZOOM_TO_RANGE:
             return {...state, zoomToRange:!state.zoomToRange}
+        case Actions.SET_ZOOM_TO_RANGE:
+            return {...state, zoomToRange:action.zoom}
+        case Actions.TOGGLE_FETCH_AQI:
+            return {...state, fetchAqi:!state.fetchAqi}
+        case Actions.SET_FETCH_AQI:
+            return {...state, state:state.fetchAqi}
         default:
             return state;
     }
