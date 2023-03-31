@@ -46,7 +46,7 @@ const getTimeZoneId = async (routeInfo, routeStart, timezoneApiKey, type, abortS
 
 const getError = async (response) => {
     try {
-        let details = await response.json();
+        let details = await response.clone().json();
         return details;
     } catch {
         let details = response.text();
