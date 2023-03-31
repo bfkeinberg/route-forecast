@@ -48,20 +48,17 @@ const getForecastFromNws = async (forecastUrl) => {
         // eslint-disable-next-line no-await-in-loop
         const forecastGridData = await axios.get(forecastUrl).catch(
             error => {
-                try {
-                    lastError = JSON.stringify(error.response.data);
-                } catch (error) {
-                    lastError = "Error serializing NWS failure message";
-                }
+                lastError = JSON.stringify(error.response.data);
             }
         );
         if (forecastGridData !== undefined) {
             return forecastGridData;
         }
+        console.log(`no NWS forecast, sleeping ${timeout}ms after ${lastError}`);
         // eslint-disable-next-line no-await-in-loop
         await sleep(timeout);
         timeout += 100;
-    } while (timeout < 1000);
+    } while (timeout < 700);
     throw Error(`Failed to get NWS forecast from ${forecastUrl}:${lastError}`);
 };
 /* eslint-disable max-params, max-lines-per-function */
