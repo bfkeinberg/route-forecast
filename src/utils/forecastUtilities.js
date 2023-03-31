@@ -44,6 +44,16 @@ const getTimeZoneId = async (routeInfo, routeStart, timezoneApiKey, type, abortS
   }
 }
 
+const getError = async (response) => {
+    try {
+        let details = await response.json();
+        return details;
+    } catch {
+        let details = response.text();
+        return {details:details}
+    }
+}
+
 const doForecastFetch = async (path, formData, abortSignal) => {
   try {
       const response = await fetch(path, {
@@ -54,7 +64,7 @@ const doForecastFetch = async (path, formData, abortSignal) => {
       if (response.ok) {
           return { result: "success", value: await response.json() }
       } else {
-          let details = await response.json();
+          let details = await getError(response);
           if (details !== undefined) {
               if (details.details !== undefined) {
                   throw new Error(details.details);
