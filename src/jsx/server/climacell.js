@@ -70,10 +70,14 @@ const callClimacell = async function (lat, lon, currentTime, distance, zone, bea
  */
         return result;
     }).
-    then(forecast => {
+    then(async forecast => {
         if (forecast.code !== undefined) {
             console.error(`got error code ${forecast.code}`);
-            throw forecast.message;
+            if (forecast.code == 429001) {
+                await sleep(500);
+            } else {
+                throw Error({"details":forecast.message});
+            }
         }
         if (forecast.apiCalls < 50) {
             throw Error({'details':'Daily count exceeded'});
@@ -108,11 +112,11 @@ const callClimacell = async function (lat, lon, currentTime, distance, zone, bea
         }
     }).
     catch(error => {
-        console.error('error',JSON.stringify(error));
+        console.error('Tomnorrow.io error',JSON.stringify(error));
         throw Error(error);
     });
 
-    await sleep(300);
+    await sleep(350);
     return forecastResult;
 };
 
