@@ -304,14 +304,14 @@ app.post('/forecast', upload.none(), async (req, res) => {
             let point = forecastPoints.shift();
             // eslint-disable-next-line no-await-in-loop
             const result = await callWeatherService(service, point.lat, point.lon, point.time, point.distance, zone, point.bearing).catch(error => {
-                console.warn('Caught forecast error in server and rethrowing');throw error;
+                throw error;
             });
             // we explicitly do not want to parallelize to avoid swamping the servers we are calling and being throttled
             results.push(result);
         }
         res.status(200).json({ 'forecast': results });
     } catch (error) {
-        res.status(500).json({ 'details': `Error calling weather service : ${JSON.stringify(error)}` });
+        res.status(500).json({ 'details': `Error calling weather service : ${error}` });
     }
 });
 
