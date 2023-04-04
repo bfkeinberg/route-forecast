@@ -240,6 +240,8 @@ export class RouteWeatherUI extends Component {
         }
         if (RouteWeatherUI.hasProvider(queryParams.provider)) {
             props.setWeatherProvider(queryParams.provider);
+        } else {
+            props.setWeatherProvider('weatherapi');
         }
         // make show weather provider "sticky"
         if (queryParams.showProvider !== undefined) {
