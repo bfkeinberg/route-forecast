@@ -12,8 +12,7 @@ const axiosConfig = {
 }
 
 const getForecastUrl = (lat, lon, time) => {
-    const url = `https://api.meteomatics.com/${time}/t_2m:F,wind_speed_FL10:mph,wind_dir_FL10:d,wind_gusts_10m_1h:mph,prob_precip_1h:p,low_cloud_cover_10y_mean:p,t_apparent:F,weather_code_1h:idx,weather_symbol_20min:idx/${lat},${lon}/json?model=mix`;
-    return url;
+    return `https://api.meteomatics.com/${time}/t_2m:F,wind_speed_FL10:mph,wind_dir_FL10:d,wind_gusts_10m_1h:mph,prob_precip_1h:p,low_cloud_cover_10y_mean:p,t_apparent:F,weather_code_1h:idx,weather_symbol_20min:idx/${lat},${lon}/json?model=mix`;
 }
 
 const extractForecast = (forecastGridData) => {
@@ -49,7 +48,7 @@ const get_API_usage = async () => {
 }
 
 const getForecastFromMeteomatics = async (forecastUrl) => {
-    const MAX_API_CALLS_PER_DAY = 900;
+    const MAX_API_CALLS_PER_DAY = 950;
     const usage = await get_API_usage();
     console.log(`Meteomatics API usage ${usage}`);
     if (usage > MAX_API_CALLS_PER_DAY) {
