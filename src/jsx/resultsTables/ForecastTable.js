@@ -106,9 +106,9 @@ export class ForecastTable extends Component {
                     return <a tabIndex='-1' href="https://www.tomorrow.io/"><img src={climacell} width={166} height={19}/></a>;
                 case 'weatherapi':
                     return <a href="https://www.weatherapi.com/" title="Free Weather API"><img src='//cdn.weatherapi.com/v4/images/weatherapi_logo.png' alt="Weather data by WeatherAPI.com" border="0"/></a>;
-                // case 'visualcrossing':
+                case 'visualcrossing':
                 //    return <a href="https://www.visualcrossing.com/weather-data"><img src={visualcrossing}/></a>;
-                    // return <div><a href="https://www.visualcrossing.com/weather-data">Powered by Visual Crossing Weather</a><p/></div>;
+                    return <div><a href="https://www.visualcrossing.com/weather-data">Powered by Visual Crossing Weather</a><p/></div>;
                 case 'nws':
                     return <img src={"https://www.weather.gov/images/gjt/newsletter/NWSLogo.png"} width={100} height={100}/>;
                 case 'meteomatics':
