@@ -49,11 +49,11 @@ const get_API_usage = async () => {
 }
 
 const getForecastFromMeteomatics = async (forecastUrl) => {
-    const MAX_API_CALLS_PER_DAY = 850;
+    const MAX_API_CALLS_PER_DAY = 900;
     const usage = await get_API_usage();
     console.log(`Meteomatics API usage ${usage}`);
     if (usage > MAX_API_CALLS_PER_DAY) {
-        throw Error({'details':'Daily count exceeded'});
+        throw Error(`Daily count exceeded - ${usage} > ${MAX_API_CALLS_PER_DAY}`);
     }
     const forecastGridData = await axios.get(forecastUrl, axiosConfig).catch(
         error => {console.error(`Failed to get Meteomatics forecast from ${forecastUrl}:${JSON.stringify(error.response.data)}`);throw Error(JSON.stringify(error.response.data))});
