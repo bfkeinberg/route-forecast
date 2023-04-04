@@ -22,17 +22,18 @@ const initialStartTime = function() {
 
 export const providerValues = {
     // darksky:{min_interval:0.25,max_days:14, canForecastPast:true, name:"Dark Sky"},
-    climacell:{min_interval:0.25,max_days:4, canForecastPast:false, name:"Tomorrow.io"},
-    weatherapi:{min_interval:1,max_days:10, canForecastPast:true, name:"WeatherAPI"},
-    visualcrossing:{min_interval:0.25,max_days:14, canForecastPast:true, name:"Visual Crossing"},
-    nws:{min_interval:1,max_days:7, canForecastPast:false, name:"National Weather Service"},
-    meteomatics:{min_interval:1,max_days:10,canForecastPast:true,name:"Meteomatics"}
+    climacell:{min_interval:0.25,max_days:4, canForecastPast:false, daysInPast:1, name:"Tomorrow.io"},
+    weatherapi:{min_interval:1,max_days:10, canForecastPast:true, daysInPast:4, name:"WeatherAPI"},
+    visualcrossing:{min_interval:0.25,max_days:14, canForecastPast:true, daysInPast:4, name:"Visual Crossing"},
+    nws:{min_interval:1,max_days:7, canForecastPast:false, daysInPast:0, name:"National Weather Service"},
+    meteomatics:{min_interval:1,max_days:10,canForecastPast:true, daysInPast:1, name:"Meteomatics"}
     };
 
     const checkedStartDate = (startDate, canForecastPast) => {
         if (canForecastPast) return startDate;
-        if (startDate < DateTime.now()) {
-            return DateTime.now().plus({hours:1});
+        const now = DateTime.now();
+        if (startDate < now) {
+            return startDate.set({day:now.day}).plus({days:1});
         }
         return startDate;
     }
@@ -53,12 +54,15 @@ export const routeParams = function(state = {
 }, action) {
     switch (action.type) {
         case Actions.SET_STOP_AFTER_LOAD:
-            return {...state, stopAfterLoad:action.value==="true"};
+            return { ...state, stopAfterLoad: action.value === "true" };
         case Actions.SET_WEATHER_PROVIDER:
-            return {...state, interval:Math.max(state.interval,providerValues[action.weatherProvider].min_interval),
-                min_interval:providerValues[action.weatherProvider].min_interval,
-                maxDaysInFuture:providerValues[action.weatherProvider].max_days,
-            canForecastPast:providerValues[action.weatherProvider].canForecastPast}
+            return {
+                ...state, interval: Math.max(state.interval, providerValues[action.weatherProvider].min_interval),
+                min_interval: providerValues[action.weatherProvider].min_interval,
+                maxDaysInFuture: providerValues[action.weatherProvider].max_days,
+                canForecastPast: providerValues[action.weatherProvider].canForecastPast,
+                start: checkedStartDate(state.start, state.canForecastPast)
+            }
         case Actions.SET_RWGPS_ROUTE:
             if (action.route !== undefined) {
                 let route = getRouteNumberFromValue(action.route);
