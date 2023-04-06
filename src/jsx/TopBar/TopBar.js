@@ -3,7 +3,7 @@ import DonationRequest from "./DonationRequest";
 import BugReportButton from "./BugReportButton";
 import ShortUrl from "./ShortUrl";
 import "./TopBar.css"
-import { usePreviousPersistent, useReusableDelay, useValueHasChanged } from "../../utils/hooks";
+import { usePreviousPersistent, useReusableDelay, useValueHasChanged, useForecastDependentValues } from "../../utils/hooks";
 import { useLoadingFromURLStatus } from "../DesktopUI";
 import { useMediaQuery } from "react-responsive";
 import PropTypes from 'prop-types';
@@ -11,6 +11,9 @@ import { RouteTitle } from "../shared/RouteTitle";
 export const TopBar = ({sidePaneOptions, activeSidePane, setActiveSidePane, sidebarWidth, panesVisible}) => {
   const smallScreen = useMediaQuery({ query: '(max-width: 900px)' })
   const roomFortitle = useMediaQuery({ query: '(min-width: 1100px)' });
+  const { finishTime: predictedFinishTime } = useForecastDependentValues();
+  const predictedFinishTimeExists = predictedFinishTime !== null;
+
   return (
     <div style={{display: "flex"}}>
       <Tabs
@@ -22,6 +25,7 @@ export const TopBar = ({sidePaneOptions, activeSidePane, setActiveSidePane, side
       />
       <div style={{display: "flex", flexGrow: 1, alignItems: "center", padding: "0px 20px", borderWidth: "0px 0px 0px 1px", borderStyle: "solid", borderColor: "grey"}}>
         {roomFortitle && <RouteTitle/>}
+        {predictedFinishTimeExists && <div style={{flexGrow: 1, fontStyle: "oblique", color: "rgba(64, 111, 140, 0.87)", fontSize: "20px", height: "60px", textAlign: "right"}}>{predictedFinishTime}</div>}
         <div style={{flexGrow: 1, display: "flex", justifyContent: "flex-end", alignItems: "center"}}>
           <ShortUrl/>
           <DonationRequest wacky/>
