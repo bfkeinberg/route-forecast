@@ -388,7 +388,7 @@ class AnalyzeRoute {
                     }
                     let effectiveSpeed = baseSpeed;
                     if (totalDistanceInKm > 0) {
-                        effectiveSpeed = AnalyzeRoute.getHilliness(accumulatedClimbMeters** 3.2808, totalDistanceInKm*kmToMiles, baseSpeed);
+                        effectiveSpeed = AnalyzeRoute.getHilliness(accumulatedClimbMeters* 3.2808, totalDistanceInKm*kmToMiles, baseSpeed);
                     }
                     const power = getPowerOrVelocity(deltas.distance, Math.abs(previousPoint.elevation-currentPoint.elevation)/2,
                         grade, 0, undefined, effectiveSpeed);
