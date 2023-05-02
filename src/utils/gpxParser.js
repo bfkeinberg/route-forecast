@@ -181,8 +181,11 @@ class AnalyzeRoute {
                     previousAccumulatedTime
                 );
             }
-            idlingTime += checkAndUpdateControls(accumulatedDistanceKm, startTime, (accumulatedTime + idlingTime),
+            // can't repro issue with NaN passed into this method so just check for it preventively
+            if (!isNaN(accumulatedTime) && !isNaN(idlingTime)) {
+                idlingTime += checkAndUpdateControls(accumulatedDistanceKm, startTime, (accumulatedTime + idlingTime),
                 controls, calculatedValues, point);
+            }
             // see if it's time for forecast
             if (((accumulatedTime + idlingTime) - lastTime) >= intervalInHours) {
                 forecastRequests.push(AnalyzeRoute.addToForecast(point, startTime, (accumulatedTime + idlingTime),
