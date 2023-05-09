@@ -206,6 +206,7 @@ class StravaRouteParser {
         let params = queryString.parse(location.search);
         params['strava_activity'] = activityId;
         params['strava_analysis'] = true;
+        console.log(JSON.stringify(params));
         window.location.href = '/stravaAuthReq?state=' + JSON.stringify(params);
     }
 }

@@ -475,6 +475,8 @@ app.get('/stravaAuthReq', (req, res) => {
         return;
     }
     try {
+        console.log(`state:${state}`);
+        console.log(`decoded:${decodeURIComponent(state)}`);
         let restoredState = JSON.parse(decodeURIComponent(state));
         insertFeatureRecord({
             timestamp: new Date(),
