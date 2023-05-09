@@ -616,8 +616,14 @@ const refreshOldToken = (dispatch, getState) => {
                     return response.json();
                 }
             }).then(response => {
-                dispatch(setStravaToken(response.access_token, response.expires_at));
-                resolve(response.access_token);
+                if (response === undefined) {
+                    dispatch(setStravaError(Error("Received undefined response from Strava auth service")));
+                    reject(Error("Received undefined response from Strava auth service"));
+                }
+                else {
+                    dispatch(setStravaToken(response.access_token, response.expires_at));
+                    resolve(response.access_token);
+                }
             }, error => {
                 dispatch(setStravaError(error));
                 reject(error);
