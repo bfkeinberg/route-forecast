@@ -475,9 +475,7 @@ app.get('/stravaAuthReq', (req, res) => {
         return;
     }
     try {
-        console.log(`state:${state}`);
-        console.log(`decoded:${decodeURIComponent(state)}`);
-        let restoredState = JSON.parse(decodeURIComponent(state));
+        let restoredState = JSON.parse(decodeURIComponent(state.replace(/\+/g, " ")));
         insertFeatureRecord({
             timestamp: new Date(),
             routeNumber: restoredState.rwgpsRoute === undefined ? null : restoredState.rwgpsRoute
@@ -485,6 +483,7 @@ app.get('/stravaAuthReq', (req, res) => {
             "strava");
     } catch (error) {
         res.status(400).json({'status':`${error} : Invalid OAuth state ${state}`});
+        return;
     }
     const baseUrl = url.format({
         protocol: req.protocol,
