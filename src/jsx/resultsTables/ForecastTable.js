@@ -19,6 +19,7 @@ import { ToggleButton } from '../shared/ToggleButton';
 import { WeatherCorrections } from './WeatherCorrections';
 import { milesToMeters } from '../../utils/util';
 import { useForecastDependentValues, useFormatSpeed } from '../../utils/hooks';
+import { InstallExtensionButton } from "../InstallExtensionButton";
 
 export class ForecastTable extends Component {
     static propTypes = {
@@ -164,6 +165,7 @@ export class ForecastTable extends Component {
 
         return (
             <div className="animated slideInLeft">
+<InstallExtensionButton/>
             <MediaQuery maxWidth={500}>
                 <h2>{this.props.routeName}</h2>
             </MediaQuery>

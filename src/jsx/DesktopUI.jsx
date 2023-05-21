@@ -56,7 +56,7 @@ const DesktopUI = ({mapsApiKey}) => {
 
     return (
         <div>
-            <InstallExtensionButton/>
+            {!mapDataExists ? <InstallExtensionButton/>:null}
             <TopBar
                 sidePaneOptions={sidePaneOptions.map(({title}) => title)}
                 activeSidePane={activeSidePane}
