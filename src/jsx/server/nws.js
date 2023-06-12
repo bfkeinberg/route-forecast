@@ -5,7 +5,7 @@ const milesToMeters = 1609.34;
 const getForecastUrl = async (lat, lon) => {
     const url = `https://api.weather.gov/points/${lat},${lon}`;
     const gridResult = await axios.get(url).catch(
-        error => {throw error.response.data});
+        error => {throw error.response.data.detail});
     return gridResult.data.properties.forecastGridData;
 }
 
@@ -59,6 +59,7 @@ const getForecastFromNws = async (forecastUrl) => {
         await sleep(timeout);
         timeout += 100;
     } while (timeout < 700);
+    console.log(lastError);
     throw Error(`Failed to get NWS forecast from ${forecastUrl}:${lastError}`);
 };
 /* eslint-disable max-params, max-lines-per-function */
