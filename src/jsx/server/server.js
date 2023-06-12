@@ -285,7 +285,7 @@ app.post('/forecast', upload.none(), async (req, res) => {
     if (!process.env.NO_LOGGING) {
         logger.info(`Request from ${req.ip} for ${forecastPoints.length} forecast points`);
     }
-    if (forecastPoints.length > 75) {
+    if (forecastPoints.length > 120) {
         res.status(400).json({ 'details': 'Invalid request, increase forecast time interval' });
         return;
     }
