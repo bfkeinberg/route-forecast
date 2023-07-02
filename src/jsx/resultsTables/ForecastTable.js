@@ -123,13 +123,12 @@ export class ForecastTable extends Component {
             return (
                 <tbody>
                 {forecast.map((point,index) =>
-                    /*<tr key={Math.random().toString(36).slice(2)}>*/
                     <tr key={point.time+Math.random().toString(10)}
                         start={point.distance*milesToMeters}
                         end={index!==forecast.length-1?forecast[index+1].distance*milesToMeters:null}
                         className={this.state.selectedRow===parseInt(point.distance*milesToMeters)?'highlighted':null}
                         onClick={this.toggleRange} onMouseEnter={this.updateWeatherRange}>
-                        <td><Time time={index === forecast.length ? null : point.time}/></td>
+                        <td><Time time={index === forecast.length-1 ? null : point.time}/></td>
                         <td>{metric ? ((point.distance*milesToMeters)/1000).toFixed(0) : point.distance}</td>
                         <td>{point.summary}</td>
                         <td>{this.state.showApparentTemp?
