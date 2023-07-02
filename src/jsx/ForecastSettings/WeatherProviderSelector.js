@@ -6,6 +6,7 @@ import {connect} from 'react-redux';
 import {setWeatherProvider} from "../../redux/actions";
 import {providerValues} from "../../redux/reducer";
 import PropTypes from 'prop-types';
+import { getForecastRequestLength } from '../../utils/forecastUtilities';
 
 const renderProvider = (provider, { handleClick, modifiers }) => {
     if (!modifiers.matchesPredicate) {
@@ -21,13 +22,13 @@ const renderProvider = (provider, { handleClick, modifiers }) => {
     );
 };
 
-const WeatherProviderSelector = ({weatherProvider,setWeatherProvider}) => {
+const WeatherProviderSelector = ({weatherProvider,setWeatherProvider,forecastLength}) => {
     return (
         <FormGroup>
             <DesktopTooltip content={"The weather provider to use for forecasts"} placement={"bottom"}>
                 <Select tabIndex="0"
                     id='provider'
-                    items={Object.entries(providerValues).map(element => { return { key: element[0], ...element[1] } })}
+                    items={Object.entries(providerValues).filter(entry => entry[1].maxCallsPerHour===undefined||entry[1].maxCallsPerHour>forecastLength).map(element => { return { key: element[0], ...element[1] } })}
                     itemsEqual={"name"}
                     itemRenderer={renderProvider}
                     filterable={false}
@@ -44,12 +45,14 @@ const WeatherProviderSelector = ({weatherProvider,setWeatherProvider}) => {
 
 WeatherProviderSelector.propTypes = {
     weatherProvider:PropTypes.string.isRequired,
-    setWeatherProvider:PropTypes.func.isRequired
+    setWeatherProvider:PropTypes.func.isRequired,
+    forecastLength:PropTypes.number.isRequired
 };
 
 const mapStateToProps = (state) =>
     ({
-        weatherProvider: state.forecast.weatherProvider
+        weatherProvider: state.forecast.weatherProvider,
+        forecastLength: getForecastRequestLength(state)
     });
 
 const mapDispatchToProps = {

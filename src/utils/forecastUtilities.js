@@ -81,6 +81,15 @@ const doForecastFetch = async (path, formData, abortSignal) => {
   }
 }
 
+export const getForecastRequestLength = (state) => {
+    const type = "rwgps";
+    const timeZoneId = "US/LosAngeles";
+    const parsedRouteInfo = getRouteInfo(state, type, timeZoneId)
+
+    const { forecastRequest} = parsedRouteInfo
+    return forecastRequest !== undefined ? forecastRequest.length : 0;
+}
+
 export const doForecast = async (state, abortSignal) => {
   const type = state.routeInfo.rwgpsRouteData !== null ? "rwgps" : "gpx"
   const {result, value, error} = await getTimeZoneId(state.routeInfo, state.uiInfo.routeParams.start, state.params.timezone_api_key, type, abortSignal)

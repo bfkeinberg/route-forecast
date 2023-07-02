@@ -22,7 +22,7 @@ const initialStartTime = function() {
 
 export const providerValues = {
     // darksky:{min_interval:0.25,max_days:14, canForecastPast:true, name:"Dark Sky"},
-    climacell:{min_interval:0.25,max_days:4, canForecastPast:false, daysInPast:1, name:"Tomorrow.io"},
+    climacell:{min_interval:0.25,max_days:4, canForecastPast:false, daysInPast:1, name:"Tomorrow.io", maxCallsPerHour:25},
     weatherapi:{min_interval:1,max_days:10, canForecastPast:true, daysInPast:4, name:"WeatherAPI"},
     visualcrossing:{min_interval:0.25,max_days:14, canForecastPast:true, daysInPast:4, name:"Visual Crossing"},
     nws:{min_interval:1,max_days:7, canForecastPast:false, daysInPast:0, name:"National Weather Service"}
