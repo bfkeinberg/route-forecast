@@ -4,7 +4,7 @@ const webpack = require('webpack');
 //const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 const CompressionPlugin = require("compression-webpack-plugin");
 const TerserPlugin = require('terser-webpack-plugin');
-const SentryCliPlugin = require('@sentry/webpack-plugin');
+const { SentryCliPlugin } = require('@sentry/webpack-plugin');
 const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
 const zlib = require("zlib");
 
