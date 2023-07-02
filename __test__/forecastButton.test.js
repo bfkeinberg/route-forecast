@@ -56,7 +56,7 @@ describe('<ForecastButton />', () => {
         const wrapper = mount(<Provider store={store}><ResponsiveContext.Provider value={{ width: 500, deviceWidth:500 }}>
             <ForecastButton/></ResponsiveContext.Provider></Provider>);
         expect(wrapper.find(Button).length).toBe(1);
-        expect(wrapper.find(Button).getDOMNode().getAttribute("class")).toMatch("bp4-button");
+        expect(wrapper.find(Button).getDOMNode().getAttribute("class")).toMatch("bp5-button bp5-fill bp5-small bp5-intent-primary");
     });
 });
 
@@ -67,7 +67,7 @@ describe('<ForecastButton large/>', () => {
         document.body.appendChild(div);
         const wrapper = mount(<Provider store={store}><ResponsiveContext.Provider value={{ width: 1000, deviceWidth:1000 }}>
             <ForecastButton/></ResponsiveContext.Provider></Provider>);
-        expect(wrapper.find(Button).getDOMNode().getAttribute("class")).toMatch("bp4-button");
+        expect(wrapper.find(Button).getDOMNode().getAttribute("class")).toMatch("bp5-button bp5-fill bp5-large bp5-intent-primary");
     });
 });
 
@@ -79,6 +79,6 @@ describe('<ForecastButton missing/>', () => {
         const wrapper = mount(<Provider store={store}><ResponsiveContext.Provider value={{ width: 850, deviceWidth:850 }}>
             <ForecastButton/></ResponsiveContext.Provider></Provider>);
         expect(wrapper.find(Button).length).toBe(1);
-        expect(wrapper.find(Button).getDOMNode().getAttribute("class")).toMatch("bp4-button");
+        expect(wrapper.find(Button).getDOMNode().getAttribute("class")).toMatch("bp5-button bp5-fill bp5-large bp5-intent-primary");
     });
 });
