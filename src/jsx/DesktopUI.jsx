@@ -29,7 +29,7 @@ const DesktopUI = ({mapsApiKey}) => {
         setActiveSidePane
     ] = useState(0)
 
-    const sidebarWidth = 400
+    const sidebarWidth = 500
 
     const routeData = useSelector(state => state.routeInfo.rwgpsRouteData)
     const stravaActivityData = useSelector(state => state.strava.activityData)
