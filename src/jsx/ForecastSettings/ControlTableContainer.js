@@ -1,11 +1,10 @@
 
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Button, Card, Elevation } from "@blueprintjs/core";
+import { Button, Card, Elevation, Tooltip } from "@blueprintjs/core";
 import { addControl, toggleDisplayBanked } from "../../redux/actions";
 import ErrorBoundary from '../shared/ErrorBoundary';
 import { ControlTable } from './ControlTable';
-import { Tooltip2 } from "@blueprintjs/popover2";
 import { ToggleButton } from '../shared/ToggleButton';
 
 export const ControlTableContainer = () => {
@@ -19,9 +18,9 @@ export const ControlTableContainer = () => {
             <ErrorBoundary>
               <ControlTable />
               <AddRowButton/>
-              <Tooltip2 usePortal={true} placement='bottom' content='Show how many minutes remain to be within ACP/RUSA brevet finishing times'>
+              <Tooltip usePortal={true} placement='bottom' content='Show how many minutes remain to be within ACP/RUSA brevet finishing times'>
                   <ToggleButton style={{marginTop: "10px"}} active={displayBanked} onClick={() => dispatch(toggleDisplayBanked())}>Display banked time</ToggleButton>
-              </Tooltip2>
+              </Tooltip>
             </ErrorBoundary>
         </Card>
       </ErrorBoundary>

@@ -1,8 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {FormGroup, Button, MenuItem} from "@blueprintjs/core";
+import {FormGroup, Button, MenuItem, Tooltip} from "@blueprintjs/core";
 import { Select } from "@blueprintjs/select";
-import { Tooltip2 } from "@blueprintjs/popover2";
 import { connect } from 'react-redux';
 import { setAnalysisInterval } from "../../redux/actions";
 
@@ -36,7 +35,7 @@ const StravaAnalysisIntervalInput = ({ interval, setInterval }) => {
     return (
         <FormGroup size='sm' style={{ flex: '1' }}>
             <div style={{fontSize: "14px", fontWeight: "bold"}}>Analysis Interval</div>
-            <Tooltip2 placement="bottom" content={interval_tooltip_text}>
+            <Tooltip placement="bottom" content={interval_tooltip_text}>
             <Select
                 items={analysisIntervals}
                 itemsEqual={"number"}
@@ -48,7 +47,7 @@ const StravaAnalysisIntervalInput = ({ interval, setInterval }) => {
             >
             <Button text={analysisIntervals.find(elem => elem.number == interval).text} rightIcon="symbol-triangle-down" />
             </Select>
-            </Tooltip2>
+            </Tooltip>
         </FormGroup>
     );
 };

@@ -9,8 +9,7 @@ import StravaAnalysisIntervalInput from './StravaAnalysisIntervalInput';
 import { useActualPace, useFormatSpeed } from '../../utils/hooks';
 import { ToggleButton } from '../shared/ToggleButton';
 import cookie from 'react-cookies';
-import { Tooltip2 } from "@blueprintjs/popover2";
-import { HTMLTable } from '@blueprintjs/core';
+import { HTMLTable, Tooltip } from '@blueprintjs/core';
 
 const PaceTable = ({activityData, activityStream, analysisInterval, setSubrange, toggleMapRange, zoomToRange, toggleZoomToRange}) =>  {
 
@@ -84,9 +83,9 @@ setSelectedRow
                         <thead>
                         <tr>
                             <th style={{'fontSize':'80%'}}>Time</th>
-                            <Tooltip2 content={'Pace is average speed adjusted for climb'} placement={"top"}>
+                            <Tooltip content={'Pace is average speed adjusted for climb'} placement={"top"}>
                                 <th id={'pace'} style={{'fontSize':'80%'}}>Pace</th>
-                            </Tooltip2>
+                            </Tooltip>
                             <th style={{'fontSize':'80%'}}>WW Pace</th>
                             <th style={{'fontSize':'80%'}}>Distance</th>
                             <th style={{'fontSize':'80%'}}>Climb</th>

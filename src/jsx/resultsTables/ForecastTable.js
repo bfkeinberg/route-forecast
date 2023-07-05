@@ -1,5 +1,4 @@
 import React, {Component} from 'react';
-import { Tooltip2 } from "@blueprintjs/popover2";
 
 import ErrorBoundary from "../shared/ErrorBoundary";
 import darkSky from 'Images/darkSkySmall.png';
@@ -13,7 +12,7 @@ import {setWeatherRange, toggleWeatherRange, setTableViewed, toggleZoomToRange, 
 import MediaQuery from 'react-responsive';
 import {finishTimeFormat} from '../../redux/reducer';
 import { DateTime } from 'luxon';
-import { Icon, HTMLTable } from '@blueprintjs/core';
+import { Icon, HTMLTable, Tooltip } from '@blueprintjs/core';
 import cookie from 'react-cookies';
 import { ToggleButton } from '../shared/ToggleButton';
 import { WeatherCorrections } from './WeatherCorrections';
@@ -154,13 +153,13 @@ export class ForecastTable extends Component {
 
     render() {
         const windHeaderText = <span className={'clickableHeaderCell'}>{this.state.showGusts ? 'Wind gust' : 'Wind speed'}</span>;
-        const windHeader = <Tooltip2 content={'Click to toggle between average wind speed and wind gusts'} placement={'top'}>{windHeaderText}</Tooltip2>
+        const windHeader = <Tooltip content={'Click to toggle between average wind speed and wind gusts'} placement={'top'}>{windHeaderText}</Tooltip>
 
         const distHeaderText = this.props.metric ? 'KM' : 'Mile';
-        const distHeader = <Tooltip2 content={'Distance at start of segment'} placement={'top'}>{distHeaderText}</Tooltip2>
+        const distHeader = <Tooltip content={'Distance at start of segment'} placement={'top'}>{distHeaderText}</Tooltip>
 
         const temperatureHeaderText = <span className={'clickableHeaderCell'}>{this.state.showApparentTemp ? "Feels like" : <Icon icon="temperature"/>}</span>;
-        const temperatureHeader = <Tooltip2 content={'Click to toggle between temperature and apparent temperature'} placement={'top'}>{temperatureHeaderText}</Tooltip2>
+        const temperatureHeader = <Tooltip content={'Click to toggle between temperature and apparent temperature'} placement={'top'}>{temperatureHeaderText}</Tooltip>
 
         return (
             <div className="animated slideInLeft">
@@ -180,7 +179,7 @@ export class ForecastTable extends Component {
                             <ToggleButton active={this.props.zoomToRange} onClick={this.toggleZoom}>Zoom to Segment</ToggleButton>
                         </div>
                     </div>
-                    <HTMLTable bordered interactive striped style={{ fontSize: "12px"}}>
+                    <HTMLTable compact={true} striped bordered interactive style={{ fontSize: "12px", "borderSpacing": "0px"}}>
                         <thead>
                             <tr>
                                 <th><span className={'headerCell'}>Time</span></th>
@@ -192,8 +191,8 @@ export class ForecastTable extends Component {
                                     <th><span className={'headerCell'}>Cloud cover</span></th>
                                 </MediaQuery>
                                 <th className={'clickableHeaderCell'} onClick={this.toggleAqi} style={{ cursor: "pointer" }} id={'aqi'}>
-                                <Tooltip2 content={'Air quality shows current conditions, not forecasted. Click to toggle'} placement={'top'}>
-                                    <span className={'largerClickableHeaderCell'}>AQI</span></Tooltip2>
+                                <Tooltip content={'Air quality shows current conditions, not forecasted. Click to toggle'} placement={'top'}>
+                                    <span className={'largerClickableHeaderCell'}>AQI</span></Tooltip>
                                 </th>
                                 <th id={'wind'} onClick={this.toggleGustDisplay} style={{ cursor: "pointer" }}>{windHeader}</th>
                                 <MediaQuery minWidth={501}>
