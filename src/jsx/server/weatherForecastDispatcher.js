@@ -4,6 +4,7 @@ const callWeatherApi = require('./weatherApi');
 const callVisualCrossing = require('./visualCrossing');
 const callNWS = require('./nws');
 const callMeteomatics = require('./meteomatics');
+const callWeatherKit = require('./weatherKit');
 
 const getBearingDifference = function (bearing,windBearing) {
     return Math.min(bearing - windBearing < 0 ? bearing - windBearing + 360 : bearing - windBearing,
@@ -39,6 +40,8 @@ const callWeatherService = function (service, lat, lon, currentTime, distance, z
         return callNWS(lat, lon, currentTime, distance, zone, bearing, getBearingDifference);
     case 'meteomatics':
         return callMeteomatics(lat, lon, currentTime, distance, zone, bearing, getBearingDifference);
+    case 'weatherKit':
+        return callWeatherKit(lat, lon, currentTime, distance, zone, bearing, getBearingDifference);
     default:
         return null;
     }
