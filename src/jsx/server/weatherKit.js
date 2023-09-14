@@ -8,7 +8,7 @@ const milesToMeters = 1609.34;
 const keyId = "4JSC7L3B75";
 const teamId = "2B6A6N9QBQ";
 const serviceId = "com.randoplan.weatherkit-client";
-const privateKey = Buffer.from(process.env.WEATHERKIT_KEY);
+const privateKey = process.env.WEATHERKIT_KEY;
 const makeJwt = () => {
     return jwt.sign(
         {
