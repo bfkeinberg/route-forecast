@@ -70,14 +70,19 @@ img#bugImage {
     color: rgb(255, 255, 255);
 }
 
+.timeHeaderCell {
+    font-size: 80%;
+    width: 78px
+}
+
 .headerCell {
     font-size: 80%;
-    width: 60%
+    /* width: 60% */
 }
 
 .clickableHeaderCell {
     font-size: 80%;
-    width: 60%;
+    /* width: 60%; */
     color: #0000EE
 }
 
@@ -87,6 +92,13 @@ img#bugImage {
     color: #0000EE
 }
 
+.timeCell {
+    width: 78px
+}
+
+.chanceRainCell {
+    width: 80px
+}
 @keyframes glowing {
     0% {
         box-shadow: 0 0 5px #0000EE;
