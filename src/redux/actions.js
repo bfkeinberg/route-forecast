@@ -704,7 +704,7 @@ export const setMapViewed = () => {return {type:SET_MAP_VIEWED}};
 
 export const SET_WEATHER_PROVIDER = 'SET_WEATHER_PROVIDER';
 export const setWeatherProviderUnthunky = (weatherProvider) => {return {type:SET_WEATHER_PROVIDER,
-    weatherProvider:weatherProvider==='darksky'?'weatherapi':weatherProvider}}
+    weatherProvider:weatherProvider==='darksky'?'weatherKit':weatherProvider}}
 
 export const setWeatherProvider = (weatherProvider) => {
     return function(dispatch) {
