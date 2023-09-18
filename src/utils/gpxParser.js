@@ -67,7 +67,7 @@ class AnalyzeRoute {
         let trailingPoint = this.findPreviousPoint(previousPoints,currentPoint);
         let distanceFromPreviousInKm =
             this.calculateDistance(trailingPoint.lat,trailingPoint.lon,currentPoint.lat,currentPoint.lon);
-        if (distanceFromPreviousInKm !== 0)
+        if (distanceFromPreviousInKm !== 0 && trailingPoint.elevation !== undefined)
         {
             grade = (currentPoint.elevation - trailingPoint.elevation) / (distanceFromPreviousInKm*1000);
         }
