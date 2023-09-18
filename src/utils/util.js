@@ -24,6 +24,9 @@ export const setMinMaxCoords = (trackPoint,bounds) => {
 
 export const getRouteInfo = (state, type, timeZoneId) => {
   const routeData = state.routeInfo[type === "rwgps" ? "rwgpsRouteData" : "gpxRouteData"]
+  if (routeData == undefined) {
+    return routeData;
+  }
   const walkFunction = type === "rwgps" ? gpxParser.walkRwgpsRoute : gpxParser.walkGpxRoute
   return walkFunction(
     routeData,
