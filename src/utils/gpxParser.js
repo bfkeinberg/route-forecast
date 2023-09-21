@@ -404,6 +404,9 @@ class AnalyzeRoute {
                 let desiredDistance = totalDistanceInKm*kmToMiles;   // because the controls always use miles internally
                 currentControl = AnalyzeRoute.calculateValuesForWind(controls, previouslyCalculatedValues,
                     calculatedValues, currentControl, desiredDistance, totalMinutesLost, start, totalDistanceInKm*kmToMiles, timeZoneId);
+                    // calculate adjusted forecast time for table display purposes
+                    const initialForecastTime = DateTime.fromFormat(currentForecast.fullTime, 'EEE MMM d h:mma yyyy');
+                    currentForecast.adjustedTime = initialForecastTime.plus({minutes:totalMinutesLost});
             }
             previousPoint = currentPoint;
             previousPoints.push(currentPoint);
