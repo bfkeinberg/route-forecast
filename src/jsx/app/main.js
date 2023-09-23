@@ -116,7 +116,7 @@ export class RouteWeatherUI extends Component {
         }
         const fetchAqi = loadCookie('fetchAqi');
         if (fetchAqi !== undefined) {
-            this.props.setFetchAqi(fetchAqi);
+            this.props.setFetchAqi(fetchAqi==="true");
         }
         this.state = {};
         if (typeof window !== 'undefined') {

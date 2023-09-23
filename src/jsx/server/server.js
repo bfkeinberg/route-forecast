@@ -323,7 +323,7 @@ app.post('/aqi', upload.none(), async (req, res) => {
         res.status(400).json({ 'status': 'Missing location key' });
         return;
     }
-    const forecastPoints =  JSON.parse(req.body.locations);
+    const forecastPoints = JSON.parse(req.body.locations);
     if (!process.env.NO_LOGGING) {
         logger.info(`AQI request from ${req.ip} for ${forecastPoints.length} points`);
     }

@@ -5,7 +5,9 @@ const airNowKey = process.env.AIRNOW_KEY;
 const forecastDay = DateTime.now().toFormat("y-MM-dd");
 const getAirNowAQI = async function (lat, lon) {
     const url = `https://www.airnowapi.org/aq/forecast/latLong/?format=application/json&latitude=${lat}&longitude=${lon}&date=${forecastDay}&API_KEY=${airNowKey}`;
-    let airNowResult = await axios.get(url);
+    let airNowResult = await axios.get(url).catch(error => {
+        console.log(error);
+    });
     if (airNowResult.data.length===0) {
         return undefined;
     }

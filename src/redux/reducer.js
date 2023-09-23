@@ -399,7 +399,7 @@ const forecast = function(state = {
         case Actions.TOGGLE_FETCH_AQI:
             return {...state, fetchAqi:!state.fetchAqi}
         case Actions.SET_FETCH_AQI:
-            return {...state, state:state.fetchAqi}
+            return {...state, fetchAqi:action.fetchAqi}
         default:
             return state;
     }
