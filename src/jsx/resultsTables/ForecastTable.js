@@ -130,7 +130,7 @@ export class ForecastTable extends Component {
                         end={index!==forecast.length-1?forecast[index+1].distance*milesToMeters:null}
                         className={this.state.selectedRow===parseInt(point.distance*milesToMeters)?'highlighted':null}
                         onClick={this.toggleRange} onMouseEnter={this.updateWeatherRange}>
-                        <td className='timeCell'><Time time={index === forecast.length-1 ? null :point.adjustedTime !== null ? point.adjustedTime.toFormat('h:mm a') : point.time}/></td>
+                        <td className='timeCell'><Time time={index === forecast.length-1 ? null :point.adjustedTime ? point.adjustedTime.toFormat('h:mm a') : point.time}/></td>
                         <td>{metric ? ((point.distance*milesToMeters)/1000).toFixed(0) : point.distance}</td>
                         <td>{point.summary}</td>
                         <td>{this.state.showApparentTemp?
