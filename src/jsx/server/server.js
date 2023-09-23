@@ -18,6 +18,7 @@ const { Datastore } = require('@google-cloud/datastore');
 const cors = require('cors');
 const axios = require('axios');
 const getPurpleAirAQI = require('./purpleAirAQI');
+const getAirNowAQI = require('./airNowAQI');
 const querystring = require('querystring');
 const Sentry = require('@sentry/node');
 // eslint-disable-next-line no-unused-vars
@@ -267,7 +268,9 @@ const getAQI = async (result, point) => {
     const transaction = getTransaction();
     const span = transaction.startChild({ op: "aqi" });
     // eslint-disable-next-line no-await-in-loop
-    result.aqi = await getPurpleAirAQI(point.lat, point.lon);
+    // result.aqi = await getPurpleAirAQI(point.lat, point.lon);
+    let results = await Promise.all([getAirNowAQI(point.lat, point.lon), getPurpleAirAQI(point.lat, point.lon)]);
+    result.aqi = results[0] ? results[0] : results[1];
     span.finish();
     transaction.finish();
 }
@@ -320,7 +323,7 @@ app.post('/aqi', upload.none(), async (req, res) => {
         res.status(400).json({ 'status': 'Missing location key' });
         return;
     }
-    const forecastPoints = JSON.parse(req.body.locations);
+    const forecastPoints =  JSON.parse(req.body.locations);
     if (!process.env.NO_LOGGING) {
         logger.info(`AQI request from ${req.ip} for ${forecastPoints.length} points`);
     }
