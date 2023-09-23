@@ -248,6 +248,6 @@ const Time = ({time}) => {
     const { finishTime } = useForecastDependentValues()
 
     return (
-        time || DateTime.fromFormat(finishTime, finishTimeFormat).toFormat('h:mma')
+        time || finishTime && DateTime.fromFormat(finishTime, finishTimeFormat).toFormat('h:mm a') || "N/A"
     )
 }
