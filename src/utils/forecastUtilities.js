@@ -85,7 +85,9 @@ export const getForecastRequestLength = (state) => {
     const type = "rwgps";
     const timeZoneId = "US/LosAngeles";
     const parsedRouteInfo = getRouteInfo(state, type, timeZoneId)
-
+    if (!parsedRouteInfo) {
+        return 0;
+    }
     const { forecastRequest} = parsedRouteInfo
     return forecastRequest !== undefined ? forecastRequest.length : 0;
 }
