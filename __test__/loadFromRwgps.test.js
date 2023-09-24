@@ -96,6 +96,9 @@ describe('load route from Ride with GPS', () => {
                 "action": "/forecast",
                 "maps_api_key": "AIzaSyDLmXz6JFen9Y9ZfwFcuJWdrRmq-kBjnKs",
                 "timezone_api_key": "AIzaSyBS_wyxfIuLDEJWNOKs4w1NqbmwSDjLqCE"
+            },
+            "rideWithGpsInfo": {
+                token:null
             }
         };
         let store = mockStore(initialState);
