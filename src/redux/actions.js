@@ -322,7 +322,7 @@ export const loadFromRideWithGps = function(routeNumber, isTrip) {
         isTrip = isTrip || getState().uiInfo.routeParams.rwgpsRouteIsTrip
         dispatch(beginLoadingRoute('rwgps'));
         dispatch(cancelForecast())
-        return loadRwgpsRoute(routeNumber, isTrip).then((routeData) => {
+        return loadRwgpsRoute(routeNumber, isTrip, getState().rideWithGpsInfo.token).then((routeData) => {
             dispatch(rwgpsRouteLoadingSuccess(routeData));
             if (getState().controls.userControlPoints.length === 0) {
                 const extractedControls = extractControlsFromRoute(routeData);

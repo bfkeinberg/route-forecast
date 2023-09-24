@@ -1,6 +1,10 @@
-export const loadRwgpsRoute = (route, isTrip) => {
+export const loadRwgpsRoute = (route, isTrip, token) => {
   return new Promise((resolve, reject) => {
-      fetch('/rwgps_route?route=' + route + '&trip=' + isTrip).then(response => {
+      let url = '/rwgps_route?route=' + route + '&trip=' + isTrip;
+      if (token) {
+        url += `&token=${token}`;
+      }
+      fetch(url).then(response => {
               if (response.status === 200) {
                   return response.json();
               }
