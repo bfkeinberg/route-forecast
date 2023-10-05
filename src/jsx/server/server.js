@@ -22,7 +22,7 @@ const getAirNowAQI = require('./airNowAQI');
 const querystring = require('querystring');
 const Sentry = require('@sentry/node');
 // eslint-disable-next-line no-unused-vars
-const Tracing = require("@sentry/tracing");
+// const Tracing = require("@sentry/tracing");
 Sentry.init({
     dsn: 'https://ea4c472ff9054dab8c18d594b95d8da2@sentry.io/298059',
     integrations: [
@@ -31,40 +31,9 @@ Sentry.init({
     ],
     tracesSampleRate: 0.15
 });
-let winston = null;
-let expressWinston = null;
 let logger = console;
-let StackdriverTransport = null;
-if (!process.env.NO_LOGGING && process.env.GOOGLE_CLOUD_PROJECT !== undefined) {
-    winston = require('winston');
-    expressWinston = require('express-winston');
-    const { LoggingWinston } = require('@google-cloud/logging-winston');
-    const loggingWinston = new LoggingWinston({ projectId: 'route-forecast' });
-
-    logger = winston.createLogger({
-        level: 'info',
-        transports: [
-            new winston.transports.Console(),
-            // Add Stackdriver Logging
-            loggingWinston
-        ]
-    });
-    StackdriverTransport = new LoggingWinston({
-        projectId: 'route-forecast'
-
-        // keyFilename: 'gcp_key.json',
-        // prefix: 'myservice',
-        // serviceContext: {
-        // service: 'myservice',
-        // version: 'dev'
-        // }
-    });
-    // require('@google-cloud/debug-agent').start({serviceContext: {enableCanary: true}});
-}
 
 var compression = require('compression');
-
-const colorize = process.env.NODE_ENV !== 'production';
 
 if (process.env.JEST_WORKER_ID === undefined) {
     app.use(Sentry.Handlers.requestHandler());
@@ -74,40 +43,7 @@ app.set('trust proxy', true);
 // Instantiate a datastore client
 const datastore = new Datastore();
 
-let requestLogger = null;
 let errorLogger = null;
-if (!process.env.NO_LOGGING && process.env.GOOGLE_CLOUD_PROJECT !== undefined) {
-    // Logger to capture all requests and output them to the console.
-    // [START requests]
-
-    requestLogger = expressWinston.logger({
-        transports: [
-            StackdriverTransport,
-            new winston.transports.Console({
-                json: false,
-                colorize: colorize
-            })
-        ],
-        expressFormat: true,
-        meta: false
-    });
-    // [END requests]
-
-    // Logger to capture any top-level errors and output json diagnostic info.
-    // [START errors]
-    errorLogger = expressWinston.errorLogger({
-        transports: [
-            StackdriverTransport,
-            new winston.transports.Console({
-                json: true,
-                colorize: colorize
-            })
-        ]
-    });
-    // [END errors]
-
-    app.use(requestLogger);
-}
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -274,7 +210,10 @@ const getAQI = async (result, point) => {
     const span = transaction.startChild({ op: "aqi" });
     // eslint-disable-next-line no-await-in-loop
     // result.aqi = await getPurpleAirAQI(point.lat, point.lon);
-    let results = await Promise.all([getAirNowAQI(point.lat, point.lon), getPurpleAirAQI(point.lat, point.lon)]);
+    let results = await Promise.all([
+        getAirNowAQI(point.lat, point.lon),
+        getPurpleAirAQI(point.lat, point.lon)
+    ]);
     result.aqi = results[0] ? results[0] : results[1];
     span.finish();
     transaction.finish();
