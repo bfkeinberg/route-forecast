@@ -94,7 +94,7 @@ const getFromTomorrowIoWithBackoff = async (forecastUrl) => {
  * @param {string} zone time zone
  * @param {number} bearing the direction of travel at the time of the forecast
  * @param {function} getBearingDifference - returns the difference between two bearings
-  * @returns {Promise<{time: *, distance: *, summary: *, tempStr: string, precip: string, cloudCover: string, windSpeed: string,
+  * @returns {Promise<{time: *, distance: *, summary: *, precip: string, cloudCover: string, windSpeed: string,
  * lat: *, lon: *, temp: string, fullTime: *, relBearing: null, rainy: boolean, windBearing: number,
  * vectorBearing: *, gust: string} | never>} a promise to evaluate to get the forecast results
  */
@@ -106,7 +106,7 @@ const callClimacell = async function (lat, lon, currentTime, distance, zone, bea
     const startTimeString = startTime.utc().format('YYYY-MM-DD[T]HH:mm:ss[Z]');
     const endTimeString = endTime.utc().format('YYYY-MM-DD[T]HH:mm:ss[Z]');
     const now = startTime.tz(zone);
-    const url = `https://data.climacell.co/v4/timelines?location=${lat},${lon}&fields=windSpeed,precipitationProbability,windDirection,temperature,temperatureApparent,windGust,cloudCover,precipitationType,weatherCode&timezone=${zone}&startTime=${startTimeString}&endTime=${endTimeString}&timesteps=1h&units=imperial&apikey=${climacellKey}`;
+    const url = `https://data.climacell.co/v4/timelines?location=${lat},${lon}&fields=windSpeed,precipitationProbability,windDirection,temperature,temperatureApparent,windGust,cloudCover,precipitationType,weatherCode,humidity&timezone=${zone}&startTime=${startTimeString}&endTime=${endTimeString}&timesteps=1h&units=imperial&apikey=${climacellKey}`;
     const forecast = await getFromTomorrowIoWithBackoff(url);
 
 /*
@@ -125,8 +125,8 @@ const callClimacell = async function (lat, lon, currentTime, distance, zone, bea
         'time':now.format('h:mmA'),
         'distance':distance,
         'summary':weatherCodes[values.weatherCode],
-        'tempStr':`${Math.round(values.temperature)}F`,
         'precip':values.precipitationProbability===undefined?'<unavailable>':`${values.precipitationProbability.toFixed(1)}%`,
+        'humidity':Math.round(values.humidity),
         'cloudCover':values.cloudCover===undefined?'<unavailable>':`${values.cloudCover.toFixed(1)}%`,
         'windSpeed':!hasWind?'<unavailable>':`${Math.round(values.windSpeed)}`,
         'lat':lat,

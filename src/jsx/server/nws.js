@@ -26,6 +26,7 @@ const extractForecast = (forecastGridData, currentTime) => {
     const gust = findNearestTime(forecastGridData.data.properties.windGust, currentTime);
     const precip = findNearestTime(forecastGridData.data.properties.probabilityOfPrecipitation, currentTime);
     const summary = findNearestTime(forecastGridData.data.properties.weather, currentTime).weather;
+    const humidity = findNearestTime(forecastGridData.data.properties.relativeHumidity, currentTime);
 
     return {
         temperatureInC:temperatureInC,
@@ -35,7 +36,8 @@ const extractForecast = (forecastGridData, currentTime) => {
         windSpeedInKph:windSpeed,
         gustInKph:gust,
         precip:precip,
-        summary:summary
+        summary:summary,
+        humidity:humidity
     }
 };
 
@@ -72,7 +74,7 @@ const getForecastFromNws = async (forecastUrl) => {
  * @param {string} zone time zone
  * @param {number} bearing the direction of travel at the time of the forecast
  * @param {function} getBearingDifference - returns the difference between two bearings
-  * @returns {Promise<{time: *, distance: *, summary: *, tempStr: string, precip: string, cloudCover: string, windSpeed: string,
+  * @returns {Promise<{time: *, distance: *, summary: *, precip: string, humidity: number, cloudCover: string, windSpeed: string,
  * lat: *, lon: *, temp: string, fullTime: *, relBearing: null, rainy: boolean, windBearing: number,
  * vectorBearing: *, gust: string} | never>} a promise to evaluate to get the forecast results
  */
@@ -88,12 +90,13 @@ const callNWS = async function (lat, lon, currentTime, distance, zone, bearing, 
     const apparentTemperatureInF = forecastValues.apparentTemperatureInC * 9/5 + 32;
     const windSpeedInMph = forecastValues.windSpeedInKph * 1000/milesToMeters;
     const windGustInMph = forecastValues.gustInKph * 1000/milesToMeters;
+
     return new Promise((resolve) => {resolve({
         'time':startTime.toFormat('h:mm a'),
         'distance':distance,
         'summary':forecastValues.summary,
-        'tempStr':`${Math.round(temperatureInF)}F`,
         'precip':`${forecastValues.precip.toFixed(1)}%`,
+        'humidity':forecastValues.humidity,
         'cloudCover':`${forecastValues.cloudCover.toFixed(1)}%`,
         'windSpeed':`${Math.round(windSpeedInMph)}`,
         'lat':lat,

@@ -14,7 +14,7 @@ const axios = require('axios');
  * @param {string} zone time zone
  * @param {number} bearing the direction of travel at the time of the forecast
  * @param {function} getBearingDifference - returns the difference between two bearings
- * @returns {Promise<{time: *, distance: *, summary: *, tempStr: string, precip: string, cloudCover: string, windSpeed: string,
+ * @returns {Promise<{time: *, distance: *, summary: *, precip: string, cloudCover: string, windSpeed: string,
  * lat: *, lon: *, temp: string, fullTime: *, relBearing: null, rainy: boolean, windBearing: number,
  * vectorBearing: *, gust: string} | never>} a promise to evaluate to get the forecast results
  */
@@ -45,8 +45,8 @@ const callWeatherApi = async function (lat, lon, currentTime, distance, zone, be
         'time':now.toFormat('h:mm a'),
         'distance':distance,
         'summary':current.condition.text,
-        'tempStr':`${Math.round(current.temp_f)}F`,
         'precip':current.chance_of_rain===undefined?'<unavailable>':`${current.chance_of_rain}%`,
+        'humidity':current.humidity,
         'cloudCover':current.cloud===undefined?'<unavailable>':`${current.cloud.toFixed(1)}%`,
         'windSpeed':!hasWind?'<unavailable>':`${Math.round(current.wind_mph)}`,
         'lat':lat,

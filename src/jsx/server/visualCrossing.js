@@ -12,7 +12,7 @@ const axios = require('axios');
  * @param {string} zone time zone
  * @param {number} bearing the direction of travel at the time of the forecast
  * @param {function} getBearingDifference - returns the difference between two bearings
-  * @returns {Promise<{time: *, distance: *, summary: *, tempStr: string, precip: string, cloudCover: string, windSpeed: string,
+  * @returns {Promise<{time: *, distance: *, summary: *, precip: string, cloudCover: string, windSpeed: string,
  * lat: *, lon: *, temp: string, fullTime: *, relBearing: null, rainy: boolean, windBearing: number,
  * vectorBearing: *, gust: string} | never>} a promise to evaluate to get the forecast results
  */
@@ -45,8 +45,8 @@ const callVisualCrossing = async function (lat, lon, currentTime, distance, zone
         'time':now.format('h:mmA'),
         'distance':distance,
         'summary':forecast.days[0].conditions,
-        'tempStr':`${Math.round(current.temp)}F`,
         'precip':`${precip.toFixed(1)}%`,
+        'humidity':Math.round(current.humidity),
         'cloudCover':current.cloudcover===undefined?'<unavailable>':`${current.cloudcover.toFixed(1)}%`,
         'windSpeed':!hasWind?'<unavailable>':`${Math.round(current.windspeed)}`,
         'lat':lat,

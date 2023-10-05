@@ -37,7 +37,7 @@ const makeJwt = () => {
  * @param {string} zone time zone
  * @param {number} bearing the direction of travel at the time of the forecast
  * @param {function} getBearingDifference - returns the difference between two bearings
-  * @returns {Promise<{time: *, distance: *, summary: *, tempStr: string, precip: string, cloudCover: string, windSpeed: string,
+  * @returns {Promise<{time: *, distance: *, summary: *, precip: string, cloudCover: string, windSpeed: string,
  * lat: *, lon: *, temp: string, fullTime: *, relBearing: null, rainy: boolean, windBearing: number,
  * vectorBearing: *, gust: string} | never>} a promise to evaluate to get the forecast results
  */
@@ -65,8 +65,8 @@ const callWeatherKit = function (lat, lon, currentTime, distance, zone, bearing,
             'time':now.toFormat('h:mm a'),
             'distance':distance,
             'summary':current.conditionCode,
-            'tempStr':`${Math.round(temperatureInF)}F`,
             'precip':`${(current.precipitationChance*100).toFixed(1)}%`,
+            'humidity':current.humidity*100,
             'cloudCover':`${(current.cloudCover*100).toFixed(1)}%`,
             'windSpeed':`${Math.round(current.windSpeed * 1000/milesToMeters)}`,
             'lat':lat,

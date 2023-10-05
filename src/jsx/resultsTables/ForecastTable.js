@@ -138,6 +138,7 @@ export class ForecastTable extends Component {
                             ForecastTable.formatTemperature(point.temp, this.props.metric)}</td>
                         <td className='chanceRain'>{point.precip}</td>
                         <MediaQuery minWidth={501}>
+                            <td>{point.humidity}</td>
                             <td>{point.cloudCover}</td>
                         </MediaQuery>
                         <td>{point.aqi!==undefined?point.aqi:'N/A'}</td>
@@ -191,6 +192,7 @@ export class ForecastTable extends Component {
                                 <th id={'temp'} className={'clickableHeaderCell'} onClick={this.toggleApparentDisplay} style={{ cursor: "pointer" }}>{temperatureHeader}</th>
                                 <th><span className={'headerCell'}>Chance of rain</span></th>
                                 <MediaQuery minWidth={501}>
+                                    <th><span className={'headerCell'}>Humidity</span></th>
                                     <th><span className={'headerCell'}>Cloud cover</span></th>
                                 </MediaQuery>
                                 <th className={'clickableHeaderCell'} onClick={this.toggleAqi} style={{ cursor: "pointer" }} id={'aqi'}>
