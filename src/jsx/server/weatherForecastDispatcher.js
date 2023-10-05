@@ -22,7 +22,7 @@ const getBearingDifference = function (bearing,windBearing) {
  * @param {number} distance - used only in the return value, not the call
  * @param {string} zone time zone
  * @param {number} bearing the direction of travel at the time of the forecast
- * @returns {Promise<{time: *, distance: *, summary: *, tempStr: string, precip: string, cloudCover: string, windSpeed: string,
+ * @returns {Promise<{time: *, distance: *, summary: *, precip: string, cloudCover: string, windSpeed: string,
  * lat: *, lon: *, temp: string, fullTime: *, relBearing: null, rainy: boolean, windBearing: number,
  * vectorBearing: *, gust: string} | never>} a promise to evaluate to get the forecast results
  */

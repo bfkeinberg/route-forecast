@@ -12,7 +12,7 @@ const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch
  * @param {string} zone time zone
  * @param {number} bearing the direction of travel at the time of the forecast
  * @param {function} getBearingDifference - returns the difference between two bearings
-  * @returns {Promise<{time: *, distance: *, summary: *, tempStr: string, precip: string, cloudCover: string, windSpeed: string,
+  * @returns {Promise<{time: *, distance: *, summary: *, precip: string, cloudCover: string, windSpeed: string,
  * lat: *, lon: *, temp: string, fullTime: *, relBearing: null, rainy: boolean, windBearing: number,
  * vectorBearing: *, gust: string} | never>} a promise to evaluate to get the forecast results
  */
@@ -42,7 +42,6 @@ const callDarkSky = function (lat, lon, currentTime, distance, zone, bearing, ge
             'time':now.format('h:mmA'),
             'distance':distance,
             'summary':current.summary,
-            'tempStr':`${Math.round(current.temperature)}F`,
             'precip':current.precipProbability===undefined?'<unavailable>':`${(current.precipProbability*100).toFixed(1)}%`,
             'cloudCover':current.cloudCover===undefined?'<unavailable>':`${(current.cloudCover*100).toFixed(1)}%`,
             'windSpeed':!hasWind?'<unavailable>':`${Math.round(current.windSpeed)}`,

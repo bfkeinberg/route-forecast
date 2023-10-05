@@ -74,7 +74,7 @@ const getForecastFromMeteomatics = async (forecastUrl) => {
  * @param {string} zone time zone
  * @param {number} bearing the direction of travel at the time of the forecast
  * @param {function} getBearingDifference - returns the difference between two bearings
-  * @returns {Promise<{time: *, distance: *, summary: *, tempStr: string, precip: string, cloudCover: string, windSpeed: string,
+  * @returns {Promise<{time: *, distance: *, summary: *, precip: string, cloudCover: string, windSpeed: string,
  * lat: *, lon: *, temp: string, fullTime: *, relBearing: null, rainy: boolean, windBearing: number,
  * vectorBearing: *, gust: string} | never>} a promise to evaluate to get the forecast results
  */
@@ -88,7 +88,6 @@ const callMeteomatics = async function (lat, lon, currentTime, distance, zone, b
         'time':startTime.toFormat('h:mm a'),
         'distance':distance,
         'summary':forecastValues.summary,
-        'tempStr':`${Math.round(forecastValues.temperatureInF)}F`,
         'precip':`${forecastValues.precipitationProbability.toFixed(1)}%`,
         'cloudCover':`${forecastValues.cloudCover.toFixed(1)}%`,
         'windSpeed':`${Math.round(forecastValues.windSpeedInMph)}`,
