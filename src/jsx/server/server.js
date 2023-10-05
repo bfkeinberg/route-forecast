@@ -43,8 +43,6 @@ app.set('trust proxy', true);
 // Instantiate a datastore client
 const datastore = new Datastore();
 
-let errorLogger = null;
-
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
@@ -496,10 +494,6 @@ app.get('/', (req, res) => {
 });
 
 app.use(Sentry.Handlers.errorHandler());
-
-if (!process.env.NO_LOGGING && process.env.GOOGLE_CLOUD_PROJECT !== undefined) {
-    app.use(errorLogger);
-}
 
 const makeFeatureRecord = (response) => {
     // Create a visit record to be stored in the database
