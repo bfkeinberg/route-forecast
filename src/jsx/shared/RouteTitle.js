@@ -3,7 +3,7 @@ import { useSelector } from "react-redux"
 import PropTypes from 'prop-types';
 
 export const RouteTitle = ({style, className}) => {
-  const routeName = useSelector(state => state.routeInfo.name)
+  const routeName = useSelector(state => state.routeInfo.name || (state.strava.activityData && state.strava.activityData.name))
 
   return (
     <div className={className} style={{fontStyle: "oblique", color: "rgba(64, 111, 140, 0.87)", fontSize: "20px", height: "60px", textAlign: "center", ...style}}>{routeName}</div>
