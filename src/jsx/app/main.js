@@ -251,7 +251,7 @@ export class RouteWeatherUI extends Component {
         else {
             let showWeatherProvider = loadCookie("showWeatherProvider");
             if (showWeatherProvider !== undefined) {
-                props.showWeatherProvider(showWeatherProvider);
+                props.showWeatherProvider(showWeatherProvider==="true");
             }
         }
         if (queryParams.rwgpsToken !== undefined) {

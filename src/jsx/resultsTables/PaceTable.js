@@ -83,9 +83,9 @@ setSelectedRow
                         <thead>
                         <tr>
                             <th style={{'fontSize':'80%'}}>Time</th>
-                            <Tooltip content={'Pace is average speed adjusted for climb'} placement={"top"}>
-                                <th id={'pace'} style={{'fontSize':'80%'}}>Pace</th>
-                            </Tooltip>
+                            <th id={'pace'} style={{'fontSize':'80%'}}>
+                                <Tooltip content={'Pace is average speed adjusted for climb'} placement={"top"}>Pace</Tooltip>
+                            </th>
                             <th style={{'fontSize':'80%'}}>WW Pace</th>
                             <th style={{'fontSize':'80%'}}>Distance</th>
                             <th style={{'fontSize':'80%'}}>Climb</th>
