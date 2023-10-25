@@ -55,8 +55,10 @@ export class ForecastTable extends Component {
 
     updateWeatherRange = (event) => {
         const start = parseInt(event.currentTarget.getAttribute('start'));
-        this.props.setWeatherRange(start, parseInt(event.currentTarget.getAttribute('end')));
-        this.setState({selectedRow:start});
+        if (this.state.selectedRow !== start) {
+            this.props.setWeatherRange(start, parseInt(event.currentTarget.getAttribute('end')));
+            this.setState({selectedRow:start});
+        }
     };
 
     toggleRange = (event) => {
