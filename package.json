@@ -139,7 +139,7 @@
     "dev:watch": "./node_modules/.bin/webpack --mode development --progress --color --config webpack.dev.js --env sentryRelease --watch",
     "deploy": "./buildRelease.sh",
     "lint": "eslint src --fix",
-    "test": "NODE_OPTIONS=--experimental-vm-modules nyc jest",
+    "test": "NODE_OPTIONS=--experimental-vm-modules nyc jest --passWithNoTests",
     "testUTC": "TZ=utc nyc jest",
     "testDbg": "node --inspect-brk node_modules/.bin/jest",
     "testUTCDbg": "TZ=utc node --inspect-brk node_modules/.bin/jest",
