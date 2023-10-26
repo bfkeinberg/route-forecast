@@ -274,7 +274,7 @@ app.post('/aqi', upload.none(), async (req, res) => {
         while (forecastPoints.length > 0) {
             let point = forecastPoints.shift();
             // we explicitly do not want to parallelize to avoid swamping the servers we are calling and being throttled
-            console.log('waiting for AQI');
+            // console.log('waiting for AQI');
             let result = {};
             // eslint-disable-next-line no-await-in-loop
             await getAQI(result, point);
