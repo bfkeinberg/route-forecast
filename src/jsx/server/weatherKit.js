@@ -3,8 +3,6 @@ const jwt = require("jsonwebtoken");
 const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
 const milesToMeters = 1609.34;
 
-/* eslint-disable max-params*/
-
 const keyId = "4JSC7L3B75";
 const teamId = "2B6A6N9QBQ";
 const serviceId = "com.randoplan.weatherkit-client";
@@ -28,6 +26,7 @@ const makeJwt = () => {
     )
 }
 
+/* eslint-disable max-params*/
 /**
  *
  * @param {number} lat latitude
