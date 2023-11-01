@@ -29,11 +29,11 @@ const getMapBounds = (points, bounds, zoomToRange, subrange) => {
     let northEast = { lat: bounds.max_latitude, lng: bounds.max_longitude };
     if (isNaN(bounds.min_latitude) || isNaN(bounds.max_latitude)) {
         console.error(`Bad latitude in bounds`);
-        return new google.maps.LatLngBounds({ lat: 0, lng: 0 }, { lat: 0, lng: 0 });
+        return new window.google.maps.LatLngBounds({ lat: 0, lng: 0 }, { lat: 0, lng: 0 });
     }
-    const defaultBounds = new google.maps.LatLngBounds(southWest, northEast);
+    const defaultBounds = new window.google.maps.LatLngBounds(southWest, northEast);
     if (zoomToRange && subrange.length === 2 && !isNaN(subrange[1])) {
-        let bounds = new google.maps.LatLngBounds();
+        let bounds = new window.google.maps.LatLngBounds();
         points.filter(point => (point.dist !== undefined) && (point.dist >= subrange[0] &&
             (isNaN(subrange[1]) || point.dist <= subrange[1])))
             .forEach(point => bounds.extend(point));
