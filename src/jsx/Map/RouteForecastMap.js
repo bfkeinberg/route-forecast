@@ -49,7 +49,6 @@ const cvtDistance = (distance, metric) => {
     return (metric ? ((distance * milesToMeters) / 1000) : Number.parseInt(distance));
 };
 
-/*global google*/
 const RouteForecastMap = ({maps_api_key}) => {
     const { isLoaded } = useJsApiLoader({
         id: 'google-map-script',

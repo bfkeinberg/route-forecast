@@ -198,7 +198,7 @@ export class ForecastTable extends Component {
                                     <th><span className={'headerCell'}>Cloud cover</span></th>
                                 </MediaQuery>
                                 <th className={'clickableHeaderCell'} onClick={this.toggleAqi} style={{ cursor: "pointer" }} id={'aqi'}>
-                                <Tooltip content={'Air quality shows current conditions, not forecasted. Click to toggle'} placement={'top'}>
+                                <Tooltip content={'Air quality shows current conditions, not forecasted. Click to toggle for the next forecast requested'} placement={'top'}>
                                     <span className={'largerClickableHeaderCell'}>AQI</span></Tooltip>
                                 </th>
                                 <th id={'wind'} onClick={this.toggleGustDisplay} style={{ cursor: "pointer" }}>{windHeader}</th>
