@@ -366,6 +366,9 @@ class AnalyzeRoute {
                 // get current forecast
                 if (forecast.length > 0 && (totalDistanceInKm*kmToMiles)>forecast[forecast.length-1].distance) {
                     currentForecast = forecast.pop();
+                    // calculate adjusted forecast time for table display purposes
+                    const initialForecastTime = DateTime.fromFormat(currentForecast.fullTime, 'EEE MMM d h:mma yyyy');
+                    currentForecast.adjustedTime = initialForecastTime.plus({minutes:totalMinutesLost});
                 }
                 // get bearing between the two points
                 let trackBearing = AnalyzeRoute.getRelativeBearing(previousPoint,currentPoint);
@@ -404,9 +407,6 @@ class AnalyzeRoute {
                 let desiredDistance = totalDistanceInKm*kmToMiles;   // because the controls always use miles internally
                 currentControl = AnalyzeRoute.calculateValuesForWind(controls, previouslyCalculatedValues,
                     calculatedValues, currentControl, desiredDistance, totalMinutesLost, start, totalDistanceInKm*kmToMiles, timeZoneId);
-                    // calculate adjusted forecast time for table display purposes
-                    const initialForecastTime = DateTime.fromFormat(currentForecast.fullTime, 'EEE MMM d h:mma yyyy');
-                    currentForecast.adjustedTime = initialForecastTime.plus({minutes:totalMinutesLost});
             }
             previousPoint = currentPoint;
             previousPoints.push(currentPoint);
