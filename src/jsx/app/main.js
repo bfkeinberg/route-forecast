@@ -49,7 +49,7 @@ import { routeLoadingModes } from '../../data/enums';
 import { /*formatControlsForUrl, */parseControls, inputPaceToSpeed } from '../../utils/util';
 
 export const saveRwgpsCredentials = (token) => {
-    if ("credentials" in navigator && "PasswordCredential" in window) {
+    if ("credentials" in navigator && "PasswordCredential" in window && "store" in navigator.credentials) {
 
         // eslint-disable-next-line no-undef
         let credential = new PasswordCredential({
