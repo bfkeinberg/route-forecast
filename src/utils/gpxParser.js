@@ -185,15 +185,15 @@ class AnalyzeRoute {
             if (!isNaN(accumulatedTime) && !isNaN(idlingTime)) {
                 idlingTime += checkAndUpdateControls(accumulatedDistanceKm, startTime, (accumulatedTime + idlingTime),
                 controls, calculatedValues, point);
-            }
-            // see if it's time for forecast
-            if (((accumulatedTime + idlingTime) - lastTime) >= intervalInHours) {
-                forecastRequests.push(AnalyzeRoute.addToForecast(point, startTime, (accumulatedTime + idlingTime),
-                    accumulatedDistanceKm * kmToMiles));
-                lastTime = accumulatedTime + idlingTime;
-                previousAccumulatedTime = accumulatedTime;
-                bearings.push(AnalyzeRoute.getRelativeBearing(forecastPoint,point));
-                forecastPoint = point;
+                // see if it's time for forecast
+                if (((accumulatedTime + idlingTime) - lastTime) >= intervalInHours) {
+                    forecastRequests.push(AnalyzeRoute.addToForecast(point, startTime, (accumulatedTime + idlingTime),
+                        accumulatedDistanceKm * kmToMiles));
+                    lastTime = accumulatedTime + idlingTime;
+                    previousAccumulatedTime = accumulatedTime;
+                    bearings.push(AnalyzeRoute.getRelativeBearing(forecastPoint,point));
+                    forecastPoint = point;
+                }
             }
             previousPoint = point;
         });
