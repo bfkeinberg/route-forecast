@@ -34,7 +34,7 @@ export const providerValues = {
         if (canForecastPast) return startDate;
         const now = DateTime.now();
         if (startDate < now) {
-            return startDate.set({day:now.day}).plus({days:1});
+            return startDate.set({year:now.year, month:now.month, day:now.day}).plus({days:1});
         }
         return startDate;
     }
