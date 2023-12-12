@@ -84,4 +84,4 @@ RouteInfoForm.propTypes = {
     setErrorDetails:PropTypes.func.isRequired
 };
 
-export default connect(mapStateToProps, mapDispatchToProps, null, {pure:true})(RouteInfoForm);
+export default connect(mapStateToProps, mapDispatchToProps, null)(RouteInfoForm);
