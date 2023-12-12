@@ -207,6 +207,11 @@ export class RouteWeatherUI extends Component {
         if (queryParams === undefined) {
             return;
         }
+        if (RouteWeatherUI.hasProvider(queryParams.provider)) {
+            props.setWeatherProvider(queryParams.provider);
+        } else {
+            props.setWeatherProvider('weatherKit');
+        }
         props.setRwgpsRoute(queryParams.rwgpsRoute);
         RouteWeatherUI.getStravaToken(queryParams,props);
         if (queryParams.startTimestamp !== undefined) {
@@ -237,11 +242,6 @@ export class RouteWeatherUI extends Component {
         props.setStravaError(queryParams.strava_error);
         if (queryParams.strava_analysis !== undefined) {
             props.setRouteLoadingMode(routeLoadingModes.STRAVA);
-        }
-        if (RouteWeatherUI.hasProvider(queryParams.provider)) {
-            props.setWeatherProvider(queryParams.provider);
-        } else {
-            props.setWeatherProvider('weatherKit');
         }
         // make show weather provider "sticky"
         if (queryParams.showProvider !== undefined) {

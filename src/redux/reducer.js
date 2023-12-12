@@ -62,7 +62,7 @@ export const routeParams = function(state = {
                 min_interval: providerValues[action.weatherProvider].min_interval,
                 maxDaysInFuture: providerValues[action.weatherProvider].max_days,
                 canForecastPast: providerValues[action.weatherProvider].canForecastPast,
-                start: checkedStartDate(state.start, state.canForecastPast)
+                start: checkedStartDate(state.start, providerValues[action.weatherProvider].canForecastPast)
             }
         case Actions.SET_RWGPS_ROUTE:
             if (action.route !== undefined) {
@@ -92,7 +92,7 @@ export const routeParams = function(state = {
                 if (!start.isValid) {
                     return state;
                 } else {
-                    return {...state, start: checkedStartDate(start, state.canForecastPast), initialStart: start};
+                    return {...state, start: checkedStartDate(start, state.canForecastPast), initialStart: checkedStartDate(start, state.canForecastPast)};
                 }
             } else {
                 return state;
@@ -103,7 +103,7 @@ export const routeParams = function(state = {
                 if (!start.isValid) {
                     return state;
                 } else {
-                    return {...state, start: checkedStartDate(start, state.canForecastPast), initialStart: start};
+                    return {...state, start: checkedStartDate(start, state.canForecastPast), initialStart: checkedStartDate(start, state.canForecastPast)};
                 }
             } else {
                 return state;
