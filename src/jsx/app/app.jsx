@@ -1,9 +1,9 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
 import TopLevel from './topLevel';
 import LocationContext from '../locationContext';
 import ReactGA from "react-ga4";
-import { BrowserTracing } from "@sentry/tracing";
+import { createRoot } from 'react-dom/client';
+import { BrowserTracing } from "@sentry/browser";
 import * as Sentry from "@sentry/react";
 
 if ('serviceWorker' in navigator) {
@@ -64,11 +64,11 @@ const timezone_api_key = script.getAttribute('timezone_api_key');
 const bitly_token = script.getAttribute('bitly_token');
 
 const render = Component => {
-    ReactDOM.render(
+    const root = createRoot(document.getElementById('content'));
+    root.render(
         <LocationContext.Provider value={{href:location.href, search:location.search, origin:location.origin}}>
             <Component mode={mode} action={action} maps_api_key={maps_api_key} timezone_api_key={timezone_api_key} bitly_token={bitly_token}/>
-        </LocationContext.Provider>,
-    document.getElementById('content'));
+        </LocationContext.Provider>);
 };
 
 render(TopLevel);
