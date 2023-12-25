@@ -490,7 +490,7 @@ app.get('/', (req, res) => {
         'reactDom': '',
         delimiter: '?'
     };
-    console.log(`request ${JSON.stringify(req.query)}`);
+    console.log(`request query ${JSON.stringify(req.query)}`);
     try {
         res.render('index', ejsVariables)
     } catch (err) {
