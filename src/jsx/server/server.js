@@ -401,7 +401,12 @@ app.get('/rwgpsAuthReply', async (req, res) => {
     const state = req.query.state;
     let restoredState = {};
     if (state !== undefined && state !== '') {
-        restoredState = JSON.parse(decodeURIComponent(state));
+        try {
+            restoredState = JSON.parse(decodeURIComponent(state));
+        } catch (error) {
+            console.warn(`error in state restored from RWGPS:${error} ${decodeURIComponent(state)}`);
+            restoredState = decodeURIComponent(state);
+        }
     }
     if (req.query.code !== undefined) {
         const token = await getRwgpsTokenFromCode(req.query.code);
