@@ -8,7 +8,7 @@ import {providerValues} from "../../redux/reducer";
 import PropTypes from 'prop-types';
 import { getForecastRequestLength } from '../../utils/forecastUtilities';
 
-const renderProvider = (provider, { handleClick, modifiers }) => {
+const renderProvider = (provider, { handleClick, handleFocus, modifiers }) => {
     if (!modifiers.matchesPredicate) {
         return null;
     }
@@ -16,7 +16,9 @@ const renderProvider = (provider, { handleClick, modifiers }) => {
         <MenuItem
             active={modifiers.active}
             key={provider.key}
+            disabled={!provider.enabled}
             onClick={handleClick}
+            onFocus={handleFocus}
             text={provider.name}
         />
     );

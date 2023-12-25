@@ -40,6 +40,9 @@ export const ForecastSettings = () => {
                 {showProvider && (
                     <WeatherProviderSelector />
                 )}
+                <div>
+                <h4>Note NWS service currently unavailable</h4>
+                </div>
                 <div style={{ display: "flex", margin: "30px 0px" }}>
                     <LocationContext.Consumer>
                         {value => <ForecastButton href={value.href} origin={value.origin} />}
