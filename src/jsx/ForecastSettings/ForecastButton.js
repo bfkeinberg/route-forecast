@@ -1,20 +1,27 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { DesktopTooltip } from '../shared/DesktopTooltip';
-import {connect} from 'react-redux';
-import {requestForecast} from "../../redux/actions";
+import {connect, useDispatch} from 'react-redux';
+import {requestForecast, shortenUrl} from "../../redux/actions";
 import { useMediaQuery } from 'react-responsive';
 import { Spinner, Button } from '@blueprintjs/core';
 import { updateHistory } from "../app/updateHistory";
+import { generateUrl } from '../../utils/queryStringUtils';
 
-const ForecastButton = ({fetchingForecast,requestForecast,routeInfo,submitDisabled,queryString}) => {
+const ForecastButton = ({fetchingForecast,requestForecast,routeInfo,submitDisabled, routeNumber, startTimestamp, pace, interval, metric, controls, strava_activity, provider, showProvider, href, urlIsShortened}) => {
+    const dispatch = useDispatch()
     let tooltipContent = submitDisabled ?
-        "Must either upload a gpx file or provide an rwgps route id" :
+        "Must provide an rwgps route id" :
         "Request a ride forecast";
     let buttonStyle = submitDisabled ? { pointerEvents: 'none', display: 'inline-flex' } : null;
     const forecastClick = () => {
         requestForecast(routeInfo);
-        updateHistory(queryString);
+        const url = generateUrl(startTimestamp, routeNumber, pace, interval, metric, controls, strava_activity, provider, showProvider, origin)
+        updateHistory(url);
+        // don't shorten localhost with bitly
+        if (origin !== 'http://localhost:8080' && (url !== href || !urlIsShortened)) {
+            dispatch(shortenUrl(url))
+        }
     };
 
     const smallScreen = useMediaQuery({query: "(max-width: 800px)"})
@@ -45,7 +52,24 @@ ForecastButton.propTypes = {
     fetchingForecast:PropTypes.bool.isRequired,
     submitDisabled:PropTypes.bool.isRequired,
     routeInfo:PropTypes.object.isRequired,
-    queryString:PropTypes.string.isRequired
+    routeNumber: PropTypes.oneOfType([
+        PropTypes.number,
+        PropTypes.string
+    ]),
+    strava_activity: PropTypes.oneOfType([
+        PropTypes.number,
+        PropTypes.oneOf([''])
+    ]),
+    startTimestamp: PropTypes.number.isRequired,
+    pace: PropTypes.string.isRequired,
+    interval: PropTypes.number.isRequired,
+    metric: PropTypes.bool.isRequired,
+    controls: PropTypes.arrayOf(PropTypes.object).isRequired,
+    origin: PropTypes.string.isRequired,
+    provider: PropTypes.string.isRequired,
+    showProvider: PropTypes.bool.isRequired,
+    urlIsShortened: PropTypes.bool.isRequired,
+    href: PropTypes.string.isRequired
 };
 
 const mapStateToProps = (state) =>
@@ -54,7 +78,17 @@ const mapStateToProps = (state) =>
         // can't request a forecast without a route loaded
         submitDisabled: state.uiInfo.routeParams.rwgpsRoute === '' && state.routeInfo.gpxRouteData === null,
         routeInfo: state.routeInfo,
-        queryString: state.params.queryString
+        queryString: state.params.queryString,
+        routeNumber: state.uiInfo.routeParams.rwgpsRoute,
+        startTimestamp: state.uiInfo.routeParams.startTimestamp,
+        pace: state.uiInfo.routeParams.pace,
+        interval: state.uiInfo.routeParams.interval,
+        metric: state.controls.metric,
+        controls: state.controls.userControlPoints,
+        urlIsShortened: state.uiInfo.dialogParams.shortUrl !== ' ',
+        strava_activity: state.strava.activity,
+        provider: state.forecast.weatherProvider,
+        showProvider: state.controls.showWeatherProvider
     });
 
 const mapDispatchToProps = {

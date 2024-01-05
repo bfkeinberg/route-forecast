@@ -33,7 +33,8 @@ export class ForecastTable extends Component {
         zoomToRange:PropTypes.bool.isRequired,
         routeName:PropTypes.string,
         toggleFetchAqi:PropTypes.func,
-        fetchAqi:PropTypes.bool.isRequired
+        fetchAqi:PropTypes.bool.isRequired,
+        adjustedTimes:PropTypes.arrayOf(PropTypes.object).isRequired
     };
 
     constructor(props) {
@@ -122,7 +123,15 @@ export class ForecastTable extends Component {
             }
     }
 
-    expandTable(forecast, metric) {
+    static getAdjustedTime(point, index, adjustedTimes) {
+        if (adjustedTimes && adjustedTimes.length > 0 && adjustedTimes.findIndex(element => element.index===index) !== -1) {
+            return adjustedTimes.find(element => element.index === index).time.toFormat('h:mm a')
+        } else {
+            return point.time
+        }
+    }
+
+    expandTable(forecast, metric, adjustedTimes) {
         if (forecast.length > 0) {
             return (
                 <tbody>
@@ -132,7 +141,7 @@ export class ForecastTable extends Component {
                         end={index!==forecast.length-1?forecast[index+1].distance*milesToMeters:null}
                         className={this.state.selectedRow===parseInt(point.distance*milesToMeters)?'highlighted':null}
                         onClick={this.toggleRange} onMouseEnter={this.updateWeatherRange}>
-                        <td className='timeCell'><Time time={index === forecast.length-1 ? null :point.adjustedTime ? point.adjustedTime.toFormat('h:mm a') : point.time}/></td>
+                        <td className='timeCell'><Time time={index === forecast.length-1 ? null : ForecastTable.getAdjustedTime(point,index,adjustedTimes)}/></td>
                         <td>{metric ? ((point.distance*milesToMeters)/1000).toFixed(0) : point.distance}</td>
                         <td>{point.summary}</td>
                         <td>{this.state.showApparentTemp?
@@ -207,7 +216,7 @@ export class ForecastTable extends Component {
                                 </MediaQuery>
                             </tr>
                         </thead>
-                        {this.expandTable(this.props.forecast, this.props.metric)}
+                        {this.expandTable(this.props.forecast, this.props.metric, this.props.adjustedTimes)}
                     </HTMLTable>
                 </ErrorBoundary>
             </div>

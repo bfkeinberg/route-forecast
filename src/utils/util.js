@@ -1,4 +1,5 @@
 import gpxParser from "./gpxParser";
+import { DateTime } from 'luxon';
 
 const formatOneControl = (controlPoint) => {
   if (typeof controlPoint === 'string') {
@@ -30,7 +31,7 @@ export const getRouteInfo = (state, type, timeZoneId) => {
   const walkFunction = type === "rwgps" ? gpxParser.walkRwgpsRoute : gpxParser.walkGpxRoute
   return walkFunction(
     routeData,
-    state.uiInfo.routeParams.start,
+    DateTime.fromMillis(state.uiInfo.routeParams.startTimestamp),
     state.uiInfo.routeParams.pace,
     state.uiInfo.routeParams.interval,
     state.controls.userControlPoints,

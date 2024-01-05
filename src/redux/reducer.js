@@ -4,6 +4,7 @@ import { DateTime } from 'luxon';
 import { getRouteNumberFromValue } from '../jsx/RouteInfoForm/RideWithGpsId';
 import { routeLoadingModes } from '../data/enums';
 import { getRouteName } from '../utils/util';
+import { createSlice } from '@reduxjs/toolkit'
 
 export const finishTimeFormat = 'EEE, MMM dd yyyy h:mma';
 
@@ -47,10 +48,10 @@ export const routeParams = function(state = {
     pace: defaultPace,
     rwgpsRoute: '',
     rwgpsRouteIsTrip: false,
-    start: initialStartTime(),
-    initialStart: initialStartTime(),
+    startTimestamp: initialStartTime().toMillis(),
+    initialStartTimestamp: initialStartTime().toMillis(),
     routeLoadingMode: routeLoadingModes.RWGPS,
-    maxDaysInFuture: providerValues['nws'].max_days,
+    maxDaysInFuture: providerValues['weatherKit'].max_days,
     stopAfterLoad: false
 }, action) {
     switch (action.type) {
@@ -62,7 +63,7 @@ export const routeParams = function(state = {
                 min_interval: providerValues[action.weatherProvider].min_interval,
                 maxDaysInFuture: providerValues[action.weatherProvider].max_days,
                 canForecastPast: providerValues[action.weatherProvider].canForecastPast,
-                start: checkedStartDate(state.start, providerValues[action.weatherProvider].canForecastPast)
+                startTimestamp: checkedStartDate(DateTime.fromMillis(state.startTimestamp), providerValues[action.weatherProvider].canForecastPast).toMillis()
             }
         case Actions.SET_RWGPS_ROUTE:
             if (action.route !== undefined) {
@@ -81,7 +82,7 @@ export const routeParams = function(state = {
                 if (!start.isValid) {
                     return state;
                 } else {
-                    return {...state, start: checkedStartDate(start, state.canForecastPast), stopAfterLoad: false};
+                    return {...state, startTimestamp: checkedStartDate(start, state.canForecastPast).toMillis(), stopAfterLoad: false};
                 }
             } else {
                 return state;
@@ -92,7 +93,7 @@ export const routeParams = function(state = {
                 if (!start.isValid) {
                     return state;
                 } else {
-                    return {...state, start: checkedStartDate(start, state.canForecastPast), initialStart: checkedStartDate(start, state.canForecastPast)};
+                    return {...state, startTimestamp: checkedStartDate(start, state.canForecastPast).toMillis(), initialStartTimestamp: checkedStartDate(start, state.canForecastPast).toMillis()};
                 }
             } else {
                 return state;
@@ -103,7 +104,7 @@ export const routeParams = function(state = {
                 if (!start.isValid) {
                     return state;
                 } else {
-                    return {...state, start: checkedStartDate(start, state.canForecastPast), initialStart: checkedStartDate(start, state.canForecastPast)};
+                    return {...state, startTimestamp: checkedStartDate(start, state.canForecastPast).toMillis(), initialStartTimestamp: checkedStartDate(start, state.canForecastPast).toMillis()};
                 }
             } else {
                 return state;
@@ -130,7 +131,7 @@ export const routeParams = function(state = {
         case Actions.BEGIN_FETCHING_FORECAST:
             // TODO
             // suspect this is vestigial
-            return {...state,initialStart:state.start}
+            return {...state,initialStartTimestamp:state.startTimestamp}
         case Actions.SET_ROUTE_LOADING_MODE:
             return {...state, routeLoadingMode: action.newMode};
         default:
@@ -147,7 +148,7 @@ loadingSource:null,fetchingForecast:false,fetchingRoute:false, cancelActiveFetch
         case Actions.BEGIN_LOADING_ROUTE:
             return {...state, fetchingRoute: true, loadingSource: action.source};
         case Actions.BEGIN_FETCHING_FORECAST:
-            return {...state, fetchingForecast: true, cancelActiveFetchMethod: action.abortMethod};
+            return {...state, fetchingForecast: true, cancelActiveFetchMethod: null/*action.abortMethod*/};
         case Actions.FORECAST_FETCH_SUCCESS:
             return {...state, fetchingForecast: false, cancelActiveFetchMethod: null, errorDetails: null};
         case Actions.FORECAST_FETCH_FAILURE:
@@ -400,26 +401,42 @@ const forecast = function(state = {
             return {...state, fetchAqi:!state.fetchAqi}
         case Actions.SET_FETCH_AQI:
             return {...state, fetchAqi:action.fetchAqi}
+        case Actions.SET_ADJUSTED_FORECAST_TIME:
+            if (state.forecast.length > action.index) {
+                let forecastArray = state.forecast.slice(0)
+                let forecast = Object.assign({}, state.forecast[action.index])
+                forecast.adjustedTime = action.value
+                forecastArray[action.index] = forecast
+                return {...state, forecastArray}
+            }
+            return {...state}
         default:
             return state;
     }
 };
 
-const params = function (state = {queryString: null}, action) {
-    switch (action.type) {
-        case Actions.SET_ACTION_URL:
-            return { ...state, action: action.action };
-        case Actions.SET_API_KEYS:
-            return { ...state, maps_api_key: action.mapsKey, timezone_api_key: action.timezoneKey, bitly_token: action.bitlyToken };
-        case Actions.SET_QUERY:
-            // here because it encodes the user entered controls
-            return { ...state, queryString: action.queryString };
-        case Actions.CLEAR_QUERY:
-            return { ...state, queryString: null };
-        default:
-            return state;
+const paramsSlice = createSlice({
+    name:'params',
+    initialState:{},
+    reducers:{
+        actionUrlAdded(state, action) {
+            const url = action.payload
+            state.action = url
+        },
+        apiKeysSet(state, action) {
+            state.maps_api_key= action.payload.maps_api_key
+            state.timezone_api_key = action.payload.timezone_api_key
+            state.bitly_token = action.payload.bitly_token
+        },
+        querySet(state, action) {
+            const query = action.payload
+            state.queryString = query
+        },
+        queryCleared(state) {
+            state.queryString = null
+        }
     }
-};
+})
 
 const rideWithGpsInfo = function(state = {pinnedRoutes:[], token:null, usePinnedRoutes:false, loadingRoutes:false}, action) {
     switch (action.type) {
@@ -436,15 +453,19 @@ const rideWithGpsInfo = function(state = {pinnedRoutes:[], token:null, usePinned
     }
 };
 
+const paramsReducer = paramsSlice.reducer
+
 const appReducer = combineReducers({uiInfo:combineReducers({routeParams,dialogParams}),
-    routeInfo, controls, strava, forecast, params, rideWithGpsInfo});
+    routeInfo, controls, strava, forecast, params:paramsReducer, rideWithGpsInfo});
 
 const rootReducer = (state, action) => {
     if (action.type === 'RESET') {
+        console.info('reset happened')
         state = {params:state.params};
     }
 
     return appReducer(state, action)
 };
 
+export const {actionUrlAdded, apiKeysSet, querySet, queryCleared} = paramsSlice.actions
 export default rootReducer;

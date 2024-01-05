@@ -8,7 +8,7 @@ import { ForecastSettings } from "./ForecastSettings/ForecastSettings";
 import { TopBar } from "./TopBar/TopBar";
 import PaceTable from "./resultsTables/PaceTable";
 import { useSelector } from "react-redux";
-import { useDelay, usePrevious, useValueHasChanged, useWhenChanged } from "../utils/hooks";
+import { useDelay, usePrevious, useValueHasChanged, useWhenChanged, useForecastDependentValues } from "../utils/hooks";
 import { TransitionWrapper } from "./shared/TransitionWrapper";
 import { TitleScreen } from "./TitleScreen";
 import { routeLoadingModes } from "../data/enums";
@@ -18,10 +18,11 @@ import { RouteTitle } from "./shared/RouteTitle";
 import { InstallExtensionButton } from "./InstallExtensionButton";
 
 const DesktopUI = ({mapsApiKey}) => {
+    const {adjustedTimes } = useForecastDependentValues()
     const sidePaneOptions = [
         {title: "Route Info", content: <ErrorBoundary><RouteInfoForm routeProps={{}} /></ErrorBoundary>},
         {title: "Forecast Settings", content: <ErrorBoundary><ForecastSettings/></ErrorBoundary>},
-        {title: "Forecast", content: <ErrorBoundary>{<ForecastTable/>}</ErrorBoundary>},
+        {title: "Forecast", content: <ErrorBoundary>{<ForecastTable adjustedTimes={adjustedTimes}/>}</ErrorBoundary>},
         {title: "Pace Analysis", content: <ErrorBoundary>{<PaceTable/>}</ErrorBoundary>}
     ]
     const [

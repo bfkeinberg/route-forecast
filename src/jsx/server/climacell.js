@@ -68,7 +68,7 @@ const getFromTomorrowIoWithBackoff = async (forecastUrl) => {
             if (forecast.apiCallsHour < 3) {
                 throw Error('Hourly count exceeded');
             }
-            console.info('returning forecast');
+            // console.info('returning forecast');
             // eslint-disable-next-line no-await-in-loop
             await sleep(timeout);
             return forecast;

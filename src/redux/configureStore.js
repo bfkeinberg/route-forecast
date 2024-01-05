@@ -1,12 +1,10 @@
-import {applyMiddleware, createStore} from 'redux';
-import thunkMiddleware from 'redux-thunk';
+import { configureStore } from '@reduxjs/toolkit'
 import {createLogger} from 'redux-logger';
 import rootReducer from './reducer';
 import * as Sentry from '@sentry/browser';
 import createSentryMiddleware from "redux-sentry-middleware";
 
 export const loggerMiddleware = createLogger();
-/* eslint-disable global-require */
 
 const bannedActionKeys = [
     'routeData',
@@ -21,45 +19,36 @@ const bannedActionKeys = [
 
 /**
  *
- * @param {boolean }mode development or production
- * @param {boolean }logging whether to log redux updates to the console
- * @returns {any[]} array of middleware to be used
- */
-export const selectMiddleware = (mode, logging = false) => {
-    const middleware = [thunkMiddleware]
-    if (mode !== 'development') {
-        middleware.push(
-            createSentryMiddleware(Sentry, {
-                stateTransformer: state => {Object.assign(...Object.keys(state)
-                    .filter(key => (key !== 'routeInfo' && key !== 'forecast'))
-                    .map( key => ({ [key]: state[key] }) ) )},
-                breadcrumbDataFromAction: action => {
-                    return Object.assign(...Object.keys(action)
-                        .filter(key => (!bannedActionKeys.includes(key)))
-                        .map( key => ({ [key]: action[key] }) ) )
-                }
-            })
-        )
-    }
-    if (logging && mode === "development") {
-        middleware.push(loggerMiddleware)
-    }
-    return middleware
-};
-
-/**
- *
  * @param {Object} preloadedState from server
  * @param {boolean} mode - development vs production
  * @returns {Object} The Redux store
  *
  */
-export default function configureStore(preloadedState,mode) {
-    const store = createStore(
-        rootReducer,
-        preloadedState,
-        applyMiddleware(...selectMiddleware(mode, true))
-    );
+export default function configureReduxStore(preloadedState,mode) {
+    const store = configureStore({
+        reducer: rootReducer,
+        middleware: getDefaultMiddleware => {
+            const middleware = getDefaultMiddleware()
+        if (mode === 'development') {
+            middleware.push(loggerMiddleware)
+        }
+        if (mode !== 'development') {
+            middleware.push(
+                createSentryMiddleware(Sentry, {
+                    stateTransformer: state => {Object.assign(...Object.keys(state)
+                        .filter(key => (key !== 'routeInfo' && key !== 'forecast'))
+                        .map( key => ({ [key]: state[key] }) ) )},
+                    breadcrumbDataFromAction: action => {
+                        return Object.assign(...Object.keys(action)
+                            .filter(key => (!bannedActionKeys.includes(key)))
+                            .map( key => ({ [key]: action[key] }) ) )
+                    }
+                })
+            )
+        }
+        return middleware;
+        }
+    });
 
     return store;
 }

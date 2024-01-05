@@ -5,12 +5,12 @@ import MapLoader from "./Map/MapLoader";
 import PropTypes from "prop-types";
 import React from "react";
 import { Route, Routes, Link, MemoryRouter, useNavigate } from "react-router-dom";
-import { Button, Icon, IconSize, Intent, Navbar, NavbarGroup, NavbarDivider, NavbarHeading, Alignment } from "@blueprintjs/core";
-import {IconNames } from "@blueprintjs/icons";
+import { Button, IconSize, Intent, Navbar, NavbarGroup, NavbarDivider, NavbarHeading, Alignment } from "@blueprintjs/core";
+import {Shop, Globe, Route as RouteIcon, Cloud, Cycle } from "@blueprintjs/icons";
 import {connect, useSelector} from 'react-redux';
 import RouteInfoForm from "./RouteInfoForm/RouteInfoForm";
 import { ForecastSettings } from "./ForecastSettings/ForecastSettings";
-import { useWhenChanged } from "../utils/hooks";
+import { useWhenChanged, useForecastDependentValues } from "../utils/hooks";
 
 const MobileUI = (props) => {
     return (
@@ -44,6 +44,7 @@ const MobileUITabs = (props) => {
     useWhenChanged(routeData, () => navigate("/controlPoints", {replace:true}))
     useWhenChanged(forecastData, () => navigate("/forecastTable", {replace:true}), forecastData.length > 0)
     useWhenChanged(stravaActivityData, () => navigate("/paceTable", {replace:true}))
+    const {adjustedTimes } = useForecastDependentValues()
     return (
         <>
             <Navbar>
@@ -51,26 +52,26 @@ const MobileUITabs = (props) => {
                     <NavbarHeading>Randoplan</NavbarHeading>
                     <ErrorBoundary>
                         <Link to={"/"} className={'nav-link'}>
-                            <Button minimal icon={IconNames.HOME} intent={Intent.PRIMARY}></Button>
+                            <Button minimal icon={<RouteIcon/>} title={"home"} intent={Intent.PRIMARY}></Button>
                         </Link>
                     </ErrorBoundary>
                     <NavbarDivider/>
                     <ErrorBoundary>
                         <Link to={"/controlPoints/"} className={'nav-link'}>
-                            <Icon icon={IconNames.SHOP} iconSize={Icon.SIZE_STANDARD} intent={Intent.NONE} />
+                            <Shop icon={Shop } size={IconSize.STANDARD} title={"controls"} htmlTitle={"controls"} intent={Intent.NONE} />
                         </Link>
                     </ErrorBoundary>
                     <NavbarDivider/>
                     <Link to={"/map/"} className={'nav-link'}>
-                        <Icon icon={IconNames.GLOBE} iconSize={IconSize.STANDARD} intent={props.needToViewMap ? Intent.DANGER : Intent.NONE}/>
+                        <Globe size={IconSize.STANDARD} title={"map"} htmlTitle={"map"} intent={props.needToViewMap ? Intent.DANGER : Intent.NONE}/>
                     </Link>
                     <NavbarDivider/>
                     <Link to={"/forecastTable/"} className={'nav-link'}>
-                        <Icon icon={IconNames.TH} iconSize={IconSize.STANDARD} intent={props.needToViewTable ? Intent.DANGER : Intent.NONE}/>
+                        <Cloud size={IconSize.STANDARD} title={"forecast"} htmlTitle={"forecast"} intent={props.needToViewTable ? Intent.DANGER : Intent.NONE}/>
                     </Link>
                     <NavbarDivider/>
                     <Link to={"/paceTable/"} className={'nav-link'}>
-                        <Icon color="orange" icon={IconNames.HEAT_GRID} iconSize={IconSize.STANDARD} intent={props.needToViewTable ? Intent.DANGER : Intent.NONE} />
+                        <Cycle color="orange" title={"strava"} htmlTitle={"Strava"} size={IconSize.STANDARD} intent={props.needToViewTable ? Intent.DANGER : Intent.NONE} />
                     </Link>
                 </NavbarGroup>
             </Navbar>
@@ -78,7 +79,7 @@ const MobileUITabs = (props) => {
                 <Route path="/" element={<RouteInfoForm />} />
                 <Route path="/controlPoints/" element={<ForecastSettings />} />
                 <Route path="/map/" element={<MapLoader maps_api_key={props.mapsApiKey} />} />
-                <Route path="/forecastTable/" element={<ForecastTable />} />
+                <Route path="/forecastTable/" element={<ForecastTable adjustedTimes={adjustedTimes}/>} />
                 <Route path="/paceTable/" element={<PaceTable />} />
             </Routes>
         </>

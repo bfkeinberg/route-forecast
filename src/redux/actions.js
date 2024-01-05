@@ -27,6 +27,8 @@ export const componentLoader = (lazyComponent, attemptsLeft) => {
     });
 };
 
+let fetchAbortMethod = null;
+
 const sanitizeCookieName = (cookieName) => {
     return encodeURIComponent(cookieName.replace(/[ =/]/,''));
 };
@@ -61,8 +63,8 @@ const invalidateForecast = () => {
 };
 
 const cancelForecast = () => {
-    return function(dispatch, getState) {
-        const cancel = getState().uiInfo.dialogParams.cancelActiveFetchMethod
+    return function(dispatch) {
+        const cancel = fetchAbortMethod
         if (cancel !== null) {
             cancel()
         }
@@ -226,10 +228,9 @@ export const loadControlsFromCookie = function(routeData) {
 };
 
 export const BEGIN_FETCHING_FORECAST = 'BEGIN_FETCHING_FORECAST';
-const beginFetchingForecast = function(abortMethod) {
+const beginFetchingForecast = function() {
     return {
-        type: BEGIN_FETCHING_FORECAST,
-        abortMethod
+        type: BEGIN_FETCHING_FORECAST
     }
 };
 
@@ -274,12 +275,14 @@ export const requestForecast = function(routeInfo) {
         }
         const fetchController = new AbortController()
         const abortMethod = fetchController.abort.bind(fetchController)
-        dispatch(beginFetchingForecast(abortMethod));
+        fetchAbortMethod = abortMethod;
+        dispatch(beginFetchingForecast());
         const { result, value, error } = await doForecast(getState(), fetchController.signal);
         if (transaction) {
             span.finish(); // Remember that only finished spans will be sent with the transaction
             transaction.finish(); // Finishing the transaction will send it to Sentry
         }
+        fetchAbortMethod = null;
         if (result === "success") {
             const { forecast, timeZoneId } = value
             dispatch(forecastFetchSuccess(forecast, timeZoneId));
@@ -341,12 +344,48 @@ export const loadFromRideWithGps = function(routeNumber, isTrip) {
     };
 };
 
-export const SET_QUERY = 'SET_QUERY';
-export const setQueryString = function(query) {
+export const SET_SHORT_URL = 'SET_SHORT_URL';
+export const setShortUrl = function(url) {
     return {
-        type: SET_QUERY,
-        queryString: query
-    };
+        type: SET_SHORT_URL,
+        url: url
+    }
+};
+
+/*
+ * @param {String} url the URL to shortern
+ * @returns {function(*=, *): Promise<T | never>} return value
+ */
+export const shortenUrl = function(url) {
+    return function (dispatch) {
+        const transaction = Sentry.startTransaction({ name: "shortenUrl" });
+        let span;
+        if (transaction) {
+            span = transaction.startChild({ op: "load" }); // This function returns a Span
+        }
+        return fetch("/bitly",
+            {
+                headers: {
+                    Accept: 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                method: 'POST',
+                body: JSON.stringify({longUrl: url})
+            })
+            .then(response => response.json())
+            .catch( error => {return setErrorDetails(error)})
+            .then(responseJson => {
+                if (transaction) {
+                    span.finish(); // Remember that only finished spans will be sent with the transaction
+                    transaction.finish(); // Finishing the transaction will send it to Sentry
+                }
+                if (responseJson.error === null) {
+                    return dispatch(setShortUrl(responseJson.url));
+                } else {
+                    return dispatch(setErrorDetails(responseJson.error));
+                }
+            })
+    }
 };
 
 export const loadRouteFromURL = () => {
@@ -361,7 +400,12 @@ export const loadRouteFromURL = () => {
         }
         if (error === null && !getState().uiInfo.routeParams.stopAfterLoad) {
             await dispatch(requestForecast(getState().routeInfo));
-            updateHistory(getState().controls.queryString);
+            updateHistory(getState().params.queryString);
+            const url = getState().params.queryString
+            if (!url.includes("localhost")) {
+                dispatch(shortenUrl(url))
+            }
+
         }
         dispatch(setLoadingFromURL(false))
     }
@@ -417,57 +461,6 @@ export const loadGpxRoute = function(event) {
             dispatch(clearRouteData());
         }
     }
-};
-
-export const SET_SHORT_URL = 'SET_SHORT_URL';
-export const setShortUrl = function(url) {
-    return {
-        type: SET_SHORT_URL,
-        url: url
-    }
-};
-
-/*
- * @param {String} url the URL to shortern
- * @returns {function(*=, *): Promise<T | never>} return value
- */
-export const shortenUrl = function(url) {
-    return function (dispatch) {
-        const transaction = Sentry.startTransaction({ name: "shortenUrl" });
-        let span;
-        if (transaction) {
-            span = transaction.startChild({ op: "load" }); // This function returns a Span
-        }
-        return fetch("/bitly",
-            {
-                headers: {
-                    Accept: 'application/json',
-                    'Content-Type': 'application/json'
-                },
-                method: 'POST',
-                body: JSON.stringify({longUrl: url})
-            })
-            .then(response => response.json())
-            .catch( error => {return setErrorDetails(error)})
-            .then(responseJson => {
-                if (transaction) {
-                    span.finish(); // Remember that only finished spans will be sent with the transaction
-                    transaction.finish(); // Finishing the transaction will send it to Sentry
-                }
-                if (responseJson.error === null) {
-                    return dispatch(setShortUrl(responseJson.url));
-                } else {
-                    return dispatch(setErrorDetails(responseJson.error));
-                }
-            })
-    }
-};
-
-export const CLEAR_QUERY = 'CLEAR_QUERY';
-export const clearQueryString = function() {
-    return {
-        type: CLEAR_QUERY,
-    };
 };
 
 export const addControl = function() {
@@ -567,24 +560,6 @@ export const stravaFetchFailure = function(error) {
     return {
         type: STRAVA_FETCH_FAILURE,
         error: error
-    };
-};
-
-export const SET_ACTION_URL = 'SET_ACTION_URL';
-export const setActionUrl = function(action) {
-    return {
-        type: SET_ACTION_URL,
-        action: action
-    };
-};
-
-export const SET_API_KEYS = 'SET_API_KEYS';
-export const setApiKeys = function(mapsKey,timezoneKey, bitlyToken) {
-    return {
-        type: SET_API_KEYS,
-        mapsKey: mapsKey,
-        timezoneKey: timezoneKey,
-        bitlyToken: bitlyToken
     };
 };
 
@@ -753,4 +728,9 @@ export const setFetchAqi = (value) => {
 export const SET_USE_PINNED_ROUTES = 'SET_USE_PINNED_ROUTES'
 export const setUsePinnedRoutes = (value) => {
     return {type:SET_USE_PINNED_ROUTES, value:value};
+}
+
+export const SET_ADJUSTED_FORECAST_TIME = 'SET_ADJUSTED_FORECAST_TIME'
+export const setAdjustedForecastTime = (index, value) => {
+    return {type:SET_ADJUSTED_FORECAST_TIME, index:index, value:value};
 }

@@ -4,6 +4,7 @@ import stravaRouteParser from "./stravaRouteParser"
 import { getRouteInfo, milesToMeters } from "./util"
 import gpxParser from "./gpxParser"
 import { routeLoadingModes } from "../data/enums"
+import { DateTime } from 'luxon';
 
 const useDelay = (delay, startCondition = true) => {
   const [
@@ -197,19 +198,19 @@ const calculateWindResult = (inputs) => {
     let sortedValues = values.slice();
     sortedValues.sort((a,b) => a['distance']-b['distance']);
 
-    const { time, values: calculatedControlPointValues, gustSpeed, finishTime: adjustedFinishTime } = gpxParser.adjustForWind(
+    const { time, values: calculatedControlPointValues, gustSpeed, finishTime: adjustedFinishTime, adjustedTimes } = gpxParser.adjustForWind(
         forecast,
         points,
         routeParams.pace,
         sortedControls,
         sortedValues,
-        routeParams.start,
+        DateTime.fromMillis(routeParams.startTimestamp),
         finishTime,
         timeZoneId
     )
-    result = { weatherCorrectionMinutes: time, calculatedControlPointValues: calculatedControlPointValues, maxGustSpeed: gustSpeed, finishTime: adjustedFinishTime}
+    result = { weatherCorrectionMinutes: time, calculatedControlPointValues: calculatedControlPointValues, maxGustSpeed: gustSpeed, finishTime: adjustedFinishTime, adjustedTimes}
   } else {
-    result = { weatherCorrectionMinutes: null, calculatedControlPointValues: [], maxGustSpeed: null, finishTime: null }
+    result = { weatherCorrectionMinutes: null, calculatedControlPointValues: [], maxGustSpeed: null, finishTime: null, adjustedTimes:[] }
   }
   lastWindResult = {result, dependencyValues: inputs}
   return result

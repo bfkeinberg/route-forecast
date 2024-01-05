@@ -1,5 +1,6 @@
 import * as Sentry from '@sentry/browser';
 import { getRouteInfo } from '../utils/util';
+import { DateTime } from 'luxon';
 
 const findTimezoneForPoint = (lat, lon, time, timezone_api_key, abortSignal) => {
     return fetch(`https://maps.googleapis.com/maps/api/timezone/json?location=${lat},${lon}&timestamp=${time.toSeconds()}&key=${timezone_api_key}`, {signal: abortSignal})
@@ -94,7 +95,7 @@ export const getForecastRequestLength = (state) => {
 
 export const doForecast = async (state, abortSignal) => {
   const type = state.routeInfo.rwgpsRouteData !== null ? "rwgps" : "gpx"
-  const {result, value, error} = await getTimeZoneId(state.routeInfo, state.uiInfo.routeParams.start, state.params.timezone_api_key, type, abortSignal)
+  const {result, value, error} = await getTimeZoneId(state.routeInfo, DateTime.fromMillis(state.uiInfo.routeParams.startTimestamp), state.params.timezone_api_key, type, abortSignal)
   if (result === "error") {
       return { result: "error", error}
   }

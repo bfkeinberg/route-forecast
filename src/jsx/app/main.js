@@ -8,11 +8,10 @@ import queryString from 'query-string';
 import PropTypes from 'prop-types';
 import { connect, useDispatch, useSelector } from 'react-redux';
 import cookie from 'react-cookies';
-import LocationContext from '../locationContext';
 import DesktopUI from '../DesktopUI';
 import MobileUI from '../MobileUI';
 import * as Sentry from "@sentry/react";
-import {providerValues} from "../../redux/reducer";
+import {providerValues, actionUrlAdded, apiKeysSet, querySet, queryCleared} from "../../redux/reducer";
 import {Info} from "luxon";
 
 import {
@@ -20,8 +19,6 @@ import {
     loadFromRideWithGps,
     reset,
     saveCookie,
-    setActionUrl,
-    setApiKeys,
     setInitialStart,
     setInterval,
     setMetric,
@@ -44,7 +41,6 @@ import {
     setStopAfterLoad,
     setFetchAqi
 } from "../../redux/actions";
-import QueryString from './QueryString';
 import { routeLoadingModes } from '../../data/enums';
 import { /*formatControlsForUrl, */parseControls, inputPaceToSpeed } from '../../utils/util';
 
@@ -72,8 +68,6 @@ export const saveRwgpsCredentials = (token) => {
 
 export class RouteWeatherUI extends Component {
     static propTypes = {
-        setActionUrl:PropTypes.func.isRequired,
-        setApiKeys:PropTypes.func.isRequired,
         updateControls:PropTypes.func.isRequired,
         setRouteLoadingMode: PropTypes.func.isRequired,
         loadFromRideWithGps: PropTypes.func.isRequired,
@@ -90,6 +84,7 @@ export class RouteWeatherUI extends Component {
         setStravaActivity: PropTypes.func.isRequired,
         setStravaError: PropTypes.func.isRequired,
         search: PropTypes.string.isRequired,
+        href: PropTypes.string.isRequired,
         action: PropTypes.string.isRequired,
         maps_api_key: PropTypes.string.isRequired,
         timezone_api_key: PropTypes.string.isRequired,
@@ -98,16 +93,20 @@ export class RouteWeatherUI extends Component {
         setZoomToRange:PropTypes.func.isRequired,
         setUsePinnedRoutes:PropTypes.func.isRequired,
         setStopAfterLoad:PropTypes.func.isRequired,
-        setFetchAqi:PropTypes.func
+        setFetchAqi:PropTypes.func,
+        actionUrlAdded:PropTypes.func.isRequired,
+        apiKeysSet:PropTypes.func.isRequired,
+        querySet:PropTypes.func.isRequired
     };
 
     constructor(props) {
         super(props);
 
         let queryParams = queryString.parse(props.search);
+        props.querySet(props.href)
         RouteWeatherUI.updateFromQueryParams(this.props, queryParams);
-        props.setActionUrl(props.action);
-        props.setApiKeys(props.maps_api_key,props.timezone_api_key, props.bitly_token);
+        props.actionUrlAdded(props.action);
+        props.apiKeysSet({maps_api_key:props.maps_api_key,timezone_api_key:props.timezone_api_key, bitly_token:props.bitly_token});
         RouteWeatherUI.setupRideWithGps(props);
         props.updateControls(queryParams.controlPoints==undefined?[]:parseControls(queryParams.controlPoints,true));
         const zoomToRange = loadCookie('zoomToRange');
@@ -271,10 +270,11 @@ export class RouteWeatherUI extends Component {
 }
 
 const mapDispatchToProps = {
-    setStravaToken, setActionUrl, setRwgpsRoute, setApiKeys, setStravaError, setInitialStart, setPace, setInterval, setMetric,
+    setStravaToken, setRwgpsRoute, setStravaError, setInitialStart, setPace, setInterval, setMetric,
     setStravaActivity, updateControls:updateUserControls, setRouteLoadingMode, setStravaRefreshToken,
     loadFromRideWithGps, reset, setWeatherProvider, showWeatherProvider, setRwgpsToken, setStartTimestamp,
-    setZoomToRange, setUsePinnedRoutes, setStopAfterLoad, setFetchAqi
+    setZoomToRange, setUsePinnedRoutes, setStopAfterLoad, setFetchAqi,
+    actionUrlAdded, apiKeysSet, querySet, queryCleared
 };
 
 const mapStateToProps = (state) =>
@@ -318,18 +318,12 @@ const useSetPageTitle = () => {
 }
 
 const FunAppWrapperThingForHooksUsability = ({maps_api_key, queryParams}) => {
-    // TODO
-    // this is causing obnoxious bugs -- can we just cut it?
-    // useSaveControlsToCookie()
     useSetPageTitle()
     useLoadRouteFromURL(queryParams)
     useLoadControlPointsFromURL(queryParams)
 
     return (
         <div>
-            <LocationContext.Consumer>
-                {value => <QueryString href={value.href} origin={value.origin} />}
-            </LocationContext.Consumer>
             <MediaQuery minWidth={501}>
                 <DesktopUI mapsApiKey={maps_api_key} />
             </MediaQuery>
@@ -344,22 +338,3 @@ FunAppWrapperThingForHooksUsability.propTypes = {
         maps_api_key: PropTypes.string.isRequired,
         queryParams: PropTypes.object.isRequired
 };
-
-// Commented out below because evaluating permanently removing the feature of saving off controls
-// const useSaveControlsToCookie = () => {
-
-//     const controlPoints = useSelector(state => state.controls.userControlPoints)
-//     const routeInfo = useSelector(state => state.routeInfo)
-
-//     useEffect(() => {
-//         if (routeInfo.name !== '') {
-//             document.title = `Forecast for ${routeInfo.name}`;
-//             if (controlPoints !== '' && controlPoints.length !== 0) {
-//                 saveCookie(routeInfo.name, formatControlsForUrl(controlPoints, false));
-//             }
-//         }
-//     }, [
-// routeInfo.name,
-// controlPoints
-// ])
-// }

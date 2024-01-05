@@ -3,7 +3,11 @@ module.exports = {
         "node": true,
         "es6": true
     },
-    "extends": "eslint:recommended",
+    "extends": [
+        "eslint:recommended",
+        'plugin:react/recommended',
+        'plugin:react-hooks/recommended'
+    ],
     "parserOptions": {
         "ecmaFeatures": {
             "jsx": true
@@ -11,7 +15,8 @@ module.exports = {
         "ecmaVersion": 2018,
         "sourceType": "module"
     },
-    "plugins": ["react"],
+    // eslint-disable-next-line array-element-newline
+    "plugins": ["react","react-redux"],
     "rules": {
         "accessor-pairs": "error",
         "array-bracket-newline": "error",

@@ -339,6 +339,7 @@ class AnalyzeRoute {
         if (forecastInfo.length===0) {
             return {time:0,values:[],gustSpeed:0,finishTime:finishTime};
         }
+
         const gustThreshold = 50;   // above this incorporate some of the gust into the effect on the rider
         let baseSpeed = inputPaceToSpeed[pace];
         let forecast = forecastInfo.slice().reverse();
@@ -351,6 +352,8 @@ class AnalyzeRoute {
         let accumulatedClimbMeters = 0;
         let calculatedValues = [];
         let maxGustSpeed = 0;
+        let adjustedTimes = []
+        let forecastIndex = 1
 
         stream.filter(point => point != null && point.lat !== undefined && point.lon !== undefined).forEach(currentPoint => {
             if (previousPoint !== null) {
@@ -368,7 +371,8 @@ class AnalyzeRoute {
                     currentForecast = forecast.pop();
                     // calculate adjusted forecast time for table display purposes
                     const initialForecastTime = DateTime.fromFormat(currentForecast.fullTime, 'EEE MMM d h:mma yyyy');
-                    currentForecast.adjustedTime = initialForecastTime.plus({minutes:totalMinutesLost});
+                    adjustedTimes.push({time:initialForecastTime.plus({minutes:totalMinutesLost}),index:forecastIndex})
+                    forecastIndex++
                 }
                 // get bearing between the two points
                 let trackBearing = AnalyzeRoute.getRelativeBearing(previousPoint,currentPoint);
@@ -413,9 +417,17 @@ class AnalyzeRoute {
         });
 
         calculatedValues.sort((a,b) => a.val-b.val);
-        // console.info(`total minutes lost was ${totalMinutesLost}, original finish time:${finishTime}`);
+        // in case there is one more forecast line to update
+        if (forecast.length > 0) {
+            currentForecast = forecast.pop();
+            // calculate adjusted forecast time for table display purposes
+            const initialForecastTime = DateTime.fromFormat(currentForecast.fullTime, 'EEE MMM d h:mma yyyy');
+            adjustedTimes.push({time:initialForecastTime.plus({minutes:totalMinutesLost}),index:forecastIndex})
+        }
         return {time:totalMinutesLost,values:calculatedValues, gustSpeed:maxGustSpeed,
-                finishTime:DateTime.fromFormat(finishTime,finishTimeFormat).plus({minutes:totalMinutesLost}).toFormat(finishTimeFormat)};
+                finishTime:DateTime.fromFormat(finishTime,finishTimeFormat).plus({minutes:totalMinutesLost}).toFormat(finishTimeFormat),
+                adjustedTimes:adjustedTimes
+            };
     };
 
     static calculateValuesForWind(controls, previouslyCalculatedValues,
