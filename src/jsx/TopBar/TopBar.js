@@ -49,7 +49,7 @@ const Tabs = ({sidePaneOptions, activeSidePane, setActiveSidePane, sidebarWidth,
 
   const [
 loadingFromURLStarted,
-loadingFromURLFinished,
+// loadingFromURLFinished,
 displayContent
 ] = useLoadingFromURLStatus()
   return (

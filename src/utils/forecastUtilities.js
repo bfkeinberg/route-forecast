@@ -8,7 +8,11 @@ const findTimezoneForPoint = (lat, lon, time, timezone_api_key, abortSignal) => 
         if (response.ok) {
             return response.json();
         }
-        throw Error(response.error());
+        if (response.error) {
+            throw Error(response.error());
+        } else {
+            throw Error(JSON.stringify(response))
+        }
     })
     .then (body => {
         // check for error in body of message
