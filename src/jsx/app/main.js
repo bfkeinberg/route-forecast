@@ -1,5 +1,5 @@
 import React, {Component, useEffect} from 'react';
-import MediaQuery from 'react-responsive';
+import  {useMediaQuery} from 'react-responsive';
 import '@blueprintjs/core/lib/css/blueprint.css';
 import "@blueprintjs/icons/lib/css/blueprint-icons.css";
 import "@blueprintjs/select/lib/css/blueprint-select.css";
@@ -321,15 +321,18 @@ const FunAppWrapperThingForHooksUsability = ({maps_api_key, queryParams}) => {
     useSetPageTitle()
     useLoadRouteFromURL(queryParams)
     useLoadControlPointsFromURL(queryParams)
-
+    const isLandscape = useMediaQuery({query:'(orientation:landscape)'})
+    const isLargeEnough = useMediaQuery({query:'(min-width: 850px)'})
+    const Desktop = ({ children }) => {
+        return (isLandscape && isLargeEnough) ? children : null
+      }
+    const Mobile = ({ children }) => {
+        return (!isLargeEnough || !isLandscape) ? children : null
+    } 
     return (
         <div>
-            <MediaQuery minWidth={850}>
-                <DesktopUI mapsApiKey={maps_api_key} />
-            </MediaQuery>
-            <MediaQuery maxWidth={849}>
-                <MobileUI mapsApiKey={maps_api_key} />
-            </MediaQuery>
+            <Desktop><DesktopUI mapsApiKey={maps_api_key} /></Desktop>
+            <Mobile><MobileUI mapsApiKey={maps_api_key} /></Mobile>
         </div>
     )
 }
