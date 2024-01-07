@@ -324,10 +324,10 @@ const FunAppWrapperThingForHooksUsability = ({maps_api_key, queryParams}) => {
 
     return (
         <div>
-            <MediaQuery minWidth={701}>
+            <MediaQuery minWidth={850}>
                 <DesktopUI mapsApiKey={maps_api_key} />
             </MediaQuery>
-            <MediaQuery maxWidth={700}>
+            <MediaQuery maxWidth={849}>
                 <MobileUI mapsApiKey={maps_api_key} />
             </MediaQuery>
         </div>
