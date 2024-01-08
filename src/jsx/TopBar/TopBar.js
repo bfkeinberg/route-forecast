@@ -9,7 +9,7 @@ import { useMediaQuery } from "react-responsive";
 import PropTypes from 'prop-types';
 import { RouteTitle } from "../shared/RouteTitle";
 export const TopBar = ({sidePaneOptions, activeSidePane, setActiveSidePane, sidebarWidth, panesVisible}) => {
-  const smallScreen = useMediaQuery({ query: '(max-width: 900px)' })
+  // const smallScreen = useMediaQuery({ query: '(max-width: 900px)' })
   const roomFortitle = useMediaQuery({ query: '(min-width: 1100px)' });
   const roomForFinishTime = useMediaQuery({ query: '(min-width: 1000px)' });
   const roomForLogo = useMediaQuery({ query: '(min-width: 1300px)' });

@@ -1,6 +1,6 @@
 import React from 'react';
 import { ControlTableContainer } from './ControlTableContainer';
-import { setDisplayControlTableUI, toggleMetric, setErrorDetails } from "../../redux/actions";
+import { setErrorDetails } from "../../redux/actions";
 import ForecastInterval from "./ForecastInterval";
 import RidingPace from "./RidingPace";
 import { useSelector, useDispatch } from "react-redux";
@@ -13,6 +13,7 @@ import { RouteTitle } from '../shared/RouteTitle';
 import LocationContext from '../locationContext';
 import ReactGA from "react-ga4";
 import { Toast } from '@blueprintjs/core';
+import { metricToggled, displayControlTableUiSet } from '../../redux/reducer';
 
 export const ForecastSettings = () => {
     // always show weather provider
@@ -22,7 +23,7 @@ export const ForecastSettings = () => {
     const errorDetails = useSelector(state => state.uiInfo.dialogParams.errorDetails)
 
     const showControlPoints = useSelector(state => state.controls.displayControlTableUI)
-    const setShowControlPoints = () => { ReactGA.event('select_content', { content_type: 'controls' });return dispatch(setDisplayControlTableUI(!showControlPoints)) }
+    const setShowControlPoints = () => { ReactGA.event('select_content', { content_type: 'controls' });return dispatch(displayControlTableUiSet(!showControlPoints)) }
 
     return (
         <div style={{ display: "flex", flexFlow: "column", alignItems: "center", marginBottom: "5px" }}>
@@ -31,7 +32,7 @@ export const ForecastSettings = () => {
                 <TimeFields />
                 <div style={{ display: "flex" }}>
                     <RidingPace />
-                    <ToggleButton style={{ flex: 1, margin: "24px 0px 0px 10px" }} active={metric} onClick={() => dispatch(toggleMetric())}>Metric</ToggleButton>
+                    <ToggleButton style={{ flex: 1, margin: "24px 0px 0px 10px" }} active={metric} onClick={() => dispatch(metricToggled())}>Metric</ToggleButton>
                 </div>
                 <div style={{ display: "flex", margin: "30px 0px" }}>
                     <ForecastInterval />

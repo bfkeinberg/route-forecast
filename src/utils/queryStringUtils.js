@@ -3,6 +3,7 @@ import { formatControlsForUrl } from './util';
 import { DateTime } from 'luxon';
 import { updateUserControls } from "../redux/actions"
 import { useDispatch } from 'react-redux';
+import { updateHistory } from "../jsx/app/updateHistory"
 
 const maxUrlLength = 2048;
 const maxControlNameLength = 15;
@@ -38,24 +39,29 @@ const dateToShortDate = function (date) {
 };
 
 const buildUrl = (routeNumber, pace, interval, metric, controls, strava_activity,
-    provider, showProvider, shortDate, start, origin) => {
+    provider, showProvider, shortDate, start, origin, setPageUrl) => {
     let query = makeQuery(routeNumber, pace, interval, metric, controls, strava_activity,
         provider, showProvider);
     if (shortDate !== 'Invalid DateTime') {
         query.startTimestamp = shortDate;
         query.zone = start.zoneName;
     }
-    return `${origin}/?${queryString.stringify(query)}`;
+    const search = queryString.stringify(query)
+    const url = `${origin}/?${search}`
+    if (setPageUrl) {
+        updateHistory(url, search)
+    }
+    return url
 }
 
 export const generateUrl = (startTimestamp, routeNumber, pace, interval, metric, controls, strava_activity,
-    provider, showProvider, origin) => {
+    provider, showProvider, origin, setPageUrl) => {
     const start = DateTime.fromMillis(startTimestamp)
     const shortDate = dateToShortDate(start);
-    let url = buildUrl(routeNumber, pace, interval, metric, controls, strava_activity, provider, showProvider, shortDate, start, origin)
+    let url = buildUrl(routeNumber, pace, interval, metric, controls, strava_activity, provider, showProvider, shortDate, start, origin, setPageUrl)
     if (url.length >= maxUrlLength) {
         const truncatedControls = shrinkControls(controls);
-        url = buildUrl(routeNumber, pace, interval, metric, truncatedControls, strava_activity, provider, showProvider, shortDate, start, origin)
+        url = buildUrl(routeNumber, pace, interval, metric, truncatedControls, strava_activity, provider, showProvider, shortDate, start, origin, setPageUrl)
     }
     return url;
 }

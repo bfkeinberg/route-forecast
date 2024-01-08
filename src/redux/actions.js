@@ -4,7 +4,8 @@ import { loadRwgpsRoute } from '../utils/rwgpsUtilities';
 import { controlsMeaningfullyDifferent, parseControls, extractControlsFromRoute } from '../utils/util';
 import ReactGA from "react-ga4";
 import * as Sentry from "@sentry/react";
-import { updateHistory } from "../jsx/app/updateHistory";
+// import { updateHistory } from "../jsx/app/updateHistory";
+import { userControlsUpdated, displayControlTableUiSet } from './reducer';
 
 export const componentLoader = (lazyComponent, attemptsLeft) => {
     return new Promise((resolve, reject) => {
@@ -198,17 +199,10 @@ const getRouteId = function(routeData) {
     }
 };
 
-export const UPDATE_USER_CONTROLS = 'UPDATE_USER_CONTROLS';
-const updateUserControlsUnthunky = function(controls) {
-    return {
-        type: UPDATE_USER_CONTROLS,
-        controls: controls
-    };
-};
 export const updateUserControls = function(controls) {
     return function(dispatch,getState) {
         const different = controlsMeaningfullyDifferent(controls, getState().controls.userControlPoints)
-        dispatch(updateUserControlsUnthunky(controls))
+        dispatch(userControlsUpdated(controls))
         if (different) {
             dispatch(cancelForecast())
         }
@@ -309,9 +303,6 @@ const setLoadingFromURL = (loading) => {
         loading
     };
 }
-export const SET_DISPLAY_CONTROL_TABLE_UI = 'SET_DISPLAY_CONTROL_TABLE_UI';
-export const setDisplayControlTableUI = (display) => { return { type: SET_DISPLAY_CONTROL_TABLE_UI, displayControlTableUI: display } }
-
 export const loadFromRideWithGps = function(routeNumber, isTrip) {
     return function(dispatch, getState) {
         // ReactGA.send({ hitType: "pageview", page: "/loadRoute" });
@@ -331,7 +322,7 @@ export const loadFromRideWithGps = function(routeNumber, isTrip) {
                 const extractedControls = extractControlsFromRoute(routeData);
                 if (extractedControls.length !== 0) {
                     dispatch(updateUserControls(extractedControls))
-                    dispatch(setDisplayControlTableUI(true))
+                    dispatch(displayControlTableUiSet(true))
                 }
             }
             // dispatch(loadControlsFromCookie(routeData));
@@ -339,7 +330,7 @@ export const loadFromRideWithGps = function(routeNumber, isTrip) {
                 span.finish(); // Remember that only finished spans will be sent with the transaction
                 transaction.finish(); // Finishing the transaction will send it to Sentry
             }
-        }, error => { return dispatch(rwgpsRouteLoadingFailure(error)) }
+        }, error => { return dispatch(rwgpsRouteLoadingFailure(error.message)) }
         );
     };
 };
@@ -400,10 +391,10 @@ export const loadRouteFromURL = () => {
         }
         if (error === null && !getState().uiInfo.routeParams.stopAfterLoad) {
             await dispatch(requestForecast(getState().routeInfo));
-            updateHistory(getState().params.queryString);
+            // updateHistory(getState().params.queryString, getState().params.searchString);
             const url = getState().params.queryString
             if (!url.includes("localhost")) {
-                dispatch(shortenUrl(url))
+                await dispatch(shortenUrl(url))
             }
 
         }
@@ -475,28 +466,6 @@ export const removeControl = function(indexToRemove) {
     return function (dispatch, getState) {
         dispatch(updateUserControls(getState().controls.userControlPoints.filter((control, index) => index !== indexToRemove)))
     }
-};
-
-export const SET_METRIC = 'SET_METRIC';
-export const setMetric = function(metric) {
-    return {
-        type: SET_METRIC,
-        metric: metric
-    };
-};
-
-export const TOGGLE_METRIC = 'TOGGLE_METRIC';
-export const toggleMetric = function() {
-    return {
-        type: TOGGLE_METRIC
-    };
-};
-
-export const TOGGLE_DISPLAY_BANKED = 'TOGGLE_DISPLAY_BANKED';
-export const toggleDisplayBanked = function() {
-    return {
-        type: TOGGLE_DISPLAY_BANKED
-    };
 };
 
 export const SET_ROUTE_LOADING_MODE = 'SET_ROUTE_LOADING_MODE';
@@ -687,9 +656,6 @@ export const setWeatherProvider = (weatherProvider) => {
         dispatch(cancelForecast());
     }
 }
-
-export const SET_SHOW_WEATHER_PROVIDER = 'SET_SHOW_WEATHER_PROVIDER';
-export const showWeatherProvider = (showProvider) => {return {type:SET_SHOW_WEATHER_PROVIDER, showProvider:showProvider}}
 
 export const SET_RWGPS_TOKEN = 'SET_RWGPS_TOKEN';
 export const setRwgpsToken = (token) => {

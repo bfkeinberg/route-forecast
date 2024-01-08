@@ -3,18 +3,8 @@ import PropTypes from 'prop-types';
 import {InputGroup, FormGroup} from '@blueprintjs/core';
 import {connect} from 'react-redux';
 import {setRwgpsRoute} from "../../redux/actions";
-
-export const getRouteNumberFromValue = (value) => {
-    if (value !== '' && value !== null) {
-        // is this just a number or a full url?
-        let route = parseInt(value);
-        if (isNaN(route)) {
-            route = value.split('/').map(part => parseInt(part)).find(val => !isNaN(val));
-        }
-        return route;
-    }
-    return value;
-}
+import { userControlsUpdated } from '../../redux/reducer';
+import { getRouteNumberFromValue } from '../../utils/util';
 
 export const decideValidationStateFor = (type, methodUsed, loadingSuccess) => {
     if (type === methodUsed) {
@@ -28,7 +18,7 @@ export const decideValidationStateFor = (type, methodUsed, loadingSuccess) => {
     }
 }
 
-const RideWithGpsId = ({setRwgpsRoute,loadingSource,loadingSuccess,rwgpsRoute}) => {
+const RideWithGpsId = ({setRwgpsRoute,loadingSource,loadingSuccess,rwgpsRoute,userControlsUpdated}) => {
     const handleRwgpsRoute = function(value) {
         let route = getRouteNumberFromValue(value);
         if (route !== '') {
@@ -53,6 +43,7 @@ const RideWithGpsId = ({setRwgpsRoute,loadingSource,loadingSuccess,rwgpsRoute}) 
 
     const settingRoute = (route) => {
         setRwgpsRoute(route);
+        userControlsUpdated([])
     };
 
     return (
@@ -102,6 +93,7 @@ const RideWithGpsId = ({setRwgpsRoute,loadingSource,loadingSuccess,rwgpsRoute}) 
 RideWithGpsId.propTypes = {
     loadingSource:PropTypes.string,
     setRwgpsRoute:PropTypes.func.isRequired,
+    userControlsUpdated:PropTypes.func.isRequired,
     loadingSuccess:PropTypes.bool,
     rwgpsRoute:PropTypes.oneOfType([
         PropTypes.number,
@@ -117,7 +109,7 @@ const mapStateToProps = (state) =>
     });
 
 const mapDispatchToProps = {
-    setRwgpsRoute
+    setRwgpsRoute, userControlsUpdated
 };
 
 export default connect(mapStateToProps,mapDispatchToProps)(RideWithGpsId);

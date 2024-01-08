@@ -1,9 +1,8 @@
 import * as Actions from './actions';
 import {combineReducers} from 'redux';
 import { DateTime } from 'luxon';
-import { getRouteNumberFromValue } from '../jsx/RouteInfoForm/RideWithGpsId';
+import { getRouteNumberFromValue, getRouteName } from '../utils/util';
 import { routeLoadingModes } from '../data/enums';
-import { getRouteName } from '../utils/util';
 import { createSlice } from '@reduxjs/toolkit'
 
 export const finishTimeFormat = 'EEE, MMM dd yyyy h:mma';
@@ -78,7 +77,7 @@ export const routeParams = function(state = {
             return state;
         case Actions.SET_START_TIME:
             if (action.start !== undefined && action.start !== null) {
-                const start =  DateTime.fromISO(action.start);
+                const start =  DateTime.fromMillis(action.start);
                 if (!start.isValid) {
                     return state;
                 } else {
@@ -215,7 +214,7 @@ const routeInfo = function(state = {
     }
 };
 
-export const controls = function (state = {
+/* export const controls = function (state = {
     metric: false,
     displayBanked: false,
     userControlPoints: [],
@@ -244,7 +243,39 @@ export const controls = function (state = {
         default:
             return state;
     }
-};
+}; */
+
+const controlsSlice = createSlice({
+    name:'controls',
+    initialState:{metric: false,
+        displayBanked: false,
+        userControlPoints: [],
+        showWeatherProvider: false,
+        displayControlTableUI: false},
+    reducers:{
+        metricSet(state, action) {
+            state.metric = action.payload
+        },
+        metricToggled(state) {
+            state.metric = !state.metric
+        },
+        bankedDisplayToggled(state) {
+            state.displayBanked = !state.displayBanked
+        },
+        userControlsUpdated(state,action) {
+            state.userControlPoints = action.payload
+        },
+        showWeatherProviderSet(state,action) {
+            state.showWeatherProvider = action.payload
+        },
+        displayControlTableUiSet(state,action) {
+            state.displayControlTableUI = action.payload
+        }
+    }
+})
+
+export const { metricSet, metricToggled, bankedDisplayToggled, userControlsUpdated, showWeatherProviderSet, displayControlTableUiSet} = controlsSlice.actions
+export const controlsReducer = controlsSlice.reducer
 
 const getAnalysisIntervalFromRouteDuration = (durationInHours) => {
     if (durationInHours > 72) {
@@ -429,8 +460,9 @@ const paramsSlice = createSlice({
             state.bitly_token = action.payload.bitly_token
         },
         querySet(state, action) {
-            const query = action.payload
+            const query = action.payload.url
             state.queryString = query
+            state.searchString = action.payload.search
         },
         queryCleared(state) {
             state.queryString = null
@@ -453,10 +485,10 @@ const rideWithGpsInfo = function(state = {pinnedRoutes:[], token:null, usePinned
     }
 };
 
-const paramsReducer = paramsSlice.reducer
+export const paramsReducer = paramsSlice.reducer
 
 const appReducer = combineReducers({uiInfo:combineReducers({routeParams,dialogParams}),
-    routeInfo, controls, strava, forecast, params:paramsReducer, rideWithGpsInfo});
+    routeInfo, controls:controlsReducer, strava, forecast, params:paramsReducer, rideWithGpsInfo});
 
 const rootReducer = (state, action) => {
     if (action.type === 'RESET') {

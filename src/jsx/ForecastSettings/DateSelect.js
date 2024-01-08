@@ -49,7 +49,7 @@ const DateSelect = ({start, setStart, setInitialStart, maxDaysInFuture, canForec
                             defaultDate: start.toJSDate(),
                             dateFormat: 'Z',
                             onParseConfig: (dates, datestr, instance) =>
-                                instance.config.onClose.push((dates) => { setStart(DateTime.fromJSDate(dates[0])) })
+                                instance.config.onClose.push((dates) => { setStart(DateTime.fromJSDate(dates[0]).toMillis()) })
                         }}
                     />
                 </DesktopTooltip>
@@ -68,7 +68,7 @@ DateSelect.propTypes = {
 
 const mapStateToProps = (state) =>
     ({
-        start: DateTime.fromMillis(state.uiInfo.routeParams.initialStartTimestamp),
+        start: DateTime.fromMillis(state.uiInfo.routeParams.startTimestamp),
         maxDaysInFuture:state.uiInfo.routeParams.maxDaysInFuture,
         canForecastPast:state.uiInfo.routeParams.canForecastPast
     });

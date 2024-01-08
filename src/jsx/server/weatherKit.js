@@ -26,6 +26,11 @@ const makeJwt = () => {
     )
 }
 
+const showAvailability = (lat, lon, weatherKitKey) => {
+    const aUrl = `https://weatherkit.apple.com/api/v1/availability/${lat}/${lon}`
+    const aResult = fetch(aUrl,{headers: {'Authorization':`Bearer ${weatherKitKey}`}}).then(response => {return response.json()}).
+    then(availablity => console.info(availablity))
+}
 /* eslint-disable max-params*/
 /**
  *
@@ -45,7 +50,8 @@ const callWeatherKit = function (lat, lon, currentTime, distance, zone, bearing,
     const weatherKitKey = makeJwt();
     const when = startTime.toISO({suppressMilliseconds:true});
     const later = startTime.plus({hours:1}).toISO({suppressMilliseconds:true});
-    const url = `https://weatherkit.apple.com/api/v1/weather/en/${lat}/${lon}?timezone=${zone}&dataSets=currentWeather,forecastHourly&countryCode=US&currentAsOf=${when}&hourlyStart=${when}&hourlyEnd=${later}`;
+    // showAvailability(lat,lon,weatherKitKey)
+    const url = `https://weatherkit.apple.com/api/v1/weather/en/${lat}/${lon}?timezone=${zone}&dataSets=currentWeather,forecastHourly,forecastNextHour,&countryCode=US&currentAsOf=${when}&hourlyStart=${when}&hourlyEnd=${later}`;
     console.info(`WeatherKit URL ${url}`);
     const forecastResult = fetch(url,{headers: {'Authorization':`Bearer ${weatherKitKey}`}}).then(response => {
         if (!response.ok) {throw response.errorText?response.errorText:`Error ${response.status}`}

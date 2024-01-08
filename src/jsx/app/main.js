@@ -11,7 +11,7 @@ import cookie from 'react-cookies';
 import DesktopUI from '../DesktopUI';
 import MobileUI from '../MobileUI';
 import * as Sentry from "@sentry/react";
-import {providerValues, actionUrlAdded, apiKeysSet, querySet, queryCleared} from "../../redux/reducer";
+import {providerValues, actionUrlAdded, apiKeysSet, querySet, queryCleared, metricSet, showWeatherProviderSet, displayControlTableUiSet, userControlsUpdated} from "../../redux/reducer";
 import {Info} from "luxon";
 
 import {
@@ -21,7 +21,6 @@ import {
     saveCookie,
     setInitialStart,
     setInterval,
-    setMetric,
     setPace,
     setRwgpsRoute,
     setStravaActivity,
@@ -31,11 +30,9 @@ import {
     updateUserControls,
     setStravaRefreshToken,
     setWeatherProvider,
-    showWeatherProvider,
     setStartTimestamp,
     setZoomToRange,
     loadRouteFromURL,
-    setDisplayControlTableUI,
     setRwgpsToken,
     setUsePinnedRoutes,
     setStopAfterLoad,
@@ -80,7 +77,7 @@ export class RouteWeatherUI extends Component {
         setWeatherProvider: PropTypes.func.isRequired,
         setPace: PropTypes.func.isRequired,
         setInterval: PropTypes.func.isRequired,
-        setMetric: PropTypes.func.isRequired,
+        metricSet: PropTypes.func.isRequired,
         setStravaActivity: PropTypes.func.isRequired,
         setStravaError: PropTypes.func.isRequired,
         search: PropTypes.string.isRequired,
@@ -103,7 +100,7 @@ export class RouteWeatherUI extends Component {
         super(props);
 
         let queryParams = queryString.parse(props.search);
-        props.querySet(props.href)
+        props.querySet({url:props.href,search:props.search})
         RouteWeatherUI.updateFromQueryParams(this.props, queryParams);
         props.actionUrlAdded(props.action);
         props.apiKeysSet({maps_api_key:props.maps_api_key,timezone_api_key:props.timezone_api_key, bitly_token:props.bitly_token});
@@ -212,6 +209,7 @@ export class RouteWeatherUI extends Component {
             props.setWeatherProvider('weatherKit');
         }
         props.setRwgpsRoute(queryParams.rwgpsRoute);
+        props.userControlsUpdated([])
         RouteWeatherUI.getStravaToken(queryParams,props);
         if (queryParams.startTimestamp !== undefined) {
             if (RouteWeatherUI.hasZone(queryParams.zone)) {
@@ -236,7 +234,7 @@ export class RouteWeatherUI extends Component {
             }
         }
         props.setInterval(queryParams.interval);
-        props.setMetric(queryParams.metric==="true");
+        props.metricSet(queryParams.metric==="true");
         props.setStravaActivity(queryParams.strava_activity);
         props.setStravaError(queryParams.strava_error);
         if (queryParams.strava_analysis !== undefined) {
@@ -244,13 +242,13 @@ export class RouteWeatherUI extends Component {
         }
         // make show weather provider "sticky"
         if (queryParams.showProvider !== undefined) {
-            props.showWeatherProvider(queryParams.showProvider==="true");
+            props.showWeatherProviderSet(queryParams.showProvider==="true");
             saveCookie("showWeatherProvider", queryParams.showProvider==="true");
         }
         else {
             let showWeatherProvider = loadCookie("showWeatherProvider");
             if (showWeatherProvider !== undefined) {
-                props.showWeatherProvider(showWeatherProvider==="true");
+                props.showWeatherProviderSet(showWeatherProvider==="true");
             }
         }
         if (queryParams.rwgpsToken !== undefined) {
@@ -270,11 +268,11 @@ export class RouteWeatherUI extends Component {
 }
 
 const mapDispatchToProps = {
-    setStravaToken, setRwgpsRoute, setStravaError, setInitialStart, setPace, setInterval, setMetric,
+    setStravaToken, setRwgpsRoute, setStravaError, setInitialStart, setPace, setInterval, metricSet,
     setStravaActivity, updateControls:updateUserControls, setRouteLoadingMode, setStravaRefreshToken,
-    loadFromRideWithGps, reset, setWeatherProvider, showWeatherProvider, setRwgpsToken, setStartTimestamp,
+    loadFromRideWithGps, reset, setWeatherProvider, showWeatherProviderSet, setRwgpsToken, setStartTimestamp,
     setZoomToRange, setUsePinnedRoutes, setStopAfterLoad, setFetchAqi,
-    actionUrlAdded, apiKeysSet, querySet, queryCleared
+    actionUrlAdded, apiKeysSet, querySet, queryCleared, userControlsUpdated
 };
 
 const mapStateToProps = (state) =>
@@ -301,7 +299,7 @@ const useLoadControlPointsFromURL = (queryParams) => {
             dispatch(updateUserControls([]))
         } else {
             dispatch(updateUserControls(parseControls(queryParams.controlPoints, false)))
-            dispatch(setDisplayControlTableUI(true))
+            dispatch(displayControlTableUiSet(true))
         }
     }, [queryParams])
 }
@@ -323,16 +321,10 @@ const FunAppWrapperThingForHooksUsability = ({maps_api_key, queryParams}) => {
     useLoadControlPointsFromURL(queryParams)
     const isLandscape = useMediaQuery({query:'(orientation:landscape)'})
     const isLargeEnough = useMediaQuery({query:'(min-width: 850px)'})
-    const Desktop = ({ children }) => {
-        return (isLandscape && isLargeEnough) ? children : null
-      }
-    const Mobile = ({ children }) => {
-        return (!isLargeEnough || !isLandscape) ? children : null
-    } 
     return (
         <div>
-            <Desktop><DesktopUI mapsApiKey={maps_api_key} /></Desktop>
-            <Mobile><MobileUI mapsApiKey={maps_api_key} /></Mobile>
+            {isLandscape && isLargeEnough && <DesktopUI mapsApiKey={maps_api_key} />}
+            {(!isLargeEnough || !isLandscape) && <MobileUI mapsApiKey={maps_api_key} />}
         </div>
     )
 }
