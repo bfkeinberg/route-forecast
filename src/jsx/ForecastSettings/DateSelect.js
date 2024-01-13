@@ -4,9 +4,10 @@ import Flatpickr from 'react-flatpickr'
 import {Icon} from '@blueprintjs/core';
 import { DesktopTooltip } from '../shared/DesktopTooltip';
 import {connect} from 'react-redux';
-import {setStart, setInitialStart} from "../../redux/actions";
+import {setStart} from "../../redux/actions";
 import 'flatpickr/dist/themes/confetti.css';
 import { DateTime } from 'luxon';
+import { initialStartTimeSet } from '../../redux/reducer';
 
 /*const setDateAndTime = function(dates, datestr, instance) {
     if (datestr === '') {
@@ -19,11 +20,11 @@ import { DateTime } from 'luxon';
 export const setDateOnly = (start, setInitialStart) => {
     let now = DateTime.now();
     let newStart = start.set({day: now.day, month:now.month, year:now.year});
-    setInitialStart(newStart, newStart.zone.name);
+    setInitialStart({start:newStart.toISO(), zone:newStart.zone.name});
 };
 
 //"EEE MMM dd yyyy HH:mm:ss 'GMT'ZZZ"
-const DateSelect = ({start, setStart, setInitialStart, maxDaysInFuture, canForecastPast}) => {
+const DateSelect = ({start, setStart, initialStartTimeSet, maxDaysInFuture, canForecastPast}) => {
     // allow us to continue to show the start time if the route was forecast for a time before the present
     const now = new Date();
     let later = new Date();
@@ -33,7 +34,7 @@ const DateSelect = ({start, setStart, setInitialStart, maxDaysInFuture, canForec
     return (
         <div style={{display: "flex", alignItems: "center", justifyContent: "center"}}>
             <span id={"startingTime"} style={{fontSize: ".875rem", fontWeight: "bolder", padding: "0px 5px", flex: 1}}>
-                <Icon icon="calendar" onClick={() => setDateOnly(start, setInitialStart)} style={{cursor: "pointer", marginRight: "3px"}}/>
+                <Icon icon="calendar" onClick={() => setDateOnly(start, initialStartTimeSet)} style={{cursor: "pointer", marginRight: "3px"}}/>
                 Starting time
             </span>
             <div style={{ flex: 2.5 }}>
@@ -61,7 +62,7 @@ const DateSelect = ({start, setStart, setInitialStart, maxDaysInFuture, canForec
 DateSelect.propTypes = {
     start:PropTypes.instanceOf(DateTime).isRequired,
     setStart:PropTypes.func.isRequired,
-    setInitialStart:PropTypes.func.isRequired,
+    initialStartTimeSet:PropTypes.func.isRequired,
     maxDaysInFuture:PropTypes.number.isRequired,
     canForecastPast:PropTypes.bool.isRequired
 };
@@ -74,7 +75,7 @@ const mapStateToProps = (state) =>
     });
 
 const mapDispatchToProps = {
-    setStart, setInitialStart
+    setStart, initialStartTimeSet
 };
 
 export default connect(mapStateToProps,mapDispatchToProps)(DateSelect);

@@ -51,10 +51,11 @@ const Tabs = ({sidePaneOptions, activeSidePane, setActiveSidePane, sidebarWidth,
 
   const [
 loadingFromURLStarted,
-// loadingFromURLFinished,
+loadingFromURLFinished,
 displayContent
 ] = useLoadingFromURLStatus()
-  return (
+console.info(`loadingFromUrlFinished=${loadingFromURLFinished}`)
+return (
     <div style={{height: "50px", display: "flex", alignItems: "center", width: `${sidebarWidth}px`}} className={(loadingFromURLStarted && displayContent) ? "fade-in" : ""}>
       {displayContent ?
         sidePaneOptions.map((option, index) => {

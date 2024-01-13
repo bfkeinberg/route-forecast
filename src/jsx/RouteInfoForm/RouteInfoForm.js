@@ -2,7 +2,6 @@ import React from 'react';
 import ShortUrl from '../TopBar/ShortUrl';
 import MediaQuery from 'react-responsive';
 import PropTypes from 'prop-types';
-import {setRouteLoadingMode, setErrorDetails} from '../../redux/actions';
 import {connect, useDispatch} from 'react-redux';
 import { AlwaysFilledSwitch } from './AlwaysFilledSwitch';
 import { RouteInfoInputRWGPS } from './RouteInfoInputRWGPS';
@@ -10,24 +9,25 @@ import { RouteInfoInputStrava } from './RouteInfoInputStrava';
 import { routeLoadingModes } from '../../data/enums';
 import ReactGA from "react-ga4";
 import {Toast} from '@blueprintjs/core';
+import { errorDetailsSet, routeLoadingModeSet } from '../../redux/reducer';
 // import mobile_usage_demo from "Images/mobile_usage_demo.gif";
 
-const RouteInfoForm = ({ errorDetails, setErrorDetails, routeLoadingMode, setRouteLoadingMode/* , routeInfo */ }) => {
+const RouteInfoForm = ({ errorDetails, errorDetailsSet, routeLoadingMode, routeLoadingModeSet/* , routeInfo */ }) => {
     const mode = routeLoadingMode
     const dispatch = useDispatch()
 
     const modeSwitched = (event) => {
-        setRouteLoadingMode(event.target.checked ? routeLoadingModes.STRAVA : routeLoadingModes.RWGPS);
+        routeLoadingModeSet(event.target.checked ? routeLoadingModes.STRAVA : routeLoadingModes.RWGPS);
         if (event.target.checked) {ReactGA.event('select_content', {content_type:'strava'})}
     }
 
     return (
         <div style={{padding: "16px"}}>
-            <RouteLoadingModeSelector mode={mode} setMode={setRouteLoadingMode} modeSwitched={modeSwitched}/>
+            <RouteLoadingModeSelector mode={mode} setMode={routeLoadingModeSet} modeSwitched={modeSwitched}/>
             {mode === routeLoadingModes.RWGPS ?
                 <RouteInfoInputRWGPS/> :
                 <RouteInfoInputStrava/>}
-            {errorDetails !== null && <Toast style={{ padding: '10px', marginTop: "10px" }} message={errorDetails} timeout={0} onDismiss={() => dispatch(setErrorDetails(null))} intent="danger"></Toast>}
+            {errorDetails !== null && <Toast style={{ padding: '10px', marginTop: "10px" }} message={errorDetails} timeout={0} onDismiss={() => dispatch(errorDetailsSet(null))} intent="danger"></Toast>}
             <MediaQuery maxDeviceWidth={500}>
                 <div style={{marginTop: "10px", textAlign: "center"}}>
                     <ShortUrl/>
@@ -70,7 +70,7 @@ const mapStateToProps = (state) =>
     });
 
 const mapDispatchToProps = {
-    setRouteLoadingMode, setErrorDetails
+    routeLoadingModeSet, errorDetailsSet
 };
 
 RouteInfoForm.propTypes = {
@@ -80,8 +80,8 @@ RouteInfoForm.propTypes = {
     needToViewTable: PropTypes.bool.isRequired,
     routeProps: PropTypes.object,
     routeLoadingMode: PropTypes.number,
-    setRouteLoadingMode: PropTypes.func.isRequired,
-    setErrorDetails:PropTypes.func.isRequired
+    routeLoadingModeSet: PropTypes.func.isRequired,
+    errorDetailsSet:PropTypes.func.isRequired
 };
 
 export default connect(mapStateToProps, mapDispatchToProps, null)(RouteInfoForm);

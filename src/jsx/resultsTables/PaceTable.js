@@ -3,15 +3,16 @@ import ErrorBoundary from "../shared/ErrorBoundary";
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 import 'animate.css/animate.min.css';
-import { setSubrange, toggleMapRange, toggleZoomToRange } from '../../redux/actions';
+import { setSubrange, toggleMapRange } from '../../redux/actions';
 import stravaRouteParser from '../../utils/stravaRouteParser';
 import StravaAnalysisIntervalInput from './StravaAnalysisIntervalInput';
 import { useActualPace, useFormatSpeed } from '../../utils/hooks';
 import { ToggleButton } from '../shared/ToggleButton';
 import cookie from 'react-cookies';
 import { HTMLTable, Tooltip } from '@blueprintjs/core';
+import { zoomToRangeToggled } from '../../redux/reducer';
 
-const PaceTable = ({activityData, activityStream, analysisInterval, setSubrange, toggleMapRange, zoomToRange, toggleZoomToRange}) =>  {
+const PaceTable = ({activityData, activityStream, analysisInterval, setSubrange, toggleMapRange, zoomToRange, zoomToRangeToggled}) =>  {
 
     const [
 selectedRow,
@@ -28,7 +29,7 @@ setSelectedRow
     };
 
     const toggleZoom = () => {
-        toggleZoomToRange();
+        zoomToRangeToggled();
         cookie.save('zoomToRange', !zoomToRange, { path: '/' });
     };
 
@@ -106,7 +107,7 @@ PaceTable.propTypes = {
     activityStream:PropTypes.object,
     analysisInterval:PropTypes.number,
     zoomToRange:PropTypes.bool.isRequired,
-    toggleZoomToRange:PropTypes.func.isRequired
+    zoomToRangeToggled:PropTypes.func.isRequired
 };
 
 const mapStateToProps = (state) =>
@@ -118,7 +119,7 @@ const mapStateToProps = (state) =>
     });
 
 const mapDispatchToProps = {
-    setSubrange, toggleMapRange, toggleZoomToRange
+    setSubrange, toggleMapRange, zoomToRangeToggled
 };
 
 export default connect(mapStateToProps,mapDispatchToProps)(PaceTable);

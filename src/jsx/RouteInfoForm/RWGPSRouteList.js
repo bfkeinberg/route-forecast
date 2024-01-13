@@ -3,8 +3,8 @@ import { Select } from "@blueprintjs/select";
 import { Button, MenuItem } from "@blueprintjs/core";
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
-import {setRwgpsRoute, setRouteIsTrip, loadFromRideWithGps} from "../../redux/actions";
-import { userControlsUpdated } from '../../redux/reducer';
+import {loadFromRideWithGps} from "../../redux/actions";
+import { routeIsTripSet, rwgpsRouteSet } from '../../redux/reducer';
 
 const renderFavorite = (favorite, { handleClick, modifiers }) => {
     if (!modifiers.matchesPredicate) {
@@ -21,7 +21,7 @@ const renderFavorite = (favorite, { handleClick, modifiers }) => {
     );
 };
 
-const RWGPSRouteList = ({pinnedRoutes, setRwgpsRoute, userControlsUpdated, route_id, setRouteIsTrip, loadFromRideWithGps}) => {
+const RWGPSRouteList = ({pinnedRoutes, rwgpsRouteSet, route_id, routeIsTripSet, loadFromRideWithGps}) => {
     return (
             <Select
                         items={pinnedRoutes}
@@ -30,9 +30,8 @@ const RWGPSRouteList = ({pinnedRoutes, setRwgpsRoute, userControlsUpdated, route
                         filterable={false}
                         itemsEqual="associated_object_id"
                         onItemSelect={(selected) => {
-                            setRouteIsTrip(selected.associated_object_type=="trip");
-                            setRwgpsRoute(selected.associated_object_id);
-                            userControlsUpdated([])
+                            routeIsTripSet(selected.associated_object_type=="trip");
+                            rwgpsRouteSet(selected.associated_object_id);
                             loadFromRideWithGps(selected.associated_object_id, selected.associated_object_type=="trip");
                         }}
             >
@@ -41,8 +40,7 @@ const RWGPSRouteList = ({pinnedRoutes, setRwgpsRoute, userControlsUpdated, route
 }
 
 RWGPSRouteList.propTypes = {
-    setRwgpsRoute:PropTypes.func.isRequired,
-    userControlsUpdated:PropTypes.func.isRequired,
+    rwgpsRouteSet:PropTypes.func.isRequired,
     pinnedRoutes:PropTypes.arrayOf(PropTypes.shape({
         id: PropTypes.number,
         associated_object_type: PropTypes.string,
@@ -52,8 +50,8 @@ RWGPSRouteList.propTypes = {
         PropTypes.number,
         PropTypes.string
     ]),
-    setRouteIsTrip:PropTypes.func.isRequired,
-    loadFromRideWithGps:PropTypes.func.isRequired
+    routeIsTripSet:PropTypes.func.isRequired,
+    loadFromRideWithGps:PropTypes.func.isRequired,
 };
 
 const mapStateToProps = (state) =>
@@ -63,7 +61,7 @@ const mapStateToProps = (state) =>
 });
 
 const mapDispatchToProps = {
-    setRwgpsRoute, setRouteIsTrip, loadFromRideWithGps, userControlsUpdated
+    rwgpsRouteSet, routeIsTripSet, loadFromRideWithGps
 };
 
 export default connect(mapStateToProps,mapDispatchToProps)(RWGPSRouteList);

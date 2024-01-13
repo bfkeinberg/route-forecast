@@ -4,6 +4,7 @@ import { DateTime } from 'luxon';
 import { updateUserControls } from "../redux/actions"
 import { useDispatch } from 'react-redux';
 import { updateHistory } from "../jsx/app/updateHistory"
+import { querySet } from '../redux/reducer';
 
 const maxUrlLength = 2048;
 const maxControlNameLength = 15;
@@ -51,6 +52,8 @@ const buildUrl = (routeNumber, pace, interval, metric, controls, strava_activity
     if (setPageUrl) {
         updateHistory(url, search)
     }
+    const dispatch = useDispatch();
+    dispatch(querySet({queryString:url,searchString:search}))
     return url
 }
 
