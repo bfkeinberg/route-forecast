@@ -208,62 +208,66 @@ const dialogParamsSlice = createSlice({
         forecastFetchBegun(state) {
             state.fetchingForecast = true
         },
-        forecastFetchFailed(state,action) {
+        forecastFetchFailed(state, action) {
             state.fetchingForecast = false
             state.errorDetails = typeof action.payload === 'object' ? action.payload.message : action.payload
         },
         forecastFetchCanceled(state) {
             state.fetchingForecast = false
         },
-        rwgpsRouteLoadingFailed(state,action) {
+        rwgpsRouteLoadingFailed(state, action) {
             state.fetchingRoute = false
             state.errorDetails = (typeof action.payload === 'object' ? action.payload.message : action.payload)
             state.succeeded = false
         },
-        gpxRouteLoadingFailed(state,action) {
+        gpxRouteLoadingFailed(state, action) {
             state.fetchingRoute = false
             state.errorDetails = (typeof action.payload === 'object' ? action.payload.message : action.payload)
             state.succeeded = false
         },
-        errorDetailsSet(state,action) {
+        errorDetailsSet(state, action) {
             if (action.payload instanceof Error) {
                 state.errorDetails = action.payload.toString()
             } else {
                 state.errorDetails = action.payload
             }
         },
-        shortUrlSet(state,action) {
+        shortUrlSet(state, action) {
             state.shortUrl = action.payload
         }
     },
-    extraReducers:(builder) => {
+    extraReducers: (builder) => {
         builder
             .addCase(pinnedRoutesSet, (state) => {
                 state.errorDetails = null
-        })
+            })
             .addCase(Actions.STRAVA_FETCH_SUCCESS, (state) => {
                 state.errorDetails = null
-        })
-            .addCase(Actions.SET_STRAVA_ERROR, (state,action) => {
+            })
+            .addCase(Actions.SET_STRAVA_ERROR, (state, action) => {
                 if (action.payload !== undefined) {
                     state.errorDetails = `Error loading route from Strava: ${action.payload}`
                 }
-        })
+            })
+            .addCase(Actions.STRAVA_FETCH_FAILURE, (state, action) => {
+                const errorMessage = typeof action.error === 'object' ? action.error.message : action.error
+                state.errorDetails = `Error loading activity from Strava: ${errorMessage}`
+            })
             .addCase(rwgpsRouteLoaded, (state) => {
                 state.fetchingRoute = false
                 state.errorDetails = null
                 state.succeeded = true
-        })
+            })
             .addCase(gpxRouteLoaded, (state) => {
                 state.fetchingRoute = false
                 state.errorDetails = null
                 state.succeeded = true
-        })
+            })
             .addCase('forecast/forecastFetched', (state) => {
                 state.fetchingForecast = false
                 state.errorDetails = null
             })
-}
+    }
 })
 
 export const dialogParamsReducer = dialogParamsSlice.reducer

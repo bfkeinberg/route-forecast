@@ -63,6 +63,7 @@ const StravaRouteIdInput = ({ setStravaActivity, strava_activity, canAnalyze }) 
 StravaRouteIdInput.propTypes = {
     strava_activity:PropTypes.oneOfType([
         PropTypes.number,
+        PropTypes.string,
         PropTypes.oneOf([''])
     ]).isRequired,
     setStravaActivity:PropTypes.func.isRequired,
