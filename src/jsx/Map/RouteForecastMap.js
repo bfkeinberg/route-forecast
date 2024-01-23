@@ -85,12 +85,17 @@ const RouteForecastMap = ({maps_api_key}) => {
     }
 
     const { points, bounds } = usePointsAndBounds()
-    const mapBounds = useMemo( () => (bounds !== null ? getMapBounds(points, bounds, zoomToRange, subrange) : null), [
-points,
-bounds,
-zoomToRange,
-subrange
-]);
+    let mapBounds
+    try {
+        mapBounds = useMemo(() => (bounds !== null ? getMapBounds(points, bounds, zoomToRange, subrange) : null), [
+            points,
+            bounds,
+            zoomToRange,
+            subrange
+        ])
+    } catch (error) {
+        console.warn(`Error creating map bounds:${error}`)
+    }
     // const mapBounds = (bounds !== null ? getMapBounds(points, bounds, zoomToRange, subrange) : null);
     const mapCenter = useMemo( () => ((mapBounds !== null && mapBounds !== undefined) ? mapBounds.getCenter() : null), [mapBounds]);
     // const mapCenter = ((mapBounds !== null && mapBounds !== undefined) ? mapBounds.getCenter() : null);
