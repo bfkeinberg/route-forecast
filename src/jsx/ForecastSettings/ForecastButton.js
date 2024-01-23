@@ -7,8 +7,10 @@ import { useMediaQuery } from 'react-responsive';
 import { Spinner, Button } from '@blueprintjs/core';
 import { updateHistory } from "../app/updateHistory";
 import { generateUrl } from '../../utils/queryStringUtils';
+import { querySet } from '../../redux/reducer';
 
-const ForecastButton = ({fetchingForecast,requestForecast,routeInfo,submitDisabled, routeNumber, startTimestamp, pace, interval, metric, controls, strava_activity, provider, showProvider, href, urlIsShortened}) => {
+const ForecastButton = ({fetchingForecast,requestForecast,routeInfo,submitDisabled, routeNumber, startTimestamp, pace, interval,
+     metric, controls, strava_activity, provider, showProvider, href, urlIsShortened, querySet}) => {
     const dispatch = useDispatch()
     let tooltipContent = submitDisabled ?
         "Must provide an rwgps route id" :
@@ -17,10 +19,11 @@ const ForecastButton = ({fetchingForecast,requestForecast,routeInfo,submitDisabl
     const forecastClick = () => {
         requestForecast(routeInfo);
         const url = generateUrl(startTimestamp, routeNumber, pace, interval, metric, controls, strava_activity, provider, showProvider, origin, true)
-        updateHistory(url, true);
+        querySet({queryString:url.url,searchString:url.search})
+        updateHistory(url.url, true);
         // don't shorten localhost with bitly
-        if (origin !== 'http://localhost:8080' && (url !== href || !urlIsShortened)) {
-            dispatch(shortenUrl(url))
+        if (origin !== 'http://localhost:8080' && (url.url !== href || !urlIsShortened)) {
+            dispatch(shortenUrl(url.url))
         }
     };
 
@@ -69,7 +72,8 @@ ForecastButton.propTypes = {
     provider: PropTypes.string.isRequired,
     showProvider: PropTypes.bool.isRequired,
     urlIsShortened: PropTypes.bool.isRequired,
-    href: PropTypes.string.isRequired
+    href: PropTypes.string.isRequired,
+    querySet: PropTypes.func.isRequired
 };
 
 const mapStateToProps = (state) =>
@@ -92,7 +96,7 @@ const mapStateToProps = (state) =>
     });
 
 const mapDispatchToProps = {
-    requestForecast
+    requestForecast, querySet
 };
 
 export default connect(mapStateToProps,mapDispatchToProps)(ForecastButton);
