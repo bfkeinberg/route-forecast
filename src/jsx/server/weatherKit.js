@@ -52,7 +52,7 @@ const callWeatherKit = function (lat, lon, currentTime, distance, zone, bearing,
     const later = startTime.plus({hours:1}).toISO({suppressMilliseconds:true});
     // showAvailability(lat,lon,weatherKitKey)
     const url = `https://weatherkit.apple.com/api/v1/weather/en/${lat}/${lon}?timezone=${zone}&dataSets=currentWeather,forecastHourly,forecastNextHour,&countryCode=US&currentAsOf=${when}&hourlyStart=${when}&hourlyEnd=${later}`;
-    console.info(`WeatherKit URL ${url}`);
+    // console.info(`WeatherKit URL ${url}`);
     const forecastResult = fetch(url,{headers: {'Authorization':`Bearer ${weatherKitKey}`}}).then(response => {
         if (!response.ok) {throw response.errorText?response.errorText:`Error ${response.status}`}
         else {
