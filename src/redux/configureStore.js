@@ -1,9 +1,9 @@
-import { configureStore } from '@reduxjs/toolkit'
+import { configureStore, combineReducers } from '@reduxjs/toolkit'
 import {createLogger} from 'redux-logger';
-import rootReducer from './reducer';
 import * as Sentry from '@sentry/browser';
 import createSentryMiddleware from "redux-sentry-middleware";
-
+import { routeParamsReducer, dialogParamsReducer, routeInfoReducer, controlsReducer,
+    stravaReducer, forecastReducer, paramsReducer, rwgpsInfoReducer } from './reducer';
 export const loggerMiddleware = createLogger();
 
 const bannedActionKeys = [
@@ -24,29 +24,34 @@ const bannedActionKeys = [
  * @returns {Object} The Redux store
  *
  */
-export default function configureReduxStore(preloadedState,mode) {
+export default function configureReduxStore(preloadedState, mode) {
     const store = configureStore({
-        reducer: rootReducer,
+        reducer: {
+            uiInfo: combineReducers({ routeParams: routeParamsReducer, dialogParams: dialogParamsReducer }),
+            routeInfo: routeInfoReducer, controls: controlsReducer, strava: stravaReducer, forecast: forecastReducer, params: paramsReducer, rideWithGpsInfo: rwgpsInfoReducer
+        },
         middleware: getDefaultMiddleware => {
             const middleware = getDefaultMiddleware()
-        if (mode === 'development') {
-            middleware.push(loggerMiddleware)
-        }
-        if (mode !== 'development') {
-            middleware.push(
-                createSentryMiddleware(Sentry, {
-                    stateTransformer: state => {Object.assign(...Object.keys(state)
-                        .filter(key => (key !== 'routeInfo' && key !== 'forecast'))
-                        .map( key => ({ [key]: state[key] }) ) )},
-                    breadcrumbDataFromAction: action => {
-                        return Object.assign(...Object.keys(action)
-                            .filter(key => (!bannedActionKeys.includes(key)))
-                            .map( key => ({ [key]: action[key] }) ) )
-                    }
-                })
-            )
-        }
-        return middleware;
+            if (mode === 'development') {
+                middleware.push(loggerMiddleware)
+            }
+            if (mode !== 'development') {
+                middleware.push(
+                    createSentryMiddleware(Sentry, {
+                        stateTransformer: state => {
+                            Object.assign(...Object.keys(state)
+                                .filter(key => (key !== 'routeInfo' && key !== 'forecast'))
+                                .map(key => ({ [key]: state[key] })))
+                        },
+                        breadcrumbDataFromAction: action => {
+                            return Object.assign(...Object.keys(action)
+                                .filter(key => (!bannedActionKeys.includes(key)))
+                                .map(key => ({ [key]: action[key] })))
+                        }
+                    })
+                )
+            }
+            return middleware;
         }
     });
 

@@ -4,11 +4,12 @@ import { loadRwgpsRoute } from '../utils/rwgpsUtilities';
 import { controlsMeaningfullyDifferent, parseControls, extractControlsFromRoute } from '../utils/util';
 import ReactGA from "react-ga4";
 import * as Sentry from "@sentry/react";
-// import { updateHistory } from "../jsx/app/updateHistory";
+import { updateHistory } from "../jsx/app/updateHistory";
 import { userControlsUpdated, displayControlTableUiSet, rwgpsRouteLoaded, routeDataCleared, loadingFromUrlSet,
     routeLoadingBegun, forecastFetchBegun, forecastFetched, forecastFetchFailed, forecastFetchCanceled,
     rwgpsRouteLoadingFailed, gpxRouteLoaded, gpxRouteLoadingFailed, shortUrlSet,
-    errorDetailsSet,weatherProviderSet, intervalSet, paceSet, forecastInvalidated, startTimeSet } from './reducer';
+    errorDetailsSet,weatherProviderSet, intervalSet, paceSet, forecastInvalidated, startTimeSet,
+    stravaTokenSet, stravaErrorSet, stravaFetchBegun, stravaFetched, stravaFetchFailed } from './reducer';
 
 export const componentLoader = (lazyComponent, attemptsLeft) => {
     return new Promise((resolve, reject) => {
@@ -248,7 +249,7 @@ export const loadRouteFromURL = () => {
         }
         if (error === null && !getState().uiInfo.routeParams.stopAfterLoad) {
             await dispatch(requestForecast(getState().routeInfo));
-            // updateHistory(getState().params.queryString, getState().params.searchString);
+            updateHistory(getState().params.queryString, getState().params.searchString, true);
             const url = getState().params.queryString
             if (!url.includes("localhost")) {
                 await dispatch(shortenUrl(url))
@@ -258,14 +259,6 @@ export const loadRouteFromURL = () => {
         dispatch(loadingFromUrlSet(false))
     }
 }
-
-export const SET_STOP_AFTER_LOAD = 'STOP_AFTER_LOAD';
-export const setStopAfterLoad = (stopAfterLoad) => {
-    return {
-        type: SET_STOP_AFTER_LOAD,
-        value: stopAfterLoad
-    }
-};
 
 export const loadGpxRoute = function(event) {
     return async function (dispatch) {
@@ -302,70 +295,6 @@ export const removeControl = function(indexToRemove) {
     }
 };
 
-export const SET_STRAVA_TOKEN = 'SET_STRAVA_TOKEN';
-export const setStravaToken = function(access_token, expires_at) {
-    return {
-        type: SET_STRAVA_TOKEN,
-        token: access_token,
-        expires_at: expires_at
-    };
-};
-
-export const SET_STRAVA_REFRESH_TOKEN = 'SET_STRAVA_REFRESH_TOKEN';
-export const setStravaRefreshToken = function(refresh_token) {
-    return {
-        type: SET_STRAVA_REFRESH_TOKEN,
-        refresh_token: refresh_token
-    };
-};
-
-export const SET_STRAVA_ACTIVITY = 'SET_STRAVA_ACTIVITY';
-export const setStravaActivity = function(activity) {
-    return {
-        type: SET_STRAVA_ACTIVITY,
-        activity: activity
-    };
-};
-
-export const SET_STRAVA_ERROR = 'SET_STRAVA_ERROR';
-export const setStravaError = function(error) {
-    return {
-        type: SET_STRAVA_ERROR,
-        error: error
-    };
-};
-
-export const BEGIN_STRAVA_FETCH = 'BEGIN_STRAVA_FETCH';
-export const beginStravaFetch = function() {
-    return {
-        type: BEGIN_STRAVA_FETCH
-    };
-};
-
-export const STRAVA_FETCH_SUCCESS = 'STRAVA_FETCH_SUCCESS';
-export const stravaFetchSuccess = function(data) {
-    return {
-        type: STRAVA_FETCH_SUCCESS,
-        data: data
-    };
-};
-
-export const STRAVA_FETCH_FAILURE = 'STRAVA_FETCH_FAILURE';
-export const stravaFetchFailure = function(error) {
-    return {
-        type: STRAVA_FETCH_FAILURE,
-        error: error
-    };
-};
-
-export const SET_ANALYSIS_INTERVAL = 'SET_ANALYSIS_INTERVAL';
-export const setAnalysisInterval = function(interval) {
-    return {
-        type: SET_ANALYSIS_INTERVAL,
-        interval: interval
-    };
-};
-
 const getStravaParser = async function() {
     const parser = await import(/* webpackChunkName: "StravaRouteParser" */ '../utils/stravaRouteParser');
     return parser.default;
@@ -387,15 +316,15 @@ const refreshOldToken = (dispatch, getState) => {
                 }
             }).then(response => {
                 if (response === undefined) {
-                    dispatch(setStravaError(Error("Received undefined response from Strava auth service")));
+                    dispatch(stravaErrorSet(Error("Received undefined response from Strava auth service")));
                     reject(Error("Received undefined response from Strava auth service"));
                 }
                 else {
-                    dispatch(setStravaToken(response.access_token, response.expires_at));
+                    dispatch(stravaTokenSet(response.access_token, response.expires_at));
                     resolve(response.access_token);
                 }
             }, error => {
-                dispatch(setStravaError(error));
+                dispatch(stravaErrorSet(error));
                 reject(error);
             });
         });
@@ -407,7 +336,7 @@ const refreshOldToken = (dispatch, getState) => {
 export const loadStravaActivity = function() {
     return async function (dispatch, getState) {
         const parser = await getStravaParser().catch((err) => {
-            dispatch(stravaFetchFailure(err));
+            dispatch(stravaFetchFailed(err));
             return null
         });
         // handle failed load, error has already been dispatched
@@ -416,46 +345,20 @@ export const loadStravaActivity = function() {
         }
 
         const access_token = await refreshOldToken(dispatch, getState)
-        dispatch(beginStravaFetch());
+        dispatch(stravaFetchBegun());
         const activityId = getState().strava.activity
         return parser.fetchStravaActivity(activityId, access_token).then(result => {
-            dispatch(stravaFetchSuccess(result));
+            dispatch(stravaFetched(result));
         }).catch(error => {
-            dispatch(stravaFetchFailure(error));
+            dispatch(stravaFetchFailed(error));
         });
 
     }
 };
-
-export const SUBRANGE_MAP = 'SUBRANGE_MAP';
-export const setSubrange = function(start,finish) {
-    return {
-        type: SUBRANGE_MAP,
-        start: start,
-        finish: finish
-    };
-};
-
-export const TOGGLE_MAP_RANGE = 'TOGGLE_MAP_RANGE';
-export const toggleMapRange = function(start,finish) {
-    return {
-        type: TOGGLE_MAP_RANGE,
-        start: start,
-        finish: finish
-    };
-};
-
-export const RESET = 'RESET';
-export const reset = () => {return {type:RESET}};
 
 export const setWeatherProvider = (weatherProvider) => {
     return function(dispatch) {
         dispatch(weatherProviderSet(weatherProvider));
         dispatch(cancelForecast());
     }
-}
-
-export const SET_ADJUSTED_FORECAST_TIME = 'SET_ADJUSTED_FORECAST_TIME'
-export const setAdjustedForecastTime = (index, value) => {
-    return {type:SET_ADJUSTED_FORECAST_TIME, index:index, value:value};
 }

@@ -3,16 +3,15 @@ import ErrorBoundary from "../shared/ErrorBoundary";
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 import 'animate.css/animate.min.css';
-import { setSubrange, toggleMapRange } from '../../redux/actions';
 import stravaRouteParser from '../../utils/stravaRouteParser';
 import StravaAnalysisIntervalInput from './StravaAnalysisIntervalInput';
 import { useActualPace, useFormatSpeed } from '../../utils/hooks';
 import { ToggleButton } from '../shared/ToggleButton';
 import cookie from 'react-cookies';
 import { HTMLTable, Tooltip } from '@blueprintjs/core';
-import { zoomToRangeToggled } from '../../redux/reducer';
+import { zoomToRangeToggled, mapSubrangeSet, mapRangeToggled } from '../../redux/reducer';
 
-const PaceTable = ({activityData, activityStream, analysisInterval, setSubrange, toggleMapRange, zoomToRange, zoomToRangeToggled}) =>  {
+const PaceTable = ({activityData, activityStream, analysisInterval, mapSubrangeSet, mapRangeToggled, zoomToRange, zoomToRangeToggled}) =>  {
 
     const [
 selectedRow,
@@ -22,7 +21,7 @@ setSelectedRow
     const updateSubrange = (event) => {
         // TODO
         // for inexplicable reasons, broken if a forecast is also loaded. so disabling this entirely for now
-        setSubrange(
+        mapSubrangeSet(
             parseInt(event.currentTarget.getAttribute('start'), 10),
             parseInt(event.currentTarget.getAttribute('end'), 10)
         );
@@ -35,7 +34,7 @@ setSelectedRow
 
     const toggleRange = (event) => {
         const start = parseInt(event.currentTarget.getAttribute('start'));
-        toggleMapRange(start, parseInt(event.currentTarget.getAttribute('end')));
+        mapRangeToggled(start, parseInt(event.currentTarget.getAttribute('end')));
         if (selectedRow === start) {
             setSelectedRow(null)
         } else {
@@ -101,8 +100,8 @@ setSelectedRow
 }
 
 PaceTable.propTypes = {
-    setSubrange:PropTypes.func.isRequired,
-    toggleMapRange:PropTypes.func.isRequired,
+    mapSubrangeSet:PropTypes.func.isRequired,
+    mapRangeToggled:PropTypes.func.isRequired,
     activityData:PropTypes.object,
     activityStream:PropTypes.object,
     analysisInterval:PropTypes.number,
@@ -119,7 +118,7 @@ const mapStateToProps = (state) =>
     });
 
 const mapDispatchToProps = {
-    setSubrange, toggleMapRange, zoomToRangeToggled
+    mapSubrangeSet, mapRangeToggled, zoomToRangeToggled
 };
 
 export default connect(mapStateToProps,mapDispatchToProps)(PaceTable);
