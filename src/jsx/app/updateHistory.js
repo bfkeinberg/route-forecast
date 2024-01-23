@@ -1,6 +1,8 @@
 import * as Sentry from '@sentry/react';
+import queryString
 
-export const updateHistory = (url, query) => {
+from 'query-string';
+export const updateHistory = (url, query, forceReplace=false) => {
     Sentry.addBreadcrumb({
         category: 'history',
         level: "info",
@@ -9,7 +11,8 @@ export const updateHistory = (url, query) => {
     });
     if (typeof window !== 'undefined' && !(/HeadlessChrome/).test(window.navigator.userAgent) && query !== null) {
         let oldState = history.state;
-        if (oldState && query && oldState.rwgpsRoute === query.rwgpsRoute) {
+        const queryParams = queryString.parse(query)
+        if (forceReplace || (oldState && query && queryString.parse(oldState).rwgpsRoute === queryParams.rwgpsRoute)) {
             history.replaceState(query, '', url);
         } else {
             history.pushState(query, '', url);
