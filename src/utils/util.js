@@ -96,7 +96,10 @@ export const getRouteNumberFromValue = (value) => {
       // is this just a number or a full url?
       let route = parseInt(value);
       if (isNaN(route)) {
-          route = value.split('/').map(part => parseInt(part)).find(val => !isNaN(val));
+        // the id may be too large to fit into a Number, so don't rely on that
+          route = value.substring(value.lastIndexOf('/') + 1)
+      } else {
+        return value
       }
       return route;
   }

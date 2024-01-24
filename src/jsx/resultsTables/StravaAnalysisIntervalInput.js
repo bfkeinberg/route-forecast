@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import {FormGroup, Button, MenuItem, Tooltip} from "@blueprintjs/core";
 import { Select } from "@blueprintjs/select";
 import { connect } from 'react-redux';
-import { setAnalysisInterval } from "../../redux/actions";
+import { analysisIntervalSet } from '../../redux/reducer';
 
 const analysisIntervals = [
     {number: "0.5", text: "Half hour"},
@@ -63,7 +63,7 @@ const mapStateToProps = (state) =>
     });
 
 const mapDispatchToProps = {
-    setInterval:setAnalysisInterval
+    setInterval:analysisIntervalSet
 };
 
 export default connect(mapStateToProps,mapDispatchToProps)(StravaAnalysisIntervalInput);

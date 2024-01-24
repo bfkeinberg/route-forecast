@@ -2,9 +2,9 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { InputGroup, FormGroup } from '@blueprintjs/core'
 import { connect } from 'react-redux';
-import { setStravaActivity } from "../../redux/actions";
+import { stravaActivitySet } from '../../redux/reducer';
 
-const StravaRouteIdInput = ({ setStravaActivity, strava_activity, canAnalyze }) => {
+const StravaRouteIdInput = ({ stravaActivitySet, strava_activity, canAnalyze }) => {
     return (
         <FormGroup label={<span><b>Strava Activity Id</b></span>} labelFor={"stravaRoute"}>
             <InputGroup autoFocus id='stravaRoute' tabIndex='0' type="text"
@@ -15,7 +15,7 @@ const StravaRouteIdInput = ({ setStravaActivity, strava_activity, canAnalyze }) 
                             if (dt.items[i].kind === 'string') {
                                 event.preventDefault();
                                 dt.items[i].getAsString(value => {
-                                    setStravaActivity(value);
+                                    stravaActivitySet(value);
                                     if (strava_activity !== '') {
                                         //updateExpectedTimes(strava_activity);
                                     }
@@ -43,7 +43,7 @@ const StravaRouteIdInput = ({ setStravaActivity, strava_activity, canAnalyze }) 
                     }
                 }}
                 value={strava_activity}
-                onChange={event => { setStravaActivity(event.target.value) }}
+                onChange={event => { stravaActivitySet(event.target.value) }}
                 onFocus={() => {
                     if (canAnalyze) {
                         // TODO
@@ -63,9 +63,10 @@ const StravaRouteIdInput = ({ setStravaActivity, strava_activity, canAnalyze }) 
 StravaRouteIdInput.propTypes = {
     strava_activity:PropTypes.oneOfType([
         PropTypes.number,
+        PropTypes.string,
         PropTypes.oneOf([''])
     ]).isRequired,
-    setStravaActivity:PropTypes.func.isRequired,
+    stravaActivitySet:PropTypes.func.isRequired,
     canAnalyze:PropTypes.bool.isRequired
 };
 
@@ -76,7 +77,7 @@ const mapStateToProps = (state) =>
     });
 
 const mapDispatchToProps = {
-    setStravaActivity
+    stravaActivitySet
 };
 
 export default connect(mapStateToProps,mapDispatchToProps)(StravaRouteIdInput);

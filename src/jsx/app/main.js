@@ -11,35 +11,24 @@ import cookie from 'react-cookies';
 import DesktopUI from '../DesktopUI';
 import MobileUI from '../MobileUI';
 import * as Sentry from "@sentry/react";
-import {providerValues, actionUrlAdded, apiKeysSet, querySet, queryCleared, metricSet, showWeatherProviderSet, displayControlTableUiSet, userControlsUpdated} from "../../redux/reducer";
+import {providerValues, actionUrlAdded, apiKeysSet, querySet, queryCleared, metricSet, showWeatherProviderSet,
+    displayControlTableUiSet, rwgpsTokenSet, usePinnedRoutesSet, routeLoadingModeSet, startTimestampSet,
+    rwgpsRouteSet,fetchAqiSet,zoomToRangeSet,stopAfterLoadSet,stravaTokenSet,stravaRefreshTokenSet,
+    stravaErrorSet,stravaActivitySet, reset} from "../../redux/reducer";
 import {Info} from "luxon";
 
 import {
     loadCookie,
     loadFromRideWithGps,
-    reset,
     saveCookie,
-    setInitialStart,
     setInterval,
     setPace,
-    setRwgpsRoute,
-    setStravaActivity,
-    setStravaError,
-    setStravaToken,
-    setRouteLoadingMode,
     updateUserControls,
-    setStravaRefreshToken,
     setWeatherProvider,
-    setStartTimestamp,
-    setZoomToRange,
     loadRouteFromURL,
-    setRwgpsToken,
-    setUsePinnedRoutes,
-    setStopAfterLoad,
-    setFetchAqi
 } from "../../redux/actions";
 import { routeLoadingModes } from '../../data/enums';
-import { /*formatControlsForUrl, */parseControls, inputPaceToSpeed } from '../../utils/util';
+import { parseControls, inputPaceToSpeed } from '../../utils/util';
 
 export const saveRwgpsCredentials = (token) => {
     if ("credentials" in navigator && "PasswordCredential" in window && "store" in navigator.credentials) {
@@ -66,31 +55,30 @@ export const saveRwgpsCredentials = (token) => {
 export class RouteWeatherUI extends Component {
     static propTypes = {
         updateControls:PropTypes.func.isRequired,
-        setRouteLoadingMode: PropTypes.func.isRequired,
+        routeLoadingModeSet: PropTypes.func.isRequired,
         loadFromRideWithGps: PropTypes.func.isRequired,
         rwgpsRouteIsTrip: PropTypes.bool.isRequired,
         reset: PropTypes.func.isRequired,
-        setRwgpsRoute: PropTypes.func.isRequired,
-        setStravaToken: PropTypes.func.isRequired,
-        setInitialStart: PropTypes.func.isRequired,
-        setStartTimestamp: PropTypes.func.isRequired,
+        rwgpsRouteSet: PropTypes.func.isRequired,
+        stravaTokenSet: PropTypes.func.isRequired,
+        startTimestampSet: PropTypes.func.isRequired,
         setWeatherProvider: PropTypes.func.isRequired,
         setPace: PropTypes.func.isRequired,
         setInterval: PropTypes.func.isRequired,
         metricSet: PropTypes.func.isRequired,
-        setStravaActivity: PropTypes.func.isRequired,
-        setStravaError: PropTypes.func.isRequired,
+        stravaActivitySet: PropTypes.func.isRequired,
+        stravaErrorSet: PropTypes.func.isRequired,
         search: PropTypes.string.isRequired,
         href: PropTypes.string.isRequired,
         action: PropTypes.string.isRequired,
         maps_api_key: PropTypes.string.isRequired,
         timezone_api_key: PropTypes.string.isRequired,
         bitly_token: PropTypes.string.isRequired,
-        setRwgpsToken:PropTypes.func.isRequired,
-        setZoomToRange:PropTypes.func.isRequired,
-        setUsePinnedRoutes:PropTypes.func.isRequired,
-        setStopAfterLoad:PropTypes.func.isRequired,
-        setFetchAqi:PropTypes.func,
+        rwgpsTokenSet:PropTypes.func.isRequired,
+        zoomToRangeSet:PropTypes.func.isRequired,
+        usePinnedRoutesSet:PropTypes.func.isRequired,
+        stopAfterLoadSet:PropTypes.func.isRequired,
+        fetchAqiSet:PropTypes.func,
         actionUrlAdded:PropTypes.func.isRequired,
         apiKeysSet:PropTypes.func.isRequired,
         querySet:PropTypes.func.isRequired
@@ -108,11 +96,11 @@ export class RouteWeatherUI extends Component {
         props.updateControls(queryParams.controlPoints==undefined?[]:parseControls(queryParams.controlPoints,true));
         const zoomToRange = loadCookie('zoomToRange');
         if (zoomToRange !== undefined) {
-            this.props.setZoomToRange(zoomToRange);
+            this.props.zoomToRangeSet(zoomToRange);
         }
         const fetchAqi = loadCookie('fetchAqi');
         if (fetchAqi !== undefined) {
-            this.props.setFetchAqi(fetchAqi==="true");
+            this.props.fetchAqiSet(fetchAqi==="true");
         }
         this.state = {};
         if (typeof window !== 'undefined') {
@@ -125,13 +113,16 @@ export class RouteWeatherUI extends Component {
                 });
 
                 if (event.state == null) {
+                    // clear the state when back button takes us past any saved routes
                     this.props.reset();
                 } else {
-                    // TODO
-                    // don't think this is necessary (anymore?) -- but check with father
-                    RouteWeatherUI.updateFromQueryParams(this.props, event.state);
-                    if (event.state.rwgpsRoute !== undefined) {
-                        this.props.loadFromRideWithGps(event.state.rwgpsRoute,this.props.rwgpsRouteIsTrip);
+                    // reload previous or next route when moving throw browser history with forward or back buttons
+                    let queryParams = queryString.parse(event.state);
+                    props.querySet({url:props.href,search:event.state})
+                    RouteWeatherUI.updateFromQueryParams(this.props, queryParams);
+                    if (queryParams.rwgpsRoute !== undefined) {
+                        this.props.loadRouteFromURL()
+                        //this.props.loadFromRideWithGps(queryParams.rwgpsRoute,this.props.rwgpsRouteIsTrip);
                     }
                 }
             }
@@ -147,19 +138,19 @@ export class RouteWeatherUI extends Component {
                     const token = loadCookie("rwgpsToken");
                     console.info('credentials retrieved from cookie');
                     if (token !== undefined) {
-                        props.setRwgpsToken(token);
+                        props.rwgpsTokenSet(token);
                         saveRwgpsCredentials(token);
                     }
                 } else {
                     console.info('credentials retrieved from credential manager');
-                    props.setRwgpsToken(credentials.password);
+                    props.rwgpsTokenSet(credentials.password);
                     saveRwgpsCredentials(credentials.password);
                 }
             } catch (err) {
                 console.info(`failed to load credentials with ${err}`);
                 const token = loadCookie("rwgpsToken");
                 if (token !== undefined) {
-                    props.setRwgpsToken(token);
+                    props.rwgpsTokenSet(token);
                     saveRwgpsCredentials(token);
                 }
         }
@@ -167,7 +158,7 @@ export class RouteWeatherUI extends Component {
             const token = loadCookie("rwgpsToken");
             console.info('credentials manager not supported, retrieved from cookie');
         if (token !== undefined) {
-                props.setRwgpsToken(token);
+                props.rwgpsTokenSet(token);
                 saveRwgpsCredentials(token);
             }
         }
@@ -178,13 +169,13 @@ export class RouteWeatherUI extends Component {
             saveCookie('strava_access_token', queryParams.strava_access_token);
             saveCookie('strava_refresh_token', queryParams.strava_refresh_token);
             saveCookie('strava_token_expires_at', queryParams.strava_token_expires_at);
-            props.setStravaToken(queryParams.strava_access_token, queryParams.strava_token_expires_at);
-            props.setStravaRefreshToken(queryParams.strava_refresh_token);
+            props.stravaTokenSet(queryParams.strava_access_token, queryParams.strava_token_expires_at);
+            props.stravaRefreshTokenSet(queryParams.strava_refresh_token);
             return queryParams.strava_access_token;
         } else {
             const stravaToken = loadCookie('strava_access_token');
-            props.setStravaToken(stravaToken, loadCookie('strava_token_expires_at'));
-            props.setStravaRefreshToken(loadCookie('strava_refresh_token'));
+            props.stravaTokenSet(stravaToken, loadCookie('strava_token_expires_at'));
+            props.stravaRefreshTokenSet(loadCookie('strava_refresh_token'));
             return stravaToken;
         }
     }
@@ -208,21 +199,13 @@ export class RouteWeatherUI extends Component {
         } else {
             props.setWeatherProvider('weatherKit');
         }
-        props.setRwgpsRoute(queryParams.rwgpsRoute);
-        props.userControlsUpdated([])
+        props.rwgpsRouteSet(queryParams.rwgpsRoute);
         RouteWeatherUI.getStravaToken(queryParams,props);
         if (queryParams.startTimestamp !== undefined) {
             if (RouteWeatherUI.hasZone(queryParams.zone)) {
-                props.setStartTimestamp(queryParams.startTimestamp, queryParams.zone);
+                props.startTimestampSet({start:queryParams.startTimestamp, zone:queryParams.zone});
             } else {
-                props.setStartTimestamp(queryParams.startTimestamp);
-            }
-        }
-        else if (queryParams.start !== undefined) {
-            if (RouteWeatherUI.hasZone(queryParams.zone)) {
-                props.setInitialStart(queryParams.start, queryParams.zone);
-            } else {
-                props.setInitialStart(queryParams.start);
+                props.startTimestampSet({start:queryParams.startTimestamp});
             }
         }
         if (queryParams.pace !== undefined && inputPaceToSpeed[queryParams.pace.trim()] !== undefined) {
@@ -235,10 +218,10 @@ export class RouteWeatherUI extends Component {
         }
         props.setInterval(queryParams.interval);
         props.metricSet(queryParams.metric==="true");
-        props.setStravaActivity(queryParams.strava_activity);
-        props.setStravaError(queryParams.strava_error);
+        props.stravaActivitySet(queryParams.strava_activity);
+        props.stravaErrorSet(queryParams.strava_error);
         if (queryParams.strava_analysis !== undefined) {
-            props.setRouteLoadingMode(routeLoadingModes.STRAVA);
+            props.routeLoadingModeSet(routeLoadingModes.STRAVA);
         }
         // make show weather provider "sticky"
         if (queryParams.showProvider !== undefined) {
@@ -252,12 +235,12 @@ export class RouteWeatherUI extends Component {
             }
         }
         if (queryParams.rwgpsToken !== undefined) {
-            props.setRwgpsToken(queryParams.rwgpsToken);
+            props.rwgpsTokenSet(queryParams.rwgpsToken);
             // if we have just received an auth token then we previously clicked show pinned routes
-            props.setUsePinnedRoutes(true);
+            props.usePinnedRoutesSet(true);
             saveRwgpsCredentials(queryParams.rwgpsToken);
         }
-        props.setStopAfterLoad(queryParams.stopAfterLoad);
+        props.stopAfterLoadSet(queryParams.stopAfterLoad);
     }
 
     render() {
@@ -268,11 +251,11 @@ export class RouteWeatherUI extends Component {
 }
 
 const mapDispatchToProps = {
-    setStravaToken, setRwgpsRoute, setStravaError, setInitialStart, setPace, setInterval, metricSet,
-    setStravaActivity, updateControls:updateUserControls, setRouteLoadingMode, setStravaRefreshToken,
-    loadFromRideWithGps, reset, setWeatherProvider, showWeatherProviderSet, setRwgpsToken, setStartTimestamp,
-    setZoomToRange, setUsePinnedRoutes, setStopAfterLoad, setFetchAqi,
-    actionUrlAdded, apiKeysSet, querySet, queryCleared, userControlsUpdated
+    stravaTokenSet, rwgpsRouteSet, stravaErrorSet, setPace, setInterval, metricSet,
+    stravaActivitySet, updateControls:updateUserControls, routeLoadingModeSet, stravaRefreshTokenSet,
+    loadFromRideWithGps, reset, setWeatherProvider, showWeatherProviderSet, rwgpsTokenSet, startTimestampSet,
+    zoomToRangeSet, usePinnedRoutesSet, stopAfterLoadSet, fetchAqiSet,
+    actionUrlAdded, apiKeysSet, querySet, queryCleared, loadRouteFromURL
 };
 
 const mapStateToProps = (state) =>

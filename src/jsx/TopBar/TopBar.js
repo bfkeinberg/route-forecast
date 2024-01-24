@@ -54,8 +54,8 @@ loadingFromURLStarted,
 loadingFromURLFinished,
 displayContent
 ] = useLoadingFromURLStatus()
-  console.info(`loadingFromUrlFinished=${loadingFromURLFinished}`)
-  return (
+console.info(`loadingFromUrlFinished=${loadingFromURLFinished}`)
+return (
     <div style={{height: "50px", display: "flex", alignItems: "center", width: `${sidebarWidth}px`}} className={(loadingFromURLStarted && displayContent) ? "fade-in" : ""}>
       {displayContent ?
         sidePaneOptions.map((option, index) => {

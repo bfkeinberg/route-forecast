@@ -1,6 +1,5 @@
 import React from 'react';
 import { ControlTableContainer } from './ControlTableContainer';
-import { setErrorDetails } from "../../redux/actions";
 import ForecastInterval from "./ForecastInterval";
 import RidingPace from "./RidingPace";
 import { useSelector, useDispatch } from "react-redux";
@@ -13,7 +12,7 @@ import { RouteTitle } from '../shared/RouteTitle';
 import LocationContext from '../locationContext';
 import ReactGA from "react-ga4";
 import { Toast } from '@blueprintjs/core';
-import { metricToggled, displayControlTableUiSet } from '../../redux/reducer';
+import { metricToggled, displayControlTableUiSet, errorDetailsSet } from '../../redux/reducer';
 
 export const ForecastSettings = () => {
     // always show weather provider
@@ -37,7 +36,7 @@ export const ForecastSettings = () => {
                 <div style={{ display: "flex", margin: "30px 0px" }}>
                     <ForecastInterval />
                 </div>
-                {errorDetails !== null && <Toast message={errorDetails} timeout={0} onDismiss={() => dispatch(setErrorDetails(null))} intent="danger"></Toast>}
+                {errorDetails !== null && <Toast message={errorDetails} timeout={0} onDismiss={() => dispatch(errorDetailsSet(null))} intent="danger"></Toast>}
                 {showProvider && (
                     <WeatherProviderSelector />
                 )}

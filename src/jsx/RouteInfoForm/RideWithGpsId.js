@@ -2,8 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import {InputGroup, FormGroup} from '@blueprintjs/core';
 import {connect} from 'react-redux';
-import {setRwgpsRoute} from "../../redux/actions";
-import { userControlsUpdated } from '../../redux/reducer';
+import { routeDataCleared, rwgpsRouteSet } from '../../redux/reducer';
 import { getRouteNumberFromValue } from '../../utils/util';
 
 export const decideValidationStateFor = (type, methodUsed, loadingSuccess) => {
@@ -18,7 +17,7 @@ export const decideValidationStateFor = (type, methodUsed, loadingSuccess) => {
     }
 }
 
-const RideWithGpsId = ({setRwgpsRoute,loadingSource,loadingSuccess,rwgpsRoute,userControlsUpdated}) => {
+const RideWithGpsId = ({rwgpsRouteSet,loadingSource,loadingSuccess,rwgpsRoute,routeDataCleared}) => {
     const handleRwgpsRoute = function(value) {
         let route = getRouteNumberFromValue(value);
         if (route !== '') {
@@ -42,8 +41,8 @@ const RideWithGpsId = ({setRwgpsRoute,loadingSource,loadingSuccess,rwgpsRoute,us
     };
 
     const settingRoute = (route) => {
-        setRwgpsRoute(route);
-        userControlsUpdated([])
+        rwgpsRouteSet(route);
+        routeDataCleared();
     };
 
     return (
@@ -92,8 +91,8 @@ const RideWithGpsId = ({setRwgpsRoute,loadingSource,loadingSuccess,rwgpsRoute,us
 
 RideWithGpsId.propTypes = {
     loadingSource:PropTypes.string,
-    setRwgpsRoute:PropTypes.func.isRequired,
-    userControlsUpdated:PropTypes.func.isRequired,
+    rwgpsRouteSet:PropTypes.func.isRequired,
+    routeDataCleared:PropTypes.func.isRequired,
     loadingSuccess:PropTypes.bool,
     rwgpsRoute:PropTypes.oneOfType([
         PropTypes.number,
@@ -109,7 +108,7 @@ const mapStateToProps = (state) =>
     });
 
 const mapDispatchToProps = {
-    setRwgpsRoute, userControlsUpdated
+    rwgpsRouteSet, routeDataCleared
 };
 
 export default connect(mapStateToProps,mapDispatchToProps)(RideWithGpsId);

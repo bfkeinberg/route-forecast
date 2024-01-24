@@ -51,6 +51,9 @@ const DesktopUI = ({mapsApiKey}) => {
     useWhenChanged(routeData, () => setActiveSidePane(sidePaneOptions.findIndex(option => option.title === "Forecast Settings")))
     useWhenChanged(forecastData, () => setActiveSidePane(sidePaneOptions.findIndex(option => option.title === "Forecast")), forecastData.length > 0)
     useWhenChanged(stravaActivityData, () => setActiveSidePane(sidePaneOptions.findIndex(option => option.title === "Pace Analysis")))
+    if (activeSidePane !== 0 && routeData === null && forecastData.length === 0) {
+        setActiveSidePane(0)
+    }
 
     const routeLoadingMode = useSelector(state => state.uiInfo.routeParams.routeLoadingMode)
     const mapDataExists = (routeLoadingMode === routeLoadingModes.RWGPS) ? (forecastData.length > 0) : stravaActivityData !== null

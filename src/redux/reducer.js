@@ -1,5 +1,3 @@
-import * as Actions from './actions';
-import {combineReducers} from 'redux';
 import { DateTime } from 'luxon';
 import { getRouteNumberFromValue, getRouteName } from '../utils/util';
 import { routeLoadingModes } from '../data/enums';
@@ -30,17 +28,16 @@ export const providerValues = {
     weatherKit:{min_interval:1,max_days:14, canForecastPast:true, name:"Apple WeatherKit", enabled:true},
     };
 
-    const checkedStartDate = (startDate, canForecastPast) => {
-        if (canForecastPast) return startDate;
-        const now = DateTime.now();
-        if (startDate < now) {
-            return startDate.set({year:now.year, month:now.month, day:now.day}).plus({days:1});
-        }
-        return startDate;
+const checkedStartDate = (startDate, canForecastPast) => {
+    if (canForecastPast) return startDate;
+    const now = DateTime.now();
+    if (startDate < now) {
+        return startDate.set({year:now.year, month:now.month, day:now.day}).plus({days:1});
     }
+    return startDate;
+}
 
-// eslint-disable-next-line complexity
-export const routeParams = function(state = {
+const routeParamsInitialState = {
     interval: defaultIntervalInHours,
     min_interval:providerValues.nws.min_interval,
     canForecastPast:providerValues.nws.canForecastPast,
@@ -48,213 +45,259 @@ export const routeParams = function(state = {
     rwgpsRoute: '',
     rwgpsRouteIsTrip: false,
     startTimestamp: initialStartTime().toMillis(),
-    initialStartTimestamp: initialStartTime().toMillis(),
     routeLoadingMode: routeLoadingModes.RWGPS,
     maxDaysInFuture: providerValues['weatherKit'].max_days,
     stopAfterLoad: false
-}, action) {
-    switch (action.type) {
-        case Actions.SET_STOP_AFTER_LOAD:
-            return { ...state, stopAfterLoad: action.value === "true" };
-        case Actions.SET_WEATHER_PROVIDER:
-            return {
-                ...state, interval: Math.max(state.interval, providerValues[action.weatherProvider].min_interval),
-                min_interval: providerValues[action.weatherProvider].min_interval,
-                maxDaysInFuture: providerValues[action.weatherProvider].max_days,
-                canForecastPast: providerValues[action.weatherProvider].canForecastPast,
-                startTimestamp: checkedStartDate(DateTime.fromMillis(state.startTimestamp), providerValues[action.weatherProvider].canForecastPast).toMillis()
+}
+const routeParamsSlice = createSlice({
+    name: 'routeParams',
+    initialState: routeParamsInitialState,
+    reducers: {
+        stopAfterLoadSet(state, action) {
+            state.stopAfterLoad = action.payload === "true"
+        },
+        rwgpsRouteSet(state,action) {
+            if (action.payload) {
+                let route = getRouteNumberFromValue(action.payload);
+                state.rwgpsRoute = route
+                state.loadingSource = null
+                state.succeeded = null
             }
-        case Actions.SET_RWGPS_ROUTE:
-            if (action.route !== undefined) {
-                let route = getRouteNumberFromValue(action.route);
-                return {
-                    ...state,
-                    rwgpsRoute: !isNaN(route) ? route : action.route,
-                    loadingSource: null,
-                    succeeded: null
-                };
-            }
-            return state;
-        case Actions.SET_START_TIME:
-            if (action.start !== undefined && action.start !== null) {
-                const start =  DateTime.fromMillis(action.start);
-                if (!start.isValid) {
-                    return state;
-                } else {
-                    return {...state, startTimestamp: checkedStartDate(start, state.canForecastPast).toMillis(), stopAfterLoad: false};
+        },
+        startTimeSet(state,action) {
+            if (action.payload) {
+                const start =  DateTime.fromMillis(action.payload)
+                if (start.isValid) {
+                    state.startTimestamp = checkedStartDate(start, state.canForecastPast).toMillis()
+                    state.stopAfterLoad = false
                 }
-            } else {
-                return state;
             }
-        case Actions.SET_INITIAL_START:
-            if (action.start !== undefined && action.start !== null) {
-                const start = DateTime.fromISO(action.start, {zone:action.zone===undefined?"local":action.zone});
-                if (!start.isValid) {
-                    return state;
-                } else {
-                    return {...state, startTimestamp: checkedStartDate(start, state.canForecastPast).toMillis(), initialStartTimestamp: checkedStartDate(start, state.canForecastPast).toMillis()};
+        },
+        initialStartTimeSet(state,action) {
+            if (action.payload) {
+                const start =  DateTime.fromISO(action.payload.start, {zone:!action.payload.zone?"local":action.payload.zone})
+                if (start.isValid) {
+                    state.startTimestamp = checkedStartDate(start, state.canForecastPast).toMillis()
+                    state.stopAfterLoad = false
                 }
-            } else {
-                return state;
             }
-        case Actions.SET_START_TIMESTAMP:
-            if (action.start !== undefined && action.start !== null) {
-                const start = DateTime.fromSeconds(action.start, {zone:action.zone===undefined?"local":action.zone});
-                if (!start.isValid) {
-                    return state;
-                } else {
-                    return {...state, startTimestamp: checkedStartDate(start, state.canForecastPast).toMillis(), initialStartTimestamp: checkedStartDate(start, state.canForecastPast).toMillis()};
+        },
+        startTimestampSet(state,action) {
+            if (action.payload) {
+                const start = DateTime.fromSeconds(parseInt(action.payload.start), {zone:action.payload.zone===undefined?"local":action.payload.zone})
+                if (start.isValid) {
+                    state.startTimestamp = checkedStartDate(start, state.canForecastPast).toMillis()
                 }
-            } else {
-                return state;
             }
-        case Actions.SET_PACE:
-            if (action.pace !== undefined) {
-                return {...state, pace: action.pace, stopAfterLoad: false};
-            } else {
-                return state;
+        },
+        paceSet(state,action) {
+            if (action.payload) {
+                state.pace = action.payload
+                state.stopAfterLoad = false
             }
-        case Actions.SET_INTERVAL:
-            if (action.interval !== undefined) {
+        },
+        intervalSet(state,action) {
+            if (action.payload) {
                 // protect against garbage in url
-                const interval = parseFloat(action.interval);
-                if (isNaN(interval) || interval < 0.25 || interval > 2.0) return state;
-                return {...state, interval: interval, stopAfterLoad: false};
-            } else {
-                return state;
+                const interval = parseFloat(action.payload);
+                if (!isNaN(interval) && interval >= 0.25 && interval <= 2.0) {
+                    state.interval = interval
+                    state.stopAfterLoad = false
+                }
             }
-        case Actions.TOGGLE_ROUTE_IS_TRIP:
-            return {...state,rwgpsRouteIsTrip:!state.rwgpsRouteIsTrip}
-        case Actions.SET_ROUTE_IS_TRIP:
-            return {...state,rwgpsRouteIsTrip:action.isTrip}
-        case Actions.BEGIN_FETCHING_FORECAST:
-            // TODO
-            // suspect this is vestigial
-            return {...state,initialStartTimestamp:state.startTimestamp}
-        case Actions.SET_ROUTE_LOADING_MODE:
-            return {...state, routeLoadingMode: action.newMode};
-        default:
-            return state;
-    }
-};
-
-// eslint-disable-next-line complexity
-const dialogParams = function(state = {errorDetails:null, succeeded:true, shortUrl:' ',
-loadingSource:null,fetchingForecast:false,fetchingRoute:false, cancelActiveFetchMethod: null}, action) {
-    switch (action.type) {
-        case Actions.CLEAR_ROUTE_DATA:
-            return {...state, loadingSource: null, succeeded: null};
-        case Actions.BEGIN_LOADING_ROUTE:
-            return {...state, fetchingRoute: true, loadingSource: action.source};
-        case Actions.BEGIN_FETCHING_FORECAST:
-            return {...state, fetchingForecast: true, cancelActiveFetchMethod: null/*action.abortMethod*/};
-        case Actions.FORECAST_FETCH_SUCCESS:
-            return {...state, fetchingForecast: false, cancelActiveFetchMethod: null, errorDetails: null};
-        case Actions.FORECAST_FETCH_FAILURE:
-            return {...state, fetchingForecast: false, cancelActiveFetchMethod: null, errorDetails: typeof action.error === 'object' ? action.error.message : action.error};
-        case Actions.FORECAST_FETCH_CANCELED:
-            return {...state, fetchingForecast: false, cancelActiveFetchMethod: null}
-        case Actions.INVALIDATE_FORECAST:
-            return { ...state, cancelActiveFetchMethod: null };
-        case Actions.RWGPS_ROUTE_LOADING_SUCCESS:
-            return {...state, fetchingRoute: false, errorDetails: null, succeeded: true};
-        case Actions.GPX_ROUTE_LOADING_SUCCESS:
-            return {...state, fetchingRoute: false, errorDetails: null, succeeded: true};
-        case Actions.RWGPS_ROUTE_LOADING_FAILURE:
-            return {...state, fetchingRoute: false, rwgpsRoute: '', succeeded: false,
-                errorDetails: (typeof action.status === 'object' ? action.status.message : action.status)};
-        case Actions.GPX_ROUTE_LOADING_FAILURE:
-            return {...state, fetchingRoute: false, succeeded: false,
-                errorDetails: (typeof action.status === 'object' ? action.status.message : action.status)};
-        case Actions.SET_ERROR_DETAILS:
-            if (action.details instanceof Error) {
-                return {...state, errorDetails: action.details.toString()};
+        },
+        routeIsTripSet(state,action) {
+            state.rwgpsRouteIsTrip = action.payload
+        },
+        routeLoadingModeSet(state,action) {
+            state.routeLoadingMode = action.payload
+        },
+        reset(state) {
+            // eslint-disable-next-line array-element-newline
+            for (const [key, value] of Object.entries(routeParamsInitialState)) {
+                state[key] = value
             }
-            return {...state, errorDetails: action.details};
-        case Actions.SET_SHORT_URL:
-            return {...state, shortUrl: action.url};
-        case Actions.SET_PINNED_ROUTES:
-            return {...state, errorDetails: null};
-        case Actions.STRAVA_FETCH_SUCCESS:
-            return {...state, errorDetails: null};
-        case Actions.STRAVA_FETCH_FAILURE: {
-            const errorMessage = typeof action.error === 'object' ? action.error.message : action.error
-            return {...state, errorDetails: `Error loading route from Strava: ${errorMessage}`};
         }
-        case Actions.SET_STRAVA_ERROR:
-            if (action.error !== undefined) {
-                return { ...state, errorDetails:  `Error loading route from Strava: ${action.error}` };
-            } else {
-                return state;
-            }
-        default:
-            return state;
+    },
+    extraReducers: (builder) => {
+        builder
+            .addCase('forecast/weatherProviderSet', (state,action) => {
+                state.interval = Math.max(state.interval, providerValues[action.payload].min_interval)
+                state.min_interval = providerValues[action.payload].min_interval
+                state.maxDaysInFuture = providerValues[action.payload].max_days
+                state.canForecastPast = providerValues[action.payload].canForecastPast
+                state.startTimestamp = checkedStartDate(DateTime.fromMillis(state.startTimestamp), providerValues[action.payload].canForecastPast).toMillis()
+        })
     }
-};
-const routeInfo = function(state = {
+})
+
+export const routeParamsReducer = routeParamsSlice.reducer
+export const {stopAfterLoadSet,rwgpsRouteSet,startTimeSet,initialStartTimeSet,
+        startTimestampSet,paceSet,intervalSet,routeIsTripToggled,routeIsTripSet,routeLoadingModeSet,reset} = routeParamsSlice.actions
+
+
+const rideWithGpsInfoSlice = createSlice({
+    name: 'rideWithGpsInfo',
+    initialState: {
+        pinnedRoutes: [], token: null, usePinnedRoutes: false, loadingRoutes: false
+    },
+    reducers: {
+        rwgpsTokenSet(state, action) {
+            state.token = action.payload
+        },
+        pinnedRoutesSet(state, action) {
+            state.pinnedRoutes = action.payload
+        },
+        loadingPinnedSet(state, action) {
+            state.loadingRoutes = action.payload
+        },
+        usePinnedRoutesSet(state, action) {
+            state.usePinnedRoutes = action.payload
+        }
+    }
+})
+
+export const {rwgpsTokenSet,pinnedRoutesSet,loadingPinnedSet,usePinnedRoutesSet} = rideWithGpsInfoSlice.actions
+
+const routeInfoInitialState = {
     name: '',
     rwgpsRouteData: null,
     gpxRouteData: null,
     loadingFromURL: false
-    }, action) {
-    switch (action.type) {
-        case Actions.RWGPS_ROUTE_LOADING_SUCCESS:
-            return { ...state, rwgpsRouteData: action.routeData, gpxRouteData: null, name: getRouteName(action.routeData, "rwgps") };
-        case Actions.GPX_ROUTE_LOADING_SUCCESS:
-            return { ...state, gpxRouteData: action.gpxRouteData, rwgpsRouteData: null, name: getRouteName(action.gpxRouteData, "gpx") };
-        case Actions.CLEAR_ROUTE_DATA:
-            return {...state,rwgpsRouteData:null,gpxRouteData:null,name:''};
-        // clear when the route is changed
-        case Actions.SET_RWGPS_ROUTE:
-            return {...state,rwgpsRouteData:null,gpxRouteData:null,name:''};
-        case Actions.SET_LOADING_FROM_URL:
-            return {...state, loadingFromURL: action.loading};
-        default:
-            return state;
+}
+const routeInfoSlice = createSlice({
+    name:'routeInfo',
+    initialState: routeInfoInitialState,
+    reducers:{
+        rwgpsRouteLoaded(state, action) {
+            state.rwgpsRouteData = action.payload
+            state.gpxRouteData = null
+            state.name = getRouteName(action.payload, "rwgps")
+        },
+        gpxRouteLoaded(state, action) {
+            state.gpxRouteData = action.payload
+            state.rwgpsRouteData = null
+            state.name = getRouteName(action.gpxRouteData, "gpx")
+        },
+        routeDataCleared(state) {
+            state.rwgpsRouteData = null
+            state.gpxRouteData = null
+            state.name = ''
+        },
+        loadingFromUrlSet(state, action) {
+            state.loadingFromURL = action.payload
+        }
+    },
+    extraReducers: (builder) => {
+        builder.addCase(rwgpsRouteSet, (state) => {
+            state.rwgpsRouteData = null
+            state.gpxRouteData = null
+            state.name = ''
+    })
+    .addCase(reset, () => routeInfoInitialState)
     }
-};
+})
 
-/* export const controls = function (state = {
+export const routeInfoReducer = routeInfoSlice.reducer
+export const {rwgpsRouteLoaded, gpxRouteLoaded, routeDataCleared,loadingFromUrlSet} = routeInfoSlice.actions
+
+const dialogParamsSlice = createSlice({
+    name: 'dialogParams',
+    initialState: {
+        errorDetails: null, succeeded: true, shortUrl: ' ',
+        loadingSource: null, fetchingForecast: false, fetchingRoute: false
+    },
+    reducers: {
+        routeLoadingBegun(state, action) {
+            state.loadingSource = action.payload
+            state.fetchingRoute = true
+        },
+        forecastFetchBegun(state) {
+            state.fetchingForecast = true
+        },
+        forecastFetchFailed(state, action) {
+            state.fetchingForecast = false
+            state.errorDetails = typeof action.payload === 'object' ? action.payload.message : action.payload
+        },
+        forecastFetchCanceled(state) {
+            state.fetchingForecast = false
+        },
+        rwgpsRouteLoadingFailed(state, action) {
+            state.fetchingRoute = false
+            state.errorDetails = (typeof action.payload === 'object' ? action.payload.message : action.payload)
+            state.succeeded = false
+        },
+        gpxRouteLoadingFailed(state, action) {
+            state.fetchingRoute = false
+            state.errorDetails = (typeof action.payload === 'object' ? action.payload.message : action.payload)
+            state.succeeded = false
+        },
+        errorDetailsSet(state, action) {
+            if (action.payload instanceof Error) {
+                state.errorDetails = action.payload.toString()
+            } else {
+                state.errorDetails = action.payload
+            }
+        },
+        shortUrlSet(state, action) {
+            state.shortUrl = action.payload
+        },
+        stravaErrorSet(state,action) {
+            if (action.payload !== undefined) {
+                state.errorDetails = `Error loading route from Strava: ${action.payload}`
+            }
+        }
+    },
+    extraReducers: (builder) => {
+        builder
+            .addCase(pinnedRoutesSet, (state) => {
+                state.errorDetails = null
+            })
+            .addCase("strava/stravaFetched", (state) => {
+                state.errorDetails = null
+            })
+            .addCase("strava/stravaFetchFailed", (state, action) => {
+                const errorMessage = typeof action.error === 'object' ? action.error.message : action.error
+                state.errorDetails = `Error loading activity from Strava: ${errorMessage}`
+            })
+            .addCase(rwgpsRouteLoaded, (state) => {
+                state.fetchingRoute = false
+                state.errorDetails = null
+                state.succeeded = true
+            })
+            .addCase(gpxRouteLoaded, (state) => {
+                state.fetchingRoute = false
+                state.errorDetails = null
+                state.succeeded = true
+            })
+            .addCase('forecast/forecastFetched', (state) => {
+                state.fetchingForecast = false
+                state.errorDetails = null
+            })
+    }
+})
+
+export const dialogParamsReducer = dialogParamsSlice.reducer
+export const {routeLoadingBegun,forecastFetchBegun,
+    forecastFetchFailed,forecastFetchCanceled,rwgpsRouteLoadingFailed,
+    gpxRouteLoadingFailed,errorDetailsSet,shortUrlSet,stravaErrorSet} = dialogParamsSlice.actions
+
+const controlsInitialState = {
     metric: false,
     displayBanked: false,
     userControlPoints: [],
     showWeatherProvider: false,
-    displayControlTableUI: false,
-    }, action) {
-    switch (action.type) {
-        case Actions.SET_METRIC:
-            if (action.metric !== undefined) {
-                return {...state, metric: action.metric};
-            } else {
-                return state;
-            }
-        case Actions.TOGGLE_METRIC:
-            return {...state, metric: !state.metric};
-        case Actions.TOGGLE_DISPLAY_BANKED:
-            return {...state, displayBanked: !state.displayBanked};
-        case Actions.UPDATE_USER_CONTROLS:
-            return {...state, userControlPoints: action.controls};
-        case Actions.SET_SHOW_WEATHER_PROVIDER:
-            return {...state, showWeatherProvider:action.showProvider};
-        case Actions.SET_DISPLAY_CONTROL_TABLE_UI:
-            return {...state, displayControlTableUI:action.displayControlTableUI};
-        case Actions.SET_RWGPS_ROUTE:
-            return {...state, userControlPoints:[]}
-        default:
-            return state;
-    }
-}; */
+    displayControlTableUI: false
+}
 
 const controlsSlice = createSlice({
-    name:'controls',
-    initialState:{metric: false,
-        displayBanked: false,
-        userControlPoints: [],
-        showWeatherProvider: false,
-        displayControlTableUI: false},
-    reducers:{
+    name: 'controls',
+    initialState: controlsInitialState,
+    reducers: {
         metricSet(state, action) {
-            state.metric = action.payload
+            if (action.payload !== undefined) {
+                state.metric = action.payload
+            }
         },
         metricToggled(state) {
             state.metric = !state.metric
@@ -262,15 +305,22 @@ const controlsSlice = createSlice({
         bankedDisplayToggled(state) {
             state.displayBanked = !state.displayBanked
         },
-        userControlsUpdated(state,action) {
+        userControlsUpdated(state, action) {
             state.userControlPoints = action.payload
         },
-        showWeatherProviderSet(state,action) {
+        showWeatherProviderSet(state, action) {
             state.showWeatherProvider = action.payload
         },
-        displayControlTableUiSet(state,action) {
+        displayControlTableUiSet(state, action) {
             state.displayControlTableUI = action.payload
         }
+    },
+    extraReducers: (builder) => {
+        builder
+            .addCase(rwgpsRouteSet, (state) => {
+                state.userControlPoints = []
+            }
+            ).addCase(reset, () => controlsInitialState)
     }
 })
 
@@ -301,7 +351,90 @@ const getAnalysisIntervalFromRouteDuration = (durationInHours) => {
     }
 };
 
-const strava = function (state = {
+const stravaInitialState = {
+    analysisInterval: defaultAnalysisIntervalInHours,
+    activity: '',
+    access_token: null,
+    refresh_token: null,
+    expires_at: null,
+    fetching: false,
+    activityData: null,
+    activityStream: null,
+    subrange:[]
+}
+
+const stravaSlice = createSlice({
+    name:'strava',
+    initialState: stravaInitialState,
+    reducers: {
+        stravaTokenSet(state,action) {
+            if (action.payload && action.payload.token) {
+                state.access_token = action.payload.token
+                state.expires_at = action.payload.expires_at
+            }
+        },
+        stravaRefreshTokenSet(state,action) {
+            if (action.payload) {
+                state.refresh_token = action.payload
+            }
+        },
+        stravaActivitySet(state,action) {
+            if (action.payload) {
+                const newValue = getRouteNumberFromValue(action.activity)
+                state.activity = !isNaN(newValue) ? newValue : action.payload
+                state.activityData = null
+                state.activityStream = null
+                state.subrange = []
+            }
+        },
+        stravaFetchBegun(state) {
+            state.fetching = true
+        },
+        stravaFetched(state,action) {
+            state.fetching = false
+            state.activityData = action.payload.activity
+            state.activityStream = action.payload.stream
+            state.analysisInterval = getAnalysisIntervalFromRouteDuration(action.payload.activity.elapsed_time/3600)
+        },
+        stravaFetchFailed(state,action) {
+            const errorMessage = typeof action.payload === 'object' ? action.payload.message : action.payload
+            state.fetching = false
+            if (errorMessage === "Authorization Error") {
+                state.access_token = null
+            }
+        },
+        analysisIntervalSet(state,action) {
+            state.analysisInterval = parseFloat(action.payload)
+            state.subrange = null
+        },
+        mapSubrangeSet(state,action) {
+            state.subrange = [
+                parseFloat(action.payload.start),
+                parseFloat(action.payload.finish)
+            ]
+        },
+        mapRangeToggled(state,action) {
+            if (state.subrange[0] === parseFloat(action.payload.start && state.subrange[1] === action.payload.finish)) {
+                state.subrange = []
+            } else {
+                state.subrange = [
+                    parseFloat(action.payload.start),
+                    parseFloat(action.payload.finish)
+                ]
+                }
+        }
+    },
+    extraReducers: (builder) => {
+        builder
+            .addCase(reset, () => stravaInitialState)
+    }
+})
+
+export const stravaReducer = stravaSlice.reducer
+export const {stravaTokenSet,stravaRefreshTokenSet,stravaActivitySet,stravaFetchBegun,
+    stravaFetched,stravaFetchFailed,analysisIntervalSet,mapSubrangeSet,mapRangeToggled} = stravaSlice.actions
+
+/* const strava = function (state = {
         analysisInterval: defaultAnalysisIntervalInHours,
         activity: '',
         access_token: null,
@@ -374,9 +507,98 @@ const strava = function (state = {
         default:
             return state;
     }
-};
+}; */
 
-const forecast = function(state = {
+const forecastInitialState = {
+    forecast: [],
+    timeZoneId: null,
+    valid: false,
+    range: [],
+    tableViewed: false,
+    mapViewed: false,
+    weatherProvider: 'weatherKit',
+    zoomToRange: true,
+    fetchAqi:false
+}
+const forecastSlice = createSlice({
+    name:'forecast',
+    initialState:forecastInitialState,
+    reducers: {
+        forecastFetched(state, action) {
+            state.forecast = action.payload.forecastInfo.forecast
+            state.timeZoneId = action.payload.timeZoneId
+            state.valid = true
+            state.tableViewed = false
+            state.mapViewed = false
+            state.range = []
+        },
+        forecastInvalidated(state) {
+            state.valid = false
+            state.forecast = []
+            state.timeZoneId = null
+            state.range = []
+        },
+        weatherRangeSet(state, action) {
+            state.range = [
+                parseFloat(action.payload.start),
+                parseFloat(action.payload.finish)
+            ]
+        },
+        weatherRangeToggled(state,action) {
+            if (state.range[0] === parseFloat(action.payload.start) && state.range[1] === parseFloat(action.payload.finish)) {
+                state.range = []
+            } else {
+                state.range = [
+                    parseFloat(action.payload.start),
+                    parseFloat(action.payload.finish)
+                ]
+            }
+        },
+        tableViewedSet(state) {
+            state.tableViewed = true
+        },
+        mapViewedSet(state) {
+            state.mapViewed = true
+        },
+        weatherProviderSet(state,action) {
+            state.weatherProvider = action.payload
+        },
+        zoomToRangeSet(state,action) {
+            state.zoomToRange = action.payload
+        },
+        zoomToRangeToggled(state) {
+            state.zoomToRange = !state.zoomToRange
+        },
+        fetchAqiSet(state,action) {
+            state.fetchAqi = action.payload
+        },
+        fetchAqiToggled(state) {
+            state.fetchAqi = !state.fetchAqi
+        }
+    },
+    extraReducers: (builder) => {
+        builder
+            .addCase(rwgpsRouteSet, (state) => {
+                state.valid = false
+                state.tableViewed = false
+                state.mapViewed = false
+                state.range = []
+                state.forecast = []
+            })
+            .addCase(gpxRouteLoaded, (state) => {
+                state.valid = false
+            })
+            .addCase(gpxRouteLoadingFailed, (state) => {
+                state.valid = false
+            })
+            .addCase(reset, () => forecastInitialState)
+    }
+})
+
+export const forecastReducer = forecastSlice.reducer
+export const {forecastFetched,forecastInvalidated,weatherRangeSet,weatherRangeToggled,
+    tableViewedSet,mapViewedSet,weatherProviderSet,zoomToRangeSet,zoomToRangeToggled,fetchAqiSet,fetchAqiToggled} = forecastSlice.actions
+/*const forecast = function(state = {
     forecast: [],
     timeZoneId: null,
     valid: false,
@@ -444,7 +666,7 @@ const forecast = function(state = {
         default:
             return state;
     }
-};
+};*/
 
 const paramsSlice = createSlice({
     name:'params',
@@ -467,37 +689,18 @@ const paramsSlice = createSlice({
         queryCleared(state) {
             state.queryString = null
         }
+    },
+    extraReducers: (builder) => {
+        builder
+            .addCase(reset, (state) => {
+                state.queryString = null
+                state.searchString = null
+            })
     }
 })
 
-const rideWithGpsInfo = function(state = {pinnedRoutes:[], token:null, usePinnedRoutes:false, loadingRoutes:false}, action) {
-    switch (action.type) {
-        case Actions.SET_RWGPS_TOKEN:
-            return {...state, token:action.token};
-        case Actions.SET_PINNED_ROUTES:
-            return {...state, pinnedRoutes:action.pinned};
-        case Actions.SET_LOADING_PINNED:
-            return {...state, loadingRoutes:action.loading};
-        case Actions.SET_USE_PINNED_ROUTES:
-            return {...state, usePinnedRoutes:action.value}
-        default:
-            return state;
-    }
-};
-
 export const paramsReducer = paramsSlice.reducer
 
-const appReducer = combineReducers({uiInfo:combineReducers({routeParams,dialogParams}),
-    routeInfo, controls:controlsReducer, strava, forecast, params:paramsReducer, rideWithGpsInfo});
-
-const rootReducer = (state, action) => {
-    if (action.type === 'RESET') {
-        console.info('reset happened')
-        state = {params:state.params};
-    }
-
-    return appReducer(state, action)
-};
+export const rwgpsInfoReducer = rideWithGpsInfoSlice.reducer
 
 export const {actionUrlAdded, apiKeysSet, querySet, queryCleared} = paramsSlice.actions
-export default rootReducer;

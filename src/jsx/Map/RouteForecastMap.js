@@ -4,12 +4,12 @@ import ErrorBoundary from "../shared/ErrorBoundary";
 import circus_tent from 'Images/circus tent.png';
 import { GoogleMap, useJsApiLoader, Polyline, MarkerF, InfoWindow } from '@react-google-maps/api';
 import { formatTemperature } from "../resultsTables/ForecastTable";
-import { setMapViewed } from "../../redux/actions";
 import { routeLoadingModes } from '../../data/enums';
 import { milesToMeters } from '../../utils/util';
 import { useForecastDependentValues, usePointsAndBounds } from '../../utils/hooks';
 import { useSelector, useDispatch } from 'react-redux';
 import PropTypes from 'prop-types';
+import { mapViewedSet } from '../../redux/reducer';
 
 const arrow = "M16.317,32.634c-0.276,0-0.5-0.224-0.5-0.5V0.5c0-0.276,0.224-0.5,0.5-0.5s0.5,0.224,0.5,0.5v31.634\n" +
     "\t\tC16.817,32.41,16.594,32.634,16.317,32.634z,M28.852,13.536c-0.128,0-0.256-0.049-0.354-0.146L16.319,1.207L4.135,13.39c-0.195,0.195-0.512,0.195-0.707,0 s-0.195-0.512,0-0.707L15.966,0.146C16.059,0.053,16.186,0,16.319,0l0,0c0.133,0,0.26,0.053,0.354,0.146l12.533,12.536 c0.195,0.195,0.195,0.512,0,0.707C29.108,13.487,28.98,13.536,28.852,13.536z";
@@ -70,7 +70,7 @@ const RouteForecastMap = ({maps_api_key}) => {
     const { calculatedControlPointValues: controls } = useForecastDependentValues()
 
     const dispatch = useDispatch()
-    useEffect(() => { dispatch(setMapViewed()) }, [])
+    useEffect(() => { dispatch(mapViewedSet()) }, [])
 
     const controlNames = userControlPoints.map(control => control.name)
 
@@ -85,12 +85,17 @@ const RouteForecastMap = ({maps_api_key}) => {
     }
 
     const { points, bounds } = usePointsAndBounds()
-    const mapBounds = useMemo( () => (bounds !== null ? getMapBounds(points, bounds, zoomToRange, subrange) : null), [
-points,
-bounds,
-zoomToRange,
-subrange
-]);
+    let mapBounds
+    try {
+        mapBounds = useMemo(() => (bounds !== null ? getMapBounds(points, bounds, zoomToRange, subrange) : null), [
+            points,
+            bounds,
+            zoomToRange,
+            subrange
+        ])
+    } catch (error) {
+        console.warn(`Error creating map bounds:${error}`)
+    }
     // const mapBounds = (bounds !== null ? getMapBounds(points, bounds, zoomToRange, subrange) : null);
     const mapCenter = useMemo( () => ((mapBounds !== null && mapBounds !== undefined) ? mapBounds.getCenter() : null), [mapBounds]);
     // const mapCenter = ((mapBounds !== null && mapBounds !== undefined) ? mapBounds.getCenter() : null);

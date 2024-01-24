@@ -9,9 +9,8 @@ const weatherKitImage = "https://weatherkit.apple.com/assets/branding/square-mar
 // import visualcrossing from 'Images/visualCrossing.png';
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
-import {setWeatherRange, toggleWeatherRange, setTableViewed, toggleZoomToRange, toggleFetchAqi} from '../../redux/actions';
 import MediaQuery from 'react-responsive';
-import {finishTimeFormat} from '../../redux/reducer';
+import {finishTimeFormat,fetchAqiToggled,tableViewedSet,zoomToRangeToggled, weatherRangeToggled,weatherRangeSet} from '../../redux/reducer';
 import { DateTime } from 'luxon';
 import { Icon, HTMLTable, Tooltip } from '@blueprintjs/core';
 import cookie from 'react-cookies';
@@ -24,15 +23,15 @@ import { InstallExtensionButton } from "../InstallExtensionButton";
 export class ForecastTable extends Component {
     static propTypes = {
         forecast:PropTypes.arrayOf(PropTypes.object).isRequired,
-        setWeatherRange:PropTypes.func.isRequired,
-        toggleWeatherRange:PropTypes.func.isRequired,
-        setTableViewed:PropTypes.func.isRequired,
+        weatherRangeSet:PropTypes.func.isRequired,
+        weatherRangeToggled:PropTypes.func.isRequired,
+        tableViewedSet:PropTypes.func.isRequired,
         metric:PropTypes.bool.isRequired,
         provider: PropTypes.string.isRequired,
-        toggleZoomToRange:PropTypes.func.isRequired,
+        zoomToRangeToggled:PropTypes.func.isRequired,
         zoomToRange:PropTypes.bool.isRequired,
         routeName:PropTypes.string,
-        toggleFetchAqi:PropTypes.func,
+        fetchAqiToggled:PropTypes.func,
         fetchAqi:PropTypes.bool.isRequired,
         adjustedTimes:PropTypes.arrayOf(PropTypes.object).isRequired
     };
@@ -41,30 +40,30 @@ export class ForecastTable extends Component {
         super(props);
         this.expandTable = this.expandTable.bind(this);
         this.state = {showGusts:false, showApparentTemp:false};
-        props.setTableViewed();
+        props.tableViewedSet();
     }
 
     toggleZoom = () => {
-        this.props.toggleZoomToRange();
+        this.props.zoomToRangeToggled();
         cookie.save('zoomToRange', !this.props.zoomToRange, { path: '/' });
     };
 
     toggleAqi = () => {
-        this.props.toggleFetchAqi();
+        this.props.fetchAqiToggled();
         cookie.save('fetchAqi', !this.props.fetchAqi, { path: '/' });
     };
 
     updateWeatherRange = (event) => {
         const start = parseInt(event.currentTarget.getAttribute('start'));
         if (this.state.selectedRow !== start) {
-            this.props.setWeatherRange(start, parseInt(event.currentTarget.getAttribute('end')));
+            this.props.weatherRangeSet({start:start, finish:parseInt(event.currentTarget.getAttribute('end'))});
             this.setState({selectedRow:start});
         }
     };
 
     toggleRange = (event) => {
         const start = parseInt(event.currentTarget.getAttribute('start'));
-        this.props.toggleWeatherRange(start, parseInt(event.currentTarget.getAttribute('end')));
+        this.props.weatherRangeToggled({start:start, finish:parseInt(event.currentTarget.getAttribute('end'))});
         if (this.state.selectedRow === start) {
             this.setState({selectedRow: null});
         } else {
@@ -236,7 +235,7 @@ const mapStateToProps = (state) =>
     });
 
 const mapDispatchToProps = {
-    setWeatherRange, setTableViewed, toggleWeatherRange, toggleZoomToRange, toggleFetchAqi
+    weatherRangeSet, tableViewedSet, weatherRangeToggled, zoomToRangeToggled, fetchAqiToggled
 };
 
 export const formatTemperature = ForecastTable.formatTemperature;
