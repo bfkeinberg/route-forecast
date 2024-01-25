@@ -340,7 +340,7 @@ export const loadRouteFromURL = () => {
             await dispatch(requestForecast(getState().routeInfo));
             updateHistory(getState().params.queryString, getState().params.searchString, true);
             const url = getState().params.queryString
-            if (!url.includes("localhost")) {
+            if (url && !url.includes("localhost")) {
                 await dispatch(shortenUrl(url))
             }
 
