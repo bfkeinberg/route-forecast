@@ -303,7 +303,7 @@ export const loadStravaRoute = (routeId) => {
     return async function (dispatch, getState) {
         routeId = routeId || getState().strava.route
         ReactGA.event('login', {method:routeId});
-        ReactGA.event('join_group', {group_id:routeId});
+        ReactGA.event('sign_up', {method:routeId});
         dispatch(routeLoadingBegun('gpx'));
         const transaction = Sentry.startTransaction({ name: "loadingStravaRoute" });
         let span;
