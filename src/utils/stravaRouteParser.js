@@ -7,7 +7,7 @@ import { paceToSpeed, setMinMaxCoords } from './util';
 const metersToMiles = 0.00062137;
 const metersToFeet = 3.2808;
 
-class StravaRouteParser {
+class StravaActivityParser {
     constructor() {
         this.processActivityStream = this.processActivityStream.bind(this);
         this.fetchActivity = this.fetchActivity.bind(this);
@@ -55,7 +55,7 @@ class StravaRouteParser {
         modifiedControls.sort((a,b) => a['distance']-b['distance']);
         let distances = activityStream.distance.data;
         let times = activityStream.time.data;
-        StravaRouteParser.walkActivity(activityData['start_date'], distances, times, modifiedControls, arrivalTimes);
+        StravaActivityParser.walkActivity(activityData['start_date'], distances, times, modifiedControls, arrivalTimes);
         arrivalTimes.sort((a,b) => a['val']-b['val']);
         return arrivalTimes;
     }
@@ -70,7 +70,7 @@ class StravaRouteParser {
         let distanceInMeters = activityData.distance;
         let climbInFeet = (climbInMeters * metersToFeet);
         let distanceInMiles = distanceInMeters*metersToMiles;
-        return StravaRouteParser.wwPaceCalc(climbInFeet, distanceInMiles, averageSpeedInMilesPerHour);
+        return StravaActivityParser.wwPaceCalc(climbInFeet, distanceInMiles, averageSpeedInMilesPerHour);
     }
 
     static wwPaceCalc(climbInFeet, distanceInMiles, averageSpeedInMilesPerHour) {
@@ -118,11 +118,11 @@ class StravaRouteParser {
             let distanceTraveledMiles = distanceTraveledMeters * metersToMiles;
             let movingAverage = (distanceTraveledMiles) / (intervalMovingTimeSeconds / 3600);
             let climbInFeet = intervalElevationGainMeters * metersToFeet;
-            let pace = StravaRouteParser.wwPaceCalc(climbInFeet, distanceTraveledMiles, movingAverage);
+            let pace = StravaActivityParser.wwPaceCalc(climbInFeet, distanceTraveledMiles, movingAverage);
             return ({
                 speed: movingAverage, distance: distanceTraveledMiles, climb: climbInFeet,
                 start:startingDistanceMeters, end:distance,
-                pace: pace, alphaPace: StravaRouteParser.getAlphaPace(Math.round(pace)),
+                pace: pace, alphaPace: StravaActivityParser.getAlphaPace(Math.round(pace)),
                 time: currentMoment.toFormat('EEE, MMM dd h:mma'), stoppedTimeSeconds: stoppedTimeSeconds
             });
         };
@@ -210,4 +210,4 @@ class StravaRouteParser {
     }
 }
 
-export default new StravaRouteParser();
+export default new StravaActivityParser();

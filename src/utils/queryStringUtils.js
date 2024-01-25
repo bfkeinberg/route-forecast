@@ -21,9 +21,9 @@ const shrinkControls = (controls) => {
 }
 
 const makeQuery = (routeNumber, pace, interval, metric, controls, strava_activity,
-    provider, showProvider) => {
+    strava_route, provider, showProvider) => {
     const query = {
-        pace, interval, metric, rwgpsRoute: routeNumber, strava_activity, provider, showProvider
+        pace, interval, metric, rwgpsRoute: routeNumber, strava_activity, strava_route, provider, showProvider
     }
     const formattedControls = formatControlsForUrl(controls, true)
     if (formattedControls !== "") {
@@ -39,9 +39,9 @@ const dateToShortDate = function (date) {
 };
 
 const buildUrl = (routeNumber, pace, interval, metric, controls, strava_activity,
-    provider, showProvider, shortDate, start, origin, setPageUrl) => {
+    strava_route, provider, showProvider, shortDate, start, origin, setPageUrl) => {
     let query = makeQuery(routeNumber, pace, interval, metric, controls, strava_activity,
-        provider, showProvider);
+        strava_route, provider, showProvider);
     if (shortDate !== 'Invalid DateTime') {
         query.startTimestamp = shortDate;
         query.zone = start.zoneName;
@@ -55,10 +55,10 @@ const buildUrl = (routeNumber, pace, interval, metric, controls, strava_activity
 }
 
 export const generateUrl = (startTimestamp, routeNumber, pace, interval, metric, controls, strava_activity,
-    provider, showProvider, origin, setPageUrl) => {
+    strava_route, provider, showProvider, origin, setPageUrl) => {
     const start = DateTime.fromMillis(startTimestamp)
     const shortDate = dateToShortDate(start);
-    let url = buildUrl(routeNumber, pace, interval, metric, controls, strava_activity, provider, showProvider, shortDate, start, origin, setPageUrl)
+    let url = buildUrl(routeNumber, pace, interval, metric, controls, strava_activity, strava_route, provider, showProvider, shortDate, start, origin, setPageUrl)
     if (url.url.length >= maxUrlLength) {
         const truncatedControls = shrinkControls(controls);
         url = buildUrl(routeNumber, pace, interval, metric, truncatedControls, strava_activity, provider, showProvider, shortDate, start, origin, setPageUrl)

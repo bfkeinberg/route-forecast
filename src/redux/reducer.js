@@ -177,7 +177,7 @@ const routeInfoSlice = createSlice({
         gpxRouteLoaded(state, action) {
             state.gpxRouteData = action.payload
             state.rwgpsRouteData = null
-            state.name = getRouteName(action.gpxRouteData, "gpx")
+            state.name = getRouteName(action.payload, "gpx")
         },
         routeDataCleared(state) {
             state.rwgpsRouteData = null
@@ -243,7 +243,7 @@ const dialogParamsSlice = createSlice({
             state.shortUrl = action.payload
         },
         stravaErrorSet(state,action) {
-            if (action.payload !== undefined) {
+            if (action.payload !== undefined && action.payload !== "") {
                 state.errorDetails = `Error loading route from Strava: ${action.payload}`
             }
         }
@@ -354,6 +354,7 @@ const getAnalysisIntervalFromRouteDuration = (durationInHours) => {
 const stravaInitialState = {
     analysisInterval: defaultAnalysisIntervalInHours,
     activity: '',
+    route: '',
     access_token: null,
     refresh_token: null,
     expires_at: null,
@@ -380,11 +381,17 @@ const stravaSlice = createSlice({
         },
         stravaActivitySet(state,action) {
             if (action.payload) {
-                const newValue = getRouteNumberFromValue(action.activity)
-                state.activity = !isNaN(newValue) ? newValue : action.payload
+                const newValue = getRouteNumberFromValue(action.payload)
+                state.activity = newValue
                 state.activityData = null
                 state.activityStream = null
+
                 state.subrange = []
+            }
+        },
+        stravaRouteSet(state,action) {
+            if (action.payload) {
+                state.route = getRouteNumberFromValue(action.payload)
             }
         },
         stravaFetchBegun(state) {
@@ -432,82 +439,8 @@ const stravaSlice = createSlice({
 
 export const stravaReducer = stravaSlice.reducer
 export const {stravaTokenSet,stravaRefreshTokenSet,stravaActivitySet,stravaFetchBegun,
-    stravaFetched,stravaFetchFailed,analysisIntervalSet,mapSubrangeSet,mapRangeToggled} = stravaSlice.actions
-
-/* const strava = function (state = {
-        analysisInterval: defaultAnalysisIntervalInHours,
-        activity: '',
-        access_token: null,
-        refresh_token: null,
-        expires_at: null,
-        fetching: false,
-        activityData: null,
-        activityStream: null,
-        subrange:[]
-    }, action) {
-    let setNewActivity = function () {
-        if (action.activity === undefined) {
-            return state;
-        }
-        let newValue = getRouteNumberFromValue(action.activity);
-        return {
-            ...state, activity: !isNaN(newValue) ? newValue : action.activity,
-            activityData: null, activityStream: null, subrange: []
-        };
-    };
-    let toggleMapRange = function () {
-        if (state.subrange[0] === parseFloat(action.start) && state.subrange[1] === parseFloat(action.finish)) {
-            return {
-                ...state,
-                subrange: []
-            }
-        }
-        return {
-            ...state, subrange:
-                [
-                    parseFloat(action.start),
-                    parseFloat(action.finish)
-                ]
-        };
-    };
-    switch (action.type) {
-        case Actions.SET_STRAVA_TOKEN:
-            if (action.token !== undefined) {
-                return {...state, access_token:action.token, expires_at: action.expires_at};
-            }
-            else {return state;}
-        case Actions.SET_STRAVA_REFRESH_TOKEN:
-            if (action.refresh_token !== undefined) {
-                return {...state, refresh_token: action.refresh_token};
-            }
-            else {return state;}
-        case Actions.SET_STRAVA_ACTIVITY: {
-            return setNewActivity();
-        }
-        case Actions.BEGIN_STRAVA_FETCH:
-            return {...state, fetching:true};
-        case Actions.STRAVA_FETCH_SUCCESS:
-            return {...state, fetching: false, activityData: action.data.activity, activityStream: action.data.stream,
-                analysisInterval:getAnalysisIntervalFromRouteDuration(action.data.activity.elapsed_time/3600)};
-        case Actions.STRAVA_FETCH_FAILURE: {
-            const errorMessage = typeof action.error === 'object' ? action.error.message : action.error
-            return {...state, fetching: false, access_token: errorMessage === "Authorization Error" ? null : state.access_token};
-        }
-        case Actions.SET_ANALYSIS_INTERVAL:
-            return {...state, analysisInterval:parseFloat(action.interval),subrange:[]};
-        case Actions.SUBRANGE_MAP:
-            return {...state,subrange:
-                [
-                    parseFloat(action.start),
-                    parseFloat(action.finish)
-                ]
-            };
-        case Actions.TOGGLE_MAP_RANGE:
-            return toggleMapRange();
-        default:
-            return state;
-    }
-}; */
+    stravaFetched,stravaFetchFailed,analysisIntervalSet,mapSubrangeSet,mapRangeToggled,
+    stravaRouteSet} = stravaSlice.actions
 
 const forecastInitialState = {
     forecast: [],

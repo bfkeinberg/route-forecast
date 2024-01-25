@@ -14,7 +14,7 @@ import * as Sentry from "@sentry/react";
 import {providerValues, actionUrlAdded, apiKeysSet, querySet, queryCleared, metricSet, showWeatherProviderSet,
     displayControlTableUiSet, rwgpsTokenSet, usePinnedRoutesSet, routeLoadingModeSet, startTimestampSet,
     rwgpsRouteSet,fetchAqiSet,zoomToRangeSet,stopAfterLoadSet,stravaTokenSet,stravaRefreshTokenSet,
-    stravaErrorSet,stravaActivitySet, reset} from "../../redux/reducer";
+    stravaErrorSet, stravaActivitySet, stravaRouteSet, reset} from "../../redux/reducer";
 import {Info} from "luxon";
 
 import {
@@ -81,7 +81,9 @@ export class RouteWeatherUI extends Component {
         fetchAqiSet:PropTypes.func,
         actionUrlAdded:PropTypes.func.isRequired,
         apiKeysSet:PropTypes.func.isRequired,
-        querySet:PropTypes.func.isRequired
+        querySet:PropTypes.func.isRequired,
+        loadRouteFromURL:PropTypes.func.isRequired,
+        stravaRouteSet:PropTypes.func.isRequired
     };
 
     constructor(props) {
@@ -169,7 +171,7 @@ export class RouteWeatherUI extends Component {
             saveCookie('strava_access_token', queryParams.strava_access_token);
             saveCookie('strava_refresh_token', queryParams.strava_refresh_token);
             saveCookie('strava_token_expires_at', queryParams.strava_token_expires_at);
-            props.stravaTokenSet(queryParams.strava_access_token, queryParams.strava_token_expires_at);
+            props.stravaTokenSet({token:queryParams.strava_access_token, expires_at:queryParams.strava_token_expires_at});
             props.stravaRefreshTokenSet(queryParams.strava_refresh_token);
             return queryParams.strava_access_token;
         } else {
@@ -219,6 +221,7 @@ export class RouteWeatherUI extends Component {
         props.setInterval(queryParams.interval);
         props.metricSet(queryParams.metric==="true");
         props.stravaActivitySet(queryParams.strava_activity);
+        props.stravaRouteSet(queryParams.strava_route)
         props.stravaErrorSet(queryParams.strava_error);
         if (queryParams.strava_analysis !== undefined) {
             props.routeLoadingModeSet(routeLoadingModes.STRAVA);
@@ -254,7 +257,7 @@ const mapDispatchToProps = {
     stravaTokenSet, rwgpsRouteSet, stravaErrorSet, setPace, setInterval, metricSet,
     stravaActivitySet, updateControls:updateUserControls, routeLoadingModeSet, stravaRefreshTokenSet,
     loadFromRideWithGps, reset, setWeatherProvider, showWeatherProviderSet, rwgpsTokenSet, startTimestampSet,
-    zoomToRangeSet, usePinnedRoutesSet, stopAfterLoadSet, fetchAqiSet,
+    zoomToRangeSet, usePinnedRoutesSet, stopAfterLoadSet, fetchAqiSet, stravaRouteSet,
     actionUrlAdded, apiKeysSet, querySet, queryCleared, loadRouteFromURL
 };
 

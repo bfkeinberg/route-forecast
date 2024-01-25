@@ -10,7 +10,7 @@ import { generateUrl } from '../../utils/queryStringUtils';
 import { querySet } from '../../redux/reducer';
 
 const ForecastButton = ({fetchingForecast,requestForecast,routeInfo,submitDisabled, routeNumber, startTimestamp, pace, interval,
-     metric, controls, strava_activity, provider, showProvider, href, urlIsShortened, querySet}) => {
+     metric, controls, strava_activity, strava_route, provider, showProvider, href, urlIsShortened, querySet}) => {
     const dispatch = useDispatch()
     let tooltipContent = submitDisabled ?
         "Must provide an rwgps route id" :
@@ -18,7 +18,7 @@ const ForecastButton = ({fetchingForecast,requestForecast,routeInfo,submitDisabl
     let buttonStyle = submitDisabled ? { pointerEvents: 'none', display: 'inline-flex' } : null;
     const forecastClick = () => {
         requestForecast(routeInfo);
-        const url = generateUrl(startTimestamp, routeNumber, pace, interval, metric, controls, strava_activity, provider, showProvider, origin, true)
+        const url = generateUrl(startTimestamp, routeNumber, pace, interval, metric, controls, strava_activity, strava_route, provider, showProvider, origin, true)
         querySet({queryString:url.url,searchString:url.search})
         updateHistory(url.url, true);
         // don't shorten localhost with bitly
@@ -63,6 +63,10 @@ ForecastButton.propTypes = {
         PropTypes.number,
         PropTypes.oneOf([''])
     ]),
+    strava_route: PropTypes.oneOfType([
+        PropTypes.string,
+        PropTypes.oneOf([''])
+    ]),
     startTimestamp: PropTypes.number.isRequired,
     pace: PropTypes.string.isRequired,
     interval: PropTypes.number.isRequired,
@@ -91,6 +95,7 @@ const mapStateToProps = (state) =>
         controls: state.controls.userControlPoints,
         urlIsShortened: state.uiInfo.dialogParams.shortUrl !== ' ',
         strava_activity: state.strava.activity,
+        strava_route: state.strava.route,
         provider: state.forecast.weatherProvider,
         showProvider: state.controls.showWeatherProvider
     });
