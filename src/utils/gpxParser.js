@@ -29,7 +29,7 @@ class AnalyzeRoute {
         // eslint-disable-next-line new-cap
         const gpx = new gpxParser()
         gpx.parse(gpxFileData)
-        return {gpxData:{tracks:gpx.tracks}}
+        return {gpxData:{tracks:gpx.tracks,name:gpx.metadata.name}}
     }
 
     /**

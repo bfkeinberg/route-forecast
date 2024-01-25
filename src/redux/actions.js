@@ -1,7 +1,7 @@
 import cookie from 'react-cookies';
 import { doForecast } from '../utils/forecastUtilities';
 import { loadRwgpsRoute } from '../utils/rwgpsUtilities';
-import { controlsMeaningfullyDifferent, parseControls, extractControlsFromRoute } from '../utils/util';
+import { controlsMeaningfullyDifferent, parseControls, extractControlsFromRoute, getRouteNumberFromValue } from '../utils/util';
 import ReactGA from "react-ga4";
 import queryString from 'query-string'
 import * as Sentry from "@sentry/react";
@@ -147,6 +147,11 @@ export const requestForecast = function(routeInfo) {
             ReactGA.event('add_to_cart', {
                 value:getRouteDistanceInKm(routeInfo.rwgpsRouteData),
                 items:[{item_id:getRouteId(routeInfo.rwgpsRouteData),item_name:getRouteName(routeInfo.rwgpsRouteData)}]
+            });
+        } else if (routeInfo.gpxData) {
+            ReactGA.event('add_to_cart', {
+                value:routeInfo.gpxRouteData.tracks[0].distance.total,
+                items:[{item_id:getRouteNumberFromValue(routeInfo.gpxRouteData.tracks[0].link),item_name:routeInfo.gpxRouteData.name}]
             });
         }
         const fetchController = new AbortController()
@@ -296,6 +301,9 @@ const authenticate = (routeId) => {
 
 export const loadStravaRoute = (routeId) => {
     return async function (dispatch, getState) {
+        routeId = routeId || getState().strava.route
+        ReactGA.event('login', {method:routeId});
+        ReactGA.event('join_group', {group_id:routeId});
         dispatch(routeLoadingBegun('gpx'));
         const transaction = Sentry.startTransaction({ name: "loadingStravaRoute" });
         let span;
@@ -304,7 +312,6 @@ export const loadStravaRoute = (routeId) => {
         }
         const api = new Api('https://www.strava.com/api/v3', [(response) => Promise.resolve(response.text())])
         const access_token = await dispatch(refreshOldToken)
-        routeId = routeId || getState().strava.route
         if (!access_token) {
             authenticate(routeId)
         }
