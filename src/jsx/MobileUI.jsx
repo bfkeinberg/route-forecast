@@ -38,7 +38,8 @@ export default connect(mapStateToProps)(MobileUI);
 
 const MobileUITabs = (props) => {
     const navigate = useNavigate()
-    const routeData = useSelector(state => state.routeInfo.rwgpsRouteData)
+    const type = useSelector(state => state.routeInfo.type)
+    const routeData = useSelector(state => state.routeInfo[type === "rwgps" ? "rwgpsRouteData" : "gpxRouteData"])
     const stravaActivityData = useSelector(state => state.strava.activityData)
     const forecastData = useSelector(state => state.forecast.forecast)
     useWhenChanged(routeData, () => navigate("/controlPoints", {replace:true}))

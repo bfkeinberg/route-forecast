@@ -3,9 +3,10 @@ import { doForecast } from '../utils/forecastUtilities';
 import { loadRwgpsRoute } from '../utils/rwgpsUtilities';
 import { controlsMeaningfullyDifferent, parseControls, extractControlsFromRoute } from '../utils/util';
 import ReactGA from "react-ga4";
+import queryString from 'query-string'
 import * as Sentry from "@sentry/react";
 import { updateHistory } from "../jsx/app/updateHistory";
-import { userControlsUpdated, displayControlTableUiSet, rwgpsRouteLoaded, routeDataCleared, loadingFromUrlSet,
+import { userControlsUpdated, displayControlTableUiSet, rwgpsRouteLoaded, loadingFromUrlSet,
     routeLoadingBegun, forecastFetchBegun, forecastFetched, forecastFetchFailed, forecastFetchCanceled,
     rwgpsRouteLoadingFailed, gpxRouteLoaded, gpxRouteLoadingFailed, shortUrlSet,
     errorDetailsSet,weatherProviderSet, intervalSet, paceSet, forecastInvalidated, startTimeSet,
@@ -191,7 +192,6 @@ export const loadFromRideWithGps = function(routeNumber, isTrip) {
                     dispatch(displayControlTableUiSet(true))
                 }
             }
-            // dispatch(loadControlsFromCookie(routeData));
             if (transaction) {
                 span.finish(); // Remember that only finished spans will be sent with the transaction
                 transaction.finish(); // Finishing the transaction will send it to Sentry
@@ -237,68 +237,23 @@ export const shortenUrl = function(url) {
     }
 };
 
-export const loadRouteFromURL = () => {
-    return async function(dispatch, getState) {
-        // ReactGA.send({ hitType: "pageview", page: "/loadRoute" });
-        // ReactGA.event('login', {method:getState().uiInfo.routeParams.rwgpsRoute});
-        await dispatch(loadingFromUrlSet(true))
-        await dispatch(loadFromRideWithGps())
-        const error = getState().uiInfo.dialogParams.errorDetails
-        if (getState().uiInfo.routeParams.stopAfterLoad) {
-            ReactGA.event('search', {search_term:getState().uiInfo.routeParams.rwgpsRoute})
-        }
-        if (error === null && !getState().uiInfo.routeParams.stopAfterLoad) {
-            await dispatch(requestForecast(getState().routeInfo));
-            updateHistory(getState().params.queryString, getState().params.searchString, true);
-            const url = getState().params.queryString
-            if (url && !url.includes("localhost")) {
-                await dispatch(shortenUrl(url))
-            }
+import { Api } from 'rest-api-handler';
 
+export const loadGpxRoute = function(gpxFileData) {
+    return async function (dispatch) {
+        const parser = await getRouteParser().catch((err) => {dispatch(gpxRouteLoadingFailed(err));return null});
+        // handle failed load, error has already been dispatched
+        if (parser == null) {
+            return Promise.resolve(Error('Cannot load parser'))
         }
-        dispatch(loadingFromUrlSet(false))
+        const parsedResults = parser.loadGpxFile(gpxFileData)
+        if (parsedResults.gpxData) {
+            dispatch(gpxRouteLoaded(parsedResults.gpxData));
+        } else if (parsedResults.error) {
+            dispatch(gpxRouteLoadingFailed(parsedResults.error))
+        }
     }
 }
-
-export const loadGpxRoute = function(event) {
-    return async function (dispatch) {
-        let gpxFiles = event.target.files;
-        if (gpxFiles.length > 0) {
-            dispatch(routeLoadingBegun('gpx'));
-            const parser = await getRouteParser().catch((err) => {dispatch(gpxRouteLoadingFailed(err));return null});
-            // handle failed load, error has already been dispatched
-            if (parser == null) {
-                return Promise.resolve(Error('Cannot load parser'));
-            }
-            parser.loadGpxFile(gpxFiles[0]).then( gpxData => {
-                    dispatch(gpxRouteLoaded(gpxData));
-                }, error => dispatch(gpxRouteLoadingFailed(error))
-            );
-        }
-        else {
-            dispatch(routeDataCleared());
-        }
-    }
-};
-
-export const addControl = function() {
-    return function (dispatch, getState) {
-        dispatch(updateUserControls([
-...getState().controls.userControlPoints,
-{ name: "", distance: 0, duration: 0 }
-]))
-    }
-};
-export const removeControl = function(indexToRemove) {
-    return function (dispatch, getState) {
-        dispatch(updateUserControls(getState().controls.userControlPoints.filter((control, index) => index !== indexToRemove)))
-    }
-};
-
-const getStravaParser = async function() {
-    const parser = await import(/* webpackChunkName: "StravaRouteParser" */ '../utils/stravaRouteParser');
-    return parser.default;
-};
 
 const stravaTokenTooOld = (getState) => {
     if (getState().strava.expires_at == null) {
@@ -307,7 +262,7 @@ const stravaTokenTooOld = (getState) => {
     return (getState().strava.expires_at < Math.round(Date.now()/1000));
 };
 
-const refreshOldToken = (dispatch, getState) => {
+export const refreshOldToken = (dispatch, getState) => {
     if (stravaTokenTooOld(getState)) {
         return new Promise((resolve, reject) => {
             fetch(`/refreshStravaToken?refreshToken=${getState().strava.refresh_token}`).then(response => {
@@ -331,6 +286,86 @@ const refreshOldToken = (dispatch, getState) => {
     } else {
         return new Promise((resolve) => {resolve(getState().strava.access_token)});
     }
+}
+
+const authenticate = (routeId) => {
+    let params = queryString.parse(location.search);
+    params['strava_route'] = routeId;
+    window.location.href = '/stravaAuthReq?state=' + encodeURIComponent(JSON.stringify(params));
+}
+
+export const loadStravaRoute = (routeId) => {
+    return async function (dispatch, getState) {
+        dispatch(routeLoadingBegun('gpx'));
+        const transaction = Sentry.startTransaction({ name: "loadingStravaRoute" });
+        let span;
+        if (transaction) {
+            span = transaction.startChild({ op: "load" }); // This function returns a Span
+        }
+        const api = new Api('https://www.strava.com/api/v3', [(response) => Promise.resolve(response.text())])
+        const access_token = await dispatch(refreshOldToken)
+        routeId = routeId || getState().strava.route
+        if (!access_token) {
+            authenticate(routeId)
+        }
+        api.setDefaultHeader('Authorization', `Bearer ${access_token}`)
+        const routeInfo = await api.get(`/routes/${routeId}/export_gpx`)
+        if (routeInfo && routeInfo.charAt(0)!=="{") {
+            await dispatch(loadGpxRoute(routeInfo))
+        } else {
+            dispatch(errorDetailsSet(`Error fetching Strava route: ${JSON.parse(routeInfo).message}`))
+        }
+        if (transaction) {
+            span.finish(); // Remember that only finished spans will be sent with the transaction
+            transaction.finish(); // Finishing the transaction will send it to Sentry
+        }
+    }
+}
+
+export const loadRouteFromURL = () => {
+    return async function(dispatch, getState) {
+        // ReactGA.send({ hitType: "pageview", page: "/loadRoute" });
+        // ReactGA.event('login', {method:getState().uiInfo.routeParams.rwgpsRoute});
+        await dispatch(loadingFromUrlSet(true))
+        if (getState().uiInfo.routeParams.rwgpsRoute !== '') {
+            await dispatch(loadFromRideWithGps())
+        } else {
+            await dispatch(loadStravaRoute())
+        }
+        const error = getState().uiInfo.dialogParams.errorDetails
+        if (getState().uiInfo.routeParams.stopAfterLoad) {
+            ReactGA.event('search', {search_term:getState().uiInfo.routeParams.rwgpsRoute})
+        }
+        if (error === null && !getState().uiInfo.routeParams.stopAfterLoad) {
+            await dispatch(requestForecast(getState().routeInfo));
+            updateHistory(getState().params.queryString, getState().params.searchString, true);
+            const url = getState().params.queryString
+            if (url && !url.includes("localhost")) {
+                await dispatch(shortenUrl(url))
+            }
+
+        }
+        dispatch(loadingFromUrlSet(false))
+    }
+}
+
+export const addControl = function() {
+    return function (dispatch, getState) {
+        dispatch(updateUserControls([
+...getState().controls.userControlPoints,
+{ name: "", distance: 0, duration: 0 }
+]))
+    }
+};
+export const removeControl = function(indexToRemove) {
+    return function (dispatch, getState) {
+        dispatch(updateUserControls(getState().controls.userControlPoints.filter((control, index) => index !== indexToRemove)))
+    }
+};
+
+const getStravaParser = async function() {
+    const parser = await import(/* webpackChunkName: "StravaRouteParser" */ '../utils/stravaRouteParser');
+    return parser.default;
 };
 
 export const loadStravaActivity = function() {

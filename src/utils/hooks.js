@@ -189,7 +189,7 @@ const calculateWindResult = (inputs) => {
   const stateStuff = {routeInfo, uiInfo: {routeParams}, controls}
 
   let result
-  if (forecast.length > 0 && routeInfo.rwgpsRouteData) {
+  if (forecast.length > 0 && (routeInfo.rwgpsRouteData || routeInfo.gpxRouteData)) {
     const { points, values, finishTime} = getRouteInfo(stateStuff, routeInfo.rwgpsRouteData !== null ? "rwgps" : "gpx", timeZoneId)
 
     let sortedControls = controls.userControlPoints.slice();

@@ -42,7 +42,7 @@ const getTimeZoneId = async (routeInfo, routeStart, timezoneApiKey, type, abortS
           Sentry.captureMessage(JSON.stringify(routeInfo.gpxRouteData));
           return { result: "error", error: "GPX route missing tracks" }
       }
-      const point = routeInfo.gpxRouteData.tracks[0].segments[0][0];
+      const point = routeInfo.gpxRouteData.tracks[0].points[0];
       return { result: "success", value: await findTimezoneForPoint(point.lat, point.lon, routeStart, timezoneApiKey, abortSignal) }
   } else {
       return { result: "error", error: "GPX route data missing" }
@@ -87,8 +87,8 @@ const doForecastFetch = async (path, formData, abortSignal) => {
 }
 
 export const getForecastRequestLength = (state) => {
-    const type = "rwgps";
-    const timeZoneId = "US/LosAngeles";
+    const type = state.routeInfo.rwgpsRouteData ? "rwgps" : "gpx"
+    const timeZoneId = "America/Los_Angeles" //"US/LosAngeles";
     const parsedRouteInfo = getRouteInfo(state, type, timeZoneId)
     if (!parsedRouteInfo) {
         return 0;

@@ -26,11 +26,11 @@ const makeJwt = () => {
     )
 }
 
-const showAvailability = (lat, lon, weatherKitKey) => {
+/* const showAvailability = (lat, lon, weatherKitKey) => {
     const aUrl = `https://weatherkit.apple.com/api/v1/availability/${lat}/${lon}`
     const aResult = fetch(aUrl,{headers: {'Authorization':`Bearer ${weatherKitKey}`}}).then(response => {return response.json()}).
     then(availablity => console.info(availablity))
-}
+} */
 /* eslint-disable max-params*/
 /**
  *

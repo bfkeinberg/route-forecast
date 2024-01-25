@@ -32,7 +32,9 @@ const DesktopUI = ({mapsApiKey}) => {
 
     const sidebarWidth = 600
 
-    const routeData = useSelector(state => state.routeInfo.rwgpsRouteData)
+    const rwgpsRouteData = useSelector(state => state.routeInfo.rwgpsRouteData)
+    const gpxRouteData = useSelector(state => state.routeInfo.gpxRouteData)
+    const routeData = rwgpsRouteData ? rwgpsRouteData : gpxRouteData
     const stravaActivityData = useSelector(state => state.strava.activityData)
     const forecastData = useSelector(state => state.forecast.forecast)
 
@@ -144,7 +146,8 @@ Sidebar.propTypes = {
 };
 
 const LoadingFromURLOverlay = () => {
-    const routeData = useSelector(state => state.routeInfo.rwgpsRouteData)
+    const type = useSelector(state => state.routeInfo.type)
+    const routeData = useSelector(state => state.routeInfo[type === "rwgps" ? "rwgpsRouteData" : "gpxRouteData"])
 
     return (
         <>

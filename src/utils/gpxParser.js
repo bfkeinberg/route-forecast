@@ -1,4 +1,4 @@
-//const gpxParse = require("gpx-parse-alpaca");
+let gpxParser = require('gpxparser')
 import {finishTimeFormat} from '../redux/reducer';
 import { DateTime } from 'luxon';
 
@@ -20,9 +20,17 @@ class AnalyzeRoute {
         this.walkRwgpsRoute = this.walkRwgpsRoute.bind(this);
         this.walkGpxRoute = this.walkGpxRoute.bind(this);
         this.analyzeRoute = this.analyzeRoute.bind(this);
+        this.loadGpxFile = this.loadGpxFile.bind(this)
     }
 
     toRad = (num) => num * Math.PI / 180;
+
+    loadGpxFile(gpxFileData) {
+        // eslint-disable-next-line new-cap
+        const gpx = new gpxParser()
+        gpx.parse(gpxFileData)
+        return {gpxData:{tracks:gpx.tracks}}
+    }
 
     /**
      * Calculates the distance between the two points using the haversine method.
@@ -106,7 +114,7 @@ class AnalyzeRoute {
     parseRouteStream = (routeData, type) =>
         (type === "rwgps" ?
         routeData[routeData.type]['track_points'].map(point => ({ lat: point.y, lon: point.x, elevation: point.e, dist: point.d })) :
-        routeData.tracks.reduce((accum,current) => accum.concat(current.segments.reduce((accum,current) => accum.concat(current),[])),[]))
+        routeData.tracks.reduce((accum,current) => accum.concat(current.points,[]),[]))
 
 
     computePointsAndBounds = (routeData, type) => {
