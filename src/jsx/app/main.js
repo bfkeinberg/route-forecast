@@ -271,7 +271,7 @@ export default connect(mapStateToProps, mapDispatchToProps)(RouteWeatherUI);
 const useLoadRouteFromURL = (queryParams) => {
     const dispatch = useDispatch()
     useEffect(() => {
-        if (queryParams.rwgpsRoute !== undefined) {
+        if (queryParams.rwgpsRoute || queryParams.strava_route) {
             dispatch(loadRouteFromURL())
         }
     }, [queryParams])
