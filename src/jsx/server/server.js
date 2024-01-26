@@ -344,7 +344,7 @@ const getStravaAuthUrl = (baseUrl, state) => {
     else {
         process.env.STRAVA_REDIRECT_URI = 'https://www.randoplan.com/stravaAuthReply';
     }
-    return strava.oauth.getRequestAccessURL({ scope: 'activity:read_all', state: encodeURIComponent(state) });
+    return strava.oauth.getRequestAccessURL({ scope: 'activity:read_all,read_all', state: encodeURIComponent(state) });
 };
 
 const getStravaToken = (code) => {
