@@ -52,11 +52,11 @@ export const extensionIsInstalled = () => {
     } else if (browserIsSafari())
     {
     // eslint-disable-next-line no-undef
-        const extensionPort = browser.runtime.connect("com.randoplan.extension.Extension (2B6A6N9QBQ)")
+/*         const extensionPort = browser.runtime.connect("com.randoplan.extension.Extension (2B6A6N9QBQ)")
         extensionPort.onMessage.addListener((message) => {
             console.log(`From extension: ${message.content}`);
         });
-        //eslint-disable-next-line no-undef
+ */        //eslint-disable-next-line no-undef
         browser.runtime.sendMessage("com.randoplan.extension.Extension (2B6A6N9QBQ)", {message: "version"}, function(response) {
             console.log("Response from extension detection", response)
             if (response && response.version) {
