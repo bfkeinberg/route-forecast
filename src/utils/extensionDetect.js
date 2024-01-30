@@ -13,9 +13,18 @@ export const browserIsFirefox = () => {
     return window.navigator.userAgent.match(/firefox|fxios/i);
 };
 
+export const browserIsSafari = () => {
+    return window.navigator.userAgent.match(/Safari/i) && !window.navigator.userAgent.match(/Chrome/i)
+}
+
 /*global chrome*/
 export const extensionIsInstalled = () => {
-    if (browserIsChrome()) {
+/*     // eslint-disable-next-line no-undef
+    const extensionPort = browser.runtime.connect("com.randoplan.extension.Extension (2B6A6N9QBQ)")
+    extensionPort.onMessage.addListener((message) => {
+        console.log(`From extension: ${message.content}`);
+      });
+ */    if (browserIsChrome()) {
         if (chrome === undefined || chrome.runtime === undefined || chrome.runtime.sendMessage === undefined) {
             return Promise.resolve(false);
         }
@@ -45,6 +54,16 @@ export const extensionIsInstalled = () => {
         } else {
             return Promise.resolve(false);
         }
+    } else if (browserIsSafari())
+    {
+        //eslint-disable-next-line no-undef
+        browser.runtime.sendMessage("com.randoplan.extension.Extension (2B6A6N9QBQ)", {message: "version"}, function(response) {
+            console.log("Response from extension detection", response)
+            if (response && response.version) {
+                return Promise.resolve(response.version >= requiredVersion)
+            } else
+            return Promise.resolve(false);
+        });
     }
     return Promise.resolve(false);
 }
