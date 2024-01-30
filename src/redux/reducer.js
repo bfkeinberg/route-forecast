@@ -173,16 +173,19 @@ const routeInfoSlice = createSlice({
             state.rwgpsRouteData = action.payload
             state.gpxRouteData = null
             state.name = getRouteName(action.payload, "rwgps")
+            state.type = "rwgps"
         },
         gpxRouteLoaded(state, action) {
             state.gpxRouteData = action.payload
             state.rwgpsRouteData = null
             state.name = getRouteName(action.payload, "gpx")
+            state.type = "gpx"
         },
         routeDataCleared(state) {
             state.rwgpsRouteData = null
             state.gpxRouteData = null
             state.name = ''
+            state.type = null
         },
         loadingFromUrlSet(state, action) {
             state.loadingFromURL = action.payload

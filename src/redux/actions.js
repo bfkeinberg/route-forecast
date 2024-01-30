@@ -135,74 +135,58 @@ export const loadControlsFromCookie = function(routeData) {
     };
 };
 
-export const requestForecast = function(routeInfo) {
-    return async function(dispatch,getState) {
-        // ReactGA.send({ hitType: "pageview", page: "/forecast" });
-        const transaction = Sentry.startTransaction({ name: "requestForecast" });
-        let span;
-        if (transaction) {
-            span = transaction.startChild({ op: "forecast" }); // This function returns a Span
-        }
-        if (routeInfo.rwgpsRouteData) {
-            ReactGA.event('add_to_cart', {
-                value:getRouteDistanceInKm(routeInfo.rwgpsRouteData),
-                items:[{item_id:getRouteId(routeInfo.rwgpsRouteData),item_name:getRouteName(routeInfo.rwgpsRouteData)}]
-            });
-        } else if (routeInfo.gpxData) {
-            ReactGA.event('add_to_cart', {
-                value:routeInfo.gpxRouteData.tracks[0].distance.total,
-                items:[{item_id:getRouteNumberFromValue(routeInfo.gpxRouteData.tracks[0].link),item_name:routeInfo.gpxRouteData.name}]
-            });
-        }
-        const fetchController = new AbortController()
-        const abortMethod = fetchController.abort.bind(fetchController)
-        fetchAbortMethod = abortMethod;
-        dispatch(forecastFetchBegun());
-        const { result, value, error } = await doForecast(getState(), fetchController.signal);
-        if (transaction) {
-            span.finish(); // Remember that only finished spans will be sent with the transaction
-            transaction.finish(); // Finishing the transaction will send it to Sentry
-        }
-        fetchAbortMethod = null;
-        if (result === "success") {
-            const { forecast, timeZoneId } = value
-            dispatch(forecastFetched({forecastInfo:forecast, timeZoneId:timeZoneId}));
-        } else if (result === "error") {
-            dispatch(forecastFetchFailed(error));
-        } else {
-            dispatch(forecastFetchCanceled());
-        }
+export const requestForecast = function (routeInfo) {
+    return async function (dispatch, getState) {
+        await Sentry.startSpan({ name: "requestForecast" }, async () => {
+            if (routeInfo.rwgpsRouteData) {
+                ReactGA.event('add_to_cart', {
+                    value: getRouteDistanceInKm(routeInfo.rwgpsRouteData),
+                    items: [{ item_id: getRouteId(routeInfo.rwgpsRouteData), item_name: getRouteName(routeInfo.rwgpsRouteData) }]
+                });
+            } else if (routeInfo.gpxData) {
+                ReactGA.event('add_to_cart', {
+                    value: routeInfo.gpxRouteData.tracks[0].distance.total,
+                    items: [{ item_id: getRouteNumberFromValue(routeInfo.gpxRouteData.tracks[0].link), item_name: routeInfo.gpxRouteData.name }]
+                });
+            }
+            const fetchController = new AbortController()
+            const abortMethod = fetchController.abort.bind(fetchController)
+            fetchAbortMethod = abortMethod;
+            dispatch(forecastFetchBegun());
+            const { result, value, error } = await doForecast(getState(), fetchController.signal);
+            fetchAbortMethod = null;
+            if (result === "success") {
+                const { forecast, timeZoneId } = value
+                dispatch(forecastFetched({ forecastInfo: forecast, timeZoneId: timeZoneId }));
+            } else if (result === "error") {
+                dispatch(forecastFetchFailed(error));
+            } else {
+                dispatch(forecastFetchCanceled());
+            }
+        })
     }
 };
 
-export const loadFromRideWithGps = function(routeNumber, isTrip) {
-    return function(dispatch, getState) {
-        // ReactGA.send({ hitType: "pageview", page: "/loadRoute" });
-        const transaction = Sentry.startTransaction({ name: "loadingRwgpsRoute" });
-        let span;
-        if (transaction) {
-            span = transaction.startChild({ op: "load" }); // This function returns a Span
-        }
-        routeNumber = routeNumber || getState().uiInfo.routeParams.rwgpsRoute
-        ReactGA.event('login', {method:routeNumber});
-        isTrip = isTrip || getState().uiInfo.routeParams.rwgpsRouteIsTrip
-        dispatch(routeLoadingBegun('rwgps'));
-        dispatch(cancelForecast())
-        return loadRwgpsRoute(routeNumber, isTrip, getState().rideWithGpsInfo.token).then((routeData) => {
-            dispatch(rwgpsRouteLoaded(routeData));
-            if (getState().controls.userControlPoints.length === 0) {
-                const extractedControls = extractControlsFromRoute(routeData);
-                if (extractedControls.length !== 0) {
-                    dispatch(updateUserControls(extractedControls))
-                    dispatch(displayControlTableUiSet(true))
+export const loadFromRideWithGps = function (routeNumber, isTrip) {
+    return function (dispatch, getState) {
+        Sentry.startSpan({ name: "loadingRwgpsRoute" }, () => {
+            routeNumber = routeNumber || getState().uiInfo.routeParams.rwgpsRoute
+            ReactGA.event('login', { method: routeNumber });
+            isTrip = isTrip || getState().uiInfo.routeParams.rwgpsRouteIsTrip
+            dispatch(routeLoadingBegun('rwgps'));
+            dispatch(cancelForecast())
+            return loadRwgpsRoute(routeNumber, isTrip, getState().rideWithGpsInfo.token).then((routeData) => {
+                dispatch(rwgpsRouteLoaded(routeData));
+                if (getState().controls.userControlPoints.length === 0) {
+                    const extractedControls = extractControlsFromRoute(routeData);
+                    if (extractedControls.length !== 0) {
+                        dispatch(updateUserControls(extractedControls))
+                        dispatch(displayControlTableUiSet(true))
+                    }
                 }
-            }
-            if (transaction) {
-                span.finish(); // Remember that only finished spans will be sent with the transaction
-                transaction.finish(); // Finishing the transaction will send it to Sentry
-            }
-        }, error => { return dispatch(rwgpsRouteLoadingFailed(error.message)) }
-        );
+            }, error => { return dispatch(rwgpsRouteLoadingFailed(error.message)) }
+            );
+        })
     };
 };
 
@@ -210,35 +194,28 @@ export const loadFromRideWithGps = function(routeNumber, isTrip) {
  * @param {String} url the URL to shortern
  * @returns {function(*=, *): Promise<T | never>} return value
  */
-export const shortenUrl = function(url) {
+export const shortenUrl = function (url) {
     return function (dispatch) {
-        const transaction = Sentry.startTransaction({ name: "shortenUrl" });
-        let span;
-        if (transaction) {
-            span = transaction.startChild({ op: "load" }); // This function returns a Span
-        }
-        return fetch("/bitly",
-            {
-                headers: {
-                    Accept: 'application/json',
-                    'Content-Type': 'application/json'
-                },
-                method: 'POST',
-                body: JSON.stringify({longUrl: url})
-            })
-            .then(response => response.json())
-            .catch( error => {return errorDetailsSet(error)})
-            .then(responseJson => {
-                if (transaction) {
-                    span.finish(); // Remember that only finished spans will be sent with the transaction
-                    transaction.finish(); // Finishing the transaction will send it to Sentry
-                }
-                if (responseJson.error === null) {
-                    return dispatch(shortUrlSet(responseJson.url));
-                } else {
-                    return dispatch(errorDetailsSet(responseJson.error));
-                }
-            })
+        Sentry.startSpan({ name: "shortenUrl" }, () => {
+            return fetch("/bitly",
+                {
+                    headers: {
+                        Accept: 'application/json',
+                        'Content-Type': 'application/json'
+                    },
+                    method: 'POST',
+                    body: JSON.stringify({ longUrl: url })
+                })
+                .then(response => response.json())
+                .catch(error => { return errorDetailsSet(error) })
+                .then(responseJson => {
+                    if (responseJson.error === null) {
+                        return dispatch(shortUrlSet(responseJson.url));
+                    } else {
+                        return dispatch(errorDetailsSet(responseJson.error));
+                    }
+                })
+        })
     }
 };
 
@@ -305,27 +282,20 @@ export const loadStravaRoute = (routeId) => {
         ReactGA.event('login', {method:routeId});
         ReactGA.event('sign_up', {method:routeId});
         dispatch(routeLoadingBegun('gpx'));
-        const transaction = Sentry.startTransaction({ name: "loadingStravaRoute" });
-        let span;
-        if (transaction) {
-            span = transaction.startChild({ op: "load" }); // This function returns a Span
-        }
-        const api = new Api('https://www.strava.com/api/v3', [(response) => Promise.resolve(response.text())])
-        const access_token = await dispatch(refreshOldToken)
-        if (!access_token) {
-            authenticate(routeId)
-        }
-        api.setDefaultHeader('Authorization', `Bearer ${access_token}`)
-        const routeInfo = await api.get(`/routes/${routeId}/export_gpx`)
-        if (routeInfo && routeInfo.charAt(0)!=="{") {
-            await dispatch(loadGpxRoute(routeInfo))
-        } else {
-            dispatch(errorDetailsSet(`Error fetching Strava route: ${JSON.parse(routeInfo).message}`))
-        }
-        if (transaction) {
-            span.finish(); // Remember that only finished spans will be sent with the transaction
-            transaction.finish(); // Finishing the transaction will send it to Sentry
-        }
+        await Sentry.startSpan({ name: "loadingStravaRoute" }, async () => {
+            const api = new Api('https://www.strava.com/api/v3', [(response) => Promise.resolve(response.text())])
+            const access_token = await dispatch(refreshOldToken)
+            if (!access_token) {
+                authenticate(routeId)
+            }
+            api.setDefaultHeader('Authorization', `Bearer ${access_token}`)
+            const routeInfo = await api.get(`/routes/${routeId}/export_gpx`)
+            if (routeInfo && routeInfo.charAt(0)!=="{") {
+                await dispatch(loadGpxRoute(routeInfo))
+            } else {
+                dispatch(errorDetailsSet(`Error fetching Strava route: ${JSON.parse(routeInfo).message}`))
+            }
+        })
     }
 }
 

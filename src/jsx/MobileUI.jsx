@@ -45,7 +45,7 @@ const MobileUITabs = (props) => {
     useWhenChanged(routeData, () => navigate("/controlPoints", {replace:true}))
     useWhenChanged(forecastData, () => navigate("/forecastTable", {replace:true}), forecastData.length > 0)
     useWhenChanged(stravaActivityData, () => navigate("/paceTable", {replace:true}))
-    const {adjustedTimes } = useForecastDependentValues()
+    const {adjustedTimes} = useForecastDependentValues()
     return (
         <>
             <Navbar>
