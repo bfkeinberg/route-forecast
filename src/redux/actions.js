@@ -169,7 +169,7 @@ export const requestForecast = function (routeInfo) {
 
 export const loadFromRideWithGps = function (routeNumber, isTrip) {
     return function (dispatch, getState) {
-        Sentry.startSpan({ name: "loadingRwgpsRoute" }, () => {
+        return Sentry.startSpan({ name: "loadingRwgpsRoute" }, () => {
             routeNumber = routeNumber || getState().uiInfo.routeParams.rwgpsRoute
             ReactGA.event('login', { method: routeNumber });
             isTrip = isTrip || getState().uiInfo.routeParams.rwgpsRouteIsTrip
@@ -196,7 +196,7 @@ export const loadFromRideWithGps = function (routeNumber, isTrip) {
  */
 export const shortenUrl = function (url) {
     return function (dispatch) {
-        Sentry.startSpan({ name: "shortenUrl" }, () => {
+        return Sentry.startSpan({ name: "shortenUrl" }, () => {
             return fetch("/bitly",
                 {
                     headers: {
