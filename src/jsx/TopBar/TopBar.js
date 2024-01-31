@@ -15,6 +15,8 @@ export const TopBar = ({sidePaneOptions, activeSidePane, setActiveSidePane, side
   const roomForLogo = useMediaQuery({ query: '(min-width: 1300px)' });
   const { finishTime: predictedFinishTime } = useForecastDependentValues();
   const predictedFinishTimeExists = predictedFinishTime !== null;
+  const finishTimeFontSize = useMediaQuery({ query: '(min-width: 1725px)' }) ? "20px" : "15px"
+  const alignment = useMediaQuery({ query: '(min-width: 1500px)' }) ? "right" : "left"
 
   return (
     <div style={{display: "flex"}}>
@@ -27,7 +29,7 @@ export const TopBar = ({sidePaneOptions, activeSidePane, setActiveSidePane, side
       />
       <div style={{display: "flex", flexGrow: 1, alignItems: "center", padding: "0px 20px", borderWidth: "0px 0px 0px 1px", borderStyle: "solid", borderColor: "grey"}}>
         {roomFortitle && <RouteTitle/>}
-        {roomForFinishTime && predictedFinishTimeExists && <div style={{flexGrow: 1, fontStyle: "oblique", color: "rgba(64, 111, 140, 0.87)", fontSize: "20px", height: "60px", textAlign: "right"}}>{predictedFinishTime}</div>}
+        {roomForFinishTime && predictedFinishTimeExists && <div style={{flexGrow: 1, fontStyle: "oblique", color: "rgba(64, 111, 140, 0.87)", fontSize: finishTimeFontSize, height: "60px", textAlign: alignment}}>{predictedFinishTime}</div>}
         <div style={{flexGrow: 1, display: "flex", justifyContent: "flex-end", alignItems: "center"}}>
           <ShortUrl/>
           <DonationRequest wacky/>
