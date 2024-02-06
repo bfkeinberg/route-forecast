@@ -18,7 +18,8 @@ const ForecastButton = ({fetchingForecast,requestForecast,routeInfo,submitDisabl
     let buttonStyle = submitDisabled ? { pointerEvents: 'none', display: 'inline-flex' } : null;
     const forecastClick = () => {
         requestForecast(routeInfo);
-        const url = generateUrl(startTimestamp, routeNumber, pace, interval, metric, controls, strava_activity, strava_route, provider, showProvider, origin, true)
+        const url = generateUrl(startTimestamp, routeNumber, pace, interval, metric, controls,
+            strava_activity, strava_route, provider, showProvider, origin, true, dispatch)
         querySet({queryString:url.url,searchString:url.search})
         updateHistory(url.url, true);
         // don't shorten localhost with bitly

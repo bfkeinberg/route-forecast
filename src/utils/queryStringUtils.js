@@ -2,14 +2,12 @@ import queryString from 'query-string';
 import { formatControlsForUrl } from './util';
 import { DateTime } from 'luxon';
 import { updateUserControls } from "../redux/actions"
-import { useDispatch } from 'react-redux';
 import { updateHistory } from "../jsx/app/updateHistory"
 
 const maxUrlLength = 2048;
 const maxControlNameLength = 15;
 
-const shrinkControls = (controls) => {
-    const dispatch = useDispatch();
+const shrinkControls = (controls, dispatch) => {
     const truncatedControls = controls.map(control => {
         return {
             name: control.name.replace(/control/i,'').slice(0, maxControlNameLength),
@@ -55,12 +53,12 @@ const buildUrl = (routeNumber, pace, interval, metric, controls, strava_activity
 }
 
 export const generateUrl = (startTimestamp, routeNumber, pace, interval, metric, controls, strava_activity,
-    strava_route, provider, showProvider, origin, setPageUrl) => {
+    strava_route, provider, showProvider, origin, setPageUrl, dispatch) => {
     const start = DateTime.fromMillis(startTimestamp)
     const shortDate = dateToShortDate(start);
     let url = buildUrl(routeNumber, pace, interval, metric, controls, strava_activity, strava_route, provider, showProvider, shortDate, start, origin, setPageUrl)
     if (url.url.length >= maxUrlLength) {
-        const truncatedControls = shrinkControls(controls);
+        const truncatedControls = shrinkControls(controls, dispatch);
         url = buildUrl(routeNumber, pace, interval, metric, truncatedControls, strava_activity, provider, showProvider, shortDate, start, origin, setPageUrl)
     }
     return url;
