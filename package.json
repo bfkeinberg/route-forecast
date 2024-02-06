@@ -4,7 +4,7 @@
   "description": "Forecast weather along a route from RideWithGps. Support for others may be added if there is demand",
   "main": "jsx/server/index.js",
   "engines": {
-    "node": "19.x"
+    "node": "21.x"
   },
   "dependencies": {
     "@babel/runtime": "^7.14.0",
