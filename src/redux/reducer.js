@@ -383,7 +383,7 @@ const stravaSlice = createSlice({
             }
         },
         stravaActivitySet(state,action) {
-            if (action.payload) {
+            if (action.payload !== undefined) {
                 const newValue = getRouteNumberFromValue(action.payload)
                 state.activity = newValue
                 state.activityData = null
@@ -393,7 +393,7 @@ const stravaSlice = createSlice({
             }
         },
         stravaRouteSet(state,action) {
-            if (action.payload) {
+            if (action.payload !== undefined) {
                 state.route = getRouteNumberFromValue(action.payload)
             }
         },
