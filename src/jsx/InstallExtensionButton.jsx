@@ -1,6 +1,6 @@
 import { Button, ButtonGroup, AnchorButton } from "@blueprintjs/core";
 import React, {useState, useEffect} from "react";
-import { extensionIsInstalled, browserIsChrome, browserIsFirefox } from "../utils/extensionDetect";
+import { extensionIsInstalled, browserIsChrome, browserIsFirefox, browserIsSafari } from "../utils/extensionDetect";
 import cookie from 'react-cookies';
 
 export const InstallExtensionButton = () => {
@@ -37,6 +37,14 @@ export const InstallExtensionButton = () => {
             return (
                 <ButtonGroup>
                     <AnchorButton text={"Install Firefox extension for randoplan"} href={"https://addons.mozilla.org/en-US/firefox/addon/randoplan-extension/"} />
+                    <Button text="Nope" onClick={() => cookie.save('muteExtensionInstallPrompt', true, { path: '/' })} />
+                </ButtonGroup>
+            )
+        }
+        if (browserIsSafari()) {
+            return (
+                <ButtonGroup>
+                    <AnchorButton text={"Install Safari extension for randoplan"} href={"https://apps.apple.com/us/app/randoplan-extension/id6477252687"} />
                     <Button text="Nope" onClick={() => cookie.save('muteExtensionInstallPrompt', true, { path: '/' })} />
                 </ButtonGroup>
             )
