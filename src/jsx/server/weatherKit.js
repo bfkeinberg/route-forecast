@@ -28,10 +28,14 @@ const makeJwt = () => {
 
 /* const showAvailability = (lat, lon, weatherKitKey) => {
     const aUrl = `https://weatherkit.apple.com/api/v1/availability/${lat}/${lon}`
-    const aResult = fetch(aUrl,{headers: {'Authorization':`Bearer ${weatherKitKey}`}}).then(response => {return response.json()}).
-    then(availablity => console.info(availablity))
-} */
-/* eslint-disable max-params*/
+    fetch(aUrl,{headers: {'Authorization':`Bearer ${weatherKitKey}`}}).then(response => {return response.json()}).
+    then(availablity => {
+        if (availablity.forecastNextHour !== undefined) {
+            
+        }
+    })
+}
+ *//* eslint-disable max-params*/
 /**
  *
  * @param {number} lat latitude
@@ -61,20 +65,21 @@ const callWeatherKit = function (lat, lon, currentTime, distance, zone, bearing,
     then(forecast => {
         const current = forecast.forecastHourly.hours[0];
         const now = DateTime.fromISO(current.forecastStart, {zone:zone});
-        const windBearing = current.windDirection;
-        const relativeBearing = windBearing !== undefined ? getBearingDifference(bearing, windBearing) : null;
-        const rainy = current.conditionCode === "Rain";
-        const temperatureInC = current.temperature;
+        const windBearing = forecast.currentWeather ? forecast.currentWeather.windDirection: current.windDirection;
+        const relativeBearing = getBearingDifference(bearing, windBearing)
+        const rainy = forecast.currentWeather.conditionCode === "Rain";
+        const temperatureInC = forecast.currentWeather.temperature;
         // eslint-disable-next-line no-mixed-operators
         const temperatureInF = temperatureInC * 9/5 + 32;
         return {
             'time':now.toFormat('h:mm a'),
             'distance':distance,
-            'summary':current.conditionCode,
-            'precip':`${(current.precipitationChance*100).toFixed(1)}%`,
+            'summary':forecast.currentWeather.conditionCode,
+            'precip':`${((
+                forecast.forecastNextHour && forecast.forecastNextHour.minutes.length > 0? forecast.forecastNextHour.minutes[0].precipitationChance : current.precipitationChance)*100).toFixed(1)}%`,
             'humidity':Math.round(current.humidity*100),
-            'cloudCover':`${(current.cloudCover*100).toFixed(1)}%`,
-            'windSpeed':`${Math.round(current.windSpeed * 1000/milesToMeters)}`,
+            'cloudCover':`${(forecast.currentWeather.cloudCover*100).toFixed(1)}%`,
+            'windSpeed':`${Math.round(forecast.currentWeather.windSpeed * 1000/milesToMeters)}`,
             'lat':lat,
             'lon':lon,
             'temp':`${Math.round(temperatureInF)}`,
@@ -83,9 +88,9 @@ const callWeatherKit = function (lat, lon, currentTime, distance, zone, bearing,
             'rainy':rainy,
             'windBearing':windBearing,
             'vectorBearing':bearing,
-            'gust':current.windGust===undefined?'<unavailable>':`${Math.round(current.windGust * 1000/milesToMeters)}`,
+            'gust':current.windGust===undefined?'<unavailable>':`${Math.round(forecast.currentWeather.windGust * 1000/milesToMeters)}`,
             // eslint-disable-next-line no-mixed-operators
-            'feel':Math.round(current.temperatureApparent * 9/5 + 32)
+            'feel':Math.round(forecast.currentWeather.temperatureApparent * 9/5 + 32)
         }
     }).
     catch(error => {
