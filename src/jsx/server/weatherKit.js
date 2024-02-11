@@ -26,16 +26,7 @@ const makeJwt = () => {
     )
 }
 
-/* const showAvailability = (lat, lon, weatherKitKey) => {
-    const aUrl = `https://weatherkit.apple.com/api/v1/availability/${lat}/${lon}`
-    fetch(aUrl,{headers: {'Authorization':`Bearer ${weatherKitKey}`}}).then(response => {return response.json()}).
-    then(availablity => {
-        if (availablity.forecastNextHour !== undefined) {
-            
-        }
-    })
-}
- *//* eslint-disable max-params*/
+/* eslint-disable max-params*/
 /**
  *
  * @param {number} lat latitude
@@ -54,7 +45,6 @@ const callWeatherKit = function (lat, lon, currentTime, distance, zone, bearing,
     const weatherKitKey = makeJwt();
     const when = startTime.toISO({suppressMilliseconds:true});
     const later = startTime.plus({hours:1}).toISO({suppressMilliseconds:true});
-    // showAvailability(lat,lon,weatherKitKey)
     const url = `https://weatherkit.apple.com/api/v1/weather/en/${lat}/${lon}?timezone=${zone}&dataSets=currentWeather,forecastHourly,forecastNextHour,&countryCode=US&currentAsOf=${when}&hourlyStart=${when}&hourlyEnd=${later}`;
     // console.info(`WeatherKit URL ${url}`);
     const forecastResult = fetch(url,{headers: {'Authorization':`Bearer ${weatherKitKey}`}}).then(response => {
@@ -64,8 +54,8 @@ const callWeatherKit = function (lat, lon, currentTime, distance, zone, bearing,
             return result;}}).
     then(forecast => {
         const current = forecast.forecastHourly.hours[0];
-        const now = DateTime.fromISO(current.forecastStart, {zone:zone});
-        const windBearing = forecast.currentWeather ? forecast.currentWeather.windDirection: current.windDirection;
+        const now = DateTime.fromISO(forecast.currentWeather.asOf, {zone:zone});
+        const windBearing = forecast.currentWeather.windDirection
         const relativeBearing = getBearingDifference(bearing, windBearing)
         const rainy = forecast.currentWeather.conditionCode === "Rain";
         const temperatureInC = forecast.currentWeather.temperature;
@@ -75,8 +65,7 @@ const callWeatherKit = function (lat, lon, currentTime, distance, zone, bearing,
             'time':now.toFormat('h:mm a'),
             'distance':distance,
             'summary':forecast.currentWeather.conditionCode,
-            'precip':`${((
-                forecast.forecastNextHour && forecast.forecastNextHour.minutes.length > 0? forecast.forecastNextHour.minutes[0].precipitationChance : current.precipitationChance)*100).toFixed(1)}%`,
+            'precip':`${(current.precipitationChance*100).toFixed(1)}%`,
             'humidity':Math.round(current.humidity*100),
             'cloudCover':`${(forecast.currentWeather.cloudCover*100).toFixed(1)}%`,
             'windSpeed':`${Math.round(forecast.currentWeather.windSpeed * 1000/milesToMeters)}`,
