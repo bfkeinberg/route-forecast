@@ -92,6 +92,13 @@ img#bugImage {
     color: #0000EE
 }
 
+.largerStruckClickableHeaderCell {
+    font-size: 100%;
+    width: 90%;
+    color: #0000EE;
+    text-decoration: line-through;
+}
+
 .timeCell {
     width: 78px
 }

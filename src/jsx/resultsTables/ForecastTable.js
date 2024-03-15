@@ -19,6 +19,7 @@ import { WeatherCorrections } from './WeatherCorrections';
 import { milesToMeters } from '../../utils/util';
 import { useForecastDependentValues, useFormatSpeed } from '../../utils/hooks';
 import { InstallExtensionButton } from "../InstallExtensionButton";
+import { AppToaster } from '../shared/toast';
 
 export class ForecastTable extends Component {
     static propTypes = {
@@ -48,9 +49,14 @@ export class ForecastTable extends Component {
         cookie.save('zoomToRange', !this.props.zoomToRange, { path: '/' });
     };
 
-    toggleAqi = () => {
+    toggleAqi = async () => {
         this.props.fetchAqiToggled();
         cookie.save('fetchAqi', !this.props.fetchAqi, { path: '/' });
+        if (this.props.fetchAqi) {
+            (await AppToaster).show({ message: "AQI fetch enabled", timeout:3000 });
+        } else {
+            (await AppToaster).show({ message: "AQI fetch disabled", timeout:3000 });
+        }
     };
 
     updateWeatherRange = (event) => {
@@ -207,7 +213,7 @@ export class ForecastTable extends Component {
                                 </MediaQuery>
                                 <th className={'clickableHeaderCell'} onClick={this.toggleAqi} style={{ cursor: "pointer" }} id={'aqi'}>
                                 <Tooltip content={'Air quality shows current conditions, not forecasted. Click to toggle for the next forecast requested'} placement={'top'}>
-                                    <span className={'largerClickableHeaderCell'}>AQI</span></Tooltip>
+                                    <span className={this.props.fetchAqi?'largerClickableHeaderCell':'largerStruckClickableHeaderCell'}>AQI</span></Tooltip>
                                 </th>
                                 <th id={'wind'} onClick={this.toggleGustDisplay} style={{ cursor: "pointer" }}>{windHeader}</th>
                                 <MediaQuery minWidth={501}>
