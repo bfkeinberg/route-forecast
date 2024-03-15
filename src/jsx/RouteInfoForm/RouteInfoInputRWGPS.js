@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import RideWithGpsId from './RideWithGpsId';
 import PinnedRouteLoader from './PinnedRouteLoader.jsx';
 import ErrorBoundary from "../shared/ErrorBoundary";
@@ -14,6 +14,7 @@ export const RouteInfoInputRWGPS = () => {
 showPinnedRoutes,
 setShowPinnedRoutes
 ] = useState(usingPinnedRoutes)
+  const loadButtonRef = useRef(null)
 
   return (
     <>
@@ -21,7 +22,7 @@ setShowPinnedRoutes
         {showPinnedRoutes ?
 null :
           <>
-            <div style={{flex: 1}}><RideWithGpsId /></div>
+            <div style={{flex: 1}}><RideWithGpsId loadButtonRef={loadButtonRef}/></div>
             <div className="or-divider" style={{flex: 0.3, fontSize: "13px", textAlign: "center"}}>- OR -</div>
           </>
         }
@@ -34,16 +35,17 @@ null :
           </div>
         </ErrorBoundary>
       </div>
-      <RWGPSLoadRouteButton/>
+      <RWGPSLoadRouteButton loadButtonRef={loadButtonRef}/>
     </>
   )
 }
 
-const RWGPSLoadRouteButton = () => {
+// eslint-disable-next-line react/prop-types
+const RWGPSLoadRouteButton = ({loadButtonRef}) => {
   const loading = useSelector(state => state.uiInfo.dialogParams.fetchingRoute)
   const dispatch = useDispatch()
   return (
-    <Button disabled={loading} style={{ backgroundColor: "#137cbd", borderColor: "#137cbd", marginTop: "10px", width: "100%" }} onClick={() => dispatch(loadFromRideWithGps())}>
+    <Button ref={loadButtonRef} disabled={loading} style={{ backgroundColor: "#137cbd", borderColor: "#137cbd", marginTop: "10px", width: "100%" }} onClick={() => dispatch(loadFromRideWithGps())}>
       {loading ? "Loading..." : "Load Route"}
       {loading && <Spinner />}
     </Button>

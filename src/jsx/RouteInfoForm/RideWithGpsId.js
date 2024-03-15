@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {Component} from 'react';
 import PropTypes from 'prop-types';
 import {InputGroup, FormGroup} from '@blueprintjs/core';
 import {connect} from 'react-redux';
@@ -17,7 +17,7 @@ export const decideValidationStateFor = (type, methodUsed, loadingSuccess) => {
     }
 }
 
-const RideWithGpsId = ({rwgpsRouteSet,loadingSource,loadingSuccess,rwgpsRoute,routeDataCleared}) => {
+const RideWithGpsId = ({rwgpsRouteSet,loadingSource,loadingSuccess,rwgpsRoute,routeDataCleared,loadButtonRef}) => {
     const handleRwgpsRoute = function(value) {
         let route = getRouteNumberFromValue(value);
         if (route !== '') {
@@ -34,9 +34,11 @@ const RideWithGpsId = ({rwgpsRouteSet,loadingSource,loadingSuccess,rwgpsRoute,ro
 
     const isNumberKey = function(event) {
         const charCode = (event.which) ? event.which : event.keyCode;
+        if (charCode === 13) {
+            loadButtonRef.current.click()
+        }
         if ((charCode < 48 || charCode > 57))
             return false;
-
         return charCode;
     };
 
@@ -51,7 +53,7 @@ const RideWithGpsId = ({rwgpsRouteSet,loadingSource,loadingSuccess,rwgpsRoute,ro
                    autoFocus tabIndex='0' type="text"
                    {...decideValidationStateFor('rwgps',loadingSource,loadingSuccess)}
                  onBlur={event => {handleRwgpsRoute(event.target.value)}}
-                 onKeyPress={isNumberKey}
+                 onKeyDown={isNumberKey}
                  onChange={event => {settingRoute(event.target.value)}}
                  onDrop={event => {
                      let dt = event.dataTransfer;
@@ -98,6 +100,10 @@ RideWithGpsId.propTypes = {
         PropTypes.number,
         PropTypes.string
     ]),
+    loadButtonRef:PropTypes.oneOfType([
+        PropTypes.func,
+        PropTypes.shape({ current: PropTypes.instanceOf(Component) })
+    ])
 };
 
 const mapStateToProps = (state) =>
