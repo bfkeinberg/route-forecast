@@ -4,18 +4,11 @@ import Flatpickr from 'react-flatpickr'
 import {Icon} from '@blueprintjs/core';
 import { DesktopTooltip } from '../shared/DesktopTooltip';
 import {connect} from 'react-redux';
-import {setStart} from "../../redux/actions";
+import {setStart, setTimeFromIso} from "../../redux/actions";
 import 'flatpickr/dist/themes/confetti.css';
 import { DateTime } from 'luxon';
 import { initialStartTimeSet } from '../../redux/reducer';
-
-/*const setDateAndTime = function(dates, datestr, instance) {
-    if (datestr === '') {
-        instance.setDate(this.props.start);
-        return;
-    }
-    this.props.setStart(new Date(dates[0]));
-};*/
+import TimeZoneSelect from 'react-timezone-select'
 
 export const setDateOnly = (start, setInitialStart) => {
     let now = DateTime.now();
@@ -24,17 +17,22 @@ export const setDateOnly = (start, setInitialStart) => {
 };
 
 //"EEE MMM dd yyyy HH:mm:ss 'GMT'ZZZ"
-const DateSelect = ({start, setStart, initialStartTimeSet, maxDaysInFuture, canForecastPast}) => {
-    // allow us to continue to show the start time if the route was forecast for a time before the present
+const DateSelect = ({ start, zone, setStart, initialStartTimeSet, maxDaysInFuture, canForecastPast, setTimeFromIso }) => {
+    // eslint-disable-next-line array-element-newline
+    const setDateWithZone = (zone) => {
+        setTimeFromIso(start.toISO({includeOffset:false}), zone.value)
+    }
+
+        // allow us to continue to show the start time if the route was forecast for a time before the present
     const now = new Date();
     let later = new Date();
     const daysToAdd = maxDaysInFuture;
     later.setDate(now.getDate() + daysToAdd);
 
     return (
-        <div style={{display: "flex", alignItems: "center", justifyContent: "center"}}>
-            <span id={"startingTime"} style={{fontSize: ".875rem", fontWeight: "bolder", padding: "0px 5px", flex: 1}}>
-                <Icon icon="calendar" onClick={() => setDateOnly(start, initialStartTimeSet)} style={{cursor: "pointer", marginRight: "3px"}}/>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <span id={"startingTime"} style={{ fontSize: ".875rem", fontWeight: "bolder", padding: "0px 5px", flex: 1 }}>
+                <Icon icon="calendar" onClick={() => setDateOnly(start, initialStartTimeSet)} style={{ cursor: "pointer", marginRight: "3px" }} />
                 Starting time
             </span>
             <div style={{ flex: 2.5 }}>
@@ -50,32 +48,45 @@ const DateSelect = ({start, setStart, initialStartTimeSet, maxDaysInFuture, canF
                             defaultDate: start.toJSDate(),
                             dateFormat: 'Z',
                             onParseConfig: (dates, datestr, instance) =>
-                                instance.config.onClose.push((dates) => { setStart(DateTime.fromJSDate(dates[0]).toMillis()) })
+                                instance.config.onClose.push((dates) => { setStart(DateTime.fromJSDate(dates[0]).toMillis(), { zone: zone }) })
                         }}
                     />
                 </DesktopTooltip>
             </div>
+            <TimeZoneSelect
+                        onChange={setDateWithZone} value={zone} labelStyle={'original'}
+                        styles={{dropdownIndicator: (baseStyles) => ({
+                                ...baseStyles, width:'90%'}),
+                                container:(baseStyles) => ({
+                                    ...baseStyles, maxWidth: '16em'}),
+                                        singleValue:(baseStyles) => ({
+                                            ...baseStyles, fontSize:'0.8rem', fontWeight:'bold'}),
+                        }}
+                    />
         </div>
     );
 };
 
 DateSelect.propTypes = {
     start:PropTypes.instanceOf(DateTime).isRequired,
+    zone:PropTypes.string,
     setStart:PropTypes.func.isRequired,
     initialStartTimeSet:PropTypes.func.isRequired,
     maxDaysInFuture:PropTypes.number.isRequired,
-    canForecastPast:PropTypes.bool.isRequired
+    canForecastPast:PropTypes.bool.isRequired,
+    setTimeFromIso:PropTypes.func.isRequired
 };
 
 const mapStateToProps = (state) =>
     ({
         start: DateTime.fromMillis(state.uiInfo.routeParams.startTimestamp),
+        zone: state.uiInfo.routeParams.zone,
         maxDaysInFuture:state.uiInfo.routeParams.maxDaysInFuture,
         canForecastPast:state.uiInfo.routeParams.canForecastPast
     });
 
 const mapDispatchToProps = {
-    setStart, initialStartTimeSet
+    setStart, initialStartTimeSet, setTimeFromIso
 };
 
 export default connect(mapStateToProps,mapDispatchToProps)(DateSelect);
