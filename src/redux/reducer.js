@@ -132,7 +132,7 @@ const routeParamsSlice = createSlice({
                 state.min_interval = providerValues[action.payload].min_interval
                 state.maxDaysInFuture = providerValues[action.payload].max_days
                 state.canForecastPast = providerValues[action.payload].canForecastPast
-                state.startTimestamp = checkedStartDate(DateTime.fromMillis(state.startTimestamp), providerValues[action.payload].canForecastPast).toMillis()
+                state.startTimestamp = checkedStartDate(DateTime.fromMillis(state.startTimestamp, {zone:state.zone}), providerValues[action.payload].canForecastPast).toMillis()
             })
     }
 })

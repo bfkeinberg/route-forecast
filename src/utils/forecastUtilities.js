@@ -100,7 +100,8 @@ export const getForecastRequestLength = (state) => {
 export const requestTimeZoneForRoute = async (state) => {
     const fetchController = new AbortController()
     const type = state.routeInfo.rwgpsRouteData !== null ? "rwgps" : "gpx"
-    const { result, value, error } = await getTimeZoneId(state.routeInfo, DateTime.fromMillis(state.uiInfo.routeParams.startTimestamp), state.params.timezone_api_key, type, fetchController.signal)
+    const { result, value, error } = await getTimeZoneId(state.routeInfo, DateTime.fromMillis(state.uiInfo.routeParams.startTimestamp, { zone: state.uiInfo.routeParams.zone }),
+        state.params.timezone_api_key, type, fetchController.signal)
     if (result === "error") {
         return { result: "error", error }
     }
@@ -108,42 +109,43 @@ export const requestTimeZoneForRoute = async (state) => {
 }
 
 export const doForecast = async (state, abortSignal) => {
-  const type = state.routeInfo.rwgpsRouteData !== null ? "rwgps" : "gpx"
-  const {result, value, error} = await getTimeZoneId(state.routeInfo, DateTime.fromMillis(state.uiInfo.routeParams.startTimestamp), state.params.timezone_api_key, type, abortSignal)
-  if (result === "error") {
-      return { result: "error", error}
-  }
-  const {zoneId: timeZoneId} = value
+    const type = state.routeInfo.rwgpsRouteData !== null ? "rwgps" : "gpx"
+    const { result, value, error } = await getTimeZoneId(state.routeInfo, DateTime.fromMillis(state.uiInfo.routeParams.startTimestamp, { zone: state.uiInfo.routeParams.zone }),
+        state.params.timezone_api_key, type, abortSignal)
+    if (result === "error") {
+        return { result: "error", error }
+    }
+    const { zoneId: timeZoneId } = value
 
-  const parsedRouteInfo = getRouteInfo(state, type, timeZoneId)
-  if (parsedRouteInfo === undefined) {
-    return {result: "error", error: "No route could be loaded"}
-  }
-  const { forecastRequest} = parsedRouteInfo
-  const formdata = new FormData();
-  formdata.append('locations', JSON.stringify(forecastRequest));
-  formdata.append('timezone', timeZoneId);
-  formdata.append('service', state.forecast.weatherProvider);
-  formdata.append('routeName', state.routeInfo.name);
-  formdata.append('routeNumber', state.uiInfo.routeParams.rwgpsRoute);
+    const parsedRouteInfo = getRouteInfo(state, type, timeZoneId)
+    if (parsedRouteInfo === undefined) {
+        return { result: "error", error: "No route could be loaded" }
+    }
+    const { forecastRequest } = parsedRouteInfo
+    const formdata = new FormData();
+    formdata.append('locations', JSON.stringify(forecastRequest));
+    formdata.append('timezone', timeZoneId);
+    formdata.append('service', state.forecast.weatherProvider);
+    formdata.append('routeName', state.routeInfo.name);
+    formdata.append('routeNumber', state.uiInfo.routeParams.rwgpsRoute);
 
-  const forecastResults = await doForecastFetch(state.params.action, formdata, abortSignal)
-  if (forecastResults.result === "success") {
-      let forecast = { result: "success", value: { forecast: forecastResults.value, timeZoneId } }
-      if (state.forecast.fetchAqi) {
-        const aqiResults = await doForecastFetch("/aqi", formdata, abortSignal)
-        if (aqiResults.result === "success") {
-            for (let indx = 0;indx < forecastResults.value.forecast.length;indx++) {
-                forecastResults.value.forecast[indx].aqi = aqiResults.value.forecast[indx].aqi;
+    const forecastResults = await doForecastFetch(state.params.action, formdata, abortSignal)
+    if (forecastResults.result === "success") {
+        let forecast = { result: "success", value: { forecast: forecastResults.value, timeZoneId } }
+        if (state.forecast.fetchAqi) {
+            const aqiResults = await doForecastFetch("/aqi", formdata, abortSignal)
+            if (aqiResults.result === "success") {
+                for (let indx = 0;indx < forecastResults.value.forecast.length;indx++) {
+                    forecastResults.value.forecast[indx].aqi = aqiResults.value.forecast[indx].aqi;
+                }
             }
         }
-      }
-      return forecast;
-  } else {
-      if (forecastResults.error === "The user aborted a request.") {
-        return { result: "canceled"}
-      } else {
-        return { result: "error", error: forecastResults.error}
-      }
-  }
+        return forecast;
+    } else {
+        if (forecastResults.error === "The user aborted a request.") {
+            return { result: "canceled" }
+        } else {
+            return { result: "error", error: forecastResults.error }
+        }
+    }
 }

@@ -31,7 +31,7 @@ export const getRouteInfo = (state, type, timeZoneId) => {
   const walkFunction = type === "rwgps" ? gpxParser.walkRwgpsRoute : gpxParser.walkGpxRoute
   return walkFunction(
     routeData,
-    DateTime.fromMillis(state.uiInfo.routeParams.startTimestamp),
+    DateTime.fromMillis(state.uiInfo.routeParams.startTimestamp, {zone:timeZoneId}),
     state.uiInfo.routeParams.pace,
     state.uiInfo.routeParams.interval,
     state.controls.userControlPoints,

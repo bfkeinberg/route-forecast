@@ -79,7 +79,7 @@ DateSelect.propTypes = {
 
 const mapStateToProps = (state) =>
     ({
-        start: DateTime.fromMillis(state.uiInfo.routeParams.startTimestamp),
+        start: DateTime.fromMillis(state.uiInfo.routeParams.startTimestamp, {zone:state.uiInfo.routeParams.zone}),
         zone: state.uiInfo.routeParams.zone,
         maxDaysInFuture:state.uiInfo.routeParams.maxDaysInFuture,
         canForecastPast:state.uiInfo.routeParams.canForecastPast

@@ -204,7 +204,7 @@ const calculateWindResult = (inputs) => {
         routeParams.pace,
         sortedControls,
         sortedValues,
-        DateTime.fromMillis(routeParams.startTimestamp),
+        DateTime.fromMillis(routeParams.startTimestamp, {zone:routeParams.zone}),
         finishTime,
         timeZoneId
     )
