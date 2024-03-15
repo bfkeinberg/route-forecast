@@ -1,5 +1,5 @@
 import cookie from 'react-cookies';
-import { doForecast } from '../utils/forecastUtilities';
+import { doForecast, requestTimeZoneForRoute } from '../utils/forecastUtilities';
 import { loadRwgpsRoute } from '../utils/rwgpsUtilities';
 import { controlsMeaningfullyDifferent, parseControls, extractControlsFromRoute, getRouteNumberFromValue } from '../utils/util';
 import ReactGA from "react-ga4";
@@ -10,7 +10,8 @@ import { userControlsUpdated, displayControlTableUiSet, rwgpsRouteLoaded, loadin
     routeLoadingBegun, forecastFetchBegun, forecastFetched, forecastFetchFailed, forecastFetchCanceled,
     rwgpsRouteLoadingFailed, gpxRouteLoaded, gpxRouteLoadingFailed, shortUrlSet,
     errorDetailsSet,weatherProviderSet, intervalSet, paceSet, forecastInvalidated, startTimeSet,
-    stravaTokenSet, stravaErrorSet, stravaFetchBegun, stravaFetched, stravaFetchFailed } from './reducer';
+    stravaTokenSet, stravaErrorSet, stravaFetchBegun, stravaFetched, stravaFetchFailed,
+    initialStartTimeSet, timeZoneSet } from './reducer';
 
 export const componentLoader = (lazyComponent, attemptsLeft) => {
     return new Promise((resolve, reject) => {
@@ -56,6 +57,13 @@ const cancelForecast = () => {
         dispatch(forecastInvalidated())
     }
 };
+
+export const setTimeFromIso = (startAsIso,zone) => {
+    return function(dispatch) {
+        dispatch(initialStartTimeSet({start:startAsIso,zone:zone}))
+        dispatch(forecastInvalidated())
+    }
+}
 
 export const setStart = function (start) {
     return function(dispatch) {
@@ -184,6 +192,14 @@ export const loadFromRideWithGps = function (routeNumber, isTrip) {
                         dispatch(displayControlTableUiSet(true))
                     }
                 }
+                requestTimeZoneForRoute(getState()).then((results) => {
+                    if (results.result === "error") {
+                        dispatch(rwgpsRouteLoadingFailed(results.error))
+                    } else {
+                        dispatch(timeZoneSet(results.result))
+                    }
+                }
+                )
             }, error => { return dispatch(rwgpsRouteLoadingFailed(error.message)) }
             );
         })
