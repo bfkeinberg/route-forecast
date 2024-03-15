@@ -40,6 +40,7 @@ export class ForecastTable extends Component {
     constructor(props) {
         super(props);
         this.expandTable = this.expandTable.bind(this);
+        this.toggleAqi = this.toggleAqi.bind(this)
         this.state = {showGusts:false, showApparentTemp:false};
         props.tableViewedSet();
     }
@@ -52,7 +53,8 @@ export class ForecastTable extends Component {
     toggleAqi = async () => {
         this.props.fetchAqiToggled();
         cookie.save('fetchAqi', !this.props.fetchAqi, { path: '/' });
-        if (this.props.fetchAqi) {
+        // whatever the value in props is will be toggled by this
+        if (!this.props.fetchAqi) {
             (await AppToaster).show({ message: "AQI fetch enabled", timeout:3000, isCloseButtonShown: false });
         } else {
             (await AppToaster).show({ message: "AQI fetch disabled", timeout:3000, isCloseButtonShown: false });
