@@ -10,7 +10,7 @@ import { generateUrl } from '../../utils/queryStringUtils';
 import { querySet } from '../../redux/reducer';
 
 const ForecastButton = ({fetchingForecast,requestForecast,routeInfo,submitDisabled, routeNumber, startTimestamp, pace, interval,
-     metric, controls, strava_activity, strava_route, provider, showProvider, href, urlIsShortened, querySet}) => {
+     metric, controls, strava_activity, strava_route, provider, showProvider, href, urlIsShortened, querySet, zone}) => {
     const dispatch = useDispatch()
     let tooltipContent = submitDisabled ?
         "Must provide an rwgps route id" :
@@ -19,7 +19,7 @@ const ForecastButton = ({fetchingForecast,requestForecast,routeInfo,submitDisabl
     const forecastClick = () => {
         requestForecast(routeInfo);
         const url = generateUrl(startTimestamp, routeNumber, pace, interval, metric, controls,
-            strava_activity, strava_route, provider, showProvider, origin, true, dispatch)
+            strava_activity, strava_route, provider, showProvider, origin, true, dispatch, zone)
         querySet({queryString:url.url,searchString:url.search})
         updateHistory(url.url, true);
         // don't shorten localhost with bitly
@@ -69,6 +69,7 @@ ForecastButton.propTypes = {
         PropTypes.oneOf([''])
     ]),
     startTimestamp: PropTypes.number.isRequired,
+    zone: PropTypes.string.isRequired,
     pace: PropTypes.string.isRequired,
     interval: PropTypes.number.isRequired,
     metric: PropTypes.bool.isRequired,
@@ -90,6 +91,7 @@ const mapStateToProps = (state) =>
         queryString: state.params.queryString,
         routeNumber: state.uiInfo.routeParams.rwgpsRoute,
         startTimestamp: state.uiInfo.routeParams.startTimestamp,
+        zone: state.uiInfo.routeParams.zone,
         pace: state.uiInfo.routeParams.pace,
         interval: state.uiInfo.routeParams.interval,
         metric: state.controls.metric,
