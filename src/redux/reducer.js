@@ -45,6 +45,8 @@ const routeParamsInitialState = {
     rwgpsRoute: '',
     rwgpsRouteIsTrip: false,
     startTimestamp: initialStartTime().toMillis(),
+    // eslint-disable-next-line new-cap
+    zone: Intl.DateTimeFormat().resolvedOptions().timeZone,
     routeLoadingMode: routeLoadingModes.RWGPS,
     maxDaysInFuture: providerValues['weatherKit'].max_days,
     stopAfterLoad: false
@@ -78,6 +80,7 @@ const routeParamsSlice = createSlice({
                 const start =  DateTime.fromISO(action.payload.start, {zone:!action.payload.zone?"local":action.payload.zone})
                 if (start.isValid) {
                     state.startTimestamp = checkedStartDate(start, state.canForecastPast).toMillis()
+                    state.zone = action.payload.zone
                     state.stopAfterLoad = false
                 }
             }
@@ -89,6 +92,9 @@ const routeParamsSlice = createSlice({
                     state.startTimestamp = checkedStartDate(start, state.canForecastPast).toMillis()
                 }
             }
+        },
+        timeZoneSet(state,action) {
+            state.zone = action.payload
         },
         paceSet(state,action) {
             if (action.payload) {
@@ -127,14 +133,14 @@ const routeParamsSlice = createSlice({
                 state.maxDaysInFuture = providerValues[action.payload].max_days
                 state.canForecastPast = providerValues[action.payload].canForecastPast
                 state.startTimestamp = checkedStartDate(DateTime.fromMillis(state.startTimestamp), providerValues[action.payload].canForecastPast).toMillis()
-        })
+            })
     }
 })
 
 export const routeParamsReducer = routeParamsSlice.reducer
 export const {stopAfterLoadSet,rwgpsRouteSet,startTimeSet,initialStartTimeSet,
-        startTimestampSet,paceSet,intervalSet,routeIsTripToggled,routeIsTripSet,routeLoadingModeSet,reset} = routeParamsSlice.actions
-
+        startTimestampSet,paceSet,intervalSet,routeIsTripToggled,routeIsTripSet,
+        routeLoadingModeSet,reset, timeZoneSet} = routeParamsSlice.actions
 
 const rideWithGpsInfoSlice = createSlice({
     name: 'rideWithGpsInfo',
@@ -533,76 +539,7 @@ const forecastSlice = createSlice({
 
 export const forecastReducer = forecastSlice.reducer
 export const {forecastFetched,forecastInvalidated,weatherRangeSet,weatherRangeToggled,
-    tableViewedSet,mapViewedSet,weatherProviderSet,zoomToRangeSet,zoomToRangeToggled,fetchAqiSet,fetchAqiToggled} = forecastSlice.actions
-/*const forecast = function(state = {
-    forecast: [],
-    timeZoneId: null,
-    valid: false,
-    range: [],
-    tableViewed: false,
-    mapViewed: false,
-    weatherProvider: 'nws',
-    zoomToRange: true,
-    fetchAqi:false
-}, action) {
-    switch (action.type) {
-        case Actions.FORECAST_FETCH_SUCCESS:
-            return {...state,forecast:action.forecastInfo.forecast, timeZoneId: action.timeZoneId, valid:true,tableViewed:false,mapViewed:false,range:[]};
-        case Actions.SET_RWGPS_ROUTE:
-            return {...state,valid:false,tableViewed:false,mapViewed:false,range:[],forecast:[]};
-        case Actions.GPX_ROUTE_LOADING_SUCCESS:
-            return {...state,valid:false};
-        case Actions.INVALIDATE_FORECAST:
-            return { ...state, valid: false, forecast: [], timeZoneId: null, range: [] };
-        case Actions.GPX_ROUTE_LOADING_FAILURE:
-            return {...state,valid:false};
-        case Actions.SET_WEATHER_RANGE:
-            return {...state,range:
-                [
-                    parseFloat(action.start),
-                    parseFloat(action.finish)
-                ]
-            };
-        case Actions.TOGGLE_WEATHER_RANGE:
-                if (state.range[0] === parseFloat(action.start) && state.range[1] === parseFloat(action.finish)) {
-                    return {
-                        ...state,
-                        range: []
-                    }
-                }
-                return {...state, range:
-                    [
-                        parseFloat(action.start),
-                        parseFloat(action.finish)
-                    ]
-                };
-        case Actions.SET_TABLE_VIEWED:
-            return {...state, tableViewed: true};
-        case Actions.SET_MAP_VIEWED:
-            return {...state, mapViewed: true};
-        case Actions.SET_WEATHER_PROVIDER:
-            return {...state, weatherProvider:action.weatherProvider}
-        case Actions.TOGGLE_ZOOM_TO_RANGE:
-            return {...state, zoomToRange:!state.zoomToRange}
-        case Actions.SET_ZOOM_TO_RANGE:
-            return {...state, zoomToRange:action.zoom}
-        case Actions.TOGGLE_FETCH_AQI:
-            return {...state, fetchAqi:!state.fetchAqi}
-        case Actions.SET_FETCH_AQI:
-            return {...state, fetchAqi:action.fetchAqi}
-        case Actions.SET_ADJUSTED_FORECAST_TIME:
-            if (state.forecast.length > action.index) {
-                let forecastArray = state.forecast.slice(0)
-                let forecast = Object.assign({}, state.forecast[action.index])
-                forecast.adjustedTime = action.value
-                forecastArray[action.index] = forecast
-                return {...state, forecastArray}
-            }
-            return {...state}
-        default:
-            return state;
-    }
-};*/
+    tableViewedSet,mapViewedSet,weatherProviderSet,zoomToRangeSet,zoomToRangeToggled,fetchAqiSet,fetchAqiToggled} = forecastSlice.actions;
 
 const paramsSlice = createSlice({
     name:'params',
