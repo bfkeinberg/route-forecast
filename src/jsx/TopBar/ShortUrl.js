@@ -3,6 +3,7 @@ import { InputGroup, FormGroup } from '@blueprintjs/core';
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 import ReactGA from "react-ga4";
+import { AppToaster } from '../shared/toast';
 
 const ShortUrl = ({shortUrl}) => {
     return (
@@ -14,6 +15,7 @@ const ShortUrl = ({shortUrl}) => {
                    onClick={async event => {
                        try {
                             await navigator.clipboard.writeText(event.target.value);
+                            (await AppToaster).show({ message: "Short URL copied", timeout:3000 });
                        } catch (err) {
                            console.warn(err);
                             event.target.select();document.execCommand('copy');
