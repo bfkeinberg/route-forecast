@@ -15,7 +15,7 @@ const ShortUrl = ({shortUrl}) => {
                    onClick={async event => {
                        try {
                             await navigator.clipboard.writeText(event.target.value);
-                            (await AppToaster).show({ message: "Short URL copied", timeout:3000 });
+                            (await AppToaster).show({ message: "Short URL copied", timeout:3000, isCloseButtonShown: false });
                        } catch (err) {
                            console.warn(err);
                             event.target.select();document.execCommand('copy');

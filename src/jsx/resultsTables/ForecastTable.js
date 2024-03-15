@@ -53,9 +53,9 @@ export class ForecastTable extends Component {
         this.props.fetchAqiToggled();
         cookie.save('fetchAqi', !this.props.fetchAqi, { path: '/' });
         if (this.props.fetchAqi) {
-            (await AppToaster).show({ message: "AQI fetch enabled", timeout:3000 });
+            (await AppToaster).show({ message: "AQI fetch enabled", timeout:3000, isCloseButtonShown: false });
         } else {
-            (await AppToaster).show({ message: "AQI fetch disabled", timeout:3000 });
+            (await AppToaster).show({ message: "AQI fetch disabled", timeout:3000, isCloseButtonShown: false });
         }
     };
 
