@@ -1,14 +1,14 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import Flatpickr from 'react-flatpickr'
+import { DateInput3, TimePrecision } from "@blueprintjs/datetime2";
+import "@blueprintjs/datetime/lib/css/blueprint-datetime.css";
+import "@blueprintjs/datetime2/lib/css/blueprint-datetime2.css";
 import {Icon} from '@blueprintjs/core';
 import { DesktopTooltip } from '../shared/DesktopTooltip';
 import {connect} from 'react-redux';
 import {setStart, setTimeFromIso} from "../../redux/actions";
-import 'flatpickr/dist/themes/confetti.css';
 import { DateTime } from 'luxon';
 import { initialStartTimeSet } from '../../redux/reducer';
-import TimeZoneSelect from 'react-timezone-select'
 
 export const setDateOnly = (start, setInitialStart) => {
     let now = DateTime.now();
@@ -18,51 +18,46 @@ export const setDateOnly = (start, setInitialStart) => {
 
 //"EEE MMM dd yyyy HH:mm:ss 'GMT'ZZZ"
 const DateSelect = ({ start, zone, setStart, initialStartTimeSet, maxDaysInFuture, canForecastPast, setTimeFromIso }) => {
-    // eslint-disable-next-line array-element-newline
     const setDateWithZone = (zone) => {
-        setTimeFromIso(start.toISO({includeOffset:false}), zone.value)
+        setTimeFromIso(start.toISO({includeOffset:false}), zone)
     }
 
-        // allow us to continue to show the start time if the route was forecast for a time before the present
+    const setDateFromPicker = (dateIsoString) => {
+        setStart(DateTime.fromISO(dateIsoString).toMillis());
+    }
+
+    // allow us to continue to show the start time if the route was forecast for a time before the present
     const now = new Date();
     let later = new Date();
     const daysToAdd = maxDaysInFuture;
     later.setDate(now.getDate() + daysToAdd);
-
+    let otherAttributes = {}
+    if (!canForecastPast) {
+        otherAttributes.minDate = now
+    }
     return (
         <div style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
             <span id={"startingTime"} style={{ fontSize: ".875rem", fontWeight: "bolder", padding: "0px 5px", flex: 1 }}>
                 <Icon icon="calendar" onClick={() => setDateOnly(start, initialStartTimeSet)} style={{ cursor: "pointer", marginRight: "3px" }} />
                 Starting time
             </span>
-            <div style={{ flex: 2.5 }}>
+            <div style={{ flex: 2.5 } }>
                 <DesktopTooltip content={'When you plan to begin riding'} placement={'bottom'}>
-                    <Flatpickr key={start.seconds} id='calendar'
-                        value={start.toJSDate()}
-                        options={{
-                            enableTime: true,
-                            altInput: true, altFormat: 'F j, Y h:i K',
-                            altInputClass: 'dateDisplay',
-                            minDate: canForecastPast ? null : now,
-                            maxDate: later,
-                            defaultDate: start.toJSDate(),
-                            dateFormat: 'Z',
-                            onParseConfig: (dates, datestr, instance) =>
-                                instance.config.onClose.push((dates) => { setStart(DateTime.fromJSDate(dates[0]).toMillis(), { zone: zone }) })
-                        }}
+                    <DateInput3
+                        onChange={setDateFromPicker}
+                        onTimezoneChange={setDateWithZone}
+                        {...otherAttributes}
+                        placeholder="M/D/YYYY"
+                        value={start.toISO()}
+                        showTimezoneSelect
+                        maxDate={later}
+                        timePrecision={TimePrecision.MINUTE}
+                        timePickerProps={{useAmPm:true, showArrowButtons:true}}
+                        dateFnsFormat='MMMM d, yyyy K:mmaaa'
+                        timezone={zone}
                     />
                 </DesktopTooltip>
             </div>
-            <TimeZoneSelect
-                        onChange={setDateWithZone} value={zone} labelStyle={'original'}
-                        styles={{dropdownIndicator: (baseStyles) => ({
-                                ...baseStyles, width:'90%'}),
-                                container:(baseStyles) => ({
-                                    ...baseStyles, maxWidth: '16em'}),
-                                        singleValue:(baseStyles) => ({
-                                            ...baseStyles, fontSize:'0.8rem', fontWeight:'bold'}),
-                        }}
-                    />
         </div>
     );
 };

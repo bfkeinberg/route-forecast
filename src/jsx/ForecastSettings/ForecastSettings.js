@@ -11,7 +11,7 @@ import { TimeFields } from "./TimeFields";
 import { RouteTitle } from '../shared/RouteTitle';
 import LocationContext from '../locationContext';
 import ReactGA from "react-ga4";
-import { Toast } from '@blueprintjs/core';
+import { Toast2 } from '@blueprintjs/core';
 import { metricToggled, displayControlTableUiSet, errorDetailsSet } from '../../redux/reducer';
 
 export const ForecastSettings = () => {
@@ -36,7 +36,7 @@ export const ForecastSettings = () => {
                 <div style={{ display: "flex", margin: "30px 0px" }}>
                     <ForecastInterval />
                 </div>
-                {errorDetails !== null && <Toast message={errorDetails} timeout={0} onDismiss={() => dispatch(errorDetailsSet(null))} intent="danger"></Toast>}
+                {errorDetails !== null && <Toast2 message={errorDetails} timeout={0} onDismiss={() => dispatch(errorDetailsSet(null))} intent="danger"></Toast2>}
                 {showProvider && (
                     <WeatherProviderSelector />
                 )}

@@ -68,7 +68,7 @@ const routeParamsSlice = createSlice({
         },
         startTimeSet(state,action) {
             if (action.payload) {
-                const start =  DateTime.fromMillis(action.payload)
+                const start =  DateTime.fromMillis(action.payload, {zone:state.zone})
                 if (start.isValid) {
                     state.startTimestamp = checkedStartDate(start, state.canForecastPast).toMillis()
                     state.stopAfterLoad = false
