@@ -25,6 +25,9 @@ const getMapBounds = (points, bounds, zoomToRange, subrange) => {
     if (window.google === undefined) {
         return;
     }
+    if (bounds === null) {
+        return null;
+    }
     let southWest = { lat: bounds.min_latitude, lng: bounds.min_longitude };
     let northEast = { lat: bounds.max_latitude, lng: bounds.max_longitude };
     if (isNaN(bounds.min_latitude) || isNaN(bounds.max_latitude)) {
@@ -60,12 +63,19 @@ const RouteForecastMap = ({maps_api_key}) => {
         setMap
     ] = React.useState(null)
 
+    const [
+        boundsFit,
+        setBoundsFit
+    ] = React.useState(false);
+
     const userControlPoints = useSelector(state => state.controls.userControlPoints)
     const forecast = useSelector(state => state.forecast.forecast)
     const subrange = useSelector(state => (state.uiInfo.routeParams.routeLoadingMode === routeLoadingModes.STRAVA ? state.strava.subrange : state.forecast.range))
     const routeLoadingMode = useSelector(state => state.uiInfo.routeParams.routeLoadingMode)
     const metric = useSelector(state => state.controls.metric)
     const zoomToRange = useSelector(state => state.forecast.zoomToRange)
+    const mapViewed = useSelector(state => state.forecast.mapViewed)
+    const tableViewed = useSelector(state => state.forecast.tableViewed)
 
     const { calculatedControlPointValues: controls } = useForecastDependentValues()
 
@@ -87,20 +97,23 @@ const RouteForecastMap = ({maps_api_key}) => {
     const { points, bounds } = usePointsAndBounds()
     let mapBounds
     try {
-        mapBounds = useMemo(() => (bounds !== null ? getMapBounds(points, bounds, zoomToRange, subrange) : null), [
+        mapBounds = useMemo(() => (getMapBounds(points, bounds, zoomToRange, subrange)), [
             points,
             bounds,
             zoomToRange,
             subrange
         ])
+        // this is the case where the forecast has been updated and the map is being displayed for the first time since then
+        // in this case we want to set bounds to our track
+        if (!mapViewed && !tableViewed && boundsFit) {
+            setBoundsFit(false)
+        }
     } catch (error) {
         console.warn(`Error creating map bounds:${error}`)
     }
-    // const mapBounds = (bounds !== null ? getMapBounds(points, bounds, zoomToRange, subrange) : null);
+
     const mapCenter = useMemo( () => ((mapBounds !== null && mapBounds !== undefined) ? mapBounds.getCenter() : null), [mapBounds]);
-    // const mapCenter = ((mapBounds !== null && mapBounds !== undefined) ? mapBounds.getCenter() : null);
     const initialCenter = useMemo( () => ((mapCenter === null || mapCenter === undefined) ? undefined : mapCenter.toJSON()), [mapCenter])
-    // const initialCenter = ((mapCenter === null || mapCenter === undefined) ? undefined : mapCenter.toJSON())
 
     const onLoad = React.useCallback((map) => {
         setMap(map);
@@ -109,6 +122,18 @@ const RouteForecastMap = ({maps_api_key}) => {
     const onUnmount = React.useCallback(() => {
         setMap(null);
     }, [])
+
+    const onTilesLoaded = React.useCallback(() => {
+        if (!boundsFit) {
+            // we only want to snap the map bounds to our track once after each forecast, to allow
+            // the user to change the map zoom if they desired
+            // this hook will be triggered every time the zoom changes amongst other things, so we
+            // have to work around that
+            map.fitBounds(mapBounds, 0)
+            setBoundsFit(true)
+        }
+    // eslint-disable-next-line array-element-newline
+    }, [mapBounds,boundsFit])
 
     if (!isLoaded) {
         return (<h2 style={{ padding: '18px', textAlign: "center" }}>Forecast map</h2>);
@@ -125,7 +150,7 @@ const RouteForecastMap = ({maps_api_key}) => {
                         mapContainerStyle={{ width: 'auto', height:  "calc(100vh - 70px)", position:'relative' }}
                         onLoad={onLoad}
                         onUnmount={onUnmount}
-                        onTilesLoaded={() => {map.fitBounds(mapBounds, 0)}}
+                        onTilesLoaded={onTilesLoaded}
                     >
                         <Polyline path={points} options={{strokeColor:'#ff0000', strokeWeight:2, strokeOpacity:1.0}} />
                         <MapHighlight points={points} subrange={subrange} />
