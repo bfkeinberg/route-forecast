@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useRef, useState, useMemo } from "react"
 import { useSelector } from "react-redux"
 import stravaRouteParser from "./stravaRouteParser"
 import { getRouteInfo, milesToMeters } from "./util"
@@ -156,18 +156,18 @@ const usePointsAndBounds = () => {
 
   if (stravaMode) {
     if (stravaActivityStream !== null) {
-      pointsAndBounds = stravaRouteParser.computePointsAndBounds(stravaActivityStream)
+      pointsAndBounds = useMemo(() => stravaRouteParser.computePointsAndBounds(stravaActivityStream), [stravaActivityStream])
     }
   } else if (rwgpsRouteData !== null) {
-    pointsAndBounds = gpxParser.computePointsAndBounds(rwgpsRouteData, "rwgps")
+    pointsAndBounds = useMemo(() => gpxParser.computePointsAndBounds(rwgpsRouteData, "rwgps"), [rwgpsRouteData])
   } else if (gpxRouteData !== null) {
-    pointsAndBounds = gpxParser.computePointsAndBounds(gpxRouteData, "gpx")
+    pointsAndBounds = useMemo(() => gpxParser.computePointsAndBounds(gpxRouteData, "gpx"), [gpxRouteData])
   }
 
   if (pointsAndBounds.points !== null) {
-    pointsAndBounds.points = pointsAndBounds.points
+    pointsAndBounds.points = useMemo(() => pointsAndBounds.points
       .filter(point => point.lat !== undefined && point.lon !== undefined)
-      .map(point => ({ lat: point.lat, lng: point.lon, dist: point.dist }))
+      .map(point => ({ lat: point.lat, lng: point.lon, dist: point.dist })), [pointsAndBounds.points])
   }
 
   return pointsAndBounds
