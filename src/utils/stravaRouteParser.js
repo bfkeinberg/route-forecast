@@ -83,7 +83,7 @@ class StravaActivityParser {
         let distance = activityStream.distance;
         let bounds = { min_latitude: 90, min_longitude: 180, max_latitude: -90, max_longitude: -180 };
         return {
-            points: latlng.data.map((coord, i) => {
+            pointList: latlng.data.map((coord, i) => {
                 let point = Object.assign({}, {lat:coord[0], lon:coord[1]}, {dist:distance.data[i]});
                 bounds = setMinMaxCoords(point, bounds);
                 return point

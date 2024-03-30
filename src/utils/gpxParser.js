@@ -112,9 +112,11 @@ class AnalyzeRoute {
         this.parseCoursePoints(routeData, type).filter(point => this.isControl(point)).map(point => this.controlFromCoursePoint(point))
 
     parseRouteStream = (routeData, type) =>
-        (type === "rwgps" ?
-        routeData[routeData.type]['track_points'].map(point => ({ lat: point.y, lon: point.x, elevation: point.e, dist: point.d })) :
-        routeData.tracks.reduce((accum,current) => accum.concat(current.points,[]),[]))
+    (type === "rwgps" ?
+        routeData[routeData.type]['track_points']
+            .filter(point => point.x !== undefined && point.y !== undefined)
+            .map(point => ({ lat: point.y, lon: point.x, elevation: point.e, dist: point.d })) :
+        routeData.tracks.reduce((accum, current) => accum.concat(current.points, []), []))
 
 
     computePointsAndBounds = (routeData, type) => {
@@ -123,12 +125,10 @@ class AnalyzeRoute {
         let bounds = { min_latitude: 90, min_longitude: 180, max_latitude: -90, max_longitude: -180 };
 
         stream
-            .filter(point => point.lat !== undefined && point.lon !== undefined)
             .forEach(point => {
                 bounds = setMinMaxCoords(point, bounds);
             })
-
-        return {points: stream, bounds}
+        return {pointList: stream, bounds}
     };
 
     analyzeRoute(stream, userStartTime, pace, intervalInHours, controls, timeZoneId) {

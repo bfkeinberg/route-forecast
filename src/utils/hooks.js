@@ -151,8 +151,7 @@ const usePointsAndBounds = () => {
   const stravaActivityStream = useSelector(state => state.strava.activityStream)
   const stravaMode = routeLoadingMode === routeLoadingModes.STRAVA
 
-  let pointsAndBounds = { bounds: null, points: null }
-
+  let pointsAndBounds
 
   if (stravaMode) {
     if (stravaActivityStream !== null) {
@@ -163,11 +162,9 @@ const usePointsAndBounds = () => {
   } else if (gpxRouteData !== null) {
     pointsAndBounds = useMemo(() => gpxParser.computePointsAndBounds(gpxRouteData, "gpx"), [gpxRouteData])
   }
-
-  if (pointsAndBounds.points !== null) {
-    pointsAndBounds.points = useMemo(() => pointsAndBounds.points
-      .filter(point => point.lat !== undefined && point.lon !== undefined)
-      .map(point => ({ lat: point.lat, lng: point.lon, dist: point.dist })), [pointsAndBounds.points])
+  if (pointsAndBounds.pointList !== null && pointsAndBounds.pointList.length > 0) {
+    pointsAndBounds.points = useMemo(() => pointsAndBounds.pointList
+      .map(point => ({ lat: point.lat, lng: point.lon, dist: point.dist })), [pointsAndBounds.pointList])
   }
 
   return pointsAndBounds
