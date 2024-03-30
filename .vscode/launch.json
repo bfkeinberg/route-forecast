@@ -7,26 +7,7 @@
         {
             "type": "node",
             "request": "launch",
-            "name": "Launch Program",
-            "skipFiles": [
-                "<node_internals>/**"
-            ],
-            "program": "/Users/brian/Src/route-forecast/dist/server/index.js",
-            "localRoot": "/Users/brian/Src/route-forecast/src/jsx/server",
-            "remoteRoot": "${workspaceFolder}/dist/server",
-            "sourceMaps": true,
-            "trace": true,
-            "outFiles": [
-                "${workspaceFolder}/dist/**/*.js"
-            ],
-            "env": {
-                "GOOGLE_APPLICATION_CREDENTIALS": "/Users/brian/Src/route-forecast/route-forecast-c4075d06140e.json"
-            }
-        },
-        {
-            "type": "node",
-            "request": "launch",
-            "name": "Launch randoplan on MacBook",
+            "name": "Launch server",
             "skipFiles": [
                 "<node_internals>/**"
             ],
@@ -38,10 +19,19 @@
             "trace": true,
             "outFiles": [
                 "${workspaceFolder}/dist/**/*.js"
-            ],
-            "env": {
-            }
+            ]
         },        
+        {
+            "type": "chrome",
+            "name": "Launch client",
+            "request": "launch",
+            "url": "http://localhost:8080",
+            "trace":true,
+            "outFiles": [
+                "${workspaceFolder}/dist/static/*"
+            ],
+            "sourceMaps": true
+        },
         {
             "type": "node",
             "name": "vscode-jest-tests",
@@ -57,14 +47,6 @@
                 "--runInBand",
                 "--watchAll=false"
             ]
-        },
-        {
-            "type": "chrome",
-            "name": "http://localhost:8080",
-            "request": "launch",
-            "url": "http://localhost:8080",
-            "trace":true,
-            "sourceMaps": true
         }
     ]
 }
