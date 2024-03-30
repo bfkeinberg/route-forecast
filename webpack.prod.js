@@ -38,6 +38,9 @@ module.exports = (env, argv) => merge(common(env, argv), {
             urlPrefix: '/static',
             debug: false,
             setCommits: { auto: true },
+            authToken: process.env.SENTRY_AUTH_TOKEN,
+            org: 'brian-feinberg',
+            project: 'randoplan',
             deploy: { env: 'production', name: 'latest' }
         }),
         new CompressionPlugin({
