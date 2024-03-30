@@ -2,7 +2,7 @@ import React, { useEffect, useMemo } from 'react';
 import rainCloud from "Images/rainCloud.png";
 import ErrorBoundary from "../shared/ErrorBoundary";
 import circus_tent from 'Images/circus tent.png';
-import { GoogleMap, useJsApiLoader, Polyline, MarkerF, InfoWindow } from '@react-google-maps/api';
+import { GoogleMap, Polyline, MarkerF, InfoWindow } from '@react-google-maps/api';
 import { formatTemperature } from "../resultsTables/ForecastTable";
 import { routeLoadingModes } from '../../data/enums';
 import { milesToMeters } from '../../utils/util';
@@ -22,12 +22,6 @@ const findMarkerInfo = (forecast, subrange) => {
 }
 
 const getMapBounds = (points, bounds, zoomToRange, subrange) => {
-    if (window.google === undefined) {
-        return;
-    }
-    if (bounds === null) {
-        return null;
-    }
     let southWest = { lat: bounds.min_latitude, lng: bounds.min_longitude };
     let northEast = { lat: bounds.max_latitude, lng: bounds.max_longitude };
     if (isNaN(bounds.min_latitude) || isNaN(bounds.max_latitude)) {
@@ -52,11 +46,7 @@ const cvtDistance = (distance, metric) => {
     return (metric ? ((distance * milesToMeters) / 1000) : Number.parseInt(distance));
 };
 
-const RouteForecastMap = ({maps_api_key}) => {
-    const { isLoaded } = useJsApiLoader({
-        id: 'google-map-script',
-        googleMapsApiKey: maps_api_key
-      })
+const RouteForecastMap = () => {
 
       const [
         map,
@@ -70,12 +60,16 @@ const RouteForecastMap = ({maps_api_key}) => {
 
     const userControlPoints = useSelector(state => state.controls.userControlPoints)
     const forecast = useSelector(state => state.forecast.forecast)
-    const subrange = useSelector(state => (state.uiInfo.routeParams.routeLoadingMode === routeLoadingModes.STRAVA ? state.strava.subrange : state.forecast.range))
+    let subrange = useSelector(state => (state.uiInfo.routeParams.routeLoadingMode === routeLoadingModes.STRAVA ?
+        state.strava.subrange :
+        state.forecast.range))
+    if (subrange.length == 2 && isNaN(subrange[1])) {
+        subrange = []
+    }
     const routeLoadingMode = useSelector(state => state.uiInfo.routeParams.routeLoadingMode)
     const metric = useSelector(state => state.controls.metric)
     const zoomToRange = useSelector(state => state.forecast.zoomToRange)
     const mapViewed = useSelector(state => state.forecast.mapViewed)
-    const tableViewed = useSelector(state => state.forecast.tableViewed)
 
     const { calculatedControlPointValues: controls } = useForecastDependentValues()
 
@@ -85,16 +79,17 @@ const RouteForecastMap = ({maps_api_key}) => {
     const controlNames = userControlPoints.map(control => control.name)
 
     let markedInfo = findMarkerInfo(forecast, subrange);
-    let infoPosition = { lat: 0, lng: 0 };
-    let infoVisible = false;
-    let infoContents = '';
-    if (markedInfo.length > 0) {
-        infoPosition = { lat: markedInfo[0].lat, lng: markedInfo[0].lon };
-        infoContents = `Temperature ${formatTemperature(markedInfo[0].temp, metric)} Wind speed ${cvtDistance(markedInfo[0].windSpeed, metric).toFixed(1)} Wind bearing ${markedInfo[0].windBearing}`;
-        infoVisible = true;
-    }
+
+    const onLoad = React.useCallback((loadedMap) => {
+        setMap(loadedMap);
+    }, [])
+
+    const onUnmount = React.useCallback(() => {
+        setMap(null);
+    }, [])
 
     const { points, bounds } = usePointsAndBounds()
+
     let mapBounds
     try {
         mapBounds = useMemo(() => (getMapBounds(points, bounds, zoomToRange, subrange)), [
@@ -105,23 +100,24 @@ const RouteForecastMap = ({maps_api_key}) => {
         ])
         // this is the case where the forecast has been updated and the map is being displayed for the first time since then
         // in this case we want to set bounds to our track
-        if (!mapViewed && !tableViewed && boundsFit) {
+        if (!mapViewed && boundsFit) {
             setBoundsFit(false)
         }
     } catch (error) {
         console.warn(`Error creating map bounds:${error}`)
     }
 
-    const mapCenter = useMemo( () => ((mapBounds !== null && mapBounds !== undefined) ? mapBounds.getCenter() : null), [mapBounds]);
+    const mapCenter = useMemo( () => mapBounds.getCenter(), [mapBounds]);
     const initialCenter = useMemo( () => ((mapCenter === null || mapCenter === undefined) ? undefined : mapCenter.toJSON()), [mapCenter])
 
-    const onLoad = React.useCallback((map) => {
-        setMap(map);
-    }, [])
-
-    const onUnmount = React.useCallback(() => {
-        setMap(null);
-    }, [])
+    let infoPosition = initialCenter
+    let infoVisible = false;
+    let infoContents = '';
+    if (markedInfo.length > 0) {
+        infoPosition = { lat: markedInfo[0].lat, lng: markedInfo[0].lon };
+        infoContents = `Temperature ${formatTemperature(markedInfo[0].temp, metric)} Wind speed ${cvtDistance(markedInfo[0].windSpeed, metric).toFixed(1)} Wind bearing ${markedInfo[0].windBearing}`;
+        infoVisible = true;
+    }
 
     const onTilesLoaded = React.useCallback(() => {
         if (!boundsFit) {
@@ -133,11 +129,8 @@ const RouteForecastMap = ({maps_api_key}) => {
             setBoundsFit(true)
         }
     // eslint-disable-next-line array-element-newline
-    }, [mapBounds,boundsFit])
+    }, [mapBounds,boundsFit,map])
 
-    if (!isLoaded) {
-        return (<h2 style={{ padding: '18px', textAlign: "center" }}>Forecast map</h2>);
-    }
     return (
         <ErrorBoundary>
             <div id="map" /*style={{ height: "calc(100vh - 50px)", position: "relative" }}*/>
@@ -166,10 +159,6 @@ const RouteForecastMap = ({maps_api_key}) => {
         </ErrorBoundary>
     )
 }
-
-RouteForecastMap.propTypes = {
-    maps_api_key: PropTypes.string
-};
 
 const MapMarkers = ({ forecast, controls, controlNames, subrange, metric, map, mapCenter, google }) => {
     // marker title now contains both temperature and mileage

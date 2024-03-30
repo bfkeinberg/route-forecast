@@ -1,6 +1,7 @@
 import ErrorBoundary from "./shared/ErrorBoundary";
 import ForecastTable from "./resultsTables/ForecastTable";
 import MapLoader from "./Map/MapLoader";
+import { useJsApiLoader } from '@react-google-maps/api';
 import PropTypes from "prop-types";
 import React, { useState } from "react";
 import RouteInfoForm from "./RouteInfoForm/RouteInfoForm";
@@ -18,6 +19,10 @@ import { RouteTitle } from "./shared/RouteTitle";
 import { InstallExtensionButton } from "./InstallExtensionButton";
 
 const DesktopUI = ({mapsApiKey}) => {
+    let { isLoaded:googleMapsIsLoaded, loadError:googleMapsLoadError } = useJsApiLoader({
+        googleMapsApiKey: mapsApiKey
+      })
+
     const {adjustedTimes } = useForecastDependentValues()
     const sidePaneOptions = [
         {title: "Route Info", content: <ErrorBoundary><RouteInfoForm routeProps={{}} /></ErrorBoundary>},
@@ -79,7 +84,12 @@ const DesktopUI = ({mapsApiKey}) => {
                     borderImage: "linear-gradient(to bottom, grey , transparent)",
                     borderImageSlice: 1
                 }}>
-                    {mapDataExists ? <MapLoader maps_api_key={mapsApiKey}/> : <TitleScreen/>}
+                    {
+                        (googleMapsLoadError && <h2>Error loading Google Maps</h2>) ||
+                            (mapDataExists && googleMapsIsLoaded) ?
+                            <MapLoader maps_api_key={mapsApiKey} /> :
+                            <TitleScreen />
+                    }
                 </div>
             </div>
         </div>

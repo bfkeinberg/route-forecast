@@ -2,6 +2,7 @@ import ErrorBoundary from "./shared/ErrorBoundary";
 import PaceTable from "./resultsTables/PaceTable";
 import ForecastTable from "./resultsTables/ForecastTable";
 import MapLoader from "./Map/MapLoader";
+import { useJsApiLoader } from '@react-google-maps/api';
 import PropTypes from "prop-types";
 import React from "react";
 import { Route, Routes, Link, MemoryRouter, useNavigate } from "react-router-dom";
@@ -37,6 +38,11 @@ const mapStateToProps = (state) =>
 export default connect(mapStateToProps)(MobileUI);
 
 const MobileUITabs = (props) => {
+    const { isLoaded:googleMapsIsLoaded } = useJsApiLoader({
+        id: 'google-map-script',
+        googleMapsApiKey: props.mapsApiKey
+      })
+
     const navigate = useNavigate()
     const type = useSelector(state => state.routeInfo.type)
     const routeData = useSelector(state => state.routeInfo[type === "rwgps" ? "rwgpsRouteData" : "gpxRouteData"])
@@ -79,7 +85,7 @@ const MobileUITabs = (props) => {
             <Routes>
                 <Route path="/" element={<RouteInfoForm />} />
                 <Route path="/controlPoints/" element={<ForecastSettings />} />
-                <Route path="/map/" element={<MapLoader maps_api_key={props.mapsApiKey} />} />
+                <Route path="/map/" element={googleMapsIsLoaded ? <MapLoader maps_api_key={props.mapsApiKey}/> : <span>Maps not loaded</span>} />
                 <Route path="/forecastTable/" element={<ForecastTable adjustedTimes={adjustedTimes}/>} />
                 <Route path="/paceTable/" element={<PaceTable />} />
             </Routes>
