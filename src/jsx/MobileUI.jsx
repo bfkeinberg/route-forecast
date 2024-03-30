@@ -39,7 +39,6 @@ export default connect(mapStateToProps)(MobileUI);
 
 const MobileUITabs = (props) => {
     const { isLoaded:googleMapsIsLoaded } = useJsApiLoader({
-        id: 'google-map-script',
         googleMapsApiKey: props.mapsApiKey
       })
 
