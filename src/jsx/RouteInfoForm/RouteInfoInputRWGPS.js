@@ -9,7 +9,6 @@ import { useSelector, useDispatch } from 'react-redux';
 
 export const RouteInfoInputRWGPS = () => {
   const usingPinnedRoutes = useSelector(state => state.rideWithGpsInfo.usePinnedRoutes)
-
   const [
 showPinnedRoutes,
 setShowPinnedRoutes
@@ -43,9 +42,11 @@ null :
 // eslint-disable-next-line react/prop-types
 const RWGPSLoadRouteButton = ({loadButtonRef}) => {
   const loading = useSelector(state => state.uiInfo.dialogParams.fetchingRoute)
+  const hasRwgpsRouteId = useSelector(state => state.uiInfo.routeParams.rwgpsRoute!=='')
+  const hasStravaRouteId = useSelector(state => state.strava.route!=='')
   const dispatch = useDispatch()
   return (
-    <Button ref={loadButtonRef} disabled={loading} style={{ backgroundColor: "#137cbd", borderColor: "#137cbd", marginTop: "10px", width: "100%" }} onClick={() => dispatch(loadFromRideWithGps())}>
+    <Button ref={loadButtonRef} disabled={loading || (!hasRwgpsRouteId && !hasStravaRouteId)} style={{ backgroundColor: "#137cbd", borderColor: "#137cbd", marginTop: "10px", width: "100%" }} onClick={() => dispatch(loadFromRideWithGps())}>
       {loading ? "Loading..." : "Load Route"}
       {loading && <Spinner />}
     </Button>
