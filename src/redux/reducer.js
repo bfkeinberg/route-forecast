@@ -19,7 +19,6 @@ const initialStartTime = function() {
 };
 
 export const providerValues = {
-    // darksky:{min_interval:0.25,max_days:14, canForecastPast:true, name:"Dark Sky"},
     climacell:{min_interval:0.25,max_days:4, canForecastPast:false, daysInPast:1, name:"Tomorrow.io", maxCallsPerHour:25, enabled:true},
     weatherapi:{min_interval:1,max_days:10, canForecastPast:false, daysInPast:4, name:"WeatherAPI", enabled:true},
     visualcrossing:{min_interval:0.25,max_days:14, canForecastPast:true, daysInPast:4, name:"Visual Crossing", enabled:true},
@@ -39,8 +38,8 @@ const checkedStartDate = (startDate, canForecastPast) => {
 
 const routeParamsInitialState = {
     interval: defaultIntervalInHours,
-    min_interval:providerValues.nws.min_interval,
-    canForecastPast:providerValues.nws.canForecastPast,
+    min_interval:providerValues.visualcrossing.min_interval,
+    canForecastPast:providerValues.visualcrossing.canForecastPast,
     pace: defaultPace,
     rwgpsRoute: '',
     rwgpsRouteIsTrip: false,
@@ -48,7 +47,7 @@ const routeParamsInitialState = {
     // eslint-disable-next-line new-cap
     zone: Intl.DateTimeFormat().resolvedOptions().timeZone,
     routeLoadingMode: routeLoadingModes.RWGPS,
-    maxDaysInFuture: providerValues['weatherKit'].max_days,
+    maxDaysInFuture: providerValues['visualcrossing'].max_days,
     stopAfterLoad: false
 }
 const routeParamsSlice = createSlice({
@@ -62,9 +61,11 @@ const routeParamsSlice = createSlice({
             if (action.payload) {
                 let route = getRouteNumberFromValue(action.payload);
                 state.rwgpsRoute = route
-                state.loadingSource = null
-                state.succeeded = null
+            } else {
+                state.rwgpsRoute = action.payload
             }
+            state.loadingSource = null
+            state.succeeded = null
         },
         startTimeSet(state,action) {
             if (action.payload) {
@@ -458,7 +459,7 @@ const forecastInitialState = {
     range: [],
     tableViewed: false,
     mapViewed: false,
-    weatherProvider: 'weatherKit',
+    weatherProvider: 'visualcrossing',
     zoomToRange: true,
     fetchAqi:false
 }
