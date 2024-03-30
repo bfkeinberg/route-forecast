@@ -99,7 +99,7 @@ export class RouteWeatherUI extends Component {
         props.updateControls(queryParams.controlPoints==undefined?[]:parseControls(queryParams.controlPoints,true));
         const zoomToRange = loadCookie('zoomToRange');
         if (zoomToRange !== undefined) {
-            this.props.zoomToRangeSet(zoomToRange);
+            this.props.zoomToRangeSet(zoomToRange==="true");
         }
         const fetchAqi = loadCookie('fetchAqi');
         if (fetchAqi !== undefined) {
@@ -200,7 +200,7 @@ export class RouteWeatherUI extends Component {
         if (RouteWeatherUI.hasProvider(queryParams.provider)) {
             props.setWeatherProvider(queryParams.provider);
         } else {
-            props.setWeatherProvider('weatherKit');
+            props.setWeatherProvider('visualcrossing');
         }
         props.rwgpsRouteSet(queryParams.rwgpsRoute);
         RouteWeatherUI.getStravaToken(queryParams,props);
