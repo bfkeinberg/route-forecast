@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { DateInput3, TimePrecision } from "@blueprintjs/datetime2";
-import "@blueprintjs/datetime/lib/css/blueprint-datetime.css";
+import "@blueprintjs/datetime2/lib/css/blueprint-datetime.css";
 import "@blueprintjs/datetime2/lib/css/blueprint-datetime2.css";
 import {Icon} from '@blueprintjs/core';
 import { DesktopTooltip } from '../shared/DesktopTooltip';
