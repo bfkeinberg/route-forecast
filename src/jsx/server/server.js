@@ -254,8 +254,14 @@ app.post('/forecast', upload.none(), async (req, res) => {
             // we explicitly do not want to parallelize to avoid swamping the servers we are calling and being throttled
             results.push(result);
         }
+        if (!process.env.NO_LOGGING) {
+            logger.info(`Done with request from ${req.ip}`);
+        }
         res.status(200).json({ 'forecast': results });
     } catch (error) {
+        if (!process.env.NO_LOGGING) {
+            logger.info(`Error with request from ${req.ip}`);
+        }
         res.status(500).json({ 'details': `Error calling weather service : ${error}` });
     }
 });
