@@ -32,7 +32,7 @@ const ForecastButton = ({fetchingForecast,submitDisabled, routeNumber, startTime
                 forecastResults.push(result)
                 locations = requestCopy.shift();
             } catch (err) {
-                dispatch(forecastFetchFailed(err))
+                            dispatch(forecastFetchFailed(err))
             }
         }
         return Promise.all(forecastResults)
@@ -50,13 +50,17 @@ const ForecastButton = ({fetchingForecast,submitDisabled, routeNumber, startTime
         "Request a ride forecast";
     let buttonStyle = submitDisabled ? { pointerEvents: 'none', display: 'inline-flex' } : null;
     const forecastClick = async () => {
-        const forecastResults = await doForecastByParts()
-        //dispatch(forecastFetched({ forecastInfo: {forecast: forecastResults.map(result => result.forecast)}, timeZoneId: zone }))
-        const firstForecast = forecastResults.shift()
-        dispatch(forecastFetched({ forecastInfo: {forecast: [firstForecast.forecast]}, timeZoneId: zone }))
-        while (forecastResults.length > 0) {
-            const nextForecast = forecastResults.shift().forecast
-            dispatch(forecastAppended(nextForecast))
+        try {
+            const forecastResults = await doForecastByParts()
+            const firstForecast = forecastResults.shift()
+            dispatch(forecastFetched({ forecastInfo: {forecast: [firstForecast.forecast]}, timeZoneId: zone }))
+            while (forecastResults.length > 0) {
+                const nextForecast = forecastResults.shift().forecast
+                dispatch(forecastAppended(nextForecast))
+            }
+            } catch (err) {
+                dispatch(forecastFetchFailed(err))
+                return
         }
 
         const url = generateUrl(startTimestamp, routeNumber, pace, interval, metric, controls,
