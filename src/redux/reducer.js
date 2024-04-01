@@ -62,7 +62,7 @@ const routeParamsSlice = createSlice({
                 let route = getRouteNumberFromValue(action.payload);
                 state.rwgpsRoute = route
             } else {
-                state.rwgpsRoute = action.payload
+                state.rwgpsRoute = ''
             }
             state.loadingSource = null
             state.succeeded = null
@@ -475,6 +475,9 @@ const forecastSlice = createSlice({
             state.mapViewed = false
             state.range = []
         },
+        forecastAppended(state, action) {
+            state.forecast = state.forecast.concat(action.payload)
+        },
         forecastInvalidated(state) {
             state.valid = false
             state.forecast = []
@@ -540,7 +543,8 @@ const forecastSlice = createSlice({
 
 export const forecastReducer = forecastSlice.reducer
 export const {forecastFetched,forecastInvalidated,weatherRangeSet,weatherRangeToggled,
-    tableViewedSet,mapViewedSet,weatherProviderSet,zoomToRangeSet,zoomToRangeToggled,fetchAqiSet,fetchAqiToggled} = forecastSlice.actions;
+    tableViewedSet,mapViewedSet,weatherProviderSet,zoomToRangeSet,zoomToRangeToggled,
+    fetchAqiSet,fetchAqiToggled,forecastAppended} = forecastSlice.actions;
 
 const paramsSlice = createSlice({
     name:'params',

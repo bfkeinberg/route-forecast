@@ -1,23 +1,64 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { DesktopTooltip } from '../shared/DesktopTooltip';
-import {connect, useDispatch} from 'react-redux';
-import {requestForecast, shortenUrl} from "../../redux/actions";
+import {connect, useDispatch, useSelector} from 'react-redux';
+import { shortenUrl } from "../../redux/actions";
 import { useMediaQuery } from 'react-responsive';
 import { Spinner, Button } from '@blueprintjs/core';
 import { updateHistory } from "../app/updateHistory";
 import { generateUrl } from '../../utils/queryStringUtils';
-import { querySet } from '../../redux/reducer';
+import { forecastFetchFailed, querySet, forecastFetched, forecastAppended } from '../../redux/reducer';
+import { getForecastRequest } from '../../utils/util';
 
-const ForecastButton = ({fetchingForecast,requestForecast,routeInfo,submitDisabled, routeNumber, startTimestamp, pace, interval,
+import { useForecastMutation } from '../../redux/forecastApiSlice';
+
+const ForecastButton = ({fetchingForecast,submitDisabled, routeNumber, startTimestamp, pace, interval,
      metric, controls, strava_activity, strava_route, provider, showProvider, href, urlIsShortened, querySet, zone}) => {
-    const dispatch = useDispatch()
+        const dispatch = useDispatch()
+        const [forecast, {isLoading}] = useForecastMutation()
+        const type = useSelector(state => ((state.routeInfo.rwgpsRouteData !== null) ? "rwgps" : "gpx"))
+        const routeName = useSelector(state => state.routeInfo.name)
+        const routeData = useSelector(state => ((type === "rwgps") ? state.routeInfo.rwgpsRouteData : state.routeInfo.gpxRouteData))
+        const userControlPoints = useSelector(state => state.controls.userControlPoints)
+
+    const forecastByParts = (forecastRequest, zone, service, routeName, routeNumber) => {
+        let requestCopy = Object.assign(forecastRequest)
+        let forecastResults = []
+        let locations = requestCopy.shift();
+        while (requestCopy.length > 0) {
+            try {
+                const request = {locations:locations, timezone:zone, service:service, routeName:routeName, routeNumber:routeNumber}
+                const result = forecast(request).unwrap()
+                forecastResults.push(result)
+                locations = requestCopy.shift();
+            } catch (err) {
+                dispatch(forecastFetchFailed(err))
+            }
+        }
+        return Promise.all(forecastResults)
+    }
+    const doForecastByParts = () => {
+        const forecastRequest = getForecastRequest(routeData, startTimestamp, type, zone, pace, interval, userControlPoints)
+        if (forecastRequest === undefined) {
+            return { result: "error", error: "No route could be loaded" }
+        }
+        return forecastByParts(forecastRequest, zone, provider, routeName, routeNumber)
+    }
+
     let tooltipContent = submitDisabled ?
         "Must provide an rwgps route id" :
         "Request a ride forecast";
     let buttonStyle = submitDisabled ? { pointerEvents: 'none', display: 'inline-flex' } : null;
-    const forecastClick = () => {
-        requestForecast(routeInfo);
+    const forecastClick = async () => {
+        const forecastResults = await doForecastByParts()
+        //dispatch(forecastFetched({ forecastInfo: {forecast: forecastResults.map(result => result.forecast)}, timeZoneId: zone }))
+        const firstForecast = forecastResults.shift()
+        dispatch(forecastFetched({ forecastInfo: {forecast: [firstForecast.forecast]}, timeZoneId: zone }))
+        while (forecastResults.length > 0) {
+            const nextForecast = forecastResults.shift().forecast
+            dispatch(forecastAppended(nextForecast))
+        }
+
         const url = generateUrl(startTimestamp, routeNumber, pace, interval, metric, controls,
             strava_activity, strava_route, provider, showProvider, origin, true, dispatch, zone)
         querySet({queryString:url.url,searchString:url.search})
@@ -43,8 +84,8 @@ const ForecastButton = ({fetchingForecast,requestForecast,routeInfo,submitDisabl
                     large={!smallScreen}
                     fill={true}
                 >
-                    {fetchingForecast ? 'Creating forecast...' : 'Find Forecast'}
-                    {fetchingForecast && <Spinner />}
+                    {isLoading ? 'Creating forecast...' : 'Find Forecast'}
+                    {isLoading && <Spinner />}
                 </Button>
             </div>
         </DesktopTooltip>
@@ -52,10 +93,8 @@ const ForecastButton = ({fetchingForecast,requestForecast,routeInfo,submitDisabl
 };
 
 ForecastButton.propTypes = {
-    requestForecast:PropTypes.func.isRequired,
     fetchingForecast:PropTypes.bool.isRequired,
     submitDisabled:PropTypes.bool.isRequired,
-    routeInfo:PropTypes.object.isRequired,
     routeNumber: PropTypes.oneOfType([
         PropTypes.number,
         PropTypes.string
@@ -87,7 +126,6 @@ const mapStateToProps = (state) =>
         fetchingForecast: state.uiInfo.dialogParams.fetchingForecast,
         // can't request a forecast without a route loaded
         submitDisabled: state.uiInfo.routeParams.rwgpsRoute === '' && state.routeInfo.gpxRouteData === null,
-        routeInfo: state.routeInfo,
         queryString: state.params.queryString,
         routeNumber: state.uiInfo.routeParams.rwgpsRoute,
         startTimestamp: state.uiInfo.routeParams.startTimestamp,
@@ -104,7 +142,7 @@ const mapStateToProps = (state) =>
     });
 
 const mapDispatchToProps = {
-    requestForecast, querySet
+    querySet
 };
 
 export default connect(mapStateToProps,mapDispatchToProps)(ForecastButton);

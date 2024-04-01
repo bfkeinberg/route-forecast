@@ -39,6 +39,19 @@ export const getRouteInfo = (state, type, timeZoneId) => {
   )
 }
 
+export const getForecastRequest = (routeData, startTimestamp, type, timeZoneId, pace, interval, userControlPoints) =>
+{
+  const walkFunction = type === "rwgps" ? gpxParser.walkRwgpsRoute : gpxParser.walkGpxRoute
+  return walkFunction(
+    routeData,
+    DateTime.fromMillis(startTimestamp, {zone:timeZoneId}),
+    pace,
+    interval,
+    userControlPoints,
+    timeZoneId
+  ).forecastRequest
+}
+
 export const parseControls = function (controlPointString, deleteFirstElement) {
   if (controlPointString === null || controlPointString === undefined) {
     return [];

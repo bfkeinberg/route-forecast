@@ -217,6 +217,45 @@ const getAQI = async (result, point) => {
     transaction.finish();
 }
 
+app.post('/forecast_one', upload.none(), async (req, res) => {
+    if (req.body.locations === undefined) {
+        res.status(400).json({ 'status': 'Missing location key' });
+        return;
+    }
+    if (req.body.timezone === undefined || req.body.timezone === 'undefined') {
+        res.status(400).json({ 'status': 'Missing timezone key' });
+        return;
+    }
+    const forecastPoints = req.body.locations;
+    if (!process.env.NO_LOGGING) {
+        logger.info(`Request from ${req.ip} for single point`);
+    }
+    let service = process.env.WEATHER_SERVICE;
+    if (req.body.service !== undefined) {
+        service = req.body.service;
+    }
+    if (req.body.routeName !== undefined && req.body.routeName !== '') {
+        // let dbRecord = makeRecord(forecastPoints[0], req.body.routeNumber);
+        // insertRecord(dbRecord, req.body.routeName);
+    }
+    const zone = req.body.timezone;
+    try {
+        const point = forecastPoints
+        const result = await callWeatherService(service, point.lat, point.lon, point.time, point.distance, zone, point.bearing).catch(error => {
+            throw error;
+        })
+        if (!process.env.NO_LOGGING) {
+            logger.info(`Done with request from ${req.ip}`);
+        }
+        res.status(200).json({ 'forecast': result });
+    } catch (error) {
+        if (!process.env.NO_LOGGING) {
+            logger.info(`Error with request from ${req.ip}`);
+        }
+        res.status(500).json({ 'details': `Error calling weather service : ${error}` });
+    }
+});
+
 app.post('/forecast', upload.none(), async (req, res) => {
     if (req.body.locations === undefined) {
         res.status(400).json({ 'status': 'Missing location key' });
