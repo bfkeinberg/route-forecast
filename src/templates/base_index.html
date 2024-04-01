@@ -5,7 +5,7 @@
         <title><%= htmlWebpackPlugin.options.title %></title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1">
         <meta name="keywords" content="bicycling, randonneuring, planning, bicycle routes, weather, elevation, hill climbing, estimates, cycle weather, bike rides">
-        <meta name="description" content="CycleRouteForecast gives time estimates and weather forecasts for a cycling route, taking into account the terrain and the forecasted wind.
+        <meta name="description" content="Randoplan gives time estimates and weather forecasts for a cycling route, taking into account the terrain and the forecasted wind.
         It also gives time estimates for any intermediate stops. Afterwards it can compare results with the actual completed ride using data from Strava.">
         <link rel="preconnect" href="https://maps.googleapis.com">
         <link rel="shortcut icon" type="image/x-icon" href="/static/favicon.ico">
@@ -21,24 +21,6 @@
         <% if (htmlWebpackPlugin.files.favicon) { %>
             <link rel="shortcut icon" href="<%= htmlWebpackPlugin.files.favicon%>">
         <% } %>
-<!--         <script>
-            // Don't register the service worker
-            // until the page has fully loaded
-            window.addEventListener('load', () => {
-              // Is service worker available?
-              if ('serviceWorker' in navigator) {
-                navigator.serviceWorker.register('/worker.js').then((registration) => {
-                    console.log(`Service worker registered! - ${registration.scope}`);
-                    if (registration.active) {
-                        console.log(`${registration.active.state} ${registration.active.scriptURL}`);
-                    }
-                }).catch((error) => {
-                  console.warn('Error registering service worker:');
-                  console.warn(error);
-                });
-              }
-            });
-        </script> -->
         <script>
         function measureCRP() {
             var t = window.performance.timing,
