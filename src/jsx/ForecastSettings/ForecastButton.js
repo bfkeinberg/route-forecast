@@ -54,7 +54,7 @@ const ForecastButton = ({fetchingForecast,submitDisabled, routeNumber, startTime
         "Request a ride forecast";
     let buttonStyle = submitDisabled ? { pointerEvents: 'none', display: 'inline-flex' } : null;
     const forecastClick = async () => {
-        await Sentry.startSpan({ name: "requestForecast" }, async () => {
+        await Sentry.startSpan({ name: "forecastClick" }, async () => {
             if (type === "rwgps") {
                 ReactGA.event('add_to_cart', {
                     value: distanceInKm,

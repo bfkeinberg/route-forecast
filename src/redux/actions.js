@@ -349,7 +349,7 @@ const doForecastByParts = (forecastFunc, dispatch, getState) => {
 }
 
 const forecastWithHook = async (forecastFunc, dispatch, getState) => {
-    await Sentry.startSpan({ name: "requestForecast" }, async () => {
+    await Sentry.startSpan({ name: "forecastWithHook" }, async () => {
         const routeInfo = getState().routeInfo
         if (routeInfo.rwgpsRouteData) {
             ReactGA.event('add_to_cart', {
