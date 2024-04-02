@@ -131,6 +131,8 @@ const RouteForecastMap = () => {
     // eslint-disable-next-line array-element-newline
     }, [mapBounds,boundsFit,map])
 
+    const infoWindow = (<InfoWindow position={infoPosition}><div>{infoContents}</div></InfoWindow>)
+
     return (
         <ErrorBoundary>
             <div id="map" /*style={{ height: "calc(100vh - 50px)", position: "relative" }}*/>
@@ -149,9 +151,7 @@ const RouteForecastMap = () => {
                         <MapHighlight points={points} subrange={subrange} />
                         {controls !== null && <MapMarkers forecast={forecast} google={window.google}
                         controls={controls} controlNames={controlNames} subrange={subrange} metric={metric} map={map} mapCenter={mapCenter}/>}
-                        <InfoWindow position={infoPosition} visible={infoVisible}>
-                            <div>{infoContents}</div>
-                        </InfoWindow>
+                        {infoVisible && infoWindow}
                     </GoogleMap> :
                     <h2 style={{ padding: '18px', textAlign: "center" }}>Forecast map</h2>
                 }
