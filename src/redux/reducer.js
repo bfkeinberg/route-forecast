@@ -170,7 +170,8 @@ const routeInfoInitialState = {
     name: '',
     rwgpsRouteData: null,
     gpxRouteData: null,
-    loadingFromURL: false
+    loadingFromURL: false,
+    distanceInKm: 0
 }
 const routeInfoSlice = createSlice({
     name:'routeInfo',
@@ -180,6 +181,11 @@ const routeInfoSlice = createSlice({
             state.rwgpsRouteData = action.payload
             state.gpxRouteData = null
             state.name = getRouteName(action.payload, "rwgps")
+            if (action.payload.route) {
+                state.distanceInKm = action.payload.route.distance/1000
+            } else {
+                state.distanceInKm = action.payload.trip.distance/1000
+            }
             state.type = "rwgps"
         },
         gpxRouteLoaded(state, action) {
@@ -187,12 +193,14 @@ const routeInfoSlice = createSlice({
             state.rwgpsRouteData = null
             state.name = getRouteName(action.payload, "gpx")
             state.type = "gpx"
+            state.distanceInKm = action.payload.tracks[0].distance.total
         },
         routeDataCleared(state) {
             state.rwgpsRouteData = null
             state.gpxRouteData = null
             state.name = ''
             state.type = null
+            state.distanceInKm = 0
         },
         loadingFromUrlSet(state, action) {
             state.loadingFromURL = action.payload
@@ -422,7 +430,7 @@ const stravaSlice = createSlice({
         },
         analysisIntervalSet(state,action) {
             state.analysisInterval = parseFloat(action.payload)
-            state.subrange = null
+            state.subrange = []
         },
         mapSubrangeSet(state,action) {
             state.subrange = [
