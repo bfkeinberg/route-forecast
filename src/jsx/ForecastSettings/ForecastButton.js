@@ -9,7 +9,8 @@ import { updateHistory } from "../app/updateHistory";
 import { generateUrl } from '../../utils/queryStringUtils';
 import { forecastFetchFailed, querySet, forecastFetched, forecastAppended } from '../../redux/reducer';
 import { getForecastRequest } from '../../utils/util';
-
+import * as Sentry from "@sentry/react";
+import ReactGA from "react-ga4";
 import { useForecastMutation } from '../../redux/forecastApiSlice';
 
 const ForecastButton = ({fetchingForecast,submitDisabled, routeNumber, startTimestamp, pace, interval,
@@ -20,19 +21,22 @@ const ForecastButton = ({fetchingForecast,submitDisabled, routeNumber, startTime
         const routeName = useSelector(state => state.routeInfo.name)
         const routeData = useSelector(state => ((type === "rwgps") ? state.routeInfo.rwgpsRouteData : state.routeInfo.gpxRouteData))
         const userControlPoints = useSelector(state => state.controls.userControlPoints)
+        const distanceInKm = useSelector(state => state.routeInfo.distanceInKm)
 
     const forecastByParts = (forecastRequest, zone, service, routeName, routeNumber) => {
         let requestCopy = Object.assign(forecastRequest)
         let forecastResults = []
         let locations = requestCopy.shift();
+        let which = 0
         while (requestCopy.length > 0) {
             try {
-                const request = {locations:locations, timezone:zone, service:service, routeName:routeName, routeNumber:routeNumber}
+                const request = {locations:locations, timezone:zone, service:service, routeName:routeName, routeNumber:routeNumber, which}
                 const result = forecast(request).unwrap()
                 forecastResults.push(result)
                 locations = requestCopy.shift();
+                ++which
             } catch (err) {
-                            dispatch(forecastFetchFailed(err))
+                dispatch(forecastFetchFailed(err))
             }
         }
         return Promise.all(forecastResults)
@@ -50,19 +54,30 @@ const ForecastButton = ({fetchingForecast,submitDisabled, routeNumber, startTime
         "Request a ride forecast";
     let buttonStyle = submitDisabled ? { pointerEvents: 'none', display: 'inline-flex' } : null;
     const forecastClick = async () => {
-        try {
-            const forecastResults = await doForecastByParts()
-            const firstForecast = forecastResults.shift()
-            dispatch(forecastFetched({ forecastInfo: {forecast: [firstForecast.forecast]}, timeZoneId: zone }))
-            while (forecastResults.length > 0) {
-                const nextForecast = forecastResults.shift().forecast
-                dispatch(forecastAppended(nextForecast))
+        await Sentry.startSpan({ name: "requestForecast" }, async () => {
+            if (type === "rwgps") {
+                ReactGA.event('add_to_cart', {
+                    value: distanceInKm,
+                    items: [{ item_id: routeNumber, item_name: routeName }]
+                });
+            } else {
+                ReactGA.event('add_to_cart', {
+                    value: distanceInKm,
+                    items: [{ item_id: routeNumber, item_name: routeName }]
+                });
             }
+            try {
+                const forecastResults = await doForecastByParts()
+                const firstForecast = forecastResults.shift()
+                dispatch(forecastFetched({ forecastInfo: {forecast: [firstForecast.forecast]}, timeZoneId: zone }))
+                while (forecastResults.length > 0) {
+                    const nextForecast = forecastResults.shift().forecast
+                    dispatch(forecastAppended(nextForecast))
+                }
             } catch (err) {
                 dispatch(forecastFetchFailed(err))
-                return
-        }
-
+            }
+        })
         const url = generateUrl(startTimestamp, routeNumber, pace, interval, metric, controls,
             strava_activity, strava_route, provider, showProvider, origin, true, dispatch, zone)
         querySet({queryString:url.url,searchString:url.search})
@@ -131,7 +146,7 @@ const mapStateToProps = (state) =>
         // can't request a forecast without a route loaded
         submitDisabled: state.uiInfo.routeParams.rwgpsRoute === '' && state.routeInfo.gpxRouteData === null,
         queryString: state.params.queryString,
-        routeNumber: state.uiInfo.routeParams.rwgpsRoute,
+        routeNumber: state.uiInfo.routeParams.rwgpsRoute !== '' ? state.uiInfo.routeParams.rwgpsRoute : state.strava.route,
         startTimestamp: state.uiInfo.routeParams.startTimestamp,
         zone: state.uiInfo.routeParams.zone,
         pace: state.uiInfo.routeParams.pace,
