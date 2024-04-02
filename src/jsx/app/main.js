@@ -30,6 +30,7 @@ import {
 } from "../../redux/actions";
 import { routeLoadingModes } from '../../data/enums';
 import { parseControls, inputPaceToSpeed } from '../../utils/util';
+import { useForecastMutation } from '../../redux/forecastApiSlice';
 
 export const saveRwgpsCredentials = (token) => {
     if ("credentials" in navigator && "PasswordCredential" in window && "store" in navigator.credentials) {
@@ -269,11 +270,11 @@ const mapStateToProps = (state) =>
 
 export default connect(mapStateToProps, mapDispatchToProps)(RouteWeatherUI);
 
-const useLoadRouteFromURL = (queryParams) => {
+const useLoadRouteFromURL = (queryParams, forecastFunc) => {
     const dispatch = useDispatch()
     useEffect(() => {
         if (queryParams.rwgpsRoute || queryParams.strava_route) {
-            dispatch(loadRouteFromURL())
+            dispatch(loadRouteFromURL(forecastFunc))
         }
     }, [queryParams])
 }
@@ -303,8 +304,9 @@ const useSetPageTitle = () => {
 }
 
 const FunAppWrapperThingForHooksUsability = ({maps_api_key, queryParams}) => {
+    const [forecast] = useForecastMutation()
     useSetPageTitle()
-    useLoadRouteFromURL(queryParams)
+    useLoadRouteFromURL(queryParams, forecast)
     useLoadControlPointsFromURL(queryParams)
     const isLandscape = useMediaQuery({query:'(orientation:landscape)'})
     const isLargeEnough = useMediaQuery({query:'(min-width: 850px)'})

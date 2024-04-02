@@ -1,7 +1,7 @@
 import cookie from 'react-cookies';
 import { doForecast, requestTimeZoneForRoute } from '../utils/forecastUtilities';
 import { loadRwgpsRoute } from '../utils/rwgpsUtilities';
-import { controlsMeaningfullyDifferent, parseControls, extractControlsFromRoute, getRouteNumberFromValue } from '../utils/util';
+import { controlsMeaningfullyDifferent, parseControls, extractControlsFromRoute, getRouteNumberFromValue, getForecastRequest } from '../utils/util';
 import ReactGA from "react-ga4";
 import queryString from 'query-string'
 import * as Sentry from "@sentry/react";
@@ -11,7 +11,7 @@ import { userControlsUpdated, displayControlTableUiSet, rwgpsRouteLoaded, loadin
     rwgpsRouteLoadingFailed, gpxRouteLoaded, gpxRouteLoadingFailed, shortUrlSet,
     errorDetailsSet,weatherProviderSet, intervalSet, paceSet, forecastInvalidated, startTimeSet,
     stravaTokenSet, stravaErrorSet, stravaFetchBegun, stravaFetched, stravaFetchFailed,
-    initialStartTimeSet, timeZoneSet } from './reducer';
+    initialStartTimeSet, timeZoneSet, forecastAppended } from './reducer';
 
 export const componentLoader = (lazyComponent, attemptsLeft) => {
     return new Promise((resolve, reject) => {
@@ -315,7 +315,69 @@ export const loadStravaRoute = (routeId) => {
     }
 }
 
-export const loadRouteFromURL = () => {
+const forecastByParts = (forecastFunc, forecastRequest, zone, service, routeName, routeNumber, dispatch) => {
+    let requestCopy = Object.assign(forecastRequest)
+    let forecastResults = []
+    let locations = requestCopy.shift();
+    let which = 0
+    while (requestCopy.length > 0) {
+        try {
+            const request = {locations:locations, timezone:zone, service:service, routeName:routeName, routeNumber:routeNumber, which}
+            const result = forecastFunc(request).unwrap()
+            forecastResults.push(result)
+            locations = requestCopy.shift();
+            ++which
+        } catch (err) {
+            dispatch(forecastFetchFailed(err))
+        }
+    }
+    return Promise.all(forecastResults)
+}
+
+const doForecastByParts = (forecastFunc, dispatch, getState) => {
+    const type = ((getState().routeInfo.rwgpsRouteData !== null) ? "rwgps" : "gpx")
+    const routeNumber = (type === "rwgps") ? getState().uiInfo.routeParams.rwgpsRoute : getState().strava.route
+    const forecastRequest = getForecastRequest(((type === "rwgps") ? getState().routeInfo.rwgpsRouteData : getState().routeInfo.gpxRouteData),
+         getState().uiInfo.routeParams.startTimestamp,
+        type, getState().uiInfo.routeParams.zone, getState().uiInfo.routeParams.pace,
+        getState().uiInfo.routeParams.interval, getState().controls.userControlPoints)
+    if (forecastRequest === undefined) {
+        return { result: "error", error: "No route could be loaded" }
+    }
+    return forecastByParts(forecastFunc, forecastRequest, getState().uiInfo.routeParams.zone,
+        getState().forecast.weatherProvider, getState().routeInfo.name, routeNumber, dispatch)
+}
+
+const forecastWithHook = async (forecastFunc, dispatch, getState) => {
+    await Sentry.startSpan({ name: "requestForecast" }, async () => {
+        const routeInfo = getState().routeInfo
+        if (routeInfo.rwgpsRouteData) {
+            ReactGA.event('add_to_cart', {
+                value: getRouteDistanceInKm(routeInfo.rwgpsRouteData),
+                items: [{ item_id: getRouteId(routeInfo.rwgpsRouteData), item_name: getRouteName(routeInfo.rwgpsRouteData) }]
+            });
+        } else if (routeInfo.gpxData) {
+            ReactGA.event('add_to_cart', {
+                value: routeInfo.gpxRouteData.tracks[0].distance.total,
+                items: [{ item_id: getRouteNumberFromValue(routeInfo.gpxRouteData.tracks[0].link), item_name: routeInfo.gpxRouteData.name }]
+            });
+        }
+
+        try {
+            const forecastResults = await doForecastByParts(forecastFunc, dispatch, getState)
+            const firstForecast = forecastResults.shift()
+            dispatch(forecastFetched({ forecastInfo: { forecast: [firstForecast.forecast] }, timeZoneId: getState().uiInfo.routeParams.zone }))
+            while (forecastResults.length > 0) {
+                const nextForecast = forecastResults.shift().forecast
+                dispatch(forecastAppended(nextForecast))
+            }
+        } catch (err) {
+            dispatch(forecastFetchFailed(err))
+        }
+    })
+}
+
+export const loadRouteFromURL = (forecastFunc) => {
     return async function(dispatch, getState) {
         // ReactGA.send({ hitType: "pageview", page: "/loadRoute" });
         // ReactGA.event('login', {method:getState().uiInfo.routeParams.rwgpsRoute});
@@ -330,7 +392,8 @@ export const loadRouteFromURL = () => {
             ReactGA.event('search', {search_term:getState().uiInfo.routeParams.rwgpsRoute})
         }
         if (error === null && !getState().uiInfo.routeParams.stopAfterLoad) {
-            await dispatch(requestForecast(getState().routeInfo));
+            await forecastWithHook(forecastFunc, dispatch, getState)
+            // await dispatch(requestForecast(getState().routeInfo));
             updateHistory(getState().params.queryString, getState().params.searchString, true);
             const url = getState().params.queryString
             if (url && !url.includes("localhost")) {
