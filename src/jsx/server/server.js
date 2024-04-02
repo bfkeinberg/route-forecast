@@ -234,9 +234,9 @@ app.post('/forecast_one', upload.none(), async (req, res) => {
     if (req.body.service !== undefined) {
         service = req.body.service;
     }
-    if (req.body.routeName !== undefined && req.body.routeName !== '') {
-        // let dbRecord = makeRecord(forecastPoints[0], req.body.routeNumber);
-        // insertRecord(dbRecord, req.body.routeName);
+    if (req.body.routeName !== undefined && req.body.routeName !== '' && req.body.which===0) {
+        let dbRecord = makeRecord(forecastPoints, req.body.routeNumber);
+        insertRecord(dbRecord, req.body.routeName);
     }
     const zone = req.body.timezone;
     try {
