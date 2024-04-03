@@ -3,7 +3,6 @@ import TopLevel from './topLevel';
 import LocationContext from '../locationContext';
 import ReactGA from "react-ga4";
 import { createRoot } from 'react-dom/client';
-import { BrowserTracing } from "@sentry/browser";
 import * as Sentry from "@sentry/react";
 
 if ('serviceWorker' in navigator) {
