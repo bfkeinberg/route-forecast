@@ -41,7 +41,7 @@ module.exports = (env, argv) => merge(common(env, argv), {
             debug: true,
             setCommits: { auto: true },
             authToken: process.env.SENTRY_AUTH_TOKEN,
-            reactComponentAnnotation.enabled,
+            // reactComponentAnnotation.enabled,
             deploy: { env: 'production', name: 'latest' }
         }),
         new CompressionPlugin({
