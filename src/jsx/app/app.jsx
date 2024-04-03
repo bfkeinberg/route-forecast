@@ -38,7 +38,7 @@ if (!window.origin.startsWith('http://localhost')) {
                 ]
             }
             ),
-            [Sentry.replayIntegration()]
+            Sentry.replayIntegration()
         ],
         enableTracing:true,
         // To set a uniform sample rate
