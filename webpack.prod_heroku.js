@@ -41,7 +41,8 @@ module.exports = (env, argv) => merge(common(env, argv), {
             debug: true,
             setCommits: { auto: true },
             authToken: process.env.SENTRY_AUTH_TOKEN,
-            // reactComponentAnnotation.enabled,
+            release: {name: process.env.HEROKU_SLUG_COMMIT},
+            reactComponentAnnotation: {enabled:true},
             deploy: { env: 'production', name: 'latest' }
         }),
         new CompressionPlugin({
