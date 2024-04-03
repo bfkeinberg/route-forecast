@@ -31,7 +31,7 @@ if (!window.origin.startsWith('http://localhost')) {
         // This enables automatic instrumentation (highly recommended), but is not
         // necessary for purely manual usage
         integrations: [
-            new BrowserTracing({
+            Sentry.browserTracingIntegration({
                 tracingOrigins: [
                     'localhost',
                     /^\//,
@@ -39,17 +39,18 @@ if (!window.origin.startsWith('http://localhost')) {
                 ]
             }
             ),
-            new Sentry.Replay()
+            [Sentry.replayIntegration()]
         ],
-
+        enableTracing:true,
         // To set a uniform sample rate
         tracesSampleRate: 0.15,
+        tracePropagationTargets: ["localhost", /^https:\/\/www\.randoplan\.com/],
         // This sets the sample rate to be 10%. You may want this to be 100% while
         // in development and sample at a lower rate in production
         replaysSessionSampleRate: 0.01,
         // If the entire session is not sampled, use the below sample rate to sample
         // sessions when an error occurs.
-        replaysOnErrorSampleRate: 0.8,
+        replaysOnErrorSampleRate: 0.7,
         /*,
         beforeBreadcrumb(breadcrumb) {
             if (breadcrumb.category==='console') {return null} else {return breadcrumb}

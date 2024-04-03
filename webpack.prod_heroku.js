@@ -32,12 +32,17 @@ module.exports = (env, argv) => merge(common(env, argv), {
                 'setupFile.js'
             ],
             configFile: 'sentry.properties',
+            org: 'brian-feinberg',
+            project: 'randoplan',
             rewrite: true,
             stripPrefix: ['/dist'],
             stripCommonPrefix: true,
             urlPrefix: '/static',
-            debug: false,
-            setCommits: { auto: false }
+            debug: true,
+            setCommits: { auto: true },
+            authToken: process.env.SENTRY_AUTH_TOKEN,
+            reactComponentAnnotation.enabled,
+            deploy: { env: 'production', name: 'latest' }
         }),
         new CompressionPlugin({
             minRatio: 0.85,
