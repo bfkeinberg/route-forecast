@@ -38,7 +38,7 @@ module.exports = (env, argv) => merge(common(env, argv), {
             stripPrefix: ['/dist'],
             stripCommonPrefix: true,
             urlPrefix: '/static',
-            debug: true,
+            debug: false,
             setCommits: { auto: true },
             authToken: process.env.SENTRY_AUTH_TOKEN,
             release: {name: process.env.HEROKU_SLUG_COMMIT},
