@@ -54,7 +54,7 @@ export const ControlTable = () => {
     const sortOurStuffByDistance = () => {
         const sortedControls = Array.from(controls);
         sortedControls.sort((control1, control2) => control1.distance - control2.distance);
-        updateControls(sortedControls.map((value, index) => {value.id = index;return value}));
+        updateControls(sortedControls.map((value, index) => {return {id:index, ...value}}));
     }
 
     const rwgpsCellStyle = calculatedValues !== null ? {backgroundColor: "rgb(19, 124, 189)", color: "white"} : {}
