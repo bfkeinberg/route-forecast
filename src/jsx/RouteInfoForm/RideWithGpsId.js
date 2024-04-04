@@ -1,7 +1,8 @@
-import React from 'react';
+import {Button,FormGroup, InputGroup} from '@blueprintjs/core';
 import PropTypes from 'prop-types';
-import {InputGroup, FormGroup, Button} from '@blueprintjs/core';
+import React from 'react';
 import {connect} from 'react-redux';
+
 import { routeDataCleared, rwgpsRouteSet } from '../../redux/reducer';
 
 

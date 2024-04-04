@@ -1,6 +1,6 @@
-import { Icon, Button } from "@blueprintjs/core";
-import React from "react";
+import { Button,Icon } from "@blueprintjs/core";
 import PropTypes from 'prop-types';
+import React from "react";
 
 export const ToggleButton = ({children, active, onClick, icon = null, style = {}}) => {
 

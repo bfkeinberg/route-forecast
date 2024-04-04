@@ -1,7 +1,8 @@
-import queryString from 'query-string';
-import { Api } from 'rest-api-handler';
-import cookie from 'react-cookies';
 import { DateTime } from 'luxon';
+import queryString from 'query-string';
+import cookie from 'react-cookies';
+import { Api } from 'rest-api-handler';
+
 import { paceToSpeed, setMinMaxCoords } from './util';
 
 const metersToMiles = 0.00062137;

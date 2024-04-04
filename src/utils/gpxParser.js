@@ -1,9 +1,9 @@
 let gpxParser = require('gpxparser')
-import {finishTimeFormat} from '../redux/reducer';
 import { DateTime } from 'luxon';
 
-import {getPowerOrVelocity} from "./windUtils";
+import {finishTimeFormat} from '../redux/reducer';
 import { inputPaceToSpeed, setMinMaxCoords } from './util';
+import {getPowerOrVelocity} from "./windUtils";
 
 const kmToMiles = 0.62137;
 /**

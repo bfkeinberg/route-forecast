@@ -1,6 +1,7 @@
 import * as Sentry from '@sentry/browser';
-import { getRouteInfo } from '../utils/util';
 import { DateTime } from 'luxon';
+
+import { getRouteInfo } from '../utils/util';
 
 const findTimezoneForPoint = (lat, lon, time, timezone_api_key, abortSignal) => {
     return fetch(`https://maps.googleapis.com/maps/api/timezone/json?location=${lat},${lon}&timestamp=${time.toSeconds()}&key=${timezone_api_key}`, {signal: abortSignal})

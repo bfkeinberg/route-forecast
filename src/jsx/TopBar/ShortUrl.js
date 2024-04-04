@@ -1,8 +1,9 @@
-import React from 'react';
-import { InputGroup, FormGroup } from '@blueprintjs/core';
+import { FormGroup,InputGroup } from '@blueprintjs/core';
 import PropTypes from 'prop-types';
-import {connect} from 'react-redux';
+import React from 'react';
 import ReactGA from "react-ga4";
+import {connect} from 'react-redux';
+
 import { AppToaster } from '../shared/toast';
 
 const ShortUrl = ({shortUrl}) => {

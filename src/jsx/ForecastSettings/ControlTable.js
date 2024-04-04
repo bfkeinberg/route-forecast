@@ -1,10 +1,11 @@
-import React from 'react';
 import { Icon } from '@blueprintjs/core';
-import { useSelector, useDispatch } from 'react-redux';
+import React from 'react';
+import { useDispatch,useSelector } from 'react-redux';
+
 import { removeControl as removeControlAction, updateUserControls } from '../../redux/actions';
-import { Table } from "./Table"
 import { useActualArrivalTimes, useForecastDependentValues } from '../../utils/hooks';
-import { stringIsOnlyNumeric, stringIsOnlyDecimal, milesToMeters } from '../../utils/util';
+import { milesToMeters,stringIsOnlyDecimal, stringIsOnlyNumeric } from '../../utils/util';
+import { Table } from "./Table"
 
 const minSuffixFunction = value => `${value} min`
 

@@ -1,7 +1,8 @@
-import React from "react";
-import { useActualFinishTime, useForecastDependentValues } from '../../utils/hooks';
 import { DateTime } from "luxon";
+import React from "react";
+
 import { finishTimeFormat } from "../../redux/reducer.js";
+import { useActualFinishTime, useForecastDependentValues } from '../../utils/hooks';
 import DateSelect from "./DateSelect";
 
 // const LoadableDatePicker = lazy(() => componentLoader(import(/* webpackChunkName: "DateSelect" */ /* webpackPrefetch: true */ './DateSelect'), 5));

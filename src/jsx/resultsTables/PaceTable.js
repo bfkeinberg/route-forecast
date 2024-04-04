@@ -1,15 +1,17 @@
-import React, { useState } from 'react';
-import ErrorBoundary from "../shared/ErrorBoundary";
-import PropTypes from 'prop-types';
-import {connect} from 'react-redux';
 import 'animate.css/animate.min.css';
-import stravaRouteParser from '../../utils/stravaRouteParser';
-import StravaAnalysisIntervalInput from './StravaAnalysisIntervalInput';
-import { useActualPace, useFormatSpeed } from '../../utils/hooks';
-import { ToggleButton } from '../shared/ToggleButton';
-import cookie from 'react-cookies';
+
 import { HTMLTable, Tooltip } from '@blueprintjs/core';
-import { zoomToRangeToggled, mapSubrangeSet, mapRangeToggled } from '../../redux/reducer';
+import PropTypes from 'prop-types';
+import React, { useState } from 'react';
+import cookie from 'react-cookies';
+import {connect} from 'react-redux';
+
+import { mapRangeToggled,mapSubrangeSet, zoomToRangeToggled } from '../../redux/reducer';
+import { useActualPace, useFormatSpeed } from '../../utils/hooks';
+import stravaRouteParser from '../../utils/stravaRouteParser';
+import ErrorBoundary from "../shared/ErrorBoundary";
+import { ToggleButton } from '../shared/ToggleButton';
+import StravaAnalysisIntervalInput from './StravaAnalysisIntervalInput';
 
 const PaceTable = ({activityData, activityStream, analysisInterval, mapSubrangeSet, mapRangeToggled, zoomToRange, zoomToRangeToggled}) =>  {
 

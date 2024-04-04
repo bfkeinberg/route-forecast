@@ -1,4 +1,5 @@
 import React from 'react';
+
 import { useForecastDependentValues } from '../../utils/hooks';
 
 const gustySpeedThreshold = 25;

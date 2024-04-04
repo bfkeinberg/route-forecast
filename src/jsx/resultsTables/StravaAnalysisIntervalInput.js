@@ -1,8 +1,9 @@
-import React from 'react';
-import PropTypes from 'prop-types';
-import {FormGroup, Button, MenuItem, Tooltip} from "@blueprintjs/core";
+import {Button, FormGroup, MenuItem, Tooltip} from "@blueprintjs/core";
 import { Select } from "@blueprintjs/select";
+import PropTypes from 'prop-types';
+import React from 'react';
 import { connect } from 'react-redux';
+
 import { analysisIntervalSet } from '../../redux/reducer';
 
 const analysisIntervals = [

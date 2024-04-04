@@ -1,10 +1,11 @@
-import { configureStore, combineReducers } from '@reduxjs/toolkit'
-import {createLogger} from 'redux-logger';
+import { combineReducers,configureStore } from '@reduxjs/toolkit'
 import * as Sentry from '@sentry/browser';
+import {createLogger} from 'redux-logger';
 import createSentryMiddleware from "redux-sentry-middleware";
-import { routeParamsReducer, dialogParamsReducer, routeInfoReducer, controlsReducer,
-    stravaReducer, forecastReducer, paramsReducer, rwgpsInfoReducer } from './reducer';
+
 import { forecastApiSlice } from './forecastApiSlice';
+import { controlsReducer,
+dialogParamsReducer, forecastReducer, paramsReducer, routeInfoReducer, routeParamsReducer, rwgpsInfoReducer,    stravaReducer } from './reducer';
 export const loggerMiddleware = createLogger();
 
 const bannedActionKeys = [

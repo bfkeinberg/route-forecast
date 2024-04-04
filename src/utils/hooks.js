@@ -1,10 +1,11 @@
-import { useEffect, useRef, useState, useMemo } from "react"
+import { DateTime } from 'luxon';
+import { useEffect, useMemo,useRef, useState } from "react"
 import { useSelector } from "react-redux"
+
+import { routeLoadingModes } from "../data/enums"
+import gpxParser from "./gpxParser"
 import stravaRouteParser from "./stravaRouteParser"
 import { getRouteInfo, milesToMeters } from "./util"
-import gpxParser from "./gpxParser"
-import { routeLoadingModes } from "../data/enums"
-import { DateTime } from 'luxon';
 
 const useDelay = (delay, startCondition = true) => {
   const [

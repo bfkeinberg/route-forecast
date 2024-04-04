@@ -1,40 +1,42 @@
-import React, {Component, useEffect, Suspense} from 'react';
-import  {useMediaQuery} from 'react-responsive';
-import lazyRetry from "@tdotcode/react-lazy-retry";
 import "normalize.css/normalize.css";
 import '@blueprintjs/core/lib/css/blueprint.css';
 import "@blueprintjs/icons/lib/css/blueprint-icons.css";
 import "@blueprintjs/select/lib/css/blueprint-select.css";
 import 'Images/style.css';
-import queryString from 'query-string';
+
+import lazyRetry from "@tdotcode/react-lazy-retry";
+import {Info} from "luxon";
 import PropTypes from 'prop-types';
-import { connect, useDispatch, useSelector } from 'react-redux';
+import queryString from 'query-string';
+import React, {Component, Suspense,useEffect} from 'react';
 import cookie from 'react-cookies';
+import { connect, useDispatch, useSelector } from 'react-redux';
+import  {useMediaQuery} from 'react-responsive';
+
 // import DesktopUI from '../DesktopUI';
 // import MobileUI from '../MobileUI';
 // import * as Sentry from "@sentry/react";
-import {providerValues, actionUrlAdded, apiKeysSet, querySet, queryCleared, metricSet, showWeatherProviderSet,
-    displayControlTableUiSet, rwgpsTokenSet, usePinnedRoutesSet, routeLoadingModeSet, startTimestampSet,
-    rwgpsRouteSet,fetchAqiSet,zoomToRangeSet,stopAfterLoadSet,stravaTokenSet,stravaRefreshTokenSet,
-    stravaErrorSet, stravaActivitySet, stravaRouteSet, reset} from "../../redux/reducer";
-import {Info} from "luxon";
+import {actionUrlAdded, apiKeysSet,     displayControlTableUiSet, fetchAqiSet,metricSet, providerValues, queryCleared, querySet, reset,routeLoadingModeSet,     rwgpsRouteSet,rwgpsTokenSet, showWeatherProviderSet,
+startTimestampSet,
+stopAfterLoadSet,stravaActivitySet,     stravaErrorSet, stravaRefreshTokenSet,
+stravaRouteSet, stravaTokenSet,usePinnedRoutesSet, zoomToRangeSet} from "../../redux/reducer";
 
 const LoadableDesktop = lazyRetry(() => import(/* webpackChunkName: "DesktopUI" */ '../DesktopUI'))
 const LoadableMobile = lazyRetry(() => import(/* webpackChunkName: "MobileUI" */ '../MobileUI'))
 
+import { routeLoadingModes } from '../../data/enums';
 import {
     loadCookie,
     loadFromRideWithGps,
+    loadRouteFromURL,
     saveCookie,
     setInterval,
     setPace,
-    updateUserControls,
     setWeatherProvider,
-    loadRouteFromURL,
+    updateUserControls,
 } from "../../redux/actions";
-import { routeLoadingModes } from '../../data/enums';
-import { parseControls, inputPaceToSpeed } from '../../utils/util';
 import { useForecastMutation } from '../../redux/forecastApiSlice';
+import { inputPaceToSpeed,parseControls } from '../../utils/util';
 
 export const saveRwgpsCredentials = (token) => {
     if ("credentials" in navigator && "PasswordCredential" in window && "store" in navigator.credentials) {

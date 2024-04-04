@@ -1,18 +1,19 @@
+import { Toast2 } from '@blueprintjs/core';
 import React from 'react';
-import { ControlTableContainer } from './ControlTableContainer';
-import ForecastInterval from "./ForecastInterval";
-import RidingPace from "./RidingPace";
-import { useSelector, useDispatch } from "react-redux";
-import WeatherProviderSelector from "./WeatherProviderSelector";
-import ForecastButton from "./ForecastButton";
+import ReactGA from "react-ga4";
+import { useDispatch,useSelector } from "react-redux";
+
+import { displayControlTableUiSet, errorDetailsSet,metricToggled } from '../../redux/reducer';
+import LocationContext from '../locationContext';
+import { RouteTitle } from '../shared/RouteTitle';
 import { ToggleButton } from "../shared/ToggleButton";
 import { ToggleButtonOpaque } from "../shared/ToggleButtonOpaque";
+import { ControlTableContainer } from './ControlTableContainer';
+import ForecastButton from "./ForecastButton";
+import ForecastInterval from "./ForecastInterval";
+import RidingPace from "./RidingPace";
 import { TimeFields } from "./TimeFields";
-import { RouteTitle } from '../shared/RouteTitle';
-import LocationContext from '../locationContext';
-import ReactGA from "react-ga4";
-import { Toast2 } from '@blueprintjs/core';
-import { metricToggled, displayControlTableUiSet, errorDetailsSet } from '../../redux/reducer';
+import WeatherProviderSelector from "./WeatherProviderSelector";
 
 export const ForecastSettings = () => {
     // always show weather provider

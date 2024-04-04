@@ -1,8 +1,9 @@
-import queryString from 'query-string';
-import { formatControlsForUrl } from './util';
 import { DateTime } from 'luxon';
-import { updateUserControls } from "../redux/actions"
+import queryString from 'query-string';
+
 import { updateHistory } from "../jsx/app/updateHistory"
+import { updateUserControls } from "../redux/actions"
+import { formatControlsForUrl } from './util';
 
 const maxUrlLength = 2048;
 const maxControlNameLength = 15;

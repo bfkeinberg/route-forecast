@@ -1,6 +1,5 @@
 import * as Sentry from '@sentry/react';
 import queryString
-
 from 'query-string';
 export const updateHistory = (url, query, forceReplace=false) => {
     Sentry.addBreadcrumb({

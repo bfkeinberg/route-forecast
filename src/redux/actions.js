@@ -1,17 +1,18 @@
+import * as Sentry from "@sentry/react";
+import queryString from 'query-string'
 import cookie from 'react-cookies';
+import ReactGA from "react-ga4";
+
+import { updateHistory } from "../jsx/app/updateHistory";
 import { doForecast, requestTimeZoneForRoute } from '../utils/forecastUtilities';
 import { loadRwgpsRoute } from '../utils/rwgpsUtilities';
-import { controlsMeaningfullyDifferent, parseControls, extractControlsFromRoute, getRouteNumberFromValue, getForecastRequest } from '../utils/util';
-import ReactGA from "react-ga4";
-import queryString from 'query-string'
-import * as Sentry from "@sentry/react";
-import { updateHistory } from "../jsx/app/updateHistory";
-import { userControlsUpdated, displayControlTableUiSet, rwgpsRouteLoaded, loadingFromUrlSet,
-    routeLoadingBegun, forecastFetchBegun, forecastFetched, forecastFetchFailed, forecastFetchCanceled,
-    rwgpsRouteLoadingFailed, gpxRouteLoaded, gpxRouteLoadingFailed, shortUrlSet,
-    errorDetailsSet,weatherProviderSet, intervalSet, paceSet, forecastInvalidated, startTimeSet,
-    stravaTokenSet, stravaErrorSet, stravaFetchBegun, stravaFetched, stravaFetchFailed,
-    initialStartTimeSet, timeZoneSet, forecastAppended } from './reducer';
+import { controlsMeaningfullyDifferent, extractControlsFromRoute, getForecastRequest,getRouteNumberFromValue, parseControls } from '../utils/util';
+import { displayControlTableUiSet,     errorDetailsSet,forecastAppended,forecastFetchBegun, forecastFetchCanceled,
+forecastFetched, forecastFetchFailed, forecastInvalidated, gpxRouteLoaded, gpxRouteLoadingFailed,     initialStartTimeSet, intervalSet, loadingFromUrlSet,
+paceSet,     routeLoadingBegun, rwgpsRouteLoaded,     rwgpsRouteLoadingFailed, shortUrlSet,
+startTimeSet,
+stravaErrorSet, stravaFetchBegun, stravaFetched, stravaFetchFailed,
+    stravaTokenSet, timeZoneSet, userControlsUpdated, weatherProviderSet } from './reducer';
 
 export const componentLoader = (lazyComponent, attemptsLeft) => {
     return new Promise((resolve, reject) => {

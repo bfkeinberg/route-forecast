@@ -1,12 +1,13 @@
-import React from 'react';
-import {FormGroup, Button, MenuItem} from "@blueprintjs/core";
+import {Button, FormGroup, MenuItem} from "@blueprintjs/core";
 import { Select } from "@blueprintjs/select";
-import { DesktopTooltip } from '../shared/DesktopTooltip';
+import PropTypes from 'prop-types';
+import React from 'react';
 import {connect} from 'react-redux';
+
 import {setWeatherProvider} from "../../redux/actions";
 import {providerValues} from "../../redux/reducer";
-import PropTypes from 'prop-types';
 import { getForecastRequestLength } from '../../utils/forecastUtilities';
+import { DesktopTooltip } from '../shared/DesktopTooltip';
 
 const renderProvider = (provider, { handleClick, handleFocus, modifiers }) => {
     if (!modifiers.matchesPredicate) {

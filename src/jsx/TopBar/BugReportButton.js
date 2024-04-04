@@ -1,8 +1,8 @@
-import React from 'react';
-import LadyBug from 'Images/gustavorezende_lady_bug-555px.png';
 import {Button} from '@blueprintjs/core';
 import * as Sentry from '@sentry/browser';
 import * as SentryReact from "@sentry/react";
+import LadyBug from 'Images/gustavorezende_lady_bug-555px.png';
+import React from 'react';
 
 const bugReportDialog = () => {
         const event = Sentry.captureMessage('bug report');

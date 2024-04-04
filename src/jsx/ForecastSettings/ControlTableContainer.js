@@ -1,12 +1,13 @@
 
+import { Button, Card, Elevation, Tooltip } from "@blueprintjs/core";
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Button, Card, Elevation, Tooltip } from "@blueprintjs/core";
+
 import { addControl } from "../../redux/actions";
-import ErrorBoundary from '../shared/ErrorBoundary';
-import { ControlTable } from './ControlTable';
-import { ToggleButton } from '../shared/ToggleButton';
 import { bankedDisplayToggled } from '../../redux/reducer';
+import ErrorBoundary from '../shared/ErrorBoundary';
+import { ToggleButton } from '../shared/ToggleButton';
+import { ControlTable } from './ControlTable';
 
 export const ControlTableContainer = () => {
   const displayBanked = useSelector(state => state.controls.displayBanked)

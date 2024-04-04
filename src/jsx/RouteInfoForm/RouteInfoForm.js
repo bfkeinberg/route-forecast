@@ -1,15 +1,16 @@
-import React from 'react';
-import ShortUrl from '../TopBar/ShortUrl';
-import MediaQuery from 'react-responsive';
+import {Toast} from '@blueprintjs/core';
 import PropTypes from 'prop-types';
+import React from 'react';
+import ReactGA from "react-ga4";
 import {connect, useDispatch} from 'react-redux';
+import MediaQuery from 'react-responsive';
+
+import { routeLoadingModes } from '../../data/enums';
+import { errorDetailsSet, routeLoadingModeSet } from '../../redux/reducer';
+import ShortUrl from '../TopBar/ShortUrl';
 import { AlwaysFilledSwitch } from './AlwaysFilledSwitch';
 import { RouteInfoInputRWGPS } from './RouteInfoInputRWGPS';
 import { RouteInfoInputStrava } from './RouteInfoInputStrava';
-import { routeLoadingModes } from '../../data/enums';
-import ReactGA from "react-ga4";
-import {Toast} from '@blueprintjs/core';
-import { errorDetailsSet, routeLoadingModeSet } from '../../redux/reducer';
 // import mobile_usage_demo from "Images/mobile_usage_demo.gif";
 
 const RouteInfoForm = ({ errorDetails, errorDetailsSet, routeLoadingMode, routeLoadingModeSet/* , routeInfo */ }) => {

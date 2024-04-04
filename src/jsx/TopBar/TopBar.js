@@ -1,13 +1,15 @@
-import React from "react";
-import DonationRequest from "./DonationRequest";
-import BugReportButton from "./BugReportButton";
-import ShortUrl from "./ShortUrl";
 import "./TopBar.css"
-import { usePreviousPersistent, useReusableDelay, useValueHasChanged, useForecastDependentValues } from "../../utils/hooks";
-import { useLoadingFromURLStatus } from "../DesktopUI";
-import { useMediaQuery } from "react-responsive";
+
 import PropTypes from 'prop-types';
+import React from "react";
+import { useMediaQuery } from "react-responsive";
+
+import { useForecastDependentValues,usePreviousPersistent, useReusableDelay, useValueHasChanged } from "../../utils/hooks";
+import { useLoadingFromURLStatus } from "../DesktopUI";
 import { RouteTitle } from "../shared/RouteTitle";
+import BugReportButton from "./BugReportButton";
+import DonationRequest from "./DonationRequest";
+import ShortUrl from "./ShortUrl";
 export const TopBar = ({sidePaneOptions, activeSidePane, setActiveSidePane, sidebarWidth, panesVisible}) => {
   // const smallScreen = useMediaQuery({ query: '(max-width: 900px)' })
   const roomFortitle = useMediaQuery({ query: '(min-width: 1100px)' });

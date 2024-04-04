@@ -1,8 +1,9 @@
 
-import { Switch } from '@blueprintjs/core';
-import React from 'react';
 import "./AlwaysFilledSwitch.css"
+
+import { Switch } from '@blueprintjs/core';
 import PropTypes from 'prop-types';
+import React from 'react';
 
 export const AlwaysFilledSwitch = (props) => {
   return (

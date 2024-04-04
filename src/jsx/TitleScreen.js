@@ -1,5 +1,5 @@
-import React from "react";
 import {Icon} from "@blueprintjs/core"
+import React from "react";
 // import usage_demo from "Images/usage_demo.gif";
 
 export const TitleScreen = () => {

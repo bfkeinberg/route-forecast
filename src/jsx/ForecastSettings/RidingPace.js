@@ -1,13 +1,15 @@
-import React from 'react';
-import PropTypes from 'prop-types';
+import "./RidingPace.css"
+
+import { Button, FormGroup,MenuItem } from "@blueprintjs/core";
 import { Select } from "@blueprintjs/select";
-import { DesktopTooltip } from '../shared/DesktopTooltip';
-import { Button, MenuItem, FormGroup } from "@blueprintjs/core";
+import PropTypes from 'prop-types';
+import React from 'react';
 import {connect} from 'react-redux';
+
 import {saveCookie, setPace} from "../../redux/actions";
 import { useActualPace, useFormatSpeed } from '../../utils/hooks';
 import { inputPaceToSpeed, metricPaceToSpeed, paceToSpeed } from '../../utils/util';
-import "./RidingPace.css"
+import { DesktopTooltip } from '../shared/DesktopTooltip';
 
 const paceValues = {
     imperialLikeAPenguin: {

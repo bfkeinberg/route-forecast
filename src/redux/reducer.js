@@ -1,7 +1,8 @@
-import { DateTime } from 'luxon';
-import { getRouteNumberFromValue, getRouteName } from '../utils/util';
-import { routeLoadingModes } from '../data/enums';
 import { createSlice } from '@reduxjs/toolkit'
+import { DateTime } from 'luxon';
+
+import { routeLoadingModes } from '../data/enums';
+import { getRouteName,getRouteNumberFromValue } from '../utils/util';
 
 export const finishTimeFormat = 'EEE, MMM dd yyyy h:mma';
 

@@ -1,5 +1,6 @@
-import gpxParser from "./gpxParser";
 import { DateTime } from 'luxon';
+
+import gpxParser from "./gpxParser";
 
 const formatOneControl = (controlPoint) => {
   if (typeof controlPoint === 'string') {

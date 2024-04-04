@@ -1,17 +1,18 @@
-import React from 'react';
-import PropTypes from 'prop-types';
-import { DesktopTooltip } from '../shared/DesktopTooltip';
-import {connect, useDispatch, useSelector} from 'react-redux';
-import { shortenUrl } from "../../redux/actions";
-import { useMediaQuery } from 'react-responsive';
-import { Spinner, Button } from '@blueprintjs/core';
-import { updateHistory } from "../app/updateHistory";
-import { generateUrl } from '../../utils/queryStringUtils';
-import { forecastFetchFailed, querySet, forecastFetched, forecastAppended } from '../../redux/reducer';
-import { getForecastRequest } from '../../utils/util';
+import { Button,Spinner } from '@blueprintjs/core';
 import * as Sentry from "@sentry/react";
+import PropTypes from 'prop-types';
+import React from 'react';
 import ReactGA from "react-ga4";
+import {connect, useDispatch, useSelector} from 'react-redux';
+import { useMediaQuery } from 'react-responsive';
+
+import { shortenUrl } from "../../redux/actions";
 import { useForecastMutation } from '../../redux/forecastApiSlice';
+import { forecastAppended,forecastFetched, forecastFetchFailed, querySet } from '../../redux/reducer';
+import { generateUrl } from '../../utils/queryStringUtils';
+import { getForecastRequest } from '../../utils/util';
+import { updateHistory } from "../app/updateHistory";
+import { DesktopTooltip } from '../shared/DesktopTooltip';
 
 const ForecastButton = ({fetchingForecast,submitDisabled, routeNumber, startTimestamp, pace, interval,
      metric, controls, strava_activity, strava_route, provider, showProvider, href, urlIsShortened, querySet, zone}) => {

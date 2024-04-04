@@ -1,5 +1,5 @@
-import React, {useState, useEffect} from 'react';
 import PropTypes from 'prop-types';
+import React, {useEffect,useState} from 'react';
 
 export const TransitionWrapper = ({diffData, children, transitionTime, transitionType, width}) => {
 
