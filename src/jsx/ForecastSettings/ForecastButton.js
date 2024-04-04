@@ -40,8 +40,8 @@ const ForecastButton = ({fetchingForecast,submitDisabled, routeNumber, startTime
                 dispatch(forecastFetchFailed(err))
             }
         }
-        // return Promise.all(forecastResults)
-        return forecastResults
+        return Promise.all(forecastResults)
+        // return forecastResults
     }
     const doForecastByParts = () => {
         const forecastRequest = getForecastRequest(routeData, startTimestamp, type, zone, pace, interval, userControlPoints)
@@ -69,12 +69,14 @@ const ForecastButton = ({fetchingForecast,submitDisabled, routeNumber, startTime
                 });
             }
             try {
-                const forecastResults = doForecastByParts()
-                const firstForecast = await forecastResults.shift()
+                const forecastResults = await doForecastByParts()
+                forecastResults.sort((l,r) => l.forecast.distance-r.forecast.distance)
+                const firstForecast = forecastResults.shift()
                 dispatch(forecastFetched({ forecastInfo: {forecast: [firstForecast.forecast]}, timeZoneId: zone }))
                 while (forecastResults.length > 0) {
-                    forecastResults.shift().then(nextForecast => {dispatch(forecastAppended(nextForecast.forecast))})
-                    // const nextForecast = (await forecastResults.shift()).forecast
+                    // forecastResults.shift().then(nextForecast => {dispatch(forecastAppended(nextForecast.forecast))})
+                    const nextForecast = forecastResults.shift().forecast
+                    dispatch(forecastAppended(nextForecast))
                 }
             } catch (err) {
                 dispatch(forecastFetchFailed(err))
