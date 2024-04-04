@@ -148,8 +148,7 @@
     "testDbg": "node --inspect-brk node_modules/.bin/jest",
     "testUTCDbg": "TZ=utc node --inspect-brk node_modules/.bin/jest",
     "start": "node dist/server/index.js",
-    "build": "webpack --mode production --config webpack.prod_heroku.js",
-    "heroku-prebuild": "printenv"
+    "build": "webpack --mode production --config webpack.prod_heroku.js"
   },
   "repository": {
     "type": "git",

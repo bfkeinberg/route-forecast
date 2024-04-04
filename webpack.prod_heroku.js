@@ -41,7 +41,7 @@ module.exports = (env, argv) => merge(common(env, argv), {
             debug: false,
             setCommits: { auto: true },
             authToken: process.env.SENTRY_AUTH_TOKEN,
-            release: {name: process.env.HEROKU_SLUG_COMMIT},
+            release: {name: process.env.SOURCE_VERSION},
             reactComponentAnnotation: {enabled:true},
             deploy: { env: 'production', name: 'latest' }
         }),
