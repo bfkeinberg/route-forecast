@@ -1,4 +1,4 @@
-import React, {Component, useEffect} from 'react';
+import React, {Component, useEffect, Suspense} from 'react';
 import  {useMediaQuery} from 'react-responsive';
 import lazyRetry from "@tdotcode/react-lazy-retry";
 import "normalize.css/normalize.css";
@@ -12,15 +12,15 @@ import { connect, useDispatch, useSelector } from 'react-redux';
 import cookie from 'react-cookies';
 // import DesktopUI from '../DesktopUI';
 // import MobileUI from '../MobileUI';
-import * as Sentry from "@sentry/react";
+// import * as Sentry from "@sentry/react";
 import {providerValues, actionUrlAdded, apiKeysSet, querySet, queryCleared, metricSet, showWeatherProviderSet,
     displayControlTableUiSet, rwgpsTokenSet, usePinnedRoutesSet, routeLoadingModeSet, startTimestampSet,
     rwgpsRouteSet,fetchAqiSet,zoomToRangeSet,stopAfterLoadSet,stravaTokenSet,stravaRefreshTokenSet,
     stravaErrorSet, stravaActivitySet, stravaRouteSet, reset} from "../../redux/reducer";
 import {Info} from "luxon";
 
-const LoadableDesktop = lazyRetry(() => import(/* webpackChunkName: "DesktopUI" */ '../DesktopUI'));
-const LoadableMobile = lazyRetry(() => import(/* webpackChunkName: "DesktopUI" */ '../MobileUI'));
+const LoadableDesktop = lazyRetry(() => import(/* webpackChunkName: "DesktopUI" */ '../DesktopUI'))
+const LoadableMobile = lazyRetry(() => import(/* webpackChunkName: "MobileUI" */ '../MobileUI'))
 
 import {
     loadCookie,
@@ -111,14 +111,18 @@ export class RouteWeatherUI extends Component {
             this.props.fetchAqiSet(fetchAqi==="true");
         }
         this.state = {};
+
         if (typeof window !== 'undefined') {
             window.onpopstate = (event) => {
-                Sentry.addBreadcrumb({
-                    category:'history',
-                    level: "info",
-                    data:JSON.stringify(event.state),
-                    message:document.location
-                });
+                import(/* webpackChunkName: "chunkName" */ /* webpackExports: ["addBreadcrumb"] */'@sentry/react').then(module => {
+                    const { addBreadcrumb } = module
+                     addBreadcrumb({
+                        category: 'history',
+                        level: "info",
+                        data: JSON.stringify(event.state),
+                        message: document.location
+                    });
+                })
 
                 if (event.state == null) {
                     // clear the state when back button takes us past any saved routes
@@ -128,7 +132,7 @@ export class RouteWeatherUI extends Component {
                     let queryParams = queryString.parse(event.state);
                     props.querySet({url:props.href,search:event.state})
                     RouteWeatherUI.updateFromQueryParams(this.props, queryParams);
-                    if (queryParams.rwgpsRoute !== undefined) {
+                    if (queryParams.rwgpsRoute !== undefined || queryParams.strava_route) {
                         this.props.loadRouteFromURL()
                         //this.props.loadFromRideWithGps(queryParams.rwgpsRoute,this.props.rwgpsRouteIsTrip);
                     }
@@ -205,7 +209,7 @@ export class RouteWeatherUI extends Component {
         if (RouteWeatherUI.hasProvider(queryParams.provider)) {
             props.setWeatherProvider(queryParams.provider);
         } else {
-            props.setWeatherProvider('visualcrossing');
+            props.setWeatherProvider('nws');
         }
         props.rwgpsRouteSet(queryParams.rwgpsRoute);
         RouteWeatherUI.getStravaToken(queryParams,props);
@@ -316,8 +320,8 @@ const FunAppWrapperThingForHooksUsability = ({maps_api_key, queryParams}) => {
     const isLargeEnough = useMediaQuery({query:'(min-width: 850px)'})
     return (
         <div>
-            {isLandscape && isLargeEnough && <LoadableDesktop mapsApiKey={maps_api_key} />}
-            {(!isLargeEnough || !isLandscape) && <LoadableMobile mapsApiKey={maps_api_key} />}
+            {isLandscape && isLargeEnough && <Suspense fallback={<div>Loading Desktop UI...</div>}><LoadableDesktop mapsApiKey={maps_api_key} /></Suspense>}
+            {(!isLargeEnough || !isLandscape) && <Suspense fallback={<div>Loading Mobile UI...</div>}><LoadableMobile mapsApiKey={maps_api_key} /></Suspense>}
         </div>
     )
 }
