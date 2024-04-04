@@ -1,5 +1,6 @@
 import ErrorBoundary from "./shared/ErrorBoundary";
-import ForecastTable from "./resultsTables/ForecastTable";
+import lazyRetry from "@tdotcode/react-lazy-retry";
+// import ForecastTable from "./resultsTables/ForecastTable";
 import MapLoader from "./Map/MapLoader";
 import { useJsApiLoader } from '@react-google-maps/api';
 import PropTypes from "prop-types";
@@ -23,11 +24,12 @@ const DesktopUI = ({mapsApiKey}) => {
         googleMapsApiKey: mapsApiKey
       })
 
+    const LoadableForecastTable = lazyRetry(() => import(/* webpackChunkName: "ForecastTable" */ './resultsTables/ForecastTable'));
     const {adjustedTimes } = useForecastDependentValues()
     const sidePaneOptions = [
         {title: "Route Info", content: <ErrorBoundary><RouteInfoForm routeProps={{}} /></ErrorBoundary>},
         {title: "Forecast Settings", content: <ErrorBoundary><ForecastSettings/></ErrorBoundary>},
-        {title: "Forecast", content: <ErrorBoundary>{<ForecastTable adjustedTimes={adjustedTimes}/>}</ErrorBoundary>},
+        {title: "Forecast", content: <ErrorBoundary>{<LoadableForecastTable adjustedTimes={adjustedTimes}/>}</ErrorBoundary>},
         {title: "Pace Analysis", content: <ErrorBoundary>{<PaceTable/>}</ErrorBoundary>}
     ]
     const [
