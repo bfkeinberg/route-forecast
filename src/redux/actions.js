@@ -392,8 +392,11 @@ export const loadRouteFromURL = (forecastFunc) => {
             ReactGA.event('search', {search_term:getState().uiInfo.routeParams.rwgpsRoute})
         }
         if (error === null && !getState().uiInfo.routeParams.stopAfterLoad) {
-            await forecastWithHook(forecastFunc, dispatch, getState)
-            // await dispatch(requestForecast(getState().routeInfo));
+            if (forecastFunc) {
+                await forecastWithHook(forecastFunc, dispatch, getState)
+            } else {
+                await dispatch(requestForecast(getState().routeInfo));
+            }
             updateHistory(getState().params.queryString, getState().params.searchString, true);
             const url = getState().params.queryString
             if (url && !url.includes("localhost")) {
