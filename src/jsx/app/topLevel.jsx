@@ -1,10 +1,11 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import {Provider} from 'react-redux';
+
 import configureReduxStore from '../../redux/configureStore';
-import RouteWeatherUI from './main';
-import ErrorBoundary from '../shared/ErrorBoundary';
 import LocationContext from '../locationContext';
-import PropTypes from 'prop-types';
+import ErrorBoundary from '../shared/ErrorBoundary';
+import RouteWeatherUI from './main';
 
 const TopLevel = ({mode, action, maps_api_key, timezone_api_key, bitly_token, preloaded_state, serverStore}) => {
     const store = serverStore !== undefined ? serverStore : configureReduxStore(preloaded_state,mode);

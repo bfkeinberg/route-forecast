@@ -1,23 +1,25 @@
-import ErrorBoundary from "./shared/ErrorBoundary";
-import lazyRetry from "@tdotcode/react-lazy-retry";
-// import ForecastTable from "./resultsTables/ForecastTable";
-import MapLoader from "./Map/MapLoader";
+import "./DesktopUI.css"
+
+import { Spinner } from "@blueprintjs/core";
 import { useJsApiLoader } from '@react-google-maps/api';
+import lazyRetry from "@tdotcode/react-lazy-retry";
 import PropTypes from "prop-types";
 import React, { useState } from "react";
-import RouteInfoForm from "./RouteInfoForm/RouteInfoForm";
-import { ForecastSettings } from "./ForecastSettings/ForecastSettings";
-import { TopBar } from "./TopBar/TopBar";
-import PaceTable from "./resultsTables/PaceTable";
 import { useSelector } from "react-redux";
-import { useDelay, usePrevious, useValueHasChanged, useWhenChanged, useForecastDependentValues } from "../utils/hooks";
+
+import { routeLoadingModes } from "../data/enums";
+import { useDelay, useForecastDependentValues,usePrevious, useValueHasChanged, useWhenChanged } from "../utils/hooks";
+import { ForecastSettings } from "./ForecastSettings/ForecastSettings";
+import { InstallExtensionButton } from "./InstallExtensionButton";
+// import ForecastTable from "./resultsTables/ForecastTable";
+import MapLoader from "./Map/MapLoader";
+import PaceTable from "./resultsTables/PaceTable";
+import RouteInfoForm from "./RouteInfoForm/RouteInfoForm";
+import ErrorBoundary from "./shared/ErrorBoundary";
+import { RouteTitle } from "./shared/RouteTitle";
 import { TransitionWrapper } from "./shared/TransitionWrapper";
 import { TitleScreen } from "./TitleScreen";
-import { routeLoadingModes } from "../data/enums";
-import { Spinner } from "@blueprintjs/core";
-import "./DesktopUI.css"
-import { RouteTitle } from "./shared/RouteTitle";
-import { InstallExtensionButton } from "./InstallExtensionButton";
+import { TopBar } from "./TopBar/TopBar";
 
 const DesktopUI = ({mapsApiKey}) => {
     let { isLoaded:googleMapsIsLoaded, loadError:googleMapsLoadError } = useJsApiLoader({

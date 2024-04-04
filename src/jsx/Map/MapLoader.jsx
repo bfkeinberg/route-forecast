@@ -1,9 +1,10 @@
+import lazyRetry from "@tdotcode/react-lazy-retry";
+import PropTypes from 'prop-types';
 import React, {Suspense} from 'react';
 import {connect} from 'react-redux';
-import PropTypes from 'prop-types';
+
 import { routeLoadingModes } from '../../data/enums';
 import ErrorBoundary from "../shared/ErrorBoundary";
-import lazyRetry from "@tdotcode/react-lazy-retry";
 
 const LoadableMap = lazyRetry(() => import(/* webpackChunkName: "Map" */ './RouteForecastMap'));
 

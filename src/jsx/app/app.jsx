@@ -1,9 +1,10 @@
-import React from 'react';
-import TopLevel from './topLevel';
-import LocationContext from '../locationContext';
-import ReactGA from "react-ga4";
-import { createRoot } from 'react-dom/client';
 import * as Sentry from "@sentry/react";
+import React from 'react';
+import { createRoot } from 'react-dom/client';
+import ReactGA from "react-ga4";
+
+import LocationContext from '../locationContext';
+import TopLevel from './topLevel';
 
 if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('/worker.js').then((registration) => {
