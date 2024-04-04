@@ -38,8 +38,8 @@ const checkedStartDate = (startDate, canForecastPast) => {
 
 const routeParamsInitialState = {
     interval: defaultIntervalInHours,
-    min_interval:providerValues.visualcrossing.min_interval,
-    canForecastPast:providerValues.visualcrossing.canForecastPast,
+    min_interval:providerValues.nws.min_interval,
+    canForecastPast:providerValues.nws.canForecastPast,
     pace: defaultPace,
     rwgpsRoute: '',
     rwgpsRouteIsTrip: false,
@@ -47,7 +47,7 @@ const routeParamsInitialState = {
     // eslint-disable-next-line new-cap
     zone: Intl.DateTimeFormat().resolvedOptions().timeZone,
     routeLoadingMode: routeLoadingModes.RWGPS,
-    maxDaysInFuture: providerValues['visualcrossing'].max_days,
+    maxDaysInFuture: providerValues['nws'].max_days,
     stopAfterLoad: false
 }
 const routeParamsSlice = createSlice({
@@ -235,7 +235,7 @@ const dialogParamsSlice = createSlice({
         },
         forecastFetchFailed(state, action) {
             state.fetchingForecast = false
-            state.errorDetails = typeof action.payload === 'object' ? action.payload.message : action.payload
+            state.errorDetails = typeof action.payload === 'object' ? action.payload.data.details : action.payload
         },
         forecastFetchCanceled(state) {
             state.fetchingForecast = false
@@ -467,7 +467,7 @@ const forecastInitialState = {
     range: [],
     tableViewed: false,
     mapViewed: false,
-    weatherProvider: 'visualcrossing',
+    weatherProvider: 'nws',
     zoomToRange: true,
     fetchAqi:false
 }
