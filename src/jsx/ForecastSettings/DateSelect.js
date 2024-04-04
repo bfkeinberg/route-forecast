@@ -55,7 +55,7 @@ const DateSelect = ({ start, zone, setStart, initialStartTimeSet, maxDaysInFutur
                         maxDate={later}
                         timePrecision={TimePrecision.MINUTE}
                         timePickerProps={{useAmPm:true, showArrowButtons:true}}
-                        dateFnsFormat='MMMM d, yyyy K:mmaaa'
+                        dateFnsFormat='MMMM d, yyyy h:mmaaa'
                         timezone={zone}
                     />
                 </DesktopTooltip>
