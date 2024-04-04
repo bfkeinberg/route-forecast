@@ -16,7 +16,7 @@ module.exports = {
         "sourceType": "module"
     },
     // eslint-disable-next-line array-element-newline
-    "plugins": ["react","react-redux"],
+    "plugins": ["react","react-redux", "simple-import-sort"],
     "rules": {
         "accessor-pairs": "error",
         "array-bracket-newline": "error",

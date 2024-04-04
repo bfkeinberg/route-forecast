@@ -15,7 +15,8 @@
     "parser": "@babel/eslint-parser",
     "plugins": [
         "react",
-        "babel"
+        "babel",
+        "simple-import-sort"
     ],
     "settings": {
         "react": {
@@ -26,6 +27,7 @@
         }
     },
     "rules": {
+        "simple-import-sort/imports": "error",
         "accessor-pairs": "error",
         "array-bracket-newline": "error",
         "array-bracket-spacing": [
