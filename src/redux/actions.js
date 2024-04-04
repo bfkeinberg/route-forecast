@@ -365,6 +365,7 @@ const forecastWithHook = async (forecastFunc, dispatch, getState) => {
         }
 
         try {
+            dispatch(forecastFetchBegun())
             const forecastResults = await doForecastByParts(forecastFunc, dispatch, getState)
             const firstForecast = forecastResults.shift()
             dispatch(forecastFetched({ forecastInfo: { forecast: [firstForecast.forecast] }, timeZoneId: getState().uiInfo.routeParams.zone }))
