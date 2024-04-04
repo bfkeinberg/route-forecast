@@ -1,5 +1,6 @@
 import React, {Component, useEffect} from 'react';
 import  {useMediaQuery} from 'react-responsive';
+import lazyRetry from "@tdotcode/react-lazy-retry";
 import "normalize.css/normalize.css";
 import '@blueprintjs/core/lib/css/blueprint.css';
 import "@blueprintjs/icons/lib/css/blueprint-icons.css";
@@ -9,14 +10,17 @@ import queryString from 'query-string';
 import PropTypes from 'prop-types';
 import { connect, useDispatch, useSelector } from 'react-redux';
 import cookie from 'react-cookies';
-import DesktopUI from '../DesktopUI';
-import MobileUI from '../MobileUI';
+// import DesktopUI from '../DesktopUI';
+// import MobileUI from '../MobileUI';
 import * as Sentry from "@sentry/react";
 import {providerValues, actionUrlAdded, apiKeysSet, querySet, queryCleared, metricSet, showWeatherProviderSet,
     displayControlTableUiSet, rwgpsTokenSet, usePinnedRoutesSet, routeLoadingModeSet, startTimestampSet,
     rwgpsRouteSet,fetchAqiSet,zoomToRangeSet,stopAfterLoadSet,stravaTokenSet,stravaRefreshTokenSet,
     stravaErrorSet, stravaActivitySet, stravaRouteSet, reset} from "../../redux/reducer";
 import {Info} from "luxon";
+
+const LoadableDesktop = lazyRetry(() => import(/* webpackChunkName: "DesktopUI" */ '../DesktopUI'));
+const LoadableMobile = lazyRetry(() => import(/* webpackChunkName: "DesktopUI" */ '../MobileUI'));
 
 import {
     loadCookie,
@@ -312,8 +316,8 @@ const FunAppWrapperThingForHooksUsability = ({maps_api_key, queryParams}) => {
     const isLargeEnough = useMediaQuery({query:'(min-width: 850px)'})
     return (
         <div>
-            {isLandscape && isLargeEnough && <DesktopUI mapsApiKey={maps_api_key} />}
-            {(!isLargeEnough || !isLandscape) && <MobileUI mapsApiKey={maps_api_key} />}
+            {isLandscape && isLargeEnough && <LoadableDesktop mapsApiKey={maps_api_key} />}
+            {(!isLargeEnough || !isLandscape) && <LoadableMobile mapsApiKey={maps_api_key} />}
         </div>
     )
 }
