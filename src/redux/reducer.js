@@ -235,7 +235,11 @@ const dialogParamsSlice = createSlice({
         },
         forecastFetchFailed(state, action) {
             state.fetchingForecast = false
-            state.errorDetails = typeof action.payload === 'object' ? action.payload.data.details : action.payload
+            state.errorDetails = typeof action.payload === 'object' ?
+                (action.payload.message ?
+                    action.payload.message :
+                    action.payload.data.details) :
+                     action.payload
         },
         forecastFetchCanceled(state) {
             state.fetchingForecast = false
