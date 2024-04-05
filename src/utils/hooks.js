@@ -164,7 +164,7 @@ const usePointsAndBounds = () => {
     pointsAndBounds = useMemo(() => gpxParser.computePointsAndBounds(gpxRouteData, "gpx"), [gpxRouteData])
   } else {
     // just in case we fall through
-    return {points:[]}
+    return {points:[], bounds:{}}
   }
   if (pointsAndBounds && pointsAndBounds.pointList && pointsAndBounds.pointList.length > 0) {
     pointsAndBounds.points = useMemo(() => pointsAndBounds.pointList
