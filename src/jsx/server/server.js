@@ -531,11 +531,14 @@ app.get('/', (req, res) => {
         'maps_key': process.env.MAPS_KEY,
         'timezone_api_key': process.env.TIMEZONE_API_KEY,
         'bitly_token': process.env.BITLY_TOKEN,
+        'sentry_trace_sample_rate': process.env.SENTRY_TRACE_SAMPLE_RATE,
         'preloaded_state': '',
         'reactDom': '',
         delimiter: '?'
     };
-    console.log(`request query ${JSON.stringify(req.query)}`);
+    if (Object.keys(req.query).length > 0) {
+        console.log(`request query ${JSON.stringify(req.query)}`);
+    }
     try {
         res.render('index', ejsVariables)
     } catch (err) {

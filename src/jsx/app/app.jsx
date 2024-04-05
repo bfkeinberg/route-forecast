@@ -19,6 +19,7 @@ if ('serviceWorker' in navigator) {
 
 ReactGA.initialize("G-0R3J1W9ECC");
 
+let script = document.scripts.namedItem('routeui')
 if (!window.origin.startsWith('http://localhost')) {
     Sentry.init({
         dsn: 'https://ea4c472ff9054dab8c18d594b95d8da2@sentry.io/298059',
@@ -43,7 +44,7 @@ if (!window.origin.startsWith('http://localhost')) {
         ],
         enableTracing:true,
         // To set a uniform sample rate
-        tracesSampleRate: 0.15,
+        tracesSampleRate: Number.parseFloat(script.getAttribute('sentry_trace_sample_rate')),
         tracePropagationTargets: ["localhost", /^https:\/\/www\.randoplan\.com/],
         // This sets the sample rate to be 10%. You may want this to be 100% while
         // in development and sample at a lower rate in production
@@ -57,7 +58,7 @@ if (!window.origin.startsWith('http://localhost')) {
         }*/
     });
 }
-let script = document.scripts.namedItem('routeui');
+
 const mode = script.getAttribute('mode');
 const action = script.getAttribute('action');
 const maps_api_key = script.getAttribute('maps_api_key');
