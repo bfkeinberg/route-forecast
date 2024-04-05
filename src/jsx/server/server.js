@@ -236,7 +236,11 @@ app.post('/forecast_one', upload.none(), async (req, res) => {
     }
     if (req.body.routeName !== undefined && req.body.routeName !== '' && req.body.which===0) {
         let dbRecord = makeRecord(forecastPoints, req.body.routeNumber);
-        insertRecord(dbRecord, req.body.routeName);
+        try {
+            insertRecord(dbRecord, req.body.routeName);
+        } catch (err) {
+            console.err(`DB call from forecast_one failed with ${err}`)
+        }
     }
     const zone = req.body.timezone;
     try {
