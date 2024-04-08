@@ -37,7 +37,7 @@ const RideWithGpsId = ({rwgpsRouteSet,loadingSource,loadingSuccess,rwgpsRoute,ro
     }
 
     return (
-        <FormGroup inline={false} style={{fontSize:"90%"}} label={<span><b>Route ID</b></span>} labelFor={'rwgps_route'} >
+        <FormGroup inline={false} style={{fontSize:"90%"}} label={<span><b>Ride with GPS Route ID</b></span>} labelFor={'rwgps_route'} >
             <InputGroup id={'rwgps_route'} className={'glowing_input'}
                    autoFocus tabIndex='0' type="text" rightElement={<Button minimal icon="delete" onClick={clearRoute}></Button>}
                    {...decideValidationStateFor('rwgps',loadingSource,loadingSuccess)}
