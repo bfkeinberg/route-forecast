@@ -94,13 +94,7 @@ const RouteForecastMap = () => {
 
     // try to address repeated errors with empty points
     if (points.length === 0 || Object.keys(bounds) === 0) {
-        Sentry.addBreadcrumb({
-            type: 'error',
-            category: 'error',
-            level: "error",
-            message: "Either points or bounds for map are empty",
-            timestamp: Date.now().getTime()/1000
-        });
+        Sentry.captureMessage("Either points or bounds for map are empty","error")
         return
     }
 
