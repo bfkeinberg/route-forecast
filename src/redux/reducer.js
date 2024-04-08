@@ -220,6 +220,14 @@ const routeInfoSlice = createSlice({
 export const routeInfoReducer = routeInfoSlice.reducer
 export const {rwgpsRouteLoaded, gpxRouteLoaded, routeDataCleared,loadingFromUrlSet} = routeInfoSlice.actions
 
+const getMessageFromError = (error) => {
+    if (typeof error === 'object') {
+        if (error.message) return error
+        if (error.data) return error.data.details
+        return error
+    } else return error
+}
+
 const dialogParamsSlice = createSlice({
     name: 'dialogParams',
     initialState: {
@@ -236,11 +244,7 @@ const dialogParamsSlice = createSlice({
         },
         forecastFetchFailed(state, action) {
             state.fetchingForecast = false
-            state.errorDetails = typeof action.payload === 'object' ?
-                (action.payload.message ?
-                    action.payload.message :
-                    action.payload.data.details) :
-                     action.payload
+            state.errorDetails = getMessageFromError(action.payload)
         },
         forecastFetchCanceled(state) {
             state.fetchingForecast = false
