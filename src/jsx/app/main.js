@@ -21,8 +21,8 @@ startTimestampSet,
 stopAfterLoadSet,stravaActivitySet,     stravaErrorSet, stravaRefreshTokenSet,
 stravaRouteSet, stravaTokenSet,usePinnedRoutesSet, zoomToRangeSet} from "../../redux/reducer";
 
-const LoadableDesktop = lazyRetry(() => import(/* webpackChunkName: "DesktopUI" */ '../DesktopUI'))
-const LoadableMobile = lazyRetry(() => import(/* webpackChunkName: "MobileUI" */ '../MobileUI'))
+const LoadableDesktop = lazyRetry(() => import(/* webpackChunkName: "DesktopUI" */ '../DesktopUI'), 8, 500)
+const LoadableMobile = lazyRetry(() => import(/* webpackChunkName: "MobileUI" */ '../MobileUI'), 8, 2000)
 
 import { routeLoadingModes } from '../../data/enums';
 import {
