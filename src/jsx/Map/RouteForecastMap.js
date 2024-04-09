@@ -55,11 +55,6 @@ const RouteForecastMap = () => {
         setMap
     ] = React.useState(null)
 
-    const [
-        boundsFit,
-        setBoundsFit
-    ] = React.useState(false);
-
     const userControlPoints = useSelector(state => state.controls.userControlPoints)
     const forecast = useSelector(state => state.forecast.forecast)
     let subrange = useSelector(state => (state.uiInfo.routeParams.routeLoadingMode === routeLoadingModes.STRAVA ?
