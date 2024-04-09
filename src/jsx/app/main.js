@@ -16,10 +16,12 @@ import  {useMediaQuery} from 'react-responsive';
 // import DesktopUI from '../DesktopUI';
 // import MobileUI from '../MobileUI';
 // import * as Sentry from "@sentry/react";
-import {actionUrlAdded, apiKeysSet,     displayControlTableUiSet, fetchAqiSet,metricSet, providerValues, queryCleared, querySet, reset,routeLoadingModeSet,     rwgpsRouteSet,rwgpsTokenSet, showWeatherProviderSet,
-startTimestampSet,
-stopAfterLoadSet,stravaActivitySet,     stravaErrorSet, stravaRefreshTokenSet,
-stravaRouteSet, stravaTokenSet,usePinnedRoutesSet, zoomToRangeSet} from "../../redux/reducer";
+import {
+    actionUrlAdded, apiKeysSet, displayControlTableUiSet, fetchAqiSet, metricSet, providerValues, queryCleared, querySet, reset, routeLoadingModeSet, rwgpsRouteSet, rwgpsTokenSet, showWeatherProviderSet,
+    startTimestampSet,
+    stopAfterLoadSet, stravaActivitySet, stravaErrorSet, stravaRefreshTokenSet,
+    stravaRouteSet, stravaTokenSet, usePinnedRoutesSet, zoomToRangeSet
+} from "../../redux/reducer";
 
 const LoadableDesktop = lazyRetry(() => import(/* webpackChunkName: "DesktopUI" */ '../DesktopUI'), 8, 500)
 const LoadableMobile = lazyRetry(() => import(/* webpackChunkName: "MobileUI" */ '../MobileUI'), 8, 2000)
