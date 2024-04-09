@@ -222,7 +222,7 @@ export const {rwgpsRouteLoaded, gpxRouteLoaded, routeDataCleared,loadingFromUrlS
 
 const getMessageFromError = (error) => {
     if (typeof error === 'object') {
-        if (error.message) return error
+        if (error.message) return error.message
         if (error.data) return error.data.details
         return error
     } else return error
