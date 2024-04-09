@@ -4,7 +4,7 @@ import { Spinner } from "@blueprintjs/core";
 import { useJsApiLoader } from '@react-google-maps/api';
 import lazyRetry from "@tdotcode/react-lazy-retry";
 import PropTypes from "prop-types";
-import React, { useState } from "react";
+import React, { Suspense,useState } from "react";
 import { useSelector } from "react-redux";
 
 import { routeLoadingModes } from "../data/enums";
@@ -31,7 +31,7 @@ const DesktopUI = ({mapsApiKey}) => {
     const sidePaneOptions = [
         {title: "Route Info", content: <ErrorBoundary><RouteInfoForm routeProps={{}} /></ErrorBoundary>},
         {title: "Forecast Settings", content: <ErrorBoundary><ForecastSettings/></ErrorBoundary>},
-        {title: "Forecast", content: <ErrorBoundary>{<LoadableForecastTable adjustedTimes={adjustedTimes}/>}</ErrorBoundary>},
+        {title: "Forecast", content: <ErrorBoundary><Suspense fallback={<div>Loading ForecastTable...</div>}>{<LoadableForecastTable adjustedTimes={adjustedTimes}/>}</Suspense></ErrorBoundary>},
         {title: "Pace Analysis", content: <ErrorBoundary>{<PaceTable/>}</ErrorBoundary>}
     ]
     const [
@@ -172,4 +172,4 @@ const LoadingFromURLOverlay = () => {
     )
 }
 
-export default DesktopUI;
+export default React.memo(DesktopUI)
