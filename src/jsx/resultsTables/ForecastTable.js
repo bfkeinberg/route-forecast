@@ -23,11 +23,11 @@ import { WeatherCorrections } from './WeatherCorrections';
 const displayBacklink = (provider) => {
     switch (provider) {
         case 'climacell':
-            return <a tabIndex='-1' href="https://www.tomorrow.io/"><img src={climacell} width={166} height={19}/></a>;
+            return <a tabIndex='-1' href="https://www.tomorrow.io/"><img src={climacell} width={166} height={19} target="_blank" rel="noopener noreferrer"/></a>;
         case 'weatherapi':
-            return <a href="https://www.weatherapi.com/" title="Free Weather API"><img src='//cdn.weatherapi.com/v4/images/weatherapi_logo.png' alt="Weather data by WeatherAPI.com" border="0"/></a>;
+            return <a href="https://www.weatherapi.com/" title="Free Weather API"><img src='//cdn.weatherapi.com/v4/images/weatherapi_logo.png' alt="Weather data by WeatherAPI.com" border="0" target="_blank" rel="noopener noreferrer"/></a>;
         case 'visualcrossing':
-           return <a href="https://www.visualcrossing.com/weather-data"><img src={visualcrossing} width={200} height={100}/></a>;
+           return <a href="https://www.visualcrossing.com/weather-data"><img src={visualcrossing} width={200} height={100} target="_blank" rel="noopener noreferrer"/></a>;
         case 'nws':
             return <img src={"https://www.weather.gov/images/gjt/newsletter/NWSLogo.png"} width={100} height={100}/>;
         case 'meteomatics':
@@ -232,8 +232,6 @@ ForecastTable.propTypes = {
     adjustedTimes:PropTypes.arrayOf(PropTypes.object).isRequired
 }
 
-export default React.memo(ForecastTable)
-
 const WindSpeed = ({gust, windSpeed, showGusts}) => {
     const formatSpeed = useFormatSpeed()
     return (
@@ -256,3 +254,5 @@ const Time = ({time}) => {
         time || finishTime && DateTime.fromFormat(finishTime, finishTimeFormat).toFormat('h:mm a') || "N/A"
     )
 }
+
+export default React.memo(ForecastTable)
