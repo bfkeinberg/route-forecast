@@ -309,6 +309,24 @@ app.post('/forecast', upload.none(), async (req, res) => {
     }
 });
 
+app.post('/aqi_one', upload.none(), async (req, res) => {
+    if (req.body.locations === undefined) {
+        res.status(400).json({ 'status': 'Missing location key' });
+        return;
+    }
+    const forecastPoint = req.body.locations
+    if (!process.env.NO_LOGGING) {
+        logger.info(`AQI request from ${req.ip} for AQI at ${forecastPoint.lat},${forecastPoint.lon}`)
+    }
+    try {
+        let result = {};
+        await getAQI(result, forecastPoint);
+        res.status(200).json({ 'aqi': result });
+    } catch (error) {
+        res.status(500).json({ 'details': `Error retrieving AQI : ${JSON.stringify(error)}` });
+    }
+});
+
 app.post('/aqi', upload.none(), async (req, res) => {
     if (req.body.locations === undefined) {
         res.status(400).json({ 'status': 'Missing location key' });

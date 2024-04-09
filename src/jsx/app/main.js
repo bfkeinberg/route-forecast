@@ -35,7 +35,7 @@ import {
     setWeatherProvider,
     updateUserControls,
 } from "../../redux/actions";
-import { useForecastMutation } from '../../redux/forecastApiSlice';
+import { useForecastMutation, useGetAqiMutation } from '../../redux/forecastApiSlice';
 import { inputPaceToSpeed,parseControls } from '../../utils/util';
 
 export const saveRwgpsCredentials = (token) => {
@@ -280,11 +280,11 @@ const mapStateToProps = (state) =>
 
 export default connect(mapStateToProps, mapDispatchToProps)(RouteWeatherUI);
 
-const useLoadRouteFromURL = (queryParams, forecastFunc) => {
+const useLoadRouteFromURL = (queryParams, forecastFunc, aqiFunc) => {
     const dispatch = useDispatch()
     useEffect(() => {
         if (queryParams.rwgpsRoute || queryParams.strava_route) {
-            dispatch(loadRouteFromURL(forecastFunc))
+            dispatch(loadRouteFromURL(forecastFunc, aqiFunc))
         }
     }, [queryParams])
 }
@@ -315,8 +315,9 @@ const useSetPageTitle = () => {
 
 const FunAppWrapperThingForHooksUsability = ({maps_api_key, queryParams}) => {
     const [forecast] = useForecastMutation()
+    const [getAqi] = useGetAqiMutation()
     useSetPageTitle()
-    useLoadRouteFromURL(queryParams, forecast)
+    useLoadRouteFromURL(queryParams, forecast, getAqi)
     useLoadControlPointsFromURL(queryParams)
     const isLandscape = useMediaQuery({query:'(orientation:landscape)'})
     const isLargeEnough = useMediaQuery({query:'(min-width: 850px)'})

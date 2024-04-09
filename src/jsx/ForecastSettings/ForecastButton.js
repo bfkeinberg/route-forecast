@@ -7,7 +7,7 @@ import {connect, useDispatch, useSelector} from 'react-redux';
 import { useMediaQuery } from 'react-responsive';
 
 import { shortenUrl } from "../../redux/actions";
-import { useForecastMutation } from '../../redux/forecastApiSlice';
+import { useForecastMutation, useGetAqiMutation } from '../../redux/forecastApiSlice';
 import { forecastAppended,forecastFetched, forecastFetchFailed, querySet } from '../../redux/reducer';
 import { generateUrl } from '../../utils/queryStringUtils';
 import { getForecastRequest } from '../../utils/util';
@@ -18,15 +18,18 @@ const ForecastButton = ({fetchingForecast,submitDisabled, routeNumber, startTime
      metric, controls, strava_activity, strava_route, provider, showProvider, href, urlIsShortened, querySet, zone}) => {
         const dispatch = useDispatch()
         const [forecast, {isLoading}] = useForecastMutation()
+        const [getAQI, {aqiIsLoading}] = useGetAqiMutation()
         const type = useSelector(state => ((state.routeInfo.rwgpsRouteData !== null) ? "rwgps" : "gpx"))
         const routeName = useSelector(state => state.routeInfo.name)
         const routeData = useSelector(state => ((type === "rwgps") ? state.routeInfo.rwgpsRouteData : state.routeInfo.gpxRouteData))
         const userControlPoints = useSelector(state => state.controls.userControlPoints)
         const distanceInKm = useSelector(state => state.routeInfo.distanceInKm)
+        const fetchAqi = useSelector(state => state.forecast.fetchAqi)
 
     const forecastByParts = (forecastRequest, zone, service, routeName, routeNumber) => {
         let requestCopy = Object.assign(forecastRequest)
         let forecastResults = []
+        let aqiResults = []
         let locations = requestCopy.shift();
         let which = 0
         while (requestCopy.length > 0) {
@@ -34,13 +37,18 @@ const ForecastButton = ({fetchingForecast,submitDisabled, routeNumber, startTime
                 const request = {locations:locations, timezone:zone, service:service, routeName:routeName, routeNumber:routeNumber, which}
                 const result = forecast(request).unwrap()
                 forecastResults.push(result)
+                if (fetchAqi) {
+                    const aqiRequest = {locations:locations}
+                    const aqiResult = getAQI(aqiRequest).unwrap()
+                    aqiResults.push(aqiResult)
+                }
                 locations = requestCopy.shift();
                 ++which
             } catch (err) {
                 dispatch(forecastFetchFailed(err))
             }
         }
-        return Promise.all(forecastResults)
+        return [Promise.all(forecastResults),fetchAqi?Promise.all(aqiResults):[]]
         // return forecastResults
     }
     const doForecastByParts = () => {
@@ -69,17 +77,29 @@ const ForecastButton = ({fetchingForecast,submitDisabled, routeNumber, startTime
                 });
             }
             try {
-                const forecastResults = await doForecastByParts()
+                const forecastAndAqiResults = doForecastByParts()
+                const forecastResults = await forecastAndAqiResults[0]
+                const aqiResults = await forecastAndAqiResults[1]
                 forecastResults.sort((l,r) => l.forecast.distance-r.forecast.distance)
-                const firstForecast = forecastResults.shift()
-                dispatch(forecastFetched({ forecastInfo: {forecast: [firstForecast.forecast]}, timeZoneId: zone }))
+                const firstForecast = {...forecastResults.shift().forecast}
+                if (aqiResults.length > 0) {
+                    firstForecast.aqi = aqiResults.shift().aqi.aqi
+                }
+                dispatch(forecastFetched({ forecastInfo: {forecast: [firstForecast]}, timeZoneId: zone }))
                 while (forecastResults.length > 0) {
-                    // forecastResults.shift().then(nextForecast => {dispatch(forecastAppended(nextForecast.forecast))})
-                    const nextForecast = forecastResults.shift().forecast
+                    const nextForecast = {...forecastResults.shift().forecast}
+                    if (aqiResults.length > 0) {
+                        nextForecast.aqi = aqiResults.shift().aqi.aqi
+                    }
                     dispatch(forecastAppended(nextForecast))
                 }
             } catch (err) {
-                dispatch(forecastFetchFailed(err))
+                if (err.message)
+                    dispatch(forecastFetchFailed(err.message))
+                else if (err.data)
+                    dispatch(forecastFetchFailed(err.data.details))
+                else
+                    dispatch(forecastFetchFailed(err))
             }
         })
         const url = generateUrl(startTimestamp, routeNumber, pace, interval, metric, controls,
@@ -108,7 +128,7 @@ const ForecastButton = ({fetchingForecast,submitDisabled, routeNumber, startTime
                     fill={true}
                 >
                     {isLoading ? 'Creating forecast...' : 'Find Forecast'}
-                    {(isLoading || fetchingForecast) && <Spinner />}
+                    {(isLoading || aqiIsLoading || fetchingForecast) && <Spinner />}
                 </Button>
             </div>
         </DesktopTooltip>

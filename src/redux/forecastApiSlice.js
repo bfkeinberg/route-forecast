@@ -12,8 +12,15 @@ export const forecastApiSlice = createApi({
                 method: 'POST',
                 body: request
             })
+        }),
+        getAqi: build.mutation({
+            query: request => ({
+                url: '/aqi_one',
+                method: 'POST',
+                body: request
+            })
         })
     })
 })
 
-export const {useForecastMutation} = forecastApiSlice
+export const {useForecastMutation, useGetAqiMutation} = forecastApiSlice

@@ -316,9 +316,10 @@ export const loadStravaRoute = (routeId) => {
     }
 }
 
-const forecastByParts = (forecastFunc, forecastRequest, zone, service, routeName, routeNumber, dispatch) => {
+const forecastByParts = (forecastFunc, aqiFunc, forecastRequest, zone, service, routeName, routeNumber, dispatch, fetchAqi) => {
     let requestCopy = Object.assign(forecastRequest)
     let forecastResults = []
+    let aqiResults = []
     let locations = requestCopy.shift();
     let which = 0
     while (requestCopy.length > 0) {
@@ -326,16 +327,21 @@ const forecastByParts = (forecastFunc, forecastRequest, zone, service, routeName
             const request = {locations:locations, timezone:zone, service:service, routeName:routeName, routeNumber:routeNumber, which}
             const result = forecastFunc(request).unwrap()
             forecastResults.push(result)
-            locations = requestCopy.shift();
+            if (fetchAqi) {
+                const aqiRequest = {locations:locations}
+                const aqiResult = aqiFunc(aqiRequest).unwrap()
+                aqiResults.push(aqiResult)
+            }
+        locations = requestCopy.shift();
             ++which
         } catch (err) {
             dispatch(forecastFetchFailed(err))
         }
     }
-    return Promise.all(forecastResults)
+    return [Promise.all(forecastResults),fetchAqi?Promise.all(aqiResults):[]]
 }
 
-const doForecastByParts = (forecastFunc, dispatch, getState) => {
+const doForecastByParts = (forecastFunc, aqiFunc, dispatch, getState) => {
     const type = ((getState().routeInfo.rwgpsRouteData !== null) ? "rwgps" : "gpx")
     const routeNumber = (type === "rwgps") ? getState().uiInfo.routeParams.rwgpsRoute : getState().strava.route
     const forecastRequest = getForecastRequest(((type === "rwgps") ? getState().routeInfo.rwgpsRouteData : getState().routeInfo.gpxRouteData),
@@ -345,11 +351,12 @@ const doForecastByParts = (forecastFunc, dispatch, getState) => {
     if (forecastRequest === undefined) {
         return { result: "error", error: "No route could be loaded" }
     }
-    return forecastByParts(forecastFunc, forecastRequest, getState().uiInfo.routeParams.zone,
-        getState().forecast.weatherProvider, getState().routeInfo.name, routeNumber, dispatch)
+    return forecastByParts(forecastFunc, aqiFunc, forecastRequest, getState().uiInfo.routeParams.zone,
+        getState().forecast.weatherProvider, getState().routeInfo.name, routeNumber, dispatch,
+        getState().forecast.fetchAqi)
 }
 
-const forecastWithHook = async (forecastFunc, dispatch, getState) => {
+const forecastWithHook = async (forecastFunc, aqiFunc, dispatch, getState) => {
     await Sentry.startSpan({ name: "forecastWithHook" }, async () => {
         const routeInfo = getState().routeInfo
         if (routeInfo.rwgpsRouteData) {
@@ -366,12 +373,20 @@ const forecastWithHook = async (forecastFunc, dispatch, getState) => {
 
         try {
             dispatch(forecastFetchBegun())
-            const forecastResults = await doForecastByParts(forecastFunc, dispatch, getState)
-            const firstForecast = forecastResults.shift()
-            dispatch(forecastFetched({ forecastInfo: { forecast: [firstForecast.forecast] }, timeZoneId: getState().uiInfo.routeParams.zone }))
+            const forecastAndAqiResults = doForecastByParts(forecastFunc, aqiFunc, dispatch, getState)
+            const forecastResults = await forecastAndAqiResults[0]
+            const aqiResults = await forecastAndAqiResults[1]
+            const firstForecast = {...forecastResults.shift().forecast}
+            if (aqiResults.length > 0) {
+                firstForecast.aqi = aqiResults.shift().aqi.aqi
+            }
+        dispatch(forecastFetched({ forecastInfo: { forecast: [firstForecast] }, timeZoneId: getState().uiInfo.routeParams.zone }))
             while (forecastResults.length > 0) {
-                const nextForecast = forecastResults.shift().forecast
-                dispatch(forecastAppended(nextForecast))
+                const nextForecast = {...forecastResults.shift().forecast}
+                if (aqiResults.length > 0) {
+                    nextForecast.aqi = aqiResults.shift().aqi.aqi
+                }
+            dispatch(forecastAppended(nextForecast))
             }
         } catch (err) {
             dispatch(forecastFetchFailed(err))
@@ -379,7 +394,7 @@ const forecastWithHook = async (forecastFunc, dispatch, getState) => {
     })
 }
 
-export const loadRouteFromURL = (forecastFunc) => {
+export const loadRouteFromURL = (forecastFunc, aqiFunc) => {
     return async function(dispatch, getState) {
         // ReactGA.send({ hitType: "pageview", page: "/loadRoute" });
         // ReactGA.event('login', {method:getState().uiInfo.routeParams.rwgpsRoute});
@@ -394,8 +409,8 @@ export const loadRouteFromURL = (forecastFunc) => {
             ReactGA.event('search', {search_term:getState().uiInfo.routeParams.rwgpsRoute})
         }
         if (error === null && !getState().uiInfo.routeParams.stopAfterLoad) {
-            if (forecastFunc) {
-                await forecastWithHook(forecastFunc, dispatch, getState)
+            if (forecastFunc && aqiFunc) {
+                await forecastWithHook(forecastFunc, aqiFunc, dispatch, getState)
             } else {
                 await dispatch(requestForecast(getState().routeInfo));
             }
