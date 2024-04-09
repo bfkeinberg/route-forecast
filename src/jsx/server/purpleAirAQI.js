@@ -203,7 +203,7 @@ const getPurpleAirAQI = async function (lat, lon) {
                     console.error(`[AXIOS] error at ${lat} ${lon}`, error.response.data);
                     if (error.response.data.error !== undefined) {
                         if (error.response.data.error === "RateLimitExceededError") {
-                            throw Error(error.response.data)
+                            throw Error(error.response.data.description)
                         }
                     }
                 }
