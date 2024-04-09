@@ -16,9 +16,9 @@ import { DesktopTooltip } from '../shared/DesktopTooltip';
 
 const ForecastButton = ({fetchingForecast,submitDisabled, routeNumber, startTimestamp, pace, interval,
      metric, controls, strava_activity, strava_route, provider, showProvider, href, urlIsShortened, querySet, zone}) => {
+        const [forecast, forecastFetchResult] = useForecastMutation()
+        const [getAQI, aqiFetchResult] = useGetAqiMutation()
         const dispatch = useDispatch()
-        const [forecast, {isLoading}] = useForecastMutation()
-        const [getAQI, {aqiIsLoading}] = useGetAqiMutation()
         const type = useSelector(state => ((state.routeInfo.rwgpsRouteData !== null) ? "rwgps" : "gpx"))
         const routeName = useSelector(state => state.routeInfo.name)
         const routeData = useSelector(state => ((type === "rwgps") ? state.routeInfo.rwgpsRouteData : state.routeInfo.gpxRouteData))
@@ -127,8 +127,8 @@ const ForecastButton = ({fetchingForecast,submitDisabled, routeNumber, startTime
                     large={!smallScreen}
                     fill={true}
                 >
-                    {isLoading ? 'Creating forecast...' : 'Find Forecast'}
-                    {(isLoading || aqiIsLoading || fetchingForecast) && <Spinner />}
+                    {forecastFetchResult.isLoading ? 'Creating forecast...' : 'Find Forecast'}
+                    {(forecastFetchResult.isLoading || aqiFetchResult.isLoading || fetchingForecast) && <Spinner />}
                 </Button>
             </div>
         </DesktopTooltip>
