@@ -39,7 +39,7 @@ import { useForecastMutation, useGetAqiMutation } from '../../redux/forecastApiS
 import { inputPaceToSpeed,parseControls } from '../../utils/util';
 
 export const saveRwgpsCredentials = (token) => {
-    if ("credentials" in navigator && "PasswordCredential" in window && "store" in navigator.credentials) {
+    if ("credentials" in navigator && "PasswordCredential" in window && "store" in navigator.credentials && token) {
 
         // eslint-disable-next-line no-undef
         let credential = new PasswordCredential({
