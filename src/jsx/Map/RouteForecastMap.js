@@ -27,19 +27,19 @@ const getMapBounds = (points, bounds, zoomToRange, subrange) => {
     let southWest = { lat: bounds.min_latitude, lng: bounds.min_longitude };
     let northEast = { lat: bounds.max_latitude, lng: bounds.max_longitude };
     if (isNaN(bounds.min_latitude) || isNaN(bounds.max_latitude)) {
-        console.error(`Bad latitude in bounds`);
+        Sentry.captureMessage("Bad latitude in map bounds","error")
         return new window.google.maps.LatLngBounds({ lat: 0, lng: 0 }, { lat: 0, lng: 0 });
     }
     const defaultBounds = new window.google.maps.LatLngBounds(southWest, northEast);
     if (zoomToRange && subrange.length === 2 && !isNaN(subrange[1])) {
-        let bounds = new window.google.maps.LatLngBounds();
+        let segmentBounds = new window.google.maps.LatLngBounds();
         points.filter(point => (point.dist !== undefined) && (point.dist >= subrange[0] &&
             (isNaN(subrange[1]) || point.dist <= subrange[1])))
-            .forEach(point => bounds.extend(point));
-        if (bounds.isEmpty()) {
+            .forEach(point => segmentBounds.extend(point));
+        if (segmentBounds.isEmpty()) {
             return defaultBounds;
         }
-        return bounds;
+        return segmentBounds;
     }
     return defaultBounds;
 }
@@ -71,7 +71,6 @@ const RouteForecastMap = () => {
     const routeLoadingMode = useSelector(state => state.uiInfo.routeParams.routeLoadingMode)
     const metric = useSelector(state => state.controls.metric)
     const zoomToRange = useSelector(state => state.forecast.zoomToRange)
-    const mapViewed = useSelector(state => state.forecast.mapViewed)
 
     const { calculatedControlPointValues: controls } = useForecastDependentValues()
 
@@ -106,17 +105,13 @@ const RouteForecastMap = () => {
             zoomToRange,
             subrange
         ])
-        // this is the case where the forecast has been updated and the map is being displayed for the first time since then
-        // in this case we want to set bounds to our track
-        if (!mapViewed && boundsFit) {
-            setBoundsFit(false)
-        }
     } catch (error) {
-        console.warn(`Error creating map bounds:${error}`)
+        Sentry.captureMessage(`Error creating map bounds:${error}`,"error")
     }
 
     const mapCenter = useMemo( () => mapBounds.getCenter(), [mapBounds]);
     const initialCenter = useMemo( () => ((mapCenter === null || mapCenter === undefined) ? undefined : mapCenter.toJSON()), [mapCenter])
+    console.log(mapBounds,initialCenter,map?map.getCenter().toJSON():"")
 
     let infoPosition = initialCenter
     let infoVisible = false;
@@ -127,17 +122,11 @@ const RouteForecastMap = () => {
         infoVisible = true;
     }
 
-    const onTilesLoaded = React.useCallback(() => {
-        if (!boundsFit) {
-            // we only want to snap the map bounds to our track once after each forecast, to allow
-            // the user to change the map zoom if they desired
-            // this hook will be triggered every time the zoom changes amongst other things, so we
-            // have to work around that
-            map.fitBounds(mapBounds, 0)
-            setBoundsFit(true)
+    const onBoundsChanged = React.useCallback(() => {
+        if (zoomToRange) {
+            if (map) {map.fitBounds(mapBounds, 0)}
         }
-    // eslint-disable-next-line array-element-newline
-    }, [mapBounds,boundsFit,map])
+    }, [mapBounds,map])
 
     const infoWindow = (<InfoWindow position={infoPosition}><div>{infoContents}</div></InfoWindow>)
 
@@ -153,7 +142,7 @@ const RouteForecastMap = () => {
                         mapContainerStyle={{ width: 'auto', height:  "calc(100vh - 70px)", position:'relative' }}
                         onLoad={onLoad}
                         onUnmount={onUnmount}
-                        onTilesLoaded={onTilesLoaded}
+                        onBoundsChanged={onBoundsChanged}
                     >
                         <Polyline path={points} options={{strokeColor:'#ff0000', strokeWeight:2, strokeOpacity:1.0}} />
                         <MapHighlight points={points} subrange={subrange} />
