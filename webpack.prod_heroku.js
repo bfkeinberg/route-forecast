@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 const { merge } = require('webpack-merge');
 const common = require('./webpack.common.js');
 const webpack = require('webpack');
@@ -11,10 +12,7 @@ const zlib = require("zlib");
 module.exports = (env, argv) => merge(common(env, argv), {
     plugins: [
         new TerserPlugin({
-            parallel: true,
-            terserOptions: {
-                ecma: 6,
-            },
+            parallel: true
         }),
         new webpack.IgnorePlugin({
             resourceRegExp: /^\.\/locale$/,
