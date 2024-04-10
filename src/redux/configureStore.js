@@ -3,9 +3,12 @@ import * as Sentry from '@sentry/browser';
 import {createLogger} from 'redux-logger';
 import createSentryMiddleware from "redux-sentry-middleware";
 
-import { forecastApiSlice } from './forecastApiSlice';
-import { controlsReducer,
-dialogParamsReducer, forecastReducer, paramsReducer, routeInfoReducer, routeParamsReducer, rwgpsInfoReducer,    stravaReducer } from './reducer';
+import { forecastApiSlice } from './forecastApiSlice'
+import {
+    controlsReducer,
+    dialogParamsReducer, forecastReducer, paramsReducer, routeInfoReducer, routeParamsReducer, rwgpsInfoReducer, stravaReducer
+} from './reducer';
+import { rusaIdLookupApiSlice} from './rusaLookupApiSlice'
 export const loggerMiddleware = createLogger();
 
 const bannedActionKeys = [
@@ -32,7 +35,8 @@ export default function configureReduxStore(preloadedState, mode) {
             uiInfo: combineReducers({ routeParams: routeParamsReducer, dialogParams: dialogParamsReducer }),
             routeInfo: routeInfoReducer, controls: controlsReducer, strava: stravaReducer, forecast: forecastReducer,
              params: paramsReducer, rideWithGpsInfo: rwgpsInfoReducer,
-             [forecastApiSlice.reducerPath] : forecastApiSlice.reducer
+             [forecastApiSlice.reducerPath] : forecastApiSlice.reducer,
+             [rusaIdLookupApiSlice.reducerPath]: rusaIdLookupApiSlice.reducer
         },
         middleware: getDefaultMiddleware => {
             const middleware = getDefaultMiddleware().concat(forecastApiSlice.middleware)

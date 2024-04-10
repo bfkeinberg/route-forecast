@@ -49,7 +49,8 @@ const routeParamsInitialState = {
     zone: Intl.DateTimeFormat().resolvedOptions().timeZone,
     routeLoadingMode: routeLoadingModes.RWGPS,
     maxDaysInFuture: providerValues['nws'].max_days,
-    stopAfterLoad: false
+    stopAfterLoad: false,
+    rusaPermRouteId: ''
 }
 const routeParamsSlice = createSlice({
     name: 'routeParams',
@@ -67,6 +68,10 @@ const routeParamsSlice = createSlice({
             }
             state.loadingSource = null
             state.succeeded = null
+        },
+        rusaPermRouteIdSet(state,action) {
+            state.rusaPermRouteId = action.payload
+            state.routeLoadingMode = routeLoadingModes.RUSA_PERM
         },
         startTimeSet(state,action) {
             if (action.payload) {
@@ -142,7 +147,7 @@ const routeParamsSlice = createSlice({
 export const routeParamsReducer = routeParamsSlice.reducer
 export const {stopAfterLoadSet,rwgpsRouteSet,startTimeSet,initialStartTimeSet,
         startTimestampSet,paceSet,intervalSet,routeIsTripToggled,routeIsTripSet,
-        routeLoadingModeSet,reset, timeZoneSet} = routeParamsSlice.actions
+        routeLoadingModeSet,reset, timeZoneSet, rusaPermRouteIdSet} = routeParamsSlice.actions
 
 const rideWithGpsInfoSlice = createSlice({
     name: 'rideWithGpsInfo',

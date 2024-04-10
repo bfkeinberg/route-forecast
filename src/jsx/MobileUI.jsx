@@ -1,17 +1,18 @@
-import ErrorBoundary from "./shared/ErrorBoundary";
-import PaceTable from "./resultsTables/PaceTable";
-import ForecastTable from "./resultsTables/ForecastTable";
-import MapLoader from "./Map/MapLoader";
+import { Alignment,Button, IconSize, Intent, Navbar, NavbarDivider, NavbarGroup, NavbarHeading } from "@blueprintjs/core";
+import {Cloud, Cycle,Globe, Route as RouteIcon, Shop } from "@blueprintjs/icons";
 import { useJsApiLoader } from '@react-google-maps/api';
 import PropTypes from "prop-types";
 import React from "react";
-import { Route, Routes, Link, MemoryRouter, useNavigate } from "react-router-dom";
-import { Button, IconSize, Intent, Navbar, NavbarGroup, NavbarDivider, NavbarHeading, Alignment } from "@blueprintjs/core";
-import {Shop, Globe, Route as RouteIcon, Cloud, Cycle } from "@blueprintjs/icons";
 import {connect, useSelector} from 'react-redux';
-import RouteInfoForm from "./RouteInfoForm/RouteInfoForm";
+import { Link, MemoryRouter, Route, Routes, useNavigate } from "react-router-dom";
+
+import { useForecastDependentValues,useWhenChanged } from "../utils/hooks";
 import { ForecastSettings } from "./ForecastSettings/ForecastSettings";
-import { useWhenChanged, useForecastDependentValues } from "../utils/hooks";
+import MapLoader from "./Map/MapLoader";
+import ForecastTable from "./resultsTables/ForecastTable";
+import PaceTable from "./resultsTables/PaceTable";
+import RouteInfoForm from "./RouteInfoForm/RouteInfoForm";
+import ErrorBoundary from "./shared/ErrorBoundary";
 
 const MobileUI = (props) => {
     return (
@@ -22,7 +23,6 @@ const MobileUI = (props) => {
 };
 
 MobileUI.propTypes = {
-    routeLoadingMode: PropTypes.number,
     mapsApiKey: PropTypes.string.isRequired,
     needToViewTable: PropTypes.bool.isRequired,
     needToViewMap: PropTypes.bool.isRequired
@@ -30,7 +30,6 @@ MobileUI.propTypes = {
 
 const mapStateToProps = (state) =>
     ({
-        routeLoadingMode:state.uiInfo.routeParams.routeLoadingMode,
         needToViewTable:state.forecast.valid && !state.forecast.tableViewed,
         needToViewMap:state.forecast.valid && !state.forecast.mapViewed
     });
