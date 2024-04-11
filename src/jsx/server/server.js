@@ -168,6 +168,14 @@ app.use((req, res, next) => {
     return next();
 });
 
+const buildRouteUrl = (routeNumber,apiKey) => {
+    const privacyCodeLoc = routeNumber.indexOf('?privacy_code')
+    if (privacyCodeLoc === -1) {
+        return `${routeNumber}.json?apikey=${apiKey}&version=2`
+    }
+    return `${routeNumber.substring(0,privacyCodeLoc)}.json${routeNumber.substring(privacyCodeLoc)}&apikey=${apiKey}&version=2`
+}
+
 app.get('/rwgps_route', (req, res) => {
     const routeNumber = req.query.route;
     if (routeNumber === undefined) {
@@ -188,7 +196,7 @@ app.get('/rwgps_route', (req, res) => {
         headers.Authorization = `Bearer ${token}`;
     }
 
-    const rwgpsUrl = `https://ridewithgps.com/${routeType}/${routeNumber}.json?apikey=${rwgpsApiKey}&version=2`;
+    const rwgpsUrl = `https://ridewithgps.com/${routeType}/${buildRouteUrl(routeNumber,rwgpsApiKey)}    `;
     fetch(rwgpsUrl,{headers:headers}).then(fetchResult => {if (!fetchResult.ok) {throw Error(fetchResult.status)} return fetchResult.text()})
         .then(body => {if (!isValidRouteResult(body, routeType)) {res.status(401).send(body)} else {res.status(200).send(body)}})
         .catch(err => {const status = isNaN(Number.parseInt(err.message,10))?500:Number.parseInt(err.message,10);res.status(status).json({ 'status': JSON.stringify(err) })});
