@@ -1,10 +1,11 @@
 
 import { Button,FormGroup, InputGroup,Spinner } from '@blueprintjs/core';
 import React, { useRef } from 'react';
+import ReactGA from "react-ga4"
 import { useDispatch,useSelector } from 'react-redux';
 
 import { loadFromRideWithGps } from '../../redux/actions';
-import { rusaPermRouteIdSet, rwgpsRouteSet } from '../../redux/reducer';
+import { errorDetailsSet,rusaPermRouteIdSet, rwgpsRouteSet } from '../../redux/reducer';
 import { rusaIdLookupApiSlice } from '../../redux/rusaLookupApiSlice';
 
 export const RouteInfoInputRUSA = () => {
@@ -13,14 +14,18 @@ export const RouteInfoInputRUSA = () => {
     const rusaPermRouteId = useSelector(state => state.uiInfo.routeParams.rusaPermRouteId)
     const rusaPermLookupApiKey = useSelector(state => state.params.rusaPermApiKey)
 
-    // console.info(`rusa perm id:${rusaPermRouteId} skip:${!rusaPermRouteId}`)
     const [getRusaPermInfo] = rusaIdLookupApiSlice.useLazyLookupRusaPermIdQuery()
 
     const lookupRouteId = React.useCallback(() => {
+        ReactGA.event('spend_virtual_currency', {virtual_currency_name:'RUSA',value:Number.parseInt(rusaPermRouteId)})
         getRusaPermInfo(rusaPermRouteId).unwrap().then(routeInfo => {
+            if (routeInfo.length === 0) {
+                dispatch(errorDetailsSet(`${rusaPermRouteId} is not a valid permanent route ID`))
+                return
+            }
             dispatch(rwgpsRouteSet(routeInfo[0].rwgps))
             dispatch(loadFromRideWithGps())
-        })
+        }).catch(error => dispatch(errorDetailsSet(error)))
     }, [rusaPermRouteId,rusaPermLookupApiKey])
 
     const isReturnKey = function(event) {
