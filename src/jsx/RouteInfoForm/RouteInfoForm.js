@@ -39,6 +39,7 @@ const RouteInfoForm = ({ errorDetails, errorDetailsSet, routeLoadingMode, routeL
     return (
         <div style={{padding: "14px"}}>
             <RouteLoadingModeSelector mode={mode} modeSwitched={modeSwitched}/>
+            <div className='spacer'/>
             {getInputForMode(mode)}
             {errorDetails !== null && <Toast2 style={{ padding: '10px', marginTop: "10px" }} message={errorDetails} timeout={0} onDismiss={() => dispatch(errorDetailsSet(null))} intent="danger"></Toast2>}
             <MediaQuery maxDeviceWidth={500}>
