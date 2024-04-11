@@ -212,7 +212,7 @@ app.get('/rusa_perm_id', (req, res) => {
 })
 
 const getAQI = (result, point) => {
-    Sentry.startSpan({name: "aqi"}, async () => {
+    return Sentry.startSpan({name: "aqi"}, async () => {
         // eslint-disable-next-line no-await-in-loop
         // result.aqi = await getPurpleAirAQI(point.lat, point.lon);
         let results = await Promise.all([
@@ -220,6 +220,7 @@ const getAQI = (result, point) => {
             getPurpleAirAQI(point.lat, point.lon)
         ])
         result.aqi = results[0] ? results[0] : results[1];
+        return result
     })
 }
 
