@@ -267,6 +267,8 @@ const dialogParamsSlice = createSlice({
         errorDetailsSet(state, action) {
             if (action.payload instanceof Error) {
                 state.errorDetails = action.payload.toString()
+            } else if (!action.payload) {
+                state.errorDetails = action.payload
             } else if (action.payload.data) {
                 state.errorDetails = action.payload.data.details
             } else {
