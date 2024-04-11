@@ -267,8 +267,10 @@ const dialogParamsSlice = createSlice({
         errorDetailsSet(state, action) {
             if (action.payload instanceof Error) {
                 state.errorDetails = action.payload.toString()
+            } else if (action.payload.data) {
+                state.errorDetails = action.payload.data.details
             } else {
-                state.errorDetails = action.payload
+                state.errorDetails = JSON.stringify(action.payload)
             }
         },
         shortUrlSet(state, action) {
