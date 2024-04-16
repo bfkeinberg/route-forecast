@@ -11,7 +11,6 @@ import { routeLoadingModes } from "../data/enums";
 import { useDelay, useForecastDependentValues,usePrevious, useValueHasChanged, useWhenChanged } from "../utils/hooks";
 import { ForecastSettings } from "./ForecastSettings/ForecastSettings";
 import { InstallExtensionButton } from "./InstallExtensionButton";
-// import ForecastTable from "./resultsTables/ForecastTable";
 import MapLoader from "./Map/MapLoader";
 import PaceTable from "./resultsTables/PaceTable";
 import RouteInfoForm from "./RouteInfoForm/RouteInfoForm";
