@@ -8,7 +8,7 @@ import {setInterval} from "../../redux/actions";
 
 const ForecastInterval = ({min_interval,interval,setInterval}) => {
     return (
-        <FormGroup style={{flex: 1}} label='Forecast Interval'>
+        <FormGroup style={{flex: 1}} label='Forecast Interval in minutes'>
             <Tooltip placement='bottom' title='How often to generate weather forecast in minutes'>
                 <Slider
                     value={interval}
