@@ -127,14 +127,19 @@ export class RouteWeatherUI extends Component {
                      addBreadcrumb({
                         category: 'history',
                         level: "info",
-                        data: JSON.stringify(event.state),
-                        message: document.location
+                        message: JSON.stringify(event.state),
+                        data: document.location
                     });
                 })
 
                 if (event.state == null) {
                     // clear the state when back button takes us past any saved routes
                     this.props.reset();
+                    Sentry.addBreadcrumb({
+                        category: 'reset',
+                        level: 'info',
+                        message:'Moving back and resetting state'
+                    })
                 } else {
                     // reload previous or next route when moving throw browser history with forward or back buttons
                     let queryParams = queryString.parse(event.state);
