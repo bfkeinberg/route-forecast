@@ -229,6 +229,7 @@ const getMessageFromError = (error) => {
     if (typeof error === 'object') {
         if (error.message) return error.message
         if (error.data) return error.data.details
+        if (error.error) return error.error
         return error
     } else return error
 }
