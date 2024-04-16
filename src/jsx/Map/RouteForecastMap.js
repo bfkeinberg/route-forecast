@@ -106,7 +106,6 @@ const RouteForecastMap = () => {
 
     const mapCenter = useMemo( () => mapBounds.getCenter(), [mapBounds]);
     const initialCenter = useMemo( () => ((mapCenter === null || mapCenter === undefined) ? undefined : mapCenter.toJSON()), [mapCenter])
-    console.log(mapBounds,initialCenter,map?map.getCenter().toJSON():"")
 
     let infoPosition = initialCenter
     let infoVisible = false;
