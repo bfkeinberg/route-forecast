@@ -37,8 +37,9 @@ const RideWithGpsId = ({rwgpsRouteSet,loadingSource,loadingSuccess,rwgpsRoute,ro
     }
 
     return (
-        <FormGroup inline={false} style={{fontSize:"90%"}} label={<span><b>Ride with GPS Route ID</b></span>} labelFor={'rwgps_route'} >
-            <InputGroup id={'rwgps_route'} className={'glowing_input'}
+        // set size to keep Mobile Safari from zooming
+        <FormGroup inline={false} label={<span><b>Ride with GPS Route ID</b></span>} labelFor={'rwgps_route'} >
+            <InputGroup id={'rwgps_route'} style={{fontSize:"16px"}} className={'glowing_input'} autoComplete='routeId'
                    autoFocus tabIndex='0' type="text" rightElement={<Button minimal icon="delete" onClick={clearRoute}></Button>}
                    {...decideValidationStateFor('rwgps',loadingSource,loadingSuccess)}
                  onKeyDown={isNumberKey}
