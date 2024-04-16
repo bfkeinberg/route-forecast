@@ -1,3 +1,4 @@
+import * as Sentry from "@sentry/react"
 import { DateTime } from 'luxon';
 import { useEffect, useMemo,useRef, useState } from "react"
 import { useSelector } from "react-redux"
@@ -165,15 +166,16 @@ const usePointsAndBounds = () => {
   } else if (gpxRouteData !== null) {
     // pointsAndBounds = useMemo(() => gpxParser.computePointsAndBounds(gpxRouteData, "gpx"), [gpxRouteData])
     pointsAndBounds = gpxParser.computePointsAndBounds(gpxRouteData, "gpx")
-  } else {
-    // just in case we fall through
-    return {points:[], bounds:{}}
   }
   if (pointsAndBounds && pointsAndBounds.pointList && pointsAndBounds.pointList.length > 0) {
     pointsAndBounds.points = useMemo(() => pointsAndBounds.pointList
       .map(point => ({ lat: point.lat, lng: point.lon, dist: point.dist })), [pointsAndBounds.pointList])
   }
 
+  if (!pointsAndBounds) {
+    Sentry.captureMessage("No points or bounds", "error")
+    pointsAndBounds = {pointList:[], points:[], bounds:{}}
+  }
   return pointsAndBounds
 }
 

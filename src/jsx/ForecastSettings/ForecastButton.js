@@ -106,6 +106,7 @@ const ForecastButton = ({fetchingForecast,submitDisabled, routeNumber, startTime
         const url = generateUrl(startTimestamp, routeNumber, pace, interval, metric, controls,
             strava_activity, strava_route, provider, showProvider, origin, true, dispatch, zone, rusaRouteId)
         querySet({queryString:url.url,searchString:url.search})
+        Sentry.setContext("query", {queryString:url.search})
         updateHistory(url.url, true);
         // don't shorten localhost with bitly
         if (origin !== 'http://localhost:8080' && (url.url !== href || !urlIsShortened)) {

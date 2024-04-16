@@ -4,6 +4,9 @@ import "@blueprintjs/icons/lib/css/blueprint-icons.css";
 import "@blueprintjs/select/lib/css/blueprint-select.css";
 import 'Images/style.css';
 
+// import DesktopUI from '../DesktopUI';
+// import MobileUI from '../MobileUI';
+import * as Sentry from "@sentry/react";
 import lazyRetry from "@tdotcode/react-lazy-retry";
 import {Info} from "luxon";
 import PropTypes from 'prop-types';
@@ -13,9 +16,6 @@ import cookie from 'react-cookies';
 import { connect, useDispatch, useSelector } from 'react-redux';
 import  {useMediaQuery} from 'react-responsive';
 
-// import DesktopUI from '../DesktopUI';
-// import MobileUI from '../MobileUI';
-// import * as Sentry from "@sentry/react";
 import {
     actionUrlAdded, apiKeysSet, displayControlTableUiSet, fetchAqiSet, metricSet, providerValues, queryCleared, querySet,
      reset, routeLoadingModeSet, rusaPermRouteIdSet,
@@ -104,6 +104,7 @@ export class RouteWeatherUI extends Component {
 
         let queryParams = queryString.parse(props.search);
         props.querySet({url:props.href,search:props.search})
+        Sentry.setContext("query", {queryString:props.search})
         RouteWeatherUI.updateFromQueryParams(this.props, queryParams);
         props.actionUrlAdded(props.action);
         props.apiKeysSet({maps_api_key:props.maps_api_key,timezone_api_key:props.timezone_api_key, bitly_token:props.bitly_token})
