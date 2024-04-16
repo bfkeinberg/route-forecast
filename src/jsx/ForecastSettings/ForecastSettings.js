@@ -7,7 +7,6 @@ import { displayControlTableUiSet, errorDetailsSet,metricToggled } from '../../r
 import LocationContext from '../locationContext';
 import { AlwaysFilledSwitch } from '../RouteInfoForm/AlwaysFilledSwitch'
 import { RouteTitle } from '../shared/RouteTitle';
-import { ToggleButton } from "../shared/ToggleButton";
 import { ToggleButtonOpaque } from "../shared/ToggleButtonOpaque";
 import { ControlTableContainer } from './ControlTableContainer';
 import ForecastButton from "./ForecastButton";
@@ -36,7 +35,7 @@ export const ForecastSettings = () => {
                         <div style={{ width: "fit-content", borderBottom: !metric ? "1px solid #106ba3" : "1px solid #0000" }}>Imperial</div>
                         <div style={{ fontSize: "10px", color: "grey", opacity: !metric ? 1 : 0, transition: "opacity 0.3s", marginTop: "3px", textAlign: "end" }}>Units are miles etc</div>
                     </div>
-                    <AlwaysFilledSwitch checked={metric} onClick={() => dispatch(metricToggled())}></AlwaysFilledSwitch>
+                    <AlwaysFilledSwitch checked={metric} onChange={() => dispatch(metricToggled())}></AlwaysFilledSwitch>
                     <div style={{ flex: 1, cursor: "pointer", display: "flex", flexFlow: "column" }} onClick={() => dispatch(metricToggled())}>
                         <div style={{ width: "fit-content", borderBottom: metric ? "1px solid rgb(234, 89, 41)" : "1px solid #0000" }}>Metric</div>
                         <div style={{ fontSize: "10px", color: "grey", opacity: metric ? 1 : 0, transition: "opacity 0.3s", marginTop: "3px" }}>Units in metric</div>
