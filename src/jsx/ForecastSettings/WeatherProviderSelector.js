@@ -27,7 +27,7 @@ const renderProvider = (provider, { handleClick, handleFocus, modifiers }) => {
 
 const WeatherProviderSelector = ({weatherProvider,setWeatherProvider,forecastLength}) => {
     return (
-        <FormGroup>
+        <FormGroup label={<span><b>Weather forecast source</b></span>} labelFor={'provider'}>
             <DesktopTooltip content={"The weather provider to use for forecasts"} placement={"bottom"}>
                 <Select tabIndex="0"
                     id='provider'
