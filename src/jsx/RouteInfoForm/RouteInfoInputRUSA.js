@@ -47,7 +47,7 @@ export const RouteInfoInputRUSA = () => {
         <>
             <div style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
             <FormGroup inline={false} style={{fontSize:"90%"}} label={<span><b>RUSA permanent route ID</b></span>} labelFor={'rusa_perm_route'} >
-                <InputGroup id={'rusa_perm_route'} className={'glowing_input'}
+                <InputGroup id={'rusa_perm_route'} style={{fontSize:"16px"}} className={'glowing_input'}
                     autoFocus tabIndex='0' type="number" rightElement={<Button minimal icon="delete" onClick={clearRoute}></Button>}
                     onValueChange={settingRoute}
                     onKeyDown={isReturnKey}
@@ -67,7 +67,7 @@ const RUSALoadRouteButton = ({loadButtonRef, lookupFunc}) => {
   const hasRusaPermId = useSelector(state => state.uiInfo.routeParams.rusaPermRouteId !== '')
   return (
     <Button ref={loadButtonRef} disabled={loading || (!hasRusaPermId)}
-        style={{ backgroundColor: "#137cbd", borderColor: "#137cbd", marginTop: "10px", width: "100%" }}
+        style={{ /* backgroundColor: "#137cbd",  */borderColor: "#137cbd", marginTop: "10px", width: "100%" }}
         onClick={lookupFunc}>
       {loading ? "Loading..." : "Load Route"}
       {loading && <Spinner />}
