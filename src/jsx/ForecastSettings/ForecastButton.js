@@ -25,6 +25,7 @@ const ForecastButton = ({fetchingForecast,submitDisabled, routeNumber, startTime
         const userControlPoints = useSelector(state => state.controls.userControlPoints)
         const distanceInKm = useSelector(state => state.routeInfo.distanceInKm)
         const fetchAqi = useSelector(state => state.forecast.fetchAqi)
+        const rusaRouteId = useSelector(state => state.uiInfo.routeParams.rusaPermRouteId)
 
     const forecastByParts = (forecastRequest, zone, service, routeName, routeNumber) => {
         let requestCopy = Object.assign(forecastRequest)
@@ -103,7 +104,7 @@ const ForecastButton = ({fetchingForecast,submitDisabled, routeNumber, startTime
             }
         })
         const url = generateUrl(startTimestamp, routeNumber, pace, interval, metric, controls,
-            strava_activity, strava_route, provider, showProvider, origin, true, dispatch, zone)
+            strava_activity, strava_route, provider, showProvider, origin, true, dispatch, zone, rusaRouteId)
         querySet({queryString:url.url,searchString:url.search})
         updateHistory(url.url, true);
         // don't shorten localhost with bitly

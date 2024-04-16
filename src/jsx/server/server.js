@@ -171,7 +171,7 @@ app.use((req, res, next) => {
 app.get('/rwgps_route', (req, res) => {
     const routeNumber = req.query.route;
     if (routeNumber === undefined) {
-        res.status(400).json("{'status': 'Missing route number'}");
+        res.status(400).json({'status': 'Missing route number'})
         return;
     }
     console.log(`request for route ${routeNumber}`);
@@ -194,27 +194,34 @@ app.get('/rwgps_route', (req, res) => {
         .catch(err => {const status = isNaN(Number.parseInt(err.message,10))?500:Number.parseInt(err.message,10);res.status(status).json({ 'status': JSON.stringify(err) })});
 });
 
-const getTransaction = () => {
-    let transaction = Sentry.getCurrentHub().getScope().
-        getTransaction();
-    if (!transaction) {
-        transaction = Sentry.startTransaction({ name: "purpleair" });
+app.get('/rusa_perm_id', (req, res) => {
+    const permId = req.query.permId
+    if (!permId) {
+        res.status(400).json({details:"Missing RUSA perm ID"})
     }
-    return transaction;
-}
+    const rusaPermLookupApiKey = process.env.RUSA_PERM_ID_KEY
+    if (!rusaPermLookupApiKey) {
+        res.status(500).json({ 'details': 'Missing RUSA perm lookup API key' });
+        return;
+    }
+    const rusaLookupUrl = `https://rusa.org/cgi-bin/permsearch_PF.pl?permid=${permId}&output_format=json&apikey=${rusaPermLookupApiKey}`
+    fetch(rusaLookupUrl).then(fetchResult =>
+        {if (!fetchResult.ok) {throw Error(fetchResult.status)} return fetchResult.json()})
+        .then(body => {res.status(200).send(body)})
+        .catch(err => {res.status(500).json({'status':JSON.stringify(err)})})
+})
 
-const getAQI = async (result, point) => {
-    const transaction = getTransaction();
-    const span = transaction.startChild({ op: "aqi" });
-    // eslint-disable-next-line no-await-in-loop
-    // result.aqi = await getPurpleAirAQI(point.lat, point.lon);
-    let results = await Promise.all([
-        getAirNowAQI(point.lat, point.lon),
-        getPurpleAirAQI(point.lat, point.lon)
-    ]);
-    result.aqi = results[0] ? results[0] : results[1];
-    span.finish();
-    transaction.finish();
+const getAQI = (result, point) => {
+    return Sentry.startSpan({name: "aqi"}, async () => {
+        // eslint-disable-next-line no-await-in-loop
+        // result.aqi = await getPurpleAirAQI(point.lat, point.lon);
+        let results = await Promise.all([
+            getAirNowAQI(point.lat, point.lon),
+            getPurpleAirAQI(point.lat, point.lon)
+        ])
+        result.aqi = results[0] ? results[0] : results[1];
+        return result
+    })
 }
 
 app.post('/forecast_one', upload.none(), async (req, res) => {

@@ -1,12 +1,13 @@
-import React, {Suspense, useEffect} from 'react';
-import PropTypes from 'prop-types';
-import {connect} from 'react-redux';
-import axios from 'axios';
-import {lazy} from '@loadable/component';
-import queryString from 'query-string';
 import { Button, Spinner } from '@blueprintjs/core';
+import {lazy} from '@loadable/component';
+import axios from 'axios';
+import PropTypes from 'prop-types';
+import queryString from 'query-string';
+import React, {Suspense, useEffect} from 'react';
 import ReactGA from "react-ga4";
-import { rwgpsTokenSet, pinnedRoutesSet, loadingPinnedSet, usePinnedRoutesSet, errorDetailsSet } from '../../redux/reducer';
+import {connect} from 'react-redux';
+
+import { errorDetailsSet,loadingPinnedSet, pinnedRoutesSet, rwgpsTokenSet, usePinnedRoutesSet } from '../../redux/reducer';
 
 const LoadableRouteList = lazy(() => import(/* webpackChunkName: "RouteList" */ './RWGPSRouteList'));
 

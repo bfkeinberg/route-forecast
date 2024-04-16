@@ -20,9 +20,9 @@ const shrinkControls = (controls, dispatch) => {
 }
 
 const makeQuery = (routeNumber, pace, interval, metric, controls, strava_activity,
-    strava_route, provider, showProvider) => {
+    strava_route, provider, showProvider, rusa_route_id) => {
     const query = {
-        pace, interval, metric, rwgpsRoute: routeNumber, strava_activity, strava_route, provider, showProvider
+        pace, interval, metric, rwgpsRoute: routeNumber, strava_activity, strava_route, provider, showProvider, rusa_route_id
     }
     const formattedControls = formatControlsForUrl(controls, true)
     if (formattedControls !== "") {
@@ -38,9 +38,10 @@ const dateToShortDate = function (date) {
 };
 
 const buildUrl = (routeNumber, pace, interval, metric, controls, strava_activity,
-    strava_route, provider, showProvider, shortDate, start, origin, setPageUrl, zone) => {
+    strava_route, provider, showProvider, shortDate, start, origin, setPageUrl, zone,
+    rusa_route_id) => {
     let query = makeQuery(routeNumber, pace, interval, metric, controls, strava_activity,
-        strava_route, provider, showProvider);
+        strava_route, provider, showProvider, rusa_route_id);
     if (shortDate !== 'Invalid DateTime') {
         query.startTimestamp = shortDate;
         query.zone = zone ? zone : start.zoneName;
@@ -54,13 +55,15 @@ const buildUrl = (routeNumber, pace, interval, metric, controls, strava_activity
 }
 
 export const generateUrl = (startTimestamp, routeNumber, pace, interval, metric, controls, strava_activity,
-    strava_route, provider, showProvider, origin, setPageUrl, dispatch, zone) => {
+    strava_route, provider, showProvider, origin, setPageUrl, dispatch, zone, rusaRouteId) => {
     const start = DateTime.fromMillis(startTimestamp, {zone:zone})
     const shortDate = dateToShortDate(start);
-    let url = buildUrl(routeNumber, pace, interval, metric, controls, strava_activity, strava_route, provider, showProvider, shortDate, start, origin, setPageUrl, zone)
+    let url = buildUrl(routeNumber, pace, interval, metric, controls, strava_activity, strava_route,
+         provider, showProvider, shortDate, start, origin, setPageUrl, zone, rusaRouteId)
     if (url.url.length >= maxUrlLength) {
         const truncatedControls = shrinkControls(controls, dispatch);
-        url = buildUrl(routeNumber, pace, interval, metric, truncatedControls, strava_activity, provider, showProvider, shortDate, start, origin, setPageUrl, zone)
+        url = buildUrl(routeNumber, pace, interval, metric, truncatedControls, strava_activity, provider,
+             showProvider, shortDate, start, origin, setPageUrl, zone, rusaRouteId)
     }
     return url;
 }

@@ -17,7 +17,9 @@ import  {useMediaQuery} from 'react-responsive';
 // import MobileUI from '../MobileUI';
 // import * as Sentry from "@sentry/react";
 import {
-    actionUrlAdded, apiKeysSet, displayControlTableUiSet, fetchAqiSet, metricSet, providerValues, queryCleared, querySet, reset, routeLoadingModeSet, rwgpsRouteSet, rwgpsTokenSet, showWeatherProviderSet,
+    actionUrlAdded, apiKeysSet, displayControlTableUiSet, fetchAqiSet, metricSet, providerValues, queryCleared, querySet,
+     reset, routeLoadingModeSet, rusaPermRouteIdSet,
+    rwgpsRouteSet, rwgpsTokenSet, showWeatherProviderSet,
     startTimestampSet,
     stopAfterLoadSet, stravaActivitySet, stravaErrorSet, stravaRefreshTokenSet,
     stravaRouteSet, stravaTokenSet, usePinnedRoutesSet, zoomToRangeSet
@@ -93,7 +95,8 @@ export class RouteWeatherUI extends Component {
         apiKeysSet:PropTypes.func.isRequired,
         querySet:PropTypes.func.isRequired,
         loadRouteFromURL:PropTypes.func.isRequired,
-        stravaRouteSet:PropTypes.func.isRequired
+        stravaRouteSet:PropTypes.func.isRequired,
+        rusaPermRouteIdSet:PropTypes.func.isRequired
     };
 
     constructor(props) {
@@ -103,7 +106,7 @@ export class RouteWeatherUI extends Component {
         props.querySet({url:props.href,search:props.search})
         RouteWeatherUI.updateFromQueryParams(this.props, queryParams);
         props.actionUrlAdded(props.action);
-        props.apiKeysSet({maps_api_key:props.maps_api_key,timezone_api_key:props.timezone_api_key, bitly_token:props.bitly_token});
+        props.apiKeysSet({maps_api_key:props.maps_api_key,timezone_api_key:props.timezone_api_key, bitly_token:props.bitly_token})
         RouteWeatherUI.setupRideWithGps(props);
         props.updateControls(queryParams.controlPoints==undefined?[]:parseControls(queryParams.controlPoints,true));
         const zoomToRange = loadCookie('zoomToRange');
@@ -240,6 +243,9 @@ export class RouteWeatherUI extends Component {
         if (queryParams.strava_analysis !== undefined) {
             props.routeLoadingModeSet(routeLoadingModes.STRAVA);
         }
+        if (queryParams.rusa_route_id) {
+            props.rusaPermRouteIdSet(queryParams.rusa_route_id)
+        }
         // make show weather provider "sticky"
         if (queryParams.showProvider !== undefined) {
             props.showWeatherProviderSet(queryParams.showProvider==="true");
@@ -272,7 +278,7 @@ const mapDispatchToProps = {
     stravaActivitySet, updateControls:updateUserControls, routeLoadingModeSet, stravaRefreshTokenSet,
     loadFromRideWithGps, reset, setWeatherProvider, showWeatherProviderSet, rwgpsTokenSet, startTimestampSet,
     zoomToRangeSet, usePinnedRoutesSet, stopAfterLoadSet, fetchAqiSet, stravaRouteSet,
-    actionUrlAdded, apiKeysSet, querySet, queryCleared, loadRouteFromURL
+    actionUrlAdded, apiKeysSet, querySet, queryCleared, loadRouteFromURL, rusaPermRouteIdSet
 };
 
 const mapStateToProps = (state) =>

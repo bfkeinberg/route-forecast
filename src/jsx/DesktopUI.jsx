@@ -67,7 +67,9 @@ const DesktopUI = ({mapsApiKey}) => {
     }
 
     const routeLoadingMode = useSelector(state => state.uiInfo.routeParams.routeLoadingMode)
-    const mapDataExists = (routeLoadingMode === routeLoadingModes.RWGPS) ? (forecastData.length > 0) : stravaActivityData !== null
+    const mapDataExists = (routeLoadingMode === routeLoadingModes.RWGPS || routeLoadingMode === routeLoadingModes.RUSA_PERM) ?
+     (forecastData.length > 0) :
+    stravaActivityData !== null
 
     return (
         <div>
