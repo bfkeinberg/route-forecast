@@ -18,40 +18,8 @@
     background-color: rgba(167, 207, 255, 0.4);
 }
 
-.ridewithgps_init {
-    box-shadow: 0 0 3px #CC0000;
-}
-
-.rwgpsLogin {
-    background: url(https://ridewithgps.com/images/logo_trans_black.png?1) no-repeat;
-    height: 40px;
-    width: 179px;
-}
-
 form.form-inline {
     margin-bottom: 0;
-}
-
-label.control-label {
-    padding-left: 8px;
-    padding-top: inherit;
-    padding-right: 8px;
-    display: inline-flex;
-    align-self: center;
-}
-
-.dlgTitle {
-    background-color: rgba(245, 245, 245, 0.91);
-}
-
-.cpListTitle {
-    color: rgba(64, 111, 140, 0.87);
-    background-color: rgba(221, 237, 246, 0.85);
-}
-
-.rideRatingPopup {
-    border-style: ridge;
-    border-width: medium;
 }
 
 img#stravaImage {
@@ -62,12 +30,6 @@ img#stravaImage {
 img#bugImage {
     width: 2rem;
     height: 2rem;
-}
-
-.stravaDialogTitle {
-    text-align: center;
-    background-color: rgba(234, 89, 41, 0.91);
-    color: rgb(255, 255, 255);
 }
 
 .timeHeaderCell {
