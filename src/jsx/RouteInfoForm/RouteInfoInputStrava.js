@@ -1,5 +1,5 @@
 
-import { Button, Spinner } from '@blueprintjs/core';
+import { Button } from '@blueprintjs/core';
 import stravaImage from 'Images/api_logo_pwrdBy_strava_stack_light.png';
 import React from 'react';
 import ReactGA from "react-ga4";

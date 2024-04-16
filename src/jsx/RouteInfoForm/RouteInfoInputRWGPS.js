@@ -47,7 +47,7 @@ const RWGPSLoadRouteButton = ({loadButtonRef}) => {
   const hasStravaRouteId = useSelector(state => state.strava.route!=='')
   const dispatch = useDispatch()
   return (
-    <Button ref={loadButtonRef} intent={Intent.PRIMARY} disabled={loading || (!hasRwgpsRouteId && !hasStravaRouteId)} 
+    <Button ref={loadButtonRef} intent={Intent.PRIMARY} disabled={loading || (!hasRwgpsRouteId && !hasStravaRouteId)}
       fill loading={loading} onClick={() => dispatch(loadFromRideWithGps())}>
       Load Route
     </Button>
