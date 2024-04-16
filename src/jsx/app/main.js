@@ -4,8 +4,6 @@ import "@blueprintjs/icons/lib/css/blueprint-icons.css";
 import "@blueprintjs/select/lib/css/blueprint-select.css";
 import 'Images/style.css';
 
-// import DesktopUI from '../DesktopUI';
-// import MobileUI from '../MobileUI';
 import * as Sentry from "@sentry/react";
 import lazyRetry from "@tdotcode/react-lazy-retry";
 import {Info} from "luxon";
