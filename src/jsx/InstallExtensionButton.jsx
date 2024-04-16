@@ -1,7 +1,8 @@
-import { Button, ButtonGroup, AnchorButton } from "@blueprintjs/core";
-import React, {useState, useEffect} from "react";
-import { extensionIsInstalled, browserIsChrome, browserIsFirefox, browserIsSafari } from "../utils/extensionDetect";
+import { AnchorButton,Button, ButtonGroup } from "@blueprintjs/core";
+import React, {useEffect,useState} from "react";
 import cookie from 'react-cookies';
+
+import { browserIsChrome, browserIsFirefox, browserIsSafari,extensionIsInstalled } from "../utils/extensionDetect";
 
 export const InstallExtensionButton = () => {
     if (cookie.load('muteExtensionInstallPrompt')) {

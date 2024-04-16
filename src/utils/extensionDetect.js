@@ -51,19 +51,20 @@ export const extensionIsInstalled = () => {
         }
     } else if (browserIsSafari())
     {
-        try {
-        // eslint-disable-next-line no-undef
-        browser.runtime.sendMessage("com.randoplan.extension.Extension (2B6A6N9QBQ)", {message: "version"}, function(response) {
-            console.log("Response from extension detection", response)
-            if (response && response.version) {
-                return Promise.resolve(response.version >= requiredVersion)
-            } else
-            return Promise.resolve(false);
-        })
-        } catch (error) {
-            console.error(error)
-            return Promise.resolve(false)
-        }
+        return new Promise(( resolve => {
+            try {
+                // eslint-disable-next-line no-undef
+                browser.runtime.sendMessage("com.randoplan.extension.Extension (2B6A6N9QBQ)", {message: "version"}, function(response) {
+                    if (response && response.version) {
+                        return resolve(response.version >= requiredVersion)
+                    } else {
+                        return resolve(false);
+                    }
+                })
+                } catch (error) {
+                    console.error(error)
+                    return resolve(false)
+                }
+        }))
     }
-    return Promise.resolve(false);
 }
