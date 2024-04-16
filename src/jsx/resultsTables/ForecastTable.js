@@ -39,8 +39,9 @@ const displayBacklink = (provider) => {
 }
 
 const getAdjustedTime = (point, index, adjustedTimes) => {
-    if (adjustedTimes && adjustedTimes.length > 0 && adjustedTimes.findIndex(element => element.index===index) !== -1) {
-        return adjustedTimes.find(element => element.index === index).time.toFormat('h:mm a')
+    if (adjustedTimes && adjustedTimes.adjustedTimes && adjustedTimes.adjustedTimes.length > 0 &&
+        adjustedTimes.adjustedTimes.findIndex(element => element.index === index) !== -1) {
+        return adjustedTimes.adjustedTimes.find(element => element.index === index).time.toFormat('h:mm a')
     } else {
         return point.time
     }
