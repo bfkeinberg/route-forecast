@@ -230,7 +230,7 @@ const getMessageFromError = (error) => {
         if (error.message) return error.message
         if (error.data) return error.data.details
         if (error.error) return error.error
-        return error
+        return error.toString()
     } else return error
 }
 
