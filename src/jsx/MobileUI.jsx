@@ -3,9 +3,10 @@ import {Cloud, Cycle,Globe, Route as RouteIcon, Shop } from "@blueprintjs/icons"
 import { useJsApiLoader } from '@react-google-maps/api';
 import PropTypes from "prop-types";
 import React from "react";
-import {connect, useSelector} from 'react-redux';
+import {connect, useDispatch,useSelector} from 'react-redux';
 import { Link, MemoryRouter, Route, Routes, useNavigate } from "react-router-dom";
 
+import { errorDetailsSet } from "../redux/reducer";
 import { useForecastDependentValues,useWhenChanged } from "../utils/hooks";
 import { ForecastSettings } from "./ForecastSettings/ForecastSettings";
 import MapLoader from "./Map/MapLoader";
@@ -37,58 +38,62 @@ const mapStateToProps = (state) =>
 export default connect(mapStateToProps)(MobileUI);
 
 const MobileUITabs = (props) => {
-    const { isLoaded:googleMapsIsLoaded } = useJsApiLoader({
-        googleMapsApiKey: props.mapsApiKey
-      })
-
-    const navigate = useNavigate()
-    const type = useSelector(state => state.routeInfo.type)
-    const routeData = useSelector(state => state.routeInfo[type === "rwgps" ? "rwgpsRouteData" : "gpxRouteData"])
-    const stravaActivityData = useSelector(state => state.strava.activityData)
-    const forecastData = useSelector(state => state.forecast.forecast)
-    useWhenChanged(routeData, () => navigate("/controlPoints", {replace:true}))
-    useWhenChanged(forecastData, () => navigate("/forecastTable", {replace:true}), forecastData.length > 0)
-    useWhenChanged(stravaActivityData, () => navigate("/paceTable", {replace:true}))
-    const {adjustedTimes} = useForecastDependentValues()
-    return (
-        <>
-            <Navbar>
-                <NavbarGroup align={Alignment.CENTER}>
-                    <NavbarHeading>Randoplan</NavbarHeading>
-                    <ErrorBoundary>
-                        <Link to={"/"} className={'nav-link'}>
-                            <Button minimal icon={<RouteIcon/>} title={"home"} intent={Intent.PRIMARY}></Button>
+    const dispatch = useDispatch()
+    try {
+        const { isLoaded: googleMapsIsLoaded } = useJsApiLoader({
+            googleMapsApiKey: props.mapsApiKey
+        })
+        const navigate = useNavigate()
+        const type = useSelector(state => state.routeInfo.type)
+        const routeData = useSelector(state => state.routeInfo[type === "rwgps" ? "rwgpsRouteData" : "gpxRouteData"])
+        const stravaActivityData = useSelector(state => state.strava.activityData)
+        const forecastData = useSelector(state => state.forecast.forecast)
+        useWhenChanged(routeData, () => navigate("/controlPoints", { replace: true }))
+        useWhenChanged(forecastData, () => navigate("/forecastTable", { replace: true }), forecastData.length > 0)
+        useWhenChanged(stravaActivityData, () => navigate("/paceTable", { replace: true }))
+        const { adjustedTimes } = useForecastDependentValues()
+        return (
+            <>
+                <Navbar>
+                    <NavbarGroup align={Alignment.CENTER}>
+                        <NavbarHeading>Randoplan</NavbarHeading>
+                        <ErrorBoundary>
+                            <Link to={"/"} className={'nav-link'}>
+                                <Button minimal icon={<RouteIcon />} title={"home"} intent={Intent.PRIMARY}></Button>
+                            </Link>
+                        </ErrorBoundary>
+                        <NavbarDivider />
+                        <ErrorBoundary>
+                            <Link to={"/controlPoints/"} className={'nav-link'}>
+                                <Shop icon={Shop} size={IconSize.STANDARD} title={"controls"} htmlTitle={"controls"} intent={Intent.NONE} />
+                            </Link>
+                        </ErrorBoundary>
+                        <NavbarDivider />
+                        <Link to={"/map/"} className={'nav-link'}>
+                            <Globe size={IconSize.STANDARD} title={"map"} htmlTitle={"map"} intent={props.needToViewMap ? Intent.DANGER : Intent.NONE} />
                         </Link>
-                    </ErrorBoundary>
-                    <NavbarDivider/>
-                    <ErrorBoundary>
-                        <Link to={"/controlPoints/"} className={'nav-link'}>
-                            <Shop icon={Shop } size={IconSize.STANDARD} title={"controls"} htmlTitle={"controls"} intent={Intent.NONE} />
+                        <NavbarDivider />
+                        <Link to={"/forecastTable/"} className={'nav-link'}>
+                            <Cloud size={IconSize.STANDARD} title={"forecast"} htmlTitle={"forecast"} intent={props.needToViewTable ? Intent.DANGER : Intent.NONE} />
                         </Link>
-                    </ErrorBoundary>
-                    <NavbarDivider/>
-                    <Link to={"/map/"} className={'nav-link'}>
-                        <Globe size={IconSize.STANDARD} title={"map"} htmlTitle={"map"} intent={props.needToViewMap ? Intent.DANGER : Intent.NONE}/>
-                    </Link>
-                    <NavbarDivider/>
-                    <Link to={"/forecastTable/"} className={'nav-link'}>
-                        <Cloud size={IconSize.STANDARD} title={"forecast"} htmlTitle={"forecast"} intent={props.needToViewTable ? Intent.DANGER : Intent.NONE}/>
-                    </Link>
-                    <NavbarDivider/>
-                    <Link to={"/paceTable/"} className={'nav-link'}>
-                        <Cycle color="orange" title={"strava"} htmlTitle={"Strava"} size={IconSize.STANDARD} intent={props.needToViewTable ? Intent.DANGER : Intent.NONE} />
-                    </Link>
-                </NavbarGroup>
-            </Navbar>
-            <Routes>
-                <Route path="/" element={<RouteInfoForm />} />
-                <Route path="/controlPoints/" element={<ForecastSettings />} />
-                <Route path="/map/" element={googleMapsIsLoaded ? <MapLoader maps_api_key={props.mapsApiKey}/> : <span>Maps not loaded</span>} />
-                <Route path="/forecastTable/" element={<ForecastTable adjustedTimes={adjustedTimes}/>} />
-                <Route path="/paceTable/" element={<PaceTable />} />
-            </Routes>
-        </>
-    )
+                        <NavbarDivider />
+                        <Link to={"/paceTable/"} className={'nav-link'}>
+                            <Cycle color="orange" title={"strava"} htmlTitle={"Strava"} size={IconSize.STANDARD} intent={props.needToViewTable ? Intent.DANGER : Intent.NONE} />
+                        </Link>
+                    </NavbarGroup>
+                </Navbar>
+                <Routes>
+                    <Route path="/" element={<RouteInfoForm />} />
+                    <Route path="/controlPoints/" element={<ForecastSettings />} />
+                    <Route path="/map/" element={googleMapsIsLoaded ? <MapLoader maps_api_key={props.mapsApiKey} /> : <span>Maps not loaded</span>} />
+                    <Route path="/forecastTable/" element={<ForecastTable adjustedTimes={adjustedTimes} />} />
+                    <Route path="/paceTable/" element={<PaceTable />} />
+                </Routes>
+            </>
+        )
+    } catch (err) {
+        dispatch(errorDetailsSet(err))
+    }
 }
 
 MobileUITabs.propTypes = {
