@@ -1,5 +1,5 @@
 
-import { Button,FormGroup, InputGroup,Spinner } from '@blueprintjs/core';
+import { Button, Intent, FormGroup, InputGroup,Spinner } from '@blueprintjs/core';
 import React, { useRef } from 'react';
 import ReactGA from "react-ga4"
 import { useDispatch,useSelector } from 'react-redux';
@@ -63,14 +63,12 @@ export const RouteInfoInputRUSA = () => {
 
 // eslint-disable-next-line react/prop-types
 const RUSALoadRouteButton = ({loadButtonRef, lookupFunc}) => {
-  const loading = useSelector(state => state.uiInfo.dialogParams.fetchingRoute)
+  const isLoading = useSelector(state => state.uiInfo.dialogParams.fetchingRoute)
   const hasRusaPermId = useSelector(state => state.uiInfo.routeParams.rusaPermRouteId !== '')
   return (
-    <Button ref={loadButtonRef} disabled={loading || (!hasRusaPermId)}
-        style={{ /* backgroundColor: "#137cbd",  */borderColor: "#137cbd", marginTop: "10px", width: "100%" }}
-        onClick={lookupFunc}>
-      {loading ? "Loading..." : "Load Route"}
-      {loading && <Spinner />}
+    <Button ref={loadButtonRef} intent={Intent.PRIMARY} fill disabled={isLoading || (!hasRusaPermId)}
+        onClick={lookupFunc} loading={isLoading}>
+            Load Route
     </Button>
   )
 }

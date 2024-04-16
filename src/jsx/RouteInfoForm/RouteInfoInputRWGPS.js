@@ -1,5 +1,5 @@
 
-import { Button,Spinner } from '@blueprintjs/core';
+import { Button,Intent } from '@blueprintjs/core';
 import React, { useRef,useState } from 'react';
 import { useDispatch,useSelector } from 'react-redux';
 
@@ -47,9 +47,9 @@ const RWGPSLoadRouteButton = ({loadButtonRef}) => {
   const hasStravaRouteId = useSelector(state => state.strava.route!=='')
   const dispatch = useDispatch()
   return (
-    <Button ref={loadButtonRef} disabled={loading || (!hasRwgpsRouteId && !hasStravaRouteId)} style={{ /* backgroundColor: "#137cbd", */borderColor: "#137cbd",  marginTop: "10px", width: "100%" }} onClick={() => dispatch(loadFromRideWithGps())}>
-      {loading ? "Loading..." : "Load Route"}
-      {loading && <Spinner />}
+    <Button ref={loadButtonRef} intent={Intent.PRIMARY} disabled={loading || (!hasRwgpsRouteId && !hasStravaRouteId)} 
+      fill loading={loading} onClick={() => dispatch(loadFromRideWithGps())}>
+      Load Route
     </Button>
   )
 }

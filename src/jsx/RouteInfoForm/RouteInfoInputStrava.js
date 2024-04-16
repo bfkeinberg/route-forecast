@@ -34,21 +34,23 @@ export const RouteInfoInputStrava = () => {
             <StravaLoginButton/> :
             <div>
               <StravaActivityIdInput/>
-              <StravaRouteIdInput/>
               <Button
                 id='analyze'
                 tabIndex='0'
                 intent="primary"
                 onClick={fetchRoute}
                 disabled={fetchingFromStrava || !validActivityId}
-                style={{backgroundColor: "rgb(234, 89, 41)", borderColor: "rgb(234, 89, 41)", width: "100%", marginTop: "10px"}}
+                loading={fetchingFromStrava}
+                fill
+                style={{backgroundColor: "rgb(234, 89, 41)", borderColor: "rgb(234, 89, 41)", color:"white", marginTop: "10px"}}
               >
                 Analyze Ride
-                {fetchingFromStrava && <Spinner/>}
               </Button>
-              <Button disabled={fetchingFromStrava || strava_route_id === ''} style={{ backgroundColor: "#137cbd", borderColor: "#137cbd", marginTop: "10px", width: "100%" }} onClick={() => dispatch(loadStravaRoute(strava_route_id))}>
+              <StravaRouteIdInput/>
+              <Button disabled={fetchingFromStrava || strava_route_id === ''}
+              style={{ backgroundColor: "#137cbd", borderColor: "#137cbd", marginTop: "10px", color:"white"}} loading={fetchingFromStrava} fill
+              onClick={() => dispatch(loadStravaRoute(strava_route_id))}>
                 {fetchingFromStrava ? "Loading..." : "Load Route"}
-                {fetchingFromStrava && <Spinner />}
               </Button>
             </div>
           }
