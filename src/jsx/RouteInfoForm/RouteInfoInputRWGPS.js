@@ -47,7 +47,7 @@ const RWGPSLoadRouteButton = ({loadButtonRef}) => {
   const hasStravaRouteId = useSelector(state => state.strava.route!=='')
   const dispatch = useDispatch()
   return (
-    <Button ref={loadButtonRef} disabled={loading || (!hasRwgpsRouteId && !hasStravaRouteId)} style={{ backgroundColor: "#137cbd", borderColor: "#137cbd", marginTop: "10px", width: "100%" }} onClick={() => dispatch(loadFromRideWithGps())}>
+    <Button ref={loadButtonRef} disabled={loading || (!hasRwgpsRouteId && !hasStravaRouteId)} style={{ /* backgroundColor: "#137cbd", */borderColor: "#137cbd",  marginTop: "10px", width: "100%" }} onClick={() => dispatch(loadFromRideWithGps())}>
       {loading ? "Loading..." : "Load Route"}
       {loading && <Spinner />}
     </Button>
