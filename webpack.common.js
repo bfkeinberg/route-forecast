@@ -17,6 +17,7 @@ var webpack = require('webpack');
 
 module.exports = (env,argv) => {
     const mode = argv === undefined ? 'development' : argv.mode;
+    const devMode = process.env.NODE_ENV !== "production"
     return {
         mode:mode,
         cache: {
@@ -71,7 +72,7 @@ module.exports = (env,argv) => {
                 {
                     test: /\.scss$/,
                     use: [
-                        "style-loader", // creates style nodes from JS strings
+                        devMode ? "style-loader" : MiniCssExtractPlugin.loader, // creates style nodes from JS strings
                         "css-loader", // translates CSS into CommonJS
                         "sass-loader" // compiles Sass to CSS, using Node Sass by default
                     ]
