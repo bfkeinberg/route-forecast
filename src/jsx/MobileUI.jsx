@@ -4,7 +4,7 @@ import { useJsApiLoader } from '@react-google-maps/api';
 import PropTypes from "prop-types";
 import React from "react";
 import {connect, useDispatch,useSelector} from 'react-redux';
-import { Link, MemoryRouter, Route, Routes, useNavigate } from "react-router-dom";
+import { Link, MemoryRouter, Route, Routes, useLocation, useNavigate } from "react-router-dom";
 
 import { errorDetailsSet } from "../redux/reducer";
 import { useForecastDependentValues,useWhenChanged } from "../utils/hooks";
@@ -39,6 +39,8 @@ export default connect(mapStateToProps)(MobileUI);
 
 const MobileUITabs = (props) => {
     const dispatch = useDispatch()
+    const location = useLocation()
+    const { pathname } = location
     try {
         const { isLoaded: googleMapsIsLoaded } = useJsApiLoader({
             googleMapsApiKey: props.mapsApiKey
@@ -52,6 +54,7 @@ const MobileUITabs = (props) => {
         useWhenChanged(forecastData, () => navigate("/forecastTable", { replace: true }), forecastData.length > 0)
         useWhenChanged(stravaActivityData, () => navigate("/paceTable", { replace: true }))
         const { adjustedTimes } = useForecastDependentValues()
+        console.log(`pathname:${pathname} `)
         return (
             <>
                 <Navbar>
@@ -59,26 +62,26 @@ const MobileUITabs = (props) => {
                         <NavbarHeading>Randoplan</NavbarHeading>
                         <ErrorBoundary>
                             <Link to={"/"} className={'nav-link'}>
-                                <Button minimal icon={<RouteIcon />} title={"home"} intent={Intent.PRIMARY}></Button>
+                                <Button small icon={<RouteIcon />} title={"home"} intent={pathname==='/'?Intent.PRIMARY:Intent.NONE}></Button>
                             </Link>
                         </ErrorBoundary>
                         <NavbarDivider />
                         <ErrorBoundary>
                             <Link to={"/controlPoints/"} className={'nav-link'}>
-                                <Shop icon={Shop} size={IconSize.STANDARD} title={"controls"} htmlTitle={"controls"} intent={Intent.NONE} />
+                                <Button small icon={<Shop/>} size={IconSize.STANDARD} title={"controls"} intent={pathname.startsWith('/controlPoints')?Intent.PRIMARY:Intent.NONE} />
                             </Link>
                         </ErrorBoundary>
                         <NavbarDivider />
                         <Link to={"/map/"} className={'nav-link'}>
-                            <Globe size={IconSize.STANDARD} title={"map"} htmlTitle={"map"} intent={props.needToViewMap ? Intent.DANGER : Intent.NONE} />
+                        <Button small icon={<Globe/>} size={IconSize.STANDARD} title={"map"} intent={props.needToViewMap ? Intent.DANGER : (pathname.startsWith('/map')?Intent.PRIMARY:Intent.NONE)} />
                         </Link>
                         <NavbarDivider />
                         <Link to={"/forecastTable/"} className={'nav-link'}>
-                            <Cloud size={IconSize.STANDARD} title={"forecast"} htmlTitle={"forecast"} intent={props.needToViewTable ? Intent.DANGER : Intent.NONE} />
+                            <Button small icon={<Cloud/>} size={IconSize.STANDARD} title={"forecast"} intent={props.needToViewTable ? Intent.DANGER : (pathname.startsWith('/forecastTable')?Intent.PRIMARY:Intent.NONE)} />
                         </Link>
                         <NavbarDivider />
                         <Link to={"/paceTable/"} className={'nav-link'}>
-                            <Cycle color="orange" title={"strava"} htmlTitle={"Strava"} size={IconSize.STANDARD} intent={props.needToViewTable ? Intent.DANGER : Intent.NONE} />
+                            <Button small icon={<Cycle/>} color="orange" title={"strava"} size={IconSize.STANDARD} intent={props.needToViewTable ? Intent.DANGER : Intent.NONE} />
                         </Link>
                     </NavbarGroup>
                 </Navbar>
