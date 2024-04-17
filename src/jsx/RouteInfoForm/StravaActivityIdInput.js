@@ -8,7 +8,7 @@ import { stravaActivitySet } from '../../redux/reducer';
 const StravaActivityIdInput = ({ stravaActivitySet, strava_activity, canAnalyze }) => {
     return (
         <FormGroup label={<span><b>Strava Activity Id</b></span>} labelFor={"stravaActivity"}>
-            <InputGroup autoFocus id='stravaActivity' tabIndex='0' type="text"
+            <InputGroup style={{fontSize:"16px"}} autoFocus id='stravaActivity' tabIndex='0' type="text"
                 onDrop={event => {
                     let dt = event.dataTransfer;
                     if (dt.items) {
@@ -28,12 +28,6 @@ const StravaActivityIdInput = ({ stravaActivitySet, strava_activity, canAnalyze 
                         }
                     }
                 }}
-                /*
-                                     onDragOver={event => {
-                                         event.preventDefault();
-                                         event.dataTransfer.dropEffect = 'move';
-                                     }}
-                */
                 onDragEnd={event => {
                     let dt = event.dataTransfer;
                     if (dt.items) {

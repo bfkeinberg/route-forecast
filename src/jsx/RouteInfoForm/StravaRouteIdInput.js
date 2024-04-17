@@ -8,7 +8,7 @@ import { stravaRouteSet } from '../../redux/reducer';
 const StravaRouteIdInput = ({ stravaRouteSet, strava_route }) => {
     return (
         <FormGroup label={<span><b>Strava Route Id</b></span>} labelFor={"stravaRoute"}>
-            <InputGroup autoFocus id='stravaRoute' tabIndex='1' type="text"
+            <InputGroup style={{fontSize:"16px"}} id='stravaRoute' tabIndex='1' type="text"
                 onDrop={event => {
                     let dt = event.dataTransfer;
                     if (dt.items) {
@@ -28,12 +28,6 @@ const StravaRouteIdInput = ({ stravaRouteSet, strava_route }) => {
                         }
                     }
                 }}
-                /*
-                                     onDragOver={event => {
-                                         event.preventDefault();
-                                         event.dataTransfer.dropEffect = 'move';
-                                     }}
-                */
                 onDragEnd={event => {
                     let dt = event.dataTransfer;
                     if (dt.items) {
