@@ -88,6 +88,12 @@ export const setInterval = function (interval) {
 };
 
  const getRouteParser = async function () {
+    Sentry.addBreadcrumb({
+        category: 'load',
+        level: 'info',
+        message:'Loading GPX parser module'
+    })
+
     const parser = await componentLoader(import(/* webpackChunkName: "RwgpsParser" */ '../utils/gpxParser'), 5);
     return parser.default;
 };

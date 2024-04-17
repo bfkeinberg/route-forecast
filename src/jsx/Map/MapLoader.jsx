@@ -1,3 +1,4 @@
+import * as Sentry from "@sentry/react";
 import lazyRetry from "@tdotcode/react-lazy-retry";
 import PropTypes from 'prop-types';
 import React, {Suspense} from 'react';
@@ -5,11 +6,15 @@ import {connect} from 'react-redux';
 
 import { routeLoadingModes } from '../../data/enums';
 import ErrorBoundary from "../shared/ErrorBoundary";
-
 const LoadableMap = lazyRetry(() => import(/* webpackChunkName: "Map" */ './RouteForecastMap'), 7, 1200);
 
 const MapLoader = (props) => {
     if (props.hasMap) {
+        Sentry.addBreadcrumb({
+            category: 'load',
+            level: 'info',
+            message:'Loading map'
+        })
         return <ErrorBoundary>
             <Suspense fallback={<div>Loading Map...</div>}>
                 <LoadableMap {...props} />

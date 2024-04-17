@@ -1,5 +1,6 @@
 
 import { Button, FormGroup, InputGroup,Intent } from '@blueprintjs/core';
+import * as Sentry from "@sentry/react";
 import React, { useRef } from 'react';
 import ReactGA from "react-ga4"
 import { useDispatch,useSelector } from 'react-redux';
@@ -7,7 +8,6 @@ import { useDispatch,useSelector } from 'react-redux';
 import { loadFromRideWithGps } from '../../redux/actions';
 import { errorDetailsSet,rusaPermRouteIdSet, rwgpsRouteSet } from '../../redux/reducer';
 import { rusaIdLookupApiSlice } from '../../redux/rusaLookupApiSlice';
-
 export const RouteInfoInputRUSA = () => {
     const loadButtonRef = useRef(null)
     const dispatch = useDispatch()
@@ -18,6 +18,12 @@ export const RouteInfoInputRUSA = () => {
 
     const lookupRouteId = React.useCallback(() => {
         ReactGA.event('spend_virtual_currency', {virtual_currency_name:'RUSA',value:Number.parseInt(rusaPermRouteId)})
+        Sentry.addBreadcrumb({
+            category: 'load',
+            level: 'info',
+            message:'Loading RUSA perm query'
+        })
+
         getRusaPermInfo(rusaPermRouteId).unwrap().then(routeInfo => {
             if (routeInfo.length === 0) {
                 dispatch(errorDetailsSet(`${rusaPermRouteId} is not a valid permanent route ID`))

@@ -1,5 +1,6 @@
 import { Button, Spinner } from '@blueprintjs/core';
 import {lazy} from '@loadable/component';
+import * as Sentry from "@sentry/react";
 import axios from 'axios';
 import PropTypes from 'prop-types';
 import queryString from 'query-string';
@@ -59,6 +60,12 @@ const PinnedRouteLoader = ({rwgpsToken, rwgpsTokenSet, credentialsValid, pinnedR
         usingPinnedRoutes
     ]);
     let button_class = usingPinnedRoutes ? null : 'glowing_input'
+    Sentry.addBreadcrumb({
+        category: 'load',
+        level: 'info',
+        message:'Loading pinned route list'
+    })
+
     return (
         <>
             <Button intent="primary"

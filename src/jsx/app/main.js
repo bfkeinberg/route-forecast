@@ -120,15 +120,21 @@ export class RouteWeatherUI extends Component {
 
         if (typeof window !== 'undefined') {
             window.onpopstate = (event) => {
-                import(/* webpackChunkName: "chunkName" */ /* webpackExports: ["addBreadcrumb"] */'@sentry/react').then(module => {
-                    const { addBreadcrumb } = module
-                     addBreadcrumb({
+                Sentry.addBreadcrumb({
                         category: 'history',
                         level: "info",
                         message: JSON.stringify(event.state),
                         data: document.location
-                    });
-                })
+                    })
+                // import(/* webpackChunkName: "chunkName" */ /* webpackExports: ["addBreadcrumb"] */'@sentry/react').then(module => {
+                //     const { addBreadcrumb } = module
+                //      addBreadcrumb({
+                //         category: 'history',
+                //         level: "info",
+                //         message: JSON.stringify(event.state),
+                //         data: document.location
+                //     });
+                // })
 
                 if (event.state == null) {
                     // clear the state when back button takes us past any saved routes
