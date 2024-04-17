@@ -1,22 +1,20 @@
 import {Button} from '@blueprintjs/core';
-import * as Sentry from '@sentry/browser';
-import * as SentryReact from "@sentry/react";
+import { getClient } from "@sentry/react"
 import LadyBug from 'Images/gustavorezende_lady_bug-555px.png';
 import React from 'react';
 
-const bugReportDialog = () => {
-        const event = Sentry.captureMessage('bug report');
-        SentryReact.showReportDialog({eventId:event,
-                title:"Looks like you want to report a problem",
-                subtitle:"Please provide the details",
-                labelSubmit:"Submit bug report"
-        });
-};
+const openSentryDialog = () => {
+        const client = getClient();
+        if (client) {
+                const feedback = client.getIntegrationByName("Feedback")
+                if (feedback) feedback.openDialog()
+        }
+}
 
 const BugReportButton = () => {
     return (
         <Button className="pt-intent-warning"
-                onClick={bugReportDialog}
+                onClick={openSentryDialog}
                 style={{height: "47px"}}
                 text={'Report a bug'}
                 small
