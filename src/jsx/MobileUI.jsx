@@ -54,7 +54,7 @@ const MobileUITabs = (props) => {
         useWhenChanged(forecastData, () => navigate("/forecastTable", { replace: true }), forecastData.length > 0)
         useWhenChanged(stravaActivityData, () => navigate("/paceTable", { replace: true }))
         const { adjustedTimes } = useForecastDependentValues()
-        console.log(`pathname:${pathname} `)
+
         return (
             <>
                 <Navbar>
@@ -73,15 +73,15 @@ const MobileUITabs = (props) => {
                         </ErrorBoundary>
                         <NavbarDivider />
                         <Link to={"/map/"} className={'nav-link'}>
-                        <Button small icon={<Globe/>} size={IconSize.STANDARD} title={"map"} intent={props.needToViewMap ? Intent.DANGER : (pathname.startsWith('/map')?Intent.PRIMARY:Intent.NONE)} />
+                        <Button small icon={<Globe/>} size={IconSize.STANDARD} title={"map"} intent={props.needToViewMap ? Intent.WARNING : (pathname.startsWith('/map')?Intent.PRIMARY:Intent.NONE)} />
                         </Link>
                         <NavbarDivider />
                         <Link to={"/forecastTable/"} className={'nav-link'}>
-                            <Button small icon={<Cloud/>} size={IconSize.STANDARD} title={"forecast"} intent={props.needToViewTable ? Intent.DANGER : (pathname.startsWith('/forecastTable')?Intent.PRIMARY:Intent.NONE)} />
+                            <Button small icon={<Cloud/>} size={IconSize.STANDARD} title={"forecast"} intent={props.needToViewTable ? Intent.WARNING : (pathname.startsWith('/forecastTable')?Intent.PRIMARY:Intent.NONE)} />
                         </Link>
                         <NavbarDivider />
                         <Link to={"/paceTable/"} className={'nav-link'}>
-                            <Button small icon={<Cycle/>} color="orange" title={"strava"} size={IconSize.STANDARD} intent={props.needToViewTable ? Intent.DANGER : Intent.NONE} />
+                            <Button small icon={<Cycle/>} color="orange" disabled={!stravaActivityData} title={"strava"} size={IconSize.STANDARD} intent={props.needToViewTable ? Intent.WARNING : pathname.startsWith('/paceTable') ? Intent.PRIMARY : Intent.NONE} />
                         </Link>
                     </NavbarGroup>
                 </Navbar>
