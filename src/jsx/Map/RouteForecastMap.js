@@ -101,10 +101,17 @@ const RouteForecastMap = () => {
             subrange
         ])
     } catch (error) {
-        Sentry.captureMessage(`Error creating map bounds:${error}`,"error")
+        Sentry.captureException(error, `Error creating map bounds`)
+        return
     }
 
-    const mapCenter = useMemo( () => mapBounds.getCenter(), [mapBounds]);
+    let mapCenter
+    try {
+        mapCenter = useMemo( () => mapBounds.getCenter(), [mapBounds]);
+    } catch (err) {
+        Sentry.captureException(err,'Error finding map center')
+        return
+    }
     const initialCenter = useMemo( () => ((mapCenter === null || mapCenter === undefined) ? undefined : mapCenter.toJSON()), [mapCenter])
 
     let infoPosition = initialCenter
@@ -124,31 +131,36 @@ const RouteForecastMap = () => {
 
     const infoWindow = (<InfoWindow position={infoPosition}><div>{infoContents}</div></InfoWindow>)
 
-    return (
-        <ErrorBoundary>
-            <div id="map" /*style={{ height: "calc(100vh - 50px)", position: "relative" }}*/>
-                {(forecast.length > 0 || routeLoadingMode === routeLoadingModes.STRAVA) && bounds !== null ?
-                    <GoogleMap
-                        mapTypeId={window.google.maps.MapTypeId.ROADMAP}
-                        options={{scaleControl:true}}
-                        zoom={8}
-                        center={initialCenter}
-                        mapContainerStyle={{ width: 'auto', height:  "calc(100vh - 70px)", position:'relative' }}
-                        onLoad={onLoad}
-                        onUnmount={onUnmount}
-                        onBoundsChanged={onBoundsChanged}
-                    >
-                        <Polyline path={points} options={{strokeColor:'#ff0000', strokeWeight:2, strokeOpacity:1.0}} />
-                        <MapHighlight points={points} subrange={subrange} />
-                        {controls !== null && <MapMarkers forecast={forecast} google={window.google}
-                        controls={controls} controlNames={controlNames} subrange={subrange} metric={metric} map={map} mapCenter={mapCenter}/>}
-                        {infoVisible && infoWindow}
-                    </GoogleMap> :
-                    <h2 style={{ padding: '18px', textAlign: "center" }}>Forecast map</h2>
-                }
-            </div>
-        </ErrorBoundary>
-    )
+    try {
+        return (
+            <ErrorBoundary>
+                <div id="map" /*style={{ height: "calc(100vh - 50px)", position: "relative" }}*/>
+                    {(forecast.length > 0 || routeLoadingMode === routeLoadingModes.STRAVA) && bounds !== null ?
+                        <GoogleMap
+                            mapTypeId={window.google.maps.MapTypeId.ROADMAP}
+                            options={{ scaleControl: true }}
+                            zoom={8}
+                            center={initialCenter}
+                            mapContainerStyle={{ width: 'auto', height: "calc(100vh - 70px)", position: 'relative' }}
+                            onLoad={onLoad}
+                            onUnmount={onUnmount}
+                            onBoundsChanged={onBoundsChanged}
+                        >
+                            <Polyline path={points} options={{ strokeColor: '#ff0000', strokeWeight: 2, strokeOpacity: 1.0 }} />
+                            <MapHighlight points={points} subrange={subrange} />
+                            {controls !== null && <MapMarkers forecast={forecast} google={window.google}
+                                controls={controls} controlNames={controlNames} subrange={subrange} metric={metric} map={map} mapCenter={mapCenter} />}
+                            {infoVisible && infoWindow}
+                        </GoogleMap> :
+                        <h2 style={{ padding: '18px', textAlign: "center" }}>Forecast map</h2>
+                    }
+                </div>
+            </ErrorBoundary>
+        )
+    } catch (err) {
+        Sentry.captureException(err, 'Error rendering Google Map')
+        return (<div>No map due to error</div>)
+    }
 }
 
 const MapMarkers = ({ forecast, controls, controlNames, subrange, metric, map, mapCenter, google }) => {

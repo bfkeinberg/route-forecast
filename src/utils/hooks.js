@@ -161,8 +161,8 @@ const usePointsAndBounds = () => {
       pointsAndBounds = stravaRouteParser.computePointsAndBounds(stravaActivityStream)
     }
   } else if (rwgpsRouteData !== null) {
-    // pointsAndBounds = useMemo(() => gpxParser.computePointsAndBounds(rwgpsRouteData, "rwgps"), [rwgpsRouteData])
-    pointsAndBounds = gpxParser.computePointsAndBounds(rwgpsRouteData, "rwgps")
+    pointsAndBounds = useMemo(() => gpxParser.computePointsAndBounds(rwgpsRouteData, "rwgps"), [rwgpsRouteData])
+    // pointsAndBounds = gpxParser.computePointsAndBounds(rwgpsRouteData, "rwgps")
   } else if (gpxRouteData !== null) {
     // pointsAndBounds = useMemo(() => gpxParser.computePointsAndBounds(gpxRouteData, "gpx"), [gpxRouteData])
     pointsAndBounds = gpxParser.computePointsAndBounds(gpxRouteData, "gpx")
