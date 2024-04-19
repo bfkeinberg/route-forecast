@@ -1,5 +1,6 @@
 const { DateTime } = require("luxon");
 const axios = require('axios');
+const Sentry = require("@sentry/node")
 
 //
 //
@@ -28,11 +29,12 @@ const callWeatherApi = async function (lat, lon, currentTime, distance, zone, be
     const forecastUrl = `https://api.weatherapi.com/v1/forecast.json?key=${weatherApiKey}&q=${lat},${lon}&days=1&hour=${hour}&aqi=yes&unixdt=${startTime.toUnixInteger()}`;
     const historyUrl = `https://api.weatherapi.com/v1/history.json?key=${weatherApiKey}&q=${lat},${lon}&hour=${hour}&unixdt=${startTime.toUnixInteger()}`;
     const url = startTime < DateTime.now() ? historyUrl : forecastUrl;
+    Sentry.setContext('url',{'url':url})
     const forecastResult = await axios.get(url).catch(error => {
         throw Error(error.response.data.error.message);
     });
     if (forecastResult.data.error !== undefined && forecastResult.data.error.code !== undefined) {
-        console.error(`got error code ${forecastResult.error.message}`);
+        Sentry.captureMessage(`WeatherAPI error ${forecastResult.error.message}`,'error')
         throw Error(forecastResult.error.message);
     }
     const current = forecastResult.data.forecast.forecastday[0].hour[0];
@@ -58,7 +60,8 @@ const callWeatherApi = async function (lat, lon, currentTime, distance, zone, be
         'windBearing':windBearing,
         'vectorBearing':bearing,
         'gust':current.gust_mph===undefined?'<unavailable>':`${Math.round(current.gust_mph)}`,
-        'feel':current.feelslike_f===undefined?Math.round(current.temp_f):Math.round(current.feelslike_f)
+        'feel':current.feelslike_f===undefined?Math.round(current.temp_f):Math.round(current.feelslike_f),
+        'aqi':forecastResult.data.current.air_quality.pm2_5
     }
 };
 
