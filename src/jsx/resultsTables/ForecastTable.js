@@ -33,7 +33,7 @@ const displayBacklink = (provider) => {
         case 'meteomatics':
             return meteomatics;
         case 'weatherKit':
-            return <img src={weatherKitImage} />;
+            return <a href="https://developer.apple.com/weatherkit/data-source-attribution/" target="_blank" rel="noopener noreferrer"><img src={weatherKitImage} /></a>
         default: return <div/>;
     }
 }
