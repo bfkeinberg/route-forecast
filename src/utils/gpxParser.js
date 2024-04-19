@@ -101,8 +101,8 @@ class AnalyzeRoute {
         [])
 
     isControl = (coursePoint) => {
-        const controlRegexp = /^control|rest stop|regroup/i;
-        return coursePoint.d !== undefined && coursePoint.t === 'Control' || (coursePoint.n && coursePoint.n.match(controlRegexp));
+        const controlRegexp = /control|rest stop|regroup/i;
+        return coursePoint.d !== undefined && coursePoint.t === 'Control' || (coursePoint.n && coursePoint.n.match(controlRegexp) && !coursePoint.n.startsWith('Depart control'))
     }
 
     controlFromCoursePoint = (coursePoint) =>
