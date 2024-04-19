@@ -1,5 +1,7 @@
 const { DateTime } = require("luxon");
 const jwt = require("jsonwebtoken");
+const Sentry = require("@sentry/node")
+
 const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
 const milesToMeters = 1609.34;
 
@@ -83,7 +85,7 @@ const callWeatherKit = function (lat, lon, currentTime, distance, zone, bearing,
         }
     }).
     catch(error => {
-        console.error('error',JSON.stringify(error));
+        Sentry.captureException(error,'Apple WeatherKit')
         throw error;
     });
     return forecastResult;
