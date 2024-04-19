@@ -1,4 +1,4 @@
-import { Button,Spinner } from '@blueprintjs/core';
+import { Button } from '@blueprintjs/core';
 import * as Sentry from "@sentry/react";
 import PropTypes from 'prop-types';
 import React from 'react';
@@ -128,9 +128,9 @@ const ForecastButton = ({fetchingForecast,submitDisabled, routeNumber, startTime
                     small={smallScreen}
                     large={!smallScreen}
                     fill={true}
+                    loading={forecastFetchResult.loading || aqiFetchResult.loading}
                 >
                     {forecastFetchResult.isLoading ? 'Creating forecast...' : 'Find Forecast'}
-                    {(forecastFetchResult.isLoading || aqiFetchResult.isLoading || fetchingForecast) && <Spinner />}
                 </Button>
             </div>
         </DesktopTooltip>
@@ -160,7 +160,6 @@ ForecastButton.propTypes = {
     controls: PropTypes.arrayOf(PropTypes.object).isRequired,
     origin: PropTypes.string.isRequired,
     provider: PropTypes.string.isRequired,
-    showProvider: PropTypes.bool.isRequired,
     urlIsShortened: PropTypes.bool.isRequired,
     href: PropTypes.string.isRequired,
     querySet: PropTypes.func.isRequired
