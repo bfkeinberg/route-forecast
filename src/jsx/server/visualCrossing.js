@@ -1,5 +1,6 @@
 const moment = require('moment-timezone');
 const axios = require('axios');
+const Sentry = require("@sentry/node")
 
 /* eslint-disable max-params, max-lines-per-function */
 
@@ -23,16 +24,16 @@ const callVisualCrossing = async function (lat, lon, currentTime, distance, zone
     endTime.add(1, 'hours');
     const startTimeString = startTime.unix();
     const url = `https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/${lat},${lon}/${startTimeString}?unitGroup=us&include=current&options=nonulls&key=${visualCrossingKey}`;
-    const weatherResult = await axios.get(url).catch(error => {console.error('axios error',error.response?error.response.data:error);
+    const weatherResult = await axios.get(url).catch(error => {Sentry.captureMessage(`axios error ${error.response?error.response.data:error}`,'error')
         throw error.response?error.response.data:error});
     const forecast = weatherResult.data;
     if (forecast.code !== undefined) {
-        console.error(`got error code ${forecast.code}`);
+        Sentry.captureMessage(`got error code ${forecast.code}`,'error')
         throw forecast.message;
     }
     const current = forecast.currentConditions;
     if (current === undefined) {
-        console.error(`Throwing error because no current conditions were returned`);
+        Sentry.captureMessage(`Throwing error because no current conditions were returned`,'error');
         throw Error({details:"No current conditions"});
     }
     const now = moment.unix(current.datetimeEpoch).tz(zone);

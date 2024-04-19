@@ -1,5 +1,6 @@
 const { DateTime, Interval } = require("luxon");
 const axios = require('axios');
+const Sentry = require("@sentry/node")
 const milesToMeters = 1609.34;
 
 const getForecastUrl = async (lat, lon) => {
@@ -61,7 +62,7 @@ const getForecastFromNws = async (forecastUrl) => {
         await sleep(timeout);
         timeout += 100;
     } while (timeout < 700);
-    console.log(lastError);
+    Sentry.captureMessage(lastError,'error')
     throw Error(`Failed to get NWS forecast from ${forecastUrl}:${lastError}`);
 };
 /* eslint-disable max-params, max-lines-per-function */
