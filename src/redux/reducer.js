@@ -323,7 +323,6 @@ const controlsInitialState = {
     metric: false,
     displayBanked: false,
     userControlPoints: [],
-    showWeatherProvider: false,
     displayControlTableUI: false
 }
 
@@ -345,9 +344,6 @@ const controlsSlice = createSlice({
         userControlsUpdated(state, action) {
             state.userControlPoints = action.payload
         },
-        showWeatherProviderSet(state, action) {
-            state.showWeatherProvider = action.payload
-        },
         displayControlTableUiSet(state, action) {
             state.displayControlTableUI = action.payload
         }
@@ -361,7 +357,7 @@ const controlsSlice = createSlice({
     }
 })
 
-export const { metricSet, metricToggled, bankedDisplayToggled, userControlsUpdated, showWeatherProviderSet, displayControlTableUiSet} = controlsSlice.actions
+export const { metricSet, metricToggled, bankedDisplayToggled, userControlsUpdated, displayControlTableUiSet} = controlsSlice.actions
 export const controlsReducer = controlsSlice.reducer
 
 const getAnalysisIntervalFromRouteDuration = (durationInHours) => {

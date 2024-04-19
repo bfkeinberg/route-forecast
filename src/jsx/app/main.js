@@ -17,7 +17,7 @@ import  {useMediaQuery} from 'react-responsive';
 import {
     actionUrlAdded, apiKeysSet, displayControlTableUiSet, fetchAqiSet, metricSet, providerValues, queryCleared, querySet,
      reset, routeLoadingModeSet, rusaPermRouteIdSet,
-    rwgpsRouteSet, rwgpsTokenSet, showWeatherProviderSet,
+    rwgpsRouteSet, rwgpsTokenSet,
     startTimestampSet,
     stopAfterLoadSet, stravaActivitySet, stravaErrorSet, stravaRefreshTokenSet,
     stravaRouteSet, stravaTokenSet, usePinnedRoutesSet, zoomToRangeSet
@@ -256,17 +256,9 @@ export class RouteWeatherUI extends Component {
         if (queryParams.rusa_route_id) {
             props.rusaPermRouteIdSet(queryParams.rusa_route_id)
         }
-        // make show weather provider "sticky"
-        if (queryParams.showProvider !== undefined) {
-            props.showWeatherProviderSet(queryParams.showProvider==="true");
-            saveCookie("showWeatherProvider", queryParams.showProvider==="true");
-        }
-        else {
-            let showWeatherProvider = loadCookie("showWeatherProvider");
-            if (showWeatherProvider !== undefined) {
-                props.showWeatherProviderSet(showWeatherProvider==="true");
-            }
-        }
+        // we no longer need this so let's clean it up
+        // TODO: after a month let's try and remember to delete this line also
+        cookie.remove("showWeatherProvider")
         if (queryParams.rwgpsToken !== undefined) {
             props.rwgpsTokenSet(queryParams.rwgpsToken);
             // if we have just received an auth token then we previously clicked show pinned routes
@@ -286,7 +278,7 @@ export class RouteWeatherUI extends Component {
 const mapDispatchToProps = {
     stravaTokenSet, rwgpsRouteSet, stravaErrorSet, setPace, setInterval, metricSet,
     stravaActivitySet, updateControls:updateUserControls, routeLoadingModeSet, stravaRefreshTokenSet,
-    loadFromRideWithGps, reset, setWeatherProvider, showWeatherProviderSet, rwgpsTokenSet, startTimestampSet,
+    loadFromRideWithGps, reset, setWeatherProvider, rwgpsTokenSet, startTimestampSet,
     zoomToRangeSet, usePinnedRoutesSet, stopAfterLoadSet, fetchAqiSet, stravaRouteSet,
     actionUrlAdded, apiKeysSet, querySet, queryCleared, loadRouteFromURL, rusaPermRouteIdSet
 };

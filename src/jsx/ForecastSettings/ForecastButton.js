@@ -15,7 +15,7 @@ import { updateHistory } from "../app/updateHistory";
 import { DesktopTooltip } from '../shared/DesktopTooltip';
 
 const ForecastButton = ({fetchingForecast,submitDisabled, routeNumber, startTimestamp, pace, interval,
-     metric, controls, strava_activity, strava_route, provider, showProvider, href, urlIsShortened, querySet, zone}) => {
+     metric, controls, strava_activity, strava_route, provider, href, urlIsShortened, querySet, zone}) => {
         const [forecast, forecastFetchResult] = useForecastMutation()
         const [getAQI, aqiFetchResult] = useGetAqiMutation()
         const dispatch = useDispatch()
@@ -104,7 +104,7 @@ const ForecastButton = ({fetchingForecast,submitDisabled, routeNumber, startTime
             }
         })
         const url = generateUrl(startTimestamp, routeNumber, pace, interval, metric, controls,
-            strava_activity, strava_route, provider, showProvider, origin, true, dispatch, zone, rusaRouteId)
+            strava_activity, strava_route, provider, origin, true, dispatch, zone, rusaRouteId)
         querySet({queryString:url.url,searchString:url.search})
         Sentry.setContext("query", {queryString:url.search})
         updateHistory(url.url, true);
@@ -183,7 +183,6 @@ const mapStateToProps = (state) =>
         strava_activity: state.strava.activity,
         strava_route: state.strava.route,
         provider: state.forecast.weatherProvider,
-        showProvider: state.controls.showWeatherProvider
     });
 
 const mapDispatchToProps = {
