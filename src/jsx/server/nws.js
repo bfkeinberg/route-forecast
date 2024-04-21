@@ -52,7 +52,8 @@ const getForecastFromNws = async (forecastUrl) => {
         const forecastGridData = await axios.get(forecastUrl).catch(
             error => {
                 lastError = JSON.stringify(error.response.data);
-                Sentry.captureException(error, `NWS error with ${forecastUrl}`)
+                Sentry.captureException(error)
+                Sentry.captureMessage(`After NWS error will sleep for ${timeout} seconds`)
             }
         );
         if (forecastGridData !== undefined) {
@@ -82,6 +83,7 @@ const getForecastFromNws = async (forecastUrl) => {
  */
 const callNWS = async function (lat, lon, currentTime, distance, zone, bearing, getBearingDifference) {
     const forecastUrl = await getForecastUrl(lat, lon);
+    Sentry.setContext('url', {'forecastUrl': forecastUrl})
     const forecastGridData = await getForecastFromNws(forecastUrl);
     const startTime = DateTime.fromISO(currentTime, {zone:zone});
     const forecastValues = extractForecast(forecastGridData, startTime, bearing, getBearingDifference);
