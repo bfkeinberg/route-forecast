@@ -52,6 +52,7 @@ const getForecastFromNws = async (forecastUrl) => {
         const forecastGridData = await axios.get(forecastUrl).catch(
             error => {
                 lastError = JSON.stringify(error.response.data);
+                Sentry.captureException(error, `NWS error with ${forecastUrl}`)
             }
         );
         if (forecastGridData !== undefined) {

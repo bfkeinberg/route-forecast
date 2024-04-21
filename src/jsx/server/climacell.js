@@ -44,7 +44,7 @@ const getFromTomorrowIoWithBackoff = async (forecastUrl) => {
         const forecastResult = await axios.get(forecastUrl).catch(
             error => {
                 lastError = JSON.stringify(error.response.data);
-                console.log(forecastUrl,lastError);
+                Sentry.captureException(error, `Tomorrow.io error with ${forecastUrl}`)
                 console.info('will sleep for ',timeout);
             }
         );
