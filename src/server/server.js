@@ -21,8 +21,6 @@ const getPurpleAirAQI = require('./purpleAirAQI');
 const getAirNowAQI = require('./airNowAQI');
 const querystring = require('querystring');
 const Sentry = require('@sentry/node');
-// eslint-disable-next-line no-unused-vars
-// const Tracing = require("@sentry/tracing");
 Sentry.init({
     dsn: 'https://ea4c472ff9054dab8c18d594b95d8da2@sentry.io/298059',
     integrations: [
@@ -37,6 +35,7 @@ var compression = require('compression');
 
 if (process.env.JEST_WORKER_ID === undefined) {
     app.use(Sentry.Handlers.requestHandler());
+    app.use(Sentry.Handlers.tracingHandler())
 }
 app.use(compression());
 app.set('trust proxy', true);
