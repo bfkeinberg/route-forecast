@@ -45,7 +45,7 @@ const extractForecast = (forecastGridData, currentTime) => {
 
 axiosRetry(axios, {
     retries: 10,
-    retryDelay: (...arg) => axiosRetry.exponentialDelay(...arg, 200),
+    retryDelay: (...arg) => axiosRetry.exponentialDelay(...arg, 400),
     retryCondition (error) {
         if (!error.response) {return false}
         switch (error.response.status) {
