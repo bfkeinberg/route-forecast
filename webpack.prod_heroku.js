@@ -36,7 +36,7 @@ module.exports = (env, argv) => merge(common(env, argv), {
             stripPrefix: ['/dist'],
             stripCommonPrefix: true,
             urlPrefix: '/static',
-            debug: false,
+            debug: true,
             setCommits: { auto: true },
             authToken: process.env.SENTRY_AUTH_TOKEN,
             release: {name: process.env.SOURCE_VERSION},
