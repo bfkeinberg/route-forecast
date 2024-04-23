@@ -106,7 +106,7 @@ const RouteForecastMap = () => {
         Sentry.captureException(err,'Error finding map center')
         return
     }
-    const initialCenter = useMemo( () => ((mapCenter === null || mapCenter === undefined) ? undefined : mapCenter.toJSON()), [mapCenter])
+    const initialCenter = useMemo( () => mapCenter.toJSON(), [mapCenter])
 
     let infoPosition = initialCenter
     let infoVisible = false;
