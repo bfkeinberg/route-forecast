@@ -8,10 +8,9 @@ import { useMediaQuery } from 'react-responsive';
 
 import { shortenUrl } from "../../redux/actions";
 import { useForecastMutation, useGetAqiMutation } from '../../redux/forecastApiSlice';
-import { forecastAppended,forecastFetched, forecastFetchFailed, querySet } from '../../redux/reducer';
+import { forecastAppended,forecastFetchBegun,forecastFetched, forecastFetchFailed, querySet } from '../../redux/reducer';
 import { generateUrl } from '../../utils/queryStringUtils';
 import { getForecastRequest } from '../../utils/util';
-import { updateHistory } from "../app/updateHistory";
 import { DesktopTooltip } from '../shared/DesktopTooltip';
 
 const ForecastButton = ({fetchingForecast,submitDisabled, routeNumber, startTimestamp, pace, interval,
@@ -66,6 +65,7 @@ const ForecastButton = ({fetchingForecast,submitDisabled, routeNumber, startTime
     let buttonStyle = submitDisabled ? { pointerEvents: 'none', display: 'inline-flex' } : null;
     const forecastClick = async () => {
         await Sentry.startSpan({ name: "forecastClick" }, async () => {
+            dispatch(forecastFetchBegun())
             if (type === "rwgps") {
                 ReactGA.event('add_to_cart', {
                     value: distanceInKm,
@@ -105,9 +105,8 @@ const ForecastButton = ({fetchingForecast,submitDisabled, routeNumber, startTime
         })
         const url = generateUrl(startTimestamp, routeNumber, pace, interval, metric, controls,
             strava_activity, strava_route, provider, origin, true, dispatch, zone, rusaRouteId)
-        querySet({queryString:url.url,searchString:url.search})
+        querySet({url:url.url,search:url.search})
         Sentry.setContext("query", {queryString:url.search})
-        updateHistory(url.url, true);
         // don't shorten localhost with bitly
         if (origin !== 'http://localhost:8080' && (url.url !== href || !urlIsShortened)) {
             dispatch(shortenUrl(url.url))
@@ -128,7 +127,7 @@ const ForecastButton = ({fetchingForecast,submitDisabled, routeNumber, startTime
                     small={smallScreen}
                     large={!smallScreen}
                     fill={true}
-                    loading={forecastFetchResult.loading || aqiFetchResult.loading}
+                    loading={forecastFetchResult.loading || aqiFetchResult.loading || fetchingForecast}
                 >
                     {forecastFetchResult.isLoading ? 'Creating forecast...' : 'Find Forecast'}
                 </Button>

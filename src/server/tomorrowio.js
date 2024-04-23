@@ -1,6 +1,7 @@
-const moment = require('moment-timezone');
+const { DateTime } = require("luxon");
 const axios = require('axios');
 const Sentry = require("@sentry/node")
+const axiosRetry = require('axios-retry').default
 
 const weatherCodes = {
     "0": "Unknown",
@@ -32,60 +33,48 @@ const weatherCodes = {
     "8000": "Thunderstorm"
 };
 
-let sleep = function (ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
-}
+axiosRetry(axios, {
+    retries: 10,
+    retryDelay: (...arg) => axiosRetry.exponentialDelay(...arg, 450),
+    retryCondition (error) {
+        if (!error.response) {return false}
+        switch (error.response.status) {
+        case 429:
+            return true;
+        default:
+            return false;
+        }
+    },
+    onRetry: (retryCount) => {
+        console.log(`axios retry count: `, retryCount);
+    }
+});
 
 const getFromTomorrowIoWithBackoff = async (forecastUrl) => {
-    let timeout = 400;
-    let lastError = "";
-    do {
-        // eslint-disable-next-line no-await-in-loop
-        const forecastResult = await axios.get(forecastUrl).catch(
-            error => {
-                lastError = JSON.stringify(error.response.data);
-                Sentry.captureException(error)
-                Sentry.captureMessage(`After Tomorrow.io error will sleep for ${timeout} seconds`)
-           }
-        )
-        if (forecastResult !== undefined) {
-            const forecast = forecastResult.data;
-            if (forecast.code !== undefined) {
-                Sentry.captureMessage(`got error code ${forecast.code}`,'error')
-                console.log(forecast);
-                if (forecast.code === 429001) {
-                    console.log(`no Tomorrow.io forecast, sleeping ${timeout}ms after ${lastError}`);
-                    // eslint-disable-next-line no-await-in-loop
-                    await sleep(timeout);
-                    timeout += 500;
-                } else {
-                    Sentry.captureMessage(`Tomnorrow.io error ${forecast.message}`)
-                    throw Error(forecast.message);
-                }
-            }
-            if (forecast.apiCalls < 50) {
-                throw Error('Daily count exceeded');
-            }
-            if (forecast.apiCallsHour < 3) {
-                throw Error('Hourly count exceeded');
-            }
-            // console.info('returning forecast');
-            // eslint-disable-next-line no-await-in-loop
-            await sleep(timeout);
-            return forecast;
+    const forecastResult = await axios.get(forecastUrl).catch(error => {
+        Sentry.captureException(error)
+        console.error(error)
+        throw Error(`Failed to get Tomorrow.io forecast from ${forecastUrl}:${error}`)
+    })
+    if (forecastResult !== undefined) {
+        const forecast = forecastResult.data;
+        if (forecast.code !== undefined) {
+            Sentry.captureMessage(`got error code ${forecast.code} with ${forecast.message}`,'error')
+            console.log(forecast);
         }
-            // eslint-disable-next-line no-else-return
-        else {
-            // eslint-disable-next-line no-await-in-loop
-            await sleep(timeout);
-            timeout += 500;
+        if (forecast.apiCalls < 30) {
+            throw Error('Daily count exceeded');
         }
-    } while (timeout < 3000);
-    Sentry.captureMessage(lastError,'error')
-    throw Error(`Failed to get Tomorrow.io forecast from ${forecastUrl}:${lastError}`);
+        if (forecast.apiCallsHour < 3) {
+            throw Error('Hourly count exceeded');
+        }
+        return forecast;
+    }
+    Sentry.captureMessage(`No forecast returned from Tomrrow.io on ${forecastUrl}`)
+    throw Error("No forecast from Tomorrow.io")
 }
-/* eslint-disable max-params,max-lines-per-function */
 
+/* eslint-disable max-params */
 /**
  *
  * @param {number} lat latitude
@@ -99,28 +88,29 @@ const getFromTomorrowIoWithBackoff = async (forecastUrl) => {
  * lat: *, lon: *, temp: string, fullTime: *, relBearing: null, rainy: boolean, windBearing: number,
  * vectorBearing: *, gust: string} | never>} a promise to evaluate to get the forecast results
  */
-const callClimacell = async function (lat, lon, currentTime, distance, zone, bearing, getBearingDifference) {
+const callTomorrowIo = async function (lat, lon, currentTime, distance, zone, bearing, getBearingDifference) {
     const climacellKey = process.env.CLIMACELL_KEY;
-    const startTime = moment(currentTime);
-    const endTime = startTime.clone();
-    endTime.add(1, 'hours');
-    const startTimeString = startTime.utc().format('YYYY-MM-DD[T]HH:mm:ss[Z]');
-    const endTimeString = endTime.utc().format('YYYY-MM-DD[T]HH:mm:ss[Z]');
-    const now = startTime.tz(zone);
-    const url = `https://api.tomorrow.io/v4/timelines?location=${lat},${lon}` +
+    const startTime = DateTime.fromISO(currentTime, {zone:'utc'});
+    const endTime = startTime.plus({hours:1})
+
+    const startTimeString = startTime.toISO()
+    const endTimeString = endTime.toISO()
+    const baseUrl = `https://api.tomorrow.io/v4/timelines?location=${lat},${lon}` +
         '&fields=windSpeed,precipitationProbability,windDirection,temperature,temperatureApparent,windGust,cloudCover,precipitationType,weatherCode,humidity,epaIndex' +
-        `&timezone=${zone}&startTime=${startTimeString}&endTime=${endTimeString}&timesteps=1h&units=imperial&apikey=${climacellKey}`
-    Sentry.setContext('url',{'url':url})
+        `&timezone=${zone}&startTime=${startTimeString}&endTime=${endTimeString}&timesteps=1h&units=imperial`
+    const url = `${baseUrl}&apikey=${climacellKey}`
+    Sentry.setContext('url',{'url':baseUrl})
     const forecast = await getFromTomorrowIoWithBackoff(url);
 
     const current = forecast.data.timelines[0];
+    const now = DateTime.fromISO(current.startTime)
     const values = current.intervals[0].values;
     const hasWind = values.windSpeed !== undefined;
     const windBearing = values.windDirection;
     const relativeBearing = hasWind && windBearing !== undefined ? getBearingDifference(bearing, windBearing) : null;
     const rainy = current.precipitationType === 1;
     return {
-        'time':now.format('h:mmA'),
+        'time':now.toFormat('h:mma'),
         'distance':distance,
         'summary':weatherCodes[values.weatherCode],
         'precip':values.precipitationProbability===undefined?'<unavailable>':`${values.precipitationProbability.toFixed(1)}%`,
@@ -130,7 +120,7 @@ const callClimacell = async function (lat, lon, currentTime, distance, zone, bea
         'lat':lat,
         'lon':lon,
         'temp':`${Math.round(values.temperature)}`,
-        'fullTime':now.format('ddd MMM D h:mmA YYYY'),
+        'fullTime':now.toFormat('EEE MMM d h:mma yyyy'),
         'relBearing':relativeBearing,
         'rainy':rainy,
         'windBearing':Math.round(windBearing),
@@ -141,4 +131,4 @@ const callClimacell = async function (lat, lon, currentTime, distance, zone, bea
     }
 };
 
-module.exports = callClimacell
+module.exports = callTomorrowIo

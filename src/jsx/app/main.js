@@ -94,7 +94,8 @@ export class RouteWeatherUI extends Component {
         querySet:PropTypes.func.isRequired,
         loadRouteFromURL:PropTypes.func.isRequired,
         stravaRouteSet:PropTypes.func.isRequired,
-        rusaPermRouteIdSet:PropTypes.func.isRequired
+        rusaPermRouteIdSet:PropTypes.func.isRequired,
+        origin: PropTypes.string.isRequired
     };
 
     constructor(props) {
@@ -126,16 +127,6 @@ export class RouteWeatherUI extends Component {
                         message: JSON.stringify(event.state),
                         data: document.location
                     })
-                // import(/* webpackChunkName: "chunkName" */ /* webpackExports: ["addBreadcrumb"] */'@sentry/react').then(module => {
-                //     const { addBreadcrumb } = module
-                //      addBreadcrumb({
-                //         category: 'history',
-                //         level: "info",
-                //         message: JSON.stringify(event.state),
-                //         data: document.location
-                //     });
-                // })
-
                 if (event.state == null) {
                     // clear the state when back button takes us past any saved routes
                     this.props.reset();
@@ -147,7 +138,7 @@ export class RouteWeatherUI extends Component {
                 } else {
                     // reload previous or next route when moving throw browser history with forward or back buttons
                     let queryParams = queryString.parse(event.state);
-                    props.querySet({url:props.href,search:event.state})
+                    props.querySet({url:`${props.origin}/${event.state}`,search:event.state})
                     RouteWeatherUI.updateFromQueryParams(this.props, queryParams);
                     if (queryParams.rwgpsRoute !== undefined || queryParams.strava_route) {
                         this.props.loadRouteFromURL()

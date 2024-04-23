@@ -2,6 +2,7 @@ const { DateTime, Interval } = require("luxon");
 const axios = require('axios');
 const Sentry = require("@sentry/node")
 const milesToMeters = 1609.34;
+const axiosRetry = require('axios-retry').default
 
 const getForecastUrl = async (lat, lon) => {
     const url = `https://api.weather.gov/points/${lat},${lon}`;
@@ -42,30 +43,31 @@ const extractForecast = (forecastGridData, currentTime) => {
     }
 };
 
-const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+axiosRetry(axios, {
+    retries: 10,
+    retryDelay: (...arg) => axiosRetry.exponentialDelay(...arg, 200),
+    retryCondition (error) {
+        if (!error.response) {return false}
+        switch (error.response.status) {
+        case 500:
+            return true;
+        default:
+            return false;
+        }
+    },
+    onRetry: (retryCount) => {
+        console.log(`axios retry count: `, retryCount);
+    }
+});
 
 const getForecastFromNws = async (forecastUrl) => {
-    let timeout = 200;
-    let lastError = "";
-    do {
-        // eslint-disable-next-line no-await-in-loop
-        const forecastGridData = await axios.get(forecastUrl).catch(
-            error => {
-                lastError = JSON.stringify(error.response.data);
-                Sentry.captureException(error)
-                Sentry.captureMessage(`After NWS error will sleep for ${timeout} seconds`)
-            }
-        );
-        if (forecastGridData !== undefined) {
-            return forecastGridData;
+    const forecastGridData = await axios.get(forecastUrl, { headers: { "User-Agent": '(randoplan.com, randoplan.ltd@gmail.com)' } }).catch(
+        error => {
+            Sentry.captureException(error)
+            throw Error(`Failed to get NWS forecast from ${forecastUrl}`)
         }
-        console.log(`no NWS forecast, sleeping ${timeout}ms after ${lastError}`);
-        // eslint-disable-next-line no-await-in-loop
-        await sleep(timeout);
-        timeout += 100;
-    } while (timeout < 700);
-    Sentry.captureMessage(lastError,'error')
-    throw Error(`Failed to get NWS forecast from ${forecastUrl}:${lastError}`);
+    );
+    return forecastGridData;
 };
 /* eslint-disable max-params, max-lines-per-function */
 /**

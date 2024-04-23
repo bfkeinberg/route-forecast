@@ -1,12 +1,11 @@
 import * as Sentry from '@sentry/react';
-import queryString
-from 'query-string';
+import queryString from 'query-string';
 export const updateHistory = (url, query, forceReplace=false) => {
     Sentry.addBreadcrumb({
         category: 'history',
         level: "info",
-        data: query,
-        message: url
+        message: query,
+        data: {url:url}
     });
     if (typeof window !== 'undefined' && !(/HeadlessChrome/).test(window.navigator.userAgent) && query !== null) {
         let oldState = history.state;

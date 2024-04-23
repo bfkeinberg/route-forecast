@@ -217,6 +217,7 @@ const routeInfoSlice = createSlice({
             state.rwgpsRouteData = null
             state.gpxRouteData = null
             state.name = ''
+            state.distanceInKm = 0
     })
     .addCase(reset, () => routeInfoInitialState)
     }

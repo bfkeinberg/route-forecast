@@ -21,22 +21,25 @@ const getPurpleAirAQI = require('./purpleAirAQI');
 const getAirNowAQI = require('./airNowAQI');
 const querystring = require('querystring');
 const Sentry = require('@sentry/node');
-// eslint-disable-next-line no-unused-vars
-// const Tracing = require("@sentry/tracing");
-Sentry.init({
-    dsn: 'https://ea4c472ff9054dab8c18d594b95d8da2@sentry.io/298059',
-    integrations: [
-        // enable HTTP calls tracing
-        new Sentry.Integrations.Http({ tracing: true })
-    ],
-    tracesSampleRate: 0.15
-});
+
+if (process.env.NODE_ENV !== 'development') {
+    Sentry.init({
+        dsn: 'https://ea4c472ff9054dab8c18d594b95d8da2@sentry.io/298059',
+        integrations: [
+            // enable HTTP calls tracing
+            new Sentry.Integrations.Http({ tracing: true }),
+            new Sentry.Integrations.Express({ app })
+        ],
+        tracesSampleRate: 0.15
+    });
+}
 let logger = console;
 
 var compression = require('compression');
 
 if (process.env.JEST_WORKER_ID === undefined) {
     app.use(Sentry.Handlers.requestHandler());
+    app.use(Sentry.Handlers.tracingHandler())
 }
 app.use(compression());
 app.set('trust proxy', true);
@@ -153,9 +156,6 @@ app.use((req, res, next) => {
     var host = req.hostname;
     // const originalHost = req.header('host');
     // console.info(`Forwarded host is ${originalHost} request host is ${host}`);
-    // if (originalHost === 'www.cyclerouteforecast.com' || originalHost === 'cyclerouteforecast.com') {
-    //     await datastore.save({key:datastore.key('OldUrl'), data:{timestamp: new Date(), caller:req.header('x-forwarded-for')}});
-    // }
     if (host === 'www.cyclerouteforecast.com' ||
         host === 'cyclerouteforecast.com') {
         res.status(404).text("Cyclerouteforecast.com has been deprecated, use www.randoplan.com instead");
