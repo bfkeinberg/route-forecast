@@ -20,7 +20,7 @@ if ('serviceWorker' in navigator) {
 ReactGA.initialize("G-0R3J1W9ECC");
 
 let script = document.scripts.namedItem('routeui')
-if (!window.origin.startsWith('http://localhost') && !window.origin.startsWith('http://Brians-MacBook-Pro.local')) {
+if (!window.origin.startsWith('http://localhost') && !window.origin.startsWith('http://127.0.0.1') && !window.origin.startsWith('http://Brians-MacBook-Pro.local')) {
     Sentry.init({
         dsn: 'https://ea4c472ff9054dab8c18d594b95d8da2@sentry.io/298059',
         environment: 'production',
@@ -54,11 +54,7 @@ if (!window.origin.startsWith('http://localhost') && !window.origin.startsWith('
         replaysSessionSampleRate: 0.01,
         // If the entire session is not sampled, use the below sample rate to sample
         // sessions when an error occurs.
-        replaysOnErrorSampleRate: 0.7,
-        /*,
-        beforeBreadcrumb(breadcrumb) {
-            if (breadcrumb.category==='console') {return null} else {return breadcrumb}
-        }*/
+        replaysOnErrorSampleRate: 0.7
     });
 }
 
