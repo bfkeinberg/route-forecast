@@ -157,25 +157,18 @@ const usePointsAndBounds = () => {
 
   if (stravaMode) {
     if (stravaActivityStream !== null) {
-      // pointsAndBounds = useMemo(() => stravaRouteParser.computePointsAndBounds(stravaActivityStream), [stravaActivityStream])
-      pointsAndBounds = stravaRouteParser.computePointsAndBounds(stravaActivityStream)
+      pointsAndBounds = useMemo(() => stravaRouteParser.computePointsAndBounds(stravaActivityStream), [stravaActivityStream])
     }
   } else if (rwgpsRouteData !== null) {
     pointsAndBounds = useMemo(() => gpxParser.computePointsAndBounds(rwgpsRouteData, "rwgps"), [rwgpsRouteData])
-    // pointsAndBounds = gpxParser.computePointsAndBounds(rwgpsRouteData, "rwgps")
   } else if (gpxRouteData !== null) {
-    // pointsAndBounds = useMemo(() => gpxParser.computePointsAndBounds(gpxRouteData, "gpx"), [gpxRouteData])
-    pointsAndBounds = gpxParser.computePointsAndBounds(gpxRouteData, "gpx")
+    pointsAndBounds = useMemo(() => gpxParser.computePointsAndBounds(gpxRouteData, "gpx"), [gpxRouteData])
   }
   if (pointsAndBounds && pointsAndBounds.pointList && pointsAndBounds.pointList.length > 0) {
     pointsAndBounds.points = useMemo(() => pointsAndBounds.pointList
       .map(point => ({ lat: point.lat, lng: point.lon, dist: point.dist })), [pointsAndBounds.pointList])
   }
 
-  if (!pointsAndBounds) {
-    Sentry.captureMessage("No points or bounds", "error")
-    pointsAndBounds = {pointList:[], points:[], bounds:{}}
-  }
   return pointsAndBounds
 }
 

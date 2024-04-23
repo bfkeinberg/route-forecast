@@ -86,12 +86,6 @@ const RouteForecastMap = () => {
 
     const { points, bounds } = usePointsAndBounds()
 
-    // try to address repeated errors with empty points
-    if (points.length === 0 || Object.keys(bounds) === 0) {
-        Sentry.captureMessage("Either points or bounds for map are empty","error")
-        return
-    }
-
     let mapBounds
     try {
         mapBounds = useMemo(() => (getMapBounds(points, bounds, zoomToRange, subrange)), [
