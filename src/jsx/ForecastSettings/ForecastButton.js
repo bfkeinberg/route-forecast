@@ -8,7 +8,7 @@ import { useMediaQuery } from 'react-responsive';
 
 import { shortenUrl } from "../../redux/actions";
 import { useForecastMutation, useGetAqiMutation } from '../../redux/forecastApiSlice';
-import { forecastAppended,forecastFetched, forecastFetchFailed, querySet } from '../../redux/reducer';
+import { forecastAppended,forecastFetchBegun,forecastFetched, forecastFetchFailed, querySet } from '../../redux/reducer';
 import { generateUrl } from '../../utils/queryStringUtils';
 import { getForecastRequest } from '../../utils/util';
 import { updateHistory } from "../app/updateHistory";
@@ -66,6 +66,7 @@ const ForecastButton = ({fetchingForecast,submitDisabled, routeNumber, startTime
     let buttonStyle = submitDisabled ? { pointerEvents: 'none', display: 'inline-flex' } : null;
     const forecastClick = async () => {
         await Sentry.startSpan({ name: "forecastClick" }, async () => {
+            dispatch(forecastFetchBegun())
             if (type === "rwgps") {
                 ReactGA.event('add_to_cart', {
                     value: distanceInKm,
@@ -128,7 +129,7 @@ const ForecastButton = ({fetchingForecast,submitDisabled, routeNumber, startTime
                     small={smallScreen}
                     large={!smallScreen}
                     fill={true}
-                    loading={forecastFetchResult.loading || aqiFetchResult.loading}
+                    loading={forecastFetchResult.loading || aqiFetchResult.loading || fetchingForecast}
                 >
                     {forecastFetchResult.isLoading ? 'Creating forecast...' : 'Find Forecast'}
                 </Button>
