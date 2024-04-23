@@ -1,8 +1,9 @@
 const { DateTime } = require("luxon");
 const jwt = require("jsonwebtoken");
 const Sentry = require("@sentry/node")
+const axios = require('axios');
+const axiosRetry = require('axios-retry').default
 
-const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
 const milesToMeters = 1609.34;
 
 const keyId = "4JSC7L3B75";
@@ -28,6 +29,23 @@ const makeJwt = () => {
     )
 }
 
+axiosRetry(axios, {
+    retries: 10,
+    retryDelay: (...arg) => axiosRetry.exponentialDelay(...arg, 200),
+    retryCondition (error) {
+        if (!error.response) {return false}
+        switch (error.response.status) {
+        case 504:
+            return true;
+        default:
+            return false;
+        }
+    },
+    onRetry: (retryCount) => {
+        console.log(`axios retry count: `, retryCount);
+    }
+});
+
 /* eslint-disable max-params*/
 /**
  *
@@ -42,53 +60,47 @@ const makeJwt = () => {
  * lat: *, lon: *, temp: string, fullTime: *, relBearing: null, rainy: boolean, windBearing: number,
  * vectorBearing: *, gust: string} | never>} a promise to evaluate to get the forecast results
  */
-const callWeatherKit = function (lat, lon, currentTime, distance, zone, bearing, getBearingDifference) {
-    const startTime = DateTime.fromISO(currentTime, {zone:'utc'});
+const callWeatherKit = async function (lat, lon, currentTime, distance, zone, bearing, getBearingDifference) {
+    const startTime = DateTime.fromISO(currentTime, { zone: 'utc' });
     const weatherKitKey = makeJwt();
-    const when = startTime.toISO({suppressMilliseconds:true});
-    const later = startTime.plus({hours:1}).toISO({suppressMilliseconds:true});
+    const when = startTime.toISO({ suppressMilliseconds: true });
+    const later = startTime.plus({ hours: 1 }).toISO({ suppressMilliseconds: true });
     const url = `https://weatherkit.apple.com/api/v1/weather/en/${lat}/${lon}?timezone=${zone}&dataSets=currentWeather,forecastHourly,forecastNextHour,&countryCode=US&currentAsOf=${when}&hourlyStart=${when}&hourlyEnd=${later}`;
-    // console.info(`WeatherKit URL ${url}`);
-    const forecastResult = fetch(url,{headers: {'Authorization':`Bearer ${weatherKitKey}`}}).then(response => {
-        if (!response.ok) {throw response.errorText?response.errorText:`Error ${response.status}`}
-        else {
-            const result = response.json();
-            return result;}}).
-    then(forecast => {
-        const current = forecast.forecastHourly.hours[0];
-        const now = DateTime.fromISO(forecast.currentWeather.asOf, {zone:zone});
-        const windBearing = forecast.currentWeather.windDirection
-        const relativeBearing = getBearingDifference(bearing, windBearing)
-        const rainy = forecast.currentWeather.conditionCode === "Rain";
-        const temperatureInC = forecast.currentWeather.temperature;
+    Sentry.setContext('url', { 'url': url })
+    const forecastResult = await axios.get(url, { headers: { 'Authorization': `Bearer ${weatherKitKey}` } }).
+        catch(error => {
+            Sentry.captureException(error)
+            throw error;
+        });
+    const forecast = forecastResult.data
+    const current = forecast.forecastHourly.hours[0];
+    const now = DateTime.fromISO(forecast.currentWeather.asOf, { zone: zone });
+    const windBearing = forecast.currentWeather.windDirection
+    const relativeBearing = getBearingDifference(bearing, windBearing)
+    const rainy = forecast.currentWeather.conditionCode === "Rain";
+    const temperatureInC = forecast.currentWeather.temperature;
+    // eslint-disable-next-line no-mixed-operators
+    const temperatureInF = temperatureInC * 9 / 5 + 32;
+    return {
+        'time': now.toFormat('h:mm a'),
+        'distance': distance,
+        'summary': forecast.currentWeather.conditionCode,
+        'precip': `${(current.precipitationChance * 100).toFixed(1)}%`,
+        'humidity': Math.round(current.humidity * 100),
+        'cloudCover': `${(forecast.currentWeather.cloudCover * 100).toFixed(1)}%`,
+        'windSpeed': `${Math.round(forecast.currentWeather.windSpeed * 1000 / milesToMeters)}`,
+        'lat': lat,
+        'lon': lon,
+        'temp': `${Math.round(temperatureInF)}`,
+        'fullTime': now.toFormat('EEE MMM d h:mma yyyy'),
+        'relBearing': relativeBearing,
+        'rainy': rainy,
+        'windBearing': windBearing,
+        'vectorBearing': bearing,
+        'gust': current.windGust === undefined ? '<unavailable>' : `${Math.round(forecast.currentWeather.windGust * 1000 / milesToMeters)}`,
         // eslint-disable-next-line no-mixed-operators
-        const temperatureInF = temperatureInC * 9/5 + 32;
-        return {
-            'time':now.toFormat('h:mm a'),
-            'distance':distance,
-            'summary':forecast.currentWeather.conditionCode,
-            'precip':`${(current.precipitationChance*100).toFixed(1)}%`,
-            'humidity':Math.round(current.humidity*100),
-            'cloudCover':`${(forecast.currentWeather.cloudCover*100).toFixed(1)}%`,
-            'windSpeed':`${Math.round(forecast.currentWeather.windSpeed * 1000/milesToMeters)}`,
-            'lat':lat,
-            'lon':lon,
-            'temp':`${Math.round(temperatureInF)}`,
-            'fullTime':now.toFormat('EEE MMM d h:mma yyyy'),
-            'relBearing':relativeBearing,
-            'rainy':rainy,
-            'windBearing':windBearing,
-            'vectorBearing':bearing,
-            'gust':current.windGust===undefined?'<unavailable>':`${Math.round(forecast.currentWeather.windGust * 1000/milesToMeters)}`,
-            // eslint-disable-next-line no-mixed-operators
-            'feel':Math.round(forecast.currentWeather.temperatureApparent * 9/5 + 32)
-        }
-    }).
-    catch(error => {
-        Sentry.captureException(error,'Apple WeatherKit')
-        throw error;
-    });
-    return forecastResult;
+        'feel': Math.round(forecast.currentWeather.temperatureApparent * 9 / 5 + 32)
+    }
 };
 
 module.exports = callWeatherKit;
