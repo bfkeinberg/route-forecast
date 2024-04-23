@@ -12,14 +12,15 @@
                 "<node_internals>/**"
             ],
             "program": "/Users/brian/Src/route-forecast/dist/server/index.js",
-            "localRoot": "/Users/brian/Src/route-forecast/src/jsx/server",
+            "localRoot": "/Users/brian/Src/route-forecast/src/server",
             "remoteRoot": "${workspaceFolder}/dist/server",
             "runtimeArgs": ["--preserve-symlinks"],
             "sourceMaps": true,
             "trace": true,
             "outFiles": [
                 "${workspaceFolder}/dist/**/*.js"
-            ]
+            ],
+            "env": {"NODE_ENV": "development"}
         },        
         {
             "type": "chrome",
