@@ -1,4 +1,4 @@
-const callClimacell = require('./climacell');
+const callTomorrowIo = require('./tomorrowio');
 const callWeatherApi = require('./weatherApi');
 const callVisualCrossing = require('./visualCrossing');
 const callNWS = require('./nws');
@@ -30,7 +30,7 @@ const callWeatherService = function (service, lat, lon, currentTime, distance, z
     switch (service) {
     case 'climacell':
         return Sentry.startSpan({ name: "tomorrow.io" }, () => {
-            return callClimacell(lat, lon, currentTime, distance, zone, bearing, getBearingDifference)
+            return callTomorrowIo(lat, lon, currentTime, distance, zone, bearing, getBearingDifference)
         })
     case 'weatherapi':
         return Sentry.startSpan({ name: "weatherapi" }, () => {
