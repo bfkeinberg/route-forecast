@@ -1,4 +1,4 @@
-import climacell from 'Images/Powered_by_Tomorrow-Black.png';
+import tomorrowIo from 'Images/Powered_by_Tomorrow-Black.png';
 import React, {useEffect,useState} from 'react';
 
 import ErrorBoundary from "../shared/ErrorBoundary";
@@ -23,7 +23,7 @@ import { WeatherCorrections } from './WeatherCorrections';
 const displayBacklink = (provider) => {
     switch (provider) {
         case 'climacell':
-            return <a tabIndex='-1' href="https://www.tomorrow.io/" target="_blank" rel="noopener noreferrer"><img src={climacell} width={166} height={19}/></a>;
+            return <a tabIndex='-1' href="https://www.tomorrow.io/" target="_blank" rel="noopener noreferrer"><img src={tomorrowIo} width={166} height={19}/></a>;
         case 'weatherapi':
             return <a href="https://www.weatherapi.com/" title="Free Weather API"  target="_blank" rel="noopener noreferrer"><img src='//cdn.weatherapi.com/v4/images/weatherapi_logo.png' alt="Weather data by WeatherAPI.com" border="0"/></a>;
         case 'visualcrossing':
