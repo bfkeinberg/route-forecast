@@ -36,6 +36,7 @@ axiosRetry(axios, {
         if (!error.response) {return false}
         switch (error.response.status) {
         case 504:
+        case 404:
             return true;
         default:
             return false;
