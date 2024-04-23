@@ -11,7 +11,6 @@ import { useForecastMutation, useGetAqiMutation } from '../../redux/forecastApiS
 import { forecastAppended,forecastFetchBegun,forecastFetched, forecastFetchFailed, querySet } from '../../redux/reducer';
 import { generateUrl } from '../../utils/queryStringUtils';
 import { getForecastRequest } from '../../utils/util';
-import { updateHistory } from "../app/updateHistory";
 import { DesktopTooltip } from '../shared/DesktopTooltip';
 
 const ForecastButton = ({fetchingForecast,submitDisabled, routeNumber, startTimestamp, pace, interval,
@@ -106,9 +105,8 @@ const ForecastButton = ({fetchingForecast,submitDisabled, routeNumber, startTime
         })
         const url = generateUrl(startTimestamp, routeNumber, pace, interval, metric, controls,
             strava_activity, strava_route, provider, origin, true, dispatch, zone, rusaRouteId)
-        querySet({queryString:url.url,searchString:url.search})
+        querySet({url:url.url,search:url.search})
         Sentry.setContext("query", {queryString:url.search})
-        updateHistory(url.url, true);
         // don't shorten localhost with bitly
         if (origin !== 'http://localhost:8080' && (url.url !== href || !urlIsShortened)) {
             dispatch(shortenUrl(url.url))
