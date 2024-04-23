@@ -1,4 +1,4 @@
-import * as Sentry from "@sentry/react"
+import * as Sentry from "@sentry/react";
 import { DateTime } from 'luxon';
 import { useEffect, useMemo,useRef, useState } from "react"
 import { useSelector } from "react-redux"
@@ -7,7 +7,6 @@ import { routeLoadingModes } from "../data/enums"
 import gpxParser from "./gpxParser"
 import stravaRouteParser from "./stravaRouteParser"
 import { getRouteInfo, milesToMeters } from "./util"
-
 const useDelay = (delay, startCondition = true) => {
   const [
 ready,
@@ -216,14 +215,17 @@ const calculateWindResult = (inputs) => {
 }
 
 const useForecastDependentValues = () => {
-  const routeInfo = useSelector(state => state.routeInfo)
-  const routeParams = useSelector(state => state.uiInfo.routeParams)
-  const controls = useSelector(state => state.controls)
-  const timeZoneId = useSelector(state => state.forecast.timeZoneId)
-  const forecast = useSelector(state => state.forecast.forecast)
+  return Sentry.startSpan({ name: "forecastCalculations" },
+    () => {
+      const routeInfo = useSelector(state => state.routeInfo)
+      const routeParams = useSelector(state => state.uiInfo.routeParams)
+      const controls = useSelector(state => state.controls)
+      const timeZoneId = useSelector(state => state.forecast.timeZoneId)
+      const forecast = useSelector(state => state.forecast.forecast)
 
-  const windAdjustmentResult = calculateWindResult({routeInfo, routeParams, controls, timeZoneId, forecast})
-  return windAdjustmentResult
+      const windAdjustmentResult = calculateWindResult({ routeInfo, routeParams, controls, timeZoneId, forecast })
+      return windAdjustmentResult
+    })
 }
 
 const useWhenChanged = (value, callback, changedCondition = true) => {
