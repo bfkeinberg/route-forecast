@@ -14,7 +14,7 @@ export const browserIsFirefox = () => {
 };
 
 export const browserIsSafari = () => {
-    return window.navigator.userAgent.match(/Safari/i) && !window.navigator.userAgent.match(/Chrome/i)
+    return window.navigator.userAgent.match(/Safari/i) && !window.navigator.userAgent.match(/Chrome/i && !window.navigator.userAgent.match(/CriOS/))
 }
 
 /*global chrome*/
