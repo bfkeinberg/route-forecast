@@ -88,9 +88,9 @@ const getFromTomorrowIoWithBackoff = async (forecastUrl) => {
  * lat: *, lon: *, temp: string, fullTime: *, relBearing: null, rainy: boolean, windBearing: number,
  * vectorBearing: *, gust: string} | never>} a promise to evaluate to get the forecast results
  */
-const callTomorrowIo = async function (lat, lon, currentTime, distance, zone, bearing, getBearingDifference) {
+const callTomorrowIo = async function callTomorrowIo (lat, lon, currentTime, distance, zone, bearing, getBearingDifference) {
     const climacellKey = process.env.CLIMACELL_KEY;
-    const startTime = DateTime.fromISO(currentTime, {zone:'utc'});
+    const startTime = DateTime.fromISO(currentTime, {zone:zone});
     const endTime = startTime.plus({hours:1})
 
     const startTimeString = startTime.toISO()
@@ -103,7 +103,7 @@ const callTomorrowIo = async function (lat, lon, currentTime, distance, zone, be
     const forecast = await getFromTomorrowIoWithBackoff(url);
 
     const current = forecast.data.timelines[0];
-    const now = DateTime.fromISO(current.startTime)
+    const now = DateTime.fromISO(current.startTime, {zone:zone})
     const values = current.intervals[0].values;
     const hasWind = values.windSpeed !== undefined;
     const windBearing = values.windDirection;
