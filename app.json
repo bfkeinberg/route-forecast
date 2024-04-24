@@ -1,0 +1,20 @@
+{
+  "name": "Randoplan",
+  "description": "Analyzes a cycling route and given a pace on flat ground predicts rider location over time and obtains weather forecasts",
+  "keywords": [
+    "cycling",
+    "fitness",
+    "navigation",
+    "weather"
+  ],
+  "website": "https://www.randoplan.com",
+  "repository": "https://github.com/bfkeinberg/route-forecast",
+ "buildpacks": [
+    {
+      "url": "heroku/nodejs"
+    },
+    {
+      "url": "https://github.com/buyersight/heroku-google-application-credentials-buildpack.git"
+    }
+  ]
+}
