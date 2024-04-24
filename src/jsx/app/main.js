@@ -5,11 +5,10 @@ import "@blueprintjs/select/lib/css/blueprint-select.css";
 import 'Images/style.css';
 
 import * as Sentry from "@sentry/react";
-import lazyRetry from "@tdotcode/react-lazy-retry";
 import {Info} from "luxon";
 import PropTypes from 'prop-types';
 import queryString from 'query-string';
-import React, {Component, Suspense,useEffect} from 'react';
+import React, {Component, lazy, Suspense,useEffect} from 'react';
 import cookie from 'react-cookies';
 import { connect, useDispatch, useSelector } from 'react-redux';
 import  {useMediaQuery} from 'react-responsive';
@@ -23,8 +22,14 @@ import {
     stravaRouteSet, stravaTokenSet, usePinnedRoutesSet, zoomToRangeSet
 } from "../../redux/reducer";
 
-const LoadableDesktop = lazyRetry(() => import(/* webpackChunkName: "DesktopUI" */ '../DesktopUI'), 8, 500)
-const LoadableMobile = lazyRetry(() => import(/* webpackChunkName: "MobileUI" */ '../MobileUI'), 8, 2000)
+const LoadableDesktop = lazy(() => import( /* webpackChunkName: "DesktopUI" */'../DesktopUI').catch((error) => {
+    setTimeout(() => window.location.reload(), 5000);
+    return { default: () => <div>{`Error ${error} loading the component. Window will reload in five seconds`}</div> };
+}))
+const LoadableMobile = lazy(() => import( /* webpackChunkName: "MobileUI" */'../MobileUI').catch((error) => {
+    setTimeout(() => window.location.reload(), 5000);
+    return { default: () => <div>{`Error ${error} loading the component. Window will reload in five seconds`}</div> };
+}))
 
 import { routeLoadingModes } from '../../data/enums';
 import {
