@@ -11,7 +11,7 @@ export const WeatherCorrections = () => {
 
   const lost = weatherCorrectionMinutes >= 0
   return (
-    <span id={weatherId} style={{ fontSize: "13px" }}>
+    <span id={weatherId} style={{ fontSize: "14px" }}>
       <span>
         {Math.abs(Math.round(weatherCorrectionMinutes))} minutes <span style={{ color: lost ? "darkorange" : "deepskyblue" }}>{lost ? "lost " : "gained "}</span>{lost ? "to" : "from"} wind
       </span>
