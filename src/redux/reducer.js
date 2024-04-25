@@ -26,7 +26,8 @@ export const providerValues = {
     nws:{min_interval:1,max_days:7, canForecastPast:false, daysInPast:0, name:"National Weather Service", enabled:true},
     // meteomatics:{min_interval:1,max_days:10,canForecastPast:true, daysInPast:1, name:"Meteomatics"}
     weatherKit:{min_interval:0.2,max_days:14, canForecastPast:true, name:"Apple WeatherKit", enabled:true},
-    };
+    }
+export const defaultProvider = 'nws'
 
 const checkedStartDate = (startDate, canForecastPast) => {
     if (canForecastPast) return startDate;
@@ -39,8 +40,8 @@ const checkedStartDate = (startDate, canForecastPast) => {
 
 const routeParamsInitialState = {
     interval: defaultIntervalInHours,
-    min_interval:providerValues.nws.min_interval,
-    canForecastPast:providerValues.nws.canForecastPast,
+    min_interval:providerValues[defaultProvider].min_interval,
+    canForecastPast:providerValues[defaultProvider].canForecastPast,
     pace: defaultPace,
     rwgpsRoute: '',
     rwgpsRouteIsTrip: false,
@@ -48,7 +49,7 @@ const routeParamsInitialState = {
     // eslint-disable-next-line new-cap
     zone: Intl.DateTimeFormat().resolvedOptions().timeZone,
     routeLoadingMode: routeLoadingModes.RWGPS,
-    maxDaysInFuture: providerValues['nws'].max_days,
+    maxDaysInFuture: providerValues[defaultProvider].max_days,
     stopAfterLoad: false,
     rusaPermRouteId: ''
 }
@@ -483,7 +484,7 @@ const forecastInitialState = {
     range: [],
     tableViewed: false,
     mapViewed: false,
-    weatherProvider: 'nws',
+    weatherProvider: defaultProvider,
     zoomToRange: true,
     fetchAqi:false
 }
