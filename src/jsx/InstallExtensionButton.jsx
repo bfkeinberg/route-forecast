@@ -5,9 +5,11 @@ import cookie from 'react-cookies';
 import { browserIsChrome, browserIsFirefox, browserIsSafari,extensionIsInstalled } from "../utils/extensionDetect";
 
 export const InstallExtensionButton = () => {
-    if (cookie.load('muteExtensionInstallPrompt')) {
-        return null;
-    }
+    const [
+        promptForExtensionInstall,
+        setPromptForExtensionInstall
+    ] = useState(!cookie.load('muteExtensionInstallPrompt'))
+
     const [
         isInstalled,
         setIsInstalled
@@ -20,7 +22,12 @@ export const InstallExtensionButton = () => {
         checkIfInstalled();
     })
 
-    if (isInstalled) {
+    const mutePrompt = () => {
+        cookie.save('muteExtensionInstallPrompt', true, { path: '/' } )
+        setPromptForExtensionInstall(false)
+    }
+
+    if (isInstalled || !promptForExtensionInstall) {
         // console.info('Extension is installed');
         return null;
     }
@@ -30,7 +37,7 @@ export const InstallExtensionButton = () => {
             return (
                 <ButtonGroup>
                     <AnchorButton text={"Install Chrome extension for randoplan"} href={"https://chrome.google.com/webstore/detail/randoplan-extension/bgodmjchmhnpgccglldbfddddignglep"}/>
-                    <Button text="Nope" onClick={()=>cookie.save('muteExtensionInstallPrompt', true, { path: '/' } )}/>
+                    <Button text="Nope" onClick={mutePrompt}/>
                 </ButtonGroup>
             )
         }
@@ -38,7 +45,7 @@ export const InstallExtensionButton = () => {
             return (
                 <ButtonGroup>
                     <AnchorButton text={"Install Firefox extension for randoplan"} href={"https://addons.mozilla.org/en-US/firefox/addon/randoplan-extension/"} />
-                    <Button text="Nope" onClick={() => cookie.save('muteExtensionInstallPrompt', true, { path: '/' })} />
+                    <Button text="Nope" onClick={mutePrompt} />
                 </ButtonGroup>
             )
         }
@@ -46,7 +53,7 @@ export const InstallExtensionButton = () => {
             return (
                 <ButtonGroup>
                     <AnchorButton text={"Install Safari extension for randoplan"} href={"https://apps.apple.com/us/app/randoplan-extension/id6477252687"} />
-                    <Button text="Nope" onClick={() => cookie.save('muteExtensionInstallPrompt', true, { path: '/' })} />
+                    <Button text="Nope" onClick={mutePrompt} />
                 </ButtonGroup>
             )
         }
