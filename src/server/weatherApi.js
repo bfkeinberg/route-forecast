@@ -19,7 +19,7 @@ const Sentry = require("@sentry/node")
  * lat: *, lon: *, temp: string, fullTime: *, relBearing: null, rainy: boolean, windBearing: number,
  * vectorBearing: *, gust: string} | never>} a promise to evaluate to get the forecast results
  */
-const callWeatherApi = async function (lat, lon, currentTime, distance, zone, bearing, getBearingDifference) {
+const callWeatherApi = async function callWeatherApi (lat, lon, currentTime, distance, zone, bearing, getBearingDifference) {
     const weatherApiKey = process.env.WEATHER_API_KEY;
     const startTime = DateTime.fromISO(currentTime, {zone:zone});
     let hour = startTime.minute > 30 ? startTime.hour + 1 : startTime.hour;
