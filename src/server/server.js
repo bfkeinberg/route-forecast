@@ -156,12 +156,7 @@ app.use((req, res, next) => {
     var host = req.hostname;
     // const originalHost = req.header('host');
     // console.info(`Forwarded host is ${originalHost} request host is ${host}`);
-    if (host === 'www.cyclerouteforecast.com' ||
-        host === 'cyclerouteforecast.com') {
-        res.status(404).text("Cyclerouteforecast.com has been deprecated, use www.randoplan.com instead");
-    }
-    if (host === 'route-forecast.ue.r.appspot.com' ||
-        host === 'route-forecast.appspot.com' || host === 'randoplan.com') {
+    if (host === 'randoplan.herokuapp.com' || host === 'randoplan.com') {
         logger.info(`Redirected ${host} to www.randoplan.com`);
         return res.redirect(301, 'https://www.randoplan.com' + req.originalUrl);
     }
