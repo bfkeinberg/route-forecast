@@ -6,7 +6,16 @@ import {connect} from 'react-redux';
 
 import { routeLoadingModes } from '../../data/enums';
 import ErrorBoundary from "../shared/ErrorBoundary";
-const LoadableMap = lazyRetry(() => import(/* webpackChunkName: "Map" */ './RouteForecastMap'), 7, 1200);
+
+const addBreadcrumb = (msg) => {
+    Sentry.addBreadcrumb({
+        category: 'loading',
+        level: "info",
+        message: msg
+    })
+}
+
+const LoadableMap = lazyRetry(() => {addBreadcrumb('loading map');return import(/* webpackChunkName: "Map" */ './RouteForecastMap')}, 7, 1200);
 
 const MapLoader = (props) => {
     if (props.hasMap) {

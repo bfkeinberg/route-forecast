@@ -8,9 +8,9 @@ import * as Sentry from "@sentry/react";
 import {Info} from "luxon";
 import PropTypes from 'prop-types';
 import queryString from 'query-string';
-import React, {Component, lazy, Suspense,useEffect} from 'react';
+import React, {lazy, Suspense,useEffect} from 'react';
 import cookie from 'react-cookies';
-import { connect, useDispatch, useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import  {useMediaQuery} from 'react-responsive';
 
 import {
@@ -22,14 +22,21 @@ import {
     stravaRouteSet, stravaTokenSet, usePinnedRoutesSet, zoomToRangeSet, defaultProvider
 } from "../../redux/reducer";
 
-const LoadableDesktop = lazy(() => import( /* webpackChunkName: "DesktopUI" */'../DesktopUI').catch((error) => {
+const addBreadcrumb = (msg) => {
+    Sentry.addBreadcrumb({
+        category: 'loading',
+        level: "info",
+        message: msg
+    })
+}
+const LoadableDesktop = lazy(() => {addBreadcrumb('loading desktop UI'); return import( /* webpackChunkName: "DesktopUI" */'../DesktopUI').catch((error) => {
     setTimeout(() => window.location.reload(), 5000);
     return { default: () => <div>{`Error ${error} loading the component. Window will reload in five seconds`}</div> };
-}))
-const LoadableMobile = lazy(() => import( /* webpackChunkName: "MobileUI" */'../MobileUI').catch((error) => {
+})})
+const LoadableMobile = lazy(() => {addBreadcrumb('loading mobile UI'); return import( /* webpackChunkName: "MobileUI" */'../MobileUI').catch((error) => {
     setTimeout(() => window.location.reload(), 5000);
     return { default: () => <div>{`Error ${error} loading the component. Window will reload in five seconds`}</div> };
-}))
+})})
 
 import { routeLoadingModes } from '../../data/enums';
 import {

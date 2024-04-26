@@ -16,14 +16,15 @@ stravaErrorSet, stravaFetchBegun, stravaFetched, stravaFetchFailed,
 
 export const componentLoader = (lazyComponent, attemptsLeft) => {
     return new Promise((resolve, reject) => {
-        lazyComponent
+        Sentry.addBreadcrumb({category:'loading',level:'info',message:'in component loader'})
+        return lazyComponent
             .then(resolve)
             .catch((error)=>{
                 // let us retry after 1500 ms
                 setTimeout(() => {
                     if (attemptsLeft === 1) {
                         // instead of rejecting reload the window
-                        console.error(error);
+                        Sentry.captureException(error);
                         if (!navigator.userAgent.includes("jsdom")) {
                             window.location.reload();
                         }

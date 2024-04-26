@@ -1,16 +1,24 @@
 import { Button, Spinner } from '@blueprintjs/core';
-import {lazy} from '@loadable/component';
+// import {lazy} from '@loadable/component';
 import * as Sentry from "@sentry/react";
 import axios from 'axios';
 import PropTypes from 'prop-types';
 import queryString from 'query-string';
-import React, {Suspense, useEffect} from 'react';
+import React, {Suspense, useEffect, lazy} from 'react';
 import ReactGA from "react-ga4";
 import {connect} from 'react-redux';
 
 import { errorDetailsSet,loadingPinnedSet, pinnedRoutesSet, rwgpsTokenSet, usePinnedRoutesSet } from '../../redux/reducer';
 
-const LoadableRouteList = lazy(() => import(/* webpackChunkName: "RouteList" */ './RWGPSRouteList'));
+const addBreadcrumb = (msg) => {
+    Sentry.addBreadcrumb({
+        category: 'loading',
+        level: "info",
+        message: msg
+    })
+}
+
+const LoadableRouteList = lazy(() => {addBreadcrumb('loading route list'); return import(/* webpackChunkName: "RouteList" */ './RWGPSRouteList')});
 
 const getPinnedRoutes = async (rwgpsToken, setErrorDetails, rwgpsTokenSet) => {
 
