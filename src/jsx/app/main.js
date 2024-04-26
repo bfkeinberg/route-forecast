@@ -54,9 +54,9 @@ import { inputPaceToSpeed,parseControls } from '../../utils/util';
 
 export const saveRwgpsCredentials = (token) => {
     Sentry.addBreadcrumb({
-        category: 'credentials',
+        category: 'rwgps',
         level: 'info',
-        message:'Saving RidewithGPS credentials'
+        message:'Saving RidewithGPS login data'
     })
 
     if ("credentials" in navigator && "PasswordCredential" in window && "PublicKeyCredential" in window && "store" in navigator.credentials && token) {
@@ -69,15 +69,15 @@ export const saveRwgpsCredentials = (token) => {
         });
 
         navigator.credentials.store(credential).then(() => {
-        console.info("Credential stored in the user agent's credential manager.");
+        console.info("Rwgps login info stored by the user agent.");
         }, (err) => {
             Sentry.captureException(err)
             cookie.save('rwgpsToken', token, { path: '/' });
-            console.info('credentials stored in cookie');
+            console.info('RideWithGps login info stored in cookie');
             });
     } else {
         cookie.save('rwgpsToken', token, { path: '/' });
-        console.info('credentials stored in cookie');
+        console.info('RideWithGps login info stored in cookie');
     }
 };
 const loadAndStoreRwgpsCredentialsViaCookie = (dispatch) => {
@@ -90,29 +90,29 @@ const loadAndStoreRwgpsCredentialsViaCookie = (dispatch) => {
 
 const setupRideWithGps = async (dispatch) => {
     Sentry.addBreadcrumb({
-        category: 'credentials',
+        category: 'rwgps',
         level: 'info',
-        message:'Loading RidewithGPS credentials'
+        message:'Loading RidewithGPS login information'
     })
     let credentials = null;
     if ("PasswordCredential" in window && "PublicKeyCredential" in window) {
         try {
             credentials = await navigator.credentials.get({password:true,mediation:"silent"});
             if (credentials === null) {
-                console.info('No rwgps credentials retrieved, trying cookie');
+                console.info('No rwgps login info retrieved, trying cookie');
                 loadAndStoreRwgpsCredentialsViaCookie(dispatch)
             } else {
-                console.info('credentials retrieved from credential manager');
+                console.info('Rwgps login info retrieved from manager');
                 dispatch(rwgpsTokenSet(credentials.password))
                 saveRwgpsCredentials(credentials.password);
             }
         } catch (err) {
-            console.info(`failed to load credentials with ${err}`)
+            console.info(`failed to load rwgps login info with ${err}`)
             Sentry.captureException(err)
             loadAndStoreRwgpsCredentialsViaCookie(dispatch)
     }
     } else {
-        console.info('credentials manager not supported, retrieved from cookie');
+        console.info('Login info manager not supported, retrieved from cookie');
         loadAndStoreRwgpsCredentialsViaCookie(dispatch)
     }
 }
