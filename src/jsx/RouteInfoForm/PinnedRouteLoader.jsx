@@ -28,6 +28,7 @@ const getPinnedRoutes = async (rwgpsToken, setErrorDetails, rwgpsTokenSet) => {
         return response.data;
     } catch (e) {
         console.log(`axios exception is ${e}`);
+        Sentry.captureException(e)
         const errorMessage = e.response !== undefined ? JSON.stringify(e.response.data) : e
         setErrorDetails(`Ride with GPS login failure: ${errorMessage}`);
         rwgpsTokenSet(null);
