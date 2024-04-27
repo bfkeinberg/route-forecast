@@ -52,6 +52,12 @@ import {
 import { useForecastMutation, useGetAqiMutation } from '../../redux/forecastApiSlice';
 import { inputPaceToSpeed,parseControls } from '../../utils/util';
 
+const checkCredentialsInterface = () => {
+    return typeof PasswordCredential !== 'undefined' && typeof PublicKeyCredential !== 'undefined' && 
+        "credentials" in navigator && "store" in navigator.credentials && "get" in navigator.credentials &&
+        "password" in PasswordCredential && "name" in PasswordCredential
+}
+
 export const saveRwgpsCredentials = (token) => {
     Sentry.addBreadcrumb({
         category: 'rwgps',
@@ -59,12 +65,12 @@ export const saveRwgpsCredentials = (token) => {
         message:'Saving RidewithGPS login data'
     })
 
-    if ("credentials" in navigator && "PasswordCredential" in window && "PublicKeyCredential" in window && "store" in navigator.credentials && token) {
+    if (checkCredentialsInterface() && token) {
 
         // eslint-disable-next-line no-undef
         let credential = new PasswordCredential({
             id: 'ridewithgps',
-            name:'ridewithgps',
+            name:'Ride With Gps',
             password:token
         });
 
@@ -80,6 +86,7 @@ export const saveRwgpsCredentials = (token) => {
         console.info('RideWithGps login info stored in cookie');
     }
 };
+
 const loadAndStoreRwgpsCredentialsViaCookie = (dispatch) => {
     const token = loadCookie("rwgpsToken");
     if (token) {
@@ -95,7 +102,7 @@ const setupRideWithGps = async (dispatch) => {
         message:'Loading RidewithGPS login information'
     })
     let credentials = null;
-    if ("PasswordCredential" in window && "PublicKeyCredential" in window) {
+    if (checkCredentialsInterface()) {
         try {
             credentials = await navigator.credentials.get({password:true,mediation:"silent"});
             if (credentials === null) {
