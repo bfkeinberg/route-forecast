@@ -215,17 +215,14 @@ const calculateWindResult = (inputs) => {
 }
 
 const useForecastDependentValues = () => {
-  return Sentry.startSpan({ name: "forecastCalculations" },
-    () => {
-      const routeInfo = useSelector(state => state.routeInfo)
-      const routeParams = useSelector(state => state.uiInfo.routeParams)
-      const controls = useSelector(state => state.controls)
-      const timeZoneId = useSelector(state => state.forecast.timeZoneId)
-      const forecast = useSelector(state => state.forecast.forecast)
+  const routeInfo = useSelector(state => state.routeInfo)
+  const routeParams = useSelector(state => state.uiInfo.routeParams)
+  const controls = useSelector(state => state.controls)
+  const timeZoneId = useSelector(state => state.forecast.timeZoneId)
+  const forecast = useSelector(state => state.forecast.forecast)
 
-      const windAdjustmentResult = calculateWindResult({ routeInfo, routeParams, controls, timeZoneId, forecast })
-      return windAdjustmentResult
-    })
+  const windAdjustmentResult = calculateWindResult({routeInfo, routeParams, controls, timeZoneId, forecast})
+  return windAdjustmentResult
 }
 
 const useWhenChanged = (value, callback, changedCondition = true) => {
