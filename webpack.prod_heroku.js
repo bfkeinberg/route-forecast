@@ -18,6 +18,22 @@ module.exports = (env, argv) => merge(common(env, argv), {
             resourceRegExp: /^\.\/locale$/,
             contextRegExp: /moment$/,
         }),
+        new CompressionPlugin({
+            minRatio: 0.85,
+            filename: "[path][base].br",
+            algorithm: "brotliCompress",
+            test: /\.(js|css|html|svg|ttf|eot)$/,
+            compressionOptions: {
+                params: {
+                    [zlib.constants.BROTLI_PARAM_QUALITY]: 11,
+                }
+            },
+            exclude: [
+                /\.png/,
+                /\.ico/,
+                /\.html/
+            ]
+        }),
         sentryWebpackPlugin({
             include: '.',
             ignoreFile: '.sentrycliignore',
@@ -41,22 +57,6 @@ module.exports = (env, argv) => merge(common(env, argv), {
             release: {name: process.env.SOURCE_VERSION},
             reactComponentAnnotation: {enabled:true},
             deploy: { env: 'production', name: 'latest' }
-        }),
-        new CompressionPlugin({
-            minRatio: 0.85,
-            filename: "[path][base].br",
-            algorithm: "brotliCompress",
-            test: /\.(js|css|html|svg|ttf|eot)$/,
-            compressionOptions: {
-                params: {
-                    [zlib.constants.BROTLI_PARAM_QUALITY]: 11,
-                }
-            },
-            exclude: [
-                /\.png/,
-                /\.ico/,
-                /\.html/
-            ]
         }),
         // new BundleAnalyzerPlugin()
     ],

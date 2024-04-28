@@ -12,3 +12,6 @@ nodejs.yaml
 sample_output/
 .vscode/launch_full.json
 .vscode/launch.json
+
+# Sentry Config File
+.env.sentry-build-plugin
