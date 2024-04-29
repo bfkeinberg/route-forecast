@@ -70,7 +70,7 @@
     "webpack": "^5.76.0"
   },
   "devDependencies": {
-    "@babel/cli": "^7.14.3",
+    "@babel/cli": "^7.24.5",
     "@babel/core": "^7.14.3",
     "@babel/plugin-proposal-decorators": "^7.10.5",
     "@babel/plugin-proposal-do-expressions": "^7.10.4",
