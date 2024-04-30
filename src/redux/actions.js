@@ -155,14 +155,16 @@ export const requestForecast = function (routeInfo) {
     return async function (dispatch, getState) {
         await Sentry.startSpan({ name: "requestForecast" }, async () => {
             if (routeInfo.rwgpsRouteData) {
-                ReactGA.event('add_to_cart', {
-                    value: getRouteDistanceInKm(routeInfo.rwgpsRouteData),
-                    items: [{ item_id: getRouteId(routeInfo.rwgpsRouteData), item_name: getRouteName(routeInfo.rwgpsRouteData) }]
+                ReactGA.event('add_payment_info', {
+                    value: getRouteDistanceInKm(routeInfo.rwgpsRouteData), coupon:getRouteName(routeInfo.rwgpsRouteData),
+                    currency:getRouteId(routeInfo.rwgpsRouteData),
+                    items: [{ item_id:'', item_name:''}]
                 });
             } else if (routeInfo.gpxData) {
-                ReactGA.event('add_to_cart', {
-                    value: routeInfo.gpxRouteData.tracks[0].distance.total,
-                    items: [{ item_id: getRouteNumberFromValue(routeInfo.gpxRouteData.tracks[0].link), item_name: routeInfo.gpxRouteData.name }]
+                ReactGA.event('add_payment_info', {
+                    value: routeInfo.gpxRouteData.tracks[0].distance.total, coupon:routeInfo.gpxRouteData.name,
+                    currency:getRouteNumberFromValue(routeInfo.gpxRouteData.tracks[0].link),
+                    items: [{item_id:'', item_name:''}]
                 });
             }
             const fetchController = new AbortController()
@@ -366,15 +368,18 @@ const doForecastByParts = (forecastFunc, aqiFunc, dispatch, getState) => {
 const forecastWithHook = async (forecastFunc, aqiFunc, dispatch, getState) => {
     await Sentry.startSpan({ name: "forecastWithHook" }, async () => {
         const routeInfo = getState().routeInfo
+
         if (routeInfo.rwgpsRouteData) {
-            ReactGA.event('add_to_cart', {
-                value: getRouteDistanceInKm(routeInfo.rwgpsRouteData),
-                items: [{ item_id: getRouteId(routeInfo.rwgpsRouteData), item_name: getRouteName(routeInfo.rwgpsRouteData) }]
+            ReactGA.event('add_payment_info', {
+                value: getRouteDistanceInKm(routeInfo.rwgpsRouteData), coupon:getRouteName(routeInfo.rwgpsRouteData),
+                currency:getRouteId(routeInfo.rwgpsRouteData),
+                items: [{ item_id: '', item_name: '' }]
             });
         } else if (routeInfo.gpxData) {
-            ReactGA.event('add_to_cart', {
-                value: routeInfo.gpxRouteData.tracks[0].distance.total,
-                items: [{ item_id: getRouteNumberFromValue(routeInfo.gpxRouteData.tracks[0].link), item_name: routeInfo.gpxRouteData.name }]
+            ReactGA.event('add_payment_info', {
+                value: routeInfo.gpxRouteData.tracks[0].distance.total,  coupon:routeInfo.gpxRouteData.name,
+                currency:getRouteNumberFromValue(routeInfo.gpxRouteData.tracks[0].link),
+                items: [{ item_id: '', item_name: '' }]
             });
         }
 

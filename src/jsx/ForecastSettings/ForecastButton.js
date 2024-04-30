@@ -66,17 +66,11 @@ const ForecastButton = ({fetchingForecast,submitDisabled, routeNumber, startTime
     const forecastClick = async () => {
         await Sentry.startSpan({ name: "forecastClick" }, async () => {
             dispatch(forecastFetchBegun())
-            if (type === "rwgps") {
-                ReactGA.event('add_to_cart', {
-                    value: distanceInKm,
-                    items: [{ item_id: routeNumber, item_name: routeName }]
-                });
-            } else {
-                ReactGA.event('add_to_cart', {
-                    value: distanceInKm,
-                    items: [{ item_id: routeNumber, item_name: routeName }]
-                });
+            const reactEventParams = {
+                value: distanceInKm, currency:routeNumber, coupon:routeName,
+                items: [{ item_id: '', item_name: '' }]
             }
+            ReactGA.event('add_payment_info', reactEventParams);
             try {
                 const forecastAndAqiResults = doForecastByParts()
                 const forecastResults = await forecastAndAqiResults[0]
