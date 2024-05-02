@@ -144,7 +144,7 @@ const setupBrowserForwardBack = (dispatch, origin) => {
             } else {
                 // reload previous or next route when moving throw browser history with forward or back buttons
                 let queryParams = queryString.parse(event.state);
-                dispatch(querySet({url:`${origin}/${event.state}`,search:event.state}))
+                dispatch(querySet({url:`${origin}/?${event.state}`,search:event.state}))
                 updateFromQueryParams(dispatch, queryParams);
                 if (queryParams.rwgpsRoute !== undefined || queryParams.strava_route) {
                     dispatch(loadRouteFromURL())
