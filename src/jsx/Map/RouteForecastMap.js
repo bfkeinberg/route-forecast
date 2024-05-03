@@ -86,14 +86,30 @@ const RouteForecastMap = () => {
 
     const { points, bounds } = usePointsAndBounds()
 
+    const addBreadcrumb = (msg) => {
+        Sentry.addBreadcrumb({
+            category: 'map centering',
+            level: "info",
+            message: msg
+        })
+    }
+    
+    if (!points) {
+        Sentry.captureMessage(`No points to compute map center from`)
+        return
+    }
+    
     let mapBounds
     try {
         mapBounds = useMemo(() => (getMapBounds(points, bounds, zoomToRange, subrange)), [
             points,
+            points.length,
             bounds,
             zoomToRange,
-            subrange
+            subrange,
+            subrange.length
         ])
+        addBreadcrumb(`conputed mapBounds ${mapBounds} from ${points.length} points in route`)
     } catch (error) {
         Sentry.captureException(error, `Error creating map bounds`)
         return
@@ -102,6 +118,7 @@ const RouteForecastMap = () => {
     let mapCenter
     try {
         mapCenter = useMemo( () => mapBounds.getCenter(), [mapBounds]);
+        addBreadcrumb(`Computed map center ${mapCenter} from map bounds`)
     } catch (err) {
         Sentry.captureException(err,'Error finding map center')
         return
