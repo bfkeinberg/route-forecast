@@ -63,6 +63,7 @@ axiosRetry(axios, {
 const getForecastFromNws = async (forecastUrl) => {
     const forecastGridData = await axios.get(forecastUrl, { headers: { "User-Agent": '(randoplan.com, randoplan.ltd@gmail.com)' } }).catch(
         error => {
+            Sentry.captureMessage(`Failed to get NWS forecast from ${forecastUrl}`)
             Sentry.captureException(error)
             throw Error(`Failed to get NWS forecast from ${forecastUrl}`)
         }
@@ -85,7 +86,7 @@ const getForecastFromNws = async (forecastUrl) => {
  */
 const callNWS = async function (lat, lon, currentTime, distance, zone, bearing, getBearingDifference) {
     const forecastUrl = await getForecastUrl(lat, lon);
-    Sentry.setContext('url', {'forecastUrl': forecastUrl})
+    Sentry.setContext('forecastUrl', {'forecastUrl': forecastUrl})
     const forecastGridData = await getForecastFromNws(forecastUrl);
     const startTime = DateTime.fromISO(currentTime, {zone:zone});
     const forecastValues = extractForecast(forecastGridData, startTime, bearing, getBearingDifference);
