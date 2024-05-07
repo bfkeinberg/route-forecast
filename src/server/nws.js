@@ -45,8 +45,8 @@ const extractForecast = (forecastGridData, currentTime) => {
 
 axiosRetry(axios, {
     retries: 12,
-    retryDelay: (...arg) => axiosRetry.exponentialDelay(...arg, 500),
-    retryCondition (error) {
+    retryDelay: axiosRetry.exponentialDelay, //(...arg) => axiosRetry.exponentialDelay(...arg, 500),
+    retryCondition: (error) => {
         if (!error.response) {console.info(JSON.stringify(error)); return true}
         switch (error.response.status) {
         case 500:
@@ -57,7 +57,10 @@ axiosRetry(axios, {
     },
     onRetry: (retryCount) => {
         Sentry.captureMessage(`axios retry count: ${retryCount}`)
-        console.log(`axios retry count: ${retryCount}`)
+        console.log(`nws axios retry count: ${retryCount}`)
+    },
+    onMaxRetryTimesExceeded: (err) => {
+        console.log(`last nws axios error after retrying was ${err}`)
     }
 });
 

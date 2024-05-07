@@ -35,9 +35,9 @@ const weatherCodes = {
 
 axiosRetry(axios, {
     retries: 10,
-    retryDelay: (...arg) => axiosRetry.exponentialDelay(...arg, 450),
-    retryCondition (error) {
-        if (!error.response) {return false}
+    retryDelay: axiosRetry.exponentialDelay, //(...arg) => axiosRetry.exponentialDelay(...arg, 450),
+    retryCondition: (error) => {
+        if (!error.response) {console.info(JSON.stringify(error)); return true}
         switch (error.response.status) {
         case 429:
             return true;
@@ -46,7 +46,10 @@ axiosRetry(axios, {
         }
     },
     onRetry: (retryCount) => {
-        console.log(`axios retry count: `, retryCount);
+        console.log(`tommorow.io axios retry count: ${retryCount}`);
+    },
+    onMaxRetryTimesExceeded: (err) => {
+        console.log(`last tomorrow.io axios error after retrying was ${err}`)
     }
 });
 
@@ -62,12 +65,7 @@ const getFromTomorrowIoWithBackoff = async (forecastUrl) => {
             Sentry.captureMessage(`got error code ${forecast.code} with ${forecast.message}`,'error')
             console.log(forecast);
         }
-        if (forecast.apiCalls < 30) {
-            throw Error('Daily count exceeded');
-        }
-        if (forecast.apiCallsHour < 3) {
-            throw Error('Hourly count exceeded');
-        }
+        console.info(`Request id for ${forecastUrl} is ${forecastResult.headers['x-request-id']}`)
         return forecast;
     }
     Sentry.captureMessage(`No forecast returned from Tomrrow.io on ${forecastUrl}`)

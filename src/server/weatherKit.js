@@ -31,9 +31,9 @@ const makeJwt = () => {
 
 axiosRetry(axios, {
     retries: 10,
-    retryDelay: (...arg) => axiosRetry.exponentialDelay(...arg, 200),
-    retryCondition (error) {
-        if (!error.response) {return false}
+    retryDelay: axiosRetry.exponentialDelay, //(...arg) => axiosRetry.exponentialDelay(...arg, 200),
+    retryCondition: (error) => {
+        if (!error.response) {console.info(JSON.stringify(error)); return true}
         switch (error.response.status) {
         case 504:
         case 404:
