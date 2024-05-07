@@ -56,7 +56,8 @@ axiosRetry(axios, {
         }
     },
     onRetry: (retryCount) => {
-        console.log(`axios retry count: `, retryCount);
+        Sentry.captureMessage(`axios retry count: ${retryCount}`)
+        console.log(`axios retry count: ${retryCount}`)
     }
 });
 
