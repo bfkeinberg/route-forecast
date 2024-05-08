@@ -2,6 +2,7 @@ const { DateTime } = require("luxon");
 const jwt = require("jsonwebtoken");
 const Sentry = require("@sentry/node")
 const axios = require('axios');
+const axiosInstance = axios.create()
 const axiosRetry = require('axios-retry').default
 
 const milesToMeters = 1609.34;
@@ -29,11 +30,10 @@ const makeJwt = () => {
     )
 }
 
-axiosRetry(axios, {
+axiosRetry(axiosInstance, {
     retries: 10,
-    retryDelay: axiosRetry.exponentialDelay, //(...arg) => axiosRetry.exponentialDelay(...arg, 200),
+    retryDelay: (...arg) => axiosRetry.exponentialDelay(...arg, 200),
     retryCondition: (error) => {
-        if (!error.response) {console.info(JSON.stringify(error)); return true}
         switch (error.response.status) {
         case 504:
         case 404:
@@ -43,7 +43,7 @@ axiosRetry(axios, {
         }
     },
     onRetry: (retryCount) => {
-        console.log(`axios retry count: `, retryCount);
+        console.log(`weatherKit axios retry count: `, retryCount);
     }
 });
 
@@ -68,7 +68,7 @@ const callWeatherKit = async function (lat, lon, currentTime, distance, zone, be
     const later = startTime.plus({ hours: 1 }).toISO({ suppressMilliseconds: true });
     const url = `https://weatherkit.apple.com/api/v1/weather/en/${lat}/${lon}?timezone=${zone}&dataSets=currentWeather,forecastHourly,forecastNextHour,&countryCode=US&currentAsOf=${when}&hourlyStart=${when}&hourlyEnd=${later}`;
     Sentry.setContext('url', { 'url': url })
-    const forecastResult = await axios.get(url, { headers: { 'Authorization': `Bearer ${weatherKitKey}` } }).
+    const forecastResult = await axiosInstance.get(url, { headers: { 'Authorization': `Bearer ${weatherKitKey}` } }).
         catch(error => {
             Sentry.captureException(error)
             throw error;

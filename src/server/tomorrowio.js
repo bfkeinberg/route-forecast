@@ -1,5 +1,6 @@
 const { DateTime } = require("luxon");
 const axios = require('axios');
+const axiosInstance = axios.create()
 const Sentry = require("@sentry/node")
 const axiosRetry = require('axios-retry').default
 
@@ -33,11 +34,10 @@ const weatherCodes = {
     "8000": "Thunderstorm"
 };
 
-axiosRetry(axios, {
-    retries: 10,
-    retryDelay: axiosRetry.exponentialDelay, //(...arg) => axiosRetry.exponentialDelay(...arg, 450),
+axiosRetry(axiosInstance, {
+    retries: 8,
+    retryDelay: axiosRetry.exponentialDelay,
     retryCondition: (error) => {
-        if (!error.response) {console.info(JSON.stringify(error)); return true}
         switch (error.response.status) {
         case 429:
             return true;
@@ -46,7 +46,7 @@ axiosRetry(axios, {
         }
     },
     onRetry: (retryCount) => {
-        console.log(`tommorow.io axios retry count: ${retryCount}`);
+        console.info(`tommorow.io axios retry count: ${retryCount}`);
     },
     onMaxRetryTimesExceeded: (err) => {
         console.log(`last tomorrow.io axios error after retrying was ${err}`)
@@ -54,9 +54,9 @@ axiosRetry(axios, {
 });
 
 const getFromTomorrowIoWithBackoff = async (forecastUrl) => {
-    const forecastResult = await axios.get(forecastUrl).catch(error => {
+    const forecastResult = await axiosInstance.get(forecastUrl).catch(error => {
         Sentry.captureException(error)
-        console.error(error)
+        console.error('Axios error', error.response.statusText)
         throw Error(`Failed to get Tomorrow.io forecast from ${forecastUrl}:${error}`)
     })
     if (forecastResult !== undefined) {
@@ -65,7 +65,6 @@ const getFromTomorrowIoWithBackoff = async (forecastUrl) => {
             Sentry.captureMessage(`got error code ${forecast.code} with ${forecast.message}`,'error')
             console.log(forecast);
         }
-        console.info(`Request id for ${forecastUrl} is ${forecastResult.headers['x-request-id']}`)
         return forecast;
     }
     Sentry.captureMessage(`No forecast returned from Tomrrow.io on ${forecastUrl}`)

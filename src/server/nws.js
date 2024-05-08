@@ -1,12 +1,33 @@
 const { DateTime, Interval } = require("luxon");
 const axios = require('axios');
+const axiosInstance = axios.create()
 const Sentry = require("@sentry/node")
 const milesToMeters = 1609.34;
 const axiosRetry = require('axios-retry').default
 
+axiosRetry(axiosInstance, {
+    retries: 12,
+    retryDelay: (...arg) => axiosRetry.exponentialDelay(...arg, 400),
+    retryCondition: (error) => {
+        switch (error.response.status) {
+        case 500:
+            return true;
+        default:
+            return false;
+        }
+    },
+    onRetry: (retryCount) => {
+        Sentry.captureMessage(`axios retry count: ${retryCount}`)
+        console.log(`nws axios retry count: ${retryCount}`)
+    },
+    onMaxRetryTimesExceeded: (err) => {
+        console.log(`last nws axios error after retrying was ${err}`)
+    }
+})
+
 const getForecastUrl = async (lat, lon) => {
     const url = `https://api.weather.gov/points/${lat},${lon}`;
-    const gridResult = await axios.get(url).catch(
+    const gridResult = await axiosInstance.get(url).catch(
         error => {throw error.response.data.detail});
     return gridResult.data.properties.forecastGridData;
 }
@@ -43,29 +64,8 @@ const extractForecast = (forecastGridData, currentTime) => {
     }
 };
 
-axiosRetry(axios, {
-    retries: 12,
-    retryDelay: axiosRetry.exponentialDelay, //(...arg) => axiosRetry.exponentialDelay(...arg, 500),
-    retryCondition: (error) => {
-        if (!error.response) {console.info(JSON.stringify(error)); return true}
-        switch (error.response.status) {
-        case 500:
-            return true;
-        default:
-            return false;
-        }
-    },
-    onRetry: (retryCount) => {
-        Sentry.captureMessage(`axios retry count: ${retryCount}`)
-        console.log(`nws axios retry count: ${retryCount}`)
-    },
-    onMaxRetryTimesExceeded: (err) => {
-        console.log(`last nws axios error after retrying was ${err}`)
-    }
-});
-
 const getForecastFromNws = async (forecastUrl) => {
-    const forecastGridData = await axios.get(forecastUrl, { headers: { "User-Agent": '(randoplan.com, randoplan.ltd@gmail.com)' } }).catch(
+    const forecastGridData = await axiosInstance.get(forecastUrl, { headers: { "User-Agent": '(randoplan.com, randoplan.ltd@gmail.com)' } }).catch(
         error => {
             Sentry.captureMessage(`Failed to get NWS forecast from ${forecastUrl}`)
             Sentry.captureException(error)
