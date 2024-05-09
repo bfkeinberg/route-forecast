@@ -31,8 +31,8 @@ const makeJwt = () => {
 }
 
 axiosRetry(axiosInstance, {
-    retries: 10,
-    retryDelay: (...arg) => axiosRetry.exponentialDelay(...arg, 200),
+    retries: 5,
+    retryDelay: axiosRetry.exponentialDelay, // (...arg) => axiosRetry.exponentialDelay(...arg, 200),
     retryCondition: (error) => {
         switch (error.response.status) {
         case 504:
@@ -42,8 +42,11 @@ axiosRetry(axiosInstance, {
             return false;
         }
     },
-    onRetry: (retryCount) => {
-        console.log(`weatherKit axios retry count: `, retryCount);
+    onRetry: (retryCount, error, requestConfig) => {
+        console.log(`weatherKit axios retry count ${retryCount} for ${requestConfig.url}`);
+    },
+    onMaxRetryTimesExceeded: (err) => {
+        console.log(`last weatherKit axios error after retrying was ${err}`)
     }
 });
 
