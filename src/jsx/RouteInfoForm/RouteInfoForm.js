@@ -1,4 +1,4 @@
-import {Button,MenuItem,Toast2} from '@blueprintjs/core';
+import {Button,MenuItem,Toast2,Section} from '@blueprintjs/core';
 import { Select } from "@blueprintjs/select"
 import PropTypes from 'prop-types';
 import React from 'react';
@@ -10,9 +10,9 @@ import { routeLoadingModeProps,routeLoadingModes } from '../../data/enums';
 import { errorDetailsSet, routeLoadingModeSet } from '../../redux/reducer';
 import ShortUrl from '../TopBar/ShortUrl';
 import { RouteInfoInputRUSA } from './RouteInfoInputRUSA';
-// import { AlwaysFilledSwitch } from './AlwaysFilledSwitch';
 import { RouteInfoInputRWGPS } from './RouteInfoInputRWGPS';
 import { RouteInfoInputStrava } from './RouteInfoInputStrava'
+import { ELEVATION_1 } from '@blueprintjs/core/lib/esm/common/classes';
 
 const getInputForMode = (mode) => {
     switch (mode) {
@@ -37,16 +37,22 @@ const RouteInfoForm = ({ errorDetails, errorDetailsSet, routeLoadingMode, routeL
     }
 
     return (
-        <div style={{padding: "14px"}}>
-            <RouteLoadingModeSelector mode={mode} modeSwitched={modeSwitched}/>
-            <div className='spacer'/>
+        <div style={{ padding: "14px" }}>
+            <RouteLoadingModeSelector mode={mode} modeSwitched={modeSwitched} />
+            <div className='spacer' />
             {getInputForMode(mode)}
             {errorDetails !== null && <Toast2 style={{ padding: '10px', marginTop: "10px" }} message={errorDetails} timeout={0} onDismiss={() => dispatch(errorDetailsSet(null))} intent="danger"></Toast2>}
             <MediaQuery maxDeviceWidth={500}>
-                <div style={{marginTop: "10px", textAlign: "center"}}>
-                    <ShortUrl/>
+                <div style={{ marginTop: "10px", textAlign: "center" }}>
+                    <ShortUrl />
                 </div>
             </MediaQuery>
+            <Section style={{marginTop:"1em"}} elevation={ELEVATION_1} title={"Source of route"}>
+                <strong>Randoplan</strong> can load routes from Ride with GPS, Strava, or using the ids of permanent routes on RUSA.org.
+                You can paste in the url of a route from Ride with GPS or Strava, or grab the id from the info of a RUSA perm route.
+                Alternatively if you pin a route that you are viewing on Ride with GPS, the button to the right will list those. It will prompt
+                to log into RWGPS if you haven't already.
+            </Section>
         </div>
     );
 }
@@ -77,21 +83,13 @@ const RouteLoadingModeSelector = ({ mode, modeSwitched }) => {
                 itemRenderer={renderMode}
                 filterable={false}
                 fill={false}
-                activeItem={{ key: mode, name:mode.name }}
+                activeItem={{ key: mode, name: mode.name }}
                 onItemSelect={(selected) => { modeSwitched(selected.key) }}
             >
-                <Button text={routeLoadingModeProps[mode-1].name} rightIcon="symbol-triangle-down" />
+                {/* <span style={{ marginRight: "1em" }}><b>Source of route</b></span> */}
+                <Button text={routeLoadingModeProps[mode - 1].name} rightIcon="symbol-triangle-down" />
             </Select>
-            {/*             <div style={{flex: 1, cursor: "pointer", display: "flex", flexFlow: "column", alignItems: "flex-end"}} onClick={() => setMode(routeLoadingModes.RWGPS)}>
-                <div style={{width: "fit-content", borderBottom: mode === routeLoadingModes.RWGPS ? "1px solid #106ba3" : "1px solid #0000"}}>Ride with GPS</div>
-                <div style={{fontSize: "10px", color: "grey", opacity: mode === routeLoadingModes.RWGPS ? 1 : 0, transition: "opacity 0.3s", marginTop: "3px", textAlign: "end"}}>Load a route from Ride with GPS, and create a weather and arrival time forecast for the ride.</div>
-            </div>
-            <AlwaysFilledSwitch tabIndex={1} checked={mode === routeLoadingModes.STRAVA} onChange={modeSwitched} />
-            <div style={{flex: 1, cursor: "pointer", display: "flex", flexFlow: "column"}} onClick={() => setMode(routeLoadingModes.STRAVA)}>
-                <div style={{width: "fit-content", borderBottom: mode === routeLoadingModes.STRAVA ? "1px solid rgb(234, 89, 41)" : "1px solid #0000"}}>Strava</div>
-                <div style={{fontSize: "10px", color: "grey", opacity: mode === routeLoadingModes.STRAVA ? 1 : 0, transition: "opacity 0.3s", marginTop: "3px"}}>Load an activity or a route from Strava, and analyze your pace over the ride or get a forecast for the route.</div>
-            </div>
- */}        </div>
+        </div>
     )
 }
 
