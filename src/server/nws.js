@@ -16,9 +16,8 @@ axiosRetry(axiosInstance, {
             return false;
         }
     },
-    onRetry: (retryCount) => {
-        Sentry.captureMessage(`axios retry count: ${retryCount}`)
-        console.log(`nws axios retry count: ${retryCount}`)
+    onRetry: (retryCount, error, requestConfig) => {
+        console.log(`nws axios retry count: ${retryCount} for ${requestConfig.url}`)
     },
     onMaxRetryTimesExceeded: (err) => {
         console.log(`last nws axios error after retrying was ${err}`)
