@@ -1,6 +1,5 @@
 import * as Sentry from "@sentry/react";
 import lazyRetry from "@tdotcode/react-lazy-retry";
-import PropTypes from 'prop-types';
 import React, {Suspense} from 'react';
 import {connect, useSelector} from 'react-redux';
 
@@ -42,10 +41,10 @@ const MapLoader = (props) => {
 
 const mapStateToProps = (state) =>
     ({
+        hasRouteData: (state.routeInfo.rwgpsRouteData || state.routeInfo.gpxRouteData || state.strava.activityStream),
         // TODO
         // this condition is not quite right -- it doesn't catch cases where we're in strava mode but no strava activity data has loaded
         // should change this and probably move it to a higher level component, when replacing the existing placeholder text with a splash screen or w/e
-        hasRouteData: (state.routeInfo.rwgpsRouteData || state.routeInfo.gpxRouteData || state.strava.activityStream),
         hasMap: (state.forecast.forecast.length > 0 || state.uiInfo.routeParams.routeLoadingMode === routeLoadingModes.STRAVA)
     });
 
