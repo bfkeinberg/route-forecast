@@ -14,6 +14,7 @@ import ForecastTable from "./resultsTables/ForecastTable";
 import PaceTable from "./resultsTables/PaceTable";
 import RouteInfoForm from "./RouteInfoForm/RouteInfoForm";
 import ErrorBoundary from "./shared/ErrorBoundary";
+import DonationRequest from "./TopBar/DonationRequest";
 
 const MobileUI = (props) => {
     return (
@@ -92,6 +93,7 @@ const MobileUITabs = (props) => {
                     <Route path="/forecastTable/" element={<ForecastTable adjustedTimes={adjustedTimes} />} />
                     <Route path="/paceTable/" element={<PaceTable />} />
                 </Routes>
+                <DonationRequest/>
             </>
         )
     } catch (err) {
