@@ -19,7 +19,7 @@
     "@mui/material": "^5.3.1",
     "@react-google-maps/api": "^2.19.2",
     "@reduxjs/toolkit": "^2.2.3",
-    "@sentry/browser": "^7.110.1",
+    "@sentry/browser": "^8.0.0",
     "@sentry/node": "^7.110.1",
     "@sentry/react": "^7.110.1",
     "@sentry/tracing": "^7.111.0",
