@@ -8,6 +8,7 @@ import {setWeatherProvider} from "../../redux/actions";
 import {providerValues} from "../../redux/reducer";
 import { getForecastRequestLength } from '../../utils/forecastUtilities';
 import { DesktopTooltip } from '../shared/DesktopTooltip';
+import {useTranslation} from 'react-i18next'
 
 const renderProvider = (provider, { handleClick, handleFocus, modifiers }) => {
     if (!modifiers.matchesPredicate) {
@@ -26,9 +27,10 @@ const renderProvider = (provider, { handleClick, handleFocus, modifiers }) => {
 };
 
 const WeatherProviderSelector = ({weatherProvider,setWeatherProvider,forecastLength}) => {
+    const { t } = useTranslation()
     return (
-        <FormGroup label={<span><b>Weather forecast source</b></span>} labelFor={'provider'}>
-            <DesktopTooltip content={"The weather provider to use for forecasts"} placement={"bottom"}>
+        <FormGroup label={<span><b>{t('labels.source')}</b></span>} labelFor={'provider'}>
+            <DesktopTooltip content={t('tooltips.provider')} placement={"bottom"}>
                 <Select tabIndex="0"
                     id='provider'
                     items={Object.entries(providerValues).filter(entry => entry[1].maxCallsPerHour===undefined||entry[1].maxCallsPerHour>forecastLength).map(element => { return { key: element[0], ...element[1] } })}

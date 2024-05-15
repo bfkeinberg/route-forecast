@@ -7,6 +7,7 @@ import { loadFromRideWithGps } from '../../redux/actions';
 import ErrorBoundary from "../shared/ErrorBoundary";
 import PinnedRouteLoader from './PinnedRouteLoader.jsx';
 import RideWithGpsId from './RideWithGpsId';
+import {useTranslation} from 'react-i18next'
 
 export const RouteInfoInputRWGPS = () => {
   const usingPinnedRoutes = useSelector(state => state.rideWithGpsInfo.usePinnedRoutes)
@@ -42,6 +43,7 @@ null :
 
 // eslint-disable-next-line react/prop-types
 const RWGPSLoadRouteButton = ({loadButtonRef}) => {
+  const { t } = useTranslation()
   const loading = useSelector(state => state.uiInfo.dialogParams.fetchingRoute)
   const hasRwgpsRouteId = useSelector(state => state.uiInfo.routeParams.rwgpsRoute!=='')
   const hasStravaRouteId = useSelector(state => state.strava.route!=='')
@@ -49,7 +51,7 @@ const RWGPSLoadRouteButton = ({loadButtonRef}) => {
   return (
     <Button ref={loadButtonRef} intent={Intent.PRIMARY} disabled={loading || (!hasRwgpsRouteId && !hasStravaRouteId)}
       fill loading={loading} onClick={() => dispatch(loadFromRideWithGps())}>
-      Load Route
+      {t('buttons.loadRoute')}
     </Button>
   )
 }

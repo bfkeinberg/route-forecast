@@ -11,6 +11,7 @@ import {connect} from 'react-redux';
 import {setStart, setTimeFromIso} from "../../redux/actions";
 import { initialStartTimeSet } from '../../redux/reducer';
 import { DesktopTooltip } from '../shared/DesktopTooltip';
+import {useTranslation} from 'react-i18next'
 
 export const setDateOnly = (start, setInitialStart) => {
     let now = DateTime.now();
@@ -20,6 +21,7 @@ export const setDateOnly = (start, setInitialStart) => {
 
 //"EEE MMM dd yyyy HH:mm:ss 'GMT'ZZZ"
 const DateSelect = ({ start, zone, setStart, initialStartTimeSet, maxDaysInFuture, canForecastPast, setTimeFromIso }) => {
+    const { t } = useTranslation()
     const setDateWithZone = (zone) => {
         setTimeFromIso(start.toISO({includeOffset:false}), zone)
     }
@@ -41,10 +43,10 @@ const DateSelect = ({ start, zone, setStart, initialStartTimeSet, maxDaysInFutur
         <div style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
             <span id={"startingTime"} style={{ fontSize: ".875rem", fontWeight: "bolder", padding: "0px 5px", flex: 1 }}>
                 <Icon icon="calendar" onClick={() => setDateOnly(start, initialStartTimeSet)} style={{ cursor: "pointer", marginRight: "3px" }} />
-                Starting time
+                {t('labels.startingTime')}
             </span>
             <div style={{ flex: 2.5 } }>
-                <DesktopTooltip content={'When you plan to begin riding'} placement={'bottom'}>
+                <DesktopTooltip content={t('tooltips.startingTime')} placement={'bottom'}>
                     <DateInput3
                         onChange={setDateFromPicker}
                         onTimezoneChange={setDateWithZone}

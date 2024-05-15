@@ -2,6 +2,7 @@ import { Toast2 } from '@blueprintjs/core';
 import React from 'react';
 import ReactGA from "react-ga4";
 import { useDispatch,useSelector } from "react-redux";
+import {useTranslation} from 'react-i18next'
 
 import { displayControlTableUiSet, errorDetailsSet,metricToggled } from '../../redux/reducer';
 import LocationContext from '../locationContext';
@@ -19,7 +20,7 @@ export const ForecastSettings = () => {
     const metric = useSelector(state => state.controls.metric)
     const dispatch = useDispatch()
     const errorDetails = useSelector(state => state.uiInfo.dialogParams.errorDetails)
-
+    const { t } = useTranslation()
     const showControlPoints = useSelector(state => state.controls.displayControlTableUI)
     const setShowControlPoints = () => { ReactGA.event('select_content', { content_type: 'controls' });return dispatch(displayControlTableUiSet(!showControlPoints)) }
 
@@ -30,15 +31,14 @@ export const ForecastSettings = () => {
                 <TimeFields />
                 <div style={{ display: "flex" }}>
                     <RidingPace />
-                    {/* <ToggleButton style={{ flex: 1, margin: "24px 0px 0px 10px" }} active={metric} onClick={() => dispatch(metricToggled())}>Metric</ToggleButton> */}
                     <div style={{ flex: 1, cursor: "pointer", display: "flex", flexFlow: "column", alignItems: "flex-end" }} onClick={() => dispatch(metricToggled())}>
-                        <div style={{ width: "fit-content", borderBottom: !metric ? "1px solid #106ba3" : "1px solid #0000" }}>Imperial</div>
-                        <div style={{ fontSize: "10px", color: "grey", opacity: !metric ? 1 : 0, transition: "opacity 0.3s", marginTop: "3px", textAlign: "end" }}>Units are miles etc</div>
+                        <div style={{ width: "fit-content", borderBottom: !metric ? "1px solid #106ba3" : "1px solid #0000" }}>{t('labels.englishSystem')}</div>
+                        <div style={{ fontSize: "10px", color: "grey", opacity: !metric ? 1 : 0, transition: "opacity 0.3s", marginTop: "3px", textAlign: "end" }}>{t('labels.miles')}</div>
                     </div>
                     <AlwaysFilledSwitch checked={metric} onChange={() => dispatch(metricToggled())}></AlwaysFilledSwitch>
                     <div style={{ flex: 1, cursor: "pointer", display: "flex", flexFlow: "column" }} onClick={() => dispatch(metricToggled())}>
-                        <div style={{ width: "fit-content", borderBottom: metric ? "1px solid rgb(234, 89, 41)" : "1px solid #0000" }}>Metric</div>
-                        <div style={{ fontSize: "10px", color: "grey", opacity: metric ? 1 : 0, transition: "opacity 0.3s", marginTop: "3px" }}>Units in metric</div>
+                        <div style={{ width: "fit-content", borderBottom: metric ? "1px solid rgb(234, 89, 41)" : "1px solid #0000" }}>{t('labels.metricSystem')}</div>
+                        <div style={{ fontSize: "10px", color: "grey", opacity: metric ? 1 : 0, transition: "opacity 0.3s", marginTop: "3px" }}>{t('labels.kilometers')}</div>
                     </div>
                 </div>
                 <div style={{ display: "flex", margin: "30px 0px" }}>
@@ -52,7 +52,7 @@ export const ForecastSettings = () => {
                     </LocationContext.Consumer>
                 </div>
             </div>
-            <ToggleButtonOpaque icon={"chevron-down"} active={showControlPoints} onClick={() => setShowControlPoints(!showControlPoints)}>Add Stops</ToggleButtonOpaque>
+            <ToggleButtonOpaque icon={"chevron-down"} active={showControlPoints} onClick={() => setShowControlPoints(!showControlPoints)}>{t('buttons.stops')}</ToggleButtonOpaque>
             {showControlPoints && <ControlTableContainer />}
         </div>
     )

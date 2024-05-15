@@ -76,7 +76,7 @@ setSelectedRow
                 <ErrorBoundary>
                     <div style={{padding: "16px", display: "flex", flexFlow: "column", alignItems: "center"}}>
                         <StravaAnalysisIntervalInput />
-                        <div id="paceSpan" style={{fontSize: "14px", marginTop: "10px"}}>Overall climb-adjusted pace was <span style={{fontWeight: "bold"}}>{formatSpeed(actualPace)}</span>.</div>
+                        <div id="paceSpan" style={{fontSize: "14px", marginTop: "10px"}}>{t('analysis.overallPace')} <span style={{fontWeight: "bold"}}>{formatSpeed(actualPace)}</span>.</div>
                     </div>
                     <div style={{padding: "16px", display: "flex", flexFlow: "column", alignItems: "end"}}>
                         <ToggleButton active={zoomToRange} onClick={toggleZoom}>Zoom to Segment</ToggleButton>
@@ -86,7 +86,7 @@ setSelectedRow
                         <tr>
                             <th style={{'fontSize':'80%'}}>Time</th>
                             <th id={'pace'} style={{'fontSize':'80%'}}>
-                                <Tooltip content={'Pace is average speed adjusted for climb'} placement={"top"}>Pace</Tooltip>
+                                <Tooltip content={t('tooltips.overallPace')} placement={"top"}>Pace</Tooltip>
                             </th>
                             <th style={{'fontSize':'80%'}}>WW Pace</th>
                             <th style={{'fontSize':'80%'}}>Distance</th>

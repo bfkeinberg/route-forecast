@@ -4,7 +4,7 @@ import React from "react";
 import { finishTimeFormat } from "../../redux/reducer.js";
 import { useActualFinishTime, useForecastDependentValues } from '../../utils/hooks';
 import DateSelect from "./DateSelect";
-
+import {useTranslation} from 'react-i18next'
 // const LoadableDatePicker = lazy(() => componentLoader(import(/* webpackChunkName: "DateSelect" */ /* webpackPrefetch: true */ './DateSelect'), 5));
 
 // const DatePickerLoader = (props) => {
@@ -14,6 +14,7 @@ import DateSelect from "./DateSelect";
 // };
 
 export const TimeFields = () => {
+  const { t } = useTranslation()
   const { finishTime: predictedFinishTime } = useForecastDependentValues()
 
   const predictedFinishTimeExists = predictedFinishTime !== null
@@ -23,7 +24,7 @@ export const TimeFields = () => {
   const newDateFormat = 'MMMM dd, yyyy h:mm a';
   const displayPredictedFinishTime = predictedFinishTimeExists ?
     DateTime.fromFormat(predictedFinishTime, finishTimeFormat).toFormat(newDateFormat) :
-    "Find forecast to create"
+    t('data.noForecastPlaceholder')
 
   const timeFieldStyle = {
     width: "240px",
@@ -40,7 +41,7 @@ export const TimeFields = () => {
       <DateSelect />
       <div>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "center", margin: "10px 0px" }}>
-          <span style={{ fontSize: ".875rem", fontWeight: "bolder", flex: 1, padding: "0px 5px" }}>Projected finish time</span>
+          <span style={{ fontSize: ".875rem", fontWeight: "bolder", flex: 1, padding: "0px 5px" }}>{t('labels.projectedFinish')}</span>
             <span style={{flex: 2.5}}>
               <div style={{...timeFieldStyle, backgroundColor: predictedFinishTimeExists ? "rgb(19, 124, 189)" : "rgba(0, 0, 0, 0.05)", fontStyle: predictedFinishTimeExists ? "" : "oblique", color: predictedFinishTimeExists ? "white" : "rgba(0, 0, 0, 0.5)"}}>
                 {displayPredictedFinishTime}

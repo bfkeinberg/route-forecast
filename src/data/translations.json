@@ -1,0 +1,178 @@
+{
+    "en": {
+        "translation": {
+            "buttons": {
+                "bugReport": "Report a bug",
+                "donate": "Donate",
+                "loadRoute":"Load Route",
+                "usePinned":"Use pinned routes",
+                "dontUsePinned":"Don't use pinned routes",
+                "stops":"Add Stops",
+                "forecast":"Find Forecast",
+                "forecastPending":"Creating forecast...",
+                "zoomToSegment":"Zoom to Segment"
+            },
+            "labels": {
+                "language": "Select language",
+                "routeType":"Route type",
+                "ridingPace":"Pace on flat ground",
+                "startingTime":"Starting time",
+                "miles":"Units are miles etc",
+                "englishSystem":"Imperial",
+                "metricSystem":"Metric",
+                "kilometers":"Units in metric",
+                "projectedFinish":"Projected finish time",
+                "interval":"Forecast Interval in minutes",
+                "source":"Weather forecast source"
+            },
+            "titles": {
+                "routeInfo": "Route info",
+                "forecastSettings": "Forecast Settings",
+                "forecast":"Forecast",
+                "paceAnalysis": "Pace Analysis"
+            },
+            "tooltips": {
+                "ridingPace":"Speed on flat ground, which will be reduced by climbing",
+                "actualPace":"Actual riding pace was",
+                "interval":"How often to generate weather forecast in minutes",
+                "provider":"The weather provider to use for forecasts",
+                "forecast": {
+                    "enabled":"Request a ride forecast",
+                    "disabled":"Must provide an rwgps route id"
+                },
+                "startingTime":"When you plan to begin riding",
+                "distHeader":"Distance at start of segment",
+                "windHeader":"Click to toggle between average wind speed and wind gusts",
+                "temperatureHeader":"Click to toggle between temperature and apparent temperature",
+                "aqiHeader":"Air quality shows current conditions, not forecasted. Click to toggle for the next forecast requested",
+                "overallPace":"Pace is average speed adjusted for climb"
+            },
+            "data": {
+                "noForecastPlaceholder":"Find forecast to create",
+                "wind": {
+                    "lost":"lost",
+                    "gained":"gained",
+                    "to": "to wind",
+                    "from": "from wind",
+                    "gust":"Wind gust",
+                    "speed":"Wind speed"
+                },
+                "summary":"Use weather and terrain data to create a route plan for your rides."
+            },
+            "tableHeaders": {
+                "temperature":"Feels like",
+                "time":"Time",
+                "summary":"Summary",
+                "precipitation":"Chance of rain",
+                "humidity":"Humidity",
+                "cloudCover":"Cloud cover",
+                "windBearing":"Wind bearing"
+            },
+            "toasts":{
+                "aqi": {
+                    "enabled":"Aqi fetch enabled",
+                    "disabled":"AQI fetch disabled"
+                }
+            },
+            "controls":{
+                "name":"Name",
+                "distanceMiles":"Miles",
+                "distanceKilometers":"Kilometers",
+                "duration":"Expected Time Spent",
+                "arrival":"Estimated Arrival Time",
+                "delete":"Delete"
+            },
+            "analysis": {
+                "overallPace":"Overall climb-adjusted pace was"
+            }
+        }
+    },
+    "fr": {
+        "translation": {
+            "buttons": {
+                "bugReport": "Signaler un bogue",
+                "donate": "Faire un don",
+                "loadRoute":"Charger un parcours",
+                "usePinned":"Utiliser des parcours épinglés",
+                "dontUsePinned": "Ne utiliser pas des parcours épinglés",
+                "stops":"Ajouter des Contrôles",
+                "forecast":"Prévisions",
+                "forecastPending":"Création de prévisions...",
+                "zoomToSegment":"Zoom sur le segment"
+            },
+            "labels": {
+                "language": "Choisissez la langue",
+                "routeType":"Type de parcours",
+                "ridingPace":"Rythme sur terrain plat",
+                "startingTime":"Heure de Départ",
+                "miles":"Les unités sont des miles, etc.",
+                "englishSystem":"Impérial",
+                "metricSystem":"SI",
+                "kilometers":"Unités en système métrique",
+                "projectedFinish":"Heure de Fin Prévue",
+                "interval":"Intervalle de Prévision en minutes",
+                "source":"Source de prévisions météorologiques"
+            },
+            "titles": {
+                "routeInfo": "Informations sur les parcours",
+                "forecastSettings": "Paramètres de prévision",
+                "forecast":"Prévisions Météorologiques",
+                "paceAnalysis":"Analyse du Rythme"
+            },
+            "tooltips": {
+                "ridingPace":"Vitesse sur terrain plat, qui sera réduite en montant",
+                "actualPace":"Le rythme de conduite réel était",
+                "interval":"À quelle fréquence générer des prévisions météorologiques en minutes",
+                "provider":"Le fournisseur météo à utiliser pour les prévisions",
+                "forecast": {
+                    "enabled":"Demander un prévisionnel de trajet",
+                    "disabled":"Doit fournir un identifiant de route rwgps"
+                },
+                "startingTime":"Quand vous envisagez de commencer à rouler",
+                "distHeader":"Distance au début du segment",
+                "windHeader":"Cliquez pour basculer entre la vitesse moyenne du vent et les rafales de vent",
+                "temperatureHeader":"Cliquez pour basculer entre la température et la température apparente",
+                "aqiHeader":"La qualité de l'air indique les conditions actuelles et non prévues. Cliquez pour basculer vers la prochaine prévision demandée",
+                "overallPace":"Le rythme est la vitesse moyenne ajustée pour la montée"
+            },
+            "data":{
+                "noForecastPlaceholder":"Cliquez sur « Prévisions »",
+                "wind": {
+                    "lost":"perdues",
+                    "gained":"gagnées",
+                    "to": "à cause du vent",
+                    "from": "grâce au vent",
+                    "gust": "Rafale de vent",
+                    "speed": "Vitesse du vent"
+                },
+                "summary":"Utilisez les données météorologiques et de terrain pour créer un plan d'itinéraire pour vos sorties."
+            },
+            "tableHeaders":{
+                "temperature":"Température ressentie",
+                "time":"Temps",
+                "summary":"Résumé",
+                "precipitation":"Risque de pluie",
+                "humidity":"Humidité",
+                "cloudCover":"Couverture Nuageuse",
+                "windBearing":"Relèvement du Vent"
+            },
+            "toasts":{
+                "aqi": {
+                    "enabled":"Récupération AQI activée",
+                    "disabled":"Récupération Aqi désactivée"
+                }
+            },
+            "controls":{
+                "name":"Nom",
+                "distanceMiles":"Miles",
+                "distanceKilometers":"Kilomètres",
+                "duration":"Temps passé prévu",
+                "arrival":"Heure d'arrivée estimée",
+                "delete":"Supprimer"
+            },
+            "analysis": {
+                "overallPace":"Le rythme global ajusté en fonction de la montée était"
+            }
+        }
+    }
+}

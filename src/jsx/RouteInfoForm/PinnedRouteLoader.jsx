@@ -7,7 +7,7 @@ import queryString from 'query-string';
 import React, {Suspense, useEffect, lazy} from 'react';
 import ReactGA from "react-ga4";
 import {connect} from 'react-redux';
-
+import {useTranslation} from 'react-i18next'
 import { errorDetailsSet,loadingPinnedSet, pinnedRoutesSet, rwgpsTokenSet, usePinnedRoutesSet } from '../../redux/reducer';
 
 const addBreadcrumb = (msg) => {
@@ -67,7 +67,8 @@ const PinnedRouteLoader = ({rwgpsToken, rwgpsTokenSet, credentialsValid, pinnedR
     }, [
         rwgpsToken,
         usingPinnedRoutes
-    ]);
+    ])
+    const { t } = useTranslation()
     let button_class = usingPinnedRoutes ? null : 'glowing_input'
     Sentry.addBreadcrumb({
         category: 'load',
@@ -84,7 +85,7 @@ const PinnedRouteLoader = ({rwgpsToken, rwgpsTokenSet, credentialsValid, pinnedR
                 icon="star"
                 loading={loadingPinnedRoutes}
                 className={button_class}
-                text={usingPinnedRoutes ? "Don't use pinned routes" : "Use pinned routes"}
+                text={usingPinnedRoutes ? t('buttons.dontUsePinned') : t('buttons.usePinned')}
                 style={{fontSize: "13px"}}
                 onClick={() => {togglePinnedRoutes(usePinnedRoutesSet, setShowPinnedRoutes, usingPinnedRoutes)}}
             />

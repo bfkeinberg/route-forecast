@@ -1,14 +1,15 @@
 import { Tooltip } from "@blueprintjs/core";
 import PropTypes from 'prop-types';
 import React from "react";
-import { useMediaQuery } from 'react-responsive'
+import MediaQuery, { useMediaQuery } from 'react-responsive'
 
 export const DesktopTooltip = (props) => {
-    const isDesktop = useMediaQuery({ query: '(minWidth={501})' });
+    // const isDesktop = useMediaQuery({ query: '(minWidth={501})' });
     return (
-        <>
-        {isDesktop ? <Tooltip {...props}>{props.children}</Tooltip> : props.children}
-        </>
+        <MediaQuery minWidth={501}>
+            {(matches) => matches ?
+            <Tooltip {...props}>{props.children}</Tooltip> : props.children}
+        </MediaQuery>
     )
 }
 

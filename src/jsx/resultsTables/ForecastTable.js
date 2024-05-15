@@ -19,6 +19,7 @@ import { InstallExtensionButton } from "../InstallExtensionButton";
 import { AppToaster } from '../shared/toast';
 import { ToggleButton } from '../shared/ToggleButton';
 import { WeatherCorrections } from './WeatherCorrections';
+import {useTranslation} from 'react-i18next'
 
 const displayBacklink = (provider) => {
     switch (provider) {
@@ -88,18 +89,19 @@ const ForecastTable = (adjustedTimes) => {
 
     const dispatch = useDispatch()
     useEffect(() => { dispatch(tableViewedSet()) }, [])
-
+    const { t } = useTranslation()
+    
     const distHeaderText = metric ? 'KM' : 'Mile';
-    const distHeader = <Tooltip content={'Distance at start of segment'} placement={'top'}>{distHeaderText}</Tooltip>
+    const distHeader = <Tooltip content={t('tooltips.distHeader')} placement={'top'}>{distHeaderText}</Tooltip>
 
     const toggleGustDisplay = () => setShowGusts(!showGusts)
-    const windHeaderText = <Button small onClick={toggleGustDisplay} >{showGusts ? 'Wind gust' : 'Wind speed'}</Button>;
-    const windHeader = <Tooltip content={'Click to toggle between average wind speed and wind gusts'} placement={'top'}>{windHeaderText}</Tooltip>
+    const windHeaderText = <Button small onClick={toggleGustDisplay} >{showGusts ? t('data.wind.gust') : t('data.wind.speed')}</Button>;
+    const windHeader = <Tooltip content={t('tooltips.windHeader')} placement={'top'}>{windHeaderText}</Tooltip>
 
     const toggleApparentDisplay = () => setShowApparentTemp(!showApparentTemp)
 
-    const temperatureHeaderText = <Button small onClick={toggleApparentDisplay}>{showApparentTemp ? "Feels like" : <Icon icon="temperature"/>}</Button>
-    const temperatureHeader = <Tooltip content={'Click to toggle between temperature and apparent temperature'} placement={'top'}>{temperatureHeaderText}</Tooltip>
+    const temperatureHeaderText = <Button small onClick={toggleApparentDisplay}>{showApparentTemp ? t('tableHeaders.temperature') : <Icon icon="temperature"/>}</Button>
+    const temperatureHeader = <Tooltip content={t('tooltips.temperatureHeader')} placement={'top'}>{temperatureHeaderText}</Tooltip>
 
     const toggleZoom = () => {
         dispatch(zoomToRangeToggled())
@@ -139,9 +141,9 @@ const ForecastTable = (adjustedTimes) => {
         cookie.save('fetchAqi', !fetchAqi, { path: '/' });
         // whatever the value in props is will be toggled by this
         if (!fetchAqi) {
-            (await AppToaster).show({ message: "AQI fetch enabled", timeout:3000, isCloseButtonShown: false });
+            (await AppToaster).show({ message: t('toasts.aqi.enabled'), timeout:3000, isCloseButtonShown: false });
         } else {
-            (await AppToaster).show({ message: "AQI fetch disabled", timeout:3000, isCloseButtonShown: false });
+            (await AppToaster).show({ message: t('toasts.aqi.disabled'), timeout:3000, isCloseButtonShown: false });
         }
     }
 
@@ -197,28 +199,28 @@ const ForecastTable = (adjustedTimes) => {
                         <WeatherCorrections />
                     </div>
                     <div style={{ flex: 1 }}>
-                        <ToggleButton active={zoomToRange} onClick={toggleZoom}>Zoom to Segment</ToggleButton>
+                        <ToggleButton style={{width:"5em", height:"4em", float:"right"}} active={zoomToRange} onClick={toggleZoom}>{t('buttons.zoomToSegment')}</ToggleButton>
                     </div>
                 </div>
                 <HTMLTable compact={true} striped bordered interactive style={{ fontSize: "12px", "borderSpacing": "0px"}}>
                     <thead>
                         <tr>
-                            <th><span className={'timeHeaderCell'}>Time</span></th>
+                            <th><span className={'timeHeaderCell'}>{t('tableHeaders.time')}</span></th>
                             <th><span className={'headerCell'}>{distHeader}</span></th>
-                            <th><span className={'headerCell'}>Summary</span></th>
+                            <th><span className={'headerCell'}>{t('tableHeaders.summary')}</span></th>
                             <th id={'temp'} className={'clickableHeaderCell'}>{temperatureHeader}</th>
-                            <th><span className={'headerCell'}>Chance of rain</span></th>
+                            <th><span className={'headerCell'}>{t('tableHeaders.precipitation')}</span></th>
                             <MediaQuery minWidth={501}>
-                                <th><span className={'headerCell'}>Humidity</span></th>
-                                <th><span className={'headerCell'}>Cloud cover</span></th>
+                                <th><span className={'headerCell'}>{t('tableHeaders.humidity')}</span></th>
+                                <th><span className={'headerCell'}>{t('tableHeaders.cloudCover')}</span></th>
                             </MediaQuery>
                             <th className={'clickableHeaderCell'} id={'aqi'}>
-                            <Tooltip content={'Air quality shows current conditions, not forecasted. Click to toggle for the next forecast requested'} placement={'top'}>
+                            <Tooltip content={t('tooltips.aqiHeader')} placement={'top'}>
                                 <Button small active={fetchAqi} onClick={toggleAqi}><span className={fetchAqi?'largerClickableHeaderCell':'largerStruckClickableHeaderCell'}>AQI</span></Button></Tooltip>
                             </th>
                             <th id={'wind'}>{windHeader}</th>
                             <MediaQuery minWidth={501}>
-                                <th><span className={'headerCell'}>Wind bearing</span></th>
+                                <th><span className={'headerCell'}>{t('tableHeaders.windBearing')}</span></th>
                             </MediaQuery>
                         </tr>
                     </thead>
