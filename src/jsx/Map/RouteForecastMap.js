@@ -215,25 +215,25 @@ const pickArrowColor = (distance, subrange) => {
     return (distanceInMeters >= subrange[0] && distanceInMeters <= subrange[1]) ? 'deeppink' : 'blue';
 }
 
-const RotatedArrow = ({rotation, distance, subrange}) => {
+export const RotatedArrow = ({rotation, distance, subrange}) => {
     return (
-        <svg viewBox='0 0 90 90'
+        <svg viewBox='-22 0 58 66'
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
-            width="90"
-            height="90"
+            width="100"
+            height="75"
         >
             <path
                 stroke={pickArrowColor(distance,subrange)}
                 strokeLinecap="round"
                 strokeWidth="2"
                 d={arrowPath}
-                transform={`rotate(${rotation}, 20, 0)`}
+                transform={`rotate(${rotation}, 16.3, 32.6)`}
             />
-            <text x="28" y="35" class="markerText">{distance.toFixed()}</text>
+            <text x={rotation<179?"-10":"25"} y="45" fill="black" textLength={24} fontSize={14}>{distance.toFixed()}</text>
         </svg>
     )
-}
+}// class="markerText
 const TempMarker = ({ latitude, longitude, value, title, bearing, windSpeed, subrange }) => {
     // Add the marker at the specified location
     if (parseInt(windSpeed) > 3) {
