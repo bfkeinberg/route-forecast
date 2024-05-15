@@ -14,6 +14,10 @@
     }
 }
 
+.markerText {
+    font: 15px sans-serif;
+}
+
 .highlighted {
     background-color: rgba(167, 207, 255, 0.4);
 }

@@ -8,7 +8,7 @@ module.exports = (env, argv) => mergeWithCustomize(
             entry: 'prepend'
         })
     })(clientCommon(env,argv), {
-        devtool: 'source-map',
+        devtool: 'eval-cheap-module-source-map',
         optimization: {
             emitOnErrors: false
         }

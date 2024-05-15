@@ -64,8 +64,7 @@ module.exports = (env,argv) => {
                     ],
                 },
                 {
-                    test: /\.tsx?$/,
-                    exclude: /node_modules/,
+                    test: /\.([cm]?ts|tsx)$/,
                     loader: 'ts-loader'
                 },
                 {
@@ -143,14 +142,19 @@ module.exports = (env,argv) => {
         resolve: {
             extensions: [
                 '*',
-                '.js',
-                '.jsx',
                 '.ts',
-                '.tsx'
+                '.tsx',
+                '.js',
+                '.jsx'
             ],
-                modules:
-            ["node_modules"],
-                alias:
+            extensionAlias: {
+                ".js": [".js", ".ts"],
+                ".cjs": [".cjs", ".cts"],
+                ".mjs": [".mjs", ".mts"]
+            },
+            modules:
+                ["node_modules"],
+            alias:
             {
                 Images: SRC_STATIC_DIR
             },

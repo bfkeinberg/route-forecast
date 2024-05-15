@@ -1,6 +1,5 @@
 import { Alignment,Button, IconSize, Intent, Navbar, NavbarDivider, NavbarGroup, NavbarHeading } from "@blueprintjs/core";
 import {Cloud, Cycle,Globe, Route as RouteIcon, Shop } from "@blueprintjs/icons";
-import { useJsApiLoader } from '@react-google-maps/api';
 import PropTypes from "prop-types";
 import React from "react";
 import {connect, useDispatch,useSelector} from 'react-redux';
@@ -43,9 +42,6 @@ const MobileUITabs = (props) => {
     const location = useLocation()
     const { pathname } = location
     try {
-        const { isLoaded: googleMapsIsLoaded } = useJsApiLoader({
-            googleMapsApiKey: props.mapsApiKey
-        })
         const navigate = useNavigate()
         const type = useSelector(state => state.routeInfo.type)
         const routeData = useSelector(state => state.routeInfo[type === "rwgps" ? "rwgpsRouteData" : "gpxRouteData"])

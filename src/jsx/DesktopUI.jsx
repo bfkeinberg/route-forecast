@@ -1,7 +1,6 @@
 import "./DesktopUI.css"
 
 import { Spinner } from "@blueprintjs/core";
-import { useJsApiLoader } from '@react-google-maps/api';
 import lazyRetry from "@tdotcode/react-lazy-retry";
 import PropTypes from "prop-types";
 import React, { Suspense,useState } from "react";
@@ -21,10 +20,6 @@ import { TitleScreen } from "./TitleScreen";
 import { TopBar } from "./TopBar/TopBar";
 
 const DesktopUI = ({mapsApiKey}) => {
-    let { isLoaded:googleMapsIsLoaded, loadError:googleMapsLoadError } = useJsApiLoader({
-        googleMapsApiKey: mapsApiKey
-      })
-
     const LoadableForecastTable = lazyRetry(() => import(/* webpackChunkName: "ForecastTable" */ './resultsTables/ForecastTable'));
     const {adjustedTimes } = useForecastDependentValues()
     const sidePaneOptions = [
@@ -90,8 +85,7 @@ const DesktopUI = ({mapsApiKey}) => {
                     borderImageSlice: 1
                 }}>
                     {
-                        (googleMapsLoadError && <h2>Error loading Google Maps</h2>) ||
-                            (mapDataExists && googleMapsIsLoaded) ?
+                        (mapDataExists) ?
                             <MapLoader maps_api_key={mapsApiKey} /> :
                             <TitleScreen />
                     }
