@@ -21,7 +21,7 @@
     "@reduxjs/toolkit": "^2.2.3",
     "@sentry/browser": "^7.110.1",
     "@sentry/node": "^7.110.1",
-    "@sentry/react": "^7.110.1",
+    "@sentry/react": "^8.2.1",
     "@sentry/tracing": "^7.111.0",
     "@tdotcode/react-lazy-retry": "^1.0.5",
     "animate.css": "^4.1.1",
