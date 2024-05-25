@@ -29,7 +29,8 @@
                 "routeInfo": "Route info",
                 "forecastSettings": "Forecast Settings",
                 "forecast":"Forecast",
-                "paceAnalysis": "Pace Analysis"
+                "paceAnalysis": "Pace Analysis",
+                "rwgpsId":"Ride with GPS Route ID"
             },
             "tooltips": {
                 "ridingPace":"Speed on flat ground, which will be reduced by climbing",
@@ -45,7 +46,8 @@
                 "windHeader":"Click to toggle between average wind speed and wind gusts",
                 "temperatureHeader":"Click to toggle between temperature and apparent temperature",
                 "aqiHeader":"Air quality shows current conditions, not forecasted. Click to toggle for the next forecast requested",
-                "overallPace":"Pace is average speed adjusted for climb"
+                "overallPace":"Pace is average speed adjusted for climb",
+                "analysisInterval":"Interval in hours at which to calculate effective pace"
             },
             "data": {
                 "noForecastPlaceholder":"Find forecast to create",
@@ -83,7 +85,8 @@
                 "delete":"Delete"
             },
             "analysis": {
-                "overallPace":"Overall climb-adjusted pace was"
+                "overallPace":"Overall climb-adjusted pace was",
+                "interval":"hour"
             }
         }
     },
@@ -117,7 +120,8 @@
                 "routeInfo": "Informations sur les parcours",
                 "forecastSettings": "Paramètres de prévision",
                 "forecast":"Prévisions Météorologiques",
-                "paceAnalysis":"Analyse du Rythme"
+                "paceAnalysis":"Analyse du Rythme",
+                "rwgpsId":"ID de parcours Ride with GPS"
             },
             "tooltips": {
                 "ridingPace":"Vitesse sur terrain plat, qui sera réduite en montant",
@@ -133,7 +137,8 @@
                 "windHeader":"Cliquez pour basculer entre la vitesse moyenne du vent et les rafales de vent",
                 "temperatureHeader":"Cliquez pour basculer entre la température et la température apparente",
                 "aqiHeader":"La qualité de l'air indique les conditions actuelles et non prévues. Cliquez pour basculer vers la prochaine prévision demandée",
-                "overallPace":"Le rythme est la vitesse moyenne ajustée pour la montée"
+                "overallPace":"Le rythme est la vitesse moyenne ajustée pour la montée",
+                "analysisInterval":"Intervalle en heures pour calculer le rythme effectif"
             },
             "data":{
                 "noForecastPlaceholder":"Cliquez sur « Prévisions »",
@@ -171,7 +176,8 @@
                 "delete":"Supprimer"
             },
             "analysis": {
-                "overallPace":"Le rythme global ajusté en fonction de la montée était"
+                "overallPace":"Le rythme global ajusté en fonction de la montée était",
+                "interval":"heure"
             }
         }
     }

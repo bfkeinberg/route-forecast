@@ -12,9 +12,10 @@ import stravaRouteParser from '../../utils/stravaRouteParser';
 import ErrorBoundary from "../shared/ErrorBoundary";
 import { ToggleButton } from '../shared/ToggleButton';
 import StravaAnalysisIntervalInput from './StravaAnalysisIntervalInput';
+import {useTranslation} from 'react-i18next'
 
 const PaceTable = ({activityData, activityStream, analysisInterval, mapSubrangeSet, mapRangeToggled, zoomToRange, zoomToRangeToggled}) =>  {
-
+    const { t } = useTranslation()
     const [
 selectedRow,
 setSelectedRow
@@ -79,7 +80,7 @@ setSelectedRow
                         <div id="paceSpan" style={{fontSize: "14px", marginTop: "10px"}}>{t('analysis.overallPace')} <span style={{fontWeight: "bold"}}>{formatSpeed(actualPace)}</span>.</div>
                     </div>
                     <div style={{padding: "16px", display: "flex", flexFlow: "column", alignItems: "end"}}>
-                        <ToggleButton active={zoomToRange} onClick={toggleZoom}>Zoom to Segment</ToggleButton>
+                        <ToggleButton active={zoomToRange} onClick={toggleZoom}>{t('buttons.zoomToSegment')}</ToggleButton>
                     </div>
                     <HTMLTable bordered interactive striped >
                         <thead>
