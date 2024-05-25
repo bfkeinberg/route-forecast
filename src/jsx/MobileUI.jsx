@@ -1,4 +1,4 @@
-import { Alignment,Button, IconSize, Intent, Navbar, NavbarDivider, NavbarGroup, NavbarHeading } from "@blueprintjs/core";
+import { Alignment,Button, IconSize, Intent, Navbar, NavbarDivider, NavbarGroup, NavbarHeading, Divider } from "@blueprintjs/core";
 import {Cloud, Cycle,Globe, Route as RouteIcon, Shop } from "@blueprintjs/icons";
 import { useJsApiLoader } from '@react-google-maps/api';
 import PropTypes from "prop-types";
@@ -86,6 +86,7 @@ const MobileUITabs = (props) => {
                         </Link>
                     </NavbarGroup>
                 </Navbar>
+                <Divider/>
                 <Routes>
                     <Route path="/" element={<RouteInfoForm />} />
                     <Route path="/controlPoints/" element={<ForecastSettings />} />
@@ -93,7 +94,7 @@ const MobileUITabs = (props) => {
                     <Route path="/forecastTable/" element={<ForecastTable adjustedTimes={adjustedTimes} />} />
                     <Route path="/paceTable/" element={<PaceTable />} />
                 </Routes>
-                <DonationRequest/>
+                <DonationRequest wacky/>
             </>
         )
     } catch (err) {

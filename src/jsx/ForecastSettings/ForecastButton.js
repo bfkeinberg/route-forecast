@@ -12,6 +12,7 @@ import { forecastAppended,forecastFetchBegun,forecastFetched, forecastFetchFaile
 import { generateUrl } from '../../utils/queryStringUtils';
 import { getForecastRequest } from '../../utils/util';
 import { DesktopTooltip } from '../shared/DesktopTooltip';
+import {useTranslation} from 'react-i18next'
 
 const ForecastButton = ({fetchingForecast,submitDisabled, routeNumber, startTimestamp, pace, interval,
      metric, controls, strava_activity, strava_route, provider, href, urlIsShortened, querySet, zone}) => {
@@ -25,6 +26,7 @@ const ForecastButton = ({fetchingForecast,submitDisabled, routeNumber, startTime
         const distanceInKm = useSelector(state => state.routeInfo.distanceInKm)
         const fetchAqi = useSelector(state => state.forecast.fetchAqi)
         const rusaRouteId = useSelector(state => state.uiInfo.routeParams.rusaPermRouteId)
+        const { t } = useTranslation()
 
     const forecastByParts = (forecastRequest, zone, service, routeName, routeNumber) => {
         let requestCopy = Object.assign(forecastRequest)
@@ -60,8 +62,8 @@ const ForecastButton = ({fetchingForecast,submitDisabled, routeNumber, startTime
     }
 
     let tooltipContent = submitDisabled ?
-        "Must provide an rwgps route id" :
-        "Request a ride forecast";
+        t('tooltips.forecast.disabled') :
+        t('tooltips.forecast.enabled')
     let buttonStyle = submitDisabled ? { pointerEvents: 'none', display: 'inline-flex' } : null;
     const forecastClick = async () => {
         await Sentry.startSpan({ name: "forecastClick" }, async () => {
@@ -123,7 +125,7 @@ const ForecastButton = ({fetchingForecast,submitDisabled, routeNumber, startTime
                     fill={true}
                     loading={forecastFetchResult.loading || aqiFetchResult.loading || fetchingForecast}
                 >
-                    {forecastFetchResult.isLoading ? 'Creating forecast...' : 'Find Forecast'}
+                    {forecastFetchResult.isLoading ? t('buttons.forecastPending') : t("buttons.forecast")}
                 </Button>
             </div>
         </DesktopTooltip>

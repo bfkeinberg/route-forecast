@@ -4,7 +4,7 @@ import { Spinner } from "@blueprintjs/core";
 import { useJsApiLoader } from '@react-google-maps/api';
 import lazyRetry from "@tdotcode/react-lazy-retry";
 import PropTypes from "prop-types";
-import React, { Suspense,useState } from "react";
+import React, { Suspense,useState,StrictMode } from "react";
 import { useSelector } from "react-redux";
 
 import { routeLoadingModes } from "../data/enums";
@@ -19,19 +19,26 @@ import { RouteTitle } from "./shared/RouteTitle";
 import { TransitionWrapper } from "./shared/TransitionWrapper";
 import { TitleScreen } from "./TitleScreen";
 import { TopBar } from "./TopBar/TopBar";
+import LangSwitcher from "./app/LangSwitcher";
+import {useTranslation} from 'react-i18next'
 
 const DesktopUI = ({mapsApiKey}) => {
+    const { t } = useTranslation()
     let { isLoaded:googleMapsIsLoaded, loadError:googleMapsLoadError } = useJsApiLoader({
         googleMapsApiKey: mapsApiKey
       })
 
     const LoadableForecastTable = lazyRetry(() => import(/* webpackChunkName: "ForecastTable" */ './resultsTables/ForecastTable'));
     const {adjustedTimes } = useForecastDependentValues()
+    const titleRouteInfo = t("titles.routeInfo")
+    const titleForecastSettings = t("titles.forecastSettings")
+    const titleForecast = t("titles.forecast")
+    const titlePaceAnalyis = t("titles.paceAnalysis")
     const sidePaneOptions = [
-        {title: "Route Info", content: <ErrorBoundary><RouteInfoForm routeProps={{}} /></ErrorBoundary>},
-        {title: "Forecast Settings", content: <ErrorBoundary><ForecastSettings/></ErrorBoundary>},
-        {title: "Forecast", content: <ErrorBoundary><Suspense fallback={<div>Loading ForecastTable...</div>}>{<LoadableForecastTable adjustedTimes={adjustedTimes}/>}</Suspense></ErrorBoundary>},
-        {title: "Pace Analysis", content: <ErrorBoundary>{<PaceTable/>}</ErrorBoundary>}
+        {title: titleRouteInfo, content: <ErrorBoundary><RouteInfoForm routeProps={{}} /></ErrorBoundary>},
+        {title: titleForecastSettings, content: <ErrorBoundary><ForecastSettings/></ErrorBoundary>},
+        {title: titleForecast, content: <ErrorBoundary><Suspense fallback={<div>Loading ForecastTable...</div>}>{<LoadableForecastTable adjustedTimes={adjustedTimes}/>}</Suspense></ErrorBoundary>},
+        {title: titlePaceAnalyis, content: <ErrorBoundary>{<PaceTable/>}</ErrorBoundary>}
     ]
     const [
         activeSidePane,
@@ -47,20 +54,20 @@ const DesktopUI = ({mapsApiKey}) => {
     const forecastData = useSelector(state => state.forecast.forecast)
 
     const panesVisible = new Set()
-    panesVisible.add("Route Info")
+    panesVisible.add(titleRouteInfo)
     if (routeData !== null) {
-        panesVisible.add("Forecast Settings")
+        panesVisible.add(titleForecastSettings)
     }
     if (forecastData.length > 0) {
-        panesVisible.add("Forecast")
+        panesVisible.add(titleForecast)
     }
     if (stravaActivityData !== null) {
-        panesVisible.add("Pace Analysis")
+        panesVisible.add(titlePaceAnalyis)
     }
 
-    useWhenChanged(routeData, () => setActiveSidePane(sidePaneOptions.findIndex(option => option.title === "Forecast Settings")))
-    useWhenChanged(forecastData, () => setActiveSidePane(sidePaneOptions.findIndex(option => option.title === "Forecast")), forecastData.length > 0)
-    useWhenChanged(stravaActivityData, () => setActiveSidePane(sidePaneOptions.findIndex(option => option.title === "Pace Analysis")))
+    useWhenChanged(routeData, () => setActiveSidePane(sidePaneOptions.findIndex(option => option.title === titleForecastSettings)))
+    useWhenChanged(forecastData, () => setActiveSidePane(sidePaneOptions.findIndex(option => option.title === titleForecast)), forecastData.length > 0)
+    useWhenChanged(stravaActivityData, () => setActiveSidePane(sidePaneOptions.findIndex(option => option.title === titlePaceAnalyis)))
     if (activeSidePane !== 0 && routeData === null && forecastData.length === 0) {
         setActiveSidePane(0)
     }
@@ -72,6 +79,7 @@ const DesktopUI = ({mapsApiKey}) => {
 
     return (
         <div>
+            <StrictMode>
             {!mapDataExists ? <InstallExtensionButton/>:null}
             <TopBar
                 sidePaneOptions={sidePaneOptions.map(({title}) => title)}
@@ -97,6 +105,8 @@ const DesktopUI = ({mapsApiKey}) => {
                     }
                 </div>
             </div>
+            <LangSwitcher/>
+            </StrictMode>
         </div>
     );
 };

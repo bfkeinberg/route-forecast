@@ -1,4 +1,4 @@
-import {Button,MenuItem,Toast2,Section} from '@blueprintjs/core';
+import {Button,MenuItem,Toast2,Divider} from '@blueprintjs/core';
 import { Select } from "@blueprintjs/select"
 import PropTypes from 'prop-types';
 import React from 'react';
@@ -13,6 +13,7 @@ import { RouteInfoInputRUSA } from './RouteInfoInputRUSA';
 import { RouteInfoInputRWGPS } from './RouteInfoInputRWGPS';
 import { RouteInfoInputStrava } from './RouteInfoInputStrava'
 import { ELEVATION_1 } from '@blueprintjs/core/lib/esm/common/classes';
+import {useTranslation} from 'react-i18next'
 
 const getInputForMode = (mode) => {
     switch (mode) {
@@ -47,12 +48,6 @@ const RouteInfoForm = ({ errorDetails, errorDetailsSet, routeLoadingMode, routeL
                     <ShortUrl />
                 </div>
             </MediaQuery>
-            <Section style={{marginTop:"1em"}} elevation={ELEVATION_1} title={"Source of route"}>
-                <strong>Randoplan</strong> can load routes from Ride with GPS, Strava, or using the ids of permanent routes on RUSA.org.
-                You can paste in the url of a route from Ride with GPS or Strava, or grab the id from the info of a RUSA perm route.
-                Alternatively if you pin a route that you are viewing on Ride with GPS, the button to the right will list those. It will prompt
-                to log into RWGPS if you haven't already.
-            </Section>
         </div>
     );
 }
@@ -74,6 +69,7 @@ const renderMode = (mode, { handleClick, handleFocus, modifiers }) => {
 };
 
 const RouteLoadingModeSelector = ({ mode, modeSwitched }) => {
+    const { t } = useTranslation()
     return (
         <div style={{ display: "flex", justifyContent: "center" }}>
             <Select tabIndex="0"
@@ -86,7 +82,7 @@ const RouteLoadingModeSelector = ({ mode, modeSwitched }) => {
                 activeItem={{ key: mode, name: mode.name }}
                 onItemSelect={(selected) => { modeSwitched(selected.key) }}
             >
-                {/* <span style={{ marginRight: "1em" }}><b>Source of route</b></span> */}
+                <span style={{ marginRight: "1em" }}><b>{t('labels.routeType')}</b></span>
                 <Button text={routeLoadingModeProps[mode - 1].name} rightIcon="symbol-triangle-down" />
             </Select>
         </div>

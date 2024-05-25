@@ -10,6 +10,7 @@ import {saveCookie, setPace} from "../../redux/actions";
 import { useActualPace, useFormatSpeed } from '../../utils/hooks';
 import { inputPaceToSpeed, metricPaceToSpeed, paceToSpeed } from '../../utils/util';
 import { DesktopTooltip } from '../shared/DesktopTooltip';
+import {useTranslation} from 'react-i18next'
 
 const paceValues = {
     imperialLikeAPenguin: {
@@ -113,7 +114,7 @@ const renderPaceMetric = (pace, { handleClick, modifiers }) => {
 };
 
 const RidingPace = ({ pace, setPace, metric }) => {
-
+    const { t } = useTranslation()
     const actualPace = useActualPace()
 
     const formatSpeed = useFormatSpeed()
@@ -123,30 +124,30 @@ const RidingPace = ({ pace, setPace, metric }) => {
     let pace_tooltip_class = 'pace_tooltip';
     const selectedSpeed = metric ? metricPaceToSpeed[pace] : paceToSpeed[pace];
     if (actualPace === null || actualPace === 0) {
-        pace_text = `Speed on flat ground, which will be reduced by climbing`;
+        pace_text = t('tooltips.ridingPace')
     } else {
         pace_tooltip_class = getPaceTooltipId(actualPace,selectedSpeed);
-        pace_text = `Actual riding pace was ${getAlphaPace(Math.round(actualPace))} (${formatSpeed(actualPace)})`;
+        pace_text = `${t('tooltips.actualPace')} ${getAlphaPace(Math.round(actualPace))} (${formatSpeed(actualPace)})`;
     }
 
     const dropdownValues = metric ? paceValues.metric : paceValues.imperialLikeAPenguin
     return (
-        <FormGroup style={{ flex: 3, fontSize: "90%" }} label={<span><b>Pace on flat ground </b></span>} labelFor={'paceInput'}>
-            <DesktopTooltip content={pace_text} className={pace_tooltip_class} placement="bottom" minimal={true}>
+        <DesktopTooltip content={pace_text} className={pace_tooltip_class}>
+            <FormGroup style={{ flex: 3, fontSize: "90%" }} label={<span><b>{t('labels.ridingPace')}</b></span>} labelFor={'paceInput'}>
                 <Select tabIndex="0"
                     id='paceInput'
                     items={dropdownValues.values}
                     itemsEqual={"number"}
-                    itemRenderer={metric?renderPaceMetric:renderPaceImperial}
+                    itemRenderer={metric ? renderPaceMetric : renderPaceImperial}
                     filterable={false}
                     fill={true}
-                    activeItem={{name:pace, number:selectedSpeed}}
-                    onItemSelect={(selected) => { saveCookie("pace", selected.name);setPace(selected.name) }}
+                    activeItem={{ name: pace, number: selectedSpeed }}
+                    onItemSelect={(selected) => { saveCookie("pace", selected.name); setPace(selected.name) }}
                 >
-                    <Button text={selectedSpeed + " " + dropdownValues.label} rightIcon="symbol-triangle-down"/>
+                    <Button text={selectedSpeed + " " + dropdownValues.label} rightIcon="symbol-triangle-down" />
                 </Select>
-            </DesktopTooltip>
-        </FormGroup>
+            </FormGroup>
+        </DesktopTooltip>
     );
 };
 

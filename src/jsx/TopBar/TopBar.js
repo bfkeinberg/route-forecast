@@ -10,6 +10,8 @@ import { RouteTitle } from "../shared/RouteTitle";
 import BugReportButton from "./BugReportButton";
 import DonationRequest from "./DonationRequest";
 import ShortUrl from "./ShortUrl";
+import {useTranslation} from 'react-i18next'
+
 export const TopBar = ({sidePaneOptions, activeSidePane, setActiveSidePane, sidebarWidth, panesVisible}) => {
   // const smallScreen = useMediaQuery({ query: '(max-width: 900px)' })
   const roomFortitle = useMediaQuery({ query: '(min-width: 1100px)' });
@@ -36,7 +38,7 @@ export const TopBar = ({sidePaneOptions, activeSidePane, setActiveSidePane, side
           <ShortUrl/>
           <DonationRequest wacky/>
           <div style={{margin: "0px 10px", flexShrink: 0}}><BugReportButton/></div>
-          {roomForLogo && <NonexistentLogo/>}
+          {/* {roomForLogo && <NonexistentLogo/>} */}
         </div>
       </div>
     </div>
@@ -51,38 +53,62 @@ TopBar.propTypes = {
   panesVisible:PropTypes.object.isRequired
 };
 
-const Tabs = ({sidePaneOptions, activeSidePane, setActiveSidePane, sidebarWidth, panesVisible}) => {
+const Tabs = ({ sidePaneOptions, activeSidePane, setActiveSidePane, sidebarWidth, panesVisible }) => {
 
   const [
-loadingFromURLStarted,
-loadingFromURLFinished,
-displayContent
-] = useLoadingFromURLStatus()
-console.info(`loadingFromUrlFinished=${loadingFromURLFinished}`)
-return (
-    <div style={{height: "50px", display: "flex", alignItems: "center", width: `${sidebarWidth}px`}} className={(loadingFromURLStarted && displayContent) ? "fade-in" : ""}>
-      {displayContent ?
-        sidePaneOptions.map((option, index) => {
-          const displayIndex = Array.from(panesVisible).indexOf(option)
-          const activeDisplayIndex = Array.from(panesVisible).indexOf(sidePaneOptions[activeSidePane])
-          return (
-            <TopBarItem
-              active={activeSidePane === index}
-              leftNeighborActive={activeDisplayIndex === displayIndex - 1}
-              rightNeighborActive={activeDisplayIndex === displayIndex + 1}
-              last={index === panesVisible.size - 1}
-              onClick={() => setActiveSidePane(index)}
-              visible={panesVisible.has(option)}
-              key={option}
-            >
-              <div style={{ fontWeight: "bold", textAlign: "center" }}>
-                {option}
-              </div>
-            </TopBarItem>
-          )
-        }) :
-        null
-      }
+    loadingFromURLStarted,
+    loadingFromURLFinished,
+    displayContent
+  ] = useLoadingFromURLStatus()
+  const { t } = useTranslation()
+  console.info(`loadingFromUrlFinished=${loadingFromURLFinished}`)
+  return (
+    <div style={{
+      width: `${sidebarWidth}px`
+    }}>
+      <div style={{
+        display: "flex",
+        justifyContent: "space-between" 
+      }}>
+        <div style={{ flex: 1 }}>
+          <NonexistentLogo />
+        </div>
+        <div style={{
+          "textAlign": "end",
+          "opacity": "0.85",
+          "fontSize": "16px",
+          "marginLeft": "auto",
+          "fontWeight": "bold",
+          "padding": "12px",
+          flex: 1
+        }}>
+          {t('data.summary')}
+        </div>
+      </div>
+      <div style={{ height: "50px", display: "flex", alignItems: "center" }} className={(loadingFromURLStarted && displayContent) ? "fade-in" : ""}>
+        {displayContent ?
+          sidePaneOptions.map((option, index) => {
+            const displayIndex = Array.from(panesVisible).indexOf(option)
+            const activeDisplayIndex = Array.from(panesVisible).indexOf(sidePaneOptions[activeSidePane])
+            return (
+              <TopBarItem
+                active={activeSidePane === index}
+                leftNeighborActive={activeDisplayIndex === displayIndex - 1}
+                rightNeighborActive={activeDisplayIndex === displayIndex + 1}
+                last={index === panesVisible.size - 1}
+                onClick={() => setActiveSidePane(index)}
+                visible={panesVisible.has(option)}
+                key={option}
+              >
+                <div style={{ fontWeight: "bold", textAlign: "center" }}>
+                  {option}
+                </div>
+              </TopBarItem>
+            )
+          }) :
+          null
+        }
+      </div>
     </div>
   )
 }

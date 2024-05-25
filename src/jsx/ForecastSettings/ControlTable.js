@@ -6,23 +6,12 @@ import { removeControl as removeControlAction, updateUserControls } from '../../
 import { useActualArrivalTimes, useForecastDependentValues } from '../../utils/hooks';
 import { milesToMeters,stringIsOnlyDecimal, stringIsOnlyNumeric } from '../../utils/util';
 import { Table } from "./Table"
+import {useTranslation} from 'react-i18next'
 
 const minSuffixFunction = value => `${value} min`
 
 export const ControlTable = () => {
-
-    //     // no name field on mobile
-    //     this.desktop = window.matchMedia("(min-width: 800px)").matches;
-    //     if (this.desktop) {
-    //         this.state.columnDefs.unshift({colId:'name', field:'name', sortable:false, resizable:true, editable:true, menuTabs:[
-    //                 'generalMenuTab',
-    //                 'columnsMenuTab'
-    //             ], headerName:'Name'});
-    //     } else {
-    //         this.state.columnDefs[1].headerName = 'Elapsed';
-    //         this.state.columnDefs[2].headerName = 'Arrival';
-    //     }
-    // }
+    const { t } = useTranslation()
 
     const displayBanked = useSelector(state => state.controls.displayBanked)
     const stravaActivityData = useSelector(state => state.strava.activityData)
@@ -72,11 +61,11 @@ export const ControlTable = () => {
         rows: controlsData.map(({name, distance, duration, arrival, banked, actual}, index) =>
             ({name, distance, duration, arrival, banked, actual, delete: <Icon icon="delete" style={{cursor: "pointer"}} onClick={() => removeControl(index)}/>})),
         columns: [
-            {name: "name", render: "Name", width: 40, editable: true},
-            {name: "distance", editTransformFunction: transformDistance, editCompleteFunction: reverseTransformDistance,  valueTransformFunction: transformDistance, render: <div style={{color: '#0000EE', cursor:'pointer'}} onClick={sortOurStuffByDistance}>{metric ? "Kilometers" : "Miles"}</div>, width: 40, editable: true, editValidateFunction: stringIsOnlyDecimal},
-            {name: "duration", render: "Expected Time Spent", valueTransformFunction: minSuffixFunction, width: 80, editable: true, editValidateFunction: stringIsOnlyNumeric},
-            {name: "arrival", render: "Estimated Arrival Time", width: 80, editable: false, cellStyle: rwgpsCellStyle, headerStyle: rwgpsCellStyle},
-            {name: "delete", render: "Delete", width: 60}
+            {name: "name", render: t('controls.name'), width: 40, editable: true},
+            {name: "distance", editTransformFunction: transformDistance, editCompleteFunction: reverseTransformDistance,  valueTransformFunction: transformDistance, render: <div style={{color: '#0000EE', cursor:'pointer'}} onClick={sortOurStuffByDistance}>{metric ? t('controls.distanceKilometers') :t('controls.distanceMiles')}</div>, width: 40, editable: true, editValidateFunction: stringIsOnlyDecimal},
+            {name: "duration", render: t('controls.duration'), valueTransformFunction: minSuffixFunction, width: 80, editable: true, editValidateFunction: stringIsOnlyNumeric},
+            {name: "arrival", render: t('controls.arrival'), width: 80, editable: false, cellStyle: rwgpsCellStyle, headerStyle: rwgpsCellStyle},
+            {name: "delete", render: t('controls.delete'), width: 60}
         ]
     }
     const bankedColumn = {name: "banked", render: "Banked Time", valueTransformFunction: minSuffixFunction, width: 80}

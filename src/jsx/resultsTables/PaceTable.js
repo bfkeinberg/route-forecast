@@ -12,9 +12,10 @@ import stravaRouteParser from '../../utils/stravaRouteParser';
 import ErrorBoundary from "../shared/ErrorBoundary";
 import { ToggleButton } from '../shared/ToggleButton';
 import StravaAnalysisIntervalInput from './StravaAnalysisIntervalInput';
+import {useTranslation} from 'react-i18next'
 
 const PaceTable = ({activityData, activityStream, analysisInterval, mapSubrangeSet, mapRangeToggled, zoomToRange, zoomToRangeToggled}) =>  {
-
+    const { t } = useTranslation()
     const [
 selectedRow,
 setSelectedRow
@@ -76,17 +77,17 @@ setSelectedRow
                 <ErrorBoundary>
                     <div style={{padding: "16px", display: "flex", flexFlow: "column", alignItems: "center"}}>
                         <StravaAnalysisIntervalInput />
-                        <div id="paceSpan" style={{fontSize: "14px", marginTop: "10px"}}>Overall climb-adjusted pace was <span style={{fontWeight: "bold"}}>{formatSpeed(actualPace)}</span>.</div>
+                        <div id="paceSpan" style={{fontSize: "14px", marginTop: "10px"}}>{t('analysis.overallPace')} <span style={{fontWeight: "bold"}}>{formatSpeed(actualPace)}</span>.</div>
                     </div>
                     <div style={{padding: "16px", display: "flex", flexFlow: "column", alignItems: "end"}}>
-                        <ToggleButton active={zoomToRange} onClick={toggleZoom}>Zoom to Segment</ToggleButton>
+                        <ToggleButton active={zoomToRange} onClick={toggleZoom}>{t('buttons.zoomToSegment')}</ToggleButton>
                     </div>
                     <HTMLTable bordered interactive striped >
                         <thead>
                         <tr>
                             <th style={{'fontSize':'80%'}}>Time</th>
                             <th id={'pace'} style={{'fontSize':'80%'}}>
-                                <Tooltip content={'Pace is average speed adjusted for climb'} placement={"top"}>Pace</Tooltip>
+                                <Tooltip content={t('tooltips.overallPace')} placement={"top"}>Pace</Tooltip>
                             </th>
                             <th style={{'fontSize':'80%'}}>WW Pace</th>
                             <th style={{'fontSize':'80%'}}>Distance</th>
