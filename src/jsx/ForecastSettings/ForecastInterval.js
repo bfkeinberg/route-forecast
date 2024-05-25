@@ -5,11 +5,13 @@ import React from 'react';
 import {connect} from 'react-redux';
 
 import {setInterval} from "../../redux/actions";
+import {useTranslation} from 'react-i18next'
 
 const ForecastInterval = ({min_interval,interval,setInterval}) => {
+    const { t } = useTranslation()
     return (
-        <FormGroup style={{flex: 1}} label='Forecast Interval in minutes'>
-            <Tooltip placement='bottom' title='How often to generate weather forecast in minutes'>
+        <FormGroup style={{flex: 1}} label={t('labels.interval')}>
+            <Tooltip placement='bottom' title={t('tooltips.interval')}>
                 <Slider
                     value={interval}
                     step={0.25}

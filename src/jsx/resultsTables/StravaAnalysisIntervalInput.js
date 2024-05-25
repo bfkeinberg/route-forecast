@@ -3,19 +3,8 @@ import { Select } from "@blueprintjs/select";
 import PropTypes from 'prop-types';
 import React from 'react';
 import { connect } from 'react-redux';
-
+import {useTranslation} from 'react-i18next'
 import { analysisIntervalSet } from '../../redux/reducer';
-
-const analysisIntervals = [
-    {number: "0.5", text: "Half hour"},
-    {number: "1", text: "1 hour"},
-    {number:"2", text:"2 hours"},
-    {number:"4", text:"4 hours"},
-    {number:"6", text:"6 hours"},
-    {number:"8", text:"8 hours"},
-    {number:"12", text:"12 hours"},
-    {number:"24", text:"24 hours"}
-];
 
 const renderInterval = (interval, { handleClick, modifiers }) => {
     if (!modifiers.matchesPredicate) {
@@ -32,7 +21,19 @@ const renderInterval = (interval, { handleClick, modifiers }) => {
 };
 
 const StravaAnalysisIntervalInput = ({ interval, setInterval }) => {
-    const interval_tooltip_text = 'Interval in hours at which to calculate effective pace';
+    const { t } = useTranslation()
+    const analysisIntervals = [
+        {number: "0.5", text: "Half hour"},
+        {number: "1", text: `1 ${t('analysis.interval')}`},
+        {number:"2", text:`2 ${t('analysis.interval')}s`},
+        {number:"4", text:`4 ${t('analysis.interval')}s`},
+        {number:"6", text:`6 ${t('analysis.interval')}s`},
+        {number:"8", text:`8 ${t('analysis.interval')}s`},
+        {number:"12", text:`12 ${t('analysis.interval')}s`},
+        {number:"24", text:`24 ${t('analysis.interval')}s`}
+    ]
+        
+    const interval_tooltip_text = t('tooltips.analysisInterval');
     return (
         <FormGroup size='sm' style={{ flex: '1' }}>
             <div style={{fontSize: "14px", fontWeight: "bold"}}>Analysis Interval</div>
