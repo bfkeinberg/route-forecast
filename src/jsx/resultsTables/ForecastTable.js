@@ -191,41 +191,43 @@ const ForecastTable = (adjustedTimes) => {
                 <h2>{routeName}</h2>
             </MediaQuery>
             <ErrorBoundary>
-                <div style={{ display: 'flex', padding: '16px' }}>
-                    <div style={{ flex: 1 }}>
-                        {displayBacklink(provider)}
+                <div style={{ display: 'flex', flexDirection: "column", overflowY: 'scroll' }}>
+                    <div style={{ display: 'flex', padding: '16px', flexShrink: 0 }}>
+                        <div style={{ flex: 1 }}>
+                            {displayBacklink(provider)}
+                        </div>
+                        <div style={{ flex: 1 }}>
+                            <WeatherCorrections />
+                        </div>
+                        <div style={{ flexShrink: 0, width: "fit-content" }}>
+                            <ToggleButton style={{width:"5em", height:"4em", float:"right"}} active={zoomToRange} onClick={toggleZoom}>{t('buttons.zoomToSegment')}</ToggleButton>
+                        </div>
                     </div>
-                    <div style={{ flex: 1 }}>
-                        <WeatherCorrections />
-                    </div>
-                    <div style={{ flex: 1 }}>
-                        <ToggleButton style={{width:"5em", height:"4em", float:"right"}} active={zoomToRange} onClick={toggleZoom}>{t('buttons.zoomToSegment')}</ToggleButton>
-                    </div>
+                    <HTMLTable compact={true} striped bordered interactive style={{ fontSize: "12px", "borderSpacing": "0px"}}>
+                        <thead>
+                            <tr>
+                                <th><span className={'timeHeaderCell'}>{t('tableHeaders.time')}</span></th>
+                                <th><span className={'headerCell'}>{distHeader}</span></th>
+                                <th><span className={'headerCell'}>{t('tableHeaders.summary')}</span></th>
+                                <th id={'temp'} className={'clickableHeaderCell'}>{temperatureHeader}</th>
+                                <th><span className={'headerCell'}>{t('tableHeaders.precipitation')}</span></th>
+                                <MediaQuery minWidth={501}>
+                                    <th><span className={'headerCell'}>{t('tableHeaders.humidity')}</span></th>
+                                    <th><span className={'headerCell'}>{t('tableHeaders.cloudCover')}</span></th>
+                                </MediaQuery>
+                                <th className={'clickableHeaderCell'} id={'aqi'}>
+                                <Tooltip content={t('tooltips.aqiHeader')} placement={'top'}>
+                                    <Button small active={fetchAqi} onClick={toggleAqi}><span className={fetchAqi?'largerClickableHeaderCell':'largerStruckClickableHeaderCell'}>AQI</span></Button></Tooltip>
+                                </th>
+                                <th id={'wind'}>{windHeader}</th>
+                                <MediaQuery minWidth={501}>
+                                    <th><span className={'headerCell'}>{t('tableHeaders.windBearing')}</span></th>
+                                </MediaQuery>
+                            </tr>
+                        </thead>
+                        {expandTable(forecast, metric, adjustedTimes)}
+                    </HTMLTable>
                 </div>
-                <HTMLTable compact={true} striped bordered interactive style={{ fontSize: "12px", "borderSpacing": "0px"}}>
-                    <thead>
-                        <tr>
-                            <th><span className={'timeHeaderCell'}>{t('tableHeaders.time')}</span></th>
-                            <th><span className={'headerCell'}>{distHeader}</span></th>
-                            <th><span className={'headerCell'}>{t('tableHeaders.summary')}</span></th>
-                            <th id={'temp'} className={'clickableHeaderCell'}>{temperatureHeader}</th>
-                            <th><span className={'headerCell'}>{t('tableHeaders.precipitation')}</span></th>
-                            <MediaQuery minWidth={501}>
-                                <th><span className={'headerCell'}>{t('tableHeaders.humidity')}</span></th>
-                                <th><span className={'headerCell'}>{t('tableHeaders.cloudCover')}</span></th>
-                            </MediaQuery>
-                            <th className={'clickableHeaderCell'} id={'aqi'}>
-                            <Tooltip content={t('tooltips.aqiHeader')} placement={'top'}>
-                                <Button small active={fetchAqi} onClick={toggleAqi}><span className={fetchAqi?'largerClickableHeaderCell':'largerStruckClickableHeaderCell'}>AQI</span></Button></Tooltip>
-                            </th>
-                            <th id={'wind'}>{windHeader}</th>
-                            <MediaQuery minWidth={501}>
-                                <th><span className={'headerCell'}>{t('tableHeaders.windBearing')}</span></th>
-                            </MediaQuery>
-                        </tr>
-                    </thead>
-                    {expandTable(forecast, metric, adjustedTimes)}
-                </HTMLTable>
             </ErrorBoundary>
         </div>
     )

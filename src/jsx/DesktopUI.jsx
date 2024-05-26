@@ -74,33 +74,39 @@ const DesktopUI = ({mapsApiKey}) => {
     stravaActivityData !== null
 
     return (
-        <div>
+        <div style={{ display: 'flex', flexDirection: 'column', maxHeight: '100vh' }}>
             <StrictMode>
-            {!mapDataExists ? <InstallExtensionButton/>:null}
-            <TopBar
-                sidePaneOptions={sidePaneOptions.map(({title}) => title)}
-                activeSidePane={activeSidePane}
-                setActiveSidePane={setActiveSidePane}
-                sidebarWidth={sidebarWidth}
-                panesVisible={panesVisible}
-            />
-            <div style={{display: "flex"}}>
-                <Sidebar sidePaneOptions={sidePaneOptions} activeSidePane={activeSidePane} sidebarWidth={sidebarWidth}/>
-                <div style={{
-                    flexGrow: 1,
-                    height: "calc(100vh - 50px)",
-                    borderLeft: "1px solid transparent",
-                    borderImage: "linear-gradient(to bottom, grey , transparent)",
-                    borderImageSlice: 1
-                }}>
-                    {
-                        (mapDataExists) ?
-                            <MapLoader maps_api_key={mapsApiKey} /> :
-                            <TitleScreen />
-                    }
+                {!mapDataExists ? <InstallExtensionButton /> : null}
+                <div style={{ flexShrink: 0 }}>
+                    <TopBar
+                        sidePaneOptions={sidePaneOptions.map(({ title }) => title)}
+                        activeSidePane={activeSidePane}
+                        setActiveSidePane={setActiveSidePane}
+                        sidebarWidth={sidebarWidth}
+                        panesVisible={panesVisible}
+                    />
                 </div>
-            </div>
-            <LangSwitcher/>
+                <div style={{ display: "flex", flex: 1, height: '0px' }}>
+                    <div style={{ maxHeight: '100%', overflowY: 'scroll' }}>
+                        <Sidebar sidePaneOptions={sidePaneOptions} activeSidePane={activeSidePane} sidebarWidth={sidebarWidth} />
+                    </div>
+                    <div style={{
+                        flexGrow: 1,
+                        maxHeight: "100%",
+                        borderLeft: "1px solid transparent",
+                        borderImage: "linear-gradient(to bottom, grey , transparent)",
+                        borderImageSlice: 1
+                    }}>
+                        {
+                            (mapDataExists) ?
+                                <MapLoader maps_api_key={mapsApiKey} /> :
+                                <TitleScreen />
+                        }
+                    </div>
+                </div>
+                <div style={{ flexShrink: 0 }}>
+                    <LangSwitcher />
+                </div>
             </StrictMode>
         </div>
     );
