@@ -19,7 +19,7 @@
     "@mui/material": "^5.3.1",
     "@reduxjs/toolkit": "^2.2.3",
     "@sentry/browser": "^8.4.0",
-    "@sentry/node": "^7.110.1",
+    "@sentry/node": "^8.4.0",
     "@sentry/react": "^8.4.0",
     "@sentry/tracing": "^7.111.0",
     "@tdotcode/react-lazy-retry": "^1.0.5",
