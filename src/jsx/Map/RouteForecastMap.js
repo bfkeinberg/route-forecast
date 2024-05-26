@@ -15,7 +15,7 @@ import { formatTemperature } from "../resultsTables/ForecastTable";
 import ErrorBoundary from "../shared/ErrorBoundary"
 import { Polyline } from './polyline';
 
-const arrowPath = "m16.317 32.634c-.276 0-.5-.224-.5-.5v-31.634c0-.276.224-.5.5-.5s.5.224.5.5v31.634c0 .276-.223.5-.5.5zm12.535-19.098c-.128 0-.256-.049-.354-.146l-12.179-12.183-12.184 12.183c-.195.195-.512.195-.707 0s-.195-.512 0-.707l12.538-12.537c.093-.093.22-.146.353-.146l0 0c.133 0 .26.053.354.146l12.533 12.536c.195.195.195.512 0 .707-.098.098-.226.147-.354.147z"
+const arrowPath = "m-.232.134c-1.104 0-2-.224-2-.5v-31.634c0-.276.896-.5 2-.5s2 .224 2 .5v31.634C1.768-.09.876.134-.232.134m12.651-20.5c-.128 0-.256-.049-.354-.146l-12.179-12.183-12.184 12.183c-.195.195-.512.195-.707 0s-.195-.512 0-.707l12.538-12.537c.093-.093.22-.146.353-.146l0 0c.133 0 .26.053.354.146l12.533 12.536c.195.195.195.512 0 .707-.098.098-.226.147-.354.147z"
 
 const findMarkerInfo = (forecast, subrange) => {
     if (!subrange || subrange.length !== 2) {
@@ -121,7 +121,7 @@ const RouteForecastMap = ({maps_api_key}) => {
     try {
         return (
             <ErrorBoundary>
-                <div id="map" style={{ height: "calc(100vh - 60px)", position: "relative" }}>
+                <div id="map" style={{ width:'auto', height: "calc(100vh - 115px)", position: "relative" }}>
                     {(forecast.length > 0 || routeLoadingMode === routeLoadingModes.STRAVA) && bounds !== null ?
                     <APIProvider apiKey={maps_api_key}>
                         <Map
@@ -215,25 +215,63 @@ const pickArrowColor = (distance, subrange) => {
     return (distanceInMeters >= subrange[0] && distanceInMeters <= subrange[1]) ? 'deeppink' : 'blue';
 }
 
+const viewbox_0 = "-25 -35 55 50"
+const viewbox_90 = "-20 -20 55 55"
+const viewbox_180 = "-35 -20 55 55"
+const viewbox_270 = "-33 -35 60 60"
+
+const pickViewbox = (rotation) => {
+    if (rotation < 90) return viewbox_0
+    if (rotation < 180) return viewbox_90
+    if (rotation < 270) return viewbox_180
+    return viewbox_270
+}
+
+const pickWidth = (rotation) => {
+    if (rotation < 90) return 55
+    if (rotation < 180) return 55
+    if (rotation < 270) return 55
+    return 60
+}
+
+const pickHeight = (rotation) => {
+    if (rotation < 90) return 50
+    if (rotation < 180) return 55
+    if (rotation < 270) return 55
+    return 60
+}
+
 export const RotatedArrow = ({rotation, distance, subrange}) => {
     return (
-        <svg viewBox='-22 0 58 66'
+        <svg viewBox={pickViewbox(rotation)} //'-40 -70 73 73'
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
-            width="100"
-            height="75"
+            width={pickWidth(rotation)}
+            height={pickHeight(rotation)}
+            x="-24"
+            y="-35"
         >
+            <defs>
+                <radialGradient id="movingShade" fy="95%">
+                    <stop offset="0%" stop-color="lime"></stop>
+                    <stop offset="100%" stop-color={pickArrowColor(distance,subrange)}></stop>
+                    <animate attributeName="fy" dur="1800ms" from="95%" to="0%" repeatCount="indefinite" />
+                </radialGradient>
+            </defs>
             <path
-                stroke={pickArrowColor(distance,subrange)}
+                // stroke={pickArrowColor(distance,subrange)}
                 strokeLinecap="round"
-                strokeWidth="2"
+                // strokeWidth="3"
+                strokeOpacity={'20%'}
                 d={arrowPath}
-                transform={`rotate(${rotation}, 16.3, 32.6)`}
+                fill={`url(#movingShade)`}
+                transform={`rotate(${rotation},-0.234,0.134)`}
             />
-            <text x={rotation<179?"-10":"25"} y="45" fill="black" textLength={24} fontSize={14}>{distance.toFixed()}</text>
+            <text x={rotation<179?"7":"5"} y={rotation>90&&rotation<180?"-10":"13"} fill="black" fontSize={14}>{distance.toFixed()}</text>
         </svg>
     )
-}// class="markerText
+}
+
 const TempMarker = ({ latitude, longitude, value, title, bearing, windSpeed, subrange }) => {
     // Add the marker at the specified location
     if (parseInt(windSpeed) > 3) {
