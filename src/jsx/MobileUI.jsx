@@ -86,7 +86,7 @@ const MobileUITabs = (props) => {
                 <Routes>
                     <Route path="/" element={<RouteInfoForm />} />
                     <Route path="/controlPoints/" element={<ForecastSettings />} />
-                    <Route path="/map/" element={googleMapsIsLoaded ? <MapLoader maps_api_key={props.mapsApiKey} /> : <span>Maps not loaded</span>} />
+                    <Route path="/map/" element={<MapLoader maps_api_key={props.mapsApiKey} />} />
                     <Route path="/forecastTable/" element={<ForecastTable adjustedTimes={adjustedTimes} />} />
                     <Route path="/paceTable/" element={<PaceTable />} />
                 </Routes>
