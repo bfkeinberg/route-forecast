@@ -23,9 +23,6 @@ import {useTranslation} from 'react-i18next'
 
 const DesktopUI = ({mapsApiKey}) => {
     const { t } = useTranslation()
-    let { isLoaded:googleMapsIsLoaded, loadError:googleMapsLoadError } = useJsApiLoader({
-        googleMapsApiKey: mapsApiKey
-      })
 
     const LoadableForecastTable = lazyRetry(() => import(/* webpackChunkName: "ForecastTable" */ './resultsTables/ForecastTable'));
     const {adjustedTimes } = useForecastDependentValues()
