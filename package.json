@@ -20,7 +20,7 @@
     "@reduxjs/toolkit": "^2.2.3",
     "@sentry/browser": "^7.110.1",
     "@sentry/node": "^7.110.1",
-    "@sentry/react": "^7.110.1",
+    "@sentry/react": "^8.4.0",
     "@sentry/tracing": "^7.111.0",
     "@tdotcode/react-lazy-retry": "^1.0.5",
     "@vis.gl/react-google-maps": "^1.0.0",
