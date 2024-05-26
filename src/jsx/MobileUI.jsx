@@ -1,6 +1,5 @@
 import { Alignment,Button, IconSize, Intent, Navbar, NavbarDivider, NavbarGroup, NavbarHeading, Divider } from "@blueprintjs/core";
 import {Cloud, Cycle,Globe, Route as RouteIcon, Shop } from "@blueprintjs/icons";
-import { useJsApiLoader } from '@react-google-maps/api';
 import PropTypes from "prop-types";
 import React from "react";
 import {connect, useDispatch,useSelector} from 'react-redux';
@@ -43,9 +42,6 @@ const MobileUITabs = (props) => {
     const location = useLocation()
     const { pathname } = location
     try {
-        const { isLoaded: googleMapsIsLoaded } = useJsApiLoader({
-            googleMapsApiKey: props.mapsApiKey
-        })
         const navigate = useNavigate()
         const type = useSelector(state => state.routeInfo.type)
         const routeData = useSelector(state => state.routeInfo[type === "rwgps" ? "rwgpsRouteData" : "gpxRouteData"])
@@ -90,7 +86,7 @@ const MobileUITabs = (props) => {
                 <Routes>
                     <Route path="/" element={<RouteInfoForm />} />
                     <Route path="/controlPoints/" element={<ForecastSettings />} />
-                    <Route path="/map/" element={googleMapsIsLoaded ? <MapLoader maps_api_key={props.mapsApiKey} /> : <span>Maps not loaded</span>} />
+                    <Route path="/map/" element={<MapLoader maps_api_key={props.mapsApiKey} />} />
                     <Route path="/forecastTable/" element={<ForecastTable adjustedTimes={adjustedTimes} />} />
                     <Route path="/paceTable/" element={<PaceTable />} />
                 </Routes>

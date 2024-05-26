@@ -1,10 +1,11 @@
-import { GoogleMap, InfoWindow,MarkerF, Polyline } from '@react-google-maps/api';
+import {APIProvider, Map, InfoWindow, useMap, AdvancedMarker, Pin} from '@vis.gl/react-google-maps';
 import * as Sentry from "@sentry/react"
 import circus_tent from 'Images/circus tent.png';
 import rainCloud from "Images/rainCloud.png";
 import PropTypes from 'prop-types';
-import React, { useEffect, useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useDispatch,useSelector } from 'react-redux';
+import 'Images/style.css';
 
 import { routeLoadingModes } from '../../data/enums';
 import { mapViewedSet } from '../../redux/reducer';
@@ -12,9 +13,9 @@ import { useForecastDependentValues, usePointsAndBounds } from '../../utils/hook
 import { milesToMeters } from '../../utils/util';
 import { formatTemperature } from "../resultsTables/ForecastTable";
 import ErrorBoundary from "../shared/ErrorBoundary"
+import { Polyline } from './polyline';
 
-const arrow = "M16.317,32.634c-0.276,0-0.5-0.224-0.5-0.5V0.5c0-0.276,0.224-0.5,0.5-0.5s0.5,0.224,0.5,0.5v31.634\n" +
-    "\t\tC16.817,32.41,16.594,32.634,16.317,32.634z,M28.852,13.536c-0.128,0-0.256-0.049-0.354-0.146L16.319,1.207L4.135,13.39c-0.195,0.195-0.512,0.195-0.707,0 s-0.195-0.512,0-0.707L15.966,0.146C16.059,0.053,16.186,0,16.319,0l0,0c0.133,0,0.26,0.053,0.354,0.146l12.533,12.536 c0.195,0.195,0.195,0.512,0,0.707C29.108,13.487,28.98,13.536,28.852,13.536z";
+const arrowPath = "m-.232.134c-1.104 0-2-.224-2-.5v-31.634c0-.276.896-.5 2-.5s2 .224 2 .5v31.634C1.768-.09.876.134-.232.134m12.651-20.5c-.128 0-.256-.049-.354-.146l-12.179-12.183-12.184 12.183c-.195.195-.512.195-.707 0s-.195-.512 0-.707l12.538-12.537c.093-.093.22-.146.353-.146l0 0c.133 0 .26.053.354.146l12.533 12.536c.195.195.195.512 0 .707-.098.098-.226.147-.354.147z"
 
 const findMarkerInfo = (forecast, subrange) => {
     if (!subrange || subrange.length !== 2) {
@@ -24,13 +25,7 @@ const findMarkerInfo = (forecast, subrange) => {
 }
 
 const getMapBounds = (points, bounds, zoomToRange, subrange) => {
-    let southWest = { lat: bounds.min_latitude, lng: bounds.min_longitude };
-    let northEast = { lat: bounds.max_latitude, lng: bounds.max_longitude };
-    if (isNaN(bounds.min_latitude) || isNaN(bounds.max_latitude)) {
-        Sentry.captureMessage("Bad latitude in map bounds","error")
-        return new window.google.maps.LatLngBounds({ lat: 0, lng: 0 }, { lat: 0, lng: 0 });
-    }
-    const defaultBounds = new window.google.maps.LatLngBounds(southWest, northEast);
+    const defaultBounds = {north:bounds.max_latitude, south:bounds.min_latitude, east:bounds.max_longitude, west:bounds.min_longitude}
     if (zoomToRange && subrange.length === 2 && !isNaN(subrange[1])) {
         let segmentBounds = new window.google.maps.LatLngBounds();
         points.filter(point => (point.dist !== undefined) && (point.dist >= subrange[0] &&
@@ -48,12 +43,44 @@ const cvtDistance = (distance, metric) => {
     return (metric ? ((distance * milesToMeters) / 1000) : Number.parseInt(distance));
 };
 
-const RouteForecastMap = () => {
+const addBreadcrumb = (msg) => {
+    Sentry.addBreadcrumb({
+        category: 'map centering',
+        level: "info",
+        message: msg
+    })
+}
 
-      const [
-        map,
+const findMapBounds = (points, bounds, zoomToRange, subrange) => {
+    const mapBounds = useMemo(() => (getMapBounds(points, bounds, zoomToRange, subrange)), [
+        points,
+        points.length,
+        bounds,
+        zoomToRange,
+        subrange,
+        subrange.length
+    ])
+    addBreadcrumb(`conputed mapBounds ${mapBounds} from ${points.length} points in route`)
+    return mapBounds
+}
+
+const SegmentZoomer = ({bounds}) => {
+    const map = useMap();
+    const [
+        savedMap,
         setMap
-    ] = React.useState(null)
+    ] = useState(null);    
+    useEffect(() => {
+        if (!map) return;
+        setMap(map)
+    }, [map]);
+
+    if (savedMap && savedMap.getBounds() && !savedMap.getBounds().equals(bounds)) {
+        savedMap.fitBounds(bounds, 0)
+    }
+}
+
+const RouteForecastMap = ({maps_api_key}) => {
 
     const userControlPoints = useSelector(state => state.controls.userControlPoints)
     const forecast = useSelector(state => state.forecast.forecast)
@@ -76,93 +103,44 @@ const RouteForecastMap = () => {
 
     let markedInfo = findMarkerInfo(forecast, subrange);
 
-    const onLoad = React.useCallback((loadedMap) => {
-        setMap(loadedMap);
-    }, [])
-
-    const onUnmount = React.useCallback(() => {
-        setMap(null);
-    }, [])
-
     const { points, bounds } = usePointsAndBounds()
-
-    const addBreadcrumb = (msg) => {
-        Sentry.addBreadcrumb({
-            category: 'map centering',
-            level: "info",
-            message: msg
-        })
-    }
     
-    if (!points) {
-        Sentry.captureMessage(`No points to compute map center from`)
-        return
-    }
-    
-    let mapBounds
-    try {
-        mapBounds = useMemo(() => (getMapBounds(points, bounds, zoomToRange, subrange)), [
-            points,
-            points.length,
-            bounds,
-            zoomToRange,
-            subrange,
-            subrange.length
-        ])
-        addBreadcrumb(`conputed mapBounds ${mapBounds} from ${points.length} points in route`)
-    } catch (error) {
-        Sentry.captureException(error, `Error creating map bounds`)
-        return
-    }
-
-    let mapCenter
-    try {
-        mapCenter = useMemo( () => mapBounds.getCenter(), [mapBounds]);
-        addBreadcrumb(`Computed map center ${mapCenter} from map bounds`)
-    } catch (err) {
-        Sentry.captureException(err,'Error finding map center')
-        return
-    }
-    const initialCenter = useMemo( () => mapCenter.toJSON(), [mapCenter])
-
-    let infoPosition = initialCenter
     let infoVisible = false;
-    let infoContents = '';
     if (markedInfo.length > 0) {
-        infoPosition = { lat: markedInfo[0].lat, lng: markedInfo[0].lon };
-        infoContents = `Temperature ${formatTemperature(markedInfo[0].temp, metric)} Wind speed ${cvtDistance(markedInfo[0].windSpeed, metric).toFixed(1)} Wind bearing ${markedInfo[0].windBearing}`;
         infoVisible = true;
     }
 
-    const onBoundsChanged = React.useCallback(() => {
-        if (zoomToRange) {
-            if (map) {map.fitBounds(mapBounds, 0)}
-        }
-    }, [mapBounds,map])
-
-    const infoWindow = (<InfoWindow position={infoPosition}><div>{infoContents}</div></InfoWindow>)
+    const getInfoWindow  = (markedInfo) => {
+        //TODO: localize below
+        const infoContents = 
+        `Temperature ${formatTemperature(markedInfo[0].temp, metric)} Wind speed ${cvtDistance(markedInfo[0].windSpeed, metric).toFixed(1)} Wind bearing ${markedInfo[0].windBearing}`
+        const infoWindow = (<InfoWindow position={{ lat: markedInfo[0].lat, lng: markedInfo[0].lon }}><div>{infoContents}</div></InfoWindow>)
+        return infoWindow
+    }
 
     try {
         return (
             <ErrorBoundary>
-                <div id="map" /*style={{ height: "calc(100vh - 50px)", position: "relative" }}*/>
+                <div id="map" style={{ width:'auto', height: "calc(100vh - 115px)", position: "relative" }}>
                     {(forecast.length > 0 || routeLoadingMode === routeLoadingModes.STRAVA) && bounds !== null ?
-                        <GoogleMap
-                            mapTypeId={window.google.maps.MapTypeId.ROADMAP}
+                    <APIProvider apiKey={maps_api_key}>
+                        <Map
+                            mapTypeId={'roadmap'}
+                            mapId={"11147ffcb9b103dc"}
                             options={{ scaleControl: true }}
-                            zoom={8}
-                            center={initialCenter}
-                            mapContainerStyle={{ width: 'auto', height: "calc(100vh - 70px)", position: 'relative' }}
-                            onLoad={onLoad}
-                            onUnmount={onUnmount}
-                            onBoundsChanged={onBoundsChanged}
+                            defaultBounds={findMapBounds(points, bounds, zoomToRange, subrange)}
                         >
-                            <Polyline path={points} options={{ strokeColor: '#ff0000', strokeWeight: 2, strokeOpacity: 1.0 }} />
+                            {controls !== null && <MapMarkers forecast={forecast}
+                                controls={controls} controlNames={controlNames} 
+                                subrange={subrange} metric={metric} 
+                            />}
+                            {infoVisible && getInfoWindow(markedInfo)}
+                            <Polyline path={points} strokeWeight={3} strokeColor={'#3244a8'} strokeOpacity={1.0} />
                             <MapHighlight points={points} subrange={subrange} />
-                            {controls !== null && <MapMarkers forecast={forecast} google={window.google}
-                                controls={controls} controlNames={controlNames} subrange={subrange} metric={metric} map={map} mapCenter={mapCenter} />}
-                            {infoVisible && infoWindow}
-                        </GoogleMap> :
+                        </Map>
+                        <SegmentZoomer bounds={findMapBounds(points, bounds, zoomToRange, subrange)}/>
+                        </APIProvider> :
+                        // TODO: localize
                         <h2 style={{ padding: '18px', textAlign: "center" }}>Forecast map</h2>
                     }
                 </div>
@@ -174,20 +152,9 @@ const RouteForecastMap = () => {
     }
 }
 
-const MapMarkers = ({ forecast, controls, controlNames, subrange, metric, map, mapCenter, google }) => {
+const MapMarkers = ({ forecast, controls, controlNames, subrange, metric }) => {
     // marker title now contains both temperature and mileage
     return (forecast.map((point) =>
-        <RainIcon
-            latitude={point.lat}
-            longitude={point.lon}
-            value={cvtDistance(point.distance, metric)}
-            title={`${point.fullTime}\n${formatTemperature(point.temp, metric)}`}
-            isRainy={point.rainy}
-            key={`${point.lat}${point.lon}${cvtDistance(point.distance, metric)}rain`}
-            map={map} mapCenter={mapCenter} google={google}
-        />))
-        .concat(
-            forecast.map((point) =>
                 <TempMarker latitude={point.lat}
                     longitude={point.lon}
                     value={cvtDistance(point.distance, metric)}
@@ -196,7 +163,6 @@ const MapMarkers = ({ forecast, controls, controlNames, subrange, metric, map, m
                     windSpeed={point.windSpeed}
                     subrange={subrange}
                     key={`${point.lat}${point.lon}${cvtDistance(point.distance, metric)}temp`}
-                    map={map} mapCenter={mapCenter} google={google}
                 />
             )
         ).concat(
@@ -208,22 +174,27 @@ const MapMarkers = ({ forecast, controls, controlNames, subrange, metric, map, m
                         longitude={control.lon}
                         value={controlNames[index]}
                         key={`${control.lat}${control.lon}${controlNames[index]}${index}control`}
-                        map={map} mapCenter={mapCenter} google={google}
                     />
                 )
+        ).concat(
+            forecast.map((point) =>
+                <RainIcon
+                    latitude={point.lat}
+                    longitude={point.lon}
+                    value={cvtDistance(point.distance, metric)}
+                    title={`${point.fullTime}\n${formatTemperature(point.temp, metric)}`}
+                    isRainy={point.rainy}
+                    key={`${point.lat}${point.lon}${cvtDistance(point.distance, metric)}rain`}
+                />
+            )
         )
 }
 
-const RainIcon = ({ latitude, longitude, value, title, isRainy, map, mapCenter, google }) => {
-    const markerIcon = {
-        url: rainCloud,
-        size: new google.maps.Size(320, 320),
-        scaledSize: new google.maps.Size(45, 50),
-        labelOrigin: new google.maps.Point(22, 15),
-        anchor: new google.maps.Point(-15, -15)
-    };
+const RainIcon = ({ latitude, longitude, value, title, isRainy }) => {
     if (isRainy) {
-        return <MarkerF position={{ lat: latitude, lng: longitude }} label={value.toFixed(0)} icon={markerIcon} title={title} map={map} mapCenter={mapCenter} />;
+        return <AdvancedMarker position={{ lat: latitude, lng: longitude }} /* label={value.toFixed(0)} */ title={title}>
+            <img src={rainCloud} width={45} height={50} />
+        </AdvancedMarker>
     }
     return null;
 }
@@ -233,10 +204,7 @@ RainIcon.propTypes = {
     longitude: PropTypes.number.isRequired,
     value: PropTypes.number.isRequired,
     title: PropTypes.string.isRequired,
-    isRainy: PropTypes.bool.isRequired,
-    map: PropTypes.object,
-    mapCenter: PropTypes.object.isRequired,
-    google: PropTypes.object.isRequired
+    isRainy: PropTypes.bool.isRequired
 };
 
 const pickArrowColor = (distance, subrange) => {
@@ -247,31 +215,90 @@ const pickArrowColor = (distance, subrange) => {
     return (distanceInMeters >= subrange[0] && distanceInMeters <= subrange[1]) ? 'deeppink' : 'blue';
 }
 
-const TempMarker = ({ latitude, longitude, value, title, bearing, windSpeed, subrange, map, google, mapCenter }) => {
+const viewbox_0 = "-25 -35 55 50"
+const viewbox_90 = "-20 -20 55 55"
+const viewbox_180 = "-35 -20 55 55"
+const viewbox_270 = "-33 -35 60 60"
+
+const pickViewbox = (rotation) => {
+    if (rotation < 90) return viewbox_0
+    if (rotation < 180) return viewbox_90
+    if (rotation < 270) return viewbox_180
+    return viewbox_270
+}
+
+const pickWidth = (rotation) => {
+    if (rotation < 90) return 55
+    if (rotation < 180) return 55
+    if (rotation < 270) return 55
+    return 60
+}
+
+const pickHeight = (rotation) => {
+    if (rotation < 90) return 50
+    if (rotation < 180) return 55
+    if (rotation < 270) return 55
+    return 60
+}
+
+export const RotatedArrow = ({rotation, distance, subrange}) => {
+    return (
+        <svg viewBox={pickViewbox(rotation)} //'-40 -70 73 73'
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            width={pickWidth(rotation)}
+            height={pickHeight(rotation)}
+            x="-24"
+            y="-35"
+        >
+            <defs>
+                <radialGradient id="movingShade" fy="95%">
+                    <stop offset="0%" stop-color="lime"></stop>
+                    <stop offset="100%" stop-color={pickArrowColor(distance,subrange)}></stop>
+                    <animate attributeName="fy" dur="1800ms" from="95%" to="0%" repeatCount="indefinite" />
+                </radialGradient>
+            </defs>
+            <path
+                // stroke={pickArrowColor(distance,subrange)}
+                strokeLinecap="round"
+                // strokeWidth="3"
+                strokeOpacity={'20%'}
+                d={arrowPath}
+                fill={`url(#movingShade)`}
+                transform={`rotate(${rotation},-0.234,0.134)`}
+            />
+            <text x={rotation<179?"7":"5"} y={rotation>90&&rotation<180?"-10":"13"} fill="black" fontSize={14}>{distance.toFixed()}</text>
+        </svg>
+    )
+}
+
+const TempMarker = ({ latitude, longitude, value, title, bearing, windSpeed, subrange }) => {
     // Add the marker at the specified location
     if (parseInt(windSpeed) > 3) {
         const flippedBearing = (bearing > 180) ? bearing - 180 : bearing + 180;
-        // const anchor = new google.maps.Point(16.317-19*Math.cos((Math.PI / 180)*bearing),16.317+(25*Math.sin((Math.PI / 180)*bearing)));
-        const anchor = new google.maps.Point(16.317, 16.317);
-        return <MarkerF
+        return <AdvancedMarker
             position={{ lat: latitude, lng: longitude }}
-            label={value.toFixed(0)}
-            icon={{
-                path: arrow,
-                rotation: flippedBearing,
-                labelOrigin: new google.maps.Point(0, 32),
-                anchor: anchor,
-                strokeWeight: 2,
-                strokeColor: pickArrowColor(value, subrange),
-                strokeOpacity: 0.9
-            }}
             title={title}
-            map={map}
-            mapCenter={mapCenter}
-        />
+        >
+            <RotatedArrow rotation={flippedBearing} distance={value} subrange={subrange} />
+        </AdvancedMarker>
     }
     else {
-        return <MarkerF position={{ lat: latitude, lng: longitude }} label={value.toFixed(0)} title={title} map={map} google={google} mapCenter={mapCenter} />
+        return <AdvancedMarker position={{ lat: latitude, lng: longitude }} title={title}>
+            <div style={{
+                width: 30,
+                height: 30,
+                position: 'relative',
+                top: -2,
+                left: 0,
+                background: '#1ee3dc',
+                border: '2px solid #0e6443',
+                borderRadius: '40%',
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center'
+            }}>{value.toFixed(0)}</div>
+        </AdvancedMarker>
     }
 }
 
@@ -282,33 +309,22 @@ TempMarker.propTypes = {
     title: PropTypes.string,
     bearing: PropTypes.number.isRequired,
     windSpeed: PropTypes.string.isRequired,
-    subrange: PropTypes.arrayOf(PropTypes.number),
-    map: PropTypes.object,
-    mapCenter: PropTypes.object,
-    google: PropTypes.object.isRequired
+    subrange: PropTypes.arrayOf(PropTypes.number)
 };
 
-const ControlMarker = ({ latitude, longitude, value = '', map, mapCenter, google }) => {
-    const controlIcon = {
-        url: circus_tent,
-        size: new google.maps.Size(225, 225),
-        scaledSize: new google.maps.Size(32, 32),
-        labelOrigin: new google.maps.Point(22, 15),
-        anchor: new google.maps.Point(0, 0)
-    };
-    return <MarkerF position={{ lat: latitude, lng: longitude }} title={value} icon={controlIcon} map={map} mapCenter={mapCenter} />;
+const ControlMarker = ({ latitude, longitude, value = '' }) => {
+    return <AdvancedMarker position={{ lat: latitude, lng: longitude }} title={value} >
+        <img src={circus_tent} width={32} height={32} />
+    </AdvancedMarker>;
 }
 
 ControlMarker.propTypes = {
     latitude: PropTypes.number.isRequired,
     longitude: PropTypes.number.isRequired,
-    value: PropTypes.string.isRequired,
-    map: PropTypes.object,
-    mapCenter: PropTypes.object,
-    google: PropTypes.object.isRequired
+    value: PropTypes.string.isRequired
 };
 
-const MapHighlight = ({ points, subrange, map, mapCenter }) => {
+const MapHighlight = ({ points, subrange }) => {
     if (subrange.length !== 2) {
         return null;
     }
@@ -316,16 +332,14 @@ const MapHighlight = ({ points, subrange, map, mapCenter }) => {
         (isNaN(subrange[1]) || point.dist <= subrange[1]));
     return <Polyline path={highlightPoints} options={{
         strokeColor: '#67ff99',
-        strokeOpacity: 0.9,
-        strokeWeight: 3
-    }} map={map} mapCenter={mapCenter} />;
+        strokeOpacity: 1.0,
+        strokeWeight: 5
+    }} />;
 }
 
 MapHighlight.propTypes = {
     points: PropTypes.array.isRequired,
-    subrange: PropTypes.arrayOf(PropTypes.number),
-    map: PropTypes.object,
-    mapCenter: PropTypes.object
+    subrange: PropTypes.arrayOf(PropTypes.number)
 }
 
 export default React.memo(RouteForecastMap)
