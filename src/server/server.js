@@ -1,4 +1,5 @@
 /* eslint-disable max-lines */
+require('./instrument');
 const express = require('express');
 const app = express();
 require('source-map-support').install();
@@ -22,25 +23,10 @@ const getAirNowAQI = require('./airNowAQI');
 const querystring = require('querystring');
 const Sentry = require('@sentry/node');
 
-if (process.env.NODE_ENV !== 'development') {
-    Sentry.init({
-        dsn: 'https://ea4c472ff9054dab8c18d594b95d8da2@sentry.io/298059',
-        integrations: [
-            // enable HTTP calls tracing
-            new Sentry.Integrations.Http({ tracing: true }),
-            new Sentry.Integrations.Express({ app })
-        ],
-        tracesSampleRate: 0.15
-    });
-}
 let logger = console;
 
 var compression = require('compression');
 
-if (process.env.JEST_WORKER_ID === undefined) {
-    app.use(Sentry.Handlers.requestHandler());
-    app.use(Sentry.Handlers.tracingHandler())
-}
 app.use(compression());
 app.set('trust proxy', true);
 // Instantiate a datastore client
@@ -577,8 +563,6 @@ app.get('/', (req, res) => {
         console.info(err);
     }
 });
-
-app.use(Sentry.Handlers.errorHandler());
 
 const makeFeatureRecord = (response) => {
     // Create a visit record to be stored in the database
