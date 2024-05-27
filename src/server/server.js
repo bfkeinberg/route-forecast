@@ -564,8 +564,6 @@ app.get('/', (req, res) => {
     }
 });
 
-app.use(Sentry.Handlers.errorHandler());
-
 const makeFeatureRecord = (response) => {
     // Create a visit record to be stored in the database
     console.info(`${response.data.user.email} used the feature`);
