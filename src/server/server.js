@@ -27,10 +27,6 @@ let logger = console;
 
 var compression = require('compression');
 
-if (process.env.JEST_WORKER_ID === undefined) {
-    app.use(Sentry.Handlers.requestHandler());
-    app.use(Sentry.Handlers.tracingHandler())
-}
 app.use(compression());
 app.set('trust proxy', true);
 // Instantiate a datastore client
