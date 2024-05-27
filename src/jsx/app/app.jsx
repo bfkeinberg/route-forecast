@@ -55,7 +55,8 @@ if (!window.origin.startsWith('http://localhost') && !window.origin.startsWith('
         replaysSessionSampleRate: 0.01,
         // If the entire session is not sampled, use the below sample rate to sample
         // sessions when an error occurs.
-        replaysOnErrorSampleRate: 0.7
+        replaysOnErrorSampleRate: 0.7,
+        normalizeDepth: 5
     });
 }
 
