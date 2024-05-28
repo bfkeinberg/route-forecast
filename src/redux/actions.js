@@ -193,7 +193,7 @@ export const loadFromRideWithGps = function (routeNumber, isTrip) {
             isTrip = isTrip || getState().uiInfo.routeParams.rwgpsRouteIsTrip
             dispatch(routeLoadingBegun('rwgps'));
             dispatch(cancelForecast())
-            return loadRwgpsRoute(routeNumber, isTrip, getState().rideWithGpsInfo.token).then((routeData) => {
+            return loadRwgpsRoute(routeNumber, isTrip, getState().rideWithGpsInfo.token).then(async (routeData) => {
                 dispatch(rwgpsRouteLoaded(routeData));
                 if (getState().controls.userControlPoints.length === 0) {
                     const extractedControls = extractControlsFromRoute(routeData);
@@ -202,14 +202,12 @@ export const loadFromRideWithGps = function (routeNumber, isTrip) {
                         dispatch(displayControlTableUiSet(true))
                     }
                 }
-                requestTimeZoneForRoute(getState()).then((results) => {
-                    if (results.result === "error") {
-                        dispatch(rwgpsRouteLoadingFailed(results.error))
-                    } else {
-                        dispatch(timeZoneSet(results.result))
-                    }
+                const timeZoneResults = await requestTimeZoneForRoute(getState())
+                if (timeZoneResults.result === "error") {
+                    dispatch(rwgpsRouteLoadingFailed(timeZoneResults.error))
+                } else {
+                    dispatch(timeZoneSet(timeZoneResults.result))
                 }
-                )
             }, error => { return dispatch(rwgpsRouteLoadingFailed(error.message)) }
             );
         })

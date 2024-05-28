@@ -114,7 +114,7 @@ const RouteForecastMap = ({maps_api_key}) => {
         //TODO: localize below
         const infoContents = 
         `Temperature ${formatTemperature(markedInfo[0].temp, metric)} Wind speed ${cvtDistance(markedInfo[0].windSpeed, metric).toFixed(1)} Wind bearing ${markedInfo[0].windBearing}`
-        const infoWindow = (<InfoWindow position={{ lat: markedInfo[0].lat, lng: markedInfo[0].lon }}><div>{infoContents}</div></InfoWindow>)
+        const infoWindow = (<InfoWindow maxWidth={120} position={{ lat: markedInfo[0].lat, lng: markedInfo[0].lon }}>{infoContents}</InfoWindow>)
         return infoWindow
     }
 
@@ -134,8 +134,8 @@ const RouteForecastMap = ({maps_api_key}) => {
                                 controls={controls} controlNames={controlNames} 
                                 subrange={subrange} metric={metric} 
                             />}
-                            {infoVisible && getInfoWindow(markedInfo)}
                             <Polyline path={points} strokeWeight={3} strokeColor={'#3244a8'} strokeOpacity={1.0} />
+                            {infoVisible && getInfoWindow(markedInfo)}
                             <MapHighlight points={points} subrange={subrange} />
                         </Map>
                         <SegmentZoomer bounds={findMapBounds(points, bounds, zoomToRange, subrange)}/>
@@ -193,7 +193,7 @@ const MapMarkers = ({ forecast, controls, controlNames, subrange, metric }) => {
 const RainIcon = ({ latitude, longitude, value, title, isRainy }) => {
     if (isRainy) {
         return <AdvancedMarker position={{ lat: latitude, lng: longitude }} /* label={value.toFixed(0)} */ title={title}>
-            <img src={rainCloud} width={45} height={50} />
+            <img style={{position:'absolute',top:'3px'}} src={rainCloud} width={45} height={50} />
         </AdvancedMarker>
     }
     return null;
@@ -252,14 +252,14 @@ export const RotatedArrow = ({rotation, distance, subrange}) => {
             y="-35"
         >
             <defs>
-                <radialGradient id="movingShade" fy="95%">
+                <radialGradient id="movingShade" fy="90%">
                     <stop offset="0%" stop-color="lime"></stop>
                     <stop offset="100%" stop-color={pickArrowColor(distance,subrange)}></stop>
-                    <animate attributeName="fy" dur="1800ms" from="95%" to="0%" repeatCount="indefinite" />
+                    <animate attributeName="fy" dur="1800ms" from="90%" to="10%" repeatCount="indefinite" />
                 </radialGradient>
             </defs>
             <path
-                // stroke={pickArrowColor(distance,subrange)}
+                stroke={pickArrowColor(distance,subrange)}
                 strokeLinecap="round"
                 // strokeWidth="3"
                 strokeOpacity={'20%'}

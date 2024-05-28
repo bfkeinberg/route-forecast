@@ -83,11 +83,12 @@ const getForecastFromNws = async (forecastUrl) => {
  * @param {string} zone time zone
  * @param {number} bearing the direction of travel at the time of the forecast
  * @param {function} getBearingDifference - returns the difference between two bearings
+ * @param {boolean} isControl the forecast point is from a controle
   * @returns {Promise<{time: *, distance: *, summary: *, precip: string, humidity: number, cloudCover: string, windSpeed: string,
  * lat: *, lon: *, temp: string, fullTime: *, relBearing: null, rainy: boolean, windBearing: number,
  * vectorBearing: *, gust: string} | never>} a promise to evaluate to get the forecast results
  */
-const callNWS = async function (lat, lon, currentTime, distance, zone, bearing, getBearingDifference) {
+const callNWS = async function (lat, lon, currentTime, distance, zone, bearing, getBearingDifference, isControl) {
     const forecastUrl = await getForecastUrl(lat, lon);
     Sentry.setContext('forecastUrl', {'forecastUrl': forecastUrl})
     const forecastGridData = await getForecastFromNws(forecastUrl);
@@ -102,7 +103,8 @@ const callNWS = async function (lat, lon, currentTime, distance, zone, bearing, 
     const windGustInMph = forecastValues.gustInKph * 1000/milesToMeters;
 
     return new Promise((resolve) => {resolve({
-        'time':startTime.toFormat('h:mm a'),
+        'time':currentTime,
+        'zone':zone,
         'distance':distance,
         'summary':forecastValues.summary,
         'precip':`${forecastValues.precip.toFixed(1)}%`,
@@ -118,7 +120,8 @@ const callNWS = async function (lat, lon, currentTime, distance, zone, bearing, 
         'windBearing':Math.round(forecastValues.windBearing),
         'vectorBearing':bearing,
         'gust':`${Math.round(windGustInMph)}`,
-        'feel':Math.round(apparentTemperatureInF)
+        'feel':Math.round(apparentTemperatureInF),
+        isControl:isControl
     }
     )
     }
