@@ -74,18 +74,20 @@ const getForecastFromMeteomatics = async (forecastUrl) => {
  * @param {string} zone time zone
  * @param {number} bearing the direction of travel at the time of the forecast
  * @param {function} getBearingDifference - returns the difference between two bearings
+ * @param {boolean} isControl the forecast point is from a controle
   * @returns {Promise<{time: *, distance: *, summary: *, precip: string, cloudCover: string, windSpeed: string,
  * lat: *, lon: *, temp: string, fullTime: *, relBearing: null, rainy: boolean, windBearing: number,
  * vectorBearing: *, gust: string} | never>} a promise to evaluate to get the forecast results
  */
-const callMeteomatics = async function (lat, lon, currentTime, distance, zone, bearing, getBearingDifference) {
+const callMeteomatics = async function (lat, lon, currentTime, distance, zone, bearing, getBearingDifference, isControl) {
     const startTime = DateTime.fromISO(currentTime, {zone:zone});
     const forecastUrl = await getForecastUrl(lat, lon, startTime);
     const forecastGridData = await getForecastFromMeteomatics(forecastUrl);
     const forecastValues = extractForecast(forecastGridData.data);
     const rainy = forecastValues.precipitationProbability > 30;
     return new Promise((resolve) => {resolve({
-        'time':startTime.toFormat('h:mm a'),
+        'time':currentTime,
+        zone:zone,
         'distance':distance,
         'summary':forecastValues.summary,
         'precip':`${forecastValues.precipitationProbability.toFixed(1)}%`,
@@ -100,7 +102,8 @@ const callMeteomatics = async function (lat, lon, currentTime, distance, zone, b
         'windBearing':Math.round(forecastValues.windBearing),
         'vectorBearing':bearing,
         'gust':`${Math.round(forecastValues.windGustInMph)}`,
-        'feel':Math.round(forecastValues.apparentTemperatureInF)
+        'feel':Math.round(forecastValues.apparentTemperatureInF),
+        isControl:isControl
     }
     )
     }

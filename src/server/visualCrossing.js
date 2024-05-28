@@ -13,11 +13,12 @@ const Sentry = require("@sentry/node")
  * @param {string} zone time zone
  * @param {number} bearing the direction of travel at the time of the forecast
  * @param {function} getBearingDifference - returns the difference between two bearings
-  * @returns {Promise<{time: *, distance: *, summary: *, precip: string, cloudCover: string, windSpeed: string,
+ * @param {boolean} isControl the forecast point is from a controle
+* @returns {Promise<{time: *, distance: *, summary: *, precip: string, cloudCover: string, windSpeed: string,
  * lat: *, lon: *, temp: string, fullTime: *, relBearing: null, rainy: boolean, windBearing: number,
  * vectorBearing: *, gust: string} | never>} a promise to evaluate to get the forecast results
  */
-const callVisualCrossing = async function (lat, lon, currentTime, distance, zone, bearing, getBearingDifference) {
+const callVisualCrossing = async function (lat, lon, currentTime, distance, zone, bearing, getBearingDifference, isControl) {
     const visualCrossingKey = process.env.VISUAL_CROSSING_KEY;
     const startTime = moment(currentTime);
     const endTime = startTime.clone();
@@ -43,7 +44,8 @@ const callVisualCrossing = async function (lat, lon, currentTime, distance, zone
     const rainy = current.precip !== 0;
     const precip = current.precipprob !== undefined ? current.precipprob : 0;
     return new Promise((resolve) => {resolve({
-        'time':now.format('h:mmA'),
+        'time':now.toISOString(),
+        zone:zone,
         'distance':distance,
         'summary':forecast.days[0].conditions,
         'precip':`${precip.toFixed(1)}%`,
@@ -59,7 +61,8 @@ const callVisualCrossing = async function (lat, lon, currentTime, distance, zone
         'windBearing':Math.round(windBearing),
         'vectorBearing':bearing,
         'gust':current.windgust===undefined?`${Math.round(current.windspeed)}`:`${Math.round(current.windgust)}`,
-        'feel':current.feelslike===undefined?Math.round(current.temperature):Math.round(current.feelslike)
+        'feel':current.feelslike===undefined?Math.round(current.temperature):Math.round(current.feelslike),
+        isControl:isControl
     })})
 };
 
