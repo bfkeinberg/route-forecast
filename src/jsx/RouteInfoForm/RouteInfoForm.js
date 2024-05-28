@@ -1,4 +1,4 @@
-import {Button,MenuItem,Toast2,Divider} from '@blueprintjs/core';
+import {Button,MenuItem,Toast2,Section} from '@blueprintjs/core';
 import { Select } from "@blueprintjs/select"
 import PropTypes from 'prop-types';
 import React from 'react';
@@ -14,6 +14,7 @@ import { RouteInfoInputRWGPS } from './RouteInfoInputRWGPS';
 import { RouteInfoInputStrava } from './RouteInfoInputStrava'
 import { ELEVATION_1 } from '@blueprintjs/core/lib/esm/common/classes';
 import {useTranslation} from 'react-i18next'
+import { t } from 'i18next';
 
 const getInputForMode = (mode) => {
     switch (mode) {
@@ -48,6 +49,9 @@ const RouteInfoForm = ({ errorDetails, errorDetailsSet, routeLoadingMode, routeL
                     <ShortUrl />
                 </div>
             </MediaQuery>
+            <Section style={{marginTop:"1em"}} elevation={ELEVATION_1} title={t('titles.loading')}>
+                <strong>Randoplan</strong> {t('data.loading')}
+            </Section>            
         </div>
     );
 }
@@ -98,7 +102,6 @@ const mapStateToProps = (state) =>
     ({
         errorDetails: state.uiInfo.dialogParams.errorDetails,
         routeInfo: state.routeInfo,
-        controlPoints: state.controls.userControlPoints,
         needToViewTable: state.forecast.valid && !state.forecast.tableViewed,
         routeLoadingMode: state.uiInfo.routeParams.routeLoadingMode
     });
@@ -108,7 +111,6 @@ const mapDispatchToProps = {
 };
 
 RouteInfoForm.propTypes = {
-    controlPoints: PropTypes.arrayOf(PropTypes.object).isRequired,
     errorDetails: PropTypes.string,
     routeInfo: PropTypes.shape({ name: PropTypes.string }),
     needToViewTable: PropTypes.bool.isRequired,
