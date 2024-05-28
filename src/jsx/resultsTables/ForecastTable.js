@@ -165,9 +165,9 @@ const ForecastTable = (adjustedTimes) => {
                 <tbody>
                 {forecast.map((point,index) =>
                 <>
-                    {(index > 0 && (DateTime.fromISO(forecast[index-1].time, {zone:point.zone}).day !== DateTime.fromISO(point.time, {zone:point.zone}).day))?
+                    {(index > 0 && (DateTime.fromISO(forecast[index-1].time).day !== DateTime.fromISO(point.time).day))?
                     <tr key={point.distance-Math.random().toString(10)} style={{outline:'thin solid'}}>
-                        <td>{DateTime.fromISO(point.time, {zone:point.zone,locale:i18n.language}).toFormat('cccc')}</td>
+                        <td>{DateTime.fromISO(point.time, {locale:i18n.language}).toFormat('cccc')}</td>
                     </tr>:null}
                     <tr key={point.distance+Math.random().toString(10)}
                         start={point.distance*milesToMeters}
@@ -230,7 +230,7 @@ const ForecastTable = (adjustedTimes) => {
                     <HTMLTable compact={true} striped bordered interactive style={{ fontSize: "12px", "borderSpacing": "0px"}}>
                         <thead>
                             <tr>
-                                <th><span className={'timeHeaderCell'}>{t('tableHeaders.time')}</span></th>
+                                <th className={'timeHeaderCell'}><span>{t('tableHeaders.time')}</span></th>
                                 <th><span className={'headerCell'}>{distHeader}</span></th>
                                 <th><span className={'headerCell'}>{t('tableHeaders.summary')}</span></th>
                                 <th id={'temp'} className={'clickableHeaderCell'}>{temperatureHeader}</th>
