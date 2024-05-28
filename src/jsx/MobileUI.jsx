@@ -77,9 +77,12 @@ const MobileUITabs = (props) => {
                             <Button small icon={<Cloud/>} size={IconSize.STANDARD} title={"forecast"} intent={props.needToViewTable ? Intent.WARNING : (pathname.startsWith('/forecastTable')?Intent.PRIMARY:Intent.NONE)} />
                         </Link>
                         <NavbarDivider />
-                        <Link to={"/paceTable/"} className={'nav-link'}>
-                            <Button small icon={<Cycle/>} color="orange" disabled={!stravaActivityData} title={"strava"} size={IconSize.STANDARD} intent={props.needToViewTable ? Intent.WARNING : pathname.startsWith('/paceTable') ? Intent.PRIMARY : Intent.NONE} />
-                        </Link>
+                        {
+                            stravaActivityData &&
+                            <Link to={"/paceTable/"} className={'nav-link'}>
+                                <Button small icon={<Cycle />} color="orange" disabled={!stravaActivityData} title={"strava"} size={IconSize.STANDARD} intent={props.needToViewTable ? Intent.WARNING : pathname.startsWith('/paceTable') ? Intent.PRIMARY : Intent.NONE} />
+                            </Link>
+                        }
                     </NavbarGroup>
                 </Navbar>
                 <Divider/>
@@ -90,7 +93,7 @@ const MobileUITabs = (props) => {
                     <Route path="/forecastTable/" element={<ForecastTable adjustedTimes={adjustedTimes} />} />
                     <Route path="/paceTable/" element={<PaceTable />} />
                 </Routes>
-                <DonationRequest wacky/>
+                <DonationRequest/>
             </>
         )
     } catch (err) {
