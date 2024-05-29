@@ -22,33 +22,34 @@ const getBearingDifference = function (bearing,windBearing) {
  * @param {number} distance - used only in the return value, not the call
  * @param {string} zone time zone
  * @param {number} bearing the direction of travel at the time of the forecast
+ * @param {boolean} isControl the forecast point is from a controle
  * @returns {Promise<{time: *, distance: *, summary: *, precip: string, cloudCover: string, windSpeed: string,
  * lat: *, lon: *, temp: string, fullTime: *, relBearing: null, rainy: boolean, windBearing: number,
  * vectorBearing: *, gust: string} | never>} a promise to evaluate to get the forecast results
  */
-const callWeatherService = function (service, lat, lon, currentTime, distance, zone, bearing) {
+const callWeatherService = function (service, lat, lon, currentTime, distance, zone, bearing, isControl) {
     switch (service) {
     case 'climacell':
         return Sentry.startSpan({ name: "tomorrow.io" }, () => {
-            return callTomorrowIo(lat, lon, currentTime, distance, zone, bearing, getBearingDifference)
+            return callTomorrowIo(lat, lon, currentTime, distance, zone, bearing, getBearingDifference, isControl)
         })
     case 'weatherapi':
         return Sentry.startSpan({ name: "weatherapi" }, () => {
-            return callWeatherApi(lat, lon, currentTime, distance, zone, bearing, getBearingDifference)
+            return callWeatherApi(lat, lon, currentTime, distance, zone, bearing, getBearingDifference, isControl)
         })
     case 'visualcrossing':
         return Sentry.startSpan({ name: "visualcrossing" }, () => {
-            return callVisualCrossing(lat, lon, currentTime, distance, zone, bearing, getBearingDifference)
+            return callVisualCrossing(lat, lon, currentTime, distance, zone, bearing, getBearingDifference, isControl)
         })
     case 'nws':
         return Sentry.startSpan({ name: "nws" }, () => {
-            return callNWS(lat, lon, currentTime, distance, zone, bearing, getBearingDifference)
+            return callNWS(lat, lon, currentTime, distance, zone, bearing, getBearingDifference, isControl)
         })
     case 'meteomatics':
-        return callMeteomatics(lat, lon, currentTime, distance, zone, bearing, getBearingDifference);
+        return callMeteomatics(lat, lon, currentTime, distance, zone, bearing, getBearingDifference, isControl);
     case 'weatherKit':
         return Sentry.startSpan({ name: "weatherkit" }, () => {
-            return callWeatherKit(lat, lon, currentTime, distance, zone, bearing, getBearingDifference)
+            return callWeatherKit(lat, lon, currentTime, distance, zone, bearing, getBearingDifference, isControl)
         })
     default:
         return null;

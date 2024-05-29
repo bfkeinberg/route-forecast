@@ -34,7 +34,8 @@ img#bugImage {
 
 .timeHeaderCell {
     font-size: 80%;
-    width: 78px
+    width: 55px;
+    display: inline-block;
 }
 
 .headerCell {
@@ -62,7 +63,7 @@ img#bugImage {
 }
 
 .timeCell {
-    width: 78px
+    width: 55px
 }
 
 .chanceRainCell {
@@ -178,3 +179,4 @@ table.bp4-html-table.bp4-html-table-bordered.bp4-html-table-striped.bp4-interact
     display: flex;
     margin-bottom: 1rem;
 }
+    

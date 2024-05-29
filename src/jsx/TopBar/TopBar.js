@@ -28,7 +28,7 @@ export const TopBar = ({sidePaneOptions, activeSidePane, setActiveSidePane, side
         sidePaneOptions={sidePaneOptions}
         activeSidePane={activeSidePane}
         setActiveSidePane={setActiveSidePane}
-        sidebarWidth={sidebarWidth}
+        sidebarWidth={sidebarWidth+15}
         panesVisible={panesVisible}
       />
       <div style={{display: "flex", flexGrow: 1, alignItems: "center", padding: "0px 20px", borderWidth: "0px 0px 0px 1px", borderStyle: "solid", borderColor: "grey"}}>

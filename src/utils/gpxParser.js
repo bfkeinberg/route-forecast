@@ -152,6 +152,13 @@ class AnalyzeRoute {
                 val:controls[nextControl].id, lat:point.lat, lon:point.lon,
                 distance:controls[nextControl].distance
             });
+            // add the control to the forecast request
+            if (distanceInMiles > 0) {
+                forecastRequests.push(AnalyzeRoute.addToForecast(point, startTime, (accumulatedTime + idlingTime),
+                    accumulatedDistanceKm * kmToMiles, true));
+                bearings.push(AnalyzeRoute.getRelativeBearing(forecastPoint, point));
+            }
+            //           
             nextControl++;
             return delayInMinutes/60;      // convert from minutes to hours
         };
@@ -315,9 +322,9 @@ class AnalyzeRoute {
         return effectiveSpeed;
     }
 
-    static addToForecast(trackPoint, currentTime, elapsedTimeInHours, distanceInMiles) {
+    static addToForecast(trackPoint, currentTime, elapsedTimeInHours, distanceInMiles, isControl) {
         return {lat:trackPoint.lat,lon:trackPoint.lon,distance:Math.round(distanceInMiles),
-            time:currentTime.plus({hours:elapsedTimeInHours}).toFormat("yyyy-MM-dd'T'HH:mm:00ZZZ")};
+            time:currentTime.plus({hours:elapsedTimeInHours}).toFormat("yyyy-MM-dd'T'HH:mm:00ZZZ"), isControl:isControl};
     }
 
     static getBearingBetween(trackBearing,windBearing) {

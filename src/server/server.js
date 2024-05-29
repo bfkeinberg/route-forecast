@@ -241,7 +241,7 @@ app.post('/forecast_one', upload.none(), async (req, res) => {
     const zone = req.body.timezone;
     try {
         const point = forecastPoints
-        const result = await callWeatherService(service, point.lat, point.lon, point.time, point.distance, zone, point.bearing).catch(error => {
+        const result = await callWeatherService(service, point.lat, point.lon, point.time, point.distance, zone, point.bearing, point.isControl).catch(error => {
             throw error;
         })
         if (!process.env.NO_LOGGING) {

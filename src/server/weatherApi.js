@@ -15,11 +15,12 @@ const Sentry = require("@sentry/node")
  * @param {string} zone time zone
  * @param {number} bearing the direction of travel at the time of the forecast
  * @param {function} getBearingDifference - returns the difference between two bearings
+ * @param {boolean} isControl the forecast point is from a controle
  * @returns {Promise<{time: *, distance: *, summary: *, precip: string, cloudCover: string, windSpeed: string,
  * lat: *, lon: *, temp: string, fullTime: *, relBearing: null, rainy: boolean, windBearing: number,
  * vectorBearing: *, gust: string} | never>} a promise to evaluate to get the forecast results
  */
-const callWeatherApi = async function callWeatherApi (lat, lon, currentTime, distance, zone, bearing, getBearingDifference) {
+const callWeatherApi = async function callWeatherApi (lat, lon, currentTime, distance, zone, bearing, getBearingDifference, isControl) {
     const weatherApiKey = process.env.WEATHER_API_KEY;
     const startTime = DateTime.fromISO(currentTime, {zone:zone});
     let hour = startTime.minute > 30 ? startTime.hour + 1 : startTime.hour;
@@ -44,7 +45,8 @@ const callWeatherApi = async function callWeatherApi (lat, lon, currentTime, dis
     const relativeBearing = hasWind && windBearing !== undefined ? getBearingDifference(bearing, windBearing) : null;
     const rainy = current.will_it_rain !== 0;
     return {
-        'time':now.toFormat('h:mm a'),
+        'time':now.toISO(),
+        zone:zone,
         'distance':distance,
         'summary':current.condition.text,
         'precip':current.chance_of_rain===undefined?'<unavailable>':`${current.chance_of_rain}%`,
@@ -61,7 +63,8 @@ const callWeatherApi = async function callWeatherApi (lat, lon, currentTime, dis
         'vectorBearing':bearing,
         'gust':current.gust_mph===undefined?'<unavailable>':`${Math.round(current.gust_mph)}`,
         'feel':current.feelslike_f===undefined?Math.round(current.temp_f):Math.round(current.feelslike_f),
-        'aqi':forecastResult.data.current.air_quality.pm2_5
+        'aqi':forecastResult.data.current.air_quality.pm2_5,
+        isControl:isControl
     }
 };
 

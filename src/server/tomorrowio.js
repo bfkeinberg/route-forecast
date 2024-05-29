@@ -81,11 +81,12 @@ const getFromTomorrowIoWithBackoff = async (forecastUrl) => {
  * @param {string} zone time zone
  * @param {number} bearing the direction of travel at the time of the forecast
  * @param {function} getBearingDifference - returns the difference between two bearings
+ * @param {boolean} isControl the forecast point is from a controle
   * @returns {Promise<{time: *, distance: *, summary: *, precip: string, cloudCover: string, windSpeed: string,
  * lat: *, lon: *, temp: string, fullTime: *, relBearing: null, rainy: boolean, windBearing: number,
  * vectorBearing: *, gust: string} | never>} a promise to evaluate to get the forecast results
  */
-const callTomorrowIo = async function callTomorrowIo (lat, lon, currentTime, distance, zone, bearing, getBearingDifference) {
+const callTomorrowIo = async function callTomorrowIo (lat, lon, currentTime, distance, zone, bearing, getBearingDifference, isControl) {
     const climacellKey = process.env.CLIMACELL_KEY;
     const startTime = DateTime.fromISO(currentTime, {zone:zone});
     const endTime = startTime.plus({hours:1})
@@ -107,7 +108,8 @@ const callTomorrowIo = async function callTomorrowIo (lat, lon, currentTime, dis
     const relativeBearing = hasWind && windBearing !== undefined ? getBearingDifference(bearing, windBearing) : null;
     const rainy = current.precipitationType === 1;
     return {
-        'time':now.toFormat('h:mma'),
+        'time':current.startTime,
+        zone:zone,
         'distance':distance,
         'summary':weatherCodes[values.weatherCode],
         'precip':values.precipitationProbability===undefined?'<unavailable>':`${values.precipitationProbability.toFixed(1)}%`,
@@ -124,7 +126,8 @@ const callTomorrowIo = async function callTomorrowIo (lat, lon, currentTime, dis
         'vectorBearing':bearing,
         'gust':values.windGust===undefined?'<unavailable>':`${Math.round(values.windGust)}`,
         'feel':values.temperatureApparent===undefined?Math.round(values.temperature):Math.round(values.temperatureApparent),
-        'aqi':values.epaIndex
+        'aqi':values.epaIndex,
+        isControl:isControl
     }
 };
 

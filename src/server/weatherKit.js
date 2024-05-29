@@ -60,11 +60,12 @@ axiosRetry(axiosInstance, {
  * @param {string} zone time zone
  * @param {number} bearing the direction of travel at the time of the forecast
  * @param {function} getBearingDifference - returns the difference between two bearings
+ * @param {boolean} isControl the forecast point is from a controle
   * @returns {Promise<{time: *, distance: *, summary: *, precip: string, cloudCover: string, windSpeed: string,
  * lat: *, lon: *, temp: string, fullTime: *, relBearing: null, rainy: boolean, windBearing: number,
  * vectorBearing: *, gust: string} | never>} a promise to evaluate to get the forecast results
  */
-const callWeatherKit = async function (lat, lon, currentTime, distance, zone, bearing, getBearingDifference) {
+const callWeatherKit = async function (lat, lon, currentTime, distance, zone, bearing, getBearingDifference, isControl) {
     const startTime = DateTime.fromISO(currentTime, { zone: 'utc' });
     const weatherKitKey = makeJwt();
     const when = startTime.toISO({ suppressMilliseconds: true });
@@ -86,7 +87,8 @@ const callWeatherKit = async function (lat, lon, currentTime, distance, zone, be
     // eslint-disable-next-line no-mixed-operators
     const temperatureInF = temperatureInC * 9 / 5 + 32;
     return {
-        'time': now.toFormat('h:mm a'),
+        'time': now.toISO(),
+        zone:zone,
         'distance': distance,
         'summary': forecast.currentWeather.conditionCode,
         'precip': `${(current.precipitationChance * 100).toFixed(1)}%`,
@@ -103,7 +105,8 @@ const callWeatherKit = async function (lat, lon, currentTime, distance, zone, be
         'vectorBearing': bearing,
         'gust': current.windGust === undefined ? '<unavailable>' : `${Math.round(forecast.currentWeather.windGust * 1000 / milesToMeters)}`,
         // eslint-disable-next-line no-mixed-operators
-        'feel': Math.round(forecast.currentWeather.temperatureApparent * 9 / 5 + 32)
+        'feel': Math.round(forecast.currentWeather.temperatureApparent * 9 / 5 + 32),
+        isControl:isControl
     }
 };
 
