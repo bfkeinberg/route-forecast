@@ -46,7 +46,7 @@ setTransitionState
   }, [diffData])
 
   return (
-    <div style={{width: width, overflow: "hidden"}}>
+    <div style={{overflow: "hidden"}}>
       <TransitioningContent transitionTime={transitionTime} transitioning={transitionState === "inactive"} transitionType={transitionType} width={width}>
         {cachedRenderContent}
       </TransitioningContent>

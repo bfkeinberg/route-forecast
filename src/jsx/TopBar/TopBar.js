@@ -28,13 +28,13 @@ export const TopBar = ({sidePaneOptions, activeSidePane, setActiveSidePane, side
         sidePaneOptions={sidePaneOptions}
         activeSidePane={activeSidePane}
         setActiveSidePane={setActiveSidePane}
-        sidebarWidth={sidebarWidth+15}
+        sidebarWidth={sidebarWidth}
         panesVisible={panesVisible}
       />
-      <div style={{display: "flex", flexGrow: 1, alignItems: "center", padding: "0px 20px", borderWidth: "0px 0px 0px 1px", borderStyle: "solid", borderColor: "grey"}}>
+      <div style={{display: "flex", flexGrow: 1, flexShrink: 8, justifyContent: "space-between", alignItems: "center", padding: "0px 20px", borderWidth: "0px 0px 0px 1px", borderStyle: "solid", borderColor: "grey"}}>
         {roomFortitle && <RouteTitle/>}
-        {roomForFinishTime && predictedFinishTimeExists && <div style={{flexGrow: 1, fontStyle: "oblique", color: "rgba(64, 111, 140, 0.87)", fontSize: finishTimeFontSize, height: "60px", textAlign: alignment}}>{predictedFinishTime}</div>}
-        <div style={{flexGrow: 1, display: "flex", justifyContent: "flex-end", alignItems: "center"}}>
+        {roomForFinishTime && predictedFinishTimeExists && <div style={{fontStyle: "oblique", color: "rgba(64, 111, 140, 0.87)", fontSize: finishTimeFontSize, height: "60px", textAlign: alignment}}>{predictedFinishTime}</div>}
+        <div style={{display: "flex", justifyContent: "flex-end", alignItems: "center"}}>
           <ShortUrl/>
           <DonationRequest wacky/>
           <div style={{margin: "0px 10px", flexShrink: 0}}><BugReportButton/></div>
