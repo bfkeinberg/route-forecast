@@ -1,5 +1,5 @@
-import {Button,MenuItem,Toast2,Section} from '@blueprintjs/core';
-import { Select } from "@blueprintjs/select"
+import {Toast2,Section,SectionCard} from '@blueprintjs/core';
+import Slider from '@mui/material/Slider';
 import PropTypes from 'prop-types';
 import React from 'react';
 import ReactGA from "react-ga4";
@@ -14,7 +14,7 @@ import { RouteInfoInputRWGPS } from './RouteInfoInputRWGPS';
 import { RouteInfoInputStrava } from './RouteInfoInputStrava'
 import { ELEVATION_1 } from '@blueprintjs/core/lib/esm/common/classes';
 import {useTranslation} from 'react-i18next'
-import { t } from 'i18next';
+import bicycle from 'Images/bicycle.svg'
 
 const getInputForMode = (mode) => {
     switch (mode) {
@@ -32,10 +32,11 @@ const getInputForMode = (mode) => {
 const RouteInfoForm = ({ errorDetails, errorDetailsSet, routeLoadingMode, routeLoadingModeSet }) => {
     const mode = routeLoadingMode
     const dispatch = useDispatch()
+    const {t} = useTranslation()
 
     const modeSwitched = (item) => {
-        routeLoadingModeSet(item);
-        if (item === routeLoadingMode.STRAVA) {ReactGA.event('select_content', {content_type:'strava'})}
+        routeLoadingModeSet(item.target.value);
+        if (item.target.value === routeLoadingMode.STRAVA) {ReactGA.event('select_content', {content_type:'strava'})}
     }
 
     return (
@@ -50,45 +51,42 @@ const RouteInfoForm = ({ errorDetails, errorDetailsSet, routeLoadingMode, routeL
                 </div>
             </MediaQuery>
             <Section style={{marginTop:"1em"}} elevation={ELEVATION_1} title={t('titles.loading')}>
-                <strong>Randoplan</strong> {t('data.loading')}
+                <SectionCard padded>
+                    <strong>Randoplan</strong> {t('data.loading')}
+                </SectionCard>
             </Section>            
         </div>
     );
 }
 
-const renderMode = (mode, { handleClick, handleFocus, modifiers }) => {
-    if (!modifiers.matchesPredicate) {
-        return null;
-    }
-    return (
-        <MenuItem
-            active={modifiers.active}
-            key={mode.key}
-            disabled={mode.disabled}
-            onClick={handleClick}
-            onFocus={handleFocus}
-            text={mode.name}
-        />
-    );
-};
+const sliderLabelRenderer = (value, index) => {
+    return routeLoadingModeProps[index].name
+}
 
 const RouteLoadingModeSelector = ({ mode, modeSwitched }) => {
-    const { t } = useTranslation()
     return (
-        <div style={{ display: "flex", justifyContent: "center" }}>
-            <Select tabIndex="0"
-                id='routeMode'
-                items={routeLoadingModeProps}
-                itemsEqual={"name"}
-                itemRenderer={renderMode}
-                filterable={false}
-                fill={false}
-                activeItem={{ key: mode, name: mode.name }}
-                onItemSelect={(selected) => { modeSwitched(selected.key) }}
-            >
-                <span style={{ marginRight: "1em" }}><b>{t('labels.routeType')}</b></span>
-                <Button text={routeLoadingModeProps[mode - 1].name} rightIcon="symbol-triangle-down" />
-            </Select>
+        <div style={{ display: "flex", justifyContent: "center", margin:'10px', padding:'40px' }}>
+            <Slider
+                value={mode}
+                onChange={modeSwitched}
+                min={1}
+                max={3}
+                valueLabelDisplay={'auto'}
+                valueLabelFormat={sliderLabelRenderer}
+                marks= {[{value:1, label:'Ride with GPS'}, {value:2,label:'Strava'}, {value:3,label:'RUSA'}]}
+                sx={{
+                    '& .MuiSlider-thumb': {
+                        backgroundImage: `url(${bicycle})`,
+                        height: '40px',
+                        width: '60px',
+                        display:'block',
+                        borderRadius:'1px',
+                        backgroundSize:'contain',
+                        backgroundColor:'white',
+                        padding:'12px'
+                    },
+                }}
+            />            
         </div>
     )
 }
