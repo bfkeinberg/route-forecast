@@ -253,8 +253,9 @@ export const RotatedArrow = ({rotation, distance, subrange}) => {
         >
             <defs>
                 <radialGradient id="movingShade" fy="90%">
-                    <stop offset="0%" stop-color="lime"></stop>
-                    <stop offset="100%" stop-color={pickArrowColor(distance,subrange)}></stop>
+                    <stop offset="0%" stop-color="lime" stop-opacity="90%"></stop>
+                    <stop offset="50%" stop-color="ff8080" stop-opacity="50%"/>
+                    <stop offset="100%" stop-color={pickArrowColor(distance,subrange)} stop-opacity="5%"></stop>
                     <animate attributeName="fy" dur="1800ms" from="90%" to="10%" repeatCount="indefinite" />
                 </radialGradient>
             </defs>

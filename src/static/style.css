@@ -34,7 +34,7 @@ img#bugImage {
 
 .timeHeaderCell {
     font-size: 80%;
-    width: 55px;
+    width: 52px;
     display: inline-block;
 }
 
@@ -63,7 +63,7 @@ img#bugImage {
 }
 
 .timeCell {
-    width: 55px
+    /* width:52px */
 }
 
 .chanceRainCell {
@@ -178,5 +178,12 @@ table.bp4-html-table.bp4-html-table-bordered.bp4-html-table-striped.bp4-interact
 .spacer {
     display: flex;
     margin-bottom: 1rem;
+}
+
+.bicycle_image {
+    background-image:url('https://svgsilh.com/svg/159680.svg');
+    height: 60px;
+    width: 60px;
+    opacity: 20%;
 }
     
