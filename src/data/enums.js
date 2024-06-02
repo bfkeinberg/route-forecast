@@ -5,6 +5,7 @@ export const routeLoadingModes = {
 }
 
 export const routeLoadingModeProps = [
+  {},
   {name:"Ride with GPS", key:routeLoadingModes.RWGPS},
   {name:"Strava", key:routeLoadingModes.STRAVA},
   {name:"RUSA perm id", key:routeLoadingModes.RUSA_PERM}
