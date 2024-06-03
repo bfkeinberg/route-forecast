@@ -41,7 +41,7 @@ const DesktopUI = ({mapsApiKey}) => {
         setActiveSidePane
     ] = useState(0)
 
-    const sidebarWidth = 648
+    const sidebarWidth = 703
 
     const rwgpsRouteData = useSelector(state => state.routeInfo.rwgpsRouteData)
     const gpxRouteData = useSelector(state => state.routeInfo.gpxRouteData)

@@ -54,10 +54,12 @@ const Segment = () => {
 
     return (
         <>
-        <Typography gutterBottom>Use custom segment length</Typography>
+        <div style={{display:"flex", justifyContent:"space-between"}}>
+            <Typography gutterBottom>Use custom segment length</Typography>
+            <Button onClick={resetSegment}>Reset</Button>
+        </div>
         <Slider marks value={getSliderValue(segment)} valueLabelFormat={sliderLabelRenderer} valueLabelDisplay='auto'
             min={0} max={maxDistance} onChange={segmentUpdate} />
-        <Button onClick={resetSegment}>Reset segment</Button>
         </>)
 }
 

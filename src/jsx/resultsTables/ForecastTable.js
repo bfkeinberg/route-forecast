@@ -83,7 +83,7 @@ const ForecastTable = (adjustedTimes) => {
     const zoomToRange = useSelector(state => state.forecast.zoomToRange)
     const routeName = useSelector(state => state.routeInfo.name)
     const fetchAqi = useSelector(state => state.forecast.fetchAqi)
-
+    const maxWidthForMobile = 501
     const [showGusts, setShowGusts] = useState(false)
     const [showApparentTemp, setShowApparentTemp] = useState(false)
     const [showRelativeBearing, setShowRelativeBearing] = useState(false)
@@ -181,15 +181,15 @@ const ForecastTable = (adjustedTimes) => {
                             // eslint-disable-next-line multiline-ternary
                             <i>{formatTemperature(point.feel, metric)}</i>:formatTemperature(point.temp, metric)}</td>
                         <td className='chanceRain'>{point.precip}</td>
-                        <MediaQuery minWidth={501}>
+                        <MediaQuery minWidth={maxWidthForMobile}>
                             <td>{point.humidity}</td>
                             <td>{point.cloudCover}</td>
+                            <td>{point.aqi!==undefined?point.aqi:'N/A'}</td>
                         </MediaQuery>
-                        <td>{point.aqi!==undefined?point.aqi:'N/A'}</td>
                         <td style={windStyle(point)}>
                             <WindSpeed gust={point.gust} windSpeed={point.windSpeed} showGusts={showGusts}/>
                         </td>
-                        <MediaQuery minWidth={501}>
+                        <MediaQuery minWidth={maxWidthForMobile}>
                             <td>{showRelativeBearing ? point.relBearing.toFixed() : point.windBearing}</td>
                         </MediaQuery>
                     </tr>
@@ -234,17 +234,17 @@ const ForecastTable = (adjustedTimes) => {
                             <tr key={'777'}>
                                 <th><span className={'timeHeaderCell'}>{t('tableHeaders.time')}</span></th>
                                 <th><span className={'headerCell'}>{distHeader}</span></th>
-                                <th><span className={'headerCell'}>{t('tableHeaders.summary')}</span></th>
+                                <th><span style={{display:"inline-block", width:"60px"}}className={'headerCell'}>{t('tableHeaders.summary')}</span></th>
                                 <th id={'temp'} className={'clickableHeaderCell'}>{temperatureHeader}</th>
                                 <th><span className={'headerCell'}>{t('tableHeaders.precipitation')}</span></th>
                                 <MediaQuery minWidth={501}>
                                     <th><span className={'headerCell'}>{t('tableHeaders.humidity')}</span></th>
                                     <th><span className={'headerCell'}>{t('tableHeaders.cloudCover')}</span></th>
+                                    <th className={'clickableHeaderCell'} id={'aqi'}>
+                                        <Tooltip content={t('tooltips.aqiHeader')} placement={'top'}>
+                                            <Button small active={fetchAqi} onClick={toggleAqi}><span className={fetchAqi ? 'largerClickableHeaderCell' : 'largerStruckClickableHeaderCell'}>AQI</span></Button></Tooltip>
+                                    </th>
                                 </MediaQuery>
-                                <th className={'clickableHeaderCell'} id={'aqi'}>
-                                <Tooltip content={t('tooltips.aqiHeader')} placement={'top'}>
-                                    <Button small active={fetchAqi} onClick={toggleAqi}><span className={fetchAqi?'largerClickableHeaderCell':'largerStruckClickableHeaderCell'}>AQI</span></Button></Tooltip>
-                                </th>
                                 <th id={'wind'}>{windHeader}</th>
                                 <MediaQuery minWidth={501}>
                                     <th><span className={'headerCell'}><Button small onClick={toggleRelBearing} >{showRelativeBearing ? t('tableHeaders.relBearing') : t('tableHeaders.windBearing')}</Button></span></th>
