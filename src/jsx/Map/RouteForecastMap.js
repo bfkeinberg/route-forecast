@@ -1,4 +1,4 @@
-import {APIProvider, Map, InfoWindow, useMap, AdvancedMarker, Pin} from '@vis.gl/react-google-maps';
+import {APIProvider, Map, InfoWindow, useMap, AdvancedMarker, useApiIsLoaded} from '@vis.gl/react-google-maps';
 import * as Sentry from "@sentry/react"
 import circus_tent from 'Images/circus tent.png';
 import rainCloud from "Images/rainCloud.png";
@@ -14,6 +14,7 @@ import { milesToMeters } from '../../utils/util';
 import { formatTemperature } from "../resultsTables/ForecastTable";
 import ErrorBoundary from "../shared/ErrorBoundary"
 import { Polyline } from './polyline';
+import {useTranslation} from 'react-i18next'
 
 const arrowPath = "m-.232.134c-1.104 0-2-.224-2-.5v-31.634c0-.276.896-.5 2-.5s2 .224 2 .5v31.634C1.768-.09.876.134-.232.134m12.651-20.5c-.128 0-.256-.049-.354-.146l-12.179-12.183-12.184 12.183c-.195.195-.512.195-.707 0s-.195-.512 0-.707l12.538-12.537c.093-.093.22-.146.353-.146l0 0c.133 0 .26.053.354.146l12.533 12.536c.195.195.195.512 0 .707-.098.098-.226.147-.354.147z"
 
@@ -24,19 +25,22 @@ const findMarkerInfo = (forecast, subrange) => {
     return forecast.filter((point) => Math.round(point.distance * milesToMeters) >= subrange[0] && Math.round(point.distance * milesToMeters) <= subrange[1]);
 }
 
-const getMapBounds = (points, bounds, zoomToRange, subrange) => {
-    const defaultBounds = {north:bounds.max_latitude, south:bounds.min_latitude, east:bounds.max_longitude, west:bounds.min_longitude}
+const getMapBounds = (points, zoomToRange, subrange, userSubrange) => {
+    let userBounds = new google.maps.LatLngBounds();
+    points.filter(point => (point.dist !== undefined) && (point.dist >= userSubrange[0] &&
+        (isNaN(userSubrange[1]) || point.dist <= userSubrange[1])))
+        .forEach(point => userBounds.extend(point));
     if (zoomToRange && subrange.length === 2 && !isNaN(subrange[1])) {
-        let segmentBounds = new window.google.maps.LatLngBounds();
+        let segmentBounds = new google.maps.LatLngBounds();
         points.filter(point => (point.dist !== undefined) && (point.dist >= subrange[0] &&
             (isNaN(subrange[1]) || point.dist <= subrange[1])))
             .forEach(point => segmentBounds.extend(point));
         if (segmentBounds.isEmpty()) {
-            return defaultBounds;
+            return userBounds;
         }
         return segmentBounds;
     }
-    return defaultBounds;
+    return userBounds;
 }
 
 const cvtDistance = (distance, metric) => {
@@ -51,54 +55,49 @@ const addBreadcrumb = (msg) => {
     })
 }
 
-const findMapBounds = (points, bounds, zoomToRange, subrange) => {
-    const mapBounds = useMemo(() => (getMapBounds(points, bounds, zoomToRange, subrange)), [
-        points,
-        points.length,
-        bounds,
-        zoomToRange,
-        subrange,
-        subrange.length
-    ])
+const findMapBounds = (points, zoomToRange, subrange, userSubrange) => {
+    const mapBounds = getMapBounds(points, zoomToRange, subrange, userSubrange)
     addBreadcrumb(`conputed mapBounds ${mapBounds} from ${points.length} points in route`)
     return mapBounds
 }
 
-const SegmentZoomer = ({bounds}) => {
-    const map = useMap();
-    const [
-        savedMap,
-        setMap
-    ] = useState(null);    
-    useEffect(() => {
-        if (!map) return;
-        setMap(map)
-    }, [map]);
-
-    if (savedMap && savedMap.getBounds() && !savedMap.getBounds().equals(bounds)) {
-        savedMap.fitBounds(bounds, 0)
-    }
-}
-
 const RouteForecastMap = ({maps_api_key}) => {
-
     const userControlPoints = useSelector(state => state.controls.userControlPoints)
     const forecast = useSelector(state => state.forecast.forecast)
-    let subrange = useSelector(state => (state.uiInfo.routeParams.routeLoadingMode === routeLoadingModes.STRAVA ?
-        state.strava.subrange :
-        state.forecast.range))
+    const doingAnalysis = useSelector(state=>state.strava.activityData) !== null
+    let subrange = useSelector(state => state.strava.activityData !== null ? state.strava.subrange : state.forecast.range)
     if (subrange.length == 2 && isNaN(subrange[1])) {
         subrange = []
     }
     const routeLoadingMode = useSelector(state => state.uiInfo.routeParams.routeLoadingMode)
     const metric = useSelector(state => state.controls.metric)
     const zoomToRange = useSelector(state => state.forecast.zoomToRange)
+    const { t } = useTranslation()
+    const userSegment = useSelector(state => state.uiInfo.routeParams.segment)
 
     const { calculatedControlPointValues: controls } = useForecastDependentValues()
 
     const dispatch = useDispatch()
     useEffect(() => { dispatch(mapViewedSet()) }, [])
-
+    
+    const BoundSetter = () => {
+        const [mapBounds, setMapBounds] = useState([])
+        const apiIsLoaded = useApiIsLoaded()
+        const map = useMap()
+        useEffect(() => {
+            if (!apiIsLoaded) return;
+            const theBounds = findMapBounds(points, zoomToRange, subrange, userSegment)
+            setMapBounds(theBounds)
+            // when the maps library is loaded, apiIsLoaded will be true and the API can be
+            // accessed using the global `google.maps` namespace.
+        }, [apiIsLoaded, zoomToRange, subrange, userSegment[0], userSegment[1]])
+        useEffect(() => {
+            if (map && Object.keys(mapBounds).length===2) {
+                map.fitBounds(mapBounds, 0)
+            }
+        }, [map, mapBounds])
+    }
+    
     const controlNames = userControlPoints.map(control => control.name)
 
     let markedInfo = findMarkerInfo(forecast, subrange);
@@ -106,29 +105,30 @@ const RouteForecastMap = ({maps_api_key}) => {
     const { points, bounds } = usePointsAndBounds()
     
     let infoVisible = false;
-    if (markedInfo.length > 0) {
+    if (!doingAnalysis && markedInfo.length > 0) {
         infoVisible = true;
     }
 
     const getInfoWindow  = (markedInfo) => {
-        //TODO: localize below
         const infoContents = 
-        `Temperature ${formatTemperature(markedInfo[0].temp, metric)} Wind speed ${cvtDistance(markedInfo[0].windSpeed, metric).toFixed(1)} Wind bearing ${markedInfo[0].windBearing}`
-        const infoWindow = (<InfoWindow maxWidth={120} position={{ lat: markedInfo[0].lat, lng: markedInfo[0].lon }}>{infoContents}</InfoWindow>)
+        `${t('data.info.temperature')} ${formatTemperature(markedInfo[0].temp, metric)} ${t('data.wind.speed')} ${cvtDistance(markedInfo[0].windSpeed, metric).toFixed(1)} ${t('tableHeaders.windBearing')} ${markedInfo[0].windBearing}`
+        const infoWindow = (<InfoWindow maxWidth={170} position={{ lat: markedInfo[0].lat, lng: markedInfo[0].lon }}>{infoContents}</InfoWindow>)
         return infoWindow
     }
 
+    const initialBounds = {north:37.34544, south:37.30822, east:-121.98912, west:-122.06169}
     try {
         return (
             <ErrorBoundary>
                 <div id="map" style={{ width:'auto', height: "calc(100vh - 115px)", position: "relative" }}>
                     {(forecast.length > 0 || routeLoadingMode === routeLoadingModes.STRAVA) && bounds !== null ?
                     <APIProvider apiKey={maps_api_key}>
+                        <BoundSetter/>
                         <Map
                             mapTypeId={'roadmap'}
                             mapId={"11147ffcb9b103dc"}
                             options={{ scaleControl: true }}
-                            defaultBounds={findMapBounds(points, bounds, zoomToRange, subrange)}
+                            defaultBounds={initialBounds}
                         >
                             {controls !== null && <MapMarkers forecast={forecast}
                                 controls={controls} controlNames={controlNames} 
@@ -138,10 +138,9 @@ const RouteForecastMap = ({maps_api_key}) => {
                             {infoVisible && getInfoWindow(markedInfo)}
                             <MapHighlight points={points} subrange={subrange} />
                         </Map>
-                        <SegmentZoomer bounds={findMapBounds(points, bounds, zoomToRange, subrange)}/>
                         </APIProvider> :
                         // TODO: localize
-                        <h2 style={{ padding: '18px', textAlign: "center" }}>Forecast map</h2>
+                        <h2 style={{ padding: '18px', textAlign: "center" }}>{t('titles.map')}</h2>
                     }
                 </div>
             </ErrorBoundary>
@@ -331,7 +330,7 @@ const MapHighlight = ({ points, subrange }) => {
     }
     const highlightPoints = points.filter(point => point.dist >= subrange[0] &&
         (isNaN(subrange[1]) || point.dist <= subrange[1]));
-    return <Polyline path={highlightPoints} options={{
+        return <Polyline path={highlightPoints} options={{
         strokeColor: '#67ff99',
         strokeOpacity: 1.0,
         strokeWeight: 5

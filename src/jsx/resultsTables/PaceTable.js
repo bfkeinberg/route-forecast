@@ -17,16 +17,17 @@ import {useTranslation} from 'react-i18next'
 const PaceTable = ({activityData, activityStream, analysisInterval, mapSubrangeSet, mapRangeToggled, zoomToRange, zoomToRangeToggled}) =>  {
     const { t } = useTranslation()
     const [
-selectedRow,
-setSelectedRow
-] = useState(null)
+        selectedRow,
+        setSelectedRow
+    ] = useState(null)
 
     const updateSubrange = (event) => {
         // TODO
         // for inexplicable reasons, broken if a forecast is also loaded. so disabling this entirely for now
-        mapSubrangeSet(
-            parseInt(event.currentTarget.getAttribute('start'), 10),
-            parseInt(event.currentTarget.getAttribute('end'), 10)
+        mapSubrangeSet({
+            start: parseInt(event.currentTarget.getAttribute('start'), 10),
+            finish: parseInt(event.currentTarget.getAttribute('end'), 10)
+        }
         );
     };
 
@@ -37,7 +38,7 @@ setSelectedRow
 
     const toggleRange = (event) => {
         const start = parseInt(event.currentTarget.getAttribute('start'));
-        mapRangeToggled(start, parseInt(event.currentTarget.getAttribute('end')));
+        mapRangeToggled({start:start, finish:parseInt(event.currentTarget.getAttribute('end'))});
         if (selectedRow === start) {
             setSelectedRow(null)
         } else {
@@ -58,6 +59,7 @@ setSelectedRow
                     <td>{pace.alphaPace}</td>
                     <td>{pace.distance.toFixed(0)}</td>
                     <td>{pace.climb.toFixed(0)}</td>
+                    <td>{((pace.climb*100)/(pace.distance*5280)).toFixed(1)}%</td>
                     <td>{(pace.stoppedTimeSeconds/60).toFixed(1)}min</td>
                 </tr>
             )}
@@ -72,6 +74,7 @@ setSelectedRow
     }
     const paceOverTime = stravaRouteParser.findMovingAverages(activityData, activityStream, analysisInterval)
 
+    // TODO: localize table headers
     return (
             <div className="animated slideInRight">
                 <ErrorBoundary>
@@ -92,6 +95,7 @@ setSelectedRow
                             <th style={{'fontSize':'80%'}}>WW Pace</th>
                             <th style={{'fontSize':'80%'}}>Distance</th>
                             <th style={{'fontSize':'80%'}}>Climb</th>
+                            <th style={{'fontSize':'80%'}}>Avg Grade</th>
                             <th style={{'fontSize':'80%'}}>Time Stopped</th>
                         </tr>
                         </thead>

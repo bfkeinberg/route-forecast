@@ -3,7 +3,7 @@ import { DateTime } from 'luxon';
 
 import {finishTimeFormat} from '../redux/reducer';
 import { inputPaceToSpeed, setMinMaxCoords } from './util';
-import {getPowerOrVelocity} from "./windUtils";
+import {getPowerOrVelocity} from "./windUtils"
 
 const kmToMiles = 0.62137;
 /**
@@ -131,7 +131,7 @@ class AnalyzeRoute {
         return {pointList: stream, bounds}
     };
 
-    analyzeRoute(stream, userStartTime, pace, intervalInHours, controls, timeZoneId) {
+    analyzeRoute(stream, userStartTime, pace, intervalInHours, controls, timeZoneId, segment) {
 
         let nextControl = 0;
 
@@ -179,8 +179,16 @@ class AnalyzeRoute {
         // correct start time for time zone
         let startTime = DateTime.fromISO(userStartTime.toFormat("yyyy-MM-dd'T'HH:mm"), {zone:timeZoneId});
         let bearings = [];
-        stream.filter(point => point.lat!==undefined && point.lon!==undefined).forEach(point => {
-            if (first) {
+        const filterFunc = (point) => {
+            return (point.lat!==undefined && point.lon!==undefined)
+        }
+        const filterToSegment = (point) => {
+            return (point.lat!==undefined && point.lon!==undefined && point.dist<=segment[1])
+        }
+        const substream = (segment[1]>segment[0]) ? stream.filter(filterToSegment) : stream.filter(filterFunc)
+        substream.forEach(point => {
+            const shouldSkip = point.dist < segment[0] 
+            if (first && !shouldSkip) {
                 forecastRequests.push(AnalyzeRoute.addToForecast(point, startTime, accumulatedTime, accumulatedDistanceKm * kmToMiles));
                 forecastPoint = point;
                 first = false;
@@ -258,18 +266,18 @@ class AnalyzeRoute {
             return startTime.plus({hours:accumulatedTime+restTime}).toFormat(finishTimeFormat);
     }
 
-    walkRwgpsRoute(routeData,startTime,pace,interval,controls,timeZoneId) {
+    walkRwgpsRoute(routeData,startTime,pace,interval,controls,timeZoneId, segment) {
         let modifiedControls = controls.slice();
         modifiedControls.sort((a,b) => a['distance']-b['distance']);
         const stream = this.parseRouteStream(routeData, "rwgps")
-        return this.analyzeRoute(stream, startTime, pace, interval, modifiedControls, timeZoneId);
+        return this.analyzeRoute(stream, startTime, pace, interval, modifiedControls, timeZoneId, segment);
     }
 
-    walkGpxRoute(routeData,startTime,pace,interval,controls,timeZoneId) {
+    walkGpxRoute(routeData,startTime,pace,interval,controls,timeZoneId, segment) {
         let modifiedControls = controls.slice();
         modifiedControls.sort((a,b) => a['distance']-b['distance']);
         const stream = this.parseRouteStream(routeData, "gpx")
-        return this.analyzeRoute(stream, startTime, pace, interval, modifiedControls, timeZoneId);
+        return this.analyzeRoute(stream, startTime, pace, interval, modifiedControls, timeZoneId, segment);
     }
 
     static rusa_time(accumulatedDistanceInKm, elapsedTimeInHours) {
@@ -404,7 +412,7 @@ class AnalyzeRoute {
                     }
                 }
                 let effectiveWindSpeed = Math.cos((Math.PI / 180)*relativeBearing)*averageWindSpeed;
-
+                let effectiveCrosswind = Math.sin((Math.PI / 180)*relativeBearing)*averageWindSpeed
                 // sometimes the route data is missing elevation, so don't try to compute with it
                 if (previousPoint.elevation!==undefined && currentPoint.elevation!==undefined) {
                     let grade = this.getGrade(previousPoints, currentPoint);

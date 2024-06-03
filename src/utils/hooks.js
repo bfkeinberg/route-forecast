@@ -164,8 +164,10 @@ const usePointsAndBounds = () => {
     pointsAndBounds = useMemo(() => gpxParser.computePointsAndBounds(gpxRouteData, "gpx"), [gpxRouteData])
   }
   if (pointsAndBounds && pointsAndBounds.pointList && pointsAndBounds.pointList.length > 0) {
-    pointsAndBounds.points = useMemo(() => pointsAndBounds.pointList
-      .map(point => ({ lat: point.lat, lng: point.lon, dist: point.dist })), [pointsAndBounds.pointList])
+    // pointsAndBounds.points = useMemo(() => pointsAndBounds.pointList
+      // .map(point => ({ lat: point.lat, lng: point.lon, dist: point.dist })), [pointsAndBounds.pointList])
+      pointsAndBounds.points = pointsAndBounds.pointList
+      .map(point => ({ lat: point.lat, lng: point.lon, dist: point.dist }))
   }
 
   return pointsAndBounds
@@ -183,12 +185,12 @@ const calculateWindResult = (inputs) => {
   if (dependencies.every(dependency => inputs[dependency] === lastWindResult.dependencyValues[dependency]) ) {
     return lastWindResult.result
   }
-  const {routeInfo, routeParams, controls, timeZoneId, forecast} = inputs
+  const {routeInfo, routeParams, controls, timeZoneId, forecast, segment} = inputs
   const stateStuff = {routeInfo, uiInfo: {routeParams}, controls}
 
   let result
   if (forecast.length > 0 && (routeInfo.rwgpsRouteData || routeInfo.gpxRouteData)) {
-    const { points, values, finishTime} = getRouteInfo(stateStuff, routeInfo.rwgpsRouteData !== null ? "rwgps" : "gpx", timeZoneId)
+    const { points, values, finishTime} = getRouteInfo(stateStuff, routeInfo.rwgpsRouteData !== null ? "rwgps" : "gpx", timeZoneId, segment)
 
     let sortedControls = controls.userControlPoints.slice();
     sortedControls.sort((a,b) => a['distance']-b['distance']);
@@ -220,8 +222,9 @@ const useForecastDependentValues = () => {
   const controls = useSelector(state => state.controls)
   const timeZoneId = useSelector(state => state.forecast.timeZoneId)
   const forecast = useSelector(state => state.forecast.forecast)
+  const segment = useSelector(state => state.uiInfo.routeParams.segment)
 
-  const windAdjustmentResult = calculateWindResult({routeInfo, routeParams, controls, timeZoneId, forecast})
+  const windAdjustmentResult = calculateWindResult({routeInfo, routeParams, controls, timeZoneId, forecast, segment})
   return windAdjustmentResult
 }
 

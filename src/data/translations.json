@@ -32,7 +32,8 @@
                 "paceAnalysis": "Pace Analysis",
                 "rwgpsId":"Ride with GPS Route ID",
                 "loading":"Route loading",
-                "forecastControls":"Forecast controls"
+                "forecastControls":"Forecast controls",
+                "map":"Forecast map"
             },
             "tooltips": {
                 "ridingPace":"Speed on flat ground, which will be reduced by climbing",
@@ -61,6 +62,9 @@
                     "from": "from wind",
                     "gust":"Wind gust",
                     "speed":"Wind speed"
+                },
+                "info":{
+                    "temperature":"Temperature"
                 },
                 "summary":"Use weather and terrain data to create a route plan for your rides.",
                 "loading":" can load routes from Ride with GPS, Strava, or using the ids of permanent routes on RUSA.org. You can paste in the url of a route from Ride with GPS or Strava, or grab the id from the info of a RUSA perm route.Alternatively if you pin a route that you are viewing on Ride with GPS, the button to the right will list those. It will prompt you to log into RWGPS if you haven't already.",
@@ -129,7 +133,8 @@
                 "paceAnalysis":"Analyse du Rythme",
                 "rwgpsId":"ID de parcours Ride with GPS",
                 "loading":"Chargement de l'itinéraire",
-                "forecastControls":"Contrôles de prévision"
+                "forecastControls":"Contrôles de prévision",
+                "map":"Carte de prévision"
             },
             "tooltips": {
                 "ridingPace":"Vitesse sur terrain plat, qui sera réduite en montant",
@@ -158,6 +163,9 @@
                     "from": "grâce au vent",
                     "gust": "Rafale de vent",
                     "speed": "Vitesse du vent"
+                },
+                "info":{
+                    "temperature":"Température"
                 },
                 "summary":"Utilisez les données météorologiques et de terrain pour créer un plan d'itinéraire pour vos sorties.",
                 "loading":" peut charger des itinéraires depuis Ride avec GPS, Strava ou en utilisant les identifiants des itinéraires permanents sur RUSA.org.Vous pouvez coller l'URL d'un itinéraire depuis Ride with GPS ou Strava, ou récupérer l'identifiant à partir des informations d'un itinéraire permanent RUSA. Alternativement, si vous épinglez un itinéraire que vous visualisez sur Ride with GPS, le bouton à droite les répertoriera. Cela demandera pour vous connecter à RWGPS si ce n'est pas déjà fait.",
