@@ -1,5 +1,5 @@
 import { Toast2 } from '@blueprintjs/core';
-import React, {useState} from 'react';
+import React from 'react';
 import ReactGA from "react-ga4";
 import { useDispatch,useSelector } from "react-redux";
 import {useTranslation} from 'react-i18next'
@@ -15,7 +15,7 @@ import ForecastInterval from "./ForecastInterval";
 import RidingPace from "./RidingPace";
 import { TimeFields } from "./TimeFields";
 import WeatherProviderSelector from "./WeatherProviderSelector"
-import Segment from './segment';
+import Segment from './Segment';
 
 export const ForecastSettings = () => {
     const metric = useSelector(state => state.controls.metric)
