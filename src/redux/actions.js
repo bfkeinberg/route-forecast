@@ -354,7 +354,9 @@ const doForecastByParts = (forecastFunc, aqiFunc, dispatch, getState) => {
     const forecastRequest = getForecastRequest(((type === "rwgps") ? getState().routeInfo.rwgpsRouteData : getState().routeInfo.gpxRouteData),
          getState().uiInfo.routeParams.startTimestamp,
         type, getState().uiInfo.routeParams.zone, getState().uiInfo.routeParams.pace,
-        getState().uiInfo.routeParams.interval, getState().controls.userControlPoints)
+        getState().uiInfo.routeParams.interval, getState().controls.userControlPoints,
+        getState().uiInfo.routeParams.segment
+    )
     if (forecastRequest === undefined) {
         return { result: "error", error: "No route could be loaded" }
     }

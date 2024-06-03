@@ -51,7 +51,10 @@ const routeParamsInitialState = {
     routeLoadingMode: routeLoadingModes.RWGPS,
     maxDaysInFuture: providerValues[defaultProvider].max_days,
     stopAfterLoad: false,
-    rusaPermRouteId: ''
+    rusaPermRouteId: '',
+    loadingSource:null,
+    succeeded:null,
+    segment:[0,0]
 }
 const routeParamsSlice = createSlice({
     name: 'routeParams',
@@ -69,6 +72,7 @@ const routeParamsSlice = createSlice({
             }
             state.loadingSource = null
             state.succeeded = null
+            state.segment = routeParamsInitialState.segment
         },
         rusaPermRouteIdSet(state,action) {
             state.rusaPermRouteId = action.payload
@@ -118,7 +122,12 @@ const routeParamsSlice = createSlice({
                     state.interval = interval
                     state.stopAfterLoad = false
                 }
+                state.segment = routeParamsInitialState.segment
             }
+        },
+        segmentSet(state,action) {
+            // start and end are in meters
+            state.segment = action.payload
         },
         routeIsTripSet(state,action) {
             state.rwgpsRouteIsTrip = action.payload
@@ -142,13 +151,27 @@ const routeParamsSlice = createSlice({
                 state.canForecastPast = providerValues[action.payload].canForecastPast
                 state.startTimestamp = checkedStartDate(DateTime.fromMillis(state.startTimestamp, {zone:state.zone}), providerValues[action.payload].canForecastPast).toMillis()
             })
+            .addCase('routeInfo/rwgpsRouteLoaded', (state,action) => {
+                if (action.payload.route) {
+                    state.segment[1] = action.payload.route.distance
+                } else {
+                    state.segment[1] = action.payload.trip.distance
+                }
+            })
+            .addCase('routeInfo/gpxRouteLoaded', (state, action) => {
+                state.segment = [state.segment[0], action.payload.tracks[0].distance.total*1000]
+            })
+            .addCase('routeInfo/routeDataCleared', (state) => {
+                state.segment = routeParamsInitialState.segment
+            })
     }
 })
 
 export const routeParamsReducer = routeParamsSlice.reducer
 export const {stopAfterLoadSet,rwgpsRouteSet,startTimeSet,initialStartTimeSet,
         startTimestampSet,paceSet,intervalSet,routeIsTripToggled,routeIsTripSet,
-        routeLoadingModeSet,reset, timeZoneSet, rusaPermRouteIdSet} = routeParamsSlice.actions
+        routeLoadingModeSet,reset, timeZoneSet, rusaPermRouteIdSet,
+        segmentSet} = routeParamsSlice.actions
 
 const rideWithGpsInfoSlice = createSlice({
     name: 'rideWithGpsInfo',
@@ -468,6 +491,12 @@ const stravaSlice = createSlice({
     },
     extraReducers: (builder) => {
         builder
+            .addCase(rwgpsRouteSet, (state) => {
+                state.activity = stravaInitialState.activity
+                state.activityData = stravaInitialState.activityData
+                state.activityStream = stravaInitialState.activityStream
+                state.subrange = stravaInitialState.subrange
+        })
             .addCase(reset, () => stravaInitialState)
     }
 })

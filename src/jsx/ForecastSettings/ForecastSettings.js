@@ -1,5 +1,5 @@
 import { Toast2 } from '@blueprintjs/core';
-import React from 'react';
+import React, {useState} from 'react';
 import ReactGA from "react-ga4";
 import { useDispatch,useSelector } from "react-redux";
 import {useTranslation} from 'react-i18next'
@@ -15,6 +15,7 @@ import ForecastInterval from "./ForecastInterval";
 import RidingPace from "./RidingPace";
 import { TimeFields } from "./TimeFields";
 import WeatherProviderSelector from "./WeatherProviderSelector"
+import Segment from './segment';
 
 export const ForecastSettings = () => {
     const metric = useSelector(state => state.controls.metric)
@@ -41,6 +42,7 @@ export const ForecastSettings = () => {
                         <div style={{ fontSize: "10px", color: "grey", opacity: metric ? 1 : 0, transition: "opacity 0.3s", marginTop: "3px" }}>{t('labels.kilometers')}</div>
                     </div>
                 </div>
+                <Segment/>
                 <div style={{ display: "flex", margin: "30px 0px" }}>
                     <ForecastInterval />
                 </div>

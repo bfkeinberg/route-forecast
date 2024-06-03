@@ -24,9 +24,9 @@ export const setMinMaxCoords = (trackPoint,bounds) => {
   return bounds;
 };
 
-export const getRouteInfo = (state, type, timeZoneId) => {
+export const getRouteInfo = (state, type, timeZoneId, segment) => {
   const routeData = state.routeInfo[type === "rwgps" ? "rwgpsRouteData" : "gpxRouteData"]
-  if (routeData == undefined) {
+  if (!routeData) {
     return routeData;
   }
   const walkFunction = type === "rwgps" ? gpxParser.walkRwgpsRoute : gpxParser.walkGpxRoute
@@ -36,11 +36,12 @@ export const getRouteInfo = (state, type, timeZoneId) => {
     state.uiInfo.routeParams.pace,
     state.uiInfo.routeParams.interval,
     state.controls.userControlPoints,
-    timeZoneId
+    timeZoneId,
+    segment
   )
 }
 
-export const getForecastRequest = (routeData, startTimestamp, type, timeZoneId, pace, interval, userControlPoints) =>
+export const getForecastRequest = (routeData, startTimestamp, type, timeZoneId, pace, interval, userControlPoints, segment) =>
 {
   const walkFunction = type === "rwgps" ? gpxParser.walkRwgpsRoute : gpxParser.walkGpxRoute
   return walkFunction(
@@ -49,7 +50,8 @@ export const getForecastRequest = (routeData, startTimestamp, type, timeZoneId, 
     pace,
     interval,
     userControlPoints,
-    timeZoneId
+    timeZoneId,
+    segment
   ).forecastRequest
 }
 

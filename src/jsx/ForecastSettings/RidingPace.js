@@ -4,13 +4,14 @@ import { Button, FormGroup,MenuItem } from "@blueprintjs/core";
 import { Select } from "@blueprintjs/select";
 import PropTypes from 'prop-types';
 import React from 'react';
-import {connect} from 'react-redux';
+import {connect, useSelector} from 'react-redux';
 
 import {saveCookie, setPace} from "../../redux/actions";
 import { useActualPace, useFormatSpeed } from '../../utils/hooks';
 import { inputPaceToSpeed, metricPaceToSpeed, paceToSpeed } from '../../utils/util';
 import { DesktopTooltip } from '../shared/DesktopTooltip';
 import {useTranslation} from 'react-i18next'
+import { milesToMeters } from '../../utils/util'
 
 const paceValues = {
     imperialLikeAPenguin: {
@@ -116,6 +117,11 @@ const renderPaceMetric = (pace, { handleClick, modifiers }) => {
 const RidingPace = ({ pace, setPace, metric }) => {
     const { t } = useTranslation()
     const actualPace = useActualPace()
+    
+    // convert mph to kph if we are using metric
+    const cvtMilesToKm = distance => {
+        return metric ? ((distance * milesToMeters) / 1000).toFixed(1) : distance;
+    };
 
     const formatSpeed = useFormatSpeed()
 
@@ -126,7 +132,8 @@ const RidingPace = ({ pace, setPace, metric }) => {
     if (actualPace === null || actualPace === 0) {
         pace_text = t('tooltips.ridingPace')
     } else {
-        pace_tooltip_class = getPaceTooltipId(actualPace,selectedSpeed);
+
+        pace_tooltip_class = getPaceTooltipId(cvtMilesToKm(actualPace),selectedSpeed);
         pace_text = `${t('tooltips.actualPace')} ${getAlphaPace(Math.round(actualPace))} (${formatSpeed(actualPace)})`;
     }
 

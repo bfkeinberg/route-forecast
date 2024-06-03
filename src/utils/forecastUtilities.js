@@ -90,7 +90,7 @@ const doForecastFetch = async (path, formData, abortSignal) => {
 export const getForecastRequestLength = (state) => {
     const type = state.routeInfo.rwgpsRouteData ? "rwgps" : "gpx"
     const timeZoneId = state.uiInfo.routeParams.zone
-    const parsedRouteInfo = getRouteInfo(state, type, timeZoneId)
+    const parsedRouteInfo = getRouteInfo(state, type, timeZoneId, state.uiInfo.routeParams.segment)
     if (!parsedRouteInfo) {
         return 0;
     }

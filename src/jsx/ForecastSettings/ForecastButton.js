@@ -8,7 +8,7 @@ import { useMediaQuery } from 'react-responsive';
 
 import { shortenUrl } from "../../redux/actions";
 import { useForecastMutation, useGetAqiMutation } from '../../redux/forecastApiSlice';
-import { forecastAppended,forecastFetchBegun,forecastFetched, forecastFetchFailed, querySet } from '../../redux/reducer';
+import { forecastAppended,forecastFetchBegun,forecastFetched, forecastFetchFailed, querySet, segmentSet } from '../../redux/reducer';
 import { generateUrl } from '../../utils/queryStringUtils';
 import { getForecastRequest } from '../../utils/util';
 import { DesktopTooltip } from '../shared/DesktopTooltip';
@@ -26,6 +26,8 @@ const ForecastButton = ({fetchingForecast,submitDisabled, routeNumber, startTime
         const distanceInKm = useSelector(state => state.routeInfo.distanceInKm)
         const fetchAqi = useSelector(state => state.forecast.fetchAqi)
         const rusaRouteId = useSelector(state => state.uiInfo.routeParams.rusaPermRouteId)
+        const segmentRange = useSelector(state => state.uiInfo.routeParams.segment)
+    
         const { t } = useTranslation()
 
     const forecastByParts = (forecastRequest, zone, service, routeName, routeNumber) => {
@@ -51,16 +53,16 @@ const ForecastButton = ({fetchingForecast,submitDisabled, routeNumber, startTime
             }
         }
         return [Promise.all(forecastResults),fetchAqi?Promise.all(aqiResults):[]]
-        // return forecastResults
     }
     const doForecastByParts = () => {
-        const forecastRequest = getForecastRequest(routeData, startTimestamp, type, zone, pace, interval, userControlPoints)
-        if (forecastRequest === undefined) {
+        const forecastRequest = getForecastRequest(routeData, startTimestamp, type, zone, 
+            pace, interval, userControlPoints, segmentRange)
+        if (!forecastRequest) {
             return { result: "error", error: "No route could be loaded" }
         }
         return forecastByParts(forecastRequest, zone, provider, routeName, routeNumber)
     }
-
+    
     let tooltipContent = submitDisabled ?
         t('tooltips.forecast.disabled') :
         t('tooltips.forecast.enabled')
@@ -73,9 +75,14 @@ const ForecastButton = ({fetchingForecast,submitDisabled, routeNumber, startTime
                 items: [{ item_id: '', item_name: '' }]
             }
             ReactGA.event('add_payment_info', reactEventParams);
+    
             try {
                 const forecastAndAqiResults = doForecastByParts()
                 const forecastResults = await forecastAndAqiResults[0]
+                if (forecastResults.length===0) {
+                    dispatch(forecastFetchFailed('No forecast was returned'))
+                    return
+                }
                 const aqiResults = await forecastAndAqiResults[1]
                 forecastResults.sort((l,r) => l.forecast.distance-r.forecast.distance)
                 const firstForecast = {...forecastResults.shift().forecast}
@@ -140,7 +147,7 @@ ForecastButton.propTypes = {
         PropTypes.string
     ]),
     strava_activity: PropTypes.oneOfType([
-        PropTypes.number,
+        PropTypes.string,
         PropTypes.oneOf([''])
     ]),
     strava_route: PropTypes.oneOfType([
