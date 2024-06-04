@@ -9,6 +9,12 @@ axiosRetry(axiosInstance, {
     retries: 12,
     retryDelay: (...arg) => axiosRetry.exponentialDelay(...arg, 400),
     retryCondition: (error) => {
+        // in the weird case that we don't get a response field in the error then report to Sentry and fail the request
+        if (!error.response) {
+            Sentry.captureMessage(`Error object reported to NWS was missing the response`)
+            Sentry.captureMessage(`Defective error object from NWS:${JSON.stringify(error)}`)
+            return false
+        }
         switch (error.response.status) {
         case 500:
             return true;
