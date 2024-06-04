@@ -4,6 +4,7 @@ import { DateTime } from 'luxon';
 import {finishTimeFormat} from '../redux/reducer';
 import { inputPaceToSpeed, setMinMaxCoords } from './util';
 import {getPowerOrVelocity} from "./windUtils"
+import * as Sentry from "@sentry/browser"
 
 const kmToMiles = 0.62137;
 /**
@@ -212,7 +213,7 @@ class AnalyzeRoute {
                 idlingTime += checkAndUpdateControls(accumulatedDistanceKm, startTime, (accumulatedTime + idlingTime),
                 controls, calculatedValues, point);
                 // see if it's time for forecast
-                if (((accumulatedTime + idlingTime) - lastTime) >= intervalInHours) {
+                if (!shouldSkip && ((accumulatedTime + idlingTime) - lastTime) >= intervalInHours) {
                     forecastRequests.push(AnalyzeRoute.addToForecast(point, startTime, (accumulatedTime + idlingTime),
                         accumulatedDistanceKm * kmToMiles));
                     lastTime = accumulatedTime + idlingTime;
@@ -222,6 +223,8 @@ class AnalyzeRoute {
                     }
                     forecastPoint = point;
                 }
+            } else {
+                Sentry.captureMessage(`Invalid accumulated or idling times ${accumulatedTime} ${idlingTime}`)
             }
             previousPoint = point;
         });
