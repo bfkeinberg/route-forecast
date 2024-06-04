@@ -40,8 +40,7 @@ const displayBacklink = (provider) => {
     }
 }
 
-const getAdjustedTime = (point, index, adjustedTimes) => {
-    const { i18n } = useTranslation()
+const getAdjustedTime = (point, index, adjustedTimes, i18n) => {
     if (adjustedTimes && adjustedTimes.adjustedTimes && adjustedTimes.adjustedTimes.length > 0 &&
         adjustedTimes.adjustedTimes.findIndex(element => element.index === index) !== -1) {
         return adjustedTimes.adjustedTimes.find(element => element.index === index).time.setLocale(i18n.language).toFormat('h:mm a')
@@ -174,7 +173,7 @@ const ForecastTable = (adjustedTimes) => {
                         end={index!==forecast.length-1?forecast[index+1].distance*milesToMeters:null}
                         className={selectedRow===parseInt(point.distance*milesToMeters)?'highlighted':null}
                         onClick={toggleRange} onMouseEnter={updateWeatherRange}>
-                        <td><span style={styleForControl(point)} className='timeCell'><Time time={index === forecast.length-1 ? null : getAdjustedTime(point,index,adjustedTimes)}/></span></td>
+                        <td><span style={styleForControl(point)} className='timeCell'><Time time={index === forecast.length-1 ? null : getAdjustedTime(point,index,adjustedTimes, i18n)}/></span></td>
                         <td style={styleForControl(point)}>{metric ? ((point.distance*milesToMeters)/1000).toFixed(0) : point.distance}</td>
                         <td>{point.summary}</td>
                         <td>{showApparentTemp?

@@ -118,7 +118,7 @@ export const doForecast = async (state, abortSignal) => {
     }
     const { zoneId: timeZoneId } = value
 
-    const parsedRouteInfo = getRouteInfo(state, type, timeZoneId)
+    const parsedRouteInfo = getRouteInfo(state, type, timeZoneId, state.uiInfo.routeParams.segment)
     if (parsedRouteInfo === undefined) {
         return { result: "error", error: "No route could be loaded" }
     }
