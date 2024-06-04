@@ -190,6 +190,9 @@ class AnalyzeRoute {
             const shouldSkip = point.dist < segment[0] 
             if (first && !shouldSkip) {
                 forecastRequests.push(AnalyzeRoute.addToForecast(point, startTime, accumulatedTime, accumulatedDistanceKm * kmToMiles));
+                if (forecastPoint) {
+                    bearings.push(AnalyzeRoute.getRelativeBearing(forecastPoint,point));
+                }
                 forecastPoint = point;
                 first = false;
             }
@@ -214,7 +217,9 @@ class AnalyzeRoute {
                         accumulatedDistanceKm * kmToMiles));
                     lastTime = accumulatedTime + idlingTime;
                     previousAccumulatedTime = accumulatedTime;
-                    bearings.push(AnalyzeRoute.getRelativeBearing(forecastPoint,point));
+                    if (forecastPoint) {
+                        bearings.push(AnalyzeRoute.getRelativeBearing(forecastPoint,point));
+                    }
                     forecastPoint = point;
                 }
             }
