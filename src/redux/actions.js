@@ -313,11 +313,15 @@ export const loadStravaRoute = (routeId) => {
                 authenticate(routeId)
             }
             api.setDefaultHeader('Authorization', `Bearer ${access_token}`)
-            const routeInfo = await api.get(`/routes/${routeId}/export_gpx`)
-            if (routeInfo && routeInfo.charAt(0)!=="{") {
-                await dispatch(loadGpxRoute(routeInfo))
-            } else {
-                dispatch(errorDetailsSet(`Error fetching Strava route: ${JSON.parse(routeInfo).message}`))
+            try {
+                const routeInfo = await api.get(`/routes/${routeId}/export_gpx`)
+                if (routeInfo && routeInfo.charAt(0)!=="{") {
+                    await dispatch(loadGpxRoute(routeInfo))
+                } else {
+                    dispatch(errorDetailsSet(`Error fetching Strava route: ${JSON.parse(routeInfo).message}`))
+                }    
+            } catch (err) {
+                dispatch(errorDetailsSet(`Error fetching Strava route: ${err.details}`))
             }
         })
     }
