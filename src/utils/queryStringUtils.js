@@ -58,6 +58,9 @@ export const generateUrl = (startTimestamp, routeNumber, pace, interval, metric,
     strava_route, provider, origin, setPageUrl, dispatch, zone, rusaRouteId) => {
     const start = DateTime.fromMillis(startTimestamp, {zone:zone})
     const shortDate = dateToShortDate(start);
+    if (strava_route !== '') {
+        routeNumber = ''
+    }
     let url = buildUrl(routeNumber, pace, interval, metric, controls, strava_activity, strava_route,
          provider, shortDate, start, origin, setPageUrl, zone, rusaRouteId)
     if (url.url.length >= maxUrlLength) {
