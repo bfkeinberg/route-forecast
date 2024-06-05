@@ -41,7 +41,6 @@ const LoadableMobile = lazy(() => {addBreadcrumb('loading mobile UI'); return im
 import { routeLoadingModes } from '../../data/enums';
 import {
     loadCookie,
-    loadFromRideWithGps,
     loadRouteFromURL,
     saveCookie,
     setInterval,
@@ -124,7 +123,7 @@ const setupRideWithGps = async (dispatch) => {
     }
 }
 
-const setupBrowserForwardBack = (dispatch, origin) => {
+const setupBrowserForwardBack = (dispatch, origin, forecastFunc, aqiFunc) => {
     if (typeof window !== 'undefined') {
         window.onpopstate = (event) => {
             Sentry.addBreadcrumb({
@@ -147,7 +146,7 @@ const setupBrowserForwardBack = (dispatch, origin) => {
                 dispatch(querySet({url:`${origin}/?${event.state}`,search:event.state}))
                 updateFromQueryParams(dispatch, queryParams);
                 if (queryParams.rwgpsRoute !== undefined || queryParams.strava_route) {
-                    dispatch(loadRouteFromURL())
+                    dispatch(loadRouteFromURL(forecastFunc, aqiFunc))
                 }
             }
         }
@@ -164,7 +163,7 @@ const getStravaToken = (queryParams, dispatch) => {
         return queryParams.strava_access_token;
     } else {
         const stravaToken = loadCookie('strava_access_token');
-        dispatch(stravaTokenSet(stravaToken, loadCookie('strava_token_expires_at')))
+        dispatch(stravaTokenSet({token:stravaToken, expires_at:loadCookie('strava_token_expires_at')}))
         dispatch(stravaRefreshTokenSet(loadCookie('strava_refresh_token')))
         return stravaToken;
     }
@@ -226,6 +225,8 @@ const updateFromQueryParams = (dispatch, queryParams) => {
 
 const RouteWeatherUI = ({search, href, action, maps_api_key, timezone_api_key, bitly_token, origin}) => {
     const dispatch = useDispatch()
+    const [forecast] = useForecastMutation()
+    const [getAqi] = useGetAqiMutation()
 
     let queryParams = queryString.parse(search);
     dispatch(querySet({url:href,search:search}))
@@ -234,7 +235,7 @@ const RouteWeatherUI = ({search, href, action, maps_api_key, timezone_api_key, b
     dispatch(actionUrlAdded(action))
     dispatch(apiKeysSet({maps_api_key:maps_api_key,timezone_api_key:timezone_api_key, bitly_token:bitly_token}))
     setupRideWithGps(dispatch);
-    setupBrowserForwardBack(dispatch, origin)
+    setupBrowserForwardBack(dispatch, origin, forecast, getAqi)
     dispatch(updateUserControls(queryParams.controlPoints?[]:parseControls(queryParams.controlPoints,true)))
     const zoomToRange = loadCookie('zoomToRange');
     if (zoomToRange !== undefined) {
