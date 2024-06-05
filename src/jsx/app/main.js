@@ -215,9 +215,6 @@ const updateFromQueryParams = (dispatch, queryParams) => {
     if (queryParams.rusa_route_id) {
         dispatch(rusaPermRouteIdSet(queryParams.rusa_route_id))
     }
-    // we no longer need this so let's clean it up
-    // TODO: after a month let's try and remember to delete this line also - 04/19/2024
-    cookie.remove("showWeatherProvider")
     if (queryParams.rwgpsToken !== undefined) {
         dispatch(rwgpsTokenSet(queryParams.rwgpsToken))
         // if we have just received an auth token then we previously clicked show pinned routes
