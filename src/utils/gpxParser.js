@@ -137,7 +137,7 @@ class AnalyzeRoute {
         let nextControl = 0;
 
         const checkAndUpdateControls = function(distanceInKm, startTime, elapsedTimeInHours, controls,
-                                                calculatedValues, point) {
+                                                calculatedValues, point, shouldSkip) {
             if (controls.length <= nextControl) {
                 return 0;
             }
@@ -154,10 +154,12 @@ class AnalyzeRoute {
                 distance:controls[nextControl].distance
             });
             // add the control to the forecast request
-            if (distanceInMiles > 0) {
+            if (distanceInMiles > 0 && !shouldSkip) {
                 forecastRequests.push(AnalyzeRoute.addToForecast(point, startTime, (accumulatedTime + idlingTime),
                     accumulatedDistanceKm * kmToMiles, true));
-                bearings.push(AnalyzeRoute.getRelativeBearing(forecastPoint, point));
+                    if (forecastPoint) {
+                        bearings.push(AnalyzeRoute.getRelativeBearing(forecastPoint, point));
+                    }
             }
             //           
             nextControl++;
@@ -184,11 +186,11 @@ class AnalyzeRoute {
             return (point.lat!==undefined && point.lon!==undefined)
         }
         const filterToSegment = (point) => {
-            return (point.lat!==undefined && point.lon!==undefined && point.dist<=segment[1])
+            return (point.lat!==undefined && point.lon!==undefined && (point.dist===undefined || point.dist<=segment[1]))
         }
         const substream = (segment[1]>segment[0]) ? stream.filter(filterToSegment) : stream.filter(filterFunc)
         substream.forEach(point => {
-            const shouldSkip = point.dist < segment[0] 
+            const shouldSkip = point.dist !== undefined && point.dist < segment[0]
             if (first && !shouldSkip) {
                 forecastRequests.push(AnalyzeRoute.addToForecast(point, startTime, accumulatedTime, accumulatedDistanceKm * kmToMiles));
                 if (forecastPoint) {
@@ -211,7 +213,7 @@ class AnalyzeRoute {
             // can't repro issue with NaN passed into this method so just check for it preventively
             if (!isNaN(accumulatedTime) && !isNaN(idlingTime)) {
                 idlingTime += checkAndUpdateControls(accumulatedDistanceKm, startTime, (accumulatedTime + idlingTime),
-                controls, calculatedValues, point);
+                    controls, calculatedValues, point, shouldSkip);
                 // see if it's time for forecast
                 if (!shouldSkip && ((accumulatedTime + idlingTime) - lastTime) >= intervalInHours) {
                     forecastRequests.push(AnalyzeRoute.addToForecast(point, startTime, (accumulatedTime + idlingTime),

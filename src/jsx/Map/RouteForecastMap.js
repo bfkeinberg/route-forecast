@@ -25,15 +25,18 @@ const findMarkerInfo = (forecast, subrange) => {
     return forecast.filter((point) => Math.round(point.distance * milesToMeters) >= subrange[0] && Math.round(point.distance * milesToMeters) <= subrange[1]);
 }
 
+const matchesSegment = (point, range) => {
+    return ((point.dist===undefined) ||
+    (point.dist >= range[0] && point.dist <= range[1]))
+}
+
 const getMapBounds = (points, zoomToRange, subrange, userSubrange) => {
     let userBounds = new google.maps.LatLngBounds();
-    points.filter(point => (point.dist !== undefined) && (point.dist >= userSubrange[0] &&
-        (isNaN(userSubrange[1]) || point.dist <= userSubrange[1])))
+    points.filter(point => matchesSegment(point,userSubrange))
         .forEach(point => userBounds.extend(point));
     if (zoomToRange && subrange.length === 2 && !isNaN(subrange[1])) {
         let segmentBounds = new google.maps.LatLngBounds();
-        points.filter(point => (point.dist !== undefined) && (point.dist >= subrange[0] &&
-            (isNaN(subrange[1]) || point.dist <= subrange[1])))
+        points.filter(point => matchesSegment(point, subrange))
             .forEach(point => segmentBounds.extend(point));
         if (segmentBounds.isEmpty()) {
             return userBounds;

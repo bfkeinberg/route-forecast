@@ -12,6 +12,7 @@ const Segment = () => {
     const maxDistanceInKm = useSelector(state => state.routeInfo.distanceInKm)
     const segment = useSelector(state => state.uiInfo.routeParams.segment)
     const metric = useSelector(state => state.controls.metric)
+    const canDoUserSegment = useSelector(state => state.routeInfo.canDoUserSegment)
 
     // convert distance from miles to meters if we are not using metric
     // else convert from km to meters
@@ -56,10 +57,10 @@ const Segment = () => {
         <>
         <div style={{display:"flex", justifyContent:"space-between"}}>
             <Typography gutterBottom>Use custom segment length</Typography>
-            <Button onClick={resetSegment}>Reset</Button>
+            <Button disabled={!canDoUserSegment} onClick={resetSegment}>Reset</Button>
         </div>
         <Slider marks value={getSliderValue(segment)} valueLabelFormat={sliderLabelRenderer} valueLabelDisplay='auto'
-            min={0} max={maxDistance} onChange={segmentUpdate} />
+            min={0} max={maxDistance} onChange={segmentUpdate} disabled={!canDoUserSegment}/>
         </>)
 }
 

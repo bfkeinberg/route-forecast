@@ -201,7 +201,8 @@ const routeInfoInitialState = {
     rwgpsRouteData: null,
     gpxRouteData: null,
     loadingFromURL: false,
-    distanceInKm: 0
+    distanceInKm: 0,
+    canDoUserSegment:false
 }
 const routeInfoSlice = createSlice({
     name:'routeInfo',
@@ -213,8 +214,10 @@ const routeInfoSlice = createSlice({
             state.name = getRouteName(action.payload, "rwgps")
             if (action.payload.route) {
                 state.distanceInKm = action.payload.route.distance/1000
+                state.canDoUserSegment = action.payload.route.track_points[0].d !== undefined
             } else {
                 state.distanceInKm = action.payload.trip.distance/1000
+                state.canDoUserSegment = action.payload.route.track_points[0].d !== undefined
             }
             state.type = "rwgps"
         },
