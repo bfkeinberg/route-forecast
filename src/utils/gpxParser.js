@@ -113,12 +113,12 @@ class AnalyzeRoute {
         this.parseCoursePoints(routeData, type).filter(point => this.isControl(point)).map(point => this.controlFromCoursePoint(point))
 
     parseRouteStream = (routeData, type) =>
-    (type === "rwgps" ?
-        routeData[routeData.type]['track_points']
-            .filter(point => point.x !== undefined && point.y !== undefined)
-            .map(point => ({ lat: point.y, lon: point.x, elevation: point.e, dist: point.d })) :
-        routeData.tracks.reduce((accum, current) => accum.concat(current.points, []), []))
-
+        (type === "rwgps" ?
+            routeData[routeData.type]['track_points']
+                .filter(point => point.x !== undefined && point.y !== undefined)
+                .map(point => ({ lat: point.y, lon: point.x, elevation: point.e, dist: point.d })) :
+            routeData.tracks.reduce((accum, current) => accum.concat(current.points, []), [])).
+            map(point => ({ lat: point.lat, lon: point.lon, elevation: point.ele }))
 
     computePointsAndBounds = (routeData, type) => {
         const stream = this.parseRouteStream(routeData, type)
