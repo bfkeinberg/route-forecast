@@ -163,6 +163,8 @@ const routeParamsSlice = createSlice({
             })
             .addCase('routeInfo/routeDataCleared', (state) => {
                 state.segment = routeParamsInitialState.segment
+            }).addCase("strava/stravaRouteSet", (state) => {
+                state.rwgpsRoute = routeParamsInitialState.rwgpsRoute
             })
     }
 })
@@ -241,12 +243,18 @@ const routeInfoSlice = createSlice({
     },
     extraReducers: (builder) => {
         builder.addCase(rwgpsRouteSet, (state) => {
-            state.rwgpsRouteData = null
-            state.gpxRouteData = null
-            state.name = ''
-            state.distanceInKm = 0
-    })
-    .addCase(reset, () => routeInfoInitialState)
+            state.rwgpsRouteData = routeInfoInitialState.rwgpsRouteData
+            state.gpxRouteData = routeInfoInitialState.gpxRouteData
+            state.name = routeInfoInitialState.name
+            state.distanceInKm = routeInfoInitialState.distanceInKm
+        })
+            .addCase("strava/stravaRouteSet", (state) => {
+                state.rwgpsRouteData = routeInfoInitialState.rwgpsRouteData
+                state.gpxRouteData = routeInfoInitialState.gpxRouteData
+                state.name = routeInfoInitialState.name
+                state.distanceInKm = routeInfoInitialState.distanceInKm
+            })
+            .addCase(reset, () => routeInfoInitialState)
     }
 })
 
@@ -496,6 +504,7 @@ const stravaSlice = createSlice({
         builder
             .addCase(rwgpsRouteSet, (state) => {
                 state.activity = stravaInitialState.activity
+                state.route = stravaInitialState.route
                 state.activityData = stravaInitialState.activityData
                 state.activityStream = stravaInitialState.activityStream
                 state.subrange = stravaInitialState.subrange
