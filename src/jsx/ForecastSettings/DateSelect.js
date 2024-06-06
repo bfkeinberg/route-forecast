@@ -49,6 +49,7 @@ const DateSelect = ({ start, zone, setStart, initialStartTimeSet, maxDaysInFutur
                 <DesktopTooltip content={t('tooltips.startingTime')} placement={'bottom'}>
                     <DateInput3
                         onChange={setDateFromPicker}
+                        closeOnSelection={false}
                         onTimezoneChange={setDateWithZone}
                         {...otherAttributes}
                         placeholder="M/D/YYYY"
