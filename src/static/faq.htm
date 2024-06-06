@@ -1,0 +1,54 @@
+<UL>
+    <li><strong>What's it about</strong></li>
+    <ul>
+        The purpose of randoplan is to help you prepare for a bike ride (or a hike I guess) with a known route.
+    </ul>
+    <li><strong>How do I get routes in</strong></li>
+    <ul>
+        There are lots of ways. You can type in the route id of a route from Ride With GPS or paste the url from
+        their web site. You can do the same with routes from Strava if you pick the Strava input from the selector
+        up top. You can click pin on the route on the Ride With GPS page and then click the Use Pinned Routes button,
+        after you log in once to their site, you'll then get a menu of all of your pinned routes, which you can pick from.
+        If you're a randonneur and riding a permanent route you can move the slider over to RUSA and enter the id of the
+        permanent route.
+        And if you install the browser extension, on Chrome, Firefox, or Safari, you can click on the extension icon
+        from your browser toolbar when you are viewing the web page for a route, and it will bring up a web page
+        with Randoplan having loaded the route, ready for you to make a forecast.
+        This also works on the iPhone with Safari browser, but it is easier on the iPhone to install the extension
+        from the App Store, and then click share in the Ride with GPS or Strava apps when viewing a route in them,
+        and one of the share options will be randoplan.
+    </ul>
+    <li><strong>What's the forecast interval for?</strong></li>
+    <ul>
+        That's how often it will look for a weather forecast. It defaults to one hour because most of the weather 
+        forecast services only offer one hour forecasts, but a few of them have the options for more frequent forecasts,
+        and some people would like to see the more granular data where available. Note that some of the sources
+        (e.g. Tomorrow.io) aggressively limit how often I can get a forecast from their site, so don't be surprised to get
+        an error message back when choosing that and using them.
+    </ul>
+    <li><strong>Speaking of that, why the choice of weather forecast providers</strong></li>
+    <ul>
+        At this time there's no clear answer as to which of any of those sources of weather information that I have
+        available is the most accurate, or is more accurate in one region than another. For that reason I have supported
+        those which I have access to and which have the capabilities to be used by randoplan.
+    </ul>
+    <li><strong>Why don't you support [xyzq] weather forecast provider</strong></li>
+    <ul>
+        In order to be used by randoplan, a forecast source has to meet serveral requirements. There has to be an web API which
+        randoplan can call, and which allows requesting forecasts for a specified time and latitude/longitude coordinates.
+        Many do not or only offer forecasts, for say, the entire current day. Also, they can't charge $$$ for their 
+        service. Many of these providers are only available when paying hefty monthly bills in advance.
+    </ul>
+    <li><strong>What do the different colors for wind speed mean</strong></li>
+    <ul>
+        So, when the wind is from behind, I color that blue. When it's a headwind, if it's less than 10mph, it's colored
+        orange, and more than that is red. Similarly for the time lost to wind, only in that case if the maximum wind 
+        gust is more than 25mph, it becomes red.
+    </ul>
+    <li><strong>Why does the map highlight when mousing over the table but only sometimes</strong></li>
+    <ul>
+        Some routes are missing the data needed to do that highlighting.
+    </ul>
+    <li><strong>What is a custom segment</strong></li>
+    <ul>This lets you get the forecast for a section of the route, making it easier to see</ul>
+</UL>
