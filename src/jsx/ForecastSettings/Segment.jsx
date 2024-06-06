@@ -6,9 +6,12 @@ import React from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { segmentSet } from '../../redux/reducer';
 import { milesToMeters } from '../../utils/util';
+import {useTranslation} from 'react-i18next'
+import { DesktopTooltip } from '../shared/DesktopTooltip';
 
 const Segment = () => {
     const dispatch = useDispatch()
+    const { t } = useTranslation()
     const maxDistanceInKm = useSelector(state => state.routeInfo.distanceInKm)
     const segment = useSelector(state => state.uiInfo.routeParams.segment)
     const metric = useSelector(state => state.controls.metric)
@@ -55,12 +58,14 @@ const Segment = () => {
 
     return (
         <>
-        <div style={{display:"flex", justifyContent:"space-between"}}>
-            <Typography gutterBottom>Use custom segment length</Typography>
-            <Button disabled={!canDoUserSegment} onClick={resetSegment}>Reset</Button>
-        </div>
-        <Slider marks value={getSliderValue(segment)} valueLabelFormat={sliderLabelRenderer} valueLabelDisplay='auto'
-            min={0} max={maxDistance} onChange={segmentUpdate} disabled={!canDoUserSegment}/>
+            <div style={{ display: "flex", justifyContent: "space-between" }}>
+                <Typography gutterBottom>{t('labels.customSegment')}</Typography>
+                <Button disabled={!canDoUserSegment} onClick={resetSegment}>Reset</Button>
+            </div>
+            <DesktopTooltip content={t()}>
+                <Slider marks value={getSliderValue(segment)} valueLabelFormat={sliderLabelRenderer} valueLabelDisplay='auto'
+                    min={0} max={maxDistance} onChange={segmentUpdate} disabled={!canDoUserSegment} />
+            </DesktopTooltip>
         </>)
 }
 

@@ -23,7 +23,8 @@
                 "kilometers":"Units in metric",
                 "projectedFinish":"Projected finish time",
                 "interval":"Forecast Interval in minutes",
-                "source":"Weather forecast source"
+                "source":"Weather forecast source",
+                "customSegment":"Use custom segment length"
             },
             "titles": {
                 "routeInfo": "Route info",
@@ -51,7 +52,8 @@
                 "aqiHeader":"Air quality shows current conditions, not forecasted. Click to toggle for the next forecast requested",
                 "overallPace":"Pace is average speed adjusted for climb",
                 "analysisInterval":"Interval in hours at which to calculate effective pace",
-                "zoom":"Whether to zoom into route segments when hovering over their line in the table"
+                "zoom":"Whether to zoom into route segments when hovering over their line in the table",
+                "customSegment":"Forecast only this portion of the route"
             },
             "data": {
                 "noForecastPlaceholder":"Find forecast to create",
@@ -124,7 +126,8 @@
                 "kilometers":"Unités en système métrique",
                 "projectedFinish":"Heure de Fin Prévue",
                 "interval":"Intervalle de Prévision en minutes",
-                "source":"Source de prévisions météorologiques"
+                "source":"Source de prévisions météorologiques",
+                "customSegment":"Utiliser une longueur de segment personnalisée"
             },
             "titles": {
                 "routeInfo": "Informations sur les parcours",
@@ -152,7 +155,8 @@
                 "aqiHeader":"La qualité de l'air indique les conditions actuelles et non prévues. Cliquez pour basculer vers la prochaine prévision demandée",
                 "overallPace":"Le rythme est la vitesse moyenne ajustée pour la montée",
                 "analysisInterval":"Intervalle en heures pour calculer le rythme effectif",
-                "zoom":"S'il faut zoomer sur les segments d'itinéraire en survolant leur ligne dans le tableau"
+                "zoom":"S'il faut zoomer sur les segments d'itinéraire en survolant leur ligne dans le tableau",
+                "customSegment":"Prévoir uniquement cette partie de le parcours"
             },
             "data":{
                 "noForecastPlaceholder":"Cliquez sur « Prévisions »",
