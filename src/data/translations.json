@@ -53,7 +53,8 @@
                 "overallPace":"Pace is average speed adjusted for climb",
                 "analysisInterval":"Interval in hours at which to calculate effective pace",
                 "zoom":"Whether to zoom into route segments when hovering over their line in the table",
-                "customSegment":"Forecast only this portion of the route"
+                "customSegment":"Forecast only this portion of the route",
+                "bearingHeader":"Click to toggle between absolute and relative wind bearing"
             },
             "data": {
                 "noForecastPlaceholder":"Find forecast to create",
@@ -156,7 +157,8 @@
                 "overallPace":"Le rythme est la vitesse moyenne ajustée pour la montée",
                 "analysisInterval":"Intervalle en heures pour calculer le rythme effectif",
                 "zoom":"S'il faut zoomer sur les segments d'itinéraire en survolant leur ligne dans le tableau",
-                "customSegment":"Prévoir uniquement cette partie de le parcours"
+                "customSegment":"Prévoir uniquement cette partie de le parcours",
+                "bearingHeader":"Cliquez pour basculer entre le relèvement du vent absolu et relatif"
             },
             "data":{
                 "noForecastPlaceholder":"Cliquez sur « Prévisions »",
