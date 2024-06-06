@@ -21,6 +21,7 @@ import { ToggleButton } from '../shared/ToggleButton';
 import { WeatherCorrections } from './WeatherCorrections';
 import {useTranslation} from 'react-i18next'
 import { DesktopTooltip } from '../shared/DesktopTooltip';
+import ShortUrl from '../TopBar/ShortUrl'
 
 const displayBacklink = (provider) => {
     switch (provider) {
@@ -94,7 +95,7 @@ const ForecastTable = (adjustedTimes) => {
     const { t } = useTranslation()
     
     const distHeaderText = metric ? 'KM' : 'Mile';
-    const distHeader = <DesktopTooltip content={t('tooltips.distHeader')} placement={'top'}>{distHeaderText}</DesktopTooltip>
+    const distHeader = <Tooltip content={t('tooltips.distHeader')} placement={'top'}>{distHeaderText}</Tooltip>
 
     const toggleGustDisplay = () => setShowGusts(!showGusts)
     const windHeaderText = <Button small onClick={toggleGustDisplay} >{showGusts ? t('data.wind.gust') : t('data.wind.speed')}</Button>;
@@ -212,10 +213,20 @@ const ForecastTable = (adjustedTimes) => {
                         <div style={{ flex: 1 }}>
                             {displayBacklink(provider)}
                         </div>
+                        <MediaQuery maxDeviceWidth={500}>
+                            <div style={{ display: 'flex', flexDirection: 'column', alignItems:'center', justifyContent:'center' }}>
+                                <div style={{ flex: 1 }}>
+                                    <WeatherCorrections />
+                                </div>
+                                <div style={{ marginTop: "5px", textAlign: "left" }}>
+                                    <ShortUrl />
+                                </div>
+                            </div>
+                        </MediaQuery>
+                        <MediaQuery minDeviceWidth={501}>
                         <div style={{ flex: 1 }}>
                             <WeatherCorrections />
                         </div>
-                        <MediaQuery minWidth={501}>
                             <div style={{ flexShrink: 0, width: "fit-content" }}>
                                 <DesktopTooltip content={t('tooltips.zoom')}>
                                     <ToggleButton style={{ width: "5em", height: "4em", float: "right" }} active={zoomToRange} onClick={toggleZoom}>{t('buttons.zoomToSegment')}</ToggleButton>
@@ -246,7 +257,9 @@ const ForecastTable = (adjustedTimes) => {
                                 </MediaQuery>
                                 <th id={'wind'}>{windHeader}</th>
                                 <MediaQuery minWidth={501}>
-                                    <th><span className={'headerCell'}><Button small onClick={toggleRelBearing} >{showRelativeBearing ? t('tableHeaders.relBearing') : t('tableHeaders.windBearing')}</Button></span></th>
+                                    <th><span className={'headerCell'}>
+                                        <Tooltip content={t('tooltips.bearingHeader')}>
+                                            <Button small onClick={toggleRelBearing} >{showRelativeBearing ? t('tableHeaders.relBearing') : t('tableHeaders.windBearing')}</Button></Tooltip></span></th>
                                 </MediaQuery>
                             </tr>
                         </thead>

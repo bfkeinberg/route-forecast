@@ -4,11 +4,9 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import ReactGA from "react-ga4";
 import {connect, useDispatch} from 'react-redux';
-import MediaQuery from 'react-responsive';
 
 import { routeLoadingModeProps,routeLoadingModes } from '../../data/enums';
 import { errorDetailsSet, routeLoadingModeSet } from '../../redux/reducer';
-import ShortUrl from '../TopBar/ShortUrl';
 import { RouteInfoInputRUSA } from './RouteInfoInputRUSA';
 import { RouteInfoInputRWGPS } from './RouteInfoInputRWGPS';
 import { RouteInfoInputStrava } from './RouteInfoInputStrava'
@@ -45,11 +43,6 @@ const RouteInfoForm = ({ errorDetails, errorDetailsSet, routeLoadingMode, routeL
             <div className='spacer' />
             {getInputForMode(mode)}
             {errorDetails !== null && <Toast2 style={{ padding: '10px', marginTop: "10px" }} message={errorDetails} timeout={0} onDismiss={() => dispatch(errorDetailsSet(null))} intent="danger"></Toast2>}
-            <MediaQuery maxDeviceWidth={500}>
-                <div style={{ marginTop: "10px", textAlign: "center" }}>
-                    <ShortUrl />
-                </div>
-            </MediaQuery>
             <Section style={{marginTop:"1em"}} elevation={ELEVATION_1} title={t('titles.loading')}>
                 <SectionCard padded>
                     <strong>Randoplan</strong> {t('data.loading')}
