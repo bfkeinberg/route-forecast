@@ -7,8 +7,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { segmentSet } from '../../redux/reducer';
 import { milesToMeters } from '../../utils/util';
 import {useTranslation} from 'react-i18next'
-import { DesktopTooltip } from '../shared/DesktopTooltip';
-
+import Tooltip from '@mui/material/Tooltip'
 const Segment = () => {
     const dispatch = useDispatch()
     const { t } = useTranslation()
@@ -62,10 +61,10 @@ const Segment = () => {
                 <Typography gutterBottom>{t('labels.customSegment')}</Typography>
                 <Button disabled={!canDoUserSegment} onClick={resetSegment}>Reset</Button>
             </div>
-            <DesktopTooltip content={t()}>
+            <Tooltip title={t('tooltips.customSegment')}>
                 <Slider marks value={getSliderValue(segment)} valueLabelFormat={sliderLabelRenderer} valueLabelDisplay='auto'
                     min={0} max={maxDistance} onChange={segmentUpdate} disabled={!canDoUserSegment} />
-            </DesktopTooltip>
+            </Tooltip>
         </>)
 }
 
