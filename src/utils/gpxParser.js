@@ -117,8 +117,8 @@ class AnalyzeRoute {
             routeData[routeData.type]['track_points']
                 .filter(point => point.x !== undefined && point.y !== undefined)
                 .map(point => ({ lat: point.y, lon: point.x, elevation: point.e, dist: point.d })) :
-            routeData.tracks.reduce((accum, current) => accum.concat(current.points, []), [])).
-            map(point => ({ lat: point.lat, lon: point.lon, elevation: point.ele }))
+            (routeData.tracks.reduce((accum, current) => accum.concat(current.points, []), [])).
+            map(point => ({ lat: point.lat, lon: point.lon, elevation: point.ele })))
 
     computePointsAndBounds = (routeData, type) => {
         const stream = this.parseRouteStream(routeData, type)
