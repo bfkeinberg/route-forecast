@@ -14,9 +14,8 @@ import {useTranslation} from 'react-i18next'
 import FaqButton from "./FaqButton";
 
 export const TopBar = ({sidePaneOptions, activeSidePane, setActiveSidePane, sidebarWidth, panesVisible}) => {
-  const roomFortitle = useMediaQuery({ query: '(min-width: 1380px)' });
+  const roomFortitle = useMediaQuery({ query: '(min-width: 1610px)' });
   const roomForFinishTime = useMediaQuery({ query: '(min-width: 1000px)' });
-  const roomForLogo = useMediaQuery({ query: '(min-width: 1300px)' });
   const { finishTime: predictedFinishTime } = useForecastDependentValues();
   const predictedFinishTimeExists = predictedFinishTime !== null;
   const finishTimeFontSize = useMediaQuery({ query: '(min-width: 1725px)' }) ? "20px" : "15px"
