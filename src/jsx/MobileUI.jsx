@@ -93,7 +93,7 @@ const MobileUITabs = (props) => {
                     <Route path="/forecastTable/" element={<ForecastTable adjustedTimes={adjustedTimes} />} />
                     <Route path="/paceTable/" element={<PaceTable />} />
                 </Routes>
-                <DonationRequest/>
+                <DonationRequest wacky={false}/>
             </>
         )
     } catch (err) {
