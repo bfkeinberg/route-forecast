@@ -6,12 +6,13 @@ import {connect} from 'react-redux';
 
 import {setInterval} from "../../redux/actions";
 import {useTranslation} from 'react-i18next'
+import { DesktopTooltip } from "../shared/DesktopTooltip";
 
 const ForecastInterval = ({min_interval,interval,setInterval}) => {
     const { t } = useTranslation()
     return (
         <FormGroup style={{flex: 1}} label={t('labels.interval')}>
-            <Tooltip placement='bottom' title={t('tooltips.interval')}>
+            <DesktopTooltip placement='bottom' title={t('tooltips.interval')}>
                 <Slider
                     value={interval}
                     step={0.25}
@@ -29,7 +30,7 @@ const ForecastInterval = ({min_interval,interval,setInterval}) => {
                     ]}
                     valueLabelDisplay="off"
                     onChange={(event, selected) => setInterval(selected)} />
-            </Tooltip>
+            </DesktopTooltip>
         </FormGroup>
     );
 };

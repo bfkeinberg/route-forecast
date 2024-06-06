@@ -8,6 +8,7 @@ import { bankedDisplayToggled } from '../../redux/reducer';
 import ErrorBoundary from '../shared/ErrorBoundary';
 import { ToggleButton } from '../shared/ToggleButton';
 import { ControlTable } from './ControlTable';
+import { DesktopTooltip } from "../shared/DesktopTooltip";
 
 export const ControlTableContainer = () => {
   const displayBanked = useSelector(state => state.controls.displayBanked)
@@ -20,9 +21,9 @@ export const ControlTableContainer = () => {
             <ErrorBoundary>
               <ControlTable />
               <AddRowButton/>
-              <Tooltip usePortal={true} placement='bottom' content='Show how many minutes remain to be within ACP/RUSA brevet finishing times'>
+              <DesktopTooltip usePortal={true} placement='bottom' content='Show how many minutes remain to be within ACP/RUSA brevet finishing times'>
                   <ToggleButton style={{marginTop: "10px"}} active={displayBanked} onClick={() => dispatch(bankedDisplayToggled())}>Display banked time</ToggleButton>
-              </Tooltip>
+              </DesktopTooltip>
             </ErrorBoundary>
         </Card>
       </ErrorBoundary>
