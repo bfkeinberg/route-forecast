@@ -11,6 +11,7 @@ import BugReportButton from "./BugReportButton";
 import DonationRequest from "./DonationRequest";
 import ShortUrl from "./ShortUrl";
 import {useTranslation} from 'react-i18next'
+import FaqButton from "./FaqButton";
 
 export const TopBar = ({sidePaneOptions, activeSidePane, setActiveSidePane, sidebarWidth, panesVisible}) => {
   const roomFortitle = useMediaQuery({ query: '(min-width: 1380px)' });
@@ -72,6 +73,7 @@ const Tabs = ({ sidePaneOptions, activeSidePane, setActiveSidePane, sidebarWidth
         <div style={{ flex: 1 }}>
           <NonexistentLogo />
         </div>
+        <FaqButton/>
         <div style={{
           "textAlign": "end",
           "opacity": "0.85",

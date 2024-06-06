@@ -1,9 +1,5 @@
-#controlListTitle, #paceSpan {
+#paceSpan {
     text-align: center;
-}
-
-#controlTable {
-    height: 170px;
 }
 
 @media (min-width: 800px) {
@@ -181,9 +177,8 @@ table.bp4-html-table.bp4-html-table-bordered.bp4-html-table-striped.bp4-interact
 }
 
 .bicycle_image {
-    background-image:url('https://svgsilh.com/svg/159680.svg');
+    background-image: url('https://svgsilh.com/svg/159680.svg');
     height: 60px;
     width: 60px;
     opacity: 20%;
-}
-    
+}    

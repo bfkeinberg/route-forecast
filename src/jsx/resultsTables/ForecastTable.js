@@ -94,16 +94,16 @@ const ForecastTable = (adjustedTimes) => {
     const { t } = useTranslation()
     
     const distHeaderText = metric ? 'KM' : 'Mile';
-    const distHeader = <Tooltip content={t('tooltips.distHeader')} placement={'top'}>{distHeaderText}</Tooltip>
+    const distHeader = <DesktopTooltip content={t('tooltips.distHeader')} placement={'top'}>{distHeaderText}</DesktopTooltip>
 
     const toggleGustDisplay = () => setShowGusts(!showGusts)
     const windHeaderText = <Button small onClick={toggleGustDisplay} >{showGusts ? t('data.wind.gust') : t('data.wind.speed')}</Button>;
-    const windHeader = <Tooltip content={t('tooltips.windHeader')} placement={'top'}>{windHeaderText}</Tooltip>
+    const windHeader = <DesktopTooltip content={t('tooltips.windHeader')} placement={'top'}>{windHeaderText}</DesktopTooltip>
 
     const toggleApparentDisplay = () => setShowApparentTemp(!showApparentTemp)
 
     const temperatureHeaderText = <Button small onClick={toggleApparentDisplay}>{showApparentTemp ? t('tableHeaders.temperature') : <Icon icon="temperature"/>}</Button>
-    const temperatureHeader = <Tooltip content={t('tooltips.temperatureHeader')} placement={'top'}>{temperatureHeaderText}</Tooltip>
+    const temperatureHeader = <DesktopTooltip content={t('tooltips.temperatureHeader')} placement={'top'}>{temperatureHeaderText}</DesktopTooltip>
 
     const toggleZoom = () => {
         dispatch(zoomToRangeToggled())
@@ -240,8 +240,8 @@ const ForecastTable = (adjustedTimes) => {
                                     <th><span className={'headerCell'}>{t('tableHeaders.humidity')}</span></th>
                                     <th><span className={'headerCell'}>{t('tableHeaders.cloudCover')}</span></th>
                                     <th className={'clickableHeaderCell'} id={'aqi'}>
-                                        <Tooltip content={t('tooltips.aqiHeader')} placement={'top'}>
-                                            <Button small active={fetchAqi} onClick={toggleAqi}><span className={fetchAqi ? 'largerClickableHeaderCell' : 'largerStruckClickableHeaderCell'}>AQI</span></Button></Tooltip>
+                                        <DesktopTooltip content={t('tooltips.aqiHeader')} placement={'top'}>
+                                            <Button small active={fetchAqi} onClick={toggleAqi}><span className={fetchAqi ? 'largerClickableHeaderCell' : 'largerStruckClickableHeaderCell'}>AQI</span></Button></DesktopTooltip>
                                     </th>
                                 </MediaQuery>
                                 <th id={'wind'}>{windHeader}</th>

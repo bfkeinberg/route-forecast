@@ -1,6 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import {Provider} from 'react-redux';
+import {OverlaysProvider} from "@blueprintjs/core"
 
 import configureReduxStore from '../../redux/configureStore';
 import LocationContext from '../locationContext';
@@ -12,10 +13,12 @@ const TopLevel = ({mode, action, maps_api_key, timezone_api_key, bitly_token, pr
     return (
         <ErrorBoundary>
             <Provider store={store}>
-                <LocationContext.Consumer>
-                    {value => <RouteWeatherUI search={value.search} href={value.href} action={action} maps_api_key={maps_api_key}
-                                              timezone_api_key={timezone_api_key} bitly_token={bitly_token} origin={value.origin}/>}
-                </LocationContext.Consumer>
+                <OverlaysProvider>
+                    <LocationContext.Consumer>
+                        {value => <RouteWeatherUI search={value.search} href={value.href} action={action} maps_api_key={maps_api_key}
+                            timezone_api_key={timezone_api_key} bitly_token={bitly_token} origin={value.origin} />}
+                    </LocationContext.Consumer>
+                </OverlaysProvider>
             </Provider>
         </ErrorBoundary>
     )

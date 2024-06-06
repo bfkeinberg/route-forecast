@@ -35,7 +35,7 @@ const weatherCodes = {
 };
 
 axiosRetry(axiosInstance, {
-    retries: 8,
+    retries: 4,
     retryDelay: axiosRetry.exponentialDelay,
     retryCondition: (error) => {
         switch (error.response.status) {

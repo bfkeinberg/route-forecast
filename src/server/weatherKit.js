@@ -34,6 +34,12 @@ axiosRetry(axiosInstance, {
     retries: 5,
     retryDelay: axiosRetry.exponentialDelay, // (...arg) => axiosRetry.exponentialDelay(...arg, 200),
     retryCondition: (error) => {
+        // in the weird case that we don't get a response field in the error then report to Sentry and fail the request
+        if (!error.response) {
+            Sentry.captureMessage(`Error object reported to Apple WeatherKit was missing the response`)
+            Sentry.captureMessage(`Defective error object from WeatherKit:${JSON.stringify(error)}`)
+            return false
+        }
         switch (error.response.status) {
         case 504:
         case 404:

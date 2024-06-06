@@ -30,7 +30,7 @@ const WeatherProviderSelector = ({weatherProvider,setWeatherProvider,forecastLen
     const { t } = useTranslation()
     return (
         <FormGroup label={<span><b>{t('labels.source')}</b></span>} labelFor={'provider'}>
-            <DesktopTooltip content={t('tooltips.provider')} placement={"bottom"}>
+            <DesktopTooltip content={t('tooltips.provider')} placement={"right"}>
                 <Select tabIndex="0"
                     id='provider'
                     items={Object.entries(providerValues).filter(entry => entry[1].maxCallsPerHour===undefined||entry[1].maxCallsPerHour>forecastLength).map(element => { return { key: element[0], ...element[1] } })}
