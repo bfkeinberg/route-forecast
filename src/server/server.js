@@ -519,12 +519,18 @@ app.get('/stravaAuthReply', async (req, res) => {
     }
     if (error === undefined) {
         process.env.STRAVA_CLIENT_SECRET = process.env.STRAVA_API_KEY;
-        const token = await getStravaToken(code)
-            .catch(error => {console.log('got bad auth reply');res.status(400).json({ 'status': `Bad Strava auth reply ${error}` })});
-        // process.env.STRAVA_ACCESS_TOKEN = token.body.access_token;
-        restoredState.strava_access_token = token.body.access_token;
-        restoredState.strava_refresh_token = token.body.refresh_token;
-        restoredState.strava_token_expires_at = token.body.expires_at;
+        try {
+            const token = await getStravaToken(code)
+                .catch(error => { console.log('got bad auth reply'); res.status(400).json({ 'status': `Bad Strava auth reply ${error}` }) });
+            // process.env.STRAVA_ACCESS_TOKEN = token.body.access_token;
+            restoredState.strava_access_token = token.body.access_token;
+            restoredState.strava_refresh_token = token.body.refresh_token;
+            restoredState.strava_token_expires_at = token.body.expires_at;
+        } catch (err) {
+            console.log(`got bad auth reply ${err.message}`); 
+            res.status(400).json({ 'status': `Bad Strava auth reply ${err.message}` })
+            error = err.message
+        }
     }
     else {
         restoredState.strava_activity = undefined;
