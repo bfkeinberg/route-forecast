@@ -36,7 +36,7 @@ const ForecastButton = ({fetchingForecast,submitDisabled, routeNumber, startTime
         let aqiResults = []
         let locations = requestCopy.shift();
         let which = 0
-        while (requestCopy.length > 0) {
+        while (requestCopy.length >= 0 && locations) {
             try {
                 const request = {locations:locations, timezone:zone, service:service, routeName:routeName, routeNumber:routeNumber, which}
                 const result = forecast(request).unwrap()
