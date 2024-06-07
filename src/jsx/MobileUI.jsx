@@ -50,6 +50,24 @@ const MobileUITabs = (props) => {
         useWhenChanged(routeData, () => navigate("/controlPoints", { replace: true }))
         useWhenChanged(forecastData, () => navigate("/forecastTable", { replace: true }), forecastData.length > 0)
         useWhenChanged(stravaActivityData, () => navigate("/paceTable", { replace: true }))
+
+        React.useEffect(() => {
+            if (props.orientationChanged) {
+                if (forecastData.length > 0) {
+                    navigate("/forecastTable", { replace: true })
+                }
+                else if (routeData) {
+                    navigate("/controlPoints", { replace: true })
+                }
+            }
+        }, [props.orientationChanged, forecastData, routeData])
+        
+        React.useEffect(() => {
+            if (props.orientationChanged) {
+                props.setOrientationChanged(() => false)
+            }
+        }, [props.orientationChanged])
+    
         const { adjustedTimes } = useForecastDependentValues()
 
         return (
@@ -97,7 +115,7 @@ const MobileUITabs = (props) => {
             </>
         )
     } catch (err) {
-        dispatch(errorDetailsSet(err))
+        dispatch(errorDetailsSet(err.message))
     }
 }
 

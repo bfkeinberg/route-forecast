@@ -66,12 +66,18 @@ const DesktopUI = ({mapsApiKey, orientationChanged, setOrientationChanged}) => {
     if (activeSidePane !== 0 && routeData === null && forecastData.length === 0) {
         setActiveSidePane(0)
     }
-    if (orientationChanged && forecastData && activeSidePane !== 2) {
-        setActiveSidePane(2)
+    if (orientationChanged) {
+        if (forecastData.length > 0 && activeSidePane !== 2) {
+            setActiveSidePane(2)
+        } else if (routeData && activeSidePane !== 1)  {
+            setActiveSidePane(1)
+        }
     }
 
     React.useEffect(() => {
-        setOrientationChanged(() => false)
+        if (orientationChanged) {
+            setOrientationChanged(() => false)
+        }
     }, [])
 
     const routeLoadingMode = useSelector(state => state.uiInfo.routeParams.routeLoadingMode)

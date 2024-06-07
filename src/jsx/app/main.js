@@ -291,17 +291,15 @@ const FunAppWrapperThingForHooksUsability = ({maps_api_key, queryParams}) => {
     const [forecast] = useForecastMutation()
     const [getAqi] = useGetAqiMutation()
     const [orientationChanged, setOrientationChanged] = React.useState(false)
+    const [mobileOrientationChanged, setMobileOrientationChanged] = React.useState(false)
     const screenOrientationType = (window.screen ? (window.screen.orientation ? window.screen.orientation.type : 'N/A') : 'N/A')
     const screenChangeListener = React.useCallback(
-        () => {
-            if (window.screen.orientation) {
-                window.screen.orientation.addEventListener ("change", (event) => {
-                    const type = event.target.type;
-                    const angle = event.target.angle;
-                    console.log(`ScreenOrientation change: ${type}, ${angle} degrees.`)
-                    setOrientationChanged(true)
-                })
-            }
+        (event) => {
+            // const type = event.target.type;
+            // const angle = event.target.angle;
+            // console.log(`ScreenOrientation change: ${type}, ${angle} degrees.`)
+            setOrientationChanged(true)
+            setMobileOrientationChanged(true)
         },
         [screenOrientationType]
     )
@@ -313,11 +311,11 @@ const FunAppWrapperThingForHooksUsability = ({maps_api_key, queryParams}) => {
     useLoadRouteFromURL(queryParams, forecast, getAqi)
     useLoadControlPointsFromURL(queryParams)
     const isLandscape = useMediaQuery({query:'(orientation:landscape)'})
-    const isLargeEnough = useMediaQuery({query:'(min-width: 850px)'})
+    const isLargeEnough = useMediaQuery({query:'(min-width: 950px)'})
     return (
         <div>
             {isLandscape && isLargeEnough && <Suspense fallback={<div>Loading Desktop UI...</div>}><LoadableDesktop mapsApiKey={maps_api_key} orientationChanged={orientationChanged} setOrientationChanged={setOrientationChanged}/></Suspense>}
-            {(!isLargeEnough || !isLandscape) && <Suspense fallback={<div>Loading Mobile UI...</div>}><LoadableMobile mapsApiKey={maps_api_key} orientationChanged={orientationChanged}/></Suspense>}
+            {(!isLargeEnough || !isLandscape) && <Suspense fallback={<div>Loading Mobile UI...</div>}><LoadableMobile mapsApiKey={maps_api_key} orientationChanged={mobileOrientationChanged} setOrientationChanged={setMobileOrientationChanged}/></Suspense>}
         </div>
     )
 }
