@@ -113,9 +113,16 @@ const RouteForecastMap = ({maps_api_key}) => {
     }
 
     const getInfoWindow  = (markedInfo) => {
-        const infoContents = 
-        `${t('data.info.temperature')} ${formatTemperature(markedInfo[0].temp, metric)} ${t('data.wind.speed')} ${cvtDistance(markedInfo[0].windSpeed, metric).toFixed(1)} ${t('tableHeaders.windBearing')} ${markedInfo[0].windBearing}`
-        const infoWindow = (<InfoWindow maxWidth={170} position={{ lat: markedInfo[0].lat, lng: markedInfo[0].lon }}>{infoContents}</InfoWindow>)
+        const infoContents = (<span>
+            {t('data.info.temperature')} &nbsp;
+            <strong>{formatTemperature(markedInfo[0].temp, metric)}</strong> &nbsp;
+            {t('data.wind.speed')} &nbsp;
+            <strong>{cvtDistance(markedInfo[0].windSpeed, metric).toFixed(1)}</strong> &nbsp;
+            {t('tableHeaders.windBearing')} &nbsp;
+            <strong>{markedInfo[0].windBearing}</strong>
+        </span>)
+        // $$`
+        const infoWindow = (<InfoWindow position={{ lat: markedInfo[0].lat, lng: markedInfo[0].lon }}>{infoContents}</InfoWindow>)
         return infoWindow
     }
 
@@ -164,7 +171,7 @@ const MapMarkers = ({ forecast, controls, controlNames, subrange, metric }) => {
                     bearing={point.windBearing}
                     windSpeed={point.windSpeed}
                     subrange={subrange}
-                    key={`${point.lat}${point.lon}${cvtDistance(point.distance, metric)}temp`}
+                    key={`${point.lat}${point.lon}_${cvtDistance(point.distance, metric)}_temp_${Math.random().toString(10)}`}
                 />
             )
         ).concat(
@@ -175,7 +182,7 @@ const MapMarkers = ({ forecast, controls, controlNames, subrange, metric }) => {
                         latitude={control.lat}
                         longitude={control.lon}
                         value={controlNames[index]}
-                        key={`${control.lat}${control.lon}${controlNames[index]}${index}control`}
+                        key={`${control.lat}${control.lon}_${controlNames[index]}${index}_control_${Math.random().toString(10)}`}
                     />
                 )
         ).concat(
@@ -186,7 +193,7 @@ const MapMarkers = ({ forecast, controls, controlNames, subrange, metric }) => {
                     value={cvtDistance(point.distance, metric)}
                     title={`${point.fullTime}\n${formatTemperature(point.temp, metric)}`}
                     isRainy={point.rainy}
-                    key={`${point.lat}${point.lon}${cvtDistance(point.distance, metric)}rain`}
+                    key={`${point.lat}${point.lon}_${cvtDistance(point.distance, metric)}_rain_${Math.random().toString(10)}`}
                 />
             )
         )
