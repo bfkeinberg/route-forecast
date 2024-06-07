@@ -21,7 +21,7 @@ import { TopBar } from "./TopBar/TopBar";
 import LangSwitcher from "./app/LangSwitcher";
 import {useTranslation} from 'react-i18next'
 
-const DesktopUI = ({mapsApiKey}) => {
+const DesktopUI = ({mapsApiKey, orientationChanged, setOrientationChanged}) => {
     const { t } = useTranslation()
 
     const LoadableForecastTable = lazyRetry(() => import(/* webpackChunkName: "ForecastTable" */ './resultsTables/ForecastTable'));
@@ -40,7 +40,6 @@ const DesktopUI = ({mapsApiKey}) => {
         activeSidePane,
         setActiveSidePane
     ] = useState(0)
-
     const sidebarWidth = 703
 
     const rwgpsRouteData = useSelector(state => state.routeInfo.rwgpsRouteData)
@@ -67,6 +66,13 @@ const DesktopUI = ({mapsApiKey}) => {
     if (activeSidePane !== 0 && routeData === null && forecastData.length === 0) {
         setActiveSidePane(0)
     }
+    if (orientationChanged && forecastData && activeSidePane !== 2) {
+        setActiveSidePane(2)
+    }
+
+    React.useEffect(() => {
+        setOrientationChanged(() => false)
+    }, [])
 
     const routeLoadingMode = useSelector(state => state.uiInfo.routeParams.routeLoadingMode)
     const mapDataExists = (routeLoadingMode === routeLoadingModes.RWGPS || routeLoadingMode === routeLoadingModes.RUSA_PERM) ?
