@@ -63,7 +63,7 @@ const Segment = () => {
             </div>
             <Tooltip title={t('tooltips.customSegment')}>
                 <Slider marks value={getSliderValue(segment)} valueLabelFormat={sliderLabelRenderer} valueLabelDisplay='auto'
-                    getAriaLabel={() => 'Route segment'} getAriaValueText={'User defined route segment'}
+                    getAriaLabel={() => 'Route segment'} getAriaValueText={() => 'User defined route segment'}
                     min={0} max={maxDistance} onChange={segmentUpdate} disabled={!canDoUserSegment} />
             </Tooltip>
         </>)
