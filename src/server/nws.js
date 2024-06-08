@@ -11,8 +11,7 @@ axiosRetry(axiosInstance, {
     retryCondition: (error) => {
         // in the weird case that we don't get a response field in the error then report to Sentry and fail the request
         if (!error.response) {
-            Sentry.captureMessage(`Error object reported to NWS was missing the response`)
-            Sentry.captureMessage(`Defective error object from NWS:${JSON.stringify(error)}`)
+            Sentry.addBreadcrumb({category:'nws',level:'error',message:`NWS error ${error.message}`})
             return false
         }
         switch (error.response.status) {
@@ -34,6 +33,12 @@ const getForecastUrl = async (lat, lon) => {
     const url = `https://api.weather.gov/points/${lat},${lon}`;
     const gridResult = await axiosInstance.get(url).catch(
         error => {throw error.response.data.detail});
+    if (!gridResult.data.properties.forecastGridData) {
+        Sentry.addBreadcrumb({category:'nws', 
+            level:'error',
+            message:`NWS API call returned ${JSON.stringify(gridResult.data.properties)} but no forecast URL`
+        })
+    }
     return gridResult.data.properties.forecastGridData;
 }
 
@@ -72,7 +77,9 @@ const extractForecast = (forecastGridData, currentTime) => {
 const getForecastFromNws = async (forecastUrl) => {
     const forecastGridData = await axiosInstance.get(forecastUrl, { headers: { "User-Agent": '(randoplan.com, randoplan.ltd@gmail.com)' } }).catch(
         error => {
-            Sentry.captureMessage(`Failed to get NWS forecast from ${forecastUrl}`)
+            Sentry.addBreadcrumb({
+                category:'nws',level:'error',message:`Failed to get NWS forecast from ${forecastUrl}`
+            })
             Sentry.captureException(error)
             throw Error(`Failed to get NWS forecast from ${forecastUrl}`)
         }
@@ -97,6 +104,9 @@ const getForecastFromNws = async (forecastUrl) => {
 const callNWS = async function (lat, lon, currentTime, distance, zone, bearing, getBearingDifference, isControl) {
     const forecastUrl = await getForecastUrl(lat, lon);
     Sentry.setContext('forecastUrl', {'forecastUrl': forecastUrl})
+    if (!forecastUrl) {
+        Sentry.captureMessage(`NWS forecast url for ${lat} ${lon} was null`)
+    }
     const forecastGridData = await getForecastFromNws(forecastUrl);
     const startTime = DateTime.fromISO(currentTime, {zone:zone});
     const forecastValues = extractForecast(forecastGridData, startTime, bearing, getBearingDifference);
