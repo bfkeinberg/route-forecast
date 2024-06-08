@@ -164,9 +164,9 @@ const routeParamsSlice = createSlice({
             .addCase('routeInfo/routeDataCleared', (state) => {
                 state.segment = routeParamsInitialState.segment
             }).addCase("strava/stravaRouteSet", (state, action) => {
-                // if (action.payload !== '') {
-                //     state.rwgpsRoute = routeParamsInitialState.rwgpsRoute
-                // }
+                if (action.payload && action.payload !== '') {
+                    state.rwgpsRoute = routeParamsInitialState.rwgpsRoute
+                }
             })
     }
 })
@@ -505,7 +505,7 @@ const stravaSlice = createSlice({
     extraReducers: (builder) => {
         builder
             .addCase(rwgpsRouteSet, (state,action) => {
-                if (action.payload !== '') {
+                if (action.payload && action.payload !== '') {
                     state.activity = stravaInitialState.activity
                     state.route = stravaInitialState.route
                     state.activityData = stravaInitialState.activityData
