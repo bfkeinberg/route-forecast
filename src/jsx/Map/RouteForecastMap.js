@@ -30,20 +30,25 @@ const matchesSegment = (point, range) => {
     (point.dist >= range[0] && point.dist <= range[1]))
 }
 
-const getMapBounds = (points, zoomToRange, subrange, userSubrange) => {
+const getMapBounds = (points, bounds, zoomToRange, subrange, userSubrange) => {
+    const defaultBounds = {north:bounds.max_latitude, south:bounds.min_latitude, east:bounds.max_longitude, west:bounds.min_longitude}
+    const preferDefault = userSubrange[0] === userSubrange[1]
+    if (preferDefault && subrange.length !== 2) {
+        return defaultBounds
+    }
     let userBounds = new google.maps.LatLngBounds();
     points.filter(point => matchesSegment(point,userSubrange))
         .forEach(point => userBounds.extend(point));
-    if (zoomToRange && subrange.length === 2 && !isNaN(subrange[1])) {
+    if (zoomToRange && subrange.length === 2) {
         let segmentBounds = new google.maps.LatLngBounds();
         points.filter(point => matchesSegment(point, subrange))
             .forEach(point => segmentBounds.extend(point));
         if (segmentBounds.isEmpty()) {
-            return userBounds;
+            return preferDefault ? defaultBounds : userBounds;
         }
         return segmentBounds;
     }
-    return userBounds;
+    return preferDefault ? defaultBounds : userBounds;
 }
 
 const cvtDistance = (distance, metric) => {
@@ -58,8 +63,8 @@ const addBreadcrumb = (msg) => {
     })
 }
 
-const findMapBounds = (points, zoomToRange, subrange, userSubrange) => {
-    const mapBounds = getMapBounds(points, zoomToRange, subrange, userSubrange)
+const findMapBounds = (points, bounds, zoomToRange, subrange, userSubrange) => {
+    const mapBounds = getMapBounds(points, bounds, zoomToRange, subrange, userSubrange)
     addBreadcrumb(`conputed mapBounds ${mapBounds} from ${points.length} points in route`)
     return mapBounds
 }
@@ -89,13 +94,13 @@ const RouteForecastMap = ({maps_api_key}) => {
         const map = useMap()
         useEffect(() => {
             if (!apiIsLoaded) return;
-            const theBounds = findMapBounds(points, zoomToRange, subrange, userSegment)
+            const theBounds = findMapBounds(points, bounds, zoomToRange, subrange, userSegment)
             setMapBounds(theBounds)
             // when the maps library is loaded, apiIsLoaded will be true and the API can be
             // accessed using the global `google.maps` namespace.
         }, [apiIsLoaded, zoomToRange, subrange, userSegment[0], userSegment[1]])
         useEffect(() => {
-            if (map && Object.keys(mapBounds).length===2) {
+            if (map && (Object.keys(mapBounds).length===2 || Object.keys(mapBounds).length == 4)) {
                 map.fitBounds(mapBounds, 0)
             }
         }, [map, mapBounds])

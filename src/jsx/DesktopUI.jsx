@@ -63,7 +63,7 @@ const DesktopUI = ({mapsApiKey, orientationChanged, setOrientationChanged}) => {
     useWhenChanged(routeData, () => setActiveSidePane(sidePaneOptions.findIndex(option => option.title === titleForecastSettings)))
     useWhenChanged(forecastData, () => setActiveSidePane(sidePaneOptions.findIndex(option => option.title === titleForecast)), forecastData.length > 0)
     useWhenChanged(stravaActivityData, () => setActiveSidePane(sidePaneOptions.findIndex(option => option.title === titlePaceAnalyis)))
-    if (activeSidePane !== 0 && routeData === null && forecastData.length === 0) {
+    if (activeSidePane !== 0 && routeData === null && forecastData.length === 0 && !stravaActivityData) {
         setActiveSidePane(0)
     }
     if (orientationChanged) {

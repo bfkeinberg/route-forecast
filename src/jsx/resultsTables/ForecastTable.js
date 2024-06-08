@@ -89,6 +89,7 @@ const ForecastTable = (adjustedTimes) => {
     const [showRelativeBearing, setShowRelativeBearing] = useState(false)
     const [currentRow, setCurrentRow] = useState()
     const [selectedRow, setSelectedRow] = useState()
+    const maxDistanceInKm = useSelector(state => state.routeInfo.distanceInKm)
 
     const dispatch = useDispatch()
     useEffect(() => { dispatch(tableViewedSet()) }, [])
@@ -171,7 +172,7 @@ const ForecastTable = (adjustedTimes) => {
                         </tr>:null}
                     <tr 
                         start={point.distance*milesToMeters}
-                        end={index!==forecast.length-1?forecast[index+1].distance*milesToMeters:null}
+                        end={index!==forecast.length-1?forecast[index+1].distance*milesToMeters:maxDistanceInKm*1000}
                         className={selectedRow===parseInt(point.distance*milesToMeters)?'highlighted':null}
                         onClick={toggleRange} onMouseEnter={updateWeatherRange}>
                         <td><span style={styleForControl(point)} className='timeCell'><Time time={index === forecast.length-1 ? null : getAdjustedTime(point,index,adjustedTimes, i18n)}/></span></td>
