@@ -66,19 +66,24 @@ const DesktopUI = ({mapsApiKey, orientationChanged, setOrientationChanged}) => {
     if (activeSidePane !== 0 && routeData === null && forecastData.length === 0 && !stravaActivityData) {
         setActiveSidePane(0)
     }
-    if (orientationChanged) {
-        if (forecastData.length > 0 && activeSidePane !== 2) {
-            setActiveSidePane(2)
-        } else if (routeData && activeSidePane !== 1)  {
-            setActiveSidePane(1)
-        }
-    }
+
+    React.useEffect(() => {
+        if (orientationChanged) {
+            const routeDataPane = sidePaneOptions.findIndex(option => option.title === titleForecastSettings)
+            const forecastPane = sidePaneOptions.findIndex(option => option.title === titleForecast)
+            if (forecastData.length > 0 && activeSidePane !== forecastPane) {
+                setActiveSidePane(forecastPane)
+            } else if (routeData && activeSidePane !== routeDataPane)  {
+                setActiveSidePane(routeDataPane)
+            }
+        }    
+    }, [orientationChanged, forecastData, routeData])
 
     React.useEffect(() => {
         if (orientationChanged) {
             setOrientationChanged(() => false)
         }
-    }, [])
+    }, [orientationChanged])
 
     const routeLoadingMode = useSelector(state => state.uiInfo.routeParams.routeLoadingMode)
     const mapDataExists = (routeLoadingMode === routeLoadingModes.RWGPS || routeLoadingMode === routeLoadingModes.RUSA_PERM) ?
