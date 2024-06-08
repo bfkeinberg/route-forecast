@@ -164,9 +164,9 @@ const routeParamsSlice = createSlice({
             .addCase('routeInfo/routeDataCleared', (state) => {
                 state.segment = routeParamsInitialState.segment
             }).addCase("strava/stravaRouteSet", (state, action) => {
-                if (action.payload !== '') {
-                    state.rwgpsRoute = routeParamsInitialState.rwgpsRoute
-                }
+                // if (action.payload !== '') {
+                //     state.rwgpsRoute = routeParamsInitialState.rwgpsRoute
+                // }
             })
     }
 })

@@ -19,9 +19,12 @@ const LoadableMap = lazyRetry(() => {addBreadcrumb('loading map');return import(
 const MapLoader = (props) => {
     // debug empty points and bounds
     const rwgpsRouteData = useSelector(state => state.routeInfo.rwgpsRouteData)
+    const gpxRouteData = useSelector(state => state.routeInfo.gpxRouteData)
     let length = 0
     if (rwgpsRouteData && rwgpsRouteData[rwgpsRouteData.type] && rwgpsRouteData[rwgpsRouteData.type]['track_points']) {
         length = rwgpsRouteData[rwgpsRouteData.type]['track_points'].length
+    } else if (gpxRouteData) {
+        length = gpxRouteData.tracks[0].points.length
     }
     if (props.hasMap && props.hasRouteData) {
         Sentry.addBreadcrumb({

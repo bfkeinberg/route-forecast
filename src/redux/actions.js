@@ -11,6 +11,7 @@ import { displayControlTableUiSet,     errorDetailsSet,forecastAppended,forecast
 forecastFetched, forecastFetchFailed, forecastInvalidated, gpxRouteLoaded, gpxRouteLoadingFailed,     initialStartTimeSet, intervalSet, loadingFromUrlSet,
 paceSet,     routeLoadingBegun, rwgpsRouteLoaded,     rwgpsRouteLoadingFailed, shortUrlSet,
 startTimeSet,
+stravaActivitySet,
 stravaErrorSet, stravaFetchBegun, stravaFetched, stravaFetchFailed,
     stravaTokenSet, timeZoneSet, userControlsUpdated, weatherProviderSet } from './reducer';
 
@@ -478,6 +479,7 @@ export const loadStravaActivity = function() {
             dispatch(stravaFetched(result));
         }).catch(error => {
             dispatch(stravaFetchFailed(error));
+            dispatch(stravaActivitySet(''))
         });
 
     }

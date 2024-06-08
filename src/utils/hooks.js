@@ -163,6 +163,9 @@ const usePointsAndBounds = () => {
   } else if (gpxRouteData !== null) {
     pointsAndBounds = useMemo(() => gpxParser.computePointsAndBounds(gpxRouteData, "gpx"), [gpxRouteData])
   }
+  if (!pointsAndBounds) {
+    Sentry.captureMessage('Empty points and bounds')
+  }
   if (pointsAndBounds && pointsAndBounds.pointList && pointsAndBounds.pointList.length > 0) {
     // pointsAndBounds.points = useMemo(() => pointsAndBounds.pointList
       // .map(point => ({ lat: point.lat, lng: point.lon, dist: point.dist })), [pointsAndBounds.pointList])
