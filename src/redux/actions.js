@@ -436,7 +436,9 @@ export const loadRouteFromURL = (forecastFunc, aqiFunc) => {
             if (url && !url.includes("localhost")) {
                 await dispatch(shortenUrl(url))
             }
-
+            if (getState().strava.activity && getState().strava.activity !== '') {
+                dispatch(loadStravaActivity())
+            }
         }
         dispatch(loadingFromUrlSet(false))
     }
