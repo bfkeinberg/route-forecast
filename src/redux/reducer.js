@@ -43,6 +43,7 @@ const routeParamsInitialState = {
     min_interval:providerValues[defaultProvider].min_interval,
     canForecastPast:providerValues[defaultProvider].canForecastPast,
     pace: defaultPace,
+    speedForTargetFinish: 0,
     rwgpsRoute: '',
     rwgpsRouteIsTrip: false,
     startTimestamp: initialStartTime().toMillis(),
@@ -86,6 +87,9 @@ const routeParamsSlice = createSlice({
                     state.stopAfterLoad = false
                 }
             }
+        },
+        speedForTargetSet(state,action) {
+            state.speedForTargetFinish = action.payload
         },
         initialStartTimeSet(state,action) {
             if (action.payload) {
@@ -175,7 +179,7 @@ export const routeParamsReducer = routeParamsSlice.reducer
 export const {stopAfterLoadSet,rwgpsRouteSet,startTimeSet,initialStartTimeSet,
         startTimestampSet,paceSet,intervalSet,routeIsTripToggled,routeIsTripSet,
         routeLoadingModeSet,reset, timeZoneSet, rusaPermRouteIdSet,
-        segmentSet} = routeParamsSlice.actions
+        segmentSet, speedForTargetSet} = routeParamsSlice.actions
 
 const rideWithGpsInfoSlice = createSlice({
     name: 'rideWithGpsInfo',
@@ -206,6 +210,7 @@ const routeInfoInitialState = {
     gpxRouteData: null,
     loadingFromURL: false,
     distanceInKm: 0,
+    elevationGainMeters: 0,
     canDoUserSegment:false
 }
 const routeInfoSlice = createSlice({
@@ -219,9 +224,11 @@ const routeInfoSlice = createSlice({
             if (action.payload.route) {
                 state.distanceInKm = action.payload.route.distance/1000
                 state.canDoUserSegment = action.payload.route.track_points[0].d !== undefined
+                state.elevationGainMeters = action.payload.route.elevation_gain
             } else {
                 state.distanceInKm = action.payload.trip.distance/1000
-                state.canDoUserSegment = action.payload.route.track_points[0].d !== undefined
+                state.canDoUserSegment = action.payload.trip.track_points[0].d !== undefined
+                state.elevationGainMeters = action.payload.trip.elevation_gain
             }
             state.type = "rwgps"
         },
@@ -231,13 +238,15 @@ const routeInfoSlice = createSlice({
             state.name = getRouteName(action.payload, "gpx")
             state.type = "gpx"
             state.distanceInKm = action.payload.tracks[0].distance.total
+            state.elevationGainMeters = action.payload.tracks[0].elevation.pos
         },
         routeDataCleared(state) {
             state.rwgpsRouteData = null
             state.gpxRouteData = null
             state.name = ''
             state.type = null
-            state.distanceInKm = 0
+            state.distanceInKm = routeInfoInitialState.distanceInKm
+            state.elevationGainMeters = routeInfoInitialState.elevationGain
         },
         loadingFromUrlSet(state, action) {
             state.loadingFromURL = action.payload

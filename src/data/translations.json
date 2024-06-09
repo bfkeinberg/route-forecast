@@ -24,7 +24,8 @@
                 "projectedFinish":"Projected finish time",
                 "interval":"Forecast Interval in minutes",
                 "source":"Weather forecast source",
-                "customSegment":"Use custom segment length"
+                "customSegment":"Use custom segment length",
+                "predictFromFinish":"Forecast based on this finish time"
             },
             "titles": {
                 "routeInfo": "Route info",
@@ -39,6 +40,7 @@
             "tooltips": {
                 "ridingPace":"Speed on flat ground, which will be reduced by climbing",
                 "actualPace":"Actual riding pace was",
+                "predictedSpeed": "Speed predicted by the specified finish time",
                 "interval":"How often to generate weather forecast in minutes",
                 "provider":"The weather provider to use for forecasts",
                 "forecast": {
@@ -128,7 +130,8 @@
                 "projectedFinish":"Heure de Fin Prévue",
                 "interval":"Intervalle de Prévision en minutes",
                 "source":"Source de prévisions météorologiques",
-                "customSegment":"Utiliser une longueur de segment personnalisée"
+                "customSegment":"Utiliser une longueur de segment personnalisée",
+                "predictFromFinish":"Prévisions basées sur cette heure de fin"
             },
             "titles": {
                 "routeInfo": "Informations sur les parcours",
@@ -143,6 +146,7 @@
             "tooltips": {
                 "ridingPace":"Vitesse sur terrain plat, qui sera réduite en montant",
                 "actualPace":"Le rythme de conduite réel était",
+                "predictedSpeed":"Vitesse prévue par l'heure d'arrivée spécifiée",
                 "interval":"À quelle fréquence générer des prévisions météorologiques en minutes",
                 "provider":"Le fournisseur météo à utiliser pour les prévisions",
                 "forecast": {

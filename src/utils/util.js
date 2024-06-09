@@ -29,6 +29,7 @@ export const getRouteInfo = (state, type, timeZoneId, segment) => {
   if (!routeData) {
     return routeData;
   }
+  const userOverrideSpeed = state.uiInfo.routeParams.speedForTargetFinish
   const walkFunction = type === "rwgps" ? gpxParser.walkRwgpsRoute : gpxParser.walkGpxRoute
   return walkFunction(
     routeData,
@@ -37,11 +38,12 @@ export const getRouteInfo = (state, type, timeZoneId, segment) => {
     state.uiInfo.routeParams.interval,
     state.controls.userControlPoints,
     timeZoneId,
-    segment
+    segment,
+    userOverrideSpeed
   )
 }
 
-export const getForecastRequest = (routeData, startTimestamp, type, timeZoneId, pace, interval, userControlPoints, segment) =>
+export const getForecastRequest = (routeData, startTimestamp, type, timeZoneId, pace, interval, userControlPoints, segment, userOverrideSpeed=0) =>
 {
   const walkFunction = type === "rwgps" ? gpxParser.walkRwgpsRoute : gpxParser.walkGpxRoute
   return walkFunction(
@@ -51,7 +53,8 @@ export const getForecastRequest = (routeData, startTimestamp, type, timeZoneId, 
     interval,
     userControlPoints,
     timeZoneId,
-    segment
+    segment,
+    userOverrideSpeed
   ).forecastRequest
 }
 

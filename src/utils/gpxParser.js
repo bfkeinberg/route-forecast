@@ -132,7 +132,7 @@ class AnalyzeRoute {
         return {pointList: stream, bounds}
     };
 
-    analyzeRoute(stream, userStartTime, pace, intervalInHours, controls, timeZoneId, segment) {
+    analyzeRoute(stream, userStartTime, pace, intervalInHours, controls, timeZoneId, segment, userOverrideSpeed) {
 
         let nextControl = 0;
 
@@ -167,7 +167,7 @@ class AnalyzeRoute {
         };
 
         let forecastRequests = [];
-        let baseSpeed = inputPaceToSpeed[pace];
+        let baseSpeed = userOverrideSpeed ? userOverrideSpeed : inputPaceToSpeed[pace];
         let first = true;
         let previousPoint = null;
         let forecastPoint = null;
@@ -276,18 +276,18 @@ class AnalyzeRoute {
             return startTime.plus({hours:accumulatedTime+restTime}).toFormat(finishTimeFormat);
     }
 
-    walkRwgpsRoute(routeData,startTime,pace,interval,controls,timeZoneId, segment) {
+    walkRwgpsRoute(routeData,startTime,pace,interval,controls,timeZoneId, segment, userOverrideSpeed=0) {
         let modifiedControls = controls.slice();
         modifiedControls.sort((a,b) => a['distance']-b['distance']);
         const stream = this.parseRouteStream(routeData, "rwgps")
-        return this.analyzeRoute(stream, startTime, pace, interval, modifiedControls, timeZoneId, segment);
+        return this.analyzeRoute(stream, startTime, pace, interval, modifiedControls, timeZoneId, segment, userOverrideSpeed);
     }
 
-    walkGpxRoute(routeData,startTime,pace,interval,controls,timeZoneId, segment) {
+    walkGpxRoute(routeData,startTime,pace,interval,controls,timeZoneId, segment, userOverrideSpeed=0) {
         let modifiedControls = controls.slice();
         modifiedControls.sort((a,b) => a['distance']-b['distance']);
         const stream = this.parseRouteStream(routeData, "gpx")
-        return this.analyzeRoute(stream, startTime, pace, interval, modifiedControls, timeZoneId, segment);
+        return this.analyzeRoute(stream, startTime, pace, interval, modifiedControls, timeZoneId, segment, userOverrideSpeed);
     }
 
     static rusa_time(accumulatedDistanceInKm, elapsedTimeInHours) {
@@ -338,6 +338,15 @@ class AnalyzeRoute {
             effectiveSpeed = baseSpeed;
         }
         return effectiveSpeed;
+    }
+
+    // get the speed on flat required to achieve the requested completion time
+    getSpeedForDesiredElapsedTime = (desiredTimeInSeconds, distanceInKm, climbInMeters) => {
+        const distanceInMiles = distanceInKm * kmToMiles
+        const climbInFeet = (climbInMeters * 3.2808)
+        const hilliness = Math.min(((climbInFeet / distanceInMiles) / 25), 6)
+        const desiredSpeed = distanceInMiles / (desiredTimeInSeconds / 3600)
+        return desiredSpeed + hilliness
     }
 
     static addToForecast(trackPoint, currentTime, elapsedTimeInHours, distanceInMiles, isControl) {

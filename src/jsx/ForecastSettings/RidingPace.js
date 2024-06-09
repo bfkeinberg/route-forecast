@@ -117,11 +117,11 @@ const renderPaceMetric = (pace, { handleClick, modifiers }) => {
 const RidingPace = ({ pace, setPace, metric }) => {
     const { t } = useTranslation()
     const actualPace = useActualPace()
-    
+    const predictedSpeed = useSelector(state => state.uiInfo.routeParams.speedForTargetFinish)
     // convert mph to kph if we are using metric
     const cvtMilesToKm = distance => {
-        return metric ? ((distance * milesToMeters) / 1000).toFixed(1) : distance;
-    };
+        return metric ? ((distance * milesToMeters) / 1000).toFixed(1) : distance.toFixed(1);
+    }
 
     const formatSpeed = useFormatSpeed()
 
@@ -129,18 +129,25 @@ const RidingPace = ({ pace, setPace, metric }) => {
     let pace_text;
     let pace_tooltip_class = 'pace_tooltip';
     const selectedSpeed = metric ? metricPaceToSpeed[pace] : paceToSpeed[pace];
+    const usePredictedSpeed = () => {
+        return predictedSpeed === 0 ? selectedSpeed : cvtMilesToKm(predictedSpeed)
+    }
     if (actualPace === null || actualPace === 0) {
-        pace_text = t('tooltips.ridingPace')
+        if (predictedSpeed !== 0) {
+            pace_text = t('tooltips.predictedSpeed')
+        } else {
+            pace_text = t('tooltips.ridingPace')
+        }
     } else {
-
-        pace_tooltip_class = getPaceTooltipId(cvtMilesToKm(actualPace),selectedSpeed);
+        pace_tooltip_class = getPaceTooltipId(cvtMilesToKm(actualPace),usePredictedSpeed());
         pace_text = `${t('tooltips.actualPace')} ${getAlphaPace(Math.round(actualPace))} (${formatSpeed(actualPace)})`;
     }
 
-    const dropdownValues = metric ? paceValues.metric : paceValues.imperialLikeAPenguin
-    return (
-        <DesktopTooltip content={pace_text} className={pace_tooltip_class}>
-            <FormGroup style={{ flex: 3, fontSize: "90%" }} label={<span><b>{t('labels.ridingPace')}</b></span>} labelFor={'paceInput'}>
+    const PaceDisplay = () => {
+        return (
+            predictedSpeed !== 0 ?
+                <div style={{ fontStyle: "italic", backgroundColor: "cyan" }}>{`${cvtMilesToKm(predictedSpeed)} ${metric?'kph':'mph'}`}</div>
+                :
                 <Select tabIndex="0"
                     id='paceInput'
                     items={dropdownValues.values}
@@ -153,6 +160,14 @@ const RidingPace = ({ pace, setPace, metric }) => {
                 >
                     <Button text={selectedSpeed + " " + dropdownValues.label} rightIcon="symbol-triangle-down" />
                 </Select>
+        )
+    }
+
+    const dropdownValues = metric ? paceValues.metric : paceValues.imperialLikeAPenguin
+    return (
+        <DesktopTooltip content={pace_text} className={pace_tooltip_class}>
+            <FormGroup style={{ flex: 3, fontSize: "90%" }} label={<span><b>{t('labels.ridingPace')}</b></span>} labelFor={'paceInput'}>
+            {<PaceDisplay/>}
             </FormGroup>
         </DesktopTooltip>
     );
