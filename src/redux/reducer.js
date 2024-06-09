@@ -332,7 +332,7 @@ const dialogParamsSlice = createSlice({
                 state.errorDetails = null
             })
             .addCase("strava/stravaFetchFailed", (state, action) => {
-                const errorMessage = typeof action.error === 'object' ? action.error.message : action.error
+                const errorMessage = typeof action.payload === 'object' ? action.error.message : action.payload
                 state.errorDetails = `Error loading activity from Strava: ${errorMessage}`
             })
             .addCase(rwgpsRouteLoaded, (state) => {
