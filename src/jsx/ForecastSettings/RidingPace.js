@@ -114,7 +114,7 @@ const renderPaceMetric = (pace, { handleClick, modifiers }) => {
     );
 };
 
-const RidingPace = ({ pace, setPace, metric }) => {
+const RidingPace = ({ pace, setPace, metric, disabled }) => {
     const { t } = useTranslation()
     const actualPace = useActualPace()
     const predictedSpeed = useSelector(state => state.uiInfo.routeParams.speedForTargetFinish)
@@ -143,12 +143,14 @@ const RidingPace = ({ pace, setPace, metric }) => {
         pace_text = `${t('tooltips.actualPace')} ${getAlphaPace(Math.round(actualPace))} (${formatSpeed(actualPace)})`;
     }
 
-    const PaceDisplay = () => {
+    const PaceDisplay = ({disabled}) => {
         return (
             predictedSpeed !== 0 ?
                 <div style={{ fontStyle: "italic", backgroundColor: "cyan" }}>{`${cvtMilesToKm(predictedSpeed)} ${metric?'kph':'mph'}`}</div>
                 :
-                <Select tabIndex="0"
+                <Select 
+                    tabIndex="0"
+                    disabled={disabled}
                     id='paceInput'
                     items={dropdownValues.values}
                     itemsEqual={"number"}
@@ -158,7 +160,7 @@ const RidingPace = ({ pace, setPace, metric }) => {
                     activeItem={{ name: pace, number: selectedSpeed }}
                     onItemSelect={(selected) => { saveCookie("pace", selected.name); setPace(selected.name) }}
                 >
-                    <Button text={selectedSpeed + " " + dropdownValues.label} rightIcon="symbol-triangle-down" />
+                    <Button disabled={disabled} text={selectedSpeed + " " + dropdownValues.label} rightIcon="symbol-triangle-down" />
                 </Select>
         )
     }
@@ -167,7 +169,7 @@ const RidingPace = ({ pace, setPace, metric }) => {
     return (
         <DesktopTooltip content={pace_text} className={pace_tooltip_class}>
             <FormGroup style={{ flex: 3, fontSize: "90%" }} label={<span><b>{t('labels.ridingPace')}</b></span>} labelFor={'paceInput'}>
-            {<PaceDisplay/>}
+            {<PaceDisplay disabled={disabled}/>}
             </FormGroup>
         </DesktopTooltip>
     );

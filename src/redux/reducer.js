@@ -285,7 +285,8 @@ const dialogParamsSlice = createSlice({
     name: 'dialogParams',
     initialState: {
         errorDetails: null, succeeded: true, shortUrl: ' ',
-        loadingSource: null, fetchingForecast: false, fetchingRoute: false
+        loadingSource: null, fetchingForecast: false, fetchingRoute: false,
+        editingFinishTime: false
     },
     reducers: {
         routeLoadingBegun(state, action) {
@@ -330,6 +331,9 @@ const dialogParamsSlice = createSlice({
             if (action.payload !== undefined && action.payload !== "") {
                 state.errorDetails = `Error loading route from Strava: ${action.payload}`
             }
+        },
+        editingFinishTimeSet(state,action) {
+            state.editingFinishTime = action.payload
         }
     },
     extraReducers: (builder) => {
@@ -364,7 +368,8 @@ const dialogParamsSlice = createSlice({
 export const dialogParamsReducer = dialogParamsSlice.reducer
 export const {routeLoadingBegun,forecastFetchBegun,
     forecastFetchFailed,forecastFetchCanceled,rwgpsRouteLoadingFailed,
-    gpxRouteLoadingFailed,errorDetailsSet,shortUrlSet,stravaErrorSet} = dialogParamsSlice.actions
+    gpxRouteLoadingFailed,errorDetailsSet,shortUrlSet,
+    stravaErrorSet,editingFinishTimeSet} = dialogParamsSlice.actions
 
 const controlsInitialState = {
     metric: false,

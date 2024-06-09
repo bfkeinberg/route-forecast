@@ -10,7 +10,8 @@
                 "stops":"Add Stops",
                 "forecast":"Forecast",
                 "forecastPending":"Creating forecast...",
-                "zoomToSegment":"Zoom"
+                "zoomToSegment":"Zoom",
+                "editFinishTime":"Instead of specifying an expected riding pace, provide a desired finish time and use that to calculate the pace and arrival times. Click again for normal behavior."
             },
             "labels": {
                 "language": "Select language",
@@ -116,7 +117,8 @@
                 "stops":"Ajouter des Contrôles",
                 "forecast":"Prévisions",
                 "forecastPending":"Création de prévisions...",
-                "zoomToSegment":"Zoom"
+                "zoomToSegment":"Zoom",
+                "editFinishTime":"Au lieu de spécifier un rythme de conduite attendu, fournissez une heure d'arrivée souhaitée et utilisez-la pour calculer le rythme et les heures d'arrivée."
             },
             "labels": {
                 "language": "Choisissez la langue",

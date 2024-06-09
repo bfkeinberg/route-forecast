@@ -1,14 +1,15 @@
 import { DateTime, Interval } from "luxon";
 import React, {useState} from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { finishTimeFormat, speedForTargetSet } from "../../redux/reducer.js";
+import { finishTimeFormat, speedForTargetSet, editingFinishTimeSet } from "../../redux/reducer.js";
 import { useActualFinishTime, useForecastDependentValues } from '../../utils/hooks';
 import DateSelect from "./DateSelect";
 import {useTranslation} from 'react-i18next'
-import { Button, InputGroup } from "@blueprintjs/core";
+import { Button } from "@blueprintjs/core";
 import { Edit, PredictiveAnalysis} from '@blueprintjs/icons'
 import { computeTargetSpeed } from "../../redux/actions.js";
 import { DateInput3, TimePrecision } from "@blueprintjs/datetime2";
+import { Tooltip } from "@blueprintjs/core";
 
 // const LoadableDatePicker = lazy(() => componentLoader(import(/* webpackChunkName: "DateSelect" */ /* webpackPrefetch: true */ './DateSelect'), 5));
 
@@ -22,7 +23,6 @@ export const TimeFields = () => {
   const dispatch = useDispatch()
   const { t } = useTranslation()
   const { finishTime: predictedFinishTime } = useForecastDependentValues()
-  const [editingFinishTime, setEditingFinishTime] = React.useState(false)
   const [desiredElapsedTimeMinutes, setDesiredElapsedTimeMinutes] = React.useState(0)
   const distanceInKm = useSelector(state => state.routeInfo.distanceInKm)
   const startTimeMillis = useSelector(state => state.uiInfo.routeParams.startTimestamp)
@@ -31,6 +31,7 @@ export const TimeFields = () => {
   const predictedFinishTimeExists = predictedFinishTime !== null
   const [desiredFinishTime, setDesiredFinishTime] = useState(predictedFinishTimeExists ?  DateTime.fromFormat(predictedFinishTime, finishTimeFormat) : startTime)
   const actualFinishTime = useActualFinishTime()
+  const editingFinishTime = useSelector(state => state.uiInfo.dialogParams.editingFinishTime)
 
   // to match datepicker displayed format
   const newDateFormat = 'MMMM dd, yyyy h:mm a';
@@ -49,8 +50,8 @@ export const TimeFields = () => {
   }
 
   const editFinishTime = () => {
-    setEditingFinishTime(!editingFinishTime)
-    if (editFinishTime) {
+    dispatch(editingFinishTimeSet(!editingFinishTime))
+    if (editingFinishTime) {      // if this is true then we are about to disable this mode
       dispatch(speedForTargetSet(0))
     }
   }
@@ -109,10 +110,10 @@ export const TimeFields = () => {
             <span style={{ display: "flex", flex: 2.5 }}>
               <div style={{ ...timeFieldStyle, backgroundColor: predictedFinishTimeExists ? "rgb(19, 124, 189)" : "rgba(0, 0, 0, 0.05)", fontStyle: predictedFinishTimeExists ? "" : "oblique", color: predictedFinishTimeExists ? "white" : "rgba(0, 0, 0, 0.5)" }}>
                 {displayPredictedFinishTime}
-                {/* <InputGroup hidden={!editingFinishTime} type="number" onValueChange={setDesiredFinishTime}  */}
-                {/* rightElement={rightElement()}/> */}
               </div>
-              <Button minimal icon={<Edit size={12} />} onClick={editFinishTime} />
+              <Tooltip content={t('buttons.editFinishTime')}>
+                <Button minimal icon={<Edit size={12} />} onClick={editFinishTime} />
+              </Tooltip>
             </span>
           </div>
           {showPicker()}
