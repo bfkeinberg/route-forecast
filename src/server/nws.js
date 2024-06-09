@@ -6,7 +6,7 @@ const milesToMeters = 1609.34;
 const axiosRetry = require('axios-retry').default
 
 axiosRetry(axiosInstance, {
-    retries: 12,
+    retries: 5,
     retryDelay: (...arg) => axiosRetry.exponentialDelay(...arg, 400),
     retryCondition: (error) => {
         // in the weird case that we don't get a response field in the error then report to Sentry and fail the request
