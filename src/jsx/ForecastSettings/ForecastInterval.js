@@ -11,7 +11,7 @@ const ForecastInterval = ({min_interval,interval,setInterval}) => {
     const { t } = useTranslation()
     return (
         <FormGroup style={{flex: 1}} label={t('labels.interval')}>
-            <Tooltip placement='bottom' title={t('tooltips.interval')}>
+            <Tooltip arrow placement='bottom' title={t('tooltips.interval')}>
                 <Slider
                     value={interval}
                     step={0.25}
