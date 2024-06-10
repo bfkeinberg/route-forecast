@@ -1,7 +1,8 @@
 import {APIProvider, Map, InfoWindow, useMap, AdvancedMarker, useApiIsLoaded} from '@vis.gl/react-google-maps';
 import * as Sentry from "@sentry/react"
 import circus_tent from 'Images/circus tent.png';
-import rainCloud from "Images/rainCloud.png";
+// import rainCloud from "Images/rainCloud.png";
+import rainCloud from "Images/lightning-and-blue-rain-cloud-16533.svg"
 import PropTypes from 'prop-types';
 import React, { useEffect, useMemo, useState } from 'react';
 import { useDispatch,useSelector } from 'react-redux';
@@ -207,7 +208,7 @@ const MapMarkers = ({ forecast, controls, controlNames, subrange, metric }) => {
 const RainIcon = ({ latitude, longitude, value, title, isRainy }) => {
     if (isRainy) {
         return <AdvancedMarker position={{ lat: latitude, lng: longitude }} /* label={value.toFixed(0)} */ title={title}>
-            <img style={{position:'absolute',top:'3px'}} src={rainCloud} width={45} height={50} />
+            <img style={{position:'relative',margin:'2px'}} src={rainCloud} width={45} height={50} />
         </AdvancedMarker>
     }
     return null;
