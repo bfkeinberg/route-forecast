@@ -61,15 +61,13 @@ export const TimeFields = () => {
     const selectedTime = DateTime.fromISO(event)
     setDesiredFinishTime(selectedTime)
     const selectedInterval = Interval.fromDateTimes(startTime, selectedTime)
-    setDesiredElapsedTimeMinutes(selectedInterval.length('minutes'))
+    const elapsedTimeInMinutes = selectedInterval.length('minutes')
+    setDesiredElapsedTimeMinutes(elapsedTimeInMinutes)
+    return dispatch(computeTargetSpeed(elapsedTimeInMinutes))
   }
 
   const getTargetSpeed = (event) => {
     return dispatch(computeTargetSpeed(desiredElapsedTimeMinutes))
-  }
-
-  const rightElement = () => {
-    return editingFinishTime ? (<Button minimal icon={<PredictiveAnalysis size={16}/>} onClick={getTargetSpeed}/>) : <></>
   }
 
   // roughly 8mph, why not
@@ -94,7 +92,6 @@ export const TimeFields = () => {
           timePickerProps={{ useAmPm: true, showArrowButtons: true }}
           dateFnsFormat='MMMM d, yyyy h:mmaaa'
           timezone={timezone}
-          rightElement={rightElement()}
         />
         </div>
       </div>
