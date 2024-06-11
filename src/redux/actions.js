@@ -494,11 +494,14 @@ export const setWeatherProvider = (weatherProvider) => {
     }
 }
 
-export const computeTargetSpeed = (timeInHours) => {
+export const computeTargetSpeed = (timeInMinutes) => {
     return async (dispatch, getState) => {
         const parser = await getRouteParser().catch((err) => {dispatch(gpxRouteLoadingFailed(err));return null});
         const distanceInKm = getState().routeInfo.distanceInKm
-        const targetElapsedSeconds = timeInHours*60
+        // subtract from the desired elapsed time the time to be spent in controls
+        const userControls = getState().controls.userControlPoints
+        userControls.forEach(control => timeInMinutes -= control.duration)
+        const targetElapsedSeconds = timeInMinutes*60
         const climbInMeters = getState().routeInfo.elevationGainMeters
         const predictedSpeed = parser.getSpeedForDesiredElapsedTime(targetElapsedSeconds, distanceInKm, climbInMeters)
         dispatch(speedForTargetSet(predictedSpeed))

@@ -9,7 +9,8 @@ import { Button } from "@blueprintjs/core";
 import { Edit, PredictiveAnalysis} from '@blueprintjs/icons'
 import { computeTargetSpeed } from "../../redux/actions.js";
 import { DateInput3, TimePrecision } from "@blueprintjs/datetime2";
-import { Tooltip } from "@blueprintjs/core";
+// import { Tooltip } from "@blueprintjs/core";
+import Tooltip from "@mui/material/Tooltip"
 
 // const LoadableDatePicker = lazy(() => componentLoader(import(/* webpackChunkName: "DateSelect" */ /* webpackPrefetch: true */ './DateSelect'), 5));
 
@@ -111,7 +112,7 @@ export const TimeFields = () => {
               <div style={{ ...timeFieldStyle, backgroundColor: predictedFinishTimeExists ? "rgb(19, 124, 189)" : "rgba(0, 0, 0, 0.05)", fontStyle: predictedFinishTimeExists ? "" : "oblique", color: predictedFinishTimeExists ? "white" : "rgba(0, 0, 0, 0.5)" }}>
                 {displayPredictedFinishTime}
               </div>
-              <Tooltip content={t('buttons.editFinishTime')}>
+              <Tooltip followCursor arrow title={t('buttons.editFinishTime')}>
                 <Button minimal icon={<Edit size={12} />} onClick={editFinishTime} />
               </Tooltip>
             </span>
