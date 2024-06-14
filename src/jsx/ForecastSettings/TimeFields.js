@@ -1,15 +1,14 @@
 import { DateTime, Interval } from "luxon";
-import React, {useState} from "react";
+import React from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { finishTimeFormat, speedForTargetSet, editingFinishTimeSet } from "../../redux/reducer.js";
+import { finishTimeFormat, speedForTargetSet, editingFinishTimeSet, desiredFinishTimeSet } from "../../redux/reducer.js";
 import { useActualFinishTime, useForecastDependentValues } from '../../utils/hooks';
 import DateSelect from "./DateSelect";
 import {useTranslation} from 'react-i18next'
 import { Button } from "@blueprintjs/core";
-import { Edit, PredictiveAnalysis} from '@blueprintjs/icons'
+import { Edit } from '@blueprintjs/icons'
 import { computeTargetSpeed } from "../../redux/actions.js";
 import { DateInput3, TimePrecision } from "@blueprintjs/datetime2";
-// import { Tooltip } from "@blueprintjs/core";
 import Tooltip from "@mui/material/Tooltip"
 
 // const LoadableDatePicker = lazy(() => componentLoader(import(/* webpackChunkName: "DateSelect" */ /* webpackPrefetch: true */ './DateSelect'), 5));
@@ -24,13 +23,12 @@ export const TimeFields = () => {
   const dispatch = useDispatch()
   const { t } = useTranslation()
   const { finishTime: predictedFinishTime } = useForecastDependentValues()
-  const [desiredElapsedTimeMinutes, setDesiredElapsedTimeMinutes] = React.useState(0)
   const distanceInKm = useSelector(state => state.routeInfo.distanceInKm)
   const startTimeMillis = useSelector(state => state.uiInfo.routeParams.startTimestamp)
   const timezone = useSelector(state => state.uiInfo.routeParams.zone)
   const startTime = DateTime.fromMillis(startTimeMillis, {zone:timezone})
   const predictedFinishTimeExists = predictedFinishTime !== null
-  const [desiredFinishTime, setDesiredFinishTime] = useState(predictedFinishTimeExists ?  DateTime.fromFormat(predictedFinishTime, finishTimeFormat) : startTime)
+  const desiredFinishTime = useSelector(state => state.uiInfo.routeParams.desiredFinishTime)
   const actualFinishTime = useActualFinishTime()
   const editingFinishTime = useSelector(state => state.uiInfo.dialogParams.editingFinishTime)
 
@@ -59,21 +57,23 @@ export const TimeFields = () => {
 
   const setDesiredCompletionTime = (event) => {
     const selectedTime = DateTime.fromISO(event)
-    setDesiredFinishTime(selectedTime)
+    dispatch(desiredFinishTimeSet(event))
     const selectedInterval = Interval.fromDateTimes(startTime, selectedTime)
     const elapsedTimeInMinutes = selectedInterval.length('minutes')
-    setDesiredElapsedTimeMinutes(elapsedTimeInMinutes)
     return dispatch(computeTargetSpeed(elapsedTimeInMinutes))
-  }
-
-  const getTargetSpeed = (event) => {
-    return dispatch(computeTargetSpeed(desiredElapsedTimeMinutes))
   }
 
   // roughly 8mph, why not
   const maxHoursPermitted = Math.ceil(distanceInKm / 13)
   let maxDate = startTime.plus({hours:maxHoursPermitted}).toJSDate()
   
+  const getDesiredFinishTime = (desiredFinishTime) => {
+    if (desiredFinishTime !== '') {
+      return desiredFinishTime
+    }
+    return predictedFinishTimeExists ?  DateTime.fromFormat(predictedFinishTime, finishTimeFormat).toISO() : startTime.toISO()
+  }
+
   const showPicker = () => {
     return (editingFinishTime ? (
       <div style={{ display: "flex", justifyContent: "center", margin: "5px 0px 10px 0px", width: '370px' }}>
@@ -83,7 +83,7 @@ export const TimeFields = () => {
           onChange={setDesiredCompletionTime}
           closeOnSelection={false}
           placeholder="M/D/YYYY"
-          value={desiredFinishTime.toISO()}
+          value={getDesiredFinishTime(desiredFinishTime)}
           fill={false}
           minDate={startTime.toJSDate()}
           maxDate={maxDate}

@@ -47,6 +47,7 @@ const routeParamsInitialState = {
     rwgpsRoute: '',
     rwgpsRouteIsTrip: false,
     startTimestamp: initialStartTime().toMillis(),
+    desiredFinishTime: '',
     // eslint-disable-next-line new-cap
     zone: Intl.DateTimeFormat().resolvedOptions().timeZone,
     routeLoadingMode: routeLoadingModes.RWGPS,
@@ -139,6 +140,9 @@ const routeParamsSlice = createSlice({
         routeLoadingModeSet(state,action) {
             state.routeLoadingMode = action.payload
         },
+        desiredFinishTimeSet(state,action) {
+            state.desiredFinishTime = action.payload
+        },
         reset(state) {
             // eslint-disable-next-line array-element-newline
             for (const [key, value] of Object.entries(routeParamsInitialState)) {
@@ -179,7 +183,7 @@ export const routeParamsReducer = routeParamsSlice.reducer
 export const {stopAfterLoadSet,rwgpsRouteSet,startTimeSet,initialStartTimeSet,
         startTimestampSet,paceSet,intervalSet,routeIsTripToggled,routeIsTripSet,
         routeLoadingModeSet,reset, timeZoneSet, rusaPermRouteIdSet,
-        segmentSet, speedForTargetSet} = routeParamsSlice.actions
+        segmentSet, speedForTargetSet, desiredFinishTimeSet} = routeParamsSlice.actions
 
 const rideWithGpsInfoSlice = createSlice({
     name: 'rideWithGpsInfo',
