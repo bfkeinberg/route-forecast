@@ -103,6 +103,7 @@ const RouteForecastMap = ({maps_api_key}) => {
         useEffect(() => {
             if (map && (Object.keys(mapBounds).length===2 || Object.keys(mapBounds).length == 4)) {
                 map.fitBounds(mapBounds, 0)
+                map.setZoom(map.getZoom()-1)
             }
         }, [map, mapBounds])
     }
@@ -127,8 +128,7 @@ const RouteForecastMap = ({maps_api_key}) => {
             {t('tableHeaders.windBearing')} &nbsp;
             <strong>{markedInfo[0].windBearing}</strong>
         </span>)
-        // $$`
-        const infoWindow = (<InfoWindow position={{ lat: markedInfo[0].lat, lng: markedInfo[0].lon }}>{infoContents}</InfoWindow>)
+        const infoWindow = (<InfoWindow disableAutoPan headerDisabled position={{ lat: markedInfo[0].lat, lng: markedInfo[0].lon }}>{infoContents}</InfoWindow>)
         return infoWindow
     }
 
@@ -258,7 +258,7 @@ const pickHeight = (rotation) => {
 
 export const RotatedArrow = ({rotation, distance, subrange}) => {
     return (
-        <svg viewBox={pickViewbox(rotation)} //'-40 -70 73 73'
+        <svg viewBox={pickViewbox(rotation)}
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
             width={pickWidth(rotation)}
@@ -268,17 +268,18 @@ export const RotatedArrow = ({rotation, distance, subrange}) => {
         >
             <defs>
                 <radialGradient id="movingShade" fy="90%">
-                    <stop offset="0%" stop-color="lime" stop-opacity="90%"></stop>
-                    <stop offset="50%" stop-color="ff8080" stop-opacity="50%"/>
-                    <stop offset="100%" stop-color={pickArrowColor(distance,subrange)} stop-opacity="5%"></stop>
-                    <animate attributeName="fy" dur="1800ms" from="90%" to="10%" repeatCount="indefinite" />
+                    <stop offset="0%" stop-color='ffa500' stop-opacity="90%"></stop>
+                    <stop offset="50%" stop-color="#ffb833" stop-opacity="50%"/>
+                    <stop offset="75%" stop-color="#ffd280" stop-opacity="25%"/>
+                    <stop offset="100%" stop-color='#ffe4b3' stop-opacity="5%"></stop>
+                    <animate attributeName="fy" dur="1900ms" from="90%" to="10%" repeatCount="indefinite" />
                 </radialGradient>
             </defs>
             <path
                 stroke={pickArrowColor(distance,subrange)}
                 strokeLinecap="round"
                 // strokeWidth="3"
-                strokeOpacity={'20%'}
+                strokeOpacity={'70%'}
                 d={arrowPath}
                 fill={`url(#movingShade)`}
                 transform={`rotate(${rotation},-0.234,0.134)`}
@@ -347,7 +348,7 @@ const MapHighlight = ({ points, subrange }) => {
     const highlightPoints = points.filter(point => point.dist >= subrange[0] &&
         (isNaN(subrange[1]) || point.dist <= subrange[1]));
         return <Polyline path={highlightPoints} options={{
-        strokeColor: '#67ff99',
+        strokeColor: '#ff9900', //'#67ff99',
         strokeOpacity: 1.0,
         strokeWeight: 5
     }} />;
