@@ -13,7 +13,7 @@ paceSet,     routeLoadingBegun, rwgpsRouteLoaded,     rwgpsRouteLoadingFailed, s
 startTimeSet,
 stravaActivitySet,
 stravaErrorSet, stravaFetchBegun, stravaFetched, stravaFetchFailed,
-    stravaTokenSet, timeZoneSet, userControlsUpdated, weatherProviderSet } from './reducer';
+    stravaTokenSet, timeZoneSet, userControlsUpdated, weatherProviderSet, speedForTargetSet } from './reducer';
 
 export const componentLoader = (lazyComponent, attemptsLeft) => {
     return new Promise((resolve, reject) => {
@@ -491,5 +491,20 @@ export const setWeatherProvider = (weatherProvider) => {
     return function(dispatch) {
         dispatch(weatherProviderSet(weatherProvider));
         dispatch(cancelForecast());
+    }
+}
+
+export const computeTargetSpeed = (timeInMinutes) => {
+    return async (dispatch, getState) => {
+        const parser = await getRouteParser().catch((err) => {dispatch(gpxRouteLoadingFailed(err));return null});
+        const distanceInKm = getState().routeInfo.distanceInKm
+        // subtract from the desired elapsed time the time to be spent in controls
+        const userControls = getState().controls.userControlPoints
+        userControls.forEach(control => timeInMinutes -= control.duration)
+        const targetElapsedSeconds = timeInMinutes*60
+        const climbInMeters = getState().routeInfo.elevationGainMeters
+        const predictedSpeed = parser.getSpeedForDesiredElapsedTime(targetElapsedSeconds, distanceInKm, climbInMeters)
+        dispatch(speedForTargetSet(predictedSpeed))
+        return predictedSpeed
     }
 }

@@ -27,6 +27,7 @@ const ForecastButton = ({fetchingForecast,submitDisabled, routeNumber, startTime
         const fetchAqi = useSelector(state => state.forecast.fetchAqi)
         const rusaRouteId = useSelector(state => state.uiInfo.routeParams.rusaPermRouteId)
         const segmentRange = useSelector(state => state.uiInfo.routeParams.segment)
+        const userOverrideSpeed = useSelector(state => state.uiInfo.routeParams.speedForTargetFinish)
     
         const { t } = useTranslation()
 
@@ -56,7 +57,7 @@ const ForecastButton = ({fetchingForecast,submitDisabled, routeNumber, startTime
     }
     const doForecastByParts = () => {
         const forecastRequest = getForecastRequest(routeData, startTimestamp, type, zone, 
-            pace, interval, userControlPoints, segmentRange)
+            pace, interval, userControlPoints, segmentRange, userOverrideSpeed)
         if (!forecastRequest) {
             return { result: "error", error: "No route could be loaded" }
         }
