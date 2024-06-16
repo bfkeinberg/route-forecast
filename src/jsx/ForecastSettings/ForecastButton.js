@@ -8,12 +8,12 @@ import { useMediaQuery } from 'react-responsive';
 
 import { shortenUrl } from "../../redux/actions";
 import { useForecastMutation, useGetAqiMutation } from '../../redux/forecastApiSlice';
-import { forecastAppended,forecastFetchBegun,forecastFetched, forecastFetchFailed, querySet, segmentSet } from '../../redux/reducer';
+import { forecastAppended,forecastFetchBegun,forecastFetched, forecastFetchFailed, querySet, errorMessageListSet } from '../../redux/reducer';
 import { generateUrl } from '../../utils/queryStringUtils';
 import { getForecastRequest } from '../../utils/util';
 import { DesktopTooltip } from '../shared/DesktopTooltip';
 import {useTranslation} from 'react-i18next'
-
+    
 const ForecastButton = ({fetchingForecast,submitDisabled, routeNumber, startTimestamp, pace, interval,
      metric, controls, strava_activity, strava_route, provider, href, urlIsShortened, querySet, zone}) => {
         const [forecast, forecastFetchResult] = useForecastMutation()
@@ -27,7 +27,6 @@ const ForecastButton = ({fetchingForecast,submitDisabled, routeNumber, startTime
         const fetchAqi = useSelector(state => state.forecast.fetchAqi)
         const rusaRouteId = useSelector(state => state.uiInfo.routeParams.rusaPermRouteId)
         const segmentRange = useSelector(state => state.uiInfo.routeParams.segment)
-    
         const { t } = useTranslation()
 
     const forecastByParts = (forecastRequest, zone, service, routeName, routeNumber) => {
@@ -37,22 +36,18 @@ const ForecastButton = ({fetchingForecast,submitDisabled, routeNumber, startTime
         let locations = requestCopy.shift();
         let which = 0
         while (requestCopy.length >= 0 && locations) {
-            try {
-                const request = {locations:locations, timezone:zone, service:service, routeName:routeName, routeNumber:routeNumber, which}
-                const result = forecast(request).unwrap()
-                forecastResults.push(result)
-                if (fetchAqi) {
-                    const aqiRequest = {locations:locations}
-                    const aqiResult = getAQI(aqiRequest).unwrap()
-                    aqiResults.push(aqiResult)
-                }
-                locations = requestCopy.shift();
-                ++which
-            } catch (err) {
-                dispatch(forecastFetchFailed(err))
+            const request = {locations:locations, timezone:zone, service:service, routeName:routeName, routeNumber:routeNumber, which}
+            const result = forecast(request).unwrap()
+            forecastResults.push(result)
+            if (fetchAqi) {
+                const aqiRequest = {locations:locations}
+                const aqiResult = getAQI(aqiRequest).unwrap()
+                aqiResults.push(aqiResult)
             }
+            locations = requestCopy.shift();
+            ++which
         }
-        return [Promise.all(forecastResults),fetchAqi?Promise.all(aqiResults):[]]
+        return [Promise.allSettled(forecastResults),fetchAqi?Promise.all(aqiResults):[]]
     }
     const doForecastByParts = () => {
         const forecastRequest = getForecastRequest(routeData, startTimestamp, type, zone, 
@@ -67,6 +62,7 @@ const ForecastButton = ({fetchingForecast,submitDisabled, routeNumber, startTime
         t('tooltips.forecast.disabled') :
         t('tooltips.forecast.enabled')
     let buttonStyle = submitDisabled ? { pointerEvents: 'none', display: 'inline-flex' } : null;
+    
     const forecastClick = async () => {
         await Sentry.startSpan({ name: "forecastClick" }, async () => {
             dispatch(forecastFetchBegun())
@@ -74,37 +70,30 @@ const ForecastButton = ({fetchingForecast,submitDisabled, routeNumber, startTime
                 value: distanceInKm, currency:routeNumber, coupon:routeName,
                 items: [{ item_id: '', item_name: '' }]
             }
-            ReactGA.event('add_payment_info', reactEventParams);
-    
-            try {
-                const forecastAndAqiResults = doForecastByParts()
-                const forecastResults = await forecastAndAqiResults[0]
-                if (forecastResults.length===0) {
-                    dispatch(forecastFetchFailed('No forecast was returned'))
-                    return
-                }
-                const aqiResults = await forecastAndAqiResults[1]
-                forecastResults.sort((l,r) => l.forecast.distance-r.forecast.distance)
-                const firstForecast = {...forecastResults.shift().forecast}
-                if (aqiResults.length > 0) {
-                    firstForecast.aqi = aqiResults.shift().aqi.aqi
-                }
-                dispatch(forecastFetched({ forecastInfo: {forecast: [firstForecast]}, timeZoneId: zone }))
-                while (forecastResults.length > 0) {
-                    const nextForecast = {...forecastResults.shift().forecast}
-                    if (aqiResults.length > 0) {
-                        nextForecast.aqi = aqiResults.shift().aqi.aqi
-                    }
-                    dispatch(forecastAppended(nextForecast))
-                }
-            } catch (err) {
-                if (err.message)
-                    dispatch(forecastFetchFailed(err.message))
-                else if (err.data)
-                    dispatch(forecastFetchFailed(err.data.details))
-                else
-                    dispatch(forecastFetchFailed(err))
+            ReactGA.event('add_payment_info', reactEventParams);    
+            const forecastAndAqiResults = doForecastByParts()
+            const forecastResults = await forecastAndAqiResults[0]
+            if (forecastResults.length===0) {
+                dispatch(forecastFetchFailed('No forecast was returned'))
+                return
             }
+            const aqiResults = await forecastAndAqiResults[1]
+            let filteredResults = forecastResults.filter(result => result.status === "fulfilled").map(result => result.value)
+            filteredResults.sort((l,r) => l.forecast.distance-r.forecast.distance)
+            const firstForecast = {...filteredResults.shift().forecast}
+            if (aqiResults.length > 0) {
+                firstForecast.aqi = aqiResults.shift().aqi.aqi
+            }
+            dispatch(forecastFetched({ forecastInfo: {forecast: [firstForecast]}, timeZoneId: zone }))
+            while (filteredResults.length > 0) {
+                const nextForecast = {...filteredResults.shift().forecast}
+                if (aqiResults.length > 0) {
+                    nextForecast.aqi = aqiResults.shift().aqi.aqi
+                }
+                dispatch(forecastAppended(nextForecast))
+            }
+            // handle any errors
+            dispatch(errorMessageListSet(forecastResults.filter(result => result.status === 'rejected').map(result => result.reason.data.details)))
         })
         const url = generateUrl(startTimestamp, routeNumber, pace, interval, metric, controls,
             strava_activity, strava_route, provider, origin, true, dispatch, zone, rusaRouteId)
@@ -117,11 +106,10 @@ const ForecastButton = ({fetchingForecast,submitDisabled, routeNumber, startTime
     };
 
     const smallScreen = useMediaQuery({query: "(max-width: 800px)"})
-
     return (
         <DesktopTooltip content={tooltipContent}>
             <div id='forecast' style={{ 'display': 'flex', width: '100%', justifyContent: "center", margin: "10px 0px 0px 10px", flex: 1.6 }} cursor='not-allowed'>
-                <Button
+            <Button
                     tabIndex='0'
                     intent="primary"
                     onClick={forecastClick}
@@ -136,7 +124,7 @@ const ForecastButton = ({fetchingForecast,submitDisabled, routeNumber, startTime
                 </Button>
             </div>
         </DesktopTooltip>
-    );
+    )
 };
 
 ForecastButton.propTypes = {

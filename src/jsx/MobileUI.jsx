@@ -5,7 +5,7 @@ import React from "react";
 import {connect, useDispatch,useSelector} from 'react-redux';
 import { Link, MemoryRouter, Route, Routes, useLocation, useNavigate } from "react-router-dom";
 
-import { errorDetailsSet } from "../redux/reducer";
+import { errorDetailsSet, lastErrorCleared } from "../redux/reducer";
 import { useForecastDependentValues,useWhenChanged } from "../utils/hooks";
 import { ForecastSettings } from "./ForecastSettings/ForecastSettings";
 import MapLoader from "./Map/MapLoader";
@@ -14,6 +14,7 @@ import PaceTable from "./resultsTables/PaceTable";
 import RouteInfoForm from "./RouteInfoForm/RouteInfoForm";
 import ErrorBoundary from "./shared/ErrorBoundary";
 import DonationRequest from "./TopBar/DonationRequest";
+import DisplayErrorList from "./app/DisplayErrorList";
 
 const MobileUI = (props) => {
     return (
@@ -69,9 +70,15 @@ const MobileUITabs = (props) => {
         }, [props.orientationChanged])
     
         const { adjustedTimes } = useForecastDependentValues()
+        const errorMessageList = useSelector(state => state.uiInfo.dialogParams.errorMessageList)
 
+        const closeErrorList = () => {
+            dispatch(lastErrorCleared())
+        }
+            
         return (
             <>
+                <DisplayErrorList errorList={errorMessageList} onClose={closeErrorList}/>
                 <Navbar>
                     <NavbarGroup align={Alignment.CENTER}>
                         <NavbarHeading>Randoplan</NavbarHeading>
@@ -87,12 +94,12 @@ const MobileUITabs = (props) => {
                             </Link>
                         </ErrorBoundary>
                         <NavbarDivider />
-                        <Link to={"/map/"} className={'nav-link'}>
-                        <Button small icon={<Globe/>} size={IconSize.STANDARD} title={"map"} intent={props.needToViewMap ? Intent.WARNING : (pathname.startsWith('/map')?Intent.PRIMARY:Intent.NONE)} />
-                        </Link>
-                        <NavbarDivider />
                         <Link to={"/forecastTable/"} className={'nav-link'}>
                             <Button small icon={<Cloud/>} size={IconSize.STANDARD} title={"forecast"} intent={props.needToViewTable ? Intent.WARNING : (pathname.startsWith('/forecastTable')?Intent.PRIMARY:Intent.NONE)} />
+                        </Link>
+                        <NavbarDivider />
+                        <Link to={"/map/"} className={'nav-link'}>
+                        <Button small icon={<Globe/>} size={IconSize.STANDARD} title={"map"} intent={props.needToViewMap ? Intent.WARNING : (pathname.startsWith('/map')?Intent.PRIMARY:Intent.NONE)} />
                         </Link>
                         <NavbarDivider />
                         {
