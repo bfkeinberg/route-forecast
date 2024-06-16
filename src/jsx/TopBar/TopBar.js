@@ -13,9 +13,21 @@ import ShortUrl from "./ShortUrl";
 import {useTranslation} from 'react-i18next'
 import FaqButton from "./FaqButton";
 
+const TitleAndFinishTime = ({finishTime, fontSize, alignment}) => {
+  return (
+    <div style={{display:'flex', flexDirection:'column'}}>
+      <RouteTitle/>
+      <div style={{fontStyle: "oblique", color: "rgba(64, 111, 140, 0.87)", fontSize: fontSize, height: "60px", textAlign: alignment}}>
+        {finishTime}
+      </div>
+    </div>
+  )
+}
 export const TopBar = ({sidePaneOptions, activeSidePane, setActiveSidePane, sidebarWidth, panesVisible}) => {
-  const roomFortitle = useMediaQuery({ query: '(min-width: 1610px)' });
+  const roomForTitle = useMediaQuery({ query: '(min-width: 1610px)' });
   const roomForFinishTime = useMediaQuery({ query: '(min-width: 1000px)' });
+  const titleAdjacent = roomForFinishTime && roomForTitle
+  const titleMustBeStacked = roomForFinishTime && !roomForTitle
   const { finishTime: predictedFinishTime } = useForecastDependentValues();
   const predictedFinishTimeExists = predictedFinishTime !== null;
   const finishTimeFontSize = useMediaQuery({ query: '(min-width: 1725px)' }) ? "20px" : "15px"
@@ -31,13 +43,13 @@ export const TopBar = ({sidePaneOptions, activeSidePane, setActiveSidePane, side
         panesVisible={panesVisible}
       />
       <div style={{display: "flex", flexGrow: 1, flexShrink: 8, justifyContent: "space-between", alignItems: "center", padding: "0px 20px", borderWidth: "0px 0px 0px 1px", borderStyle: "solid", borderColor: "grey"}}>
-        {roomFortitle && <RouteTitle/>}
-        {roomForFinishTime && predictedFinishTimeExists && <div style={{fontStyle: "oblique", color: "rgba(64, 111, 140, 0.87)", fontSize: finishTimeFontSize, height: "60px", textAlign: alignment}}>{predictedFinishTime}</div>}
+        {roomForTitle && <RouteTitle/>}
+        {titleMustBeStacked && predictedFinishTimeExists && <TitleAndFinishTime finishTime={predictedFinishTime} fontSize={'20px'} alignment={alignment}/>}
+        {titleAdjacent && predictedFinishTimeExists && <div style={{fontStyle: "oblique", color: "rgba(64, 111, 140, 0.87)", fontSize: finishTimeFontSize, height: "60px", textAlign: alignment}}>{predictedFinishTime}</div>}
         <div style={{display: "flex", justifyContent: "flex-end", alignItems: "center"}}>
           <ShortUrl/>
           <DonationRequest wacky/>
           <div style={{margin: "0px 10px", flexShrink: 0}}><BugReportButton/></div>
-          {/* {roomForLogo && <NonexistentLogo/>} */}
         </div>
       </div>
     </div>
