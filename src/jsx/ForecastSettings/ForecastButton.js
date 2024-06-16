@@ -13,7 +13,8 @@ import { generateUrl } from '../../utils/queryStringUtils';
 import { getForecastRequest } from '../../utils/util';
 import { DesktopTooltip } from '../shared/DesktopTooltip';
 import {useTranslation} from 'react-i18next'
-    
+import { providerValues } from '../../redux/reducer';
+
 const ForecastButton = ({fetchingForecast,submitDisabled, routeNumber, startTimestamp, pace, interval,
      metric, controls, strava_activity, strava_route, provider, href, urlIsShortened, querySet, zone}) => {
         const [forecast, forecastFetchResult] = useForecastMutation()
@@ -49,7 +50,7 @@ const ForecastButton = ({fetchingForecast,submitDisabled, routeNumber, startTime
         }
         return [Promise.allSettled(forecastResults),fetchAqi?Promise.all(aqiResults):[]]
     }
-    const doForecastByParts = () => {
+    const doForecastByParts = (provider) => {
         const forecastRequest = getForecastRequest(routeData, startTimestamp, type, zone, 
             pace, interval, userControlPoints, segmentRange)
         if (!forecastRequest) {
@@ -63,7 +64,37 @@ const ForecastButton = ({fetchingForecast,submitDisabled, routeNumber, startTime
         t('tooltips.forecast.enabled')
     let buttonStyle = submitDisabled ? { pointerEvents: 'none', display: 'inline-flex' } : null;
     
-    const forecastClick = async () => {
+    const getForecastForProvider = async (provider) => {
+        const forecastAndAqiResults = doForecastByParts(provider)
+        const forecastResults = await forecastAndAqiResults[0]
+        let filteredResults = forecastResults.filter(result => result.status === "fulfilled").map(result => result.value)
+        filteredResults.sort((l,r) => l.forecast.distance-r.forecast.distance)
+        let returnedForecast = [{...filteredResults.shift().forecast}]
+
+        while (filteredResults.length > 0) {
+            returnedForecast.push({...filteredResults.shift().forecast})
+        }
+        return returnedForecast
+    }
+
+    const grabAllPossibleForecasts = async () => {
+        let allForecasts = {}
+        await Promise.all(Object.keys(providerValues).map(async (provider) => allForecasts[provider] = await getForecastForProvider(provider)))
+        // download the file
+        const aElement = document.createElement('a');
+        aElement.setAttribute('download', 'forecasts.json');
+        const href = URL.createObjectURL(new Blob([JSON.stringify(allForecasts)]), {type:'application/json'})
+        aElement.href = href;
+        aElement.setAttribute('target', '_blank');
+        aElement.click();
+        URL.revokeObjectURL(href)
+    }
+
+    const forecastClick = async (event) => {
+        if (event.altKey) {
+            grabAllPossibleForecasts()
+            return
+        }
         await Sentry.startSpan({ name: "forecastClick" }, async () => {
             dispatch(forecastFetchBegun())
             const reactEventParams = {
@@ -71,7 +102,7 @@ const ForecastButton = ({fetchingForecast,submitDisabled, routeNumber, startTime
                 items: [{ item_id: '', item_name: '' }]
             }
             ReactGA.event('add_payment_info', reactEventParams);    
-            const forecastAndAqiResults = doForecastByParts()
+            const forecastAndAqiResults = doForecastByParts(provider)
             const forecastResults = await forecastAndAqiResults[0]
             if (forecastResults.length===0) {
                 dispatch(forecastFetchFailed('No forecast was returned'))
