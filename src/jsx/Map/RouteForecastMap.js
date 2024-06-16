@@ -175,6 +175,7 @@ const MapMarkers = ({ forecast, controls, controlNames, subrange, metric }) => {
                     value={cvtDistance(point.distance, metric)}
                     title={`${point.fullTime}\n${formatTemperature(point.temp, metric)}`}
                     bearing={point.windBearing}
+                    relBearing={point.relBearing}
                     windSpeed={point.windSpeed}
                     subrange={subrange}
                     key={`${point.lat}${point.lon}_${cvtDistance(point.distance, metric)}_temp_${Math.random().toString(10)}`}
@@ -222,12 +223,16 @@ RainIcon.propTypes = {
     isRainy: PropTypes.bool.isRequired
 };
 
-const pickArrowColor = (distance, subrange) => {
-    if (subrange.length !== 2) {
-        return 'blue';
+const pickArrowColor = (relBearing, windSpeed) => {
+    if (relBearing <90) {
+        if (Math.cos((Math.PI / 180) * relBearing) * windSpeed >= 10) {
+            return '#e60a0a'
+        } else {
+            return '#ff9900'
+        }
+    } else {
+        return '#4169E1 ';
     }
-    const distanceInMeters = distance * milesToMeters;
-    return (distanceInMeters >= subrange[0] && distanceInMeters <= subrange[1]) ? 'deeppink' : 'blue';
 }
 
 const viewbox_0 = "-25 -35 55 50"
@@ -256,7 +261,7 @@ const pickHeight = (rotation) => {
     return 60
 }
 
-export const RotatedArrow = ({rotation, distance, subrange}) => {
+export const RotatedArrow = ({rotation, distance, relBearing, windSpeed}) => {
     return (
         <svg viewBox={pickViewbox(rotation)}
             xmlns="http://www.w3.org/2000/svg"
@@ -267,19 +272,18 @@ export const RotatedArrow = ({rotation, distance, subrange}) => {
             y="-35"
         >
             <defs>
-                <radialGradient id="movingShade" fy="90%">
-                    <stop offset="0%" stop-color='ffa500' stop-opacity="90%"></stop>
+                <radialGradient id="movingShade" fy="25%">
+                    <stop offset="0%" stop-color={pickArrowColor(relBearing, windSpeed)} stop-opacity="95%"></stop>
                     <stop offset="50%" stop-color="#ffb833" stop-opacity="50%"/>
                     <stop offset="75%" stop-color="#ffd280" stop-opacity="25%"/>
-                    <stop offset="100%" stop-color='#ffe4b3' stop-opacity="5%"></stop>
+                    <stop offset="100%" stop-color='#ffff80' stop-opacity="5%"></stop>
                     <animate attributeName="fy" dur="1900ms" from="90%" to="10%" repeatCount="indefinite" />
                 </radialGradient>
             </defs>
             <path
-                stroke={pickArrowColor(distance,subrange)}
+                stroke='gray'
                 strokeLinecap="round"
-                // strokeWidth="3"
-                strokeOpacity={'70%'}
+                strokeOpacity={'40%'}
                 d={arrowPath}
                 fill={`url(#movingShade)`}
                 transform={`rotate(${rotation},-0.234,0.134)`}
@@ -289,7 +293,7 @@ export const RotatedArrow = ({rotation, distance, subrange}) => {
     )
 }
 
-const TempMarker = ({ latitude, longitude, value, title, bearing, windSpeed, subrange }) => {
+const TempMarker = ({ latitude, longitude, value, title, bearing, relBearing, windSpeed }) => {
     // Add the marker at the specified location
     if (parseInt(windSpeed) > 3) {
         const flippedBearing = (bearing > 180) ? bearing - 180 : bearing + 180;
@@ -297,7 +301,7 @@ const TempMarker = ({ latitude, longitude, value, title, bearing, windSpeed, sub
             position={{ lat: latitude, lng: longitude }}
             title={title}
         >
-            <RotatedArrow rotation={flippedBearing} distance={value} subrange={subrange} />
+            <RotatedArrow rotation={flippedBearing} distance={value} relBearing={relBearing} windSpeed={parseInt(windSpeed)} />
         </AdvancedMarker>
     }
     else {
