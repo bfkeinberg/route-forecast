@@ -26,6 +26,7 @@ export const providerValues = {
     nws:{min_interval:1,max_days:7, canForecastPast:false, daysInPast:0, name:"National Weather Service", enabled:true},
     // meteomatics:{min_interval:1,max_days:10,canForecastPast:true, daysInPast:1, name:"Meteomatics"}
     weatherKit:{min_interval:0.25,max_days:8, canForecastPast:true, name:"Apple WeatherKit", enabled:true},
+    oneCall:{min_interval:0.25,max_days:4, canForecastPast:true, name:"OneCall", enabled:true},
     }
 export const defaultProvider = 'nws'
 

@@ -209,7 +209,7 @@ export const loadFromRideWithGps = function (routeNumber, isTrip) {
                 } else {
                     dispatch(timeZoneSet(timeZoneResults.result))
                 }
-            }, error => { return dispatch(rwgpsRouteLoadingFailed(error.message)) }
+            }, error => { return dispatch(rwgpsRouteLoadingFailed(error.message?error.message:error)) }
             );
         })
     };

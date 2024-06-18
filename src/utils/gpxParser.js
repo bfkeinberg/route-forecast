@@ -403,7 +403,7 @@ class AnalyzeRoute {
                 if (forecast.length > 0 && (totalDistanceInKm*kmToMiles)>forecast[forecast.length-1].distance) {
                     currentForecast = forecast.pop();
                     // calculate adjusted forecast time for table display purposes
-                    const initialForecastTime = DateTime.fromFormat(currentForecast.fullTime, 'EEE MMM d h:mma yyyy');
+                    const initialForecastTime = DateTime.fromISO(currentForecast.time);
                     adjustedTimes.push({time:initialForecastTime.plus({minutes:totalMinutesLost}),index:forecastIndex})
                     forecastIndex++
                 }
@@ -454,7 +454,7 @@ class AnalyzeRoute {
         if (forecast.length > 0) {
             currentForecast = forecast.pop();
             // calculate adjusted forecast time for table display purposes
-            const initialForecastTime = DateTime.fromFormat(currentForecast.fullTime, 'EEE MMM d h:mma yyyy');
+            const initialForecastTime = DateTime.fromISO(currentForecast.time);
             adjustedTimes.push({time:initialForecastTime.plus({minutes:totalMinutesLost}),index:forecastIndex})
         }
         return {time:totalMinutesLost,values:calculatedValues, gustSpeed:maxGustSpeed,
