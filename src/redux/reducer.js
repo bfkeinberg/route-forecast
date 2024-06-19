@@ -221,7 +221,7 @@ const routeInfoSlice = createSlice({
                 state.canDoUserSegment = action.payload.route.track_points[0].d !== undefined
             } else {
                 state.distanceInKm = action.payload.trip.distance/1000
-                state.canDoUserSegment = action.payload.route.track_points[0].d !== undefined
+                state.canDoUserSegment = action.payload.trip.track_points[0].d !== undefined
             }
             state.type = "rwgps"
         },
