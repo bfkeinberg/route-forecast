@@ -230,7 +230,7 @@ const routeInfoSlice = createSlice({
             state.rwgpsRouteData = null
             state.name = getRouteName(action.payload, "gpx")
             state.type = "gpx"
-            state.distanceInKm = action.payload.tracks[0].distance.total
+            state.distanceInKm = action.payload.tracks[0].distance.total/1000
         },
         routeDataCleared(state) {
             state.rwgpsRouteData = null
