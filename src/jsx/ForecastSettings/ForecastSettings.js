@@ -36,7 +36,7 @@ export const ForecastSettings = () => {
                         <div style={{ width: "fit-content", borderBottom: !metric ? "1px solid #106ba3" : "1px solid #0000" }}>{t('labels.englishSystem')}</div>
                         <div style={{ fontSize: "10px", color: "grey", opacity: !metric ? 1 : 0, transition: "opacity 0.3s", marginTop: "3px", textAlign: "end" }}>{t('labels.miles')}</div>
                     </div>
-                    <AlwaysFilledSwitch checked={metric} onChange={() => dispatch(metricToggled())}></AlwaysFilledSwitch>
+                    <AlwaysFilledSwitch id={'metricImperialSwitch'} checked={metric} onChange={() => dispatch(metricToggled())}></AlwaysFilledSwitch>
                     <div style={{ flex: 1, cursor: "pointer", display: "flex", flexFlow: "column" }} onClick={() => dispatch(metricToggled())}>
                         <div style={{ width: "fit-content", borderBottom: metric ? "1px solid rgb(234, 89, 41)" : "1px solid #0000" }}>{t('labels.metricSystem')}</div>
                         <div style={{ fontSize: "10px", color: "grey", opacity: metric ? 1 : 0, transition: "opacity 0.3s", marginTop: "3px" }}>{t('labels.kilometers')}</div>

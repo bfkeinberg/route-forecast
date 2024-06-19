@@ -32,7 +32,6 @@ const WeatherProviderSelector = ({weatherProvider,setWeatherProvider,forecastLen
         <FormGroup label={<span><b>{t('labels.source')}</b></span>} labelFor={'provider'}>
             <DesktopTooltip content={t('tooltips.provider')} placement={"right"}>
                 <Select tabIndex="0"
-                    id='provider'
                     items={Object.entries(providerValues).filter(entry => entry[1].maxCallsPerHour===undefined||entry[1].maxCallsPerHour>forecastLength).map(element => { return { key: element[0], ...element[1] } })}
                     itemsEqual={"name"}
                     itemRenderer={renderProvider}
@@ -41,7 +40,7 @@ const WeatherProviderSelector = ({weatherProvider,setWeatherProvider,forecastLen
                     activeItem={{ key: weatherProvider, ...providerValues[weatherProvider] }}
                     onItemSelect={(selected) => { setWeatherProvider(selected.key) }}
                 >
-                    <Button text={providerValues[weatherProvider].name} rightIcon="symbol-triangle-down" />
+                    <Button id={'provider'} text={providerValues[weatherProvider].name} rightIcon="symbol-triangle-down" />
                 </Select>
             </DesktopTooltip>
         </FormGroup>
