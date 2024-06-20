@@ -2,6 +2,7 @@
 require('./instrument');
 const express = require('express');
 const app = express();
+const apicache = require('node-cache-32')
 require('source-map-support').install();
 const expressStaticGzip = require("express-static-gzip");
 
@@ -24,7 +25,6 @@ const querystring = require('querystring');
 const Sentry = require('@sentry/node');
 
 let logger = console;
-
 var compression = require('compression');
 
 app.use(compression());
@@ -212,8 +212,22 @@ const getAQI = (result, point) => {
         return result
     })
 }
+    // add route to display cache performance (courtesy of @killdash9)
+app.get('/cache/performance', (req, res) => {
+    res.json(apicache.getPerformance())
+})
+  
+  // add route to display cache index
+app.get('/cache/index', (req, res) => {
+    res.json(apicache.getIndex())
+})
 
-app.post('/forecast_one', upload.none(), async (req, res) => {
+let cache = apicache.options(
+    {
+        trackPerformance:true,
+        appendKey: (req, res) => req.body.locations.lat.toString() + req.body.locations.lon.toString() + req.body.locations.time})
+
+app.post('/forecast_one', cache.middleware(), upload.none(), async (req, res) => {
     if (req.body.locations === undefined) {
         res.status(400).json({ 'status': 'Missing location key' });
         return;

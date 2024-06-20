@@ -11,7 +11,7 @@ import { displayControlTableUiSet,     errorDetailsSet,forecastAppended,forecast
 forecastFetched, forecastFetchFailed, forecastInvalidated, gpxRouteLoaded, gpxRouteLoadingFailed,     initialStartTimeSet, intervalSet, loadingFromUrlSet,
 paceSet,     routeLoadingBegun, rwgpsRouteLoaded,     rwgpsRouteLoadingFailed, shortUrlSet,
 startTimeSet,
-stravaActivitySet,
+stravaActivitySet, errorMessageListSet,
 stravaErrorSet, stravaFetchBegun, stravaFetched, stravaFetchFailed,
     stravaTokenSet, timeZoneSet, userControlsUpdated, weatherProviderSet } from './reducer';
 
@@ -350,7 +350,7 @@ const forecastByParts = (forecastFunc, aqiFunc, forecastRequest, zone, service, 
             dispatch(forecastFetchFailed(err))
         }
     }
-    return [Promise.all(forecastResults),fetchAqi?Promise.all(aqiResults):[]]
+    return [Promise.allSettled(forecastResults),fetchAqi?Promise.all(aqiResults):[]]
 }
 
 const doForecastByParts = (forecastFunc, aqiFunc, dispatch, getState) => {
@@ -388,26 +388,26 @@ const forecastWithHook = async (forecastFunc, aqiFunc, dispatch, getState) => {
             });
         }
 
-        try {
-            dispatch(forecastFetchBegun())
-            const forecastAndAqiResults = doForecastByParts(forecastFunc, aqiFunc, dispatch, getState)
-            const forecastResults = await forecastAndAqiResults[0]
-            const aqiResults = await forecastAndAqiResults[1]
-            const firstForecast = {...forecastResults.shift().forecast}
-            if (aqiResults.length > 0) {
-                firstForecast.aqi = aqiResults.shift().aqi.aqi
-            }
-        dispatch(forecastFetched({ forecastInfo: { forecast: [firstForecast] }, timeZoneId: getState().uiInfo.routeParams.zone }))
-            while (forecastResults.length > 0) {
-                const nextForecast = {...forecastResults.shift().forecast}
-                if (aqiResults.length > 0) {
-                    nextForecast.aqi = aqiResults.shift().aqi.aqi
-                }
-            dispatch(forecastAppended(nextForecast))
-            }
-        } catch (err) {
-            dispatch(forecastFetchFailed(err))
+        dispatch(forecastFetchBegun())
+        const forecastAndAqiResults = doForecastByParts(forecastFunc, aqiFunc, dispatch, getState)
+        const forecastResults = await forecastAndAqiResults[0]
+        const aqiResults = await forecastAndAqiResults[1]
+        let filteredResults = forecastResults.filter(result => result.status === "fulfilled").map(result => result.value)
+        filteredResults.sort((l,r) => l.forecast.distance-r.forecast.distance)
+        const firstForecast = {...filteredResults.shift().forecast}
+        if (aqiResults.length > 0) {
+            firstForecast.aqi = aqiResults.shift().aqi.aqi
         }
+        dispatch(forecastFetched({ forecastInfo: { forecast: [firstForecast] }, timeZoneId: getState().uiInfo.routeParams.zone }))
+        while (filteredResults.length > 0) {
+            const nextForecast = {...filteredResults.shift().forecast}
+            if (aqiResults.length > 0) {
+                nextForecast.aqi = aqiResults.shift().aqi.aqi
+            }
+        dispatch(forecastAppended(nextForecast))
+        }
+        // handle any errors
+        dispatch(errorMessageListSet(forecastResults.filter(result => result.status === 'rejected').map(result => result.reason.data.details)))
     })
 }
 

@@ -164,7 +164,7 @@ const usePointsAndBounds = () => {
     pointsAndBounds = useMemo(() => gpxParser.computePointsAndBounds(gpxRouteData, "gpx"), [gpxRouteData])
   }
   if (!pointsAndBounds) {
-    Sentry.captureMessage('Empty points and bounds')
+    Sentry.captureMessage(`Empty points and bounds :Strava=${stravaActivityStream===null} RWGPS:${rwgpsRouteData===null} GPX:${gpxRouteData===null}`)
   }
   if (pointsAndBounds && pointsAndBounds.pointList && pointsAndBounds.pointList.length > 0) {
     // pointsAndBounds.points = useMemo(() => pointsAndBounds.pointList
