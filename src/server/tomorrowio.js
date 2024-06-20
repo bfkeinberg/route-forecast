@@ -55,7 +55,7 @@ axiosRetry(axiosInstance, {
 
 const getFromTomorrowIoWithBackoff = async (forecastUrl) => {
     const forecastResult = await axiosInstance.get(forecastUrl).catch(error => {
-        Sentry.captureException(error)
+        // Sentry.captureException(error)
         console.error('Axios error', error.response.statusText)
         throw Error(`Failed to get Tomorrow.io forecast from ${forecastUrl}:${error}`)
     })

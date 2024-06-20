@@ -21,7 +21,7 @@ export const setDateOnly = (start, setInitialStart) => {
 
 //"EEE MMM dd yyyy HH:mm:ss 'GMT'ZZZ"
 const DateSelect = ({ start, zone, setStart, initialStartTimeSet, maxDaysInFuture, canForecastPast, setTimeFromIso }) => {
-    const { t } = useTranslation()
+    const { t, i18n } = useTranslation()
     const setDateWithZone = (zone) => {
         setTimeFromIso(start.toISO({includeOffset:false}), zone)
     }
@@ -48,6 +48,7 @@ const DateSelect = ({ start, zone, setStart, initialStartTimeSet, maxDaysInFutur
             <div style={{ flex: 2.5 } }>
                 <DesktopTooltip content={t('tooltips.startingTime')} placement={'bottom'}>
                     <DateInput3
+                        inputProps={{id:'startDatePicker'}}
                         onChange={setDateFromPicker}
                         closeOnSelection={false}
                         onTimezoneChange={setDateWithZone}
@@ -60,6 +61,7 @@ const DateSelect = ({ start, zone, setStart, initialStartTimeSet, maxDaysInFutur
                         timePickerProps={{useAmPm:true, showArrowButtons:true}}
                         dateFnsFormat='MMMM d, yyyy h:mmaaa'
                         timezone={zone}
+                        locale={i18n.language}
                     />
                 </DesktopTooltip>
             </div>

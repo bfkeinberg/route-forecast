@@ -10,13 +10,14 @@ import {useTranslation} from 'react-i18next'
 const ForecastInterval = ({min_interval,interval,setInterval}) => {
     const { t } = useTranslation()
     return (
-        <FormGroup style={{flex: 1}} label={t('labels.interval')}>
+        <FormGroup style={{flex: 1}} label={t('labels.interval')} labelFor="intervalRange">
             <Tooltip arrow placement='bottom' title={t('tooltips.interval')}>
                 <Slider
                     value={interval}
                     step={0.25}
                     min={min_interval}
                     max={2.0}
+                    id={'intervalRange'}
                     marks={[
                         { value: 0.25, label: '15' },
                         { value: 0.5, label: '30' },
