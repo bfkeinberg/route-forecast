@@ -67,7 +67,7 @@ const skyBlueText = {color: 'deepSkyBlue'}
 
 const redText = {color: 'red'}
 
-const windStyle = (point) => {
+const headwindStyle = (point) => {
     if (point.relBearing <90) {
         if (Math.cos((Math.PI / 180) * point.relBearing) * parseInt(point.windSpeed) >= 10) {
             return redText;
@@ -76,6 +76,19 @@ const windStyle = (point) => {
         }
     } else {
         return skyBlueText;
+    }
+}
+
+const windStyle = (point) => {
+    const headwindColor = headwindStyle(point)
+    if ((point.relBearing >= 75 && point.relBearing <= 105) || (point.relBearing >= 255 && point.relBearing <= 285) ) {
+        if (Math.sin((Math.PI / 180) * point.relBearing) * parseInt(point.windSpeed) >= 10) {
+            return {fontWeight:'900', backgroundColor: '#682c36  ', ...headwindColor}
+        } else {
+            return headwindColor    
+        }
+    } else {
+        return headwindColor
     }
 }
 

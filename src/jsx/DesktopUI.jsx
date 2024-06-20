@@ -4,7 +4,7 @@ import { Spinner } from "@blueprintjs/core";
 import lazyRetry from "@tdotcode/react-lazy-retry";
 import PropTypes from "prop-types";
 import React, { Suspense,useState,StrictMode } from "react";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 
 import { routeLoadingModes } from "../data/enums";
 import { useDelay, useForecastDependentValues,usePrevious, useValueHasChanged, useWhenChanged } from "../utils/hooks";
@@ -20,9 +20,12 @@ import { TitleScreen } from "./TitleScreen";
 import { TopBar } from "./TopBar/TopBar";
 import LangSwitcher from "./app/LangSwitcher";
 import {useTranslation} from 'react-i18next'
+import { lastErrorCleared } from "../redux/reducer";
+import DisplayErrorList from "./app/DisplayErrorList";
 
 const DesktopUI = ({mapsApiKey, orientationChanged, setOrientationChanged}) => {
     const { t } = useTranslation()
+    const dispatch = useDispatch()
 
     const LoadableForecastTable = lazyRetry(() => import(/* webpackChunkName: "ForecastTable" */ './resultsTables/ForecastTable'));
     const {adjustedTimes } = useForecastDependentValues()
@@ -47,7 +50,12 @@ const DesktopUI = ({mapsApiKey, orientationChanged, setOrientationChanged}) => {
     const routeData = rwgpsRouteData ? rwgpsRouteData : gpxRouteData
     const stravaActivityData = useSelector(state => state.strava.activityData)
     const forecastData = useSelector(state => state.forecast.forecast)
+    const errorMessageList = useSelector(state => state.uiInfo.dialogParams.errorMessageList)
 
+    const closeErrorList = () => {
+        dispatch(lastErrorCleared())
+    }
+    
     const panesVisible = new Set()
     panesVisible.add(titleRouteInfo)
     if (routeData !== null) {
@@ -92,7 +100,7 @@ const DesktopUI = ({mapsApiKey, orientationChanged, setOrientationChanged}) => {
 
     return (
         <StrictMode>
-            <div style={{ display: 'flex', flexDirection: 'column', maxHeight: '100vh' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', maxHeight: '97vh' }}>
                 {!mapDataExists ? <InstallExtensionButton /> : null}
                 <div /* style={{ display:'flex',  flexShrink: 0 }} */>
                     <TopBar
@@ -107,6 +115,7 @@ const DesktopUI = ({mapsApiKey, orientationChanged, setOrientationChanged}) => {
                     <div style={{ maxHeight: '100%', overflowY: 'scroll', width: `${sidebarWidth}px` }}>
                         <Sidebar sidePaneOptions={sidePaneOptions} activeSidePane={activeSidePane} sidebarWidth={sidebarWidth} />
                     </div>
+                    <DisplayErrorList errorList={errorMessageList} onClose={closeErrorList}/>
                     <div style={{
                         flexGrow: 1,
                         maxHeight: "100%",

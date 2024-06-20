@@ -3,6 +3,7 @@ import { DateTime } from 'luxon';
 
 import { routeLoadingModes } from '../data/enums';
 import { getRouteName,getRouteNumberFromValue } from '../utils/util';
+import { act } from 'react';
 
 export const finishTimeFormat = 'EEE, MMM dd yyyy h:mma';
 
@@ -222,7 +223,7 @@ const routeInfoSlice = createSlice({
                 state.canDoUserSegment = action.payload.route.track_points[0].d !== undefined
             } else {
                 state.distanceInKm = action.payload.trip.distance/1000
-                state.canDoUserSegment = action.payload.route.track_points[0].d !== undefined
+                state.canDoUserSegment = action.payload.trip.track_points[0].d !== undefined
             }
             state.type = "rwgps"
         },
@@ -231,7 +232,7 @@ const routeInfoSlice = createSlice({
             state.rwgpsRouteData = null
             state.name = getRouteName(action.payload, "gpx")
             state.type = "gpx"
-            state.distanceInKm = action.payload.tracks[0].distance.total
+            state.distanceInKm = action.payload.tracks[0].distance.total/1000
         },
         routeDataCleared(state) {
             state.rwgpsRouteData = null
@@ -276,7 +277,9 @@ const getMessageFromError = (error) => {
 const dialogParamsSlice = createSlice({
     name: 'dialogParams',
     initialState: {
-        errorDetails: null, succeeded: true, shortUrl: ' ',
+        errorDetails: null,
+        errorMessageList: [],
+        succeeded: true, shortUrl: ' ',
         loadingSource: null, fetchingForecast: false, fetchingRoute: false
     },
     reducers: {
@@ -313,6 +316,14 @@ const dialogParamsSlice = createSlice({
                 state.errorDetails = action.payload.data.details
             } else {
                 state.errorDetails = JSON.stringify(action.payload)
+            }
+        },
+        errorMessageListSet(state,action) {
+            state.errorMessageList = action.payload
+        },
+        lastErrorCleared(state) {
+            if (state.errorMessageList.length > 0) {
+                state.errorMessageList.shift()
             }
         },
         shortUrlSet(state, action) {
@@ -356,7 +367,7 @@ const dialogParamsSlice = createSlice({
 export const dialogParamsReducer = dialogParamsSlice.reducer
 export const {routeLoadingBegun,forecastFetchBegun,
     forecastFetchFailed,forecastFetchCanceled,rwgpsRouteLoadingFailed,
-    gpxRouteLoadingFailed,errorDetailsSet,shortUrlSet,stravaErrorSet} = dialogParamsSlice.actions
+    gpxRouteLoadingFailed,errorDetailsSet,errorMessageListSet,shortUrlSet,lastErrorCleared,stravaErrorSet} = dialogParamsSlice.actions
 
 const controlsInitialState = {
     metric: false,

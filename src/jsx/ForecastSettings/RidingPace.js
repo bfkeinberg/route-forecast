@@ -142,7 +142,6 @@ const RidingPace = ({ pace, setPace, metric }) => {
         <DesktopTooltip content={pace_text} className={pace_tooltip_class}>
             <FormGroup style={{ flex: 3, fontSize: "90%" }} label={<span><b>{t('labels.ridingPace')}</b></span>} labelFor={'paceInput'}>
                 <Select tabIndex="0"
-                    id='paceInput'
                     items={dropdownValues.values}
                     itemsEqual={"number"}
                     itemRenderer={metric ? renderPaceMetric : renderPaceImperial}
@@ -151,7 +150,7 @@ const RidingPace = ({ pace, setPace, metric }) => {
                     activeItem={{ name: pace, number: selectedSpeed }}
                     onItemSelect={(selected) => { saveCookie("pace", selected.name); setPace(selected.name) }}
                 >
-                    <Button text={selectedSpeed + " " + dropdownValues.label} rightIcon="symbol-triangle-down" />
+                    <Button id={'paceInput'} text={selectedSpeed + " " + dropdownValues.label} rightIcon="symbol-triangle-down" />
                 </Select>
             </FormGroup>
         </DesktopTooltip>
