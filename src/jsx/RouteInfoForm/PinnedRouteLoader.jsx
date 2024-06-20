@@ -18,7 +18,12 @@ const addBreadcrumb = (msg) => {
     })
 }
 
-const LoadableRouteList = lazy(() => {addBreadcrumb('loading route list'); return import(/* webpackChunkName: "RouteList" */ './RWGPSRouteList')});
+const LoadableRouteList = lazy(() => {addBreadcrumb('loading route list'); return import(/* webpackChunkName: "RouteList" */ './RWGPSRouteList').catch((err) => {
+    addBreadcrumb('failed to load pinned routes')
+    return {default: () => <div>Failed to load pinned route list</div>}
+})
+
+});
 
 const getPinnedRoutes = async (rwgpsToken, setErrorDetails, rwgpsTokenSet) => {
 
