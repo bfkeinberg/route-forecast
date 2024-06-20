@@ -42,7 +42,7 @@ const getPinnedRoutes = async (rwgpsToken, setErrorDetails, rwgpsTokenSet) => {
 }
 
 const setRoutes = async (rwgpsToken, setRwgpsToken, setError, setPinnedRoutes, setLoadingPinned, usingPinnedRoutes, hasRoutes) => {
-    if (rwgpsToken === '' || rwgpsToken === null || !usingPinnedRoutes || hasRoutes) {
+    if (rwgpsToken === '' || !rwgpsToken || !usingPinnedRoutes || hasRoutes) {
         return null;
     }
     setLoadingPinned(true);
