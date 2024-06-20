@@ -65,7 +65,6 @@ const addBreadcrumb = (msg) => {
 
 const findMapBounds = (points, bounds, zoomToRange, subrange, userSubrange) => {
     const mapBounds = getMapBounds(points, bounds, zoomToRange, subrange, userSubrange)
-    addBreadcrumb(`conputed mapBounds ${mapBounds} from ${points.length} points in route`)
     return mapBounds
 }
 
