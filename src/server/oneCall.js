@@ -52,7 +52,7 @@ const callOneCall = async function callWeatherApi (lat, lon, currentTime, distan
     const url = `https://api.openweathermap.org/data/3.0/onecall/timemachine?lat=${lat}&lon=${lon}&units=imperial&dt=${startTime.toUTC().toUnixInteger()}&appid=${oneCallKey}`
     Sentry.setContext('url',{'url':url})
     const forecastResult = await axios.get(url).catch(error => {
-        throw Error(error.response.data.error.message);
+        throw Error(error.response.data.message);
     });
     if (forecastResult.data.error !== undefined && forecastResult.data.error.code !== undefined) {
         Sentry.captureMessage(`OneCall error ${forecastResult.error.message}`,'error')
