@@ -6,7 +6,7 @@ import ReactGA from "react-ga4";
 import {connect, useDispatch, useSelector} from 'react-redux';
 import { useMediaQuery } from 'react-responsive';
 
-import { shortenUrl } from "../../redux/actions";
+import { shortenUrl, msgFromError } from "../../redux/actions";
 import { useForecastMutation, useGetAqiMutation } from '../../redux/forecastApiSlice';
 import { forecastAppended,forecastFetchBegun,forecastFetched, forecastFetchFailed, querySet, errorMessageListSet } from '../../redux/reducer';
 import { generateUrl } from '../../utils/queryStringUtils';
@@ -96,7 +96,7 @@ const ForecastButton = ({fetchingForecast,submitDisabled, routeNumber, startTime
                 }
             }
             // handle any errors
-            dispatch(errorMessageListSet(forecastResults.filter(result => result.status === 'rejected').map(result => result.reason.data.details)))
+            dispatch(errorMessageListSet(forecastResults.filter(result => result.status === 'rejected').map(result => msgFromError(result))))
         })
         const url = generateUrl(startTimestamp, routeNumber, pace, interval, metric, controls,
             strava_activity, strava_route, provider, origin, true, dispatch, zone, rusaRouteId)
