@@ -370,6 +370,15 @@ const doForecastByParts = (forecastFunc, aqiFunc, dispatch, getState) => {
         getState().forecast.fetchAqi)
 }
 
+export const msgFromError = (error) => {
+    if (error.reason.data) {
+        return error.reason.data.details
+    } else {
+        Sentry.captureMessage(`Missing data in rejection ${JSON.stringify(error.reason)}`)
+        return JSON.stringify(error.reason)
+    }
+}
+
 const forecastWithHook = async (forecastFunc, aqiFunc, dispatch, getState) => {
     await Sentry.startSpan({ name: "forecastWithHook" }, async () => {
         const routeInfo = getState().routeInfo
@@ -394,20 +403,23 @@ const forecastWithHook = async (forecastFunc, aqiFunc, dispatch, getState) => {
         const aqiResults = await forecastAndAqiResults[1]
         let filteredResults = forecastResults.filter(result => result.status === "fulfilled").map(result => result.value)
         filteredResults.sort((l,r) => l.forecast.distance-r.forecast.distance)
-        const firstForecast = {...filteredResults.shift().forecast}
-        if (aqiResults.length > 0) {
-            firstForecast.aqi = aqiResults.shift().aqi.aqi
-        }
-        dispatch(forecastFetched({ forecastInfo: { forecast: [firstForecast] }, timeZoneId: getState().uiInfo.routeParams.zone }))
-        while (filteredResults.length > 0) {
-            const nextForecast = {...filteredResults.shift().forecast}
+        const firstForecastResult = filteredResults.shift()
+        if (firstForecastResult) {
+            const firstForecast = { ...firstForecastResult.forecast }
             if (aqiResults.length > 0) {
-                nextForecast.aqi = aqiResults.shift().aqi.aqi
+                firstForecast.aqi = aqiResults.shift().aqi.aqi
             }
-        dispatch(forecastAppended(nextForecast))
+            dispatch(forecastFetched({ forecastInfo: { forecast: [firstForecast] }, timeZoneId: getState().uiInfo.routeParams.zone }))
+            while (filteredResults.length > 0) {
+                const nextForecast = {...filteredResults.shift().forecast}
+                if (aqiResults.length > 0) {
+                    nextForecast.aqi = aqiResults.shift().aqi.aqi
+                }
+            dispatch(forecastAppended(nextForecast))
+            }
         }
         // handle any errors
-        dispatch(errorMessageListSet(forecastResults.filter(result => result.status === 'rejected').map(result => result.reason.data.details)))
+        dispatch(errorMessageListSet(forecastResults.filter(result => result.status === 'rejected').map(result => msgFromError(result))))
     })
 }
 

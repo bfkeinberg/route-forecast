@@ -225,7 +225,7 @@ app.get('/cache/index', (req, res) => {
 let cache = apicache.options(
     {
         trackPerformance:true,
-        appendKey: (req, res) => req.body.locations.lat.toString() + req.body.locations.lon.toString() + req.body.locations.time})
+        appendKey: (req, res) => req.body.locations.lat.toString() + req.body.locations.lon.toString() + req.body.locations.time + req.body.service})
 
 app.post('/forecast_one', cache.middleware(), upload.none(), async (req, res) => {
     if (req.body.locations === undefined) {
@@ -237,12 +237,12 @@ app.post('/forecast_one', cache.middleware(), upload.none(), async (req, res) =>
         return;
     }
     const forecastPoints = req.body.locations;
-    if (!process.env.NO_LOGGING) {
-        logger.info(`Request from ${req.ip} for single point`);
-    }
     let service = process.env.WEATHER_SERVICE;
     if (req.body.service !== undefined) {
         service = req.body.service;
+    }
+    if (!process.env.NO_LOGGING) {
+        logger.info(`Request from ${req.ip} for single point from ${service}`);
     }
     if (req.body.routeName !== undefined && req.body.routeName !== '' && req.body.which===0) {
         let dbRecord = makeRecord(forecastPoints, req.body.routeNumber);

@@ -222,7 +222,7 @@ const routeInfoSlice = createSlice({
                 state.canDoUserSegment = action.payload.route.track_points[0].d !== undefined
             } else {
                 state.distanceInKm = action.payload.trip.distance/1000
-                state.canDoUserSegment = action.payload.route.track_points[0].d !== undefined
+                state.canDoUserSegment = action.payload.trip.track_points[0].d !== undefined
             }
             state.type = "rwgps"
         },
@@ -231,7 +231,7 @@ const routeInfoSlice = createSlice({
             state.rwgpsRouteData = null
             state.name = getRouteName(action.payload, "gpx")
             state.type = "gpx"
-            state.distanceInKm = action.payload.tracks[0].distance.total
+            state.distanceInKm = action.payload.tracks[0].distance.total/1000
         },
         routeDataCleared(state) {
             state.rwgpsRouteData = null
@@ -319,6 +319,7 @@ const dialogParamsSlice = createSlice({
         },
         errorMessageListSet(state,action) {
             state.errorMessageList = action.payload
+            state.fetchingForecast = false
         },
         lastErrorCleared(state) {
             if (state.errorMessageList.length > 0) {
