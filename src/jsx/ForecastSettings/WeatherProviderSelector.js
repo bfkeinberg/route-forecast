@@ -29,7 +29,9 @@ const renderProvider = (provider, { handleClick, handleFocus, modifiers }) => {
 const WeatherProviderSelector = ({weatherProvider,setWeatherProvider}) => {
     const { t } = useTranslation()
     // TODO: move into separate component, design pattern as yet unclear
-    const type = useSelector(state => state.routeInfo.rwgpsRouteData) ? "rwgps" : "gpx"
+    const rwgpsRouteData = useSelector(state => state.routeInfo.rwgpsRouteData)
+    const gpxRouteData = useSelector(state => state.routeInfo.gpxRouteData)
+    const type = rwgpsRouteData ? "rwgps" : (gpxRouteData ? "gpx" : null)
     const timeZoneId = useSelector(state => state.uiInfo.routeParams.zone)
     const routeData = useSelector(state => state.routeInfo[type === "rwgps" ? "rwgpsRouteData" : "gpxRouteData"])
     const startTimestamp = useSelector(state => state.uiInfo.routeParams.startTimestamp)
@@ -37,7 +39,11 @@ const WeatherProviderSelector = ({weatherProvider,setWeatherProvider}) => {
     const interval = useSelector(state => state.uiInfo.routeParams.interval)
     const controlPoints = useSelector(state => state.controls.userControlPoints)
     const segment = useSelector(state => state.uiInfo.routeParams.segment)
+
     const getForecastRequestLength = () => {
+        if (!type) {
+            return 0
+        }
         const forecastRequest = getForecastRequest(
             routeData, 
             startTimestamp, 
