@@ -4,10 +4,10 @@ import Alert from '@mui/material/Alert';
 
 const ErrorDisplayer = ({ errorDetails, onClose }) => {
     return (
-        <Snackbar open={true} autoHideDuration={6000} onClose={onClose} anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}>
+        <Snackbar sx={{ height: "100%" }} open={true} autoHideDuration={6000} onClose={onClose} anchorOrigin={{ vertical: 'top', horizontal: 'left' }}>
             <Alert
                 severity="error"
-                variant="outlined"
+                // variant="outlined"
                 sx={{ width: '100%' }}
             >
                 {errorDetails}
