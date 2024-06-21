@@ -3,7 +3,6 @@ import { DateTime } from 'luxon';
 
 import { routeLoadingModes } from '../data/enums';
 import { getRouteName,getRouteNumberFromValue } from '../utils/util';
-import { act } from 'react';
 
 export const finishTimeFormat = 'EEE, MMM dd yyyy h:mma';
 
