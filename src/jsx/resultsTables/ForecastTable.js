@@ -10,7 +10,7 @@ import { DateTime } from 'luxon';
 import PropTypes from 'prop-types';
 import cookie from 'react-cookies';
 import {useDispatch,useSelector} from 'react-redux'
-import MediaQuery from 'react-responsive';
+import MediaQuery, {useMediaQuery} from 'react-responsive';
 
 import {fetchAqiToggled,finishTimeFormat,tableViewedSet,weatherRangeSet,weatherRangeToggled,zoomToRangeToggled} from '../../redux/reducer';
 import { useForecastDependentValues, useFormatSpeed } from '../../utils/hooks';
@@ -238,9 +238,12 @@ const ForecastTable = (adjustedTimes) => {
                             </div>
                         </MediaQuery>
                         <MediaQuery minDeviceWidth={501}>
-                        <div style={{ flex: 1 }}>
-                            <WeatherCorrections />
-                        </div>
+                            <MediaQuery maxWidth={1700}>
+                                <ShortUrl/>
+                            </MediaQuery>
+                            <div style={{ flex: 1 }}>
+                                <WeatherCorrections />
+                            </div>
                             <div style={{ flexShrink: 0, width: "fit-content" }}>
                                 <DesktopTooltip content={t('tooltips.zoom')}>
                                     <ToggleButton style={{ width: "5em", height: "4em", float: "right" }} active={zoomToRange} onClick={toggleZoom}>{t('buttons.zoomToSegment')}</ToggleButton>

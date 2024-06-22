@@ -2,7 +2,7 @@ import "./TopBar.css"
 
 import PropTypes from 'prop-types';
 import React from "react";
-import { useMediaQuery } from "react-responsive";
+import MediaQuery, { useMediaQuery } from "react-responsive";
 
 import { useForecastDependentValues,usePreviousPersistent, useReusableDelay, useValueHasChanged } from "../../utils/hooks";
 import { useLoadingFromURLStatus } from "../DesktopUI";
@@ -47,7 +47,9 @@ export const TopBar = ({sidePaneOptions, activeSidePane, setActiveSidePane, side
         {titleMustBeStacked && predictedFinishTimeExists && <TitleAndFinishTime finishTime={predictedFinishTime} fontSize={'20px'} alignment={alignment}/>}
         {titleAdjacent && predictedFinishTimeExists && <div style={{fontStyle: "oblique", color: "rgba(64, 111, 140, 0.87)", fontSize: finishTimeFontSize, height: "60px", textAlign: alignment}}>{predictedFinishTime}</div>}
         <div style={{display: "flex", justifyContent: "flex-end", alignItems: "center"}}>
-          <ShortUrl/>
+          <MediaQuery minWidth={1701}>
+            <ShortUrl/>
+          </MediaQuery>
           <DonationRequest wacky/>
           <div style={{margin: "0px 10px", flexShrink: 0}}><BugReportButton/></div>
         </div>
