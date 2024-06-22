@@ -89,6 +89,18 @@ const windStyle = (point) => {
     }
 }
 
+const copyTable = (event) => {
+    var htmlTable = document.getElementById('forecastTable')   
+    var range = document.createRange()
+    range.selectNode(htmlTable)
+    const selection = window.getSelection();
+    selection.removeAllRanges();
+    selection.addRange(range)
+    document.execCommand('copy')
+    selection.removeAllRanges();
+}
+
+
 const ForecastTable = (adjustedTimes) => {
     const forecast = useSelector(state => state.forecast.forecast)
     const provider = useSelector(state => state.forecast.weatherProvider)
@@ -248,12 +260,13 @@ const ForecastTable = (adjustedTimes) => {
                             </div>
                         </MediaQuery>
                     </div>
+                    <Button onClick={copyTable}>Copy forecast table</Button>
                     <Section title={t('titles.forecastControls')}>
                         <SectionCard padded>
                             {t('data.tableHeadersDoc')}
                         </SectionCard>
                     </Section>
-                    <HTMLTable compact={true} striped bordered interactive style={{ fontSize: "12px", "borderSpacing": "0px"}}>
+                    <HTMLTable id={'forecastTable'} compact={true} striped bordered interactive style={{ fontSize: "12px", "borderSpacing": "0px"}}>
                         <thead>
                             <tr key={'777'}>
                                 <th><span className={'timeHeaderCell'}>{t('tableHeaders.time')}</span></th>
