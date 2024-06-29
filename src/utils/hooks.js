@@ -188,7 +188,7 @@ const calculateWindResult = (inputs) => {
   if (dependencies.every(dependency => inputs[dependency] === lastWindResult.dependencyValues[dependency]) ) {
     return lastWindResult.result
   }
-  const {routeInfo, routeParams, controls, timeZoneId, forecast, segment} = inputs
+  const {routeInfo, routeParams, controls, timeZoneId, forecast, segment, userOverrideSpeed} = inputs
   const stateStuff = {routeInfo, uiInfo: {routeParams}, controls}
 
   let result
@@ -209,7 +209,8 @@ const calculateWindResult = (inputs) => {
         sortedValues,
         DateTime.fromMillis(routeParams.startTimestamp, {zone:routeParams.zone}),
         finishTime,
-        timeZoneId
+        timeZoneId,
+        userOverrideSpeed
     )
     result = { weatherCorrectionMinutes: time, calculatedControlPointValues: calculatedControlPointValues, maxGustSpeed: gustSpeed, finishTime: adjustedFinishTime, adjustedTimes}
   } else {
@@ -226,8 +227,8 @@ const useForecastDependentValues = () => {
   const timeZoneId = useSelector(state => state.forecast.timeZoneId)
   const forecast = useSelector(state => state.forecast.forecast)
   const segment = useSelector(state => state.uiInfo.routeParams.segment)
-
-  const windAdjustmentResult = calculateWindResult({routeInfo, routeParams, controls, timeZoneId, forecast, segment})
+  const userOverrideSpeed = useSelector(state => state.uiInfo.routeParams.speedForTargetFinish)
+  const windAdjustmentResult = calculateWindResult({routeInfo, routeParams, controls, timeZoneId, forecast, segment, userOverrideSpeed})
   return windAdjustmentResult
 }
 

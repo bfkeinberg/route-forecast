@@ -377,13 +377,13 @@ class AnalyzeRoute {
         return (distance*60)/modifiedVelocity-(distance*60)/baseSpeed;
     }
 
-    adjustForWind = (forecastInfo,stream,pace,controls,previouslyCalculatedValues,start,finishTime,timeZoneId) => {
+    adjustForWind = (forecastInfo,stream,pace,controls,previouslyCalculatedValues,start,finishTime,timeZoneId,userOverrideSpeed) => {
         if (forecastInfo.length===0) {
             return {time:0,values:[],gustSpeed:0,finishTime:finishTime};
         }
 
         const gustThreshold = 50;   // above this incorporate some of the gust into the effect on the rider
-        let baseSpeed = inputPaceToSpeed[pace];
+        let baseSpeed = userOverrideSpeed ? userOverrideSpeed : inputPaceToSpeed[pace];
         let forecast = forecastInfo.slice().reverse();
         let currentForecast = forecast.pop();
         let currentControl = 0;
