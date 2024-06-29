@@ -370,6 +370,15 @@ const doForecastByParts = (forecastFunc, aqiFunc, dispatch, getState) => {
         getState().forecast.fetchAqi)
 }
 
+export const msgFromError = (error) => {
+    if (error.reason.data) {
+        return error.reason.data.details
+    } else {
+        Sentry.captureMessage(`Missing data in rejection ${JSON.stringify(error.reason)}`)
+        return JSON.stringify(error.reason)
+    }
+}
+
 const forecastWithHook = async (forecastFunc, aqiFunc, dispatch, getState) => {
     await Sentry.startSpan({ name: "forecastWithHook" }, async () => {
         const routeInfo = getState().routeInfo
@@ -410,7 +419,7 @@ const forecastWithHook = async (forecastFunc, aqiFunc, dispatch, getState) => {
             }
         }
         // handle any errors
-        dispatch(errorMessageListSet(forecastResults.filter(result => result.status === 'rejected').map(result => result.reason.data.details)))
+        dispatch(errorMessageListSet(forecastResults.filter(result => result.status === 'rejected').map(result => msgFromError(result))))
     })
 }
 

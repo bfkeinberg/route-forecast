@@ -29,7 +29,9 @@ const renderProvider = (provider, { handleClick, handleFocus, modifiers }) => {
 const WeatherProviderSelector = ({weatherProvider,setWeatherProvider}) => {
     const { t } = useTranslation()
     // TODO: move into separate component, design pattern as yet unclear
-    const type = useSelector(state => state.routeInfo.rwgpsRouteData) ? "rwgps" : "gpx"
+    const rwgpsRouteData = useSelector(state => state.routeInfo.rwgpsRouteData)
+    const gpxRouteData = useSelector(state => state.routeInfo.gpxRouteData)
+    const type = rwgpsRouteData ? "rwgps" : (gpxRouteData ? "gpx" : null)
     const timeZoneId = useSelector(state => state.uiInfo.routeParams.zone)
     const routeData = useSelector(state => state.routeInfo[type === "rwgps" ? "rwgpsRouteData" : "gpxRouteData"])
     const startTimestamp = useSelector(state => state.uiInfo.routeParams.startTimestamp)
@@ -38,6 +40,9 @@ const WeatherProviderSelector = ({weatherProvider,setWeatherProvider}) => {
     const controlPoints = useSelector(state => state.controls.userControlPoints)
     const segment = useSelector(state => state.uiInfo.routeParams.segment)
     const getForecastRequestData = () => {
+        if (!type) {
+            return {length:0, last:DateTime.now().toISO()}
+        }
         const forecastRequest = getForecastRequest(
             routeData, 
             startTimestamp, 
@@ -47,7 +52,7 @@ const WeatherProviderSelector = ({weatherProvider,setWeatherProvider}) => {
         return {length:forecastRequest.length, last:forecastRequest[forecastRequest.length-1].time}
     }
     const forecastData = useMemo(getForecastRequestData, [routeData,interval])
-    const daysInFuture = Interval.fromDateTimes(DateTime.now(), DateTime.fromISO(forecastData   .last)).length('days')
+    const daysInFuture = Interval.fromDateTimes(DateTime.now(), DateTime.fromISO(forecastData.last)).length('days')
 
     return (
         <FormGroup label={<span><b>{t('labels.source')}</b></span>} labelFor={'provider'}>

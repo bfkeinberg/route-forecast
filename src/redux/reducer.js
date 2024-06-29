@@ -319,6 +319,7 @@ const dialogParamsSlice = createSlice({
         },
         errorMessageListSet(state,action) {
             state.errorMessageList = action.payload
+            state.fetchingForecast = false
         },
         lastErrorCleared(state) {
             if (state.errorMessageList.length > 0) {
