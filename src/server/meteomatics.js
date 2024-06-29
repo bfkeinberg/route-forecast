@@ -96,7 +96,6 @@ const callMeteomatics = async function (lat, lon, currentTime, distance, zone, b
         'lat':lat,
         'lon':lon,
         'temp':`${Math.round(forecastValues.temperatureInF)}`,
-        'fullTime':startTime.toFormat('EEE MMM d h:mma yyyy'),
         'relBearing':getBearingDifference(bearing, forecastValues.windBearing),
         'rainy':rainy,
         'windBearing':Math.round(forecastValues.windBearing),

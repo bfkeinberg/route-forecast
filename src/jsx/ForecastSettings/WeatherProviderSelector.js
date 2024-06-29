@@ -3,7 +3,7 @@ import { Select } from "@blueprintjs/select";
 import PropTypes from 'prop-types';
 import React, {useMemo} from 'react';
 import {connect, useSelector} from 'react-redux';
-
+import { DateTime, Interval } from 'luxon';
 import {setWeatherProvider} from "../../redux/actions";
 import {providerValues} from "../../redux/reducer";
 import { DesktopTooltip } from '../shared/DesktopTooltip';
@@ -39,10 +39,9 @@ const WeatherProviderSelector = ({weatherProvider,setWeatherProvider}) => {
     const interval = useSelector(state => state.uiInfo.routeParams.interval)
     const controlPoints = useSelector(state => state.controls.userControlPoints)
     const segment = useSelector(state => state.uiInfo.routeParams.segment)
-
-    const getForecastRequestLength = () => {
+    const getForecastRequestData = () => {
         if (!type) {
-            return 0
+            return {length:0, last:DateTime.now().toISO()}
         }
         const forecastRequest = getForecastRequest(
             routeData, 
@@ -50,15 +49,20 @@ const WeatherProviderSelector = ({weatherProvider,setWeatherProvider}) => {
             type, timeZoneId, pace, 
             interval, controlPoints,
             segment)
-        return forecastRequest.length
+        return {length:forecastRequest.length, last:forecastRequest[forecastRequest.length-1].time}
     }
-    const forecastLength = useMemo(getForecastRequestLength, [routeData,interval])
+    const forecastData = useMemo(getForecastRequestData, [routeData,interval])
+    const daysInFuture = Interval.fromDateTimes(DateTime.now(), DateTime.fromISO(forecastData.last)).length('days')
 
     return (
         <FormGroup label={<span><b>{t('labels.source')}</b></span>} labelFor={'provider'}>
             <DesktopTooltip content={t('tooltips.provider')} placement={"right"}>
                 <Select tabIndex="0"
-                    items={Object.entries(providerValues).filter(entry => entry[1].maxCallsPerHour===undefined||entry[1].maxCallsPerHour>forecastLength).map(element => { return { key: element[0], ...element[1] } })}
+                    items={Object.entries(providerValues).
+                        filter(entry => entry[1].maxCallsPerHour === undefined || 
+                            entry[1].maxCallsPerHour > forecastData.length).
+                        filter(entry => entry[1].max_days >= daysInFuture).
+                        map(element => { return { key: element[0], ...element[1] } })}
                     itemsEqual={"name"}
                     itemRenderer={renderProvider}
                     filterable={false}
