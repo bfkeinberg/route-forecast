@@ -6,6 +6,7 @@ const meteomatics = <svg viewBox="20 0 115 38" fill="none" xmlns="http://www.w3.
 const weatherKitImage = "https://weatherkit.apple.com/assets/branding/square-mark.png";
 import { Button, HTMLTable, Icon, Tooltip, Section, SectionCard } from '@blueprintjs/core';
 import visualcrossing from 'Images/vclogo.svg';
+import oneCallLogo from 'Images/OpenWeather-Master-Logo RGB.png'
 import { DateTime } from 'luxon';
 import PropTypes from 'prop-types';
 import cookie from 'react-cookies';
@@ -37,6 +38,8 @@ const displayBacklink = (provider) => {
             return meteomatics;
         case 'weatherKit':
             return <a href="https://developer.apple.com/weatherkit/data-source-attribution/" target="_blank" rel="noopener noreferrer"><img src={weatherKitImage} /></a>
+        case 'oneCall':
+            return <a href="https://openweathermap.org/" target="_blank" rel="noopener noreferrer"><img src={oneCallLogo} width={150} height={85}/></a>
         default: return <div/>;
     }
 }

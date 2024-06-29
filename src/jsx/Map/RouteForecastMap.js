@@ -1,13 +1,12 @@
 import {APIProvider, Map, InfoWindow, useMap, AdvancedMarker, useApiIsLoaded} from '@vis.gl/react-google-maps';
 import * as Sentry from "@sentry/react"
 import circus_tent from 'Images/circus tent.png';
-// import rainCloud from "Images/rainCloud.png";
 import rainCloud from "Images/lightning-and-blue-rain-cloud-16533.svg"
 import PropTypes from 'prop-types';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDispatch,useSelector } from 'react-redux';
 import 'Images/style.css';
-
+import { DateTime } from 'luxon';
 import { routeLoadingModes } from '../../data/enums';
 import { mapViewedSet } from '../../redux/reducer';
 import { useForecastDependentValues, usePointsAndBounds } from '../../utils/hooks';
@@ -66,7 +65,6 @@ const addBreadcrumb = (msg) => {
 
 const findMapBounds = (points, bounds, zoomToRange, subrange, userSubrange) => {
     const mapBounds = getMapBounds(points, bounds, zoomToRange, subrange, userSubrange)
-    addBreadcrumb(`conputed mapBounds ${mapBounds} from ${points.length} points in route`)
     return mapBounds
 }
 
@@ -155,7 +153,6 @@ const RouteForecastMap = ({maps_api_key}) => {
                             <MapHighlight points={points} subrange={subrange} />
                         </Map>
                         </APIProvider> :
-                        // TODO: localize
                         <h2 style={{ padding: '18px', textAlign: "center" }}>{t('titles.map')}</h2>
                     }
                 </div>
@@ -168,12 +165,13 @@ const RouteForecastMap = ({maps_api_key}) => {
 }
 
 const MapMarkers = ({ forecast, controls, controlNames, subrange, metric }) => {
+    const { i18n } = useTranslation()
     // marker title now contains both temperature and mileage
     return (forecast.map((point) =>
                 <TempMarker latitude={point.lat}
                     longitude={point.lon}
                     value={cvtDistance(point.distance, metric)}
-                    title={`${point.fullTime}\n${formatTemperature(point.temp, metric)}`}
+                    title={`${DateTime.fromISO(point.time, {zone:point.zone, locale:i18n.language}).toFormat('EEE MMM d h:mma yyyy')}\n${formatTemperature(point.temp, metric)}`}
                     bearing={point.windBearing}
                     relBearing={point.relBearing}
                     windSpeed={point.windSpeed}
@@ -198,7 +196,7 @@ const MapMarkers = ({ forecast, controls, controlNames, subrange, metric }) => {
                     latitude={point.lat}
                     longitude={point.lon}
                     value={cvtDistance(point.distance, metric)}
-                    title={`${point.fullTime}\n${formatTemperature(point.temp, metric)}`}
+                    title={`${DateTime.fromISO(point.time, {zone:point.zone, locale:i18n.language}).toFormat('EEE MMM d h:mma yyyy')}\n${formatTemperature(point.temp, metric)}`}
                     isRainy={point.rainy}
                     key={`${point.lat}${point.lon}_${cvtDistance(point.distance, metric)}_rain_${Math.random().toString(10)}`}
                 />
