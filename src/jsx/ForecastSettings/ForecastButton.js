@@ -1,7 +1,7 @@
 import { Button } from '@blueprintjs/core';
 import * as Sentry from "@sentry/react";
 import PropTypes from 'prop-types';
-import React, {useRef} from 'react';
+import React, {useRef, useState} from 'react';
 import ReactGA from "react-ga4";
 import {connect, useDispatch, useSelector} from 'react-redux';
 import { useMediaQuery } from 'react-responsive';
@@ -31,6 +31,29 @@ const ForecastButton = ({fetchingForecast,submitDisabled, routeNumber, startTime
         const segmentRange = useSelector(state => state.uiInfo.routeParams.segment)
         const { t } = useTranslation()
         const forecastRequestData = useRef(useForecastRequestData())
+        const [optionPressed, setOptionPressed] = useState(false)
+
+    const keyIsDown = (event) => {
+        if (event.code === "AltLeft" || event.code === "AltRight"   ) {
+            setOptionPressed(true)
+        }
+    }
+
+    const keyIsUp = (event) => {
+        if (event.code === "AltLeft" || event.code === "AltRight") {
+            setOptionPressed(false)
+        }
+    }
+
+    React.useEffect(() => {
+        window.addEventListener('keydown', keyIsDown);
+        window.addEventListener('keyup', keyIsUp);
+        
+        return () => {
+            window.removeEventListener('keydown', keyIsDown);
+            window.removeEventListener('keyup', keyIsUp);
+        }
+    }, [optionPressed])
 
     const forecastByParts = (forecastRequest, zone, service, routeName, routeNumber) => {
         let requestCopy = Object.assign(forecastRequest)
@@ -158,6 +181,8 @@ const ForecastButton = ({fetchingForecast,submitDisabled, routeNumber, startTime
                     tabIndex='0'
                     intent="primary"
                     onClick={forecastClick}
+                    onKeyDown={keyIsDown}
+                    onKeyUp={keyIsUp}
                     style={{ ...buttonStyle, width: "100%", backgroundColor: "#137cbd", borderColor: "#137cbd", }}
                     disabled={submitDisabled || fetchingForecast}
                     small={smallScreen}
@@ -165,7 +190,7 @@ const ForecastButton = ({fetchingForecast,submitDisabled, routeNumber, startTime
                     fill={true}
                     loading={forecastFetchResult.loading || aqiFetchResult.loading || fetchingForecast}
                 >
-                    {forecastFetchResult.isLoading ? t('buttons.forecastPending') : t("buttons.forecast")}
+                    {forecastFetchResult.isLoading ? t('buttons.forecastPending') : (optionPressed ? "Download all forecasts" : t("buttons.forecast"))}
                 </Button>
             </div>
         </DesktopTooltip>
