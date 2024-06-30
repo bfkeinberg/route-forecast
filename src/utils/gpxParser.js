@@ -103,7 +103,7 @@ class AnalyzeRoute {
 
     isControl = (coursePoint) => {
         const controlRegexp = /control|rest stop|regroup/i;
-        const exclusionRegexp = /(Depart|Exit) control/i 
+        const exclusionRegexp = /(^Depart)|(^Exit)/i 
         return coursePoint.d !== undefined && coursePoint.t === 'Control' || (coursePoint.n && coursePoint.n.match(controlRegexp) && !coursePoint.n.match(exclusionRegexp))
     }
 
