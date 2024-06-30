@@ -1,14 +1,13 @@
 import {Button, FormGroup, MenuItem} from "@blueprintjs/core";
 import { Select } from "@blueprintjs/select";
 import PropTypes from 'prop-types';
-import React, {useMemo} from 'react';
-import {connect, useSelector} from 'react-redux';
-import { DateTime, Interval } from 'luxon';
+import React from 'react';
+import {connect} from 'react-redux';
 import {setWeatherProvider} from "../../redux/actions";
 import {providerValues} from "../../redux/reducer";
 import { DesktopTooltip } from '../shared/DesktopTooltip';
 import {useTranslation} from 'react-i18next'
-import { getForecastRequest } from "../../utils/util";
+import {useForecastRequestData} from "../../utils/hooks"
 
 const renderProvider = (provider, { handleClick, handleFocus, modifiers }) => {
     if (!modifiers.matchesPredicate) {
@@ -28,31 +27,7 @@ const renderProvider = (provider, { handleClick, handleFocus, modifiers }) => {
 
 const WeatherProviderSelector = ({weatherProvider,setWeatherProvider}) => {
     const { t } = useTranslation()
-    // TODO: move into separate component, design pattern as yet unclear
-    const rwgpsRouteData = useSelector(state => state.routeInfo.rwgpsRouteData)
-    const gpxRouteData = useSelector(state => state.routeInfo.gpxRouteData)
-    const type = rwgpsRouteData ? "rwgps" : (gpxRouteData ? "gpx" : null)
-    const timeZoneId = useSelector(state => state.uiInfo.routeParams.zone)
-    const routeData = useSelector(state => state.routeInfo[type === "rwgps" ? "rwgpsRouteData" : "gpxRouteData"])
-    const startTimestamp = useSelector(state => state.uiInfo.routeParams.startTimestamp)
-    const pace = useSelector(state => state.uiInfo.routeParams.pace)
-    const interval = useSelector(state => state.uiInfo.routeParams.interval)
-    const controlPoints = useSelector(state => state.controls.userControlPoints)
-    const segment = useSelector(state => state.uiInfo.routeParams.segment)
-    const getForecastRequestData = () => {
-        if (!type) {
-            return {length:0, last:DateTime.now().toISO()}
-        }
-        const forecastRequest = getForecastRequest(
-            routeData, 
-            startTimestamp, 
-            type, timeZoneId, pace, 
-            interval, controlPoints,
-            segment)
-        return {length:forecastRequest.length, last:forecastRequest[forecastRequest.length-1].time}
-    }
-    const forecastData = useMemo(getForecastRequestData, [routeData,interval])
-    const daysInFuture = Interval.fromDateTimes(DateTime.now(), DateTime.fromISO(forecastData.last)).length('days')
+    const forecastData = useForecastRequestData()
 
     return (
         <FormGroup label={<span><b>{t('labels.source')}</b></span>} labelFor={'provider'}>
@@ -61,7 +36,7 @@ const WeatherProviderSelector = ({weatherProvider,setWeatherProvider}) => {
                     items={Object.entries(providerValues).
                         filter(entry => entry[1].maxCallsPerHour === undefined || 
                             entry[1].maxCallsPerHour > forecastData.length).
-                        filter(entry => entry[1].max_days >= daysInFuture).
+                        filter(entry => entry[1].max_days >= forecastData.daysInFuture).
                         map(element => { return { key: element[0], ...element[1] } })}
                     itemsEqual={"name"}
                     itemRenderer={renderProvider}
