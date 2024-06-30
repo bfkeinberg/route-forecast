@@ -198,7 +198,7 @@ const ForecastTable = (adjustedTimes) => {
         const elapsedTimeInterval = Interval.fromDateTimes(startTime, DateTime.fromFormat(finishTime, finishTimeFormat))
         const minutesOfIdling = userControls.reduce((accum,current) => accum += Number.parseInt(current.duration), 0)
         return (
-            <div style={{border:'3px solid black'}}>Elapsed time <strong>{elapsedTimeInterval.length('hours').toFixed(1)} hours</strong>, <strong>{minutesOfIdling/60}</strong> off bike</div>
+            <div style={{border:'3px solid black'}}>Elapsed time <strong>{elapsedTimeInterval.length('hours').toFixed(1)} hours</strong>, <strong>{(minutesOfIdling/60).toFixed(1)}</strong> off bike</div>
         )
     }
 
@@ -208,7 +208,7 @@ const ForecastTable = (adjustedTimes) => {
             return (
                 <tbody>
                 {forecast.map((point,index) =>
-                <React.Fragment key={point.distance}>
+                <React.Fragment key={index}>
                     {(index > 0 && (DateTime.fromISO(forecast[index-1].time).day !== DateTime.fromISO(point.time).day))?
                         <tr style={{outline:'thin solid'}}>
                             <td>{DateTime.fromISO(point.time, {locale:i18n.language}).toFormat('cccc')}</td>
@@ -278,7 +278,7 @@ const ForecastTable = (adjustedTimes) => {
                                 <div style={{ flex: 1 }}>
                                     <WeatherCorrections />
                                 </div>
-                                <MakeSummaryLine startTime={startTime} finishTime={finishTime} finishTimeFormat={finishTimeFormat} userControls={userControls} />
+                                finishTime && finishTimeFormat && <MakeSummaryLine startTime={startTime} finishTime={finishTime} finishTimeFormat={finishTimeFormat} userControls={userControls} />
                             </div>
                             <div style={{padding:'20px'}}>
                                 <Tooltip content={t('tooltips.copyTable')}>
