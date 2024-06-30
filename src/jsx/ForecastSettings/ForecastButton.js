@@ -1,7 +1,7 @@
 import { Button } from '@blueprintjs/core';
 import * as Sentry from "@sentry/react";
 import PropTypes from 'prop-types';
-import React from 'react';
+import React, {useRef} from 'react';
 import ReactGA from "react-ga4";
 import {connect, useDispatch, useSelector} from 'react-redux';
 import { useMediaQuery } from 'react-responsive';
@@ -14,6 +14,7 @@ import { getForecastRequest } from '../../utils/util';
 import { DesktopTooltip } from '../shared/DesktopTooltip';
 import {useTranslation} from 'react-i18next'
 import { providerValues } from '../../redux/reducer';
+import { useForecastRequestData } from '../../utils/hooks';
 
 const ForecastButton = ({fetchingForecast,submitDisabled, routeNumber, startTimestamp, pace, interval,
      metric, controls, strava_activity, strava_route, provider, href, urlIsShortened, querySet, zone}) => {
@@ -29,6 +30,7 @@ const ForecastButton = ({fetchingForecast,submitDisabled, routeNumber, startTime
         const rusaRouteId = useSelector(state => state.uiInfo.routeParams.rusaPermRouteId)
         const segmentRange = useSelector(state => state.uiInfo.routeParams.segment)
         const { t } = useTranslation()
+        const forecastRequestData = useRef(useForecastRequestData())
 
     const forecastByParts = (forecastRequest, zone, service, routeName, routeNumber) => {
         let requestCopy = Object.assign(forecastRequest)
@@ -53,9 +55,9 @@ const ForecastButton = ({fetchingForecast,submitDisabled, routeNumber, startTime
     const doForecastByParts = (provider) => {
         const forecastRequest = getForecastRequest(routeData, startTimestamp, type, zone, 
             pace, interval, userControlPoints, segmentRange)
-        if (!forecastRequest) {
+        /* if (!forecastRequest) {
             return { result: "error", error: "No route could be loaded" }
-        }
+        } */
         return forecastByParts(forecastRequest, zone, provider, routeName, routeNumber)
     }
     
@@ -69,17 +71,25 @@ const ForecastButton = ({fetchingForecast,submitDisabled, routeNumber, startTime
         const forecastResults = await forecastAndAqiResults[0]
         let filteredResults = forecastResults.filter(result => result.status === "fulfilled").map(result => result.value)
         filteredResults.sort((l,r) => l.forecast.distance-r.forecast.distance)
-        let returnedForecast = [{...filteredResults.shift().forecast}]
-
-        while (filteredResults.length > 0) {
-            returnedForecast.push({...filteredResults.shift().forecast})
+        const firstForecastResult = filteredResults.shift()
+        if (firstForecastResult) {
+            const firstForecast = { ...firstForecastResult.forecast }
+            let returnedForecast = [firstForecast]
+            while (filteredResults.length > 0) {
+                returnedForecast.push({ ...filteredResults.shift().forecast })
+            }
+            return returnedForecast
         }
-        return returnedForecast
+        return []
     }
 
-    const grabAllPossibleForecasts = async () => {
+    const grabAllPossibleForecasts = async (forecastData) => {
         let allForecasts = {}
-        await Promise.all(Object.keys(providerValues).map(async (provider) => allForecasts[provider] = await getForecastForProvider(provider)))
+        await Promise.all(Object.entries(providerValues).
+                        filter(entry => entry[1].maxCallsPerHour === undefined || 
+                            entry[1].maxCallsPerHour > forecastData.length).
+                        filter(entry => entry[1].max_days >= forecastData.daysInFuture).
+                        map(async (provider) => allForecasts[provider[0]] = await getForecastForProvider(provider[0])))
         // download the file
         const aElement = document.createElement('a');
         aElement.setAttribute('download', 'forecasts.json');
@@ -92,7 +102,7 @@ const ForecastButton = ({fetchingForecast,submitDisabled, routeNumber, startTime
 
     const forecastClick = async (event) => {
         if (event.altKey) {
-            grabAllPossibleForecasts()
+            grabAllPossibleForecasts(forecastRequestData.current)
             return
         }
         await Sentry.startSpan({ name: "forecastClick" }, async () => {
@@ -140,10 +150,11 @@ const ForecastButton = ({fetchingForecast,submitDisabled, routeNumber, startTime
     };
 
     const smallScreen = useMediaQuery({query: "(max-width: 800px)"})
+    forecastRequestData.current = useForecastRequestData()
     return (
         <DesktopTooltip content={tooltipContent}>
             <div id='forecast' style={{ 'display': 'flex', width: '100%', justifyContent: "center", margin: "10px 0px 0px 10px", flex: 1.6 }} cursor='not-allowed'>
-            <Button
+                <Button
                     tabIndex='0'
                     intent="primary"
                     onClick={forecastClick}
