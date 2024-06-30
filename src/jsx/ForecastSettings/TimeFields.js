@@ -22,7 +22,7 @@ export const TimeFields = () => {
 
   // to match datepicker displayed format
   const newDateFormat = 'MMMM dd, yyyy h:mm a';
-  const displayPredictedFinishTime = predictedFinishTimeExists ?
+  const displayPredictedFinishTime = predictedFinishTime ?
     DateTime.fromFormat(predictedFinishTime, finishTimeFormat).toFormat(newDateFormat) :
     t('data.noForecastPlaceholder')
 

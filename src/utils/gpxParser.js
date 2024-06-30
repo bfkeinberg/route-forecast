@@ -457,6 +457,13 @@ class AnalyzeRoute {
             const initialForecastTime = DateTime.fromISO(currentForecast.time);
             adjustedTimes.push({time:initialForecastTime.plus({minutes:totalMinutesLost}),index:forecastIndex})
         }
+        if (!finishTime) {
+            Sentry.addBreadcrumb({
+                category: 'fromFormat',
+                level: "warning",
+                message: `Finish time missing in adjustForWind`
+            })                                    
+        }
         return {time:totalMinutesLost,values:calculatedValues, gustSpeed:maxGustSpeed,
                 finishTime:DateTime.fromFormat(finishTime,finishTimeFormat).plus({minutes:totalMinutesLost}).toFormat(finishTimeFormat),
                 adjustedTimes:adjustedTimes
@@ -469,6 +476,13 @@ class AnalyzeRoute {
         if (controls.length > currentControl) {
             if (desiredDistance >= controls[currentControl].distance) {
                 // console.info(`updating control ${currentControl} with delay ${totalMinutesLost} minutes`);
+                if (!previouslyCalculatedValues[currentControl].arrival) {
+                    Sentry.addBreadcrumb({
+                        category: 'fromFormat',
+                        level: "warning",
+                        message: `Previous control arrival time missing for ${currentControl}`
+                    })                                    
+                }
                 let previousArrivalTime = DateTime.fromFormat(previouslyCalculatedValues[currentControl].arrival, finishTimeFormat, {zone:timeZoneId});
                 let arrivalTime = previousArrivalTime.plus({minutes:totalMinutesLost});
                 let elapsedDuration = arrivalTime.diff(start);
