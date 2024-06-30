@@ -374,7 +374,6 @@ export const msgFromError = (error) => {
     if (error.reason.data) {
         return error.reason.data.details
     } else {
-        Sentry.captureMessage(`Missing data in rejection ${JSON.stringify(error.reason)}`)
         return JSON.stringify(error.reason)
     }
 }
