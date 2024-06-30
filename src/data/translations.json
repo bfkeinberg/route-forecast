@@ -54,7 +54,8 @@
                 "analysisInterval":"Interval in hours at which to calculate effective pace",
                 "zoom":"Whether to zoom into route segments when hovering over their line in the table",
                 "customSegment":"Forecast only this portion of the route",
-                "bearingHeader":"Click to toggle between absolute and relative wind bearing"
+                "bearingHeader":"Click to toggle between absolute and relative wind bearing",
+                "copyTable":"Copy forecast table"
             },
             "data": {
                 "noForecastPlaceholder":"Find forecast to create",
@@ -87,7 +88,8 @@
                 "aqi": {
                     "enabled":"Aqi fetch enabled",
                     "disabled":"AQI fetch disabled"
-                }
+                },
+                "tableCopied":"Forecast table copied"
             },
             "controls":{
                 "name":"Name",
@@ -158,7 +160,8 @@
                 "analysisInterval":"Intervalle en heures pour calculer le rythme effectif",
                 "zoom":"S'il faut zoomer sur les segments d'itinéraire en survolant leur ligne dans le tableau",
                 "customSegment":"Prévoir uniquement cette partie de le parcours",
-                "bearingHeader":"Cliquez pour basculer entre le relèvement du vent absolu et relatif"
+                "bearingHeader":"Cliquez pour basculer entre le relèvement du vent absolu et relatif",
+                "copyTable":"Copier le tableau de prévisions"
             },
             "data":{
                 "noForecastPlaceholder":"Cliquez sur « Prévisions »",
@@ -191,7 +194,8 @@
                 "aqi": {
                     "enabled":"Récupération AQI activée",
                     "disabled":"Récupération Aqi désactivée"
-                }
+                },
+                "tableCopied":"Tableau de prévisions copié"
             },
             "controls":{
                 "name":"Nom",
