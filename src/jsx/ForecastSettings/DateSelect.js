@@ -46,7 +46,7 @@ const DateSelect = ({ start, zone, setStart, initialStartTimeSet, maxDaysInFutur
                 {t('labels.startingTime')}
             </span>
             <div style={{ flex: 2.5 } }>
-                <DesktopTooltip content={t('tooltips.startingTime')} placement={'bottom'}>
+                <DesktopTooltip content={t('tooltips.startingTime')} placement={'top'}>
                     <DateInput3
                         inputProps={{id:'startDatePicker'}}
                         onChange={setDateFromPicker}
