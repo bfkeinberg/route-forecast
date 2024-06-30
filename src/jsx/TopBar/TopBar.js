@@ -30,7 +30,7 @@ export const TopBar = ({sidePaneOptions, activeSidePane, setActiveSidePane, side
   const titleMustBeStacked = roomForFinishTime && !roomForTitle
   const { finishTime: predictedFinishTime } = useForecastDependentValues();
   const predictedFinishTimeExists = predictedFinishTime !== null;
-  const finishTimeFontSize = useMediaQuery({ query: '(min-width: 1725px)' }) ? "20px" : "15px"
+  const finishTimeFontSize = useMediaQuery({ query: '(min-width: 1300px)' }) ? "20px" : "15px"
   const alignment = useMediaQuery({ query: '(min-width: 1500px)' }) ? "right" : "left"
 
   return (
@@ -44,10 +44,10 @@ export const TopBar = ({sidePaneOptions, activeSidePane, setActiveSidePane, side
       />
       <div style={{display: "flex", flexGrow: 1, flexShrink: 8, justifyContent: "space-between", alignItems: "center", padding: "0px 20px", borderWidth: "0px 0px 0px 1px", borderStyle: "solid", borderColor: "grey"}}>
         {roomForTitle && <RouteTitle/>}
-        {titleMustBeStacked && predictedFinishTimeExists && <TitleAndFinishTime finishTime={predictedFinishTime} fontSize={'20px'} alignment={alignment}/>}
+        {titleMustBeStacked && predictedFinishTimeExists && <TitleAndFinishTime finishTime={predictedFinishTime} fontSize={finishTimeFontSize} alignment={alignment}/>}
         {titleAdjacent && predictedFinishTimeExists && <div style={{fontStyle: "oblique", color: "rgba(64, 111, 140, 0.87)", fontSize: finishTimeFontSize, height: "60px", textAlign: alignment}}>{predictedFinishTime}</div>}
         <div style={{display: "flex", justifyContent: "flex-end", alignItems: "center"}}>
-          <MediaQuery minWidth={1701}>
+          <MediaQuery minWidth={1750}>
             <ShortUrl/>
           </MediaQuery>
           <DonationRequest wacky/>

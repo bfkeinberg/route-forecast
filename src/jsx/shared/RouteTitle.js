@@ -4,7 +4,7 @@ import { useSelector } from "react-redux"
 import { useMediaQuery } from "react-responsive";
 
 export const RouteTitle = ({style, className}) => {
-  const titleFont = useMediaQuery({ query: '(min-width: 1540px)' }) ? "20px" : "15px"
+  const titleFont = useMediaQuery({ query: '(min-width: 1300px)' }) ? "20px" : "15px"
   const routeName = useSelector(state => state.routeInfo.name || (state.strava.activityData && state.strava.activityData.name))
 
   return (

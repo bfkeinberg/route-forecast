@@ -13,6 +13,7 @@ import PropTypes from 'prop-types';
 import cookie from 'react-cookies';
 import {useDispatch,useSelector} from 'react-redux'
 import MediaQuery from 'react-responsive';
+import MuiTooltip from '@mui/material/Tooltip'
 
 import {fetchAqiToggled,finishTimeFormat,tableViewedSet,weatherRangeSet,weatherRangeToggled,zoomToRangeToggled} from '../../redux/reducer';
 import { useForecastDependentValues, useFormatSpeed } from '../../utils/hooks';
@@ -117,7 +118,7 @@ const ForecastTable = (adjustedTimes) => {
     const { t } = useTranslation()
     
     const distHeaderText = metric ? 'KM' : 'Mile';
-    const distHeader = <Tooltip content={t('tooltips.distHeader')} placement={'top'}>{distHeaderText}</Tooltip>
+    const distHeader = <MuiTooltip arrow title={t('tooltips.distHeader')} placement={'top'}>{distHeaderText}</MuiTooltip>
 
     const toggleGustDisplay = () => setShowGusts(!showGusts)
     const windHeaderText = <Button small onClick={toggleGustDisplay} >{showGusts ? t('data.wind.gust') : t('data.wind.speed')}</Button>;
@@ -197,9 +198,8 @@ const ForecastTable = (adjustedTimes) => {
         const elapsedTimeInterval = Interval.fromDateTimes(startTime, DateTime.fromFormat(finishTime, finishTimeFormat))
         const minutesOfIdling = userControls.reduce((accum,current) => accum += Number.parseInt(current.duration), 0)
         return (
-            <div style={{border:'5px solid black'}}>Elapsed time <strong>{elapsedTimeInterval.length('hours').toFixed(1)} hours</strong>, <strong>{minutesOfIdling}</strong> minutes spent standing around</div>
+            <div style={{border:'3px solid black'}}>Elapsed time <strong>{elapsedTimeInterval.length('hours').toFixed(1)} hours</strong>, <strong>{minutesOfIdling}</strong> minutes off bike</div>
         )
-        console.log(`${elapsedTimeInterval.length('hours').toFixed(1)} hours elapsed time ${minutesOfIdling} spent waiting around`)
     }
 
     const expandTable = (forecast, metric, adjustedTimes) => {
@@ -253,10 +253,11 @@ const ForecastTable = (adjustedTimes) => {
             </MediaQuery>
             <ErrorBoundary>
                 <div style={{ display: 'flex', flexDirection: "column", overflowY: 'scroll'}}>
-                    <div style={{ display: 'flex', padding: '16px', flexShrink: 0 }}>
-                        <div style={{ flex: 1 }}>
+                    <div style={{ display: 'flex', padding: '16px', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
+                        <div /* style={{ flex: 1 }} */>
                             {displayBacklink(provider)}
                         </div>
+                        {/* mobile layout for the first row above the forecast */}
                         <MediaQuery maxDeviceWidth={500}>
                             <div style={{ display: 'flex', flexDirection: 'column', alignItems:'center', justifyContent:'center' }}>
                                 <div style={{ flex: 1 }}>
@@ -267,13 +268,18 @@ const ForecastTable = (adjustedTimes) => {
                                 </div>
                             </div>
                         </MediaQuery>
+                        {/* desktop layout for first row above the forecast table */}
                         <MediaQuery minDeviceWidth={501}>
-                            <MediaQuery maxWidth={1700}>
+                            <MediaQuery maxWidth={1749}>
                                 <ShortUrl/>
                             </MediaQuery>
+                            {/* /put the summary line below the wind effects */}
+                            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', alignSelf:'normal' }}>
                                 <div style={{ flex: 1 }}>
                                     <WeatherCorrections />
                                 </div>
+                                <MakeSummaryLine startTime={startTime} finishTime={finishTime} finishTimeFormat={finishTimeFormat} userControls={userControls} />
+                            </div>
                             <div style={{padding:'20px'}}>
                                 <Tooltip content={t('tooltips.copyTable')}>
                                     <Button icon={<Clipboard size={16}/>} onClick={copyTable}/>
@@ -285,7 +291,6 @@ const ForecastTable = (adjustedTimes) => {
                                 </DesktopTooltip>
                             </div>
                         </MediaQuery>
-                        <MakeSummaryLine startTime={startTime} finishTime={finishTime} finishTimeFormat={finishTimeFormat} userControls={userControls}/>
                     </div>
                     <Section title={t('titles.forecastControls')}>
                         <SectionCard padded>
