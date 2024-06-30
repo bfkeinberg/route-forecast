@@ -15,7 +15,7 @@ const Sentry = require("@sentry/node")
  * @param {function} getBearingDifference - returns the difference between two bearings
  * @param {boolean} isControl the forecast point is from a controle
 * @returns {Promise<{time: *, distance: *, summary: *, precip: string, cloudCover: string, windSpeed: string,
- * lat: *, lon: *, temp: string, fullTime: *, relBearing: null, rainy: boolean, windBearing: number,
+ * lat: *, lon: *, temp: string, relBearing: null, rainy: boolean, windBearing: number,
  * vectorBearing: *, gust: string} | never>} a promise to evaluate to get the forecast results
  */
 const callVisualCrossing = async function (lat, lon, currentTime, distance, zone, bearing, getBearingDifference, isControl) {
@@ -55,7 +55,6 @@ const callVisualCrossing = async function (lat, lon, currentTime, distance, zone
         'lat':lat,
         'lon':lon,
         'temp':`${Math.round(current.temp)}`,
-        'fullTime':now.format('ddd MMM D h:mmA YYYY'),
         'relBearing':relativeBearing,
         'rainy':rainy,
         'windBearing':Math.round(windBearing),

@@ -4,6 +4,7 @@ const callVisualCrossing = require('./visualCrossing');
 const callNWS = require('./nws');
 const callMeteomatics = require('./meteomatics');
 const callWeatherKit = require('./weatherKit');
+const callOneCall = require('./oneCall')
 const Sentry = require('@sentry/node')
 
 const getBearingDifference = function (bearing,windBearing) {
@@ -24,7 +25,7 @@ const getBearingDifference = function (bearing,windBearing) {
  * @param {number} bearing the direction of travel at the time of the forecast
  * @param {boolean} isControl the forecast point is from a controle
  * @returns {Promise<{time: *, distance: *, summary: *, precip: string, cloudCover: string, windSpeed: string,
- * lat: *, lon: *, temp: string, fullTime: *, relBearing: null, rainy: boolean, windBearing: number,
+ * lat: *, lon: *, temp: string, relBearing: null, rainy: boolean, windBearing: number,
  * vectorBearing: *, gust: string} | never>} a promise to evaluate to get the forecast results
  */
 const callWeatherService = function (service, lat, lon, currentTime, distance, zone, bearing, isControl) {
@@ -50,6 +51,10 @@ const callWeatherService = function (service, lat, lon, currentTime, distance, z
     case 'weatherKit':
         return Sentry.startSpan({ name: "weatherkit" }, () => {
             return callWeatherKit(lat, lon, currentTime, distance, zone, bearing, getBearingDifference, isControl)
+        })
+    case 'oneCall':
+        return Sentry.startSpan({ name: "oneCall" }, () => {
+            return callOneCall(lat, lon, currentTime, distance, zone, bearing, getBearingDifference, isControl)
         })
     default:
         return null;

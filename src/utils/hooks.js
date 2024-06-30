@@ -1,12 +1,12 @@
 import * as Sentry from "@sentry/react";
-import { DateTime } from 'luxon';
-import { useEffect, useMemo,useRef, useState } from "react"
+import { DateTime, Interval } from 'luxon';
+import { useEffect, useMemo, useRef, useState } from "react"
 import { useSelector } from "react-redux"
 
 import { routeLoadingModes } from "../data/enums"
 import gpxParser from "./gpxParser"
 import stravaRouteParser from "./stravaRouteParser"
-import { getRouteInfo, milesToMeters } from "./util"
+import { getRouteInfo, getForecastRequest, milesToMeters } from "./util"
 const useDelay = (delay, startCondition = true) => {
   const [
 ready,
@@ -241,4 +241,35 @@ const useWhenChanged = (value, callback, changedCondition = true) => {
   }, [value])
 }
 
-export { useValueHasChanged, useActualPace, useActualFinishTime, useActualArrivalTimes, usePrevious, useFormatSpeed, usePointsAndBounds, useDelay, useReusableDelay, usePreviousPersistent, useForecastDependentValues, useWhenChanged }
+const useForecastRequestData = () => {
+  const rwgpsRouteData = useSelector(state => state.routeInfo.rwgpsRouteData)
+  const gpxRouteData = useSelector(state => state.routeInfo.gpxRouteData)
+  const type = rwgpsRouteData ? "rwgps" : (gpxRouteData ? "gpx" : null)
+  const timeZoneId = useSelector(state => state.uiInfo.routeParams.zone)
+  const routeData = useSelector(state => state.routeInfo[type === "rwgps" ? "rwgpsRouteData" : "gpxRouteData"])
+  const startTimestamp = useSelector(state => state.uiInfo.routeParams.startTimestamp)
+  const pace = useSelector(state => state.uiInfo.routeParams.pace)
+  const interval = useSelector(state => state.uiInfo.routeParams.interval)
+  const controlPoints = useSelector(state => state.controls.userControlPoints)
+  const segment = useSelector(state => state.uiInfo.routeParams.segment)
+  const getForecastRequestData = () => {
+    if (!type) {
+      return { length: 0, daysInFuture:0 }
+    }
+    const forecastRequest = getForecastRequest(
+      routeData,
+      startTimestamp,
+      type, timeZoneId, pace,
+      interval, controlPoints,
+      segment)
+    return { length: forecastRequest.length, last: forecastRequest[forecastRequest.length - 1].time }
+  }
+  const forecastData = useMemo(getForecastRequestData, [routeData, interval, startTimestamp])
+  const daysInFuture = Interval.fromDateTimes(DateTime.now(), DateTime.fromISO(forecastData.last)).length('days')
+
+  return {length: forecastData.length, daysInFuture:daysInFuture}
+}
+
+export { useValueHasChanged, useActualPace, useActualFinishTime, useActualArrivalTimes, 
+  usePrevious, useFormatSpeed, usePointsAndBounds, useDelay, useReusableDelay, 
+  usePreviousPersistent, useForecastDependentValues, useWhenChanged, useForecastRequestData }
