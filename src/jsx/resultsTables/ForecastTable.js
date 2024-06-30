@@ -8,11 +8,11 @@ import { Button, HTMLTable, Icon, Tooltip, Section, SectionCard } from '@bluepri
 import { Clipboard } from '@blueprintjs/icons';
 import visualcrossing from 'Images/vclogo.svg';
 import oneCallLogo from 'Images/OpenWeather-Master-Logo RGB.png'
-import { DateTime } from 'luxon';
+import { DateTime, Interval } from 'luxon';
 import PropTypes from 'prop-types';
 import cookie from 'react-cookies';
 import {useDispatch,useSelector} from 'react-redux'
-import MediaQuery, {useMediaQuery} from 'react-responsive';
+import MediaQuery from 'react-responsive';
 
 import {fetchAqiToggled,finishTimeFormat,tableViewedSet,weatherRangeSet,weatherRangeToggled,zoomToRangeToggled} from '../../redux/reducer';
 import { useForecastDependentValues, useFormatSpeed } from '../../utils/hooks';
@@ -107,7 +107,11 @@ const ForecastTable = (adjustedTimes) => {
     const [currentRow, setCurrentRow] = useState()
     const [selectedRow, setSelectedRow] = useState()
     const maxDistanceInKm = useSelector(state => state.routeInfo.distanceInKm)
-
+    const userControls = useSelector(state => state.controls.userControlPoints)
+    const startTimestamp = useSelector(state => state.uiInfo.routeParams.startTimestamp)
+    const zone = useSelector(state => state.uiInfo.routeParams.zone)
+    const startTime = DateTime.fromMillis(startTimestamp, {zone:zone})
+    const { finishTime } = useForecastDependentValues()
     const dispatch = useDispatch()
     useEffect(() => { dispatch(tableViewedSet()) }, [])
     const { t } = useTranslation()
@@ -187,6 +191,15 @@ const ForecastTable = (adjustedTimes) => {
 
     const styleForControl = (point) => {
         return {color:point.isControl?'blue':'black'}
+    }
+
+    const MakeSummaryLine = ({startTime, finishTime, finishTimeFormat, userControls}) => {
+        const elapsedTimeInterval = Interval.fromDateTimes(startTime, DateTime.fromFormat(finishTime, finishTimeFormat))
+        const minutesOfIdling = userControls.reduce((accum,current) => accum += Number.parseInt(current.duration), 0)
+        return (
+            <div style={{border:'5px solid black'}}>Elapsed time <strong>{elapsedTimeInterval.length('hours').toFixed(1)} hours</strong>, <strong>{minutesOfIdling}</strong> minutes spent standing around</div>
+        )
+        console.log(`${elapsedTimeInterval.length('hours').toFixed(1)} hours elapsed time ${minutesOfIdling} spent waiting around`)
     }
 
     const expandTable = (forecast, metric, adjustedTimes) => {
@@ -272,6 +285,7 @@ const ForecastTable = (adjustedTimes) => {
                                 </DesktopTooltip>
                             </div>
                         </MediaQuery>
+                        <MakeSummaryLine startTime={startTime} finishTime={finishTime} finishTimeFormat={finishTimeFormat} userControls={userControls}/>
                     </div>
                     <Section title={t('titles.forecastControls')}>
                         <SectionCard padded>
