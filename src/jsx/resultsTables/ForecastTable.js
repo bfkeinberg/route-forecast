@@ -8,11 +8,12 @@ import { Button, HTMLTable, Icon, Tooltip, Section, SectionCard } from '@bluepri
 import { Clipboard } from '@blueprintjs/icons';
 import visualcrossing from 'Images/vclogo.svg';
 import oneCallLogo from 'Images/OpenWeather-Master-Logo RGB.png'
-import { DateTime } from 'luxon';
+import { DateTime, Interval } from 'luxon';
 import PropTypes from 'prop-types';
 import cookie from 'react-cookies';
 import {useDispatch,useSelector} from 'react-redux'
 import MediaQuery from 'react-responsive';
+import MuiTooltip from '@mui/material/Tooltip'
 
 import {fetchAqiToggled,finishTimeFormat,tableViewedSet,weatherRangeSet,weatherRangeToggled,zoomToRangeToggled} from '../../redux/reducer';
 import { useForecastDependentValues, useFormatSpeed } from '../../utils/hooks';
@@ -107,13 +108,17 @@ const ForecastTable = (adjustedTimes) => {
     const [currentRow, setCurrentRow] = useState()
     const [selectedRow, setSelectedRow] = useState()
     const maxDistanceInKm = useSelector(state => state.routeInfo.distanceInKm)
-
+    const userControls = useSelector(state => state.controls.userControlPoints)
+    const startTimestamp = useSelector(state => state.uiInfo.routeParams.startTimestamp)
+    const zone = useSelector(state => state.uiInfo.routeParams.zone)
+    const startTime = DateTime.fromMillis(startTimestamp, {zone:zone})
+    const { finishTime } = useForecastDependentValues()
     const dispatch = useDispatch()
     useEffect(() => { dispatch(tableViewedSet()) }, [])
     const { t } = useTranslation()
     
     const distHeaderText = metric ? 'KM' : 'Mile';
-    const distHeader = <Tooltip content={t('tooltips.distHeader')} placement={'top'}>{distHeaderText}</Tooltip>
+    const distHeader = <MuiTooltip arrow title={t('tooltips.distHeader')} placement={'top'}>{distHeaderText}</MuiTooltip>
 
     const toggleGustDisplay = () => setShowGusts(!showGusts)
     const windHeaderText = <Button small onClick={toggleGustDisplay} >{showGusts ? t('data.wind.gust') : t('data.wind.speed')}</Button>;
@@ -189,6 +194,14 @@ const ForecastTable = (adjustedTimes) => {
         return {color:point.isControl?'blue':'black'}
     }
 
+    const MakeSummaryLine = ({startTime, finishTime, finishTimeFormat, userControls}) => {
+        const elapsedTimeInterval = Interval.fromDateTimes(startTime, DateTime.fromFormat(finishTime, finishTimeFormat))
+        const minutesOfIdling = userControls.reduce((accum,current) => accum += Number.parseInt(current.duration), 0)
+        return (
+            <div style={{border:'3px solid black'}}>Elapsed time <strong>{elapsedTimeInterval.length('hours').toFixed(1)} hours</strong>, <strong>{minutesOfIdling}</strong> minutes off bike</div>
+        )
+    }
+
     const expandTable = (forecast, metric, adjustedTimes) => {
         const { i18n } = useTranslation()
         if (forecast.length > 0) {
@@ -240,10 +253,11 @@ const ForecastTable = (adjustedTimes) => {
             </MediaQuery>
             <ErrorBoundary>
                 <div style={{ display: 'flex', flexDirection: "column", overflowY: 'scroll'}}>
-                    <div style={{ display: 'flex', padding: '16px', flexShrink: 0 }}>
-                        <div style={{ flex: 1 }}>
+                    <div style={{ display: 'flex', padding: '16px', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
+                        <div /* style={{ flex: 1 }} */>
                             {displayBacklink(provider)}
                         </div>
+                        {/* mobile layout for the first row above the forecast */}
                         <MediaQuery maxDeviceWidth={500}>
                             <div style={{ display: 'flex', flexDirection: 'column', alignItems:'center', justifyContent:'center' }}>
                                 <div style={{ flex: 1 }}>
@@ -254,9 +268,17 @@ const ForecastTable = (adjustedTimes) => {
                                 </div>
                             </div>
                         </MediaQuery>
+                        {/* desktop layout for first row above the forecast table */}
                         <MediaQuery minDeviceWidth={501}>
-                            <div style={{ flex: 1 }}>
-                                <WeatherCorrections />
+                            <MediaQuery maxWidth={1749}>
+                                <ShortUrl/>
+                            </MediaQuery>
+                            {/* /put the summary line below the wind effects */}
+                            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', alignSelf:'normal' }}>
+                                <div style={{ flex: 1 }}>
+                                    <WeatherCorrections />
+                                </div>
+                                <MakeSummaryLine startTime={startTime} finishTime={finishTime} finishTimeFormat={finishTimeFormat} userControls={userControls} />
                             </div>
                             <div style={{padding:'20px'}}>
                                 <Tooltip content={t('tooltips.copyTable')}>

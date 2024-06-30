@@ -2,7 +2,7 @@ import { AnchorButton } from "@blueprintjs/core";
 import PropTypes from 'prop-types';
 import React, { useEffect, useState } from 'react';
 import ReactGA from "react-ga4";
-
+import { useMediaQuery } from "react-responsive";
 import {DesktopTooltip} from "../shared/DesktopTooltip"
 import {useTranslation} from 'react-i18next'
 import cookie from 'react-cookies';
@@ -24,7 +24,7 @@ const DonationRequest = ({wacky}) =>  {
     ] = useState("")
 
     const donateWasClicked = cookie.load('clickedDonate')
-
+    const buttonImageWidth = useMediaQuery({ query: '(min-width: 1300px)' }) ?'106px' : '80px'
     useEffect(() => {
         if (wacky && !donateWasClicked) {
             const interval = setInterval(() => {
@@ -45,7 +45,7 @@ const DonationRequest = ({wacky}) =>  {
             <DesktopTooltip content={'Hi, if you would like to support randoplan, please consider donating something to my Paypal'}>
                 <AnchorButton id={'donate'} href="https://paypal.me/BFeinberg" target="_blank"
                     onClick={() => { cookie.save('clickedDonate', true, { path: '/' }); ReactGA.event('purchase', { currency: 'dollars' }) }}>
-                    <img alt="" border="0" src={donationImage(i18n)} width="106" height="30" />
+                    <img alt="" border="0" src={donationImage(i18n)} width={buttonImageWidth} /* height="30" */ />
                 </AnchorButton>
             </DesktopTooltip>
         </div>
