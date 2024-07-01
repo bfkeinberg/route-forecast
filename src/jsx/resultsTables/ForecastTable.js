@@ -117,8 +117,8 @@ const ForecastTable = (adjustedTimes) => {
     useEffect(() => { dispatch(tableViewedSet()) }, [])
     const { t } = useTranslation()
     
-    const distHeaderText = metric ? 'KM' : 'Mile';
-    const distHeader = <MuiTooltip arrow title={t('tooltips.distHeader')} placement={'top'}>{distHeaderText}</MuiTooltip>
+    const distHeaderText = <span>{metric ? 'KM' : 'Mile'}</span>
+    const distHeader = <DesktopTooltip content={t('tooltips.distHeader')} placement={'top'}>{distHeaderText}</DesktopTooltip>
 
     const toggleGustDisplay = () => setShowGusts(!showGusts)
     const windHeaderText = <Button small onClick={toggleGustDisplay} >{showGusts ? t('data.wind.gust') : t('data.wind.speed')}</Button>;
@@ -278,7 +278,7 @@ const ForecastTable = (adjustedTimes) => {
                                 <div style={{ flex: 1 }}>
                                     <WeatherCorrections />
                                 </div>
-                                finishTime && finishTimeFormat && <MakeSummaryLine startTime={startTime} finishTime={finishTime} finishTimeFormat={finishTimeFormat} userControls={userControls} />
+                                {finishTime && finishTimeFormat && <MakeSummaryLine startTime={startTime} finishTime={finishTime} finishTimeFormat={finishTimeFormat} userControls={userControls} />}
                             </div>
                             <div style={{padding:'20px'}}>
                                 <Tooltip content={t('tooltips.copyTable')}>
