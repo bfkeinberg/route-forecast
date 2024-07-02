@@ -73,7 +73,7 @@ const ForecastButton = ({fetchingForecast,submitDisabled, routeNumber, startTime
             locations = requestCopy.shift();
             ++which
         }
-        return [Promise.allSettled(forecastResults),fetchAqi?Promise.all(aqiResults):[]]
+        return [Promise.allSettled(forecastResults),fetchAqi?Promise.allSettled(aqiResults):[]]    
     }
     const doForecastByParts = (provider) => {
         const forecastRequest = getForecastRequest(routeData, startTimestamp, type, zone, 
@@ -144,23 +144,25 @@ const ForecastButton = ({fetchingForecast,submitDisabled, routeNumber, startTime
             const aqiResults = await forecastAndAqiResults[1]
             let filteredResults = forecastResults.filter(result => result.status === "fulfilled").map(result => result.value)
             filteredResults.sort((l, r) => l.forecast.distance - r.forecast.distance)
+            let filteredAqi = aqiResults.filter(result => result.status === "fulfilled").map(result => result.value)
             const firstForecastResult = filteredResults.shift()
             if (firstForecastResult) {
                 const firstForecast = { ...firstForecastResult.forecast }
-                if (aqiResults.length > 0) {
-                    firstForecast.aqi = aqiResults.shift().aqi.aqi
+                if (filteredAqi.length > 0) {
+                    firstForecast.aqi = filteredAqi.shift().aqi.aqi
                 }
                 dispatch(forecastFetched({ forecastInfo: { forecast: [firstForecast] }, timeZoneId: zone }))
                 while (filteredResults.length > 0) {
                     const nextForecast = { ...filteredResults.shift().forecast }
-                    if (aqiResults.length > 0) {
-                        nextForecast.aqi = aqiResults.shift().aqi.aqi
+                    if (filteredAqi.length > 0) {
+                        nextForecast.aqi = filteredAqi.shift().aqi.aqi
                     }
                     dispatch(forecastAppended(nextForecast))
                 }
             }
             // handle any errors
             dispatch(errorMessageListSet(forecastResults.filter(result => result.status === 'rejected').map(result => msgFromError(result))))
+            dispatch(errorMessageListSet(aqiResults.filter(result => result.status === 'rejected').map(result => msgFromError(result))))
         })
         const url = generateUrl(startTimestamp, routeNumber, pace, interval, metric, controls,
             strava_activity, strava_route, provider, origin, true, dispatch, zone, rusaRouteId)
