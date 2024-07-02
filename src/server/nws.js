@@ -80,7 +80,6 @@ const getForecastFromNws = async (forecastUrl) => {
             Sentry.addBreadcrumb({
                 category:'nws',level:'error',message:`Failed to get NWS forecast from ${forecastUrl}`
             })
-            Sentry.captureException(error)
             throw Error(`Failed to get NWS forecast from ${forecastUrl}`)
         }
     );
