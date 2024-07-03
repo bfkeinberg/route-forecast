@@ -207,6 +207,7 @@ export const loadFromRideWithGps = function (routeNumber, isTrip) {
                 if (timeZoneResults.result === "error") {
                     dispatch(rwgpsRouteLoadingFailed(timeZoneResults.error))
                 } else {
+                    Sentry.addBreadcrumb({category:'timezone',level:'info',message:`TimeZone API call returned ${timeZoneResults.result}`})
                     dispatch(timeZoneSet(timeZoneResults.result))
                 }
             }, error => { return dispatch(rwgpsRouteLoadingFailed(error.message?error.message:error)) }
