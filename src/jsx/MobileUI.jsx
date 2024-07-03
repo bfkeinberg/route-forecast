@@ -1,5 +1,5 @@
 import { Alignment,Button, IconSize, Intent, Navbar, NavbarDivider, NavbarGroup, NavbarHeading, Divider } from "@blueprintjs/core";
-import {Cloud, Cycle,Globe, Route as RouteIcon, Shop } from "@blueprintjs/icons";
+import {Cloud, Cycle,Globe, Map as MapIcon, Shop } from "@blueprintjs/icons";
 import PropTypes from "prop-types";
 import React from "react";
 import {connect, useDispatch,useSelector} from 'react-redux';
@@ -84,7 +84,7 @@ const MobileUITabs = (props) => {
                         <NavbarHeading>Randoplan</NavbarHeading>
                         <ErrorBoundary>
                             <Link to={"/"} className={'nav-link'}>
-                                <Button small icon={<RouteIcon />} title={"home"} intent={pathname==='/'?Intent.PRIMARY:Intent.NONE}></Button>
+                                <Button small icon={<MapIcon />} title={"home"} intent={pathname==='/'?Intent.PRIMARY:Intent.NONE}></Button>
                             </Link>
                         </ErrorBoundary>
                         <NavbarDivider />
