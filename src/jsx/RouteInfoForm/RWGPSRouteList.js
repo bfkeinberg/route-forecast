@@ -2,7 +2,7 @@ import { Button, MenuItem } from "@blueprintjs/core";
 import { Select } from "@blueprintjs/select";
 import PropTypes from 'prop-types';
 import React from 'react';
-import {connect} from 'react-redux';
+import {connect, useSelector} from 'react-redux';
 
 import {loadFromRideWithGps} from "../../redux/actions";
 import { routeIsTripSet, rwgpsRouteSet } from '../../redux/reducer';
@@ -23,6 +23,7 @@ const renderFavorite = (favorite, { handleClick, modifiers }) => {
 };
 
 const RWGPSRouteList = ({pinnedRoutes, rwgpsRouteSet, route_id, routeIsTripSet, loadFromRideWithGps}) => {
+    const routeName = useSelector(state => state.routeInfo.name)
     return (
             <Select
                         items={pinnedRoutes}
@@ -36,7 +37,7 @@ const RWGPSRouteList = ({pinnedRoutes, rwgpsRouteSet, route_id, routeIsTripSet, 
                             loadFromRideWithGps(selected.associated_object_id, selected.associated_object_type=="trip");
                         }}
             >
-        <Button icon="route" text={route_id} rightIcon="double-caret-vertical" className={'glowing_input'}/>
+        <Button icon="map" text={routeName === '' ? route_id : routeName} rightIcon="double-caret-vertical" className={'glowing_input'}/>
     </Select>)
 }
 
