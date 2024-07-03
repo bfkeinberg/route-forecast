@@ -18,8 +18,8 @@ const addBreadcrumb = (msg) => {
 }
 
 const LoadableRouteList = lazy(() => {addBreadcrumb('loading route list'); return import(/* webpackChunkName: "RouteList" */ './RWGPSRouteList').catch((err) => {
-    addBreadcrumb(`failed to load pinned routes : ${err}`)
-    return {default: () => <div>Failed to load pinned route list - {err}</div>}
+    addBreadcrumb(`failed to load pinned routes : ${JSON.stringify(err)}`)
+    return {default: () => <div>Failed to load pinned route list - {err.message}</div>}
 })
 
 });
@@ -32,7 +32,7 @@ const getPinnedRoutes = async (rwgpsToken, setErrorDetails, rwgpsTokenSet) => {
         return response.data;
     } catch (e) {
         Sentry.captureException(e)
-        const errorMessage = e.response !== undefined ? JSON.stringify(e.response.data) : e
+        const errorMessage = e.response ? (e.response.data ? JSON.stringify(e.response.data) : JSON.stringify(e.response)) : e
         setErrorDetails(`Ride with GPS login failure: ${errorMessage}`);
         rwgpsTokenSet(null);
         return null;
