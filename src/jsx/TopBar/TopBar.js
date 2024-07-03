@@ -43,11 +43,11 @@ export const TopBar = ({sidePaneOptions, activeSidePane, setActiveSidePane, side
         panesVisible={panesVisible}
       />
       <div style={{display: "flex", flexGrow: 1, flexShrink: 8, justifyContent: "space-between", alignItems: "center", padding: "0px 20px", borderWidth: "0px 0px 0px 1px", borderStyle: "solid", borderColor: "grey"}}>
-        {roomForTitle && <RouteTitle/>}
+        {roomForTitle && <RouteTitle style={{width:'21rem'}} className={'truncated_title'}/>}
         {titleMustBeStacked && predictedFinishTimeExists && <TitleAndFinishTime finishTime={predictedFinishTime} fontSize={finishTimeFontSize} alignment={alignment}/>}
         {titleAdjacent && predictedFinishTimeExists && <div style={{fontStyle: "oblique", color: "rgba(64, 111, 140, 0.87)", fontSize: finishTimeFontSize, height: "60px", textAlign: alignment}}>{predictedFinishTime}</div>}
         <div style={{display: "flex", justifyContent: "flex-end", alignItems: "center"}}>
-          <MediaQuery minWidth={1750}>
+          <MediaQuery minWidth={1780}>
             <ShortUrl/>
           </MediaQuery>
           <DonationRequest wacky/>

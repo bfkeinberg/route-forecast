@@ -58,10 +58,6 @@ img#bugImage {
     text-decoration: line-through;
 }
 
-.timeCell {
-    /* width:52px */
-}
-
 .chanceRainCell {
     width: 80px
 }
@@ -181,4 +177,15 @@ table.bp4-html-table.bp4-html-table-bordered.bp4-html-table-striped.bp4-interact
     height: 60px;
     width: 60px;
     opacity: 20%;
-}    
+}
+
+.truncated_title {
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+.truncated_title:hover {
+    overflow: visible;
+    white-space: normal;
+}
