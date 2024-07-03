@@ -42,7 +42,7 @@ const DonationRequest = ({wacky}) =>  {
     return (
         // eslint-disable-next-line react/jsx-no-comment-textnodes
         <div style={{ transform: transform, transition: "transform 1.5s, filter 1.5s linear", filter: filter, zIndex: 1 }}>
-            <DesktopTooltip content={'Hi, if you would like to support randoplan, please consider donating something to my Paypal'}>
+            <DesktopTooltip content={'Hi, if you would like to support randoplan, please consider donating'}>
                 <AnchorButton id={'donate'} href="https://paypal.me/BFeinberg" target="_blank"
                     onClick={() => { cookie.save('clickedDonate', true, { path: '/' }); ReactGA.event('purchase', { currency: 'dollars' }) }}>
                     <img alt="" border="0" src={donationImage(i18n)} width={buttonImageWidth} /* height="30" */ />
