@@ -228,17 +228,17 @@ const routeInfoSlice = createSlice({
         },
         gpxRouteLoaded(state, action) {
             state.gpxRouteData = action.payload
-            state.rwgpsRouteData = null
+            state.rwgpsRouteData = routeInfoInitialState.rwgpsRouteData
             state.name = getRouteName(action.payload, "gpx")
             state.type = "gpx"
             state.distanceInKm = action.payload.tracks[0].distance.total/1000
         },
         routeDataCleared(state) {
-            state.rwgpsRouteData = null
-            state.gpxRouteData = null
-            state.name = ''
+            state.rwgpsRouteData = routeInfoInitialState.rwgpsRouteData
+            state.gpxRouteData = routeInfoInitialState.gpxRouteData
+            state.name = routeInfoInitialState.name
             state.type = null
-            state.distanceInKm = 0
+            state.distanceInKm = routeInfoInitialState.distanceInKm
         },
         loadingFromUrlSet(state, action) {
             state.loadingFromURL = action.payload
