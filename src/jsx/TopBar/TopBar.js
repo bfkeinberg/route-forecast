@@ -16,7 +16,7 @@ import FaqButton from "./FaqButton";
 const TitleAndFinishTime = ({finishTime, fontSize, alignment}) => {
   return (
     <div style={{display:'flex', flexDirection:'column'}}>
-      <RouteTitle/>
+      <RouteTitle style={{width:'21rem'}} className={'truncated_title'}/>
       <div style={{fontStyle: "oblique", color: "rgba(64, 111, 140, 0.87)", fontSize: fontSize, height: "60px", textAlign: alignment}}>
         {finishTime}
       </div>
