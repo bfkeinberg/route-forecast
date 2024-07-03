@@ -1,5 +1,4 @@
 import { Button, Spinner } from '@blueprintjs/core';
-// import {lazy} from '@loadable/component';
 import * as Sentry from "@sentry/react";
 import axios from 'axios';
 import PropTypes from 'prop-types';
@@ -19,8 +18,8 @@ const addBreadcrumb = (msg) => {
 }
 
 const LoadableRouteList = lazy(() => {addBreadcrumb('loading route list'); return import(/* webpackChunkName: "RouteList" */ './RWGPSRouteList').catch((err) => {
-    addBreadcrumb('failed to load pinned routes')
-    return {default: () => <div>Failed to load pinned route list</div>}
+    addBreadcrumb(`failed to load pinned routes : ${err}`)
+    return {default: () => <div>Failed to load pinned route list - {err}</div>}
 })
 
 });
@@ -32,7 +31,6 @@ const getPinnedRoutes = async (rwgpsToken, setErrorDetails, rwgpsTokenSet) => {
         const response = await axios.get(url);
         return response.data;
     } catch (e) {
-        console.log(`axios exception is ${e}`);
         Sentry.captureException(e)
         const errorMessage = e.response !== undefined ? JSON.stringify(e.response.data) : e
         setErrorDetails(`Ride with GPS login failure: ${errorMessage}`);
