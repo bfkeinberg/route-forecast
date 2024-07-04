@@ -80,8 +80,8 @@ const makeRecord = (point, routeNumber) => {
     };
 }
 
-const insertRecord = (record, routeName) => {
-    return datastore.save({
+const insertRecord = async (record, routeName) => {
+    return await datastore.save({
         key: datastore.key([
             'RouteName',
             routeName
@@ -247,7 +247,7 @@ app.post('/forecast_one', cache.middleware(), upload.none(), async (req, res) =>
     if (req.body.routeName !== undefined && req.body.routeName !== '' && req.body.which===0) {
         let dbRecord = makeRecord(forecastPoints, req.body.routeNumber);
         try {
-            insertRecord(dbRecord, req.body.routeName);
+            await insertRecord(dbRecord, req.body.routeName);
         } catch (err) {
             console.err(`DB call from forecast_one failed with ${err}`)
         }
