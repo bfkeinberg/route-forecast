@@ -128,7 +128,7 @@ const ForecastButton = ({fetchingForecast,submitDisabled, routeNumber, startTime
             grabAllPossibleForecasts(forecastRequestData.current)
             return
         }
-        await Sentry.startSpan({ name: "forecastClick" }, async () => {
+        // await Sentry.startSpan({ name: "forecastClick" }, async () => {
             dispatch(forecastFetchBegun())
             const reactEventParams = {
                 value: distanceInKm, currency:routeNumber, coupon:routeName,
@@ -163,7 +163,7 @@ const ForecastButton = ({fetchingForecast,submitDisabled, routeNumber, startTime
             // handle any errors
             dispatch(errorMessageListSet(forecastResults.filter(result => result.status === 'rejected').map(result => msgFromError(result))))
             dispatch(errorMessageListSet(aqiResults.filter(result => result.status === 'rejected').map(result => msgFromError(result))))
-        })
+        // })
         const url = generateUrl(startTimestamp, routeNumber, pace, interval, metric, controls,
             strava_activity, strava_route, provider, origin, true, dispatch, zone, rusaRouteId)
         querySet({url:url.url,search:url.search})
