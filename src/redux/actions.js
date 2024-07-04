@@ -380,7 +380,7 @@ export const msgFromError = (error) => {
 }
 
 const forecastWithHook = async (forecastFunc, aqiFunc, dispatch, getState) => {
-    await Sentry.startSpan({ name: "forecastWithHook" }, async () => {
+    // await Sentry.startSpan({ name: "forecastWithHook" }, async () => {
         const routeInfo = getState().routeInfo
 
         if (routeInfo.rwgpsRouteData) {
@@ -422,7 +422,7 @@ const forecastWithHook = async (forecastFunc, aqiFunc, dispatch, getState) => {
         // handle any errors
         dispatch(errorMessageListSet(forecastResults.filter(result => result.status === 'rejected').map(result => msgFromError(result))))
         dispatch(errorMessageListSet(aqiResults.filter(result => result.status === 'rejected').map(result => msgFromError(result))))
-    })
+    // })
 }
 
 export const loadRouteFromURL = (forecastFunc, aqiFunc) => {
