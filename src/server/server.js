@@ -249,7 +249,7 @@ app.post('/forecast_one', cache.middleware(), upload.none(), async (req, res) =>
         try {
             await insertRecord(dbRecord, req.body.routeName);
         } catch (err) {
-            console.err(`DB call from forecast_one failed with ${err}`)
+            console.error(`DB call from forecast_one failed with ${err}`)
         }
     }
     const zone = req.body.timezone;
