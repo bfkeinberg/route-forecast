@@ -80,7 +80,6 @@ const callWeatherKit = async function (lat, lon, currentTime, distance, zone, be
     Sentry.setContext('url', { 'url': url })
     const forecastResult = await axiosInstance.get(url, { headers: { 'Authorization': `Bearer ${weatherKitKey}` } }).
         catch(error => {
-            Sentry.captureException(error)
             throw error;
         });
     const forecast = forecastResult.data
