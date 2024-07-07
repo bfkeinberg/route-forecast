@@ -8,7 +8,7 @@ import {providerValues} from "../../redux/reducer";
 import { DesktopTooltip } from '../shared/DesktopTooltip';
 import {useTranslation} from 'react-i18next'
 import {useForecastRequestData} from "../../utils/hooks"
-import * as Sentry from "*sentry/react"
+import * as Sentry from "@sentry/react"
 
 const renderProvider = (provider, { handleClick, handleFocus, modifiers }) => {
     if (!modifiers.matchesPredicate) {

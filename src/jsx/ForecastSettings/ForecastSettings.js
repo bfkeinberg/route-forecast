@@ -16,7 +16,7 @@ import RidingPace from "./RidingPace";
 import { TimeFields } from "./TimeFields";
 import WeatherProviderSelector from "./WeatherProviderSelector"
 import Segment from './Segment'
-import * as Sentry from "@sentry/react"
+import * as Sentry from "@sentry/react";
 
 export const ForecastSettings = () => {
     const metric = useSelector(state => state.controls.metric)
