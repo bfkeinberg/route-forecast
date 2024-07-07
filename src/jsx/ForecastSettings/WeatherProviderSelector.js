@@ -8,6 +8,7 @@ import {providerValues} from "../../redux/reducer";
 import { DesktopTooltip } from '../shared/DesktopTooltip';
 import {useTranslation} from 'react-i18next'
 import {useForecastRequestData} from "../../utils/hooks"
+import * as Sentry from "*sentry/react"
 
 const renderProvider = (provider, { handleClick, handleFocus, modifiers }) => {
     if (!modifiers.matchesPredicate) {
@@ -43,7 +44,7 @@ const WeatherProviderSelector = ({weatherProvider,setWeatherProvider}) => {
                     filterable={false}
                     fill={true}
                     activeItem={{ key: weatherProvider, ...providerValues[weatherProvider] }}
-                    onItemSelect={(selected) => { setWeatherProvider(selected.key) }}
+                    onItemSelect={(selected) => { Sentry.metrics.set("provider", selected.key); setWeatherProvider(selected.key) }}
                 >
                     <Button id={'provider'} text={providerValues[weatherProvider].name} rightIcon="symbol-triangle-down" />
                 </Select>

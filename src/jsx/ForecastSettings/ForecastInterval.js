@@ -6,6 +6,7 @@ import {connect} from 'react-redux';
 
 import {setInterval} from "../../redux/actions";
 import {useTranslation} from 'react-i18next'
+import * as Sentry from "@sentry/react"
 
 const ForecastInterval = ({min_interval,interval,setInterval}) => {
     const { t } = useTranslation()
@@ -29,7 +30,7 @@ const ForecastInterval = ({min_interval,interval,setInterval}) => {
                         { value: 2.0, label: '120' }
                     ]}
                     valueLabelDisplay="off"
-                    onChange={(event, selected) => setInterval(selected)} />
+                    onChange={(event, selected) => {Sentry.metrics.gauge("interval", selected, {unit:"minute"}); setInterval(selected)}} />
             </Tooltip>
         </FormGroup>
     );

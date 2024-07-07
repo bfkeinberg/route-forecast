@@ -78,9 +78,7 @@ const ForecastButton = ({fetchingForecast,submitDisabled, routeNumber, startTime
     const doForecastByParts = (provider) => {
         const forecastRequest = getForecastRequest(routeData, startTimestamp, type, zone, 
             pace, interval, userControlPoints, segmentRange)
-        /* if (!forecastRequest) {
-            return { result: "error", error: "No route could be loaded" }
-        } */
+        Sentry.metrics.distribution("forecastPoints", forecastRequest.length)
         return forecastByParts(forecastRequest, zone, provider, routeName, routeNumber)
     }
     
@@ -128,6 +126,7 @@ const ForecastButton = ({fetchingForecast,submitDisabled, routeNumber, startTime
             grabAllPossibleForecasts(forecastRequestData.current)
             return
         }
+        Sentry.metrics.increment('forecast', 1)
         // await Sentry.startSpan({ name: "forecastClick" }, async () => {
             dispatch(forecastFetchBegun())
             const reactEventParams = {

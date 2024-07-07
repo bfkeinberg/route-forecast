@@ -120,16 +120,17 @@ const ForecastTable = (adjustedTimes) => {
     const distHeaderText = <span>{metric ? 'KM' : 'Mile'}</span>
     const distHeader = <DesktopTooltip content={t('tooltips.distHeader')} placement={'top'}>{distHeaderText}</DesktopTooltip>
 
-    const toggleGustDisplay = () => setShowGusts(!showGusts)
+    const toggleGustDisplay = () => {Sentry.metrics.increment("gusts", 1); return setShowGusts(!showGusts)}
     const windHeaderText = <Button small onClick={toggleGustDisplay} >{showGusts ? t('data.wind.gust') : t('data.wind.speed')}</Button>;
     const windHeader = <DesktopTooltip content={t('tooltips.windHeader')} placement={'top'}>{windHeaderText}</DesktopTooltip>
 
-    const toggleApparentDisplay = () => setShowApparentTemp(!showApparentTemp)
+    const toggleApparentDisplay = () => {Sentry.metrics.increment("temperature", 1); return setShowApparentTemp(!showApparentTemp)}
 
     const temperatureHeaderText = <Button small onClick={toggleApparentDisplay}>{showApparentTemp ? t('tableHeaders.temperature') : <Icon icon="temperature"/>}</Button>
     const temperatureHeader = <DesktopTooltip content={t('tooltips.temperatureHeader')} placement={'top'}>{temperatureHeaderText}</DesktopTooltip>
 
     const copyTable = React.useCallback(async (event) => {
+        Sentry.metrics.increment("copyTable", 1)
         var htmlTable = document.getElementById('forecastTable')   
         var range = document.createRange()
         range.selectNode(htmlTable)
@@ -143,11 +144,13 @@ const ForecastTable = (adjustedTimes) => {
     })
         
     const toggleZoom = () => {
+        Sentry.metrics.increment("zoom", 1)
         dispatch(zoomToRangeToggled())
         cookie.save('zoomToRange', !zoomToRange, { path: '/' })
     }
 
     const toggleRelBearing = () => {
+        Sentry.metrics.increment("relativeBearing", 1)
         setShowRelativeBearing(!showRelativeBearing)
     }
 
@@ -180,6 +183,9 @@ const ForecastTable = (adjustedTimes) => {
     }
 
     const toggleAqi = async () => {
+        if (!fetchAqi) {
+            Sentry.metrics.increment("aqi", 1)
+        }
         dispatch(fetchAqiToggled())
         cookie.save('fetchAqi', !fetchAqi, { path: '/' });
         // whatever the value in props is will be toggled by this

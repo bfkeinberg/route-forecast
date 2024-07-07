@@ -15,7 +15,8 @@ import ForecastInterval from "./ForecastInterval";
 import RidingPace from "./RidingPace";
 import { TimeFields } from "./TimeFields";
 import WeatherProviderSelector from "./WeatherProviderSelector"
-import Segment from './Segment';
+import Segment from './Segment'
+import * as Sentry from "@sentry/react"
 
 export const ForecastSettings = () => {
     const metric = useSelector(state => state.controls.metric)
@@ -32,7 +33,7 @@ export const ForecastSettings = () => {
                 <TimeFields />
                 <div style={{ display: "flex" }}>
                     <RidingPace />
-                    <div style={{ flex: 1, cursor: "pointer", display: "flex", flexFlow: "column", alignItems: "flex-end" }} onClick={() => dispatch(metricToggled())}>
+                    <div style={{ flex: 1, cursor: "pointer", display: "flex", flexFlow: "column", alignItems: "flex-end" }} onClick={() => {Sentry.metrics.increment("metric", 1); dispatch(metricToggled())}}>
                         <div style={{ width: "fit-content", borderBottom: !metric ? "1px solid #106ba3" : "1px solid #0000" }}>{t('labels.englishSystem')}</div>
                         <div style={{ fontSize: "10px", color: "grey", opacity: !metric ? 1 : 0, transition: "opacity 0.3s", marginTop: "3px", textAlign: "end" }}>{t('labels.miles')}</div>
                     </div>
@@ -54,7 +55,7 @@ export const ForecastSettings = () => {
                     </LocationContext.Consumer>
                 </div>
             </div>
-            <ToggleButtonOpaque icon={"chevron-down"} active={showControlPoints} onClick={() => setShowControlPoints(!showControlPoints)}>{t('buttons.stops')}</ToggleButtonOpaque>
+            <ToggleButtonOpaque icon={"chevron-down"} active={showControlPoints} onClick={() => {Sentry.metrics.increment("controls", 1); setShowControlPoints(!showControlPoints)}}>{t('buttons.stops')}</ToggleButtonOpaque>
             {showControlPoints && <ControlTableContainer />}
         </div>
     )
