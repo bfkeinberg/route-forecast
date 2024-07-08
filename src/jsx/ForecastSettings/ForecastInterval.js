@@ -30,7 +30,7 @@ const ForecastInterval = ({min_interval,interval,setInterval}) => {
                         { value: 2.0, label: '120' }
                     ]}
                     valueLabelDisplay="off"
-                    onChange={(event, selected) => {Sentry.metrics.gauge("interval", selected, {unit:"minute"}); setInterval(selected)}} />
+                    onChange={(event, selected) => {Sentry.metrics.gauge("interval", selected, {unit:"hour"}); setInterval(selected)}} />
             </Tooltip>
         </FormGroup>
     );
