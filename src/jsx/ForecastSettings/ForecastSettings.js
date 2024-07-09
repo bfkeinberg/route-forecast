@@ -4,7 +4,7 @@ import ReactGA from "react-ga4";
 import { useDispatch,useSelector } from "react-redux";
 import {useTranslation} from 'react-i18next'
 
-import { displayControlTableUiSet, errorDetailsSet,metricToggled } from '../../redux/reducer';
+import { displayControlTableUiSet, errorDetailsSet,metricToggled, celsiusToggled } from '../../redux/reducer';
 import LocationContext from '../locationContext';
 import { AlwaysFilledSwitch } from '../RouteInfoForm/AlwaysFilledSwitch'
 import { RouteTitle } from '../shared/RouteTitle';
@@ -20,6 +20,7 @@ import * as Sentry from "@sentry/react";
 
 export const ForecastSettings = () => {
     const metric = useSelector(state => state.controls.metric)
+    const celsius = useSelector(state => state.controls.celsius)
     const dispatch = useDispatch()
     const errorDetails = useSelector(state => state.uiInfo.dialogParams.errorDetails)
     const { t } = useTranslation()
@@ -41,6 +42,15 @@ export const ForecastSettings = () => {
                     <div style={{ flex: 1, cursor: "pointer", display: "flex", flexFlow: "column" }} onClick={() => dispatch(metricToggled())}>
                         <div style={{ width: "fit-content", borderBottom: metric ? "1px solid rgb(234, 89, 41)" : "1px solid #0000" }}>{t('labels.metricSystem')}</div>
                         <div style={{ fontSize: "10px", color: "grey", opacity: metric ? 1 : 0, transition: "opacity 0.3s", marginTop: "3px" }}>{t('labels.kilometers')}</div>
+                    </div>
+                    <div style={{ flex: 1, cursor: "pointer", display: "flex", flexFlow: "column", alignItems: "flex-end" }} onClick={() => {Sentry.metrics.increment("celsius", 1); dispatch(celsiusToggled())}}>
+                        <div style={{ width: "fit-content", borderBottom: !celsius ? "1px solid #106ba3" : "1px solid #0000" }}>{t('Fahrenheit')}</div>
+                        <div style={{ fontSize: "10px", color: "grey", opacity: !celsius ? 1 : 0, transition: "opacity 0.3s", marginTop: "3px", textAlign: "end" }}>{t('labels.degreesF')}</div>
+                    </div>
+                    <AlwaysFilledSwitch id={'celsiusFahrenheitSwitch'} checked={celsius} onChange={() => dispatch(celsiusToggled())}></AlwaysFilledSwitch>
+                    <div style={{ flex: 1, cursor: "pointer", display: "flex", flexFlow: "column" }} onClick={() => dispatch(celsiusToggled())}>
+                        <div style={{ width: "fit-content", borderBottom: celsius ? "1px solid rgb(234, 89, 41)" : "1px solid #0000" }}>{'Celsius'}</div>
+                        <div style={{ fontSize: "10px", color: "grey", opacity: celsius ? 1 : 0, transition: "opacity 0.3s", marginTop: "3px" }}>{t('labels.degreesC')}</div>
                     </div>
                 </div>
                 <Segment/>

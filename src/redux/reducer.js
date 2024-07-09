@@ -371,6 +371,7 @@ export const {routeLoadingBegun,forecastFetchBegun,
 
 const controlsInitialState = {
     metric: false,
+    celsius: false,
     displayBanked: false,
     userControlPoints: [],
     displayControlTableUI: false
@@ -387,6 +388,9 @@ const controlsSlice = createSlice({
         },
         metricToggled(state) {
             state.metric = !state.metric
+        },
+        celsiusToggled(state) {
+            state.celsius = !state.celsius
         },
         bankedDisplayToggled(state) {
             state.displayBanked = !state.displayBanked
@@ -407,7 +411,7 @@ const controlsSlice = createSlice({
     }
 })
 
-export const { metricSet, metricToggled, bankedDisplayToggled, userControlsUpdated, displayControlTableUiSet} = controlsSlice.actions
+export const { metricSet, metricToggled, celsiusToggled, bankedDisplayToggled, userControlsUpdated, displayControlTableUiSet} = controlsSlice.actions
 export const controlsReducer = controlsSlice.reducer
 
 const getAnalysisIntervalFromRouteDuration = (durationInHours) => {
