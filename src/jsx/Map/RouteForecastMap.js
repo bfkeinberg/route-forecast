@@ -78,6 +78,7 @@ const RouteForecastMap = ({maps_api_key}) => {
     }
     const routeLoadingMode = useSelector(state => state.uiInfo.routeParams.routeLoadingMode)
     const metric = useSelector(state => state.controls.metric)
+    const celsius = useSelector(state => state.controls.celsius)
     const zoomToRange = useSelector(state => state.forecast.zoomToRange)
     const { t } = useTranslation()
     const userSegment = useSelector(state => state.uiInfo.routeParams.segment)
@@ -120,7 +121,7 @@ const RouteForecastMap = ({maps_api_key}) => {
     const getInfoWindow  = (markedInfo) => {
         const infoContents = (<span>
             {t('data.info.temperature')} &nbsp;
-            <strong>{formatTemperature(markedInfo[0].temp, metric)}</strong> &nbsp;
+            <strong>{formatTemperature(markedInfo[0].temp, celsius)}</strong> &nbsp;
             {t('data.wind.speed')} &nbsp;
             <strong>{cvtDistance(markedInfo[0].windSpeed, metric).toFixed(1)}</strong> &nbsp;
             {t('tableHeaders.windBearing')} &nbsp;
@@ -166,12 +167,13 @@ const RouteForecastMap = ({maps_api_key}) => {
 
 const MapMarkers = ({ forecast, controls, controlNames, subrange, metric }) => {
     const { i18n } = useTranslation()
+    const celsius = useSelector(state => state.controls.celsius)
     // marker title now contains both temperature and mileage
     return (forecast.map((point) =>
                 <TempMarker latitude={point.lat}
                     longitude={point.lon}
                     value={cvtDistance(point.distance, metric)}
-                    title={`${DateTime.fromISO(point.time, {zone:point.zone, locale:i18n.language}).toFormat('EEE MMM d h:mma yyyy')}\n${formatTemperature(point.temp, metric)}`}
+                    title={`${DateTime.fromISO(point.time, {zone:point.zone, locale:i18n.language}).toFormat('EEE MMM d h:mma yyyy')}\n${formatTemperature(point.temp, celsius)}`}
                     bearing={point.windBearing}
                     relBearing={point.relBearing}
                     windSpeed={point.windSpeed}
@@ -196,7 +198,7 @@ const MapMarkers = ({ forecast, controls, controlNames, subrange, metric }) => {
                     latitude={point.lat}
                     longitude={point.lon}
                     value={cvtDistance(point.distance, metric)}
-                    title={`${DateTime.fromISO(point.time, {zone:point.zone, locale:i18n.language}).toFormat('EEE MMM d h:mma yyyy')}\n${formatTemperature(point.temp, metric)}`}
+                    title={`${DateTime.fromISO(point.time, {zone:point.zone, locale:i18n.language}).toFormat('EEE MMM d h:mma yyyy')}\n${formatTemperature(point.temp, celsius)}`}
                     isRainy={point.rainy}
                     key={`${point.lat}${point.lon}_${cvtDistance(point.distance, metric)}_rain_${Math.random().toString(10)}`}
                 />

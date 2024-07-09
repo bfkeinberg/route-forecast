@@ -24,7 +24,11 @@
                 "projectedFinish":"Projected finish time",
                 "interval":"Forecast Interval in minutes",
                 "source":"Weather forecast source",
-                "customSegment":"Use custom segment length"
+                "customSegment":"Use custom segment length",
+                "celsius":"Celsius",
+                "fahrenheit":"Fahrenheit",
+                "degreesF":"Temperature in degrees F",
+                "degreesC":"Temperature in degrees C"
             },
             "titles": {
                 "routeInfo": "Route info",
@@ -130,7 +134,9 @@
                 "projectedFinish":"Heure de Fin Prévue",
                 "interval":"Intervalle de Prévision en minutes",
                 "source":"Source de prévisions météorologiques",
-                "customSegment":"Utiliser une longueur de segment personnalisée"
+                "customSegment":"Utiliser une longueur de segment personnalisée",
+                "degreesF":"Température en degrés F",
+                "degreesC":"Température en degrés C"
             },
             "titles": {
                 "routeInfo": "Informations sur les parcours",

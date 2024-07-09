@@ -59,8 +59,8 @@ const fahrenheitToCelsius = (degrees) => {
     return (((degrees-32)*5)/9).toFixed(0);
 }
 
-export const formatTemperature = (temperature, isMetric) => {
-    return isMetric ? `${fahrenheitToCelsius(temperature)}C` : `${temperature}F`;
+export const formatTemperature = (temperature, isCelsius) => {
+    return isCelsius ? `${fahrenheitToCelsius(temperature)}C` : `${temperature}F`;
 }
 
 const orangeText = {color: 'darkOrange'}
@@ -98,6 +98,7 @@ const ForecastTable = (adjustedTimes) => {
     const forecast = useSelector(state => state.forecast.forecast)
     const provider = useSelector(state => state.forecast.weatherProvider)
     const metric = useSelector(state => state.controls.metric)
+    const celsius = useSelector(state => state.controls.celsius)
     const zoomToRange = useSelector(state => state.forecast.zoomToRange)
     const routeName = useSelector(state => state.routeInfo.name)
     const fetchAqi = useSelector(state => state.forecast.fetchAqi)
@@ -229,7 +230,7 @@ const ForecastTable = (adjustedTimes) => {
                         <td>{point.summary}</td>
                         <td>{showApparentTemp?
                             // eslint-disable-next-line multiline-ternary
-                            <i>{formatTemperature(point.feel, metric)}</i>:formatTemperature(point.temp, metric)}</td>
+                            <i>{formatTemperature(point.feel, celsius)}</i>:formatTemperature(point.temp, celsius)}</td>
                         <td className='chanceRain'>{point.precip}</td>
                         <MediaQuery minWidth={maxWidthForMobile}>
                             <td>{point.humidity}</td>
