@@ -25,8 +25,6 @@
                 "interval":"Forecast Interval in minutes",
                 "source":"Weather forecast source",
                 "customSegment":"Use custom segment length",
-                "celsius":"Celsius",
-                "fahrenheit":"Fahrenheit",
                 "degreesF":"Temperature in degrees F",
                 "degreesC":"Temperature in degrees C"
             },
