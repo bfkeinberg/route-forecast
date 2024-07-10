@@ -9,6 +9,8 @@ const formatOneControl = (controlPoint) => {
   return controlPoint.name + "," + controlPoint.distance + "," + controlPoint.duration;
 };
 
+export const maxWidthForMobile = '501px'
+
 // TODO
 // ask wtf is up with this & parseControls()
 export const formatControlsForUrl = (controlPoints, filter) => {
