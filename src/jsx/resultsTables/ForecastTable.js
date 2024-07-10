@@ -14,7 +14,7 @@ import cookie from 'react-cookies';
 import {useDispatch,useSelector} from 'react-redux'
 import MediaQuery from 'react-responsive';
 import MuiTooltip from '@mui/material/Tooltip'
-
+import { maxWidthForMobile } from '../../utils/util';
 import {fetchAqiToggled,finishTimeFormat,tableViewedSet,weatherRangeSet,weatherRangeToggled,zoomToRangeToggled} from '../../redux/reducer';
 import { useForecastDependentValues, useFormatSpeed } from '../../utils/hooks';
 import { milesToMeters } from '../../utils/util';
@@ -102,7 +102,6 @@ const ForecastTable = (adjustedTimes) => {
     const zoomToRange = useSelector(state => state.forecast.zoomToRange)
     const routeName = useSelector(state => state.routeInfo.name)
     const fetchAqi = useSelector(state => state.forecast.fetchAqi)
-    const maxWidthForMobile = 501
     const [showGusts, setShowGusts] = useState(false)
     const [showApparentTemp, setShowApparentTemp] = useState(false)
     const [showRelativeBearing, setShowRelativeBearing] = useState(false)
