@@ -12,6 +12,7 @@ import React, {lazy, Suspense,useEffect} from 'react';
 import cookie from 'react-cookies';
 import { useDispatch, useSelector } from 'react-redux';
 import  {useMediaQuery} from 'react-responsive';
+import {useTranslation} from 'react-i18next'
 
 import {
     actionUrlAdded, apiKeysSet, displayControlTableUiSet, fetchAqiSet, metricSet, providerValues, queryCleared, querySet,
@@ -227,6 +228,7 @@ const RouteWeatherUI = ({search, href, action, maps_api_key, timezone_api_key, b
     const dispatch = useDispatch()
     const [forecast] = useForecastMutation()
     const [getAqi] = useGetAqiMutation()
+    const { i18n } = useTranslation()
 
     let queryParams = queryString.parse(search);
     dispatch(querySet({url:href,search:search}))
@@ -245,7 +247,9 @@ const RouteWeatherUI = ({search, href, action, maps_api_key, timezone_api_key, b
     if (fetchAqi) {
         dispatch(fetchAqiSet(fetchAqi==="true"))
     }
-
+    if (i18n.language === 'fr') {
+        Sentry.metrics.increment('french', 1)
+    }
     return (
         <FunAppWrapperThingForHooksUsability maps_api_key={maps_api_key} queryParams={queryString.parse(search)}/>
     )
