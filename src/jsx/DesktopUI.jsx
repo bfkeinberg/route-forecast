@@ -94,9 +94,11 @@ const DesktopUI = ({mapsApiKey, orientationChanged, setOrientationChanged}) => {
     }, [orientationChanged])
 
     const routeLoadingMode = useSelector(state => state.uiInfo.routeParams.routeLoadingMode)
-    const mapDataExists = (routeLoadingMode === routeLoadingModes.RWGPS || routeLoadingMode === routeLoadingModes.RUSA_PERM) ?
-     (forecastData.length > 0) :
-    stravaActivityData !== null
+    const hasStravaRoute = useSelector(state => state.strava.route) !== ''
+    const mapDataExists = (routeLoadingMode === routeLoadingModes.RWGPS ||
+         routeLoadingMode === routeLoadingModes.RUSA_PERM || 
+         (routeLoadingMode === routeLoadingModes.STRAVA && hasStravaRoute)) ?
+     (forecastData.length > 0) : stravaActivityData !== null
 
     return (
         <StrictMode>

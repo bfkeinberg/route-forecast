@@ -209,7 +209,7 @@ const updateFromQueryParams = (dispatch, queryParams) => {
     dispatch(stravaActivitySet(queryParams.strava_activity))
     dispatch(stravaRouteSet(queryParams.strava_route))
     dispatch(stravaErrorSet(queryParams.strava_error))
-    if (queryParams.strava_analysis !== undefined) {
+    if (queryParams.strava_analysis !== undefined || queryParams.strava_route) {
         dispatch(routeLoadingModeSet(routeLoadingModes.STRAVA))
     }
     if (queryParams.rusa_route_id) {

@@ -149,6 +149,7 @@ const usePointsAndBounds = () => {
   const gpxRouteData = useSelector(state => state.routeInfo.gpxRouteData)
 
   const routeLoadingMode = useSelector(state => state.uiInfo.routeParams.routeLoadingMode)
+  const stravaRouteUsed = useSelector(state => state.strava.route) !== ''
   const stravaActivityStream = useSelector(state => state.strava.activityStream)
   const stravaMode = routeLoadingMode === routeLoadingModes.STRAVA
 
@@ -157,6 +158,9 @@ const usePointsAndBounds = () => {
   if (stravaMode) {
     if (stravaActivityStream !== null) {
       pointsAndBounds = useMemo(() => stravaRouteParser.computePointsAndBounds(stravaActivityStream), [stravaActivityStream])
+    } else if (stravaRouteUsed) {
+      // we import strava routes as gpx
+      pointsAndBounds = useMemo(() => gpxParser.computePointsAndBounds(gpxRouteData, "gpx"), [gpxRouteData])
     }
   } else if (rwgpsRouteData !== null) {
     pointsAndBounds = useMemo(() => gpxParser.computePointsAndBounds(rwgpsRouteData, "rwgps"), [rwgpsRouteData])
@@ -164,13 +168,13 @@ const usePointsAndBounds = () => {
     pointsAndBounds = useMemo(() => gpxParser.computePointsAndBounds(gpxRouteData, "gpx"), [gpxRouteData])
   }
   if (!pointsAndBounds) {
-    Sentry.captureMessage(`Empty points and bounds :Strava=${stravaActivityStream===null} RWGPS:${rwgpsRouteData===null} GPX:${gpxRouteData===null}`)
+    Sentry.captureMessage(`Empty points and bounds :Strava=${stravaActivityStream === null} RWGPS:${rwgpsRouteData === null} GPX:${gpxRouteData === null}`)
   }
   if (pointsAndBounds && pointsAndBounds.pointList && pointsAndBounds.pointList.length > 0) {
-    // pointsAndBounds.points = useMemo(() => pointsAndBounds.pointList
-      // .map(point => ({ lat: point.lat, lng: point.lon, dist: point.dist })), [pointsAndBounds.pointList])
-      pointsAndBounds.points = pointsAndBounds.pointList
-      .map(point => ({ lat: point.lat, lng: point.lon, dist: point.dist }))
+    pointsAndBounds.points = useMemo(() => pointsAndBounds.pointList
+      .map(point => ({ lat: point.lat, lng: point.lon, dist: point.dist })), [pointsAndBounds.pointList])
+    // pointsAndBounds.points = pointsAndBounds.pointList
+    // .map(point => ({ lat: point.lat, lng: point.lon, dist: point.dist }))
   }
 
   return pointsAndBounds
