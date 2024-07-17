@@ -307,6 +307,7 @@ export const loadStravaRoute = (routeId) => {
         routeId = routeId || getState().strava.route
         ReactGA.event('login', {method:routeId});
         ReactGA.event('sign_up', {method:routeId});
+        Sentry.metrics.increment('loadStravaRoute', 1)
         dispatch(routeLoadingBegun('gpx'));
         await Sentry.startSpan({ name: "loadingStravaRoute" }, async () => {
             const api = new Api('https://www.strava.com/api/v3', [(response) => Promise.resolve(response.text())])
@@ -490,6 +491,7 @@ export const loadStravaActivity = function() {
 
         const access_token = await refreshOldToken(dispatch, getState)
         dispatch(stravaFetchBegun());
+        Sentry.metrics.increment('loadStravaActivity', 1)
         const activityId = getState().strava.activity
         return parser.fetchStravaActivity(activityId, access_token).then(result => {
             dispatch(stravaFetched(result));
