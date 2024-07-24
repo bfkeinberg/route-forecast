@@ -123,6 +123,7 @@ const ForecastButton = ({fetchingForecast,submitDisabled, routeNumber, startTime
 
     const forecastClick = async (event) => {
         if (event.altKey) {
+            Sentry.metrics.increment('forecastAll', 1)
             grabAllPossibleForecasts(forecastRequestData.current)
             return
         }
