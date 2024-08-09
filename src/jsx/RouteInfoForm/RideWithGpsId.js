@@ -4,6 +4,7 @@ import React from 'react';
 import {connect} from 'react-redux';
 import {useTranslation} from 'react-i18next'
 import { routeDataCleared, rwgpsRouteSet } from '../../redux/reducer';
+import * as Sentry from "@sentry/react";
 
 export const decideValidationStateFor = (type, methodUsed, loadingSuccess) => {
     if (type === methodUsed) {
@@ -62,8 +63,12 @@ const RideWithGpsId = ({rwgpsRouteSet,loadingSource,loadingSuccess,rwgpsRoute,ro
                      let dt = event.dataTransfer;
                      if (dt.items) {
                          // Use DataTransferItemList interface to remove the drag data
-                         for (let i = 0;i < dt.items.length;i++) {
-                             dt.items.remove(i);
+                         try {
+                            for (let i = dt.items.length - 1; i >= 0; i--) {
+                                dt.items.remove(i);
+                            }   
+                         } catch (err) {
+                            Sentry.captureException(err)
                          }
                      }
                  }}
