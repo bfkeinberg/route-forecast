@@ -38,7 +38,7 @@
     "express-winston": "^4.0.5",
     "gpxparser": "^3.0.8",
     "history": "^5.0.0",
-    "i18next": "^23.11.3",
+    "i18next": "^23.12.3",
     "i18next-browser-languagedetector": "^8.0.0",
     "isomorphic-fetch": "^3.0.0",
     "jest-environment-jsdom": "^29.0.1",
