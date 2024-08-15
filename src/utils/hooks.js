@@ -163,12 +163,17 @@ const usePointsAndBounds = () => {
       pointsAndBounds = useMemo(() => gpxParser.computePointsAndBounds(gpxRouteData, "gpx"), [gpxRouteData])
     }
   } else if (rwgpsRouteData !== null) {
-    pointsAndBounds = useMemo(() => gpxParser.computePointsAndBounds(rwgpsRouteData, "rwgps"), [rwgpsRouteData])
+    console.log('computing points and bounds for RWGPS case');
+    // pointsAndBounds = useMemo(() => gpxParser.computePointsAndBounds(rwgpsRouteData, "rwgps"), [rwgpsRouteData])
+    pointsAndBounds = gpxParser.computePointsAndBounds(rwgpsRouteData, "rwgps")
+    if (!pointsAndBounds) {
+      console.log(`no points and bounds from RWGPS data with ${rwgpsRouteData[rwgpsRouteData.type][track_points].length} points`)
+    }
   } else if (gpxRouteData !== null) {
     pointsAndBounds = useMemo(() => gpxParser.computePointsAndBounds(gpxRouteData, "gpx"), [gpxRouteData])
   }
   if (!pointsAndBounds) {
-    Sentry.captureMessage(`Empty points and bounds :Strava=${stravaActivityStream === null} RWGPS:${rwgpsRouteData === null} GPX:${gpxRouteData === null}`)
+    Sentry.captureMessage(`Empty points and bounds :Strava=${stravaActivityStream === null} Strava route: ${stravaRouteUsed} RWGPS:${rwgpsRouteData === null} GPX:${gpxRouteData === null}`)
   }
   if (pointsAndBounds && pointsAndBounds.pointList && pointsAndBounds.pointList.length > 0) {
     pointsAndBounds.points = useMemo(() => pointsAndBounds.pointList
