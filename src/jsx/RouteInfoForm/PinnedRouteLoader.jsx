@@ -40,7 +40,7 @@ const getPinnedRoutes = async (rwgpsToken, setErrorDetails, rwgpsTokenSet) => {
 }
 
 const setRoutes = async (rwgpsToken, setRwgpsToken, setError, setPinnedRoutes, setLoadingPinned, usingPinnedRoutes, hasRoutes) => {
-    if (rwgpsToken === '' || !rwgpsToken || !usingPinnedRoutes || hasRoutes) {
+    if (rwgpsToken === '' || !rwgpsToken || rwgpsToken===undefined || !usingPinnedRoutes || hasRoutes) {
         return null;
     }
     setLoadingPinned(true);
@@ -61,7 +61,7 @@ const togglePinnedRoutes = (setUsePinnedRoutes, setShowPinnedRoutes, usingPinned
 };
 
 const PinnedRouteLoader = ({rwgpsToken, rwgpsTokenSet, credentialsValid, pinnedRoutesSet, errorDetailsSet, hasRoutes, loadingPinnedRoutes, loadingPinnedSet, usePinnedRoutesSet, setShowPinnedRoutes, usingPinnedRoutes}) => {
-    useEffect(() => {if (usingPinnedRoutes && !rwgpsToken) {window.location.href = `/rwgpsAuthReq?state=${JSON.stringify(queryString.parse(location.search))}`}}, [
+    useEffect(() => {if (usingPinnedRoutes && (!rwgpsToken || rwgpsToken===undefined)) {window.location.href = `/rwgpsAuthReq?state=${JSON.stringify(queryString.parse(location.search))}`}}, [
         usingPinnedRoutes,
          credentialsValid
         ]);
