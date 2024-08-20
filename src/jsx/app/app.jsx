@@ -46,6 +46,7 @@ if (!window.origin.startsWith('http://localhost') && !window.origin.startsWith('
                 autoInject:false
               })
         ],
+        denyUrls:["https://maps.googleapis"],
         enableTracing:true,
         // To set a uniform sample rate
         tracesSampleRate: Number.parseFloat(script.getAttribute('sentry_trace_sample_rate')),
