@@ -27,7 +27,7 @@ const callWeatherApi = async function callWeatherApi (lat, lon, currentTime, dis
     if (hour > 23) {
         hour = 0;
     }
-    const forecastUrl = `https://api.weatherapi.com/v1/forecast.json?key=${weatherApiKey}&q=${lat},${lon}&days=1&hour=${hour}&aqi=yes&unixdt=${startTime.toUnixInteger()}`;
+    const forecastUrl = `https://api.weatherapi.com/v1/forecast.json?key=${weatherApiKey}&q=${lat},${lon}&days=1&hour=${hour}&aqi=yes&dt=${startTime.toISODate()}`;
     const historyUrl = `https://api.weatherapi.com/v1/history.json?key=${weatherApiKey}&q=${lat},${lon}&hour=${hour}&unixdt=${startTime.toUnixInteger()}`;
     const url = startTime < DateTime.now() ? historyUrl : forecastUrl;
     Sentry.setContext('url',{'url':url})
