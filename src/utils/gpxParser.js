@@ -147,6 +147,9 @@ class AnalyzeRoute {
                 return 0
             }
             let delayInMinutes = controls[nextControl].duration;
+            if (isNaN(delayInMinutes)) {
+                Sentry.captureMessage(`Invalid duration for control ${nextControl} - ${controls[nextControl].duration}`)
+            }
             let arrivalTime = startTime.plus({hours:elapsedTimeInHours});
             let banked = Math.round(AnalyzeRoute.rusa_time(distanceInKm, elapsedTimeInHours));
             calculatedValues.push({arrival:arrivalTime.toFormat(finishTimeFormat),

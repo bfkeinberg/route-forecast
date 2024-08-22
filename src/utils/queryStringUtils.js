@@ -6,7 +6,7 @@ import { updateUserControls } from "../redux/actions"
 import { formatControlsForUrl } from './util';
 
 const maxUrlLength = 2048;
-const maxControlNameLength = 15;
+const maxControlNameLength = 10;
 
 const shrinkControls = (controls, dispatch) => {
     const truncatedControls = controls.map(control => {
