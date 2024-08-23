@@ -219,7 +219,7 @@ const ForecastTable = (adjustedTimes) => {
                         <tr style={{outline:'thin solid'}}>
                             <td>{DateTime.fromISO(point.time, {locale:i18n.language}).toFormat('cccc')}</td>
                         </tr>:null}
-                    <tr 
+                    <tr id={`forecast_row_${index}`}
                         start={point.distance*milesToMeters}
                         end={index!==forecast.length-1?forecast[index+1].distance*milesToMeters:maxDistanceInKm*1000}
                         className={selectedRow===parseInt(point.distance*milesToMeters)?'highlighted':null}
@@ -247,6 +247,19 @@ const ForecastTable = (adjustedTimes) => {
                 )}
                 </tbody>
             );
+        }
+    }
+
+    const scrollToChanceOfRain = () => {
+        var rowNum = 0
+        while (rowNum < forecast.length) {
+            if (forecast[rowNum].precip !== '0.0%') {
+                document.getElementById(`forecast_row_${rowNum}`).scrollIntoView({
+                    behavior: 'smooth'
+                  });
+                break
+            }
+            rowNum++
         }
     }
 
@@ -311,7 +324,7 @@ const ForecastTable = (adjustedTimes) => {
                                 <th><span className={'headerCell'}>{distHeader}</span></th>
                                 <th><span style={{display:"inline-block", width:"60px"}}className={'headerCell'}>{t('tableHeaders.summary')}</span></th>
                                 <th id={'temp'} className={'clickableHeaderCell'}>{temperatureHeader}</th>
-                                <th><span className={'headerCell'}>{t('tableHeaders.precipitation')}</span></th>
+                                <th onClick={scrollToChanceOfRain}><span className={'headerCell'}>{t('tableHeaders.precipitation')}</span></th>
                                 <MediaQuery minWidth={501}>
                                     <th><span className={'headerCell'}>{t('tableHeaders.humidity')}</span></th>
                                     <th><span className={'headerCell'}>{t('tableHeaders.cloudCover')}</span></th>
