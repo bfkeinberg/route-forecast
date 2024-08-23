@@ -65,7 +65,8 @@ export const generateUrl = (startTimestamp, routeNumber, pace, interval, metric,
          provider, shortDate, start, origin, setPageUrl, zone, rusaRouteId)
     if (url.url.length >= maxUrlLength) {
         const truncatedControls = shrinkControls(controls, dispatch);
-        url = buildUrl(routeNumber, pace, interval, metric, truncatedControls, strava_activity, provider,
+        url = buildUrl(routeNumber, pace, interval, metric, truncatedControls, 
+            strava_activity, strava_route, provider,
              shortDate, start, origin, setPageUrl, zone, rusaRouteId)
     }
     return url;
