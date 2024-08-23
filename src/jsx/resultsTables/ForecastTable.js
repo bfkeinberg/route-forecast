@@ -12,7 +12,7 @@ import { DateTime, Interval } from 'luxon';
 import PropTypes from 'prop-types';
 import cookie from 'react-cookies';
 import {useDispatch,useSelector} from 'react-redux'
-import MediaQuery from 'react-responsive';
+import MediaQuery, {useMediaQuery} from 'react-responsive';
 import MuiTooltip from '@mui/material/Tooltip'
 import { maxWidthForMobile } from '../../utils/util';
 import {fetchAqiToggled,finishTimeFormat,tableViewedSet,weatherRangeSet,weatherRangeToggled,zoomToRangeToggled} from '../../redux/reducer';
@@ -250,13 +250,14 @@ const ForecastTable = (adjustedTimes) => {
         }
     }
 
+    const isLandscape = useMediaQuery({query:'(orientation:landscape)'})
+    const isLargeEnough = useMediaQuery({query:'(min-width: 950px)'})
+    
     return (
 
         <div className="animated slideInLeft">
             <InstallExtensionButton/>
-            <MediaQuery maxWidth={500}>
-                <h2>{routeName}</h2>
-            </MediaQuery>
+            {(!isLargeEnough || !isLandscape) && <h2>{routeName}</h2>}
             <ErrorBoundary>
                 <div style={{ display: 'flex', flexDirection: "column", overflowY: 'scroll'}}>
                     <div style={{ display: 'flex', padding: '16px', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
