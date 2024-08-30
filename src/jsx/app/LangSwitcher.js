@@ -15,7 +15,7 @@ const LangSwitcher = () => {
     <ButtonGroup style={{position:'absolute', bottom:'0px'}}>
         <Button minimal active disabled>{t('labels.language')}</Button>
         {Object.keys(lngs).map((lng) => (
-            <Button key={lng} style={{ fontWeight: i18n.resolvedLanguage === lng ? 'bold' : 'normal' }} type="submit" onClick={() => i18n.changeLanguage(lng)}>
+            <Button key={lng} style={{ fontWeight: i18n.language === lng ? 'bold' : 'normal' }} type="submit" onClick={() => i18n.changeLanguage(lng)}>
                 {lngs[lng].nativeName}
             </Button>
         ))}

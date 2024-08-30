@@ -57,7 +57,8 @@
                 "zoom":"Whether to zoom into route segments when hovering over their line in the table",
                 "customSegment":"Forecast only this portion of the route",
                 "bearingHeader":"Click to toggle between absolute and relative wind bearing",
-                "copyTable":"Copy forecast table"
+                "copyTable":"Copy forecast table",
+                "scrollToRain":"Bring first forecast line with change of rain into view"
             },
             "data": {
                 "noForecastPlaceholder":"Find forecast to create",
@@ -165,7 +166,8 @@
                 "zoom":"S'il faut zoomer sur les segments d'itinéraire en survolant leur ligne dans le tableau",
                 "customSegment":"Prévoir uniquement cette partie de le parcours",
                 "bearingHeader":"Cliquez pour basculer entre le relèvement du vent absolu et relatif",
-                "copyTable":"Copier le tableau de prévisions"
+                "copyTable":"Copier le tableau de prévisions",
+                "scrollToRain":"Afficher la première ligne de prévision avec changement de pluie"
             },
             "data":{
                 "noForecastPlaceholder":"Cliquez sur « Prévisions »",

@@ -324,7 +324,13 @@ const ForecastTable = (adjustedTimes) => {
                                 <th><span className={'headerCell'}>{distHeader}</span></th>
                                 <th><span style={{display:"inline-block", width:"60px"}}className={'headerCell'}>{t('tableHeaders.summary')}</span></th>
                                 <th id={'temp'} className={'clickableHeaderCell'}>{temperatureHeader}</th>
-                                <th onClick={scrollToChanceOfRain}><span className={'headerCell'}>{t('tableHeaders.precipitation')}</span></th>
+                                <th>
+                                    <span className={'headerCell'}>
+                                        <DesktopTooltip content={t('tooltips.scrollToRain')} placement={'top'}>
+                                            <Button small onClick={scrollToChanceOfRain}>{t('tableHeaders.precipitation')}</Button>
+                                        </DesktopTooltip>
+                                    </span>
+                                </th>
                                 <MediaQuery minWidth={501}>
                                     <th><span className={'headerCell'}>{t('tableHeaders.humidity')}</span></th>
                                     <th><span className={'headerCell'}>{t('tableHeaders.cloudCover')}</span></th>
