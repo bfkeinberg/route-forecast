@@ -30,7 +30,12 @@ var compression = require('compression');
 app.use(compression());
 app.set('trust proxy', true);
 // Instantiate a datastore client
-const datastore = new Datastore();
+let datastore;
+try {
+    datastore = new Datastore();
+} catch (err) {
+    console.log(`Couldn't create Google Datastore : ${err}`)
+}
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -87,7 +92,7 @@ const insertRecord = async (record, routeName) => {
             routeName
         ]),
         data: record
-    });
+    }).catch(err=> console.error(`Caught ${err} in call to datastore.save`));
 };
 
 const getVisits = () => {
@@ -249,7 +254,7 @@ app.post('/forecast_one', cache.middleware(), upload.none(), async (req, res) =>
         try {
             await insertRecord(dbRecord, req.body.routeName);
         } catch (err) {
-            console.error(`DB call from forecast_one failed with ${err}`)
+            console.error(`DB call from /forecast_one failed with ${err}`)
         }
     }
     const zone = req.body.timezone;
@@ -293,7 +298,11 @@ app.post('/forecast', upload.none(), async (req, res) => {
     }
     if (req.body.routeName !== undefined && req.body.routeName !== '') {
         let dbRecord = makeRecord(forecastPoints[0], req.body.routeNumber);
-        insertRecord(dbRecord, req.body.routeName);
+        try {
+            await insertRecord(dbRecord, req.body.routeName);
+        } catch (err) {
+            console.error(`DB call from /forecast failed with ${err}`)
+        }
     }
     const zone = req.body.timezone;
     try {
