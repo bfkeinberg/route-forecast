@@ -249,14 +249,14 @@ app.post('/forecast_one', cache.middleware(), upload.none(), async (req, res) =>
     if (!process.env.NO_LOGGING) {
         logger.info(`Request from ${req.ip} for single point from ${service}`);
     }
-    if (req.body.routeName !== undefined && req.body.routeName !== '' && req.body.which===0) {
-        let dbRecord = makeRecord(forecastPoints, req.body.routeNumber);
-        try {
-            await insertRecord(dbRecord, req.body.routeName);
-        } catch (err) {
-            console.error(`DB call from /forecast_one failed with ${err}`)
-        }
-    }
+    // if (req.body.routeName !== undefined && req.body.routeName !== '' && req.body.which===0) {
+    //     let dbRecord = makeRecord(forecastPoints, req.body.routeNumber);
+    //     try {
+    //         await insertRecord(dbRecord, req.body.routeName);
+    //     } catch (err) {
+    //         console.error(`DB call from /forecast_one failed with ${err}`)
+    //     }
+    // }
     const zone = req.body.timezone;
     try {
         const point = forecastPoints
@@ -296,14 +296,14 @@ app.post('/forecast', upload.none(), async (req, res) => {
     if (req.body.service !== undefined) {
         service = req.body.service;
     }
-    if (req.body.routeName !== undefined && req.body.routeName !== '') {
-        let dbRecord = makeRecord(forecastPoints[0], req.body.routeNumber);
-        try {
-            await insertRecord(dbRecord, req.body.routeName);
-        } catch (err) {
-            console.error(`DB call from /forecast failed with ${err}`)
-        }
-    }
+    // if (req.body.routeName !== undefined && req.body.routeName !== '') {
+    //     let dbRecord = makeRecord(forecastPoints[0], req.body.routeNumber);
+    //     try {
+    //         await insertRecord(dbRecord, req.body.routeName);
+    //     } catch (err) {
+    //         console.error(`DB call from /forecast failed with ${err}`)
+    //     }
+    // }
     const zone = req.body.timezone;
     try {
         let results = [];
