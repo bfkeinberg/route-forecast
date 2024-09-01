@@ -16,7 +16,7 @@ const upload = multer({
 const callWeatherService = require('./weatherForecastDispatcher');
 const url = require('url');
 const strava = require('strava-v3');
-const { Datastore } = require('@google-cloud/datastore');
+// const { Datastore } = require('@google-cloud/datastore');
 const cors = require('cors');
 const axios = require('axios');
 const getPurpleAirAQI = require('./purpleAirAQI');
@@ -30,12 +30,8 @@ var compression = require('compression');
 app.use(compression());
 app.set('trust proxy', true);
 // Instantiate a datastore client
-let datastore;
-try {
-    datastore = new Datastore();
-} catch (err) {
-    console.log(`Couldn't create Google Datastore : ${err}`)
-}
+// const datastore = new Datastore();
+
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -512,11 +508,11 @@ app.get('/stravaAuthReq', (req, res) => {
     }
     try {
         let restoredState = JSON.parse(decodeURIComponent(state.replace(/\+/g, " ")));
-        insertFeatureRecord({
-            timestamp: new Date(),
-            routeNumber: restoredState.rwgpsRoute === undefined ? null : restoredState.rwgpsRoute
-        },
-            "strava");
+        // insertFeatureRecord({
+        //     timestamp: new Date(),
+        //     routeNumber: restoredState.rwgpsRoute === undefined ? null : restoredState.rwgpsRoute
+        // },
+        //     "strava");
     } catch (error) {
         res.status(400).json({'status':`${error} : Invalid OAuth state ${state}`});
         return;
@@ -625,7 +621,7 @@ app.get('/pinned_routes', async (req, res) => {
         if (response === undefined) {
             return;
         }
-        insertFeatureRecord(makeFeatureRecord(response), "pinned", response.data.user.email);
+        // insertFeatureRecord(makeFeatureRecord(response), "pinned", response.data.user.email);
         const favoritesReply = await axios.get(`https://ridewithgps.com/users/${response.data.user.id}/favorites.json?version=2&apikey=${rwgpsApiKey}`, options).catch(error => {
             console.warn(`Favorites error ${error}`);
             res.status(error.response.status).json(error.response.data);
