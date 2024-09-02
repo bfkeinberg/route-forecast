@@ -102,7 +102,7 @@ class AnalyzeRoute {
         [])
 
     isControl = (coursePoint) => {
-        const controlRegexp = /control|rest stop|regroup|lunch/i;
+        const controlRegexp = /^control|rest stop|regroup|lunch/i;
         const exclusionRegexp = /(^Depart)|(^Exit)/i 
         return coursePoint.d !== undefined && coursePoint.t === 'Control' || (coursePoint.n && coursePoint.n.match(controlRegexp) && !coursePoint.n.match(exclusionRegexp))
     }
@@ -407,7 +407,7 @@ class AnalyzeRoute {
                 if (forecast.length > 0 && (totalDistanceInKm*kmToMiles)>forecast[forecast.length-1].distance) {
                     currentForecast = forecast.pop();
                     // calculate adjusted forecast time for table display purposes
-                    const initialForecastTime = DateTime.fromISO(currentForecast.time);
+                    const initialForecastTime = DateTime.fromISO(currentForecast.time, {zone:timeZoneId});
                     adjustedTimes.push({time:initialForecastTime.plus({minutes:totalMinutesLost}),index:forecastIndex})
                     forecastIndex++
                 }
