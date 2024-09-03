@@ -159,11 +159,14 @@ class AnalyzeRoute {
             });
             // add the control to the forecast request
             if (distanceInMiles > 0 && !shouldSkip) {
-                forecastRequests.push(AnalyzeRoute.addToForecast(point, startTime, (accumulatedTime + idlingTime),
-                    accumulatedDistanceKm * kmToMiles, true));
+                // don't add request with duplicate distance
+                if (Math.round(accumulatedDistanceKm * kmToMiles) !== forecastRequests[forecastRequests.length - 1].distance) {
+                    forecastRequests.push(AnalyzeRoute.addToForecast(point, startTime, (accumulatedTime + idlingTime),
+                        accumulatedDistanceKm * kmToMiles, true));
                     if (forecastPoint) {
                         bearings.push(AnalyzeRoute.getRelativeBearing(forecastPoint, point));
                     }
+                }
             }
             //           
             nextControl++;

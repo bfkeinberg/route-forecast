@@ -380,6 +380,26 @@ export const msgFromError = (error) => {
     }
 }
 
+export const removeDuplicateForecasts = (results) => {
+    let deduplicatedResults = []
+    let resultsToRemove = []
+    for (let i = 0; i < results.length-1; ++i) {
+        if (results[i].forecast.time===results[i+1].forecast.time) {
+            if (results[i].forecast.isControl) {
+                resultsToRemove.push(i+1)
+            } else {
+                resultsToRemove.push(i)
+            }
+        }
+    }
+    for (let i = 0; i < results.length-1; ++i) {
+        if (!resultsToRemove.includes(i)) {
+            deduplicatedResults.push(results[i])
+        }
+    }
+    return deduplicatedResults
+}
+
 const forecastWithHook = async (forecastFunc, aqiFunc, dispatch, getState) => {
     // await Sentry.startSpan({ name: "forecastWithHook" }, async () => {
         const routeInfo = getState().routeInfo
@@ -404,6 +424,7 @@ const forecastWithHook = async (forecastFunc, aqiFunc, dispatch, getState) => {
         const aqiResults = await forecastAndAqiResults[1]
         let filteredResults = forecastResults.filter(result => result.status === "fulfilled").map(result => result.value)
         filteredResults.sort((l,r) => l.forecast.distance-r.forecast.distance)
+        filteredResults = removeDuplicateForecasts(filteredResults)
         let filteredAqi = aqiResults.filter(result => result.status === "fulfilled").map(result => result.value)
         const firstForecastResult = filteredResults.shift()
         if (firstForecastResult) {

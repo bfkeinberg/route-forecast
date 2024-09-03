@@ -15,6 +15,7 @@ import { DesktopTooltip } from '../shared/DesktopTooltip';
 import {useTranslation} from 'react-i18next'
 import { providerValues } from '../../redux/reducer';
 import { useForecastRequestData } from '../../utils/hooks';
+import { removeDuplicateForecasts } from '../../redux/actions';
 
 const ForecastButton = ({fetchingForecast,submitDisabled, routeNumber, startTimestamp, pace, interval,
      metric, controls, strava_activity, strava_route, provider, href, urlIsShortened, querySet, zone}) => {
@@ -92,6 +93,7 @@ const ForecastButton = ({fetchingForecast,submitDisabled, routeNumber, startTime
         const forecastResults = await forecastAndAqiResults[0]
         let filteredResults = forecastResults.filter(result => result.status === "fulfilled").map(result => result.value)
         filteredResults.sort((l,r) => l.forecast.distance-r.forecast.distance)
+        filteredResults = removeDuplicateForecasts(filteredResults)
         const firstForecastResult = filteredResults.shift()
         if (firstForecastResult) {
             const firstForecast = { ...firstForecastResult.forecast }
