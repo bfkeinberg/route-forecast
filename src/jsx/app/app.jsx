@@ -19,6 +19,8 @@ if ('serviceWorker' in navigator) {
 }
 
 
+const sentry_app_id = script.getAttribute('sentry_app_id')
+console.log('Sentry app id', sentry_app_id)
 let script = document.scripts.namedItem('routeui')
 if (!window.origin.startsWith('http://localhost') && !window.origin.startsWith('http://127.0.0.1') && !window.origin.startsWith('http://Brians-MacBook-Pro.local')) {
     ReactGA.initialize("G-0R3J1W9ECC");
@@ -33,6 +35,10 @@ if (!window.origin.startsWith('http://localhost') && !window.origin.startsWith('
         // This enables automatic instrumentation (highly recommended), but is not
         // necessary for purely manual usage
         integrations: [
+            Sentry.thirdPartyErrorFilterIntegration({
+                filterKeys: ["_randoplan_sentry_app_id_"],
+                behaviour: "drop-error-if-exclusively-contains-third-party-frames"
+            }),
             Sentry.browserTracingIntegration({
                 tracingOrigins: [
                     'localhost',

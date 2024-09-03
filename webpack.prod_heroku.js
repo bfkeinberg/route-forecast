@@ -35,6 +35,7 @@ module.exports = (env, argv) => merge(common(env, argv), {
             ]
         }),
         sentryWebpackPlugin({
+            applicationKey: process.env.SENTRY_APP_ID,
             include: '.',
             ignoreFile: '.sentrycliignore',
             ignore: [

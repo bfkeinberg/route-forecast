@@ -575,6 +575,7 @@ app.get('/', (req, res) => {
         'timezone_api_key': process.env.TIMEZONE_API_KEY,
         'bitly_token': process.env.BITLY_TOKEN,
         'sentry_trace_sample_rate': process.env.SENTRY_TRACE_SAMPLE_RATE,
+        'sentry_app_id': process.env.SENTRY_APP_ID,
         'preloaded_state': '',
         'reactDom': '',
         delimiter: '?'
