@@ -36,7 +36,7 @@ if (!window.origin.startsWith('http://localhost') && !window.origin.startsWith('
         // necessary for purely manual usage
         integrations: [
             Sentry.thirdPartyErrorFilterIntegration({
-                filterKeys: ["_randoplan_sentry_app_id_"],
+                filterKeys: [sentry_app_id],
                 behaviour: "drop-error-if-exclusively-contains-third-party-frames"
             }),
             Sentry.browserTracingIntegration({
