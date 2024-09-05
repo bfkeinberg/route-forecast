@@ -21,7 +21,7 @@ if ('serviceWorker' in navigator) {
 
 let script = document.scripts.namedItem('routeui')
 const sentry_app_id = script.getAttribute('sentry_app_id')
-console.log('NPM version : ' + npm_package_version)
+// console.log('NPM version : ' + process.env.npm_package_version)
 if (!window.origin.startsWith('http://localhost') && !window.origin.startsWith('http://127.0.0.1') && !window.origin.startsWith('http://Brians-MacBook-Pro.local')) {
     ReactGA.initialize("G-0R3J1W9ECC");
     Sentry.init({
