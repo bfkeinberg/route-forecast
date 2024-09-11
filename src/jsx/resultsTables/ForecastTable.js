@@ -208,6 +208,15 @@ const ForecastTable = (adjustedTimes) => {
         )
     }
 
+    const getDayForComparison = (time, index, forecastLength, zone) => {
+        if (index === forecastLength-1) {
+            const { finishTime } = useForecastDependentValues()
+            return DateTime.fromFormat(finishTime, finishTimeFormat, {zone:zone}).day
+        } else {
+            return DateTime.fromISO(time, {zone:zone}).day
+        }
+    }
+
     const expandTable = (forecast, metric, adjustedTimes) => {
         const { i18n } = useTranslation()
         if (forecast.length > 0) {
@@ -215,7 +224,7 @@ const ForecastTable = (adjustedTimes) => {
                 <tbody>
                 {forecast.map((point,index) =>
                 <React.Fragment key={index}>
-                    {(index > 0 && (DateTime.fromISO(forecast[index-1].time).day !== DateTime.fromISO(point.time).day))?
+                    {(index > 0 && (DateTime.fromISO(forecast[index-1].time, {zone:point.zone}).day !== getDayForComparison(point.time, index, forecast.length, point.zone)))?
                         <tr style={{outline:'thin solid'}}>
                             <td>{DateTime.fromISO(point.time, {locale:i18n.language}).toFormat('cccc')}</td>
                         </tr>:null}
@@ -224,7 +233,7 @@ const ForecastTable = (adjustedTimes) => {
                         end={index!==forecast.length-1?forecast[index+1].distance*milesToMeters:maxDistanceInKm*1000}
                         className={selectedRow===parseInt(point.distance*milesToMeters)?'highlighted':null}
                         onClick={toggleRange} onMouseEnter={updateWeatherRange}>
-                        <td><span style={styleForControl(point)} className='timeCell'><Time time={index === forecast.length-1 ? null : getAdjustedTime(point,index,adjustedTimes, i18n)}/></span></td>
+                        <td><span style={styleForControl(point)} className='timeCell'><Time time={index === forecast.length-1 ? null : getAdjustedTime(point,index,adjustedTimes, i18n)} zone={point.zone}/></span></td>
                         <td style={styleForControl(point)}>{metric ? ((point.distance*milesToMeters)/1000).toFixed(0) : point.distance}</td>
                         <td>{point.summary}</td>
                         <td>{showApparentTemp?
@@ -374,7 +383,7 @@ WindSpeed.propTypes = {
     showGusts:PropTypes.bool.isRequired
 };
 
-const Time = ({time}) => {
+const Time = ({time, zone}) => {
     const { finishTime } = useForecastDependentValues()
     if (!finishTime) {
         Sentry.addBreadcrumb({
@@ -385,7 +394,7 @@ const Time = ({time}) => {
     }
 
     return (
-        time || finishTime && DateTime.fromFormat(finishTime, finishTimeFormat).toFormat('h:mm a') || "N/A"
+        time || finishTime && DateTime.fromFormat(finishTime, finishTimeFormat, {zone:zone}).toFormat('h:mm a') || "N/A"
     )
 }
 
