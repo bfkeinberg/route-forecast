@@ -48,7 +48,11 @@ const MobileUITabs = (props) => {
         const routeData = useSelector(state => state.routeInfo[type === "rwgps" ? "rwgpsRouteData" : "gpxRouteData"])
         const stravaActivityData = useSelector(state => state.strava.activityData)
         const forecastData = useSelector(state => state.forecast.forecast)
-        useWhenChanged(routeData, () => navigate("/controlPoints", { replace: true }))
+        // if we've been reset while displaying another tab
+        if (pathname !== '/' && routeData === null) {
+            navigate('/')
+        }
+        useWhenChanged(routeData, () => navigate("/controlPoints", { replace: true }), routeData !== null)
         useWhenChanged(forecastData, () => navigate("/forecastTable", { replace: true }), forecastData.length > 0)
         useWhenChanged(stravaActivityData, () => navigate("/paceTable", { replace: true }))
 
