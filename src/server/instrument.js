@@ -10,7 +10,7 @@ if (process.env.NODE_ENV !== 'development') {
         tracesSampleRate: 0.15,
         // Set sampling rate for profiling
         // This is relative to tracesSampleRate
-        profilesSampleRate: 1.0        
+        profilesSampleRate: 0.2
     });
 } else {
 }
