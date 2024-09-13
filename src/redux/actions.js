@@ -186,6 +186,21 @@ export const requestForecast = function (routeInfo) {
     }
 };
 
+const mergeControls = (oldCtrls, newCtrls) => {
+    let oldCtrlsCopy = oldCtrls.slice()
+    let old = oldCtrlsCopy.shift()
+    const merged = newCtrls.map(ctrl => {
+        if (ctrl.distance === old.distance) {
+            const result =  {name:ctrl.name, distance:ctrl.distance, duration:old.duration}
+            old = oldCtrlsCopy.shift()
+            return result
+        } else {
+            return ctrl
+        }
+    })
+    return merged
+}
+
 export const loadFromRideWithGps = function (routeNumber, isTrip) {
     return function (dispatch, getState) {
         return Sentry.startSpan({ name: "loadingRwgpsRoute" }, () => {
@@ -196,13 +211,19 @@ export const loadFromRideWithGps = function (routeNumber, isTrip) {
             dispatch(cancelForecast())
             return loadRwgpsRoute(routeNumber, isTrip, getState().rideWithGpsInfo.token).then(async (routeData) => {
                 dispatch(rwgpsRouteLoaded(routeData));
-                if (getState().controls.userControlPoints.length === 0) {
+                // if (getState().controls.userControlPoints.length === 0) {
                     const extractedControls = extractControlsFromRoute(routeData);
                     if (extractedControls.length !== 0) {
-                        dispatch(updateUserControls(extractedControls))
+                        const oldControls = getState().controls.userControlPoints
+                        if (oldControls.length === 0) {
+                            dispatch(updateUserControls(extractedControls))
+                        } else {
+                            const merged = mergeControls(oldControls, extractedControls)
+                            dispatch(updateUserControls(merged))
+                        }
                         dispatch(displayControlTableUiSet(true))
                     }
-                }
+                // }
                 const timeZoneResults = await requestTimeZoneForRoute(getState())
                 if (timeZoneResults.result === "error") {
                     dispatch(rwgpsRouteLoadingFailed(timeZoneResults.error))
