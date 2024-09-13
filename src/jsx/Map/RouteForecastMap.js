@@ -288,7 +288,7 @@ export const RotatedArrow = ({rotation, distance, relBearing, windSpeed}) => {
                 fill={`url(#movingShade)`}
                 transform={`rotate(${rotation},-0.234,0.134)`}
             />
-            <text x={rotation<179?"7":"5"} y={rotation>90&&rotation<180?"-10":"13"} fill="black" fontSize={14}>{distance.toFixed()}</text>
+            {/* <text x={rotation<179?"7":"5"} y={rotation>90&&rotation<180?"-10":"13"} fill="black" fontSize={14}>{distance.toFixed()}</text> */}
         </svg>
     )
 }
@@ -301,7 +301,22 @@ const TempMarker = ({ latitude, longitude, value, title, bearing, relBearing, wi
             position={{ lat: latitude, lng: longitude }}
             title={title}
         >
+            <>
             <RotatedArrow rotation={flippedBearing} distance={value} relBearing={relBearing} windSpeed={parseInt(windSpeed)} />
+            <div style={{
+                    width: 30,
+                    height: 30,
+                    position: 'relative',
+                    top: -2,
+                    left: 0,
+                    background: '#1ee3dc',
+                    border: '2px solid #0e6443',
+                    borderRadius: '40%',
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center'
+                }}>{value.toFixed(0)}</div>
+            </>
         </AdvancedMarker>
     }
     else {
