@@ -190,7 +190,7 @@ const mergeControls = (oldCtrls, newCtrls) => {
     let oldCtrlsCopy = oldCtrls.slice()
     let old = oldCtrlsCopy.shift()
     const merged = newCtrls.map(ctrl => {
-        if (ctrl.distance === old.distance) {
+        if (old && ctrl.distance === old.distance) {
             const result =  {name:ctrl.name, distance:ctrl.distance, duration:old.duration}
             old = oldCtrlsCopy.shift()
             return result
