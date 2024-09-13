@@ -238,7 +238,7 @@ const RouteWeatherUI = ({search, href, action, maps_api_key, timezone_api_key, b
     dispatch(apiKeysSet({maps_api_key:maps_api_key,timezone_api_key:timezone_api_key, bitly_token:bitly_token}))
     setupRideWithGps(dispatch);
     setupBrowserForwardBack(dispatch, origin, forecast, getAqi)
-    dispatch(updateUserControls(queryParams.controlPoints?[]:parseControls(queryParams.controlPoints,true)))
+    dispatch(updateUserControls(queryParams.controlPoints?parseControls(queryParams.controlPoints,true):[]))
     const zoomToRange = loadCookie('zoomToRange');
     if (zoomToRange !== undefined) {
         dispatch(zoomToRangeSet(zoomToRange==="true"))

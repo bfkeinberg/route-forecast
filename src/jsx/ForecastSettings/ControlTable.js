@@ -27,6 +27,9 @@ export const ControlTable = () => {
     const removeControl = indexToRemove => dispatch(removeControlAction(indexToRemove))
 
     const onCellValueChanged = (rowIndex, field, value) => {
+        if (field === "duration") {
+            value = Number(value)
+        }
         updateControls(controls.map((control, index) => (index === rowIndex ? {...control, [field]: value} : control)))
     }
 

@@ -15,7 +15,7 @@ const shrinkControls = (controls, dispatch) => {
             distance: control.distance, duration: control.duration
         }
     });
-    dispatch(updateUserControls(truncatedControls));
+    // dispatch(updateUserControls(truncatedControls));
     return truncatedControls
 }
 
