@@ -2,7 +2,7 @@ import { Button } from '@blueprintjs/core';
 import Slider from "@mui/material/Slider"
 import Typography from '@mui/material/Typography'
 
-import React from 'react';
+import * as React from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { segmentSet } from '../../redux/reducer';
 import { milesToMeters } from '../../utils/util';
@@ -61,9 +61,9 @@ const Segment = () => {
                 <Typography gutterBottom>{t('labels.customSegment')}</Typography>
                 <Button disabled={!canDoUserSegment} onClick={resetSegment}>Reset</Button>
             </div>
-            <Tooltip arrow title={t('tooltips.customSegment')}>
+            <Tooltip describeChild arrow title={t('tooltips.customSegment')}>
                 <Slider marks value={getSliderValue(segment)} valueLabelFormat={sliderLabelRenderer} valueLabelDisplay='auto'
-                    getAriaLabel={() => 'Route segment'} getAriaValueText={() => 'User defined route segment'}
+                    getAriaLabel={() => 'Route segment'}
                     min={0} max={maxDistance} onChange={segmentUpdate} disabled={!canDoUserSegment} />
             </Tooltip>
         </>)
