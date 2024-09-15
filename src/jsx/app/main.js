@@ -126,7 +126,7 @@ const setupRideWithGps = async (dispatch) => {
 
 const setupBrowserForwardBack = (dispatch, origin, forecastFunc, aqiFunc) => {
     if (typeof window !== 'undefined') {
-        window.onpopstate = (event) => {
+        window.addEventListener( "popstate", (event) => {
             Sentry.addBreadcrumb({
                     category: 'history',
                     level: "info",
@@ -151,7 +151,8 @@ const setupBrowserForwardBack = (dispatch, origin, forecastFunc, aqiFunc) => {
                 }
             }
         }
-    }    
+        )
+    }
 }
 
 const getStravaToken = (queryParams, dispatch) => {
