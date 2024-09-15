@@ -211,7 +211,12 @@ const ForecastTable = (adjustedTimes) => {
     const getDayForComparison = (time, index, forecastLength, zone) => {
         if (index === forecastLength-1) {
             const { finishTime } = useForecastDependentValues()
-            return DateTime.fromFormat(finishTime, finishTimeFormat, {zone:zone}).day
+            if (finishTime) {
+                return DateTime.fromFormat(finishTime, finishTimeFormat, {zone:zone}).day
+            }
+            else {
+                return DateTime.fromISO(time, {zone:zone}).day
+            }
         } else {
             return DateTime.fromISO(time, {zone:zone}).day
         }
