@@ -198,6 +198,11 @@ const mergeControls = (oldCtrls, newCtrls) => {
             return ctrl
         }
     })
+    // add in any old controls that are not present
+    while (old) {
+        merged.push(old)
+        old = oldCtrlsCopy.shift()
+    }
     return merged
 }
 
