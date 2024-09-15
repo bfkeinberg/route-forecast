@@ -108,7 +108,7 @@ class AnalyzeRoute {
     }
 
     controlFromCoursePoint = (coursePoint) =>
-        ({name:coursePoint.n.replace(':','_'), duration:1, distance:Math.round((coursePoint.d*kmToMiles)/1000)})
+        ({name:coursePoint.n?coursePoint.n.replace(':','_'):coursePoint.description.replace(':','_'), duration:1, distance:Math.round((coursePoint.d*kmToMiles)/1000)})
 
     extractControlPoints = (routeData, type) =>
         this.parseCoursePoints(routeData, type).filter(point => this.isControl(point)).map(point => this.controlFromCoursePoint(point))
