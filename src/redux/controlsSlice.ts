@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 
-interface UserControl {
+export interface UserControl {
     distance: number,
     duration: number,
     name: string
@@ -9,7 +9,7 @@ interface UserControl {
     banked: number
 }
 
-interface ControlsState {
+export interface ControlsState {
     metric: boolean,
     celsius: boolean,
     displayBanked: boolean,

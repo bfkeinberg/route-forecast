@@ -1,6 +1,6 @@
 import * as Sentry from "@sentry/react";
 import { DateTime, Interval } from 'luxon';
-import { MutableRefObject, useEffect, useMemo, useRef, useState } from "react"
+import { useEffect, useMemo, useRef, useState } from "react"
 import { useDispatch, useSelector, useStore } from "react-redux"
 import type { AppDispatch, RootState } from '../jsx/app/topLevel'
 
@@ -11,6 +11,8 @@ import { routeLoadingModes } from "../data/enums"
 import gpxParser from "./gpxParser"
 import stravaRouteParser from "./stravaRouteParser"
 import { getRouteInfo, getForecastRequest, milesToMeters } from "./util"
+import type {ControlsState} from '../redux/controlsSlice'
+import type { RouteInfoState } from "../redux/routeInfoSlice";
 
 const useDelay = (delay: number, startCondition = true) => {
   const [
@@ -38,8 +40,8 @@ const useReusableDelay = <Type>(delay: number, startCondition = true) => {
   const [
     restartedAt,
     setRestartedAt
-  ] = useState(null)
-  const timeout = useRef(null)
+  ] = useState<number|null>(null)
+  const timeout = useRef<NodeJS.Timeout|null>(null)
 
   const cancel = () => {
     if (timeout.current !== null) {
@@ -205,8 +207,28 @@ const dependencies = [
   'timeZoneId',
   'forecast'
 ]
-let lastWindResult = {result: null, dependencyValues: {}}
-const calculateWindResult = (inputs) => {
+interface WindResultInputs {
+  controls?: ControlsState
+  routeInfo?: RouteInfoState
+  [index:string]:any
+}
+type WalkRouteResult = {
+    forecastRequest:[],
+    points:[],
+    values:[],
+    finishTime:String,
+    timeInHours:number
+}
+type WindAdjustResult = {
+  time:number,
+  values:[], 
+  gustSpeed:number,
+  finishTime:string,
+  adjustedTimes:[]
+}
+
+let lastWindResult : { result: WindResultInputs | null, dependencyValues: WindResultInputs}= {result: null, dependencyValues: {}}
+const calculateWindResult = (inputs : WindResultInputs) => {
   if (dependencies.every(dependency => inputs[dependency] === lastWindResult.dependencyValues[dependency]) ) {
     return lastWindResult.result
   }
@@ -214,11 +236,11 @@ const calculateWindResult = (inputs) => {
   const stateStuff = {routeInfo, uiInfo: {routeParams}, controls}
 
   let result
-  if (forecast.length > 0 && (routeInfo.rwgpsRouteData || routeInfo.gpxRouteData)) {
+  if (forecast.length > 0 && (routeInfo?.rwgpsRouteData || routeInfo?.gpxRouteData)) {
     const { points, values, finishTime} = getRouteInfo(stateStuff, routeInfo.rwgpsRouteData !== null ? "rwgps" : "gpx", timeZoneId, segment)
 
-    let sortedControls = controls.userControlPoints.slice();
-    sortedControls.sort((a,b) => a['distance']-b['distance']);
+    let sortedControls = controls?.userControlPoints.slice();
+    sortedControls?.sort((a,b) => a['distance']-b['distance']);
 
     let sortedValues = values.slice();
     sortedValues.sort((a,b) => a['distance']-b['distance']);
@@ -253,7 +275,7 @@ const useForecastDependentValues = () => {
   return windAdjustmentResult
 }
 
-const useWhenChanged = <Type>(value : Type, callback, changedCondition = true) => {
+const useWhenChanged = <Type>(value : Type, callback : () => void, changedCondition = true) => {
   const previousValue = usePrevious(value)
   const valueChanged = previousValue !== undefined && previousValue !== value && value !== null && changedCondition
   useEffect(() => {

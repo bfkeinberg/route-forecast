@@ -42,7 +42,7 @@ interface GpxRouteData {
     }[]
 }
 
-interface RouteInfoState  {
+export interface RouteInfoState  {
     name: string,
     rwgpsRouteData: RwgpsRoute | RwgpsTrip | null,
     gpxRouteData: GpxRouteData | null,

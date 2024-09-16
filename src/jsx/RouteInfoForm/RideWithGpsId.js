@@ -1,10 +1,10 @@
 import {Button,FormGroup, InputGroup} from '@blueprintjs/core';
 import PropTypes from 'prop-types';
-import * as React from 'react';
 import {connect} from 'react-redux';
 import {useTranslation} from 'react-i18next'
-import { routeDataCleared, rwgpsRouteSet } from '../../redux/reducer';
 import * as Sentry from "@sentry/react";
+import { routeDataCleared} from '../../redux/routeInfoSlice';
+import { rwgpsRouteSet } from '../../redux/reducer';
 
 export const decideValidationStateFor = (type, methodUsed, loadingSuccess) => {
     if (type === methodUsed) {

@@ -9,12 +9,7 @@ import {useTranslation} from 'react-i18next'
 import { RootState } from '../app/topLevel'
 import { useAppSelector, useAppDispatch } from '../../utils/hooks';
 const minSuffixFunction = (value : (string | number)) => `${value} min`
-
-interface UserControl {
-    distance: number,
-    duration: number,
-    name: string
-}
+import type { UserControl } from '../../redux/controlsSlice';
 
 export const ControlTable = () => {
     const { t } = useTranslation()
@@ -66,7 +61,24 @@ export const ControlTable = () => {
         return metric ? ((distance * 1000) / milesToMeters).toFixed(1) : distance;
     }
 
-    const tableData = {
+    interface ColumnData {
+        name:string,
+        render: JSX.Element | string,
+        width: number,
+        editable? : boolean,
+        editCompleteFunction? : (value: number) => number | string,
+        editTransformFunction? : (value: number) => number | string,
+        valueTransformFunction? : (value: number) => string | number,
+        editValidateFunction? : (value: string) => boolean,
+        cellStyle? : {},
+        headerStyle? : {}
+    }
+    interface TableData { 
+        rows: UserControl[],
+        columns : ColumnData[]
+    }
+
+    const tableData : TableData= {
         rows: controlsData.map(({name, distance, duration, arrival, banked, actual}, index) =>
             ({name, distance, duration, arrival, banked, actual, delete: <Icon icon="delete" style={{cursor: "pointer"}} onClick={() => removeControl(index)}/>})),
         columns: [

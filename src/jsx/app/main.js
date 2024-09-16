@@ -15,14 +15,14 @@ import  {useMediaQuery} from 'react-responsive';
 import {useTranslation} from 'react-i18next'
 
 import {
-    actionUrlAdded, apiKeysSet, displayControlTableUiSet, fetchAqiSet, metricSet, providerValues, queryCleared, querySet,
+    actionUrlAdded, apiKeysSet, fetchAqiSet, providerValues, queryCleared, querySet,
      reset, routeLoadingModeSet, rusaPermRouteIdSet,
     rwgpsRouteSet, rwgpsTokenSet,
     startTimestampSet,
     stopAfterLoadSet, stravaActivitySet, stravaErrorSet, stravaRefreshTokenSet,
     stravaRouteSet, stravaTokenSet, usePinnedRoutesSet, zoomToRangeSet, defaultProvider
 } from "../../redux/reducer";
-
+import { metricSet, displayControlTableUiSet } from "../../redux/controlsSlice";
 const addBreadcrumb = (msg) => {
     Sentry.addBreadcrumb({
         category: 'loading',

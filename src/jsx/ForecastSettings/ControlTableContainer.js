@@ -1,10 +1,9 @@
 
 import { Button, Card, Elevation, Tooltip } from "@blueprintjs/core";
-import * as React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { addControl } from "../../redux/actions";
-import { bankedDisplayToggled } from '../../redux/reducer';
+import { bankedDisplayToggled } from "../../redux/controlsSlice";
 import ErrorBoundary from '../shared/ErrorBoundary';
 import { ToggleButton } from '../shared/ToggleButton';
 import { ControlTable } from './ControlTable';

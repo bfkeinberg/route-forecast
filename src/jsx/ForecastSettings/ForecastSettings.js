@@ -5,7 +5,8 @@ import { useDispatch,useSelector } from "react-redux";
 import {useTranslation} from 'react-i18next'
 import  {useMediaQuery} from 'react-responsive';
 import { maxWidthForMobile } from '../../utils/util';
-import { displayControlTableUiSet, errorDetailsSet,metricToggled, celsiusToggled } from '../../redux/reducer';
+import { errorDetailsSet } from '../../redux/reducer';
+import { displayControlTableUiSet, metricToggled, celsiusToggled } from '../../redux/controlsSlice';
 import LocationContext from '../locationContext';
 import { AlwaysFilledSwitch } from '../RouteInfoForm/AlwaysFilledSwitch'
 import { RouteTitle } from '../shared/RouteTitle';
