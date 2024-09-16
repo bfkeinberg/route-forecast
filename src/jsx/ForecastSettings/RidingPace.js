@@ -3,7 +3,7 @@ import "./RidingPace.css"
 import { Button, FormGroup,MenuItem } from "@blueprintjs/core";
 import { Select } from "@blueprintjs/select";
 import PropTypes from 'prop-types';
-import React from 'react';
+import * as React from 'react';
 import {connect, useSelector} from 'react-redux';
 
 import {saveCookie, setPace} from "../../redux/actions";

@@ -1,7 +1,7 @@
 import {Toast2,Section,SectionCard} from '@blueprintjs/core';
 import Slider from '@mui/material/Slider';
 import PropTypes from 'prop-types';
-import React from 'react';
+import * as React from 'react';
 import ReactGA from "react-ga4";
 import {connect, useDispatch} from 'react-redux';
 

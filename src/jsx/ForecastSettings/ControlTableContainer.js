@@ -1,6 +1,6 @@
 
 import { Button, Card, Elevation, Tooltip } from "@blueprintjs/core";
-import React from 'react';
+import * as React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { addControl } from "../../redux/actions";

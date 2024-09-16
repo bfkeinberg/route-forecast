@@ -1,17 +1,22 @@
 import * as Sentry from "@sentry/react";
 import { DateTime, Interval } from 'luxon';
-import { useEffect, useMemo, useRef, useState } from "react"
-import { useSelector } from "react-redux"
+import { MutableRefObject, useEffect, useMemo, useRef, useState } from "react"
+import { useDispatch, useSelector, useStore } from "react-redux"
+import type { AppDispatch, RootState } from '../jsx/app/topLevel'
+
+export const useAppDispatch = useDispatch.withTypes<AppDispatch>()
+export const useAppSelector = useSelector.withTypes<RootState>()
 
 import { routeLoadingModes } from "../data/enums"
 import gpxParser from "./gpxParser"
 import stravaRouteParser from "./stravaRouteParser"
 import { getRouteInfo, getForecastRequest, milesToMeters } from "./util"
-const useDelay = (delay, startCondition = true) => {
+
+const useDelay = (delay: number, startCondition = true) => {
   const [
-ready,
-setReady
-] = useState(false)
+    ready,
+    setReady
+  ] = useState(false)
   useEffect(() => {
     if (startCondition) {
       setTimeout(() => {
@@ -19,21 +24,21 @@ setReady
       }, delay)
     }
   }, [
-delay,
-startCondition
-])
+    delay,
+    startCondition
+  ])
   return ready
 }
 
-const useReusableDelay = (delay, startCondition = true) => {
+const useReusableDelay = <Type>(delay: number, startCondition = true) => {
   const [
-ready,
-setReady
-] = useState(false)
+    ready,
+    setReady
+  ] = useState(false)
   const [
-restartedAt,
-setRestartedAt
-] = useState(null)
+    restartedAt,
+    setRestartedAt
+  ] = useState(null)
   const timeout = useRef(null)
 
   const cancel = () => {
@@ -57,31 +62,31 @@ setRestartedAt
 
     return cancel
   }, [
-delay,
-startCondition,
-restartedAt
-])
+    delay,
+    startCondition,
+    restartedAt
+  ])
 
   const restart = () => {
     setReady(false)
     setRestartedAt(Date.now())
   }
   return [
-ready,
-restart,
-cancel
-]
+    ready,
+    restart,
+    cancel
+  ]
 }
 
-const useValueHasChanged = (value, startValue) => {
+const useValueHasChanged = <Type>(value : Type, startValue : Type) => {
   const [
-oldValue,
-setOldValue
-] = useState(value)
+    oldValue,
+    setOldValue
+  ] = useState(value)
   const [
-hasChanged,
-setHasChanged
-] = useState(false)
+    hasChanged,
+    setHasChanged
+  ] = useState(false)
   useEffect(() => {
     if (oldValue !== value) {
       if (startValue === oldValue || startValue === undefined) {
@@ -94,15 +99,15 @@ setHasChanged
   return hasChanged
 }
 
-const usePreviousPersistent = (value) => {
+const usePreviousPersistent = <Type>(value : Type) => {
   const [
-oldValue,
-setOldValue
-] = useState(null)
+    oldValue,
+    setOldValue
+  ] = useState<Type | null>(null)
   const [
-newValue,
-setNewValue
-] = useState(value)
+    newValue,
+    setNewValue
+  ] = useState(value)
   useEffect(() => {
     setOldValue(newValue)
     setNewValue(value)
@@ -112,25 +117,25 @@ setNewValue
 }
 
 const useActualPace = () => {
-  const activityData = useSelector(state => state.strava.activityData)
+  const activityData = useAppSelector(state => state.strava.activityData)
   return activityData !== null ? stravaRouteParser.computeWWPaceForActivity(activityData) : null
 }
 
 const useActualFinishTime = () => {
-  const activityData = useSelector(state => state.strava.activityData)
+  const activityData = useAppSelector(state => state.strava.activityData)
   return activityData !== null ? stravaRouteParser.computeActualFinishTime(activityData) : null
 }
 
 const useActualArrivalTimes = () => {
-  const activityData = useSelector(state => state.strava.activityData)
-  const activityStream = useSelector(state => state.strava.activityStream)
-  const controls = useSelector(state => state.controls.userControlPoints)
+  const activityData = useAppSelector(state => state.strava.activityData)
+  const activityStream = useAppSelector(state => state.strava.activityStream)
+  const controls = useAppSelector(state => state.controls.userControlPoints)
 
   return activityData !== null ? stravaRouteParser.computeControlPointArrivalTimes(activityData, activityStream, controls) : null
 }
 
-const usePrevious = (value) => {
-  const ref = useRef();
+const usePrevious = <Type>(value : Type) => {
+  const ref = useRef<Type>();
   useEffect(() => {
     ref.current = value;
   });
@@ -138,22 +143,27 @@ const usePrevious = (value) => {
 }
 
 const useFormatSpeed = () => {
-  const metric = useSelector(state => state.controls.metric)
-  return speed => (metric ?
+  const metric = useAppSelector(state => state.controls.metric)
+  return (speed : number) => (metric ?
     `${((speed * milesToMeters) / 1000).toFixed(1)} kph` :
     `${speed.toFixed(1)} mph`);
 }
 
 const usePointsAndBounds = () => {
-  const rwgpsRouteData = useSelector(state => state.routeInfo.rwgpsRouteData)
-  const gpxRouteData = useSelector(state => state.routeInfo.gpxRouteData)
+  const rwgpsRouteData = useAppSelector(state => state.routeInfo.rwgpsRouteData)
+  const gpxRouteData = useAppSelector(state => state.routeInfo.gpxRouteData)
 
-  const routeLoadingMode = useSelector(state => state.uiInfo.routeParams.routeLoadingMode)
-  const stravaRouteUsed = useSelector(state => state.strava.route) !== ''
-  const stravaActivityStream = useSelector(state => state.strava.activityStream)
+  const routeLoadingMode = useAppSelector(state => state.uiInfo.routeParams.routeLoadingMode)
+  const stravaRouteUsed = useAppSelector(state => state.strava.route) !== ''
+  const stravaActivityStream = useAppSelector(state => state.strava.activityStream)
   const stravaMode = routeLoadingMode === routeLoadingModes.STRAVA
 
-  let pointsAndBounds
+  type PointsAndBounds = {
+    points?: {lat:number, lng:number, dist:number}[],
+    pointList: {lat:number, lon:number, dist:number}[],
+    bounds: { min_latitude: number, min_longitude: number, max_latitude: number, max_longitude: number }
+  }
+  let pointsAndBounds : PointsAndBounds | null = null
 
   if (stravaMode) {
     if (stravaActivityStream !== null) {
@@ -167,7 +177,7 @@ const usePointsAndBounds = () => {
     // pointsAndBounds = useMemo(() => gpxParser.computePointsAndBounds(rwgpsRouteData, "rwgps"), [rwgpsRouteData])
     pointsAndBounds = gpxParser.computePointsAndBounds(rwgpsRouteData, "rwgps")
     if (!pointsAndBounds) {
-      console.log(`no points and bounds from RWGPS data with ${rwgpsRouteData[rwgpsRouteData.type][track_points].length} points`)
+      console.log(`no points and bounds from RWGPS data with ${rwgpsRouteData[rwgpsRouteData.type].track_points.length} points`)
     }
   } else if (gpxRouteData !== null) {
     pointsAndBounds = useMemo(() => gpxParser.computePointsAndBounds(gpxRouteData, "gpx"), [gpxRouteData])
@@ -185,12 +195,15 @@ const usePointsAndBounds = () => {
   return pointsAndBounds
 }
 
+
+///
+//  routeInfo, routeParams, controls, timeZoneId, forecast, segment
 const dependencies = [
   'routeInfo',
-'routeParams',
-'controls',
-'timeZoneId',
-'forecast'
+  'routeParams',
+  'controls',
+  'timeZoneId',
+  'forecast'
 ]
 let lastWindResult = {result: null, dependencyValues: {}}
 const calculateWindResult = (inputs) => {
@@ -229,38 +242,38 @@ const calculateWindResult = (inputs) => {
 }
 
 const useForecastDependentValues = () => {
-  const routeInfo = useSelector(state => state.routeInfo)
-  const routeParams = useSelector(state => state.uiInfo.routeParams)
-  const controls = useSelector(state => state.controls)
-  const timeZoneId = useSelector(state => state.forecast.timeZoneId)
-  const forecast = useSelector(state => state.forecast.forecast)
-  const segment = useSelector(state => state.uiInfo.routeParams.segment)
+  const routeInfo = useAppSelector(state => state.routeInfo)
+  const routeParams = useAppSelector(state => state.uiInfo.routeParams)
+  const controls = useAppSelector(state => state.controls)
+  const timeZoneId = useAppSelector(state => state.forecast.timeZoneId)
+  const forecast = useAppSelector(state => state.forecast.forecast)
+  const segment = useAppSelector(state => state.uiInfo.routeParams.segment)
 
   const windAdjustmentResult = calculateWindResult({routeInfo, routeParams, controls, timeZoneId, forecast, segment})
   return windAdjustmentResult
 }
 
-const useWhenChanged = (value, callback, changedCondition = true) => {
+const useWhenChanged = <Type>(value : Type, callback, changedCondition = true) => {
   const previousValue = usePrevious(value)
   const valueChanged = previousValue !== undefined && previousValue !== value && value !== null && changedCondition
   useEffect(() => {
-      if (valueChanged) {
-          return callback()
-      }
+    if (valueChanged) {
+      return callback()
+    }
   }, [value])
 }
 
 const useForecastRequestData = () => {
-  const rwgpsRouteData = useSelector(state => state.routeInfo.rwgpsRouteData)
-  const gpxRouteData = useSelector(state => state.routeInfo.gpxRouteData)
+  const rwgpsRouteData = useAppSelector(state => state.routeInfo.rwgpsRouteData)
+  const gpxRouteData = useAppSelector(state => state.routeInfo.gpxRouteData)
   const type = rwgpsRouteData ? "rwgps" : (gpxRouteData ? "gpx" : null)
-  const timeZoneId = useSelector(state => state.uiInfo.routeParams.zone)
-  const routeData = useSelector(state => state.routeInfo[type === "rwgps" ? "rwgpsRouteData" : "gpxRouteData"])
-  const startTimestamp = useSelector(state => state.uiInfo.routeParams.startTimestamp)
-  const pace = useSelector(state => state.uiInfo.routeParams.pace)
-  const interval = useSelector(state => state.uiInfo.routeParams.interval)
-  const controlPoints = useSelector(state => state.controls.userControlPoints)
-  const segment = useSelector(state => state.uiInfo.routeParams.segment)
+  const timeZoneId = useAppSelector(state => state.uiInfo.routeParams.zone)
+  const routeData = useAppSelector(state => state.routeInfo[type === "rwgps" ? "rwgpsRouteData" : "gpxRouteData"])
+  const startTimestamp = useAppSelector(state => state.uiInfo.routeParams.startTimestamp)
+  const pace = useAppSelector(state => state.uiInfo.routeParams.pace)
+  const interval = useAppSelector(state => state.uiInfo.routeParams.interval)
+  const controlPoints = useAppSelector(state => state.controls.userControlPoints)
+  const segment = useAppSelector(state => state.uiInfo.routeParams.segment)
   const getForecastRequestData = () => {
     if (!type) {
       return { length: 0, daysInFuture:0 }

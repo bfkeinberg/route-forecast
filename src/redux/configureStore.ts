@@ -1,13 +1,15 @@
-import { combineReducers,configureStore } from '@reduxjs/toolkit'
+import { combineReducers, configureStore } from '@reduxjs/toolkit'
 import * as Sentry from '@sentry/react';
 import {createLogger} from 'redux-logger';
 
 import { forecastApiSlice } from './forecastApiSlice'
 import {
-    controlsReducer,
-    dialogParamsReducer, forecastReducer, paramsReducer, routeInfoReducer, routeParamsReducer, rwgpsInfoReducer, stravaReducer
+    dialogParamsReducer, forecastReducer, paramsReducer, routeParamsReducer, rwgpsInfoReducer, stravaReducer
 } from './reducer';
 import { rusaIdLookupApiSlice} from './rusaLookupApiSlice'
+import { routeInfoReducer } from './routeInfoSlice';
+import { controlsReducer } from './controlsSlice';
+
 export const loggerMiddleware = createLogger();
 
 const bannedActionKeys = [
@@ -23,12 +25,12 @@ const bannedActionKeys = [
 
 /**
  *
- * @param {Object} preloadedState from server
+ * @param {Object} _preloadedState from server
  * @param {boolean} mode - development vs production
  * @returns {Object} The Redux store
  *
  */
-export default function configureReduxStore(preloadedState, mode) {
+export default function configureReduxStore({ _preloadedState, mode }: { _preloadedState:object; mode:string; }) {
     const sentryReduxEnhancer = Sentry.createReduxEnhancer({
         actionTransformer: action => {
             if (action.type === 'paramsSlice/apiKeysSet') {
@@ -50,17 +52,21 @@ export default function configureReduxStore(preloadedState, mode) {
         reducer: {
             uiInfo: combineReducers({ routeParams: routeParamsReducer, dialogParams: dialogParamsReducer }),
             routeInfo: routeInfoReducer, controls: controlsReducer, strava: stravaReducer, forecast: forecastReducer,
-            params: paramsReducer, rideWithGpsInfo: rwgpsInfoReducer,
+            params: paramsReducer, 
+            rideWithGpsInfo: rwgpsInfoReducer,
             [forecastApiSlice.reducerPath]: forecastApiSlice.reducer,
             [rusaIdLookupApiSlice.reducerPath]: rusaIdLookupApiSlice.reducer
         },
+        preloadedState:_preloadedState,
         enhancers: getDefaultEnhancers => {
             return getDefaultEnhancers().concat(sentryReduxEnhancer);
         },
-        middleware: getDefaultMiddleware => {
-            const middleware = getDefaultMiddleware().concat(forecastApiSlice.middleware)
+        middleware: (getDefaultMiddleware) => {
+            const middleware = getDefaultMiddleware()
             if (mode === 'development') {
-                middleware.push(loggerMiddleware)
+                middleware.concat(forecastApiSlice.middleware,rusaIdLookupApiSlice.middleware,loggerMiddleware)
+            } else {
+                middleware.concat(forecastApiSlice.middleware,rusaIdLookupApiSlice.middleware)
             }
             return middleware;
         }

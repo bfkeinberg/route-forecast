@@ -1,6 +1,6 @@
 import * as Sentry from '@sentry/react';
 import queryString from 'query-string';
-export const updateHistory = (url, query, forceReplace=false) => {
+export const updateHistory = (url : string, query : string, forceReplace=false) => {
     Sentry.addBreadcrumb({
         category: 'history',
         level: "info",

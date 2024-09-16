@@ -1,6 +1,6 @@
 import { FormGroup,InputGroup } from '@blueprintjs/core'
 import PropTypes from 'prop-types';
-import React from 'react';
+import * as React from 'react';
 import { connect } from 'react-redux';
 
 import { stravaRouteSet } from '../../redux/reducer';

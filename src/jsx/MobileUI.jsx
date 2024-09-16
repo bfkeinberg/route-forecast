@@ -1,7 +1,7 @@
 import { Alignment,Button, IconSize, Intent, Navbar, NavbarDivider, NavbarGroup, NavbarHeading, Divider } from "@blueprintjs/core";
 import {Cloud, Cycle,Globe, Map as MapIcon, Shop } from "@blueprintjs/icons";
 import PropTypes from "prop-types";
-import React from "react";
+import * as React from "react";
 import {connect, useDispatch,useSelector} from 'react-redux';
 import { Link, MemoryRouter, Route, Routes, useLocation, useNavigate } from "react-router-dom";
 

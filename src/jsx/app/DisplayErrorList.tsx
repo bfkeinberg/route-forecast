@@ -1,8 +1,10 @@
-import React from 'react';
-import Snackbar from '@mui/material/Snackbar';
+import * as React from 'react';
+import Snackbar, {SnackbarCloseReason} from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
 
-const ErrorDisplayer = ({ errorDetails, onClose }) => {
+type CloseHandler = (event?: React.SyntheticEvent | Event, reason?: SnackbarCloseReason) => void
+
+const ErrorDisplayer = ({ errorDetails, onClose } : {errorDetails : string, onClose: CloseHandler}) => {
     return (
         <Snackbar sx={{ height: "100%" }} open={true} autoHideDuration={6000} onClose={onClose} anchorOrigin={{ vertical: 'top', horizontal: 'left' }}>
             <Alert
@@ -16,7 +18,7 @@ const ErrorDisplayer = ({ errorDetails, onClose }) => {
     )
 }
 
-const DisplayErrorList = ({errorList, onClose}) => {
+const DisplayErrorList = ({errorList, onClose} : {errorList : string[], onClose: CloseHandler}) => {
     return (
         errorList.length > 0 && <ErrorDisplayer key={Date.now()+Math.random()} errorDetails={errorList[0]} onClose={onClose}/>
     )

@@ -1,5 +1,5 @@
 import { DateTime } from "luxon";
-import React from "react";
+import * as React from "react";
 
 import { finishTimeFormat } from "../../redux/reducer.js";
 import { useActualFinishTime, useForecastDependentValues } from '../../utils/hooks';

@@ -1,5 +1,5 @@
 import { Toast2 } from '@blueprintjs/core';
-import React from 'react';
+import * as React from 'react';
 import ReactGA from "react-ga4";
 import { useDispatch,useSelector } from "react-redux";
 import {useTranslation} from 'react-i18next'

@@ -1,7 +1,7 @@
 import { FormGroup } from "@blueprintjs/core";
 import { Slider, Tooltip } from "@mui/material"
 import PropTypes from 'prop-types';
-import React from 'react';
+import * as React from 'react';
 import {connect} from 'react-redux';
 
 import {setInterval} from "../../redux/actions";

@@ -2,7 +2,7 @@ import { createSlice } from '@reduxjs/toolkit'
 import { DateTime } from 'luxon';
 
 import { routeLoadingModes } from '../data/enums';
-import { getRouteName,getRouteNumberFromValue } from '../utils/util';
+import { getRouteNumberFromValue } from '../utils/util';
 
 export const finishTimeFormat = 'EEE, MMM dd yyyy h:mma';
 
@@ -201,69 +201,6 @@ const rideWithGpsInfoSlice = createSlice({
 
 export const {rwgpsTokenSet,pinnedRoutesSet,loadingPinnedSet,usePinnedRoutesSet} = rideWithGpsInfoSlice.actions
 
-const routeInfoInitialState = {
-    name: '',
-    rwgpsRouteData: null,
-    gpxRouteData: null,
-    loadingFromURL: false,
-    distanceInKm: 0,
-    canDoUserSegment:false
-}
-const routeInfoSlice = createSlice({
-    name:'routeInfo',
-    initialState: routeInfoInitialState,
-    reducers:{
-        rwgpsRouteLoaded(state, action) {
-            state.rwgpsRouteData = action.payload
-            state.gpxRouteData = null
-            state.name = getRouteName(action.payload, "rwgps")
-            if (action.payload.route) {
-                state.distanceInKm = action.payload.route.distance/1000
-                state.canDoUserSegment = action.payload.route.track_points[0].d !== undefined
-            } else {
-                state.distanceInKm = action.payload.trip.distance/1000
-                state.canDoUserSegment = action.payload.trip.track_points[0].d !== undefined
-            }
-            state.type = "rwgps"
-        },
-        gpxRouteLoaded(state, action) {
-            state.gpxRouteData = action.payload
-            state.rwgpsRouteData = routeInfoInitialState.rwgpsRouteData
-            state.name = getRouteName(action.payload, "gpx")
-            state.type = "gpx"
-            state.distanceInKm = action.payload.tracks[0].distance.total/1000
-        },
-        routeDataCleared(state) {
-            state.rwgpsRouteData = routeInfoInitialState.rwgpsRouteData
-            state.gpxRouteData = routeInfoInitialState.gpxRouteData
-            state.name = routeInfoInitialState.name
-            state.type = null
-            state.distanceInKm = routeInfoInitialState.distanceInKm
-        },
-        loadingFromUrlSet(state, action) {
-            state.loadingFromURL = action.payload
-        }
-    },
-    extraReducers: (builder) => {
-        builder.addCase(rwgpsRouteSet, (state) => {
-            state.rwgpsRouteData = routeInfoInitialState.rwgpsRouteData
-            state.gpxRouteData = routeInfoInitialState.gpxRouteData
-            state.name = routeInfoInitialState.name
-            state.distanceInKm = routeInfoInitialState.distanceInKm
-        })
-            .addCase("strava/stravaRouteSet", (state) => {
-                state.rwgpsRouteData = routeInfoInitialState.rwgpsRouteData
-                state.gpxRouteData = routeInfoInitialState.gpxRouteData
-                state.name = routeInfoInitialState.name
-                state.distanceInKm = routeInfoInitialState.distanceInKm
-            })
-            .addCase(reset, () => routeInfoInitialState)
-    }
-})
-
-export const routeInfoReducer = routeInfoSlice.reducer
-export const {rwgpsRouteLoaded, gpxRouteLoaded, routeDataCleared,loadingFromUrlSet} = routeInfoSlice.actions
-
 const getMessageFromError = (error) => {
     if (typeof error === 'object') {
         if (error.message) return error.message
@@ -368,51 +305,6 @@ export const dialogParamsReducer = dialogParamsSlice.reducer
 export const {routeLoadingBegun,forecastFetchBegun,
     forecastFetchFailed,forecastFetchCanceled,rwgpsRouteLoadingFailed,
     gpxRouteLoadingFailed,errorDetailsSet,errorMessageListSet,shortUrlSet,lastErrorCleared,stravaErrorSet} = dialogParamsSlice.actions
-
-const controlsInitialState = {
-    metric: false,
-    celsius: false,
-    displayBanked: false,
-    userControlPoints: [],
-    displayControlTableUI: false
-}
-
-const controlsSlice = createSlice({
-    name: 'controls',
-    initialState: controlsInitialState,
-    reducers: {
-        metricSet(state, action) {
-            if (action.payload !== undefined) {
-                state.metric = action.payload
-            }
-        },
-        metricToggled(state) {
-            state.metric = !state.metric
-        },
-        celsiusToggled(state) {
-            state.celsius = !state.celsius
-        },
-        bankedDisplayToggled(state) {
-            state.displayBanked = !state.displayBanked
-        },
-        userControlsUpdated(state, action) {
-            state.userControlPoints = action.payload
-        },
-        displayControlTableUiSet(state, action) {
-            state.displayControlTableUI = action.payload
-        }
-    },
-    extraReducers: (builder) => {
-        builder
-            .addCase(rwgpsRouteSet, (state) => {
-                state.userControlPoints = []
-            }
-            ).addCase(reset, () => controlsInitialState)
-    }
-})
-
-export const { metricSet, metricToggled, celsiusToggled, bankedDisplayToggled, userControlsUpdated, displayControlTableUiSet} = controlsSlice.actions
-export const controlsReducer = controlsSlice.reducer
 
 const getAnalysisIntervalFromRouteDuration = (durationInHours) => {
     if (durationInHours > 72) {

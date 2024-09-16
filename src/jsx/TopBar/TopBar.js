@@ -1,7 +1,7 @@
 import "./TopBar.css"
 
 import PropTypes from 'prop-types';
-import React from "react";
+import * as React from "react";
 import MediaQuery, { useMediaQuery } from "react-responsive";
 
 import { useForecastDependentValues,usePreviousPersistent, useReusableDelay, useValueHasChanged } from "../../utils/hooks";

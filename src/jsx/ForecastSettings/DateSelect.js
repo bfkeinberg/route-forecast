@@ -5,7 +5,7 @@ import {Icon} from '@blueprintjs/core';
 import { DateInput3, TimePrecision } from "@blueprintjs/datetime2";
 import { DateTime } from 'luxon';
 import PropTypes from 'prop-types';
-import React from 'react';
+import * as React from 'react';
 import {connect} from 'react-redux';
 
 import {setStart, setTimeFromIso} from "../../redux/actions";

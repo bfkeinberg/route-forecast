@@ -1,32 +1,38 @@
 import { Icon } from '@blueprintjs/core';
-import React from 'react';
-import { useDispatch,useSelector } from 'react-redux';
+import * as React from 'react';
 
 import { removeControl as removeControlAction, updateUserControls } from '../../redux/actions';
 import { useActualArrivalTimes, useForecastDependentValues } from '../../utils/hooks';
 import { milesToMeters,stringIsOnlyDecimal, stringIsOnlyNumeric } from '../../utils/util';
 import { Table } from "./Table"
 import {useTranslation} from 'react-i18next'
+import { RootState } from '../app/topLevel'
+import { useAppSelector, useAppDispatch } from '../../utils/hooks';
+const minSuffixFunction = (value : (string | number)) => `${value} min`
 
-const minSuffixFunction = value => `${value} min`
+interface UserControl {
+    distance: number,
+    duration: number,
+    name: string
+}
 
 export const ControlTable = () => {
     const { t } = useTranslation()
 
-    const displayBanked = useSelector(state => state.controls.displayBanked)
-    const stravaActivityData = useSelector(state => state.strava.activityData)
+    const displayBanked = useAppSelector(state => state.controls.displayBanked)
+    const stravaActivityData = useAppSelector(state => state.strava.activityData)
     const compare = stravaActivityData !== null
-    const metric = useSelector(state => state.controls.metric)
-    const controls = useSelector(state => state.controls.userControlPoints)
+    const metric = useAppSelector(state => state.controls.metric)
+    const controls = useAppSelector(state => state.controls.userControlPoints)
 
     const { calculatedControlPointValues: calculatedValues } = useForecastDependentValues()
 
     const actualArrivalTimes = useActualArrivalTimes()
-    const dispatch = useDispatch()
-    const updateControls = controls => dispatch(updateUserControls(controls))
-    const removeControl = indexToRemove => dispatch(removeControlAction(indexToRemove))
+    const dispatch = useAppDispatch()
+    const updateControls = (controls : UserControl[]) => dispatch(updateUserControls(controls))
+    const removeControl = (indexToRemove : number) => dispatch(removeControlAction(indexToRemove))
 
-    const onCellValueChanged = (rowIndex, field, value) => {
+    const onCellValueChanged = (rowIndex : number, field : string, value : (string | number)) => {
         if (field === "duration") {
             value = Number(value)
         }
@@ -52,11 +58,11 @@ export const ControlTable = () => {
 
     const rwgpsCellStyle = calculatedValues !== null ? {backgroundColor: "rgb(19, 124, 189)", color: "white"} : {}
 
-    const transformDistance = distance => {
+    const transformDistance = (distance : number) => {
         return metric ? ((distance * milesToMeters) / 1000).toFixed(1) : distance;
     };
 
-    const reverseTransformDistance = distance => {
+    const reverseTransformDistance = (distance : number) => {
         return metric ? ((distance * 1000) / milesToMeters).toFixed(1) : distance;
     }
 
