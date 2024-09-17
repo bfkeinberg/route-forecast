@@ -3,10 +3,11 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 export interface UserControl {
     distance: number,
     duration: number,
-    name: string
-    actual: string,
-    arrival: string,
-    banked: number
+    name: string,
+    id: number,
+    actual?: string,
+    arrival?: string,
+    banked?: number
 }
 
 export interface ControlsState {

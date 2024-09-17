@@ -8,7 +8,7 @@ const routeInfoInitialState : RouteInfoState = {
     loadingFromURL: false,
     distanceInKm: 0,
     canDoUserSegment:false,
-    type: null
+    type: null,
 }
 
 interface RwgpsRoute {
@@ -50,6 +50,7 @@ export interface RouteInfoState  {
     distanceInKm: number,
     canDoUserSegment: boolean,
     type: string | null
+    [index:string]:any
 }
 
 type RwGpsData = RwgpsRoute | RwgpsTrip
