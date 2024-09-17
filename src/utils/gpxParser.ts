@@ -44,6 +44,13 @@ type ForecastRequest = {
     time: string
     isControl: boolean
 }
+export type WindAdjustResults = {
+    time:number, 
+    values:Array<CalculatedValue>
+    gustSpeed:number
+    finishTime:string
+    adjustedTimes:Array<{time:DateTime,index:number}>
+}
 
 const desiredSeparationInMeters = 25;       // meters of distance desired between two points for grade calculation
 class AnalyzeRoute {
@@ -275,18 +282,19 @@ class AnalyzeRoute {
         if (previousPoint !== null && accumulatedTime !== 0) {
             forecastRequests.push(AnalyzeRoute.addToForecast(previousPoint, startTime, (accumulatedTime + idlingTime),
                 accumulatedDistanceKm * kmToMiles, false));
-            let lastBearing = AnalyzeRoute.getRelativeBearing(forecastPoint,previousPoint);
-            bearings.push(lastBearing);
+            if (forecastPoint) {
+                let lastBearing = AnalyzeRoute.getRelativeBearing(forecastPoint,previousPoint);
+                bearings.push(lastBearing);    
+            }
         }
         let finishTime = AnalyzeRoute.formatFinishTime(startTime,accumulatedTime,idlingTime);
         // console.info(`setting finish time ${finishTime} from start ${startTime} accumulated ${accumulatedTime} and idling ${idlingTime}`);
         AnalyzeRoute.fillLastControlPoint(finishTime, controls, nextControl, accumulatedTime + idlingTime,
             accumulatedDistanceKm, calculatedValues);
         calculatedValues.sort((a,b) => a.val-b.val);
-        if (forecastRequests.length == bearings.length) {
-            forecastRequests.forEach(request => {const bearing = bearings.shift(); if (bearing) {request.bearing = bearing}});
-        }
-        return {forecastRequest:forecastRequests,
+        let requestsWithBearings : Array<ForecastRequest> = forecastRequests.map( 
+            ( request, index) => {return (index === 0) ? {...request, bearing:0} : {...request, bearing:bearings.shift()}})
+        return {forecastRequest:requestsWithBearings,
             points:stream,values:calculatedValues,
             finishTime: finishTime, timeInHours:accumulatedTime + idlingTime};
     }
@@ -416,9 +424,10 @@ class AnalyzeRoute {
     }
 
     adjustForWind = (forecastInfo : ForecastInfo, stream : Array<Point>, pace : string, controls : Array<UserControl>, 
-        previouslyCalculatedValues : Array<CalculatedValue>, start : DateTime, finishTime : string, timeZoneId : string) => {
+        previouslyCalculatedValues : Array<CalculatedValue>, start : DateTime, 
+        finishTime : string, timeZoneId : string) : WindAdjustResults => {
         if (forecastInfo.length===0) {
-            return {time:0,values:[],gustSpeed:0,finishTime:finishTime};
+            return {time:0,values:[],gustSpeed:0, adjustedTimes:[], finishTime:finishTime};
         }
 
         const gustThreshold = 50;   // above this incorporate some of the gust into the effect on the rider
