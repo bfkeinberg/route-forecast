@@ -11,9 +11,10 @@ import { routeLoadingModes } from "../data/enums"
 import gpxParser from "./gpxParser"
 import stravaRouteParser from "./stravaRouteParser"
 import { getRouteInfo, getForecastRequest, milesToMeters } from "./util"
-import type {ControlsState, UserControl} from '../redux/controlsSlice'
-import type { RouteInfoState, GpxRouteData } from "../redux/routeInfoSlice";
-import type { WindAdjustResults, Point, CalculatedValue } from "./gpxParser";
+import type {ControlsState} from '../redux/controlsSlice'
+import type { RouteInfoState } from "../redux/routeInfoSlice";
+import type { WindAdjustResults, Point } from "./gpxParser";
+import type {Bounds} from './util'
 
 const useDelay = (delay: number, startCondition = true) => {
   const [
@@ -164,7 +165,7 @@ const usePointsAndBounds = () => {
   type PointsAndBounds = {
     points?: Array<{lat:number, lng:number, dist?:number}>
     pointList: Array<Point>
-    bounds: { min_latitude: number, min_longitude: number, max_latitude: number, max_longitude: number }
+    bounds: Bounds
   }
   let pointsAndBounds : PointsAndBounds | null = null
 

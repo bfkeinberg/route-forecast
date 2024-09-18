@@ -7,7 +7,7 @@ import {getPowerOrVelocity} from "./windUtils"
 import * as Sentry from "@sentry/browser"
 import { UserControl} from '../redux/controlsSlice';
 import { RouteInfoState } from '../redux/routeInfoSlice';
-
+import type { GpxRouteData, RwgpsRoute, RwgpsTrip } from '../redux/routeInfoSlice';
 const kmToMiles = 0.62137;
 /**
  Begin section swiped from gpx parser
@@ -25,11 +25,11 @@ type SingleForecast = {
     gust: string
 }
 type ForecastInfo = Array<SingleForecast>
-type Point = {lat : number, lon: number, dist: number, elevation: number}
-type CalculatedValue = {arrival : string, banked: number, val: number}
+export type Point = {lat : number, lon: number, dist?: number, elevation: number}
+export type CalculatedValue = {arrival : string, banked: number, val: number}
 type RwgpsCoursePoint = {d:number, t:string, n:string, x:number, y:number, i:number}
 type RwgpsPoint = {x:number, y:number, d:number, e:number}
-type GpxPoint = {lat: number, lon: number, ele: number}
+export type GpxPoint = {lat: number, lon: number, ele: number}
 interface ExtractedControl {
     distance: number,
     duration: number,
@@ -45,10 +45,10 @@ type ForecastRequest = {
     isControl: boolean
 }
 export type WindAdjustResults = {
-    time:number, 
-    values:Array<CalculatedValue>
-    gustSpeed:number
-    finishTime:string
+    weatherCorrectionMinutes:number, 
+    calculatedControlPointValues:Array<CalculatedValue>
+    maxGustSpeed:number
+    finishTime:string | null
     adjustedTimes:Array<{time:DateTime,index:number}>
 }
 
@@ -153,16 +153,18 @@ class AnalyzeRoute {
     extractControlPoints = (routeData : RouteInfoState, type : string) =>
         this.parseCoursePoints(routeData, type).filter((point : RwgpsCoursePoint) => this.isControl(point)).map((point : RwgpsCoursePoint) => this.controlFromCoursePoint(point))
 
-    parseRouteStream = (routeData : RouteInfoState, type : string) =>
-        ((type === "rwgps" && routeData.type) ?
-            (routeData[routeData.type]['track_points']
-                .filter((point : RwgpsPoint) => point.x !== undefined && point.y !== undefined)
-                .map((point : RwgpsPoint)  => ({ lat: point.y, lon: point.x, elevation: point.e, dist: point.d }))) :
-            (routeData.tracks.reduce((accum : Array<Point>, current: {points: Array<Point>}) => accum.concat(current.points, []), [])).
-            map((point : GpxPoint) => ({ lat: point.lat, lon: point.lon, elevation: point.ele })))
+    parseGpxRouteStream ( routeData : GpxRouteData) : Array<Point> {
+        return routeData.tracks.reduce((accum : Array<GpxPoint>, current: {points: Array<GpxPoint>}) => accum.concat(current.points, []), []).
+        map((point : GpxPoint) => ({ lat: point.lat, lon: point.lon, elevation: point.ele }))
+    }
 
-    computePointsAndBounds = (routeData : RouteInfoState, type : string) => {
-        const stream = this.parseRouteStream(routeData, type)
+    parseRwgpsRouteStream( routeData : RwgpsRoute|RwgpsTrip) : Array<Point> {
+        return routeData[routeData.type]['track_points']
+            .filter((point : RwgpsPoint) => point.x !== undefined && point.y !== undefined)
+            .map((point : RwgpsPoint)  => ({ lat: point.y, lon: point.x, elevation: point.e, dist: point.d }))
+    }
+
+    computePointsAndBounds = (stream:Array<Point>) => {
 
         let bounds = { min_latitude: 90, min_longitude: 180, max_latitude: -90, max_longitude: -180 };
 
@@ -194,9 +196,10 @@ class AnalyzeRoute {
             }
             let arrivalTime = startTime.plus({hours:elapsedTimeInHours});
             let banked = Math.round(AnalyzeRoute.rusa_time(distanceInKm, elapsedTimeInHours));
+            let ctrlId = controls[nextControl].id
             calculatedValues.push({arrival:arrivalTime.toFormat(finishTimeFormat),
                 banked: banked,
-                val:controls[nextControl].id, /*lat:point.lat, lon:point.lon,
+                val:(ctrlId?ctrlId:0), /*lat:point.lat, lon:point.lon,
                 distance:controls[nextControl].distance*/
             });
             // add the control to the forecast request
@@ -328,19 +331,19 @@ class AnalyzeRoute {
             return startTime.plus({hours:accumulatedTime+restTime}).toFormat(finishTimeFormat);
     }
 
-    walkRwgpsRoute(routeData : RouteInfoState, startTime : DateTime, pace : string, interval : number, 
+    walkRwgpsRoute(routeData : RwgpsRoute|RwgpsTrip, startTime : DateTime, pace : string, interval : number, 
         controls : Array<UserControl>, timeZoneId : string, segment : Segment) {
         let modifiedControls = controls.slice();
         modifiedControls.sort((a,b) => a['distance']-b['distance']);
-        const stream = this.parseRouteStream(routeData, "rwgps")
+        const stream = this.parseRwgpsRouteStream(routeData)
         return this.analyzeRoute(stream, startTime, pace, interval, modifiedControls, timeZoneId, segment);
     }
 
-    walkGpxRoute(routeData : RouteInfoState, startTime : DateTime, pace : string, interval: number,
+    walkGpxRoute(routeData : GpxRouteData, startTime : DateTime, pace : string, interval: number,
         controls: Array<UserControl>, timeZoneId : string, segment : Segment) {
         let modifiedControls = controls.slice();
         modifiedControls.sort((a,b) => a['distance']-b['distance']);
-        const stream = this.parseRouteStream(routeData, "gpx")
+        const stream = this.parseGpxRouteStream(routeData)
         return this.analyzeRoute(stream, startTime, pace, interval, modifiedControls, timeZoneId, segment);
     }
 
@@ -427,7 +430,7 @@ class AnalyzeRoute {
         previouslyCalculatedValues : Array<CalculatedValue>, start : DateTime, 
         finishTime : string, timeZoneId : string) : WindAdjustResults => {
         if (forecastInfo.length===0) {
-            return {time:0,values:[],gustSpeed:0, adjustedTimes:[], finishTime:finishTime};
+            return {weatherCorrectionMinutes:0,calculatedControlPointValues:[],maxGustSpeed:0, adjustedTimes:[], finishTime:finishTime};
         }
 
         const gustThreshold = 50;   // above this incorporate some of the gust into the effect on the rider
@@ -527,7 +530,7 @@ class AnalyzeRoute {
                 message: `Finish time missing in adjustForWind`
             })                                    
         }
-        return {time:totalMinutesLost,values:calculatedValues, gustSpeed:maxGustSpeed,
+        return {weatherCorrectionMinutes:totalMinutesLost,calculatedControlPointValues:calculatedValues, maxGustSpeed:maxGustSpeed,
                 finishTime:DateTime.fromFormat(finishTime,finishTimeFormat).plus({minutes:totalMinutesLost}).toFormat(finishTimeFormat),
                 adjustedTimes:adjustedTimes
             };
