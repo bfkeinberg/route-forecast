@@ -1,5 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { getRouteName } from '../utils/util';
+import type { GpxPoint } from '../utils/gpxParser';
 
 const routeInfoInitialState : RouteInfoState = {
     name: '',
@@ -11,7 +12,7 @@ const routeInfoInitialState : RouteInfoState = {
     type: null,
 }
 
-interface RwgpsRoute {
+export interface RwgpsRoute {
     route: {
         distance: number,
         name: string,
@@ -22,7 +23,7 @@ interface RwgpsRoute {
     [index:string]:any
 }
 
-interface RwgpsTrip {
+export interface RwgpsTrip {
     trip: {
         distance: number,
         name: string,
@@ -33,13 +34,14 @@ interface RwgpsTrip {
     [index:string]:any
 }
 
-interface GpxRouteData {
-    tracks: {
+export interface GpxRouteData {
+    tracks: Array<{
         distance: {
             total: number
         },
+        points: Array<GpxPoint>,
         name: string
-    }[]
+    }>
 }
 
 export interface RouteInfoState  {
@@ -53,7 +55,20 @@ export interface RouteInfoState  {
     [index:string]:any
 }
 
+interface RwgpsRouteInfoState extends RouteInfoState {
+    type: "rwgps"
+    rwgpsRouteData: RwgpsRoute | RwgpsTrip
+    gpxRouteData: never
+}
+
+interface GpxRouteInfoState extends RouteInfoState {
+    type: null
+    rwgpsRouteData: never
+    gpxRouteData: GpxRouteData
+}
+
 type RwGpsData = RwgpsRoute | RwgpsTrip
+export type RouteInfo = RwgpsRouteInfoState | GpxRouteInfoState
 
 const routeInfoSlice = createSlice({
     name:'routeInfo',

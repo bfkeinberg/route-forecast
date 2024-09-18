@@ -11,8 +11,9 @@ import { routeLoadingModes } from "../data/enums"
 import gpxParser from "./gpxParser"
 import stravaRouteParser from "./stravaRouteParser"
 import { getRouteInfo, getForecastRequest, milesToMeters } from "./util"
-import type {ControlsState} from '../redux/controlsSlice'
-import type { RouteInfoState } from "../redux/routeInfoSlice";
+import type {ControlsState, UserControl} from '../redux/controlsSlice'
+import type { RouteInfoState, GpxRouteData } from "../redux/routeInfoSlice";
+import type { WindAdjustResults, Point, CalculatedValue } from "./gpxParser";
 
 const useDelay = (delay: number, startCondition = true) => {
   const [
@@ -161,8 +162,8 @@ const usePointsAndBounds = () => {
   const stravaMode = routeLoadingMode === routeLoadingModes.STRAVA
 
   type PointsAndBounds = {
-    points?: {lat:number, lng:number, dist:number}[],
-    pointList: {lat:number, lon:number, dist:number}[],
+    points?: Array<{lat:number, lng:number, dist?:number}>
+    pointList: Array<Point>
     bounds: { min_latitude: number, min_longitude: number, max_latitude: number, max_longitude: number }
   }
   let pointsAndBounds : PointsAndBounds | null = null
@@ -170,19 +171,21 @@ const usePointsAndBounds = () => {
   if (stravaMode) {
     if (stravaActivityStream !== null) {
       pointsAndBounds = useMemo(() => stravaRouteParser.computePointsAndBounds(stravaActivityStream), [stravaActivityStream])
-    } else if (stravaRouteUsed) {
-      // we import strava routes as gpx
-      pointsAndBounds = useMemo(() => gpxParser.computePointsAndBounds(gpxRouteData, "gpx"), [gpxRouteData])
+    } else if (stravaRouteUsed && gpxRouteData) {
+      // we import strava routes as gpx - so we expect the second half of the above condition to 
+      // always be true
+      pointsAndBounds = useMemo(() => gpxParser.computePointsAndBounds(
+        gpxParser.parseGpxRouteStream(gpxRouteData)), [gpxRouteData])
     }
   } else if (rwgpsRouteData !== null) {
     console.log('computing points and bounds for RWGPS case');
     // pointsAndBounds = useMemo(() => gpxParser.computePointsAndBounds(rwgpsRouteData, "rwgps"), [rwgpsRouteData])
-    pointsAndBounds = gpxParser.computePointsAndBounds(rwgpsRouteData, "rwgps")
+    pointsAndBounds = gpxParser.computePointsAndBounds(gpxParser.parseRwgpsRouteStream(rwgpsRouteData))
     if (!pointsAndBounds) {
       console.log(`no points and bounds from RWGPS data with ${rwgpsRouteData[rwgpsRouteData.type].track_points.length} points`)
     }
   } else if (gpxRouteData !== null) {
-    pointsAndBounds = useMemo(() => gpxParser.computePointsAndBounds(gpxRouteData, "gpx"), [gpxRouteData])
+    pointsAndBounds = useMemo(() => gpxParser.computePointsAndBounds(gpxParser.parseGpxRouteStream(gpxRouteData)), [gpxRouteData])
   }
   if (!pointsAndBounds) {
     Sentry.captureMessage(`Empty points and bounds :Strava=${stravaActivityStream === null} Strava route: ${stravaRouteUsed} RWGPS:${rwgpsRouteData === null} GPX:${gpxRouteData === null}`)
@@ -208,7 +211,7 @@ const dependencies = [
   'forecast'
 ]
 interface WindResultInputs {
-  controls?: ControlsState
+  controls: ControlsState
   routeInfo?: RouteInfoState
   [index:string]:any
 }
@@ -219,16 +222,14 @@ type WalkRouteResult = {
     finishTime:String,
     timeInHours:number
 }
-type WindAdjustResult = {
-  time:number,
-  values:[], 
-  gustSpeed:number,
-  finishTime:string,
-  adjustedTimes:[]
+type CachedWindResult = {
+  result : WindAdjustResults
+  dependencyValues: WindResultInputs | {[index:string]:any}
 }
 
-let lastWindResult : { result: WindResultInputs | null, dependencyValues: WindResultInputs}= {result: null, dependencyValues: {}}
-const calculateWindResult = (inputs : WindResultInputs) => {
+let lastWindResult : CachedWindResult = {result: {weatherCorrectionMinutes:0, calculatedControlPointValues:[],
+   maxGustSpeed:0, finishTime:"", adjustedTimes:[]}, dependencyValues: {}}
+const calculateWindResult = (inputs : WindResultInputs) : WindAdjustResults => {
   if (dependencies.every(dependency => inputs[dependency] === lastWindResult.dependencyValues[dependency]) ) {
     return lastWindResult.result
   }
@@ -239,13 +240,13 @@ const calculateWindResult = (inputs : WindResultInputs) => {
   if (forecast.length > 0 && (routeInfo?.rwgpsRouteData || routeInfo?.gpxRouteData)) {
     const { points, values, finishTime} = getRouteInfo(stateStuff, routeInfo.rwgpsRouteData !== null ? "rwgps" : "gpx", timeZoneId, segment)
 
-    let sortedControls = controls?.userControlPoints.slice();
+    let sortedControls = controls.userControlPoints.slice();
     sortedControls?.sort((a,b) => a['distance']-b['distance']);
 
     let sortedValues = values.slice();
     sortedValues.sort((a,b) => a['distance']-b['distance']);
 
-    const { time, values: calculatedControlPointValues, gustSpeed, finishTime: adjustedFinishTime, adjustedTimes } = gpxParser.adjustForWind(
+    const { weatherCorrectionMinutes, calculatedControlPointValues, maxGustSpeed, finishTime: adjustedFinishTime, adjustedTimes } = gpxParser.adjustForWind(
         forecast,
         points,
         routeParams.pace,
@@ -255,9 +256,9 @@ const calculateWindResult = (inputs : WindResultInputs) => {
         finishTime,
         timeZoneId
     )
-    result = { weatherCorrectionMinutes: time, calculatedControlPointValues: calculatedControlPointValues, maxGustSpeed: gustSpeed, finishTime: adjustedFinishTime, adjustedTimes}
+    result = { weatherCorrectionMinutes: weatherCorrectionMinutes, calculatedControlPointValues: calculatedControlPointValues, maxGustSpeed: maxGustSpeed, finishTime: adjustedFinishTime, adjustedTimes}
   } else {
-    result = { weatherCorrectionMinutes: null, calculatedControlPointValues: [], maxGustSpeed: null, finishTime: null, adjustedTimes:[] }
+    result = { weatherCorrectionMinutes: 0, calculatedControlPointValues: [], maxGustSpeed: 0, finishTime: null, adjustedTimes:[] }
   }
   lastWindResult = {result, dependencyValues: inputs}
   return result

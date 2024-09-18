@@ -4,7 +4,7 @@ export interface UserControl {
     distance: number,
     duration: number,
     name: string,
-    id: number,
+    id?: number,
     actual?: string,
     arrival?: string,
     banked?: number
