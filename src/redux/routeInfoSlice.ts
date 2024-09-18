@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
-import { getRouteName } from '../utils/util';
+import { getRwgpsRouteName, getGpxRouteName } from '../utils/util';
 import type { GpxPoint } from '../utils/gpxParser';
 
 const routeInfoInitialState : RouteInfoState = {
@@ -77,7 +77,7 @@ const routeInfoSlice = createSlice({
         rwgpsRouteLoaded(state, action: PayloadAction<RwGpsData>) {
             state.rwgpsRouteData = action.payload
             state.gpxRouteData = null
-            state.name = getRouteName(action.payload, "rwgps")
+            state.name = getRwgpsRouteName(action.payload)
             if (action.payload.route) {
                 state.distanceInKm = action.payload.route.distance/1000
                 state.canDoUserSegment = action.payload.route.track_points[0].d !== undefined
@@ -90,7 +90,7 @@ const routeInfoSlice = createSlice({
         gpxRouteLoaded(state, action : PayloadAction<GpxRouteData>) {
             state.gpxRouteData = action.payload
             state.rwgpsRouteData = routeInfoInitialState.rwgpsRouteData
-            state.name = getRouteName(action.payload, "gpx")
+            state.name = getGpxRouteName(action.payload)
             state.type = "gpx"
             state.distanceInKm = action.payload.tracks[0].distance.total/1000
         },

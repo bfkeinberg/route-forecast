@@ -4,11 +4,12 @@ import {createLogger} from 'redux-logger';
 
 import { forecastApiSlice } from './forecastApiSlice'
 import {
-    dialogParamsReducer, forecastReducer, paramsReducer, routeParamsReducer, rwgpsInfoReducer, stravaReducer
+    dialogParamsReducer, forecastReducer, paramsReducer, rwgpsInfoReducer, stravaReducer
 } from './reducer';
 import { rusaIdLookupApiSlice} from './rusaLookupApiSlice'
 import { routeInfoReducer } from './routeInfoSlice';
 import { controlsReducer } from './controlsSlice';
+import {routeParamsReducer} from './routeParamsSlice'
 
 export const loggerMiddleware = createLogger();
 

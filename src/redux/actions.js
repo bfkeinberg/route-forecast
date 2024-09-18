@@ -6,7 +6,7 @@ import ReactGA from "react-ga4";
 import { updateHistory } from "../jsx/app/updateHistory";
 import { doForecast, requestTimeZoneForRoute } from '../utils/forecastUtilities';
 import { loadRwgpsRoute } from '../utils/rwgpsUtilities';
-import { controlsMeaningfullyDifferent, extractControlsFromRoute, getForecastRequest,getRouteNumberFromValue, parseControls } from '../utils/util';
+import { controlsMeaningfullyDifferent, extractControlsFromRoute, getForecastRequest,getRouteNumberFromValue, getRwgpsRouteName, parseControls } from '../utils/util';
 import { errorDetailsSet,forecastAppended,forecastFetchBegun, forecastFetchCanceled,
 forecastFetched, forecastFetchFailed, forecastInvalidated, gpxRouteLoadingFailed,     initialStartTimeSet, intervalSet,
 paceSet,     routeLoadingBegun, rwgpsRouteLoadingFailed, shortUrlSet,
@@ -141,24 +141,12 @@ export const updateUserControls = function(controls) {
     }
 };
 
-export const loadControlsFromCookie = function(routeData) {
-    return function(dispatch) {
-        let routeName = getRouteName(routeData);
-        if (routeName !== null) {
-            let savedControlPoints = loadCookie(routeName);
-            if (savedControlPoints !== undefined && savedControlPoints.length > 0) {
-                dispatch(updateUserControls(parseControls(savedControlPoints, true)));
-            }
-        }
-    };
-};
-
 export const requestForecast = function (routeInfo) {
     return async function (dispatch, getState) {
         await Sentry.startSpan({ name: "requestForecast" }, async () => {
             if (routeInfo.rwgpsRouteData) {
                 ReactGA.event('add_payment_info', {
-                    value: getRouteDistanceInKm(routeInfo.rwgpsRouteData), coupon:getRouteName(routeInfo.rwgpsRouteData),
+                    value: getRouteDistanceInKm(routeInfo.rwgpsRouteData), coupon:getRwgpsRouteName(routeInfo.rwgpsRouteData),
                     currency:getRouteId(routeInfo.rwgpsRouteData),
                     items: [{ item_id:'', item_name:''}]
                 });
@@ -428,7 +416,7 @@ const forecastWithHook = async (forecastFunc, aqiFunc, dispatch, getState) => {
 
         if (routeInfo.rwgpsRouteData) {
             ReactGA.event('add_payment_info', {
-                value: getRouteDistanceInKm(routeInfo.rwgpsRouteData), coupon:getRouteName(routeInfo.rwgpsRouteData),
+                value: getRouteDistanceInKm(routeInfo.rwgpsRouteData), coupon:getRwgpsRouteName(routeInfo.rwgpsRouteData),
                 currency:getRouteId(routeInfo.rwgpsRouteData),
                 items: [{ item_id: '', item_name: '' }]
             });
