@@ -26,7 +26,7 @@ type SingleForecast = {
 }
 type ForecastInfo = Array<SingleForecast>
 export type Point = {lat : number, lon: number, dist?: number, elevation: number}
-export type CalculatedValue = {arrival : string, banked: number, val: number}
+export type CalculatedValue = {arrival : string, banked: number, val: number, distance: number, [index:string]:any}
 type RwgpsCoursePoint = {d:number, t:string, n:string, x:number, y:number, i:number}
 type RwgpsPoint = {x:number, y:number, d:number, e:number}
 export type GpxPoint = {lat: number, lon: number, ele: number}
@@ -199,8 +199,8 @@ class AnalyzeRoute {
             let ctrlId = controls[nextControl].id
             calculatedValues.push({arrival:arrivalTime.toFormat(finishTimeFormat),
                 banked: banked,
-                val:(ctrlId?ctrlId:0), /*lat:point.lat, lon:point.lon,
-                distance:controls[nextControl].distance*/
+                val:(ctrlId?ctrlId:0), lat:point.lat, lon:point.lon,
+                distance:controls[nextControl].distance
             });
             // add the control to the forecast request
             if (distanceInMiles > 0 && !shouldSkip) {
@@ -322,7 +322,9 @@ class AnalyzeRoute {
         while (nextControl < controls.length) {
             // update banked time also, supplying final distance in km and total time taken
             let banked = Math.round(AnalyzeRoute.rusa_time(totalDistanceInKm, totalTime));
-            calculatedValues.push({ arrival: finishTime, banked: banked, val: controls[nextControl].distance });
+            let ctrlId = controls[nextControl].id
+            calculatedValues.push({ arrival: finishTime, banked: banked, val: ctrlId?ctrlId:0,
+                distance: controls[nextControl].distance });
             ++nextControl;
         }
     }
