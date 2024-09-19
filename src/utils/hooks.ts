@@ -300,7 +300,8 @@ const useForecastRequestData = () => {
   const segment = useAppSelector(state => state.uiInfo.routeParams.segment)
   const getForecastRequestData = () => {
     if (!type || !routeData) {
-      return { length: 0, daysInFuture:0 }
+      Sentry.captureMessage("useForecastRequestData() called before route loaded")
+      return { length: 0, daysInFuture:0, last:DateTime.now().toString() }
     }
     const forecastRequest = getForecastRequest(
       routeData,

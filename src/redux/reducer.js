@@ -6,17 +6,6 @@ export const finishTimeFormat = 'EEE, MMM dd yyyy h:mma';
 
 const defaultAnalysisIntervalInHours = 1;
 
-export const providerValues = {
-    nws:{min_interval:1, max_days:7, canForecastPast:false, daysInPast:0, name:"National Weather Service", enabled:true},
-    oneCall:{min_interval:0.25, max_days:5, canForecastPast:true, daysInPast:14, name:"OneCall", enabled:true},
-    visualcrossing:{min_interval:0.25, max_days:14, canForecastPast:true, daysInPast:4, name:"Visual Crossing", enabled:true},
-    weatherapi:{min_interval:1, max_days:10, canForecastPast:false, daysInPast:4, name:"WeatherAPI", enabled:true},
-    weatherKit:{min_interval:0.25, max_days:8, canForecastPast:true, name:"Apple WeatherKit", enabled:true},
-    climacell:{min_interval:0.25, max_days:4, canForecastPast:false, daysInPast:1, name:"Tomorrow.io", maxCallsPerHour:25, enabled:true},
-    // meteomatics:{min_interval:1, max_days:10,canForecastPast:true, daysInPast:1, name:"Meteomatics"}
-    }
-export const defaultProvider = 'nws'
-
 const rideWithGpsInfoSlice = createSlice({
     name: 'rideWithGpsInfo',
     initialState: {
@@ -268,100 +257,6 @@ export const stravaReducer = stravaSlice.reducer
 export const {stravaTokenSet,stravaRefreshTokenSet,stravaActivitySet,stravaFetchBegun,
     stravaFetched,stravaFetchFailed,analysisIntervalSet,mapSubrangeSet,mapRangeToggled,
     stravaRouteSet} = stravaSlice.actions
-
-const forecastInitialState = {
-    forecast: [],
-    timeZoneId: null,
-    valid: false,
-    range: [],
-    tableViewed: false,
-    mapViewed: false,
-    weatherProvider: defaultProvider,
-    zoomToRange: true,
-    fetchAqi:false
-}
-const forecastSlice = createSlice({
-    name:'forecast',
-    initialState:forecastInitialState,
-    reducers: {
-        forecastFetched(state, action) {
-            state.forecast = action.payload.forecastInfo.forecast
-            state.timeZoneId = action.payload.timeZoneId
-            state.valid = true
-            state.tableViewed = false
-            state.mapViewed = false
-            state.range = []
-        },
-        forecastAppended(state, action) {
-            state.forecast = state.forecast.concat(action.payload)
-        },
-        forecastInvalidated(state) {
-            state.valid = false
-            state.forecast = []
-            state.timeZoneId = null
-            state.range = []
-        },
-        weatherRangeSet(state, action) {
-            state.range = [
-                parseFloat(action.payload.start),
-                parseFloat(action.payload.finish)
-            ]
-        },
-        weatherRangeToggled(state,action) {
-            if (state.range[0] === parseFloat(action.payload.start) && state.range[1] === parseFloat(action.payload.finish)) {
-                state.range = []
-            } else {
-                state.range = [
-                    parseFloat(action.payload.start),
-                    parseFloat(action.payload.finish)
-                ]
-            }
-        },
-        tableViewedSet(state) {
-            state.tableViewed = true
-        },
-        mapViewedSet(state) {
-            state.mapViewed = true
-        },
-        weatherProviderSet(state,action) {
-            state.weatherProvider = action.payload
-        },
-        zoomToRangeSet(state,action) {
-            state.zoomToRange = action.payload
-        },
-        zoomToRangeToggled(state) {
-            state.zoomToRange = !state.zoomToRange
-        },
-        fetchAqiSet(state,action) {
-            state.fetchAqi = action.payload
-        },
-        fetchAqiToggled(state) {
-            state.fetchAqi = !state.fetchAqi
-        }
-    },
-    extraReducers: (builder) => {
-        builder
-            .addCase(rwgpsRouteSet, (state) => {
-                state.valid = false
-                state.tableViewed = false
-                state.mapViewed = false
-                state.range = []
-                state.forecast = []
-            })
-            .addCase(gpxRouteLoaded, (state) => {
-                state.valid = false
-            })
-            .addCase(gpxRouteLoadingFailed, (state) => {
-                state.valid = false
-            })
-            .addCase(reset, () => forecastInitialState)
-    }
-})
-
-export const forecastReducer = forecastSlice.reducer
-export const {forecastFetched,forecastInvalidated,weatherRangeSet,weatherRangeToggled,
-    tableViewedSet,mapViewedSet,weatherProviderSet,zoomToRangeSet,zoomToRangeToggled,
-    fetchAqiSet,fetchAqiToggled,forecastAppended} = forecastSlice.actions;
 
 const paramsSlice = createSlice({
     name:'params',
