@@ -1,11 +1,12 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
-import { providerValues } from './reducer'
+import { providerValues, defaultProvider } from './providerValues'
 import { routeLoadingModes } from '../data/enums';
 import type { Segment } from '../utils/gpxParser';
 import { DateTime } from 'luxon';
-import { defaultProvider, weatherProviderSet, stravaRouteSet } from './reducer';
+import { stravaRouteSet } from './reducer';
+import { weatherProviderSet } from './forecastSlice';
 import { getRouteNumberFromValue } from '../utils/util';
-import { GpxRouteData, RwgpsRoute, RwgpsTrip, rwgpsRouteLoaded, gpxRouteLoaded } from './routeInfoSlice';
+import { rwgpsRouteLoaded, gpxRouteLoaded } from './routeInfoSlice';
 
 const defaultIntervalInHours = 1;
 const defaultPace = 'D';
@@ -69,10 +70,10 @@ const routeParamsSlice = createSlice({
     name: 'routeParams',
     initialState: routeParamsInitialState,
     reducers: {
-        stopAfterLoadSet(state, action) {
+        stopAfterLoadSet(state, action : PayloadAction<string>) {
             state.stopAfterLoad = action.payload === "true"
         },
-        rwgpsRouteSet(state,action) {
+        rwgpsRouteSet(state,action : PayloadAction<string>) {
             if (action.payload) {
                 let route = getRouteNumberFromValue(action.payload);
                 state.rwgpsRoute = route
@@ -83,11 +84,11 @@ const routeParamsSlice = createSlice({
             state.succeeded = null
             state.segment = routeParamsInitialState.segment
         },
-        rusaPermRouteIdSet(state,action) {
+        rusaPermRouteIdSet(state,action : PayloadAction<string>) {
             state.rusaPermRouteId = action.payload
             state.routeLoadingMode = routeLoadingModes.RUSA_PERM
         },
-        startTimeSet(state,action) {
+        startTimeSet(state,action : PayloadAction<number>) {
             if (action.payload) {
                 const start =  DateTime.fromMillis(action.payload, {zone:state.zone})
                 if (start.isValid) {
@@ -96,7 +97,7 @@ const routeParamsSlice = createSlice({
                 }
             }
         },
-        initialStartTimeSet(state,action) {
+        initialStartTimeSet(state,action : PayloadAction<{start:string, zone:string}>) {
             if (action.payload) {
                 const start =  DateTime.fromISO(action.payload.start, {zone:!action.payload.zone?"local":action.payload.zone})
                 if (start.isValid) {
@@ -106,7 +107,7 @@ const routeParamsSlice = createSlice({
                 }
             }
         },
-        startTimestampSet(state,action) {
+        startTimestampSet(state,action:PayloadAction<{start:string, zone:string}>) {
             if (action.payload) {
                 const start = DateTime.fromSeconds(parseInt(action.payload.start), {zone:action.payload.zone===undefined?"local":action.payload.zone})
                 if (start.isValid) {
@@ -114,10 +115,10 @@ const routeParamsSlice = createSlice({
                 }
             }
         },
-        timeZoneSet(state,action) {
+        timeZoneSet(state,action : PayloadAction<string>) {
             state.zone = action.payload
         },
-        paceSet(state,action) {
+        paceSet(state,action : PayloadAction<string>) {
             if (action.payload) {
                 state.pace = action.payload
                 state.stopAfterLoad = false
