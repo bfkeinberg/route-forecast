@@ -5,11 +5,10 @@ import {Icon} from '@blueprintjs/core';
 import { DateInput3, TimePrecision } from "@blueprintjs/datetime2";
 import { DateTime } from 'luxon';
 import PropTypes from 'prop-types';
-import * as React from 'react';
 import {connect} from 'react-redux';
 
 import {setStart, setTimeFromIso} from "../../redux/actions";
-import { initialStartTimeSet } from '../../redux/reducer';
+import { initialStartTimeSet } from "../../redux/routeParamsSlice";
 import { DesktopTooltip } from '../shared/DesktopTooltip';
 import {useTranslation} from 'react-i18next'
 

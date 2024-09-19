@@ -8,13 +8,13 @@ import { useDispatch,useSelector } from 'react-redux';
 import 'Images/style.css';
 import { DateTime } from 'luxon';
 import { routeLoadingModes } from '../../data/enums';
-import { mapViewedSet } from '../../redux/reducer';
 import { useForecastDependentValues, usePointsAndBounds } from '../../utils/hooks';
 import { milesToMeters } from '../../utils/util';
 import { formatTemperature } from "../resultsTables/ForecastTable";
 import ErrorBoundary from "../shared/ErrorBoundary"
 import { Polyline } from './polyline';
 import {useTranslation} from 'react-i18next'
+import { mapViewedSet } from '../../redux/forecastSlice';
 
 const arrowPath = "m-.232.134c-1.104 0-2-.224-2-.5v-31.634c0-.276.896-.5 2-.5s2 .224 2 .5v31.634C1.768-.09.876.134-.232.134m12.651-20.5c-.128 0-.256-.049-.354-.146l-12.179-12.183-12.184 12.183c-.195.195-.512.195-.707 0s-.195-.512 0-.707l12.538-12.537c.093-.093.22-.146.353-.146l0 0c.133 0 .26.053.354.146l12.533 12.536c.195.195.195.512 0 .707-.098.098-.226.147-.354.147z"
 

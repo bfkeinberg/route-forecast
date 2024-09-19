@@ -13,9 +13,9 @@ import PropTypes from 'prop-types';
 import cookie from 'react-cookies';
 import {useDispatch,useSelector} from 'react-redux'
 import MediaQuery, {useMediaQuery} from 'react-responsive';
-import MuiTooltip from '@mui/material/Tooltip'
 import { maxWidthForMobile } from '../../utils/util';
-import {fetchAqiToggled,finishTimeFormat,tableViewedSet,weatherRangeSet,weatherRangeToggled,zoomToRangeToggled} from '../../redux/reducer';
+import {finishTimeFormat} from '../../redux/reducer';
+import { fetchAqiToggled, weatherRangeSet, weatherRangeToggled, zoomToRangeToggled, tableViewedSet } from '../../redux/forecastSlice';
 import { useForecastDependentValues, useFormatSpeed } from '../../utils/hooks';
 import { milesToMeters } from '../../utils/util';
 import { InstallExtensionButton } from "../InstallExtensionButton";
@@ -144,7 +144,7 @@ const ForecastTable = (adjustedTimes) => {
     })
         
     const toggleZoom = () => {
-        Sentry.metrics.increment("zoom", 1)
+        //ReactGA.event()
         dispatch(zoomToRangeToggled())
         cookie.save('zoomToRange', !zoomToRange, { path: '/' })
     }
@@ -184,7 +184,7 @@ const ForecastTable = (adjustedTimes) => {
 
     const toggleAqi = async () => {
         if (!fetchAqi) {
-            Sentry.metrics.increment("aqi", 1)
+            //ReactGA.event()
         }
         dispatch(fetchAqiToggled())
         cookie.save('fetchAqi', !fetchAqi, { path: '/' });

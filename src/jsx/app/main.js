@@ -13,16 +13,19 @@ import cookie from 'react-cookies';
 import { useDispatch, useSelector } from 'react-redux';
 import  {useMediaQuery} from 'react-responsive';
 import {useTranslation} from 'react-i18next'
+import ReactGA from "react-ga4";
 
 import {
-    actionUrlAdded, apiKeysSet, fetchAqiSet, providerValues, queryCleared, querySet,
-     reset, routeLoadingModeSet, rusaPermRouteIdSet,
-    rwgpsRouteSet, rwgpsTokenSet,
-    startTimestampSet,
-    stopAfterLoadSet, stravaActivitySet, stravaErrorSet, stravaRefreshTokenSet,
-    stravaRouteSet, stravaTokenSet, usePinnedRoutesSet, zoomToRangeSet, defaultProvider
+    actionUrlAdded, apiKeysSet, querySet,
+    rwgpsTokenSet,
+    stravaActivitySet, stravaErrorSet, stravaRefreshTokenSet,
+    stravaRouteSet, stravaTokenSet, usePinnedRoutesSet
 } from "../../redux/reducer";
+import { fetchAqiSet, zoomToRangeSet } from "../../redux/forecastSlice";
+import { stopAfterLoadSet, rusaPermRouteIdSet, routeLoadingModeSet, startTimestampSet, rwgpsRouteSet, reset } from "../../redux/routeParamsSlice";
 import { metricSet, displayControlTableUiSet } from "../../redux/controlsSlice";
+import { defaultProvider, providerValues } from "../../redux/providerValues";
+
 const addBreadcrumb = (msg) => {
     Sentry.addBreadcrumb({
         category: 'loading',
@@ -248,7 +251,7 @@ const RouteWeatherUI = ({search, href, action, maps_api_key, timezone_api_key, b
         dispatch(fetchAqiSet(fetchAqi==="true"))
     }
     if (i18n.language === 'fr') {
-        Sentry.metrics.increment('french', 1)
+        // ReactGA.event()
     }
     return (
         <FunAppWrapperThingForHooksUsability maps_api_key={maps_api_key} queryParams={queryString.parse(search)}/>

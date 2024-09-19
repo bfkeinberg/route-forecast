@@ -6,7 +6,8 @@ import React, { useState } from 'react';
 import cookie from 'react-cookies';
 import {connect} from 'react-redux';
 
-import { mapRangeToggled,mapSubrangeSet, zoomToRangeToggled } from '../../redux/reducer';
+import { mapRangeToggled,mapSubrangeSet } from '../../redux/reducer';
+import { zoomToRangeToggled } from '../../redux/forecastSlice';
 import { useActualPace, useFormatSpeed } from '../../utils/hooks';
 import stravaRouteParser from '../../utils/stravaRouteParser';
 import ErrorBoundary from "../shared/ErrorBoundary";

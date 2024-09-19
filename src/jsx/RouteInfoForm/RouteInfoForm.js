@@ -1,18 +1,18 @@
 import {Toast2,Section,SectionCard} from '@blueprintjs/core';
 import Slider from '@mui/material/Slider';
 import PropTypes from 'prop-types';
-import * as React from 'react';
 import ReactGA from "react-ga4";
 import {connect, useDispatch} from 'react-redux';
 
 import { routeLoadingModeProps,routeLoadingModes } from '../../data/enums';
-import { errorDetailsSet, routeLoadingModeSet } from '../../redux/reducer';
+import { errorDetailsSet} from '../../redux/reducer';
 import { RouteInfoInputRUSA } from './RouteInfoInputRUSA';
 import { RouteInfoInputRWGPS } from './RouteInfoInputRWGPS';
 import { RouteInfoInputStrava } from './RouteInfoInputStrava'
 import { ELEVATION_1 } from '@blueprintjs/core/lib/esm/common/classes';
 import {useTranslation} from 'react-i18next'
 import bicycle from 'Images/bicycle.svg'
+import { routeLoadingModeSet } from '../../redux/routeParamsSlice';
 
 const getInputForMode = (mode) => {
     switch (mode) {

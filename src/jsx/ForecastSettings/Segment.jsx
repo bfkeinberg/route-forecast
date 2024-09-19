@@ -4,7 +4,7 @@ import Typography from '@mui/material/Typography'
 
 import * as React from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { segmentSet } from '../../redux/reducer';
+import { segmentSet } from '../../redux/routeParamsSlice'
 import { milesToMeters } from '../../utils/util';
 import {useTranslation} from 'react-i18next'
 import Tooltip from '@mui/material/Tooltip'

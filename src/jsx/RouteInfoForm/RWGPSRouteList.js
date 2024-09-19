@@ -1,11 +1,11 @@
 import { Button, MenuItem } from "@blueprintjs/core";
 import { Select } from "@blueprintjs/select";
 import PropTypes from 'prop-types';
-import React, {useRef} from 'react';
+import {useRef} from 'react';
 import {connect, useSelector} from 'react-redux';
 
 import {loadFromRideWithGps} from "../../redux/actions";
-import { routeIsTripSet, rwgpsRouteSet } from '../../redux/reducer';
+import { routeIsTripSet, rwgpsRouteSet } from "../../redux/routeParamsSlice";
 
 const renderFavorite = (favorite, { handleClick, modifiers }) => {
     if (!modifiers.matchesPredicate) {

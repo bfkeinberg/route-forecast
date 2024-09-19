@@ -3,7 +3,7 @@ import * as Sentry from "@sentry/react";
 import axios from 'axios';
 import PropTypes from 'prop-types';
 import queryString from 'query-string';
-import React, {Suspense, useEffect, lazy} from 'react';
+import {Suspense, useEffect, lazy} from 'react';
 import ReactGA from "react-ga4";
 import {connect} from 'react-redux';
 import {useTranslation} from 'react-i18next'

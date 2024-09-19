@@ -4,7 +4,7 @@ import {connect} from 'react-redux';
 import {useTranslation} from 'react-i18next'
 import * as Sentry from "@sentry/react";
 import { routeDataCleared} from '../../redux/routeInfoSlice';
-import { rwgpsRouteSet } from '../../redux/reducer';
+import { rwgpsRouteSet } from '../../redux/routeParamsSlice';
 
 export const decideValidationStateFor = (type, methodUsed, loadingSuccess) => {
     if (type === methodUsed) {

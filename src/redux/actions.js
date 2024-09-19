@@ -6,14 +6,16 @@ import ReactGA from "react-ga4";
 import { updateHistory } from "../jsx/app/updateHistory";
 import { doForecast, requestTimeZoneForRoute } from '../utils/forecastUtilities';
 import { loadRwgpsRoute } from '../utils/rwgpsUtilities';
-import { controlsMeaningfullyDifferent, extractControlsFromRoute, getForecastRequest,getRouteNumberFromValue, getRwgpsRouteName, parseControls } from '../utils/util';
-import { errorDetailsSet,forecastAppended,forecastFetchBegun, forecastFetchCanceled,
-forecastFetched, forecastFetchFailed, forecastInvalidated, gpxRouteLoadingFailed,     initialStartTimeSet, intervalSet,
-paceSet,     routeLoadingBegun, rwgpsRouteLoadingFailed, shortUrlSet,
-startTimeSet,
+import { controlsMeaningfullyDifferent, extractControlsFromRoute, getForecastRequest,getRouteNumberFromValue, getRwgpsRouteName } from '../utils/util';
+import { errorDetailsSet,forecastFetchBegun, forecastFetchCanceled,
+ forecastFetchFailed, gpxRouteLoadingFailed,
+routeLoadingBegun, rwgpsRouteLoadingFailed, shortUrlSet,
 stravaActivitySet, errorMessageListSet,
 stravaErrorSet, stravaFetchBegun, stravaFetched, stravaFetchFailed,
-    stravaTokenSet, timeZoneSet, weatherProviderSet } from './reducer';
+    stravaTokenSet } from './reducer';
+import { weatherProviderSet, forecastAppended, forecastFetched, forecastInvalidated } from "./forecastSlice";
+import { timeZoneSet, intervalSet, paceSet, startTimeSet, initialStartTimeSet } from "./routeParamsSlice"
+
 import { loadingFromUrlSet, gpxRouteLoaded, rwgpsRouteLoaded } from "./routeInfoSlice";
 import { displayControlTableUiSet, userControlsUpdated } from "./controlsSlice";
 export const componentLoader = (lazyComponent, attemptsLeft) => {
@@ -317,7 +319,6 @@ export const loadStravaRoute = (routeId) => {
         routeId = routeId || getState().strava.route
         ReactGA.event('login', {method:routeId});
         ReactGA.event('sign_up', {method:routeId});
-        Sentry.metrics.increment('loadStravaRoute', 1)
         dispatch(routeLoadingBegun('gpx'));
         await Sentry.startSpan({ name: "loadingStravaRoute" }, async () => {
             const api = new Api('https://www.strava.com/api/v3', [(response) => Promise.resolve(response.text())])
@@ -522,8 +523,8 @@ export const loadStravaActivity = function() {
 
         const access_token = await refreshOldToken(dispatch, getState)
         dispatch(stravaFetchBegun());
-        Sentry.metrics.increment('loadStravaActivity', 1)
         const activityId = getState().strava.activity
+        ReactGA.event('login', {method:activityId});
         return parser.fetchStravaActivity(activityId, access_token).then(result => {
             dispatch(stravaFetched(result));
         }).catch(error => {

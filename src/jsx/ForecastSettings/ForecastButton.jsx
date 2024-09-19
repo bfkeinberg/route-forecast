@@ -8,12 +8,13 @@ import { useMediaQuery } from 'react-responsive';
 
 import { shortenUrl, msgFromError } from "../../redux/actions";
 import { useForecastMutation, useGetAqiMutation } from '../../redux/forecastApiSlice';
-import { forecastAppended,forecastFetchBegun,forecastFetched, forecastFetchFailed, querySet, errorMessageListSet } from '../../redux/reducer';
+import { forecastFetchBegun, forecastFetchFailed, querySet, errorMessageListSet } from '../../redux/reducer';
+import {forecastAppended, forecastFetched} from '../../redux/forecastSlice'
 import { generateUrl } from '../../utils/queryStringUtils';
 import { getForecastRequest } from '../../utils/util';
 import { DesktopTooltip } from '../shared/DesktopTooltip';
 import {useTranslation} from 'react-i18next'
-import { providerValues } from '../../redux/reducer';
+import { providerValues } from '../../redux/providerValues';
 import { useForecastRequestData } from '../../utils/hooks';
 import { removeDuplicateForecasts } from '../../redux/actions';
 
@@ -125,11 +126,10 @@ const ForecastButton = ({fetchingForecast,submitDisabled, routeNumber, startTime
 
     const forecastClick = async (event) => {
         if (event.altKey) {
-            Sentry.metrics.increment('forecastAll', 1)
+            //ReactGA.event()
             grabAllPossibleForecasts(forecastRequestData.current)
             return
         }
-        Sentry.metrics.increment('forecast', 1)
         // await Sentry.startSpan({ name: "forecastClick" }, async () => {
             dispatch(forecastFetchBegun())
             const reactEventParams = {
