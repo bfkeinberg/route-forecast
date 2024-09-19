@@ -213,7 +213,7 @@ const dependencies = [
 ]
 interface WindResultInputs {
   controls: ControlsState
-  routeInfo?: RouteInfoState
+  routeInfo: RouteInfoState
   [index:string]:any
 }
 type WalkRouteResult = {
@@ -299,7 +299,7 @@ const useForecastRequestData = () => {
   const controlPoints = useAppSelector(state => state.controls.userControlPoints)
   const segment = useAppSelector(state => state.uiInfo.routeParams.segment)
   const getForecastRequestData = () => {
-    if (!type) {
+    if (!type || !routeData) {
       return { length: 0, daysInFuture:0 }
     }
     const forecastRequest = getForecastRequest(

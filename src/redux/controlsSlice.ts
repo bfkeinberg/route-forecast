@@ -8,6 +8,7 @@ export interface UserControl {
     actual?: string,
     arrival?: string,
     banked?: number
+    [index:string]:any
 }
 
 export interface ControlsState {
