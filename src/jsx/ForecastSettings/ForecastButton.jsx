@@ -80,7 +80,6 @@ const ForecastButton = ({fetchingForecast,submitDisabled, routeNumber, startTime
     const doForecastByParts = (provider) => {
         const forecastRequest = getForecastRequest(routeData, startTimestamp, type, zone, 
             pace, interval, userControlPoints, segmentRange)
-        Sentry.metrics.distribution("forecastPoints", forecastRequest.length)
         return forecastByParts(forecastRequest, zone, provider, routeName, routeNumber)
     }
     

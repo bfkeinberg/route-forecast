@@ -43,7 +43,8 @@ const WeatherProviderSelector = ({weatherProvider,setWeatherProvider}) => {
                     filterable={false}
                     fill={true}
                     activeItem={{ key: weatherProvider, ...providerValues[weatherProvider] }}
-                    onItemSelect={(selected) => { Sentry.metrics.set("provider", selected.key); setWeatherProvider(selected.key) }}
+                    // TODO: GA event for weather forecast providers
+                    onItemSelect={(selected) => { setWeatherProvider(selected.key) }}
                 >
                     <Button id={'provider'} text={providerValues[weatherProvider].name} rightIcon="symbol-triangle-down" />
                 </Select>

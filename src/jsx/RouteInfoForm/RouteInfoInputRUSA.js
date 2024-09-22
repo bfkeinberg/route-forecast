@@ -25,7 +25,6 @@ export const RouteInfoInputRUSA = () => {
             level: 'info',
             message:'Loading RUSA perm query'
         })
-        Sentry.metrics.increment('load_RUSA_perm', 1)
         getRusaPermInfo(rusaPermRouteId).unwrap().then(routeInfo => {
             if (routeInfo.length === 0) {
                 dispatch(errorDetailsSet(`${rusaPermRouteId} is not a valid permanent route ID`))
