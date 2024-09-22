@@ -1,7 +1,6 @@
 
-import { Button, Card, Elevation, Tooltip } from "@blueprintjs/core";
-import { useDispatch, useSelector } from 'react-redux';
-
+import { Button, Card, Elevation } from "@blueprintjs/core";
+import { useAppDispatch, useAppSelector } from "../../utils/hooks";
 import { addControl } from "../../redux/actions";
 import { bankedDisplayToggled } from "../../redux/controlsSlice";
 import ErrorBoundary from '../shared/ErrorBoundary';
@@ -10,8 +9,8 @@ import { ControlTable } from './ControlTable';
 import { DesktopTooltip } from "../shared/DesktopTooltip";
 
 export const ControlTableContainer = () => {
-  const displayBanked = useSelector(state => state.controls.displayBanked)
-  const dispatch = useDispatch()
+  const displayBanked = useAppSelector(state => state.controls.displayBanked)
+  const dispatch = useAppDispatch()
 
   return (
     <>
@@ -26,7 +25,7 @@ export const ControlTableContainer = () => {
             </ErrorBoundary>
         </Card>
       </ErrorBoundary>
-      <div tabIndex="98" onFocus={() => {
+      <div tabIndex={98} onFocus={() => {
         let button = document.getElementById('addButton');
         if (button !== undefined && button !== null) {
           button.focus();
@@ -37,7 +36,7 @@ export const ControlTableContainer = () => {
 }
 
 const AddRowButton = () => {
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
   return (
     <div style={{border: "1px solid black", width: "100%"}} onClick={() => dispatch(addControl())}>
       <Button id={'addButton'} style={{width: "100%"}} minimal={true} tabIndex={0} icon={"add"}>Add</Button>
