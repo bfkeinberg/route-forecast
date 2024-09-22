@@ -90,7 +90,7 @@ const PinnedRouteLoader = ({rwgpsToken, rwgpsTokenSet, credentialsValid, pinnedR
                 className={button_class}
                 text={usingPinnedRoutes ? t('buttons.dontUsePinned') : t('buttons.usePinned')}
                 style={{fontSize: "13px"}}
-                onClick={() => {Sentry.metrics.increment('pinned', 1); togglePinnedRoutes(usePinnedRoutesSet, setShowPinnedRoutes, usingPinnedRoutes)}}
+                onClick={() => {togglePinnedRoutes(usePinnedRoutesSet, setShowPinnedRoutes, usingPinnedRoutes)}}
             />
             {credentialsValid ?
             (

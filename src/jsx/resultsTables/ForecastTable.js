@@ -120,17 +120,19 @@ const ForecastTable = (adjustedTimes) => {
     const distHeaderText = <span>{metric ? 'KM' : 'Mile'}</span>
     const distHeader = <DesktopTooltip content={t('tooltips.distHeader')} placement={'top'}>{distHeaderText}</DesktopTooltip>
 
-    const toggleGustDisplay = () => {Sentry.metrics.increment("gusts", 1); return setShowGusts(!showGusts)}
+    // TODO: GA event for gusts viewed vs wind speed
+    const toggleGustDisplay = () => {return setShowGusts(!showGusts)}
     const windHeaderText = <Button small onClick={toggleGustDisplay} >{showGusts ? t('data.wind.gust') : t('data.wind.speed')}</Button>;
     const windHeader = <DesktopTooltip content={t('tooltips.windHeader')} placement={'top'}>{windHeaderText}</DesktopTooltip>
 
-    const toggleApparentDisplay = () => {Sentry.metrics.increment("temperature", 1); return setShowApparentTemp(!showApparentTemp)}
+    // TODO: GA4 event for showing apparent temperature
+    const toggleApparentDisplay = () => {return setShowApparentTemp(!showApparentTemp)}
 
     const temperatureHeaderText = <Button small onClick={toggleApparentDisplay}>{showApparentTemp ? t('tableHeaders.temperature') : <Icon icon="temperature"/>}</Button>
     const temperatureHeader = <DesktopTooltip content={t('tooltips.temperatureHeader')} placement={'top'}>{temperatureHeaderText}</DesktopTooltip>
 
     const copyTable = React.useCallback(async (event) => {
-        Sentry.metrics.increment("copyTable", 1)
+        // TODO: GA4 event for copying forecast table
         var htmlTable = document.getElementById('forecastTable')   
         var range = document.createRange()
         range.selectNode(htmlTable)
@@ -150,7 +152,7 @@ const ForecastTable = (adjustedTimes) => {
     }
 
     const toggleRelBearing = () => {
-        Sentry.metrics.increment("relativeBearing", 1)
+        // TODO: GA4 event for showing relative vs absolute bearing
         setShowRelativeBearing(!showRelativeBearing)
     }
 
