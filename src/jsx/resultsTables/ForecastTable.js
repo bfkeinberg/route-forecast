@@ -120,17 +120,19 @@ const ForecastTable = (adjustedTimes) => {
     const distHeaderText = <span>{metric ? 'KM' : 'Mile'}</span>
     const distHeader = <DesktopTooltip content={t('tooltips.distHeader')} placement={'top'}>{distHeaderText}</DesktopTooltip>
 
-    const toggleGustDisplay = () => {Sentry.metrics.increment("gusts", 1); return setShowGusts(!showGusts)}
+    // TODO: GA event for gusts viewed vs wind speed
+    const toggleGustDisplay = () => {return setShowGusts(!showGusts)}
     const windHeaderText = <Button small onClick={toggleGustDisplay} >{showGusts ? t('data.wind.gust') : t('data.wind.speed')}</Button>;
     const windHeader = <DesktopTooltip content={t('tooltips.windHeader')} placement={'top'}>{windHeaderText}</DesktopTooltip>
 
-    const toggleApparentDisplay = () => {Sentry.metrics.increment("temperature", 1); return setShowApparentTemp(!showApparentTemp)}
+    // TODO: GA4 event for showing apparent temperature
+    const toggleApparentDisplay = () => {return setShowApparentTemp(!showApparentTemp)}
 
     const temperatureHeaderText = <Button small onClick={toggleApparentDisplay}>{showApparentTemp ? t('tableHeaders.temperature') : <Icon icon="temperature"/>}</Button>
     const temperatureHeader = <DesktopTooltip content={t('tooltips.temperatureHeader')} placement={'top'}>{temperatureHeaderText}</DesktopTooltip>
 
     const copyTable = React.useCallback(async (event) => {
-        Sentry.metrics.increment("copyTable", 1)
+        // TODO: GA4 event for copying forecast table
         var htmlTable = document.getElementById('forecastTable')   
         var range = document.createRange()
         range.selectNode(htmlTable)
@@ -150,7 +152,7 @@ const ForecastTable = (adjustedTimes) => {
     }
 
     const toggleRelBearing = () => {
-        Sentry.metrics.increment("relativeBearing", 1)
+        // TODO: GA4 event for showing relative vs absolute bearing
         setShowRelativeBearing(!showRelativeBearing)
     }
 
@@ -208,23 +210,27 @@ const ForecastTable = (adjustedTimes) => {
         )
     }
 
-    const getDayForComparison = (time, index, forecastLength, zone) => {
+    const getDayForComparison = (time, index, forecastLength, zone, finishTime) => {
         if (index === forecastLength-1) {
-            const { finishTime } = useForecastDependentValues()
-            return DateTime.fromFormat(finishTime, finishTimeFormat, {zone:zone}).day
+            if (finishTime) {
+                return DateTime.fromFormat(finishTime, finishTimeFormat, {zone:zone}).day
+            }
+            else {
+                return DateTime.fromISO(time, {zone:zone}).day
+            }
         } else {
             return DateTime.fromISO(time, {zone:zone}).day
         }
     }
 
-    const expandTable = (forecast, metric, adjustedTimes) => {
+    const expandTable = (forecast, metric, adjustedTimes, finishTime) => {
         const { i18n } = useTranslation()
         if (forecast.length > 0) {
             return (
                 <tbody>
                 {forecast.map((point,index) =>
                 <React.Fragment key={index}>
-                    {(index > 0 && (DateTime.fromISO(forecast[index-1].time, {zone:point.zone}).day !== getDayForComparison(point.time, index, forecast.length, point.zone)))?
+                    {(index > 0 && (DateTime.fromISO(forecast[index-1].time, {zone:point.zone}).day !== getDayForComparison(point.time, index, forecast.length, point.zone, finishTime)))?
                         <tr style={{outline:'thin solid'}}>
                             <td>{DateTime.fromISO(point.time, {locale:i18n.language}).toFormat('cccc')}</td>
                         </tr>:null}
@@ -356,7 +362,7 @@ const ForecastTable = (adjustedTimes) => {
                                 </MediaQuery>
                             </tr>
                         </thead>
-                        {expandTable(forecast, metric, adjustedTimes)}
+                        {expandTable(forecast, metric, adjustedTimes, finishTime)}
                     </HTMLTable>
                 </div>
             </ErrorBoundary>
