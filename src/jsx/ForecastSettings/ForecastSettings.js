@@ -34,7 +34,7 @@ export const ForecastSettings = () => {
                 <TimeFields />
                 <div style={{ display: "flex" }}>
                     <RidingPace />
-                    <div style={{ flex: 1, cursor: "pointer", display: "flex", flexFlow: "column", alignItems: "flex-end" }} onClick={() => {Sentry.metrics.increment("metric", 1); dispatch(metricToggled())}}>
+                    <div style={{ flex: 1, cursor: "pointer", display: "flex", flexFlow: "column", alignItems: "flex-end" }} onClick={() => {/*TODO: GA event for metric*/dispatch(metricToggled())}}>
                         <div style={{ width: "fit-content", borderBottom: !metric ? "1px solid #106ba3" : "1px solid #0000" }}>{t('labels.englishSystem')}</div>
                         <div style={{ fontSize: "10px", color: "grey", opacity: !metric ? 1 : 0, transition: "opacity 0.3s", marginTop: "3px", textAlign: "end" }}>{t('labels.miles')}</div>
                     </div>
@@ -43,7 +43,7 @@ export const ForecastSettings = () => {
                         <div style={{ width: "fit-content", borderBottom: metric ? "1px solid rgb(234, 89, 41)" : "1px solid #0000" }}>{t('labels.metricSystem')}</div>
                         <div style={{ fontSize: "10px", color: "grey", opacity: metric ? 1 : 0, transition: "opacity 0.3s", marginTop: "3px" }}>{t('labels.kilometers')}</div>
                     </div>
-                    <div style={{ flex: 1, cursor: "pointer", display: "flex", flexFlow: "column", alignItems: "flex-end" }} onClick={() => {Sentry.metrics.increment("celsius", 1); dispatch(celsiusToggled())}}>
+                    <div style={{ flex: 1, cursor: "pointer", display: "flex", flexFlow: "column", alignItems: "flex-end" }} onClick={() => {/*TODO: GA event for celsius*/dispatch(celsiusToggled())}}>
                         <div style={{ width: "fit-content", borderBottom: !celsius ? "1px solid #106ba3" : "1px solid #0000" }}>{onDesktop?'Fahrenheit':'F'}</div>
                         <div style={{ fontSize: "10px", color: "grey", opacity: !celsius ? 1 : 0, transition: "opacity 0.3s", marginTop: "3px", textAlign: "end" }}>{t('labels.degreesF')}</div>
                     </div>
@@ -65,7 +65,7 @@ export const ForecastSettings = () => {
                     </LocationContext.Consumer>
                 </div>
             </div>
-            <ToggleButtonOpaque icon={"chevron-down"} active={showControlPoints} onClick={() => {Sentry.metrics.increment("controls", 1); setShowControlPoints(!showControlPoints)}}>{t('buttons.stops')}</ToggleButtonOpaque>
+            <ToggleButtonOpaque icon={"chevron-down"} active={showControlPoints} onClick={() => {setShowControlPoints(!showControlPoints)}}>{t('buttons.stops')}</ToggleButtonOpaque>
             {showControlPoints && <ControlTableContainer />}
         </div>
     )
