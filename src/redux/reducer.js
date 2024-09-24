@@ -86,6 +86,10 @@ const dialogParamsSlice = createSlice({
             state.errorMessageList = action.payload
             state.fetchingForecast = false
         },
+        errorMessageListAppend(state,action) {
+            state.errorMessageList.concat(action.payload)
+            state.fetchingForecast = false
+        },
         lastErrorCleared(state) {
             if (state.errorMessageList.length > 0) {
                 state.errorMessageList.shift()
@@ -132,7 +136,8 @@ const dialogParamsSlice = createSlice({
 export const dialogParamsReducer = dialogParamsSlice.reducer
 export const {routeLoadingBegun,forecastFetchBegun,
     forecastFetchFailed,forecastFetchCanceled,rwgpsRouteLoadingFailed,
-    gpxRouteLoadingFailed,errorDetailsSet,errorMessageListSet,shortUrlSet,lastErrorCleared,stravaErrorSet} = dialogParamsSlice.actions
+    gpxRouteLoadingFailed,errorDetailsSet,errorMessageListSet,shortUrlSet,
+    lastErrorCleared,stravaErrorSet, errorMessageListAppend} = dialogParamsSlice.actions
 
 const getAnalysisIntervalFromRouteDuration = (durationInHours) => {
     if (durationInHours > 72) {

@@ -384,7 +384,7 @@ const doForecastByParts = (forecastFunc, aqiFunc, dispatch, getState) => {
 }
 
 export const msgFromError = (error) => {
-    if (error.reason.data) {
+    if (error.reason.data !== undefined) {
         return error.reason.data.details
     } else {
         return JSON.stringify(error.reason)
