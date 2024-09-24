@@ -1,5 +1,17 @@
 const requiredVersion = 1.0;
 
+declare global {
+    interface Window { getRpExtVersion: any; }
+}
+
+declare namespace browser.runtime {
+    export function sendMessage<M = any, R = any>(
+        extensionId: string | undefined | null,
+        message: M,
+        responseCallback: (response: R) => void,
+    ): void;
+}
+
 export const browserIsChrome = () => {
     var isChromium = window.chrome;
     var winNav = window.navigator;
@@ -54,7 +66,7 @@ export const extensionIsInstalled = () => {
         return new Promise(( resolve => {
             try {
                 // eslint-disable-next-line no-undef
-                browser.runtime.sendMessage("com.randoplan.extension.Extension (2B6A6N9QBQ)", {message: "version"}, function(response) {
+                browser.runtime.sendMessage("com.randoplan.extension.Extension (2B6A6N9QBQ)", {message: "version"}, function(response: { version: number; }) {
                     if (response && response.version) {
                         return resolve(response.version >= requiredVersion)
                     } else {

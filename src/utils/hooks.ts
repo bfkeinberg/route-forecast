@@ -14,6 +14,7 @@ import { getRouteInfo, getForecastRequest, milesToMeters } from "./util"
 import type {ControlsState} from '../redux/controlsSlice'
 import type { RouteInfoState } from "../redux/routeInfoSlice";
 import type { WindAdjustResults, Point } from "./gpxParser";
+import type { StravaActivityStream, StravaActivityData } from "./stravaRouteParser";
 import type {Bounds} from './util'
 
 const useDelay = (delay: number, startCondition = true) => {
@@ -135,7 +136,8 @@ const useActualArrivalTimes = () => {
   const activityStream = useAppSelector(state => state.strava.activityStream)
   const controls = useAppSelector(state => state.controls.userControlPoints)
 
-  return activityData !== null ? stravaRouteParser.computeControlPointArrivalTimes(activityData, activityStream, controls) : null
+  return activityData !== null && activityStream !== null ? 
+  stravaRouteParser.computeControlPointArrivalTimes(activityData, activityStream, controls) : null
 }
 
 const usePrevious = <Type>(value : Type) => {

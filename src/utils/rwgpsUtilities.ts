@@ -1,4 +1,4 @@
-export const loadRwgpsRoute = (route, isTrip, token) => {
+export const loadRwgpsRoute = (route : string, isTrip : boolean, token : string) => {
   return new Promise((resolve, reject) => {
       let url = '/rwgps_route?route=' + route + '&trip=' + isTrip;
       if (token) {
