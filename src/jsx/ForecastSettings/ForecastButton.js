@@ -8,7 +8,8 @@ import { useMediaQuery } from 'react-responsive';
 
 import { shortenUrl, msgFromError } from "../../redux/actions";
 import { useForecastMutation, useGetAqiMutation } from '../../redux/forecastApiSlice';
-import { forecastAppended,forecastFetchBegun,forecastFetched, forecastFetchFailed, querySet, errorMessageListSet } from '../../redux/reducer';
+import { forecastAppended,forecastFetchBegun,forecastFetched, forecastFetchFailed, 
+    querySet, errorMessageListSet, errorMessageListAppend } from '../../redux/reducer';
 import { generateUrl } from '../../utils/queryStringUtils';
 import { getForecastRequest } from '../../utils/util';
 import { DesktopTooltip } from '../shared/DesktopTooltip';
@@ -163,7 +164,7 @@ const ForecastButton = ({fetchingForecast,submitDisabled, routeNumber, startTime
             }
             // handle any errors
             dispatch(errorMessageListSet(forecastResults.filter(result => result.status === 'rejected').map(result => msgFromError(result))))
-            dispatch(errorMessageListSet(aqiResults.filter(result => result.status === 'rejected').map(result => msgFromError(result))))
+            dispatch(errorMessageListAppend(aqiResults.filter(result => result.status === 'rejected').map(result => msgFromError(result))))
         // })
         const url = generateUrl(startTimestamp, routeNumber, pace, interval, metric, controls,
             strava_activity, strava_route, provider, origin, true, dispatch, zone, rusaRouteId)
