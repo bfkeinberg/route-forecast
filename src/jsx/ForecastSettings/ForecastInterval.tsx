@@ -1,22 +1,21 @@
 import { FormGroup } from "@blueprintjs/core";
 import { Slider, Tooltip } from "@mui/material"
-import PropTypes from 'prop-types';
-import * as React from 'react';
-import {connect} from 'react-redux';
-
+import {connect, ConnectedProps} from 'react-redux';
+import { RootState } from "../app/topLevel";
 import {setInterval} from "../../redux/actions";
 import {useTranslation} from 'react-i18next'
-import * as Sentry from "@sentry/react"
 
-const ForecastInterval = ({min_interval,interval,setInterval}) => {
+type PropsFromRedux = ConnectedProps<typeof connector>
+
+const ForecastInterval = (props: PropsFromRedux) => {
     const { t } = useTranslation()
     return (
         <FormGroup style={{flex: 1}} label={t('labels.interval')} labelFor="intervalRange">
             <Tooltip arrow placement='bottom' title={t('tooltips.interval')}>
                 <Slider
-                    value={interval}
+                    value={props.interval}
                     step={0.25}
-                    min={min_interval}
+                    min={props.min_interval}
                     max={2.0}
                     id={'intervalRange'}
                     marks={[
@@ -31,19 +30,13 @@ const ForecastInterval = ({min_interval,interval,setInterval}) => {
                     ]}
                     valueLabelDisplay="off"
                     // TODO: GA event for interval here
-                    onChange={(event, selected) => {setInterval(selected)}} />
+                    onChange={(event, selected) => {props.setInterval(selected)}} />
             </Tooltip>
         </FormGroup>
     );
 };
 
-ForecastInterval.propTypes = {
-    min_interval:PropTypes.number.isRequired,
-    interval:PropTypes.number.isRequired,
-    setInterval:PropTypes.func.isRequired
-};
-
-const mapStateToProps = (state) =>
+const mapStateToProps = (state : RootState) =>
     ({
         min_interval: state.uiInfo.routeParams.min_interval,
         interval: state.uiInfo.routeParams.interval
@@ -51,6 +44,7 @@ const mapStateToProps = (state) =>
 
 const mapDispatchToProps = {
     setInterval
-};
+}
 
-export default connect(mapStateToProps,mapDispatchToProps)(ForecastInterval);
+const connector = connect(mapStateToProps,mapDispatchToProps)
+export default connector(ForecastInterval)

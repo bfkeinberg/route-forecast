@@ -1,0 +1,109 @@
+{
+        "translation": {
+            "buttons": {
+                "bugReport": "Signaler un bogue",
+                "donate": "Faire un don",
+                "loadRoute":"Charger un parcours",
+                "usePinned":"Utiliser des parcours épinglés",
+                "dontUsePinned": "Ne utiliser pas des parcours épinglés",
+                "stops":"Ajouter des Contrôles",
+                "forecast":"Prévisions",
+                "forecastPending":"Création de prévisions...",
+                "zoomToSegment":"Zoom"
+            },
+            "labels": {
+                "language": "Choisissez la langue",
+                "routeType":"Type de parcours",
+                "ridingPace":"Rythme sur terrain plat",
+                "startingTime":"Heure de Départ",
+                "miles":"Les unités sont des miles, etc.",
+                "englishSystem":"Impérial",
+                "metricSystem":"SI",
+                "kilometers":"Unités en système métrique",
+                "projectedFinish":"Heure de Fin Prévue",
+                "interval":"Intervalle de Prévision en minutes",
+                "source":"Source de prévisions météorologiques",
+                "customSegment":"Utiliser une longueur de segment personnalisée",
+                "degreesF":"Température en degrés F",
+                "degreesC":"Température en degrés C"
+            },
+            "titles": {
+                "routeInfo": "Informations sur les parcours",
+                "forecastSettings": "Paramètres de prévision",
+                "forecast":"Prévisions Météorologiques",
+                "paceAnalysis":"Analyse du Rythme",
+                "rwgpsId":"ID de parcours Ride with GPS",
+                "loading":"Chargement de l'itinéraire",
+                "forecastControls":"Contrôles de prévision",
+                "map":"Carte de prévision"
+            },
+            "tooltips": {
+                "ridingPace":"Vitesse sur terrain plat, qui sera réduite en montant",
+                "actualPace":"Le rythme de conduite réel était",
+                "interval":"À quelle fréquence générer des prévisions météorologiques en minutes",
+                "provider":"Le fournisseur météo à utiliser pour les prévisions",
+                "forecast": {
+                    "enabled":"Demander un prévisionnel de trajet",
+                    "disabled":"Doit fournir un identifiant de route rwgps"
+                },
+                "startingTime":"Quand vous envisagez de commencer à rouler",
+                "distHeader":"Distance au début du segment",
+                "windHeader":"Cliquez pour basculer entre la vitesse moyenne du vent et les rafales de vent",
+                "temperatureHeader":"Cliquez pour basculer entre la température et la température apparente",
+                "aqiHeader":"La qualité de l'air indique les conditions actuelles et non prévues. Cliquez pour basculer vers la prochaine prévision demandée",
+                "overallPace":"Le rythme est la vitesse moyenne ajustée pour la montée",
+                "analysisInterval":"Intervalle en heures pour calculer le rythme effectif",
+                "zoom":"S'il faut zoomer sur les segments d'itinéraire en survolant leur ligne dans le tableau",
+                "customSegment":"Prévoir uniquement cette partie de le parcours",
+                "bearingHeader":"Cliquez pour basculer entre le relèvement du vent absolu et relatif",
+                "copyTable":"Copier le tableau de prévisions",
+                "scrollToRain":"Afficher la première ligne de prévision avec changement de pluie"
+            },
+            "data":{
+                "noForecastPlaceholder":"Cliquez sur « Prévisions »",
+                "wind": {
+                    "lost":"perdues",
+                    "gained":"gagnées",
+                    "to": "à cause du vent",
+                    "from": "grâce au vent",
+                    "gust": "Rafale de vent",
+                    "speed": "Vitesse du vent"
+                },
+                "info":{
+                    "temperature":"Température"
+                },
+                "summary":"Utilisez les données météorologiques et de terrain pour créer un plan d'itinéraire pour vos sorties.",
+                "loading":" peut charger des itinéraires depuis Ride avec GPS, Strava ou en utilisant les identifiants des itinéraires permanents sur RUSA.org.Vous pouvez coller l'URL d'un itinéraire depuis Ride with GPS ou Strava, ou récupérer l'identifiant à partir des informations d'un itinéraire permanent RUSA. Alternativement, si vous épinglez un itinéraire que vous visualisez sur Ride with GPS, le bouton à droite les répertoriera. Cela demandera pour vous connecter à RWGPS si ce n'est pas déjà fait.",
+                "tableHeadersDoc":"Les boutons au-dessus des en-têtes de colonnes permettent de modifier les informations affichées, par exemple la température absolue par rapport à la température ressentie."
+            },
+            "tableHeaders":{
+                "temperature":"Température ressentie",
+                "time":"Temps",
+                "summary":"Résumé",
+                "precipitation":"Risque de pluie",
+                "humidity":"Humidité",
+                "cloudCover":"Couverture Nuageuse",
+                "windBearing":"Relèvement du Vent",
+                "relBearing":"Relèvement du Vent Relatif"
+            },
+            "toasts":{
+                "aqi": {
+                    "enabled":"Récupération AQI activée",
+                    "disabled":"Récupération Aqi désactivée"
+                },
+                "tableCopied":"Tableau de prévisions copié"
+            },
+            "controls":{
+                "name":"Nom",
+                "distanceMiles":"Miles",
+                "distanceKilometers":"Kilomètres",
+                "duration":"Temps passé prévu",
+                "arrival":"Heure d'arrivée estimée",
+                "delete":"Supprimer"
+            },
+            "analysis": {
+                "overallPace":"Le rythme global ajusté en fonction de la montée était",
+                "interval":"heure"
+            }
+        }
+    }
