@@ -1,11 +1,10 @@
 import { Toast2 } from '@blueprintjs/core';
-import * as React from 'react';
-import ReactGA from "react-ga4";
+import ReactGA from "react-ga4";i18n
 import { useDispatch,useSelector } from "react-redux";
 import {useTranslation} from 'react-i18next'
 import  {useMediaQuery} from 'react-responsive';
 import { maxWidthForMobile } from '../../utils/util';
-import { errorDetailsSet } from '../../redux/reducer';
+import { errorDetailsSet } from '../../redux/dialogParamsSlice';
 import { displayControlTableUiSet, metricToggled, celsiusToggled } from '../../redux/controlsSlice';
 import LocationContext from '../locationContext';
 import { AlwaysFilledSwitch } from '../RouteInfoForm/AlwaysFilledSwitch'
@@ -18,6 +17,7 @@ import RidingPace from "./RidingPace";
 import { TimeFields } from "./TimeFields";
 import WeatherProviderSelector from "./WeatherProviderSelector"
 import Segment from './Segment'
+import i18n from '../app/i18n';
 
 export const ForecastSettings = () => {
     const metric = useSelector(state => state.controls.metric)

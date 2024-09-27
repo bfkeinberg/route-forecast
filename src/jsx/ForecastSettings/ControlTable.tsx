@@ -1,12 +1,10 @@
 import { Icon } from '@blueprintjs/core';
-import * as React from 'react';
 
 import { removeControl as removeControlAction, updateUserControls } from '../../redux/actions';
 import { useActualArrivalTimes, useForecastDependentValues } from '../../utils/hooks';
 import { milesToMeters,stringIsOnlyDecimal, stringIsOnlyNumeric } from '../../utils/util';
 import { Table } from "./Table"
 import {useTranslation} from 'react-i18next'
-import { RootState } from '../app/topLevel'
 import { useAppSelector, useAppDispatch } from '../../utils/hooks';
 const minSuffixFunction = (value : (string | number)) => `${value} min`
 import type { UserControl } from '../../redux/controlsSlice';

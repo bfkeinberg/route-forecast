@@ -20,7 +20,7 @@ import { TitleScreen } from "./TitleScreen";
 import { TopBar } from "./TopBar/TopBar";
 import LangSwitcher from "./app/LangSwitcher";
 import {useTranslation} from 'react-i18next'
-import { lastErrorCleared } from "../redux/reducer";
+import { lastErrorCleared } from '../redux/dialogParamsSlice'
 import DisplayErrorList from "./app/DisplayErrorList";
 
 const DesktopUI = ({mapsApiKey, orientationChanged, setOrientationChanged}) => {

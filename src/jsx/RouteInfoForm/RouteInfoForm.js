@@ -5,7 +5,7 @@ import ReactGA from "react-ga4";
 import {connect, useDispatch} from 'react-redux';
 
 import { routeLoadingModeProps,routeLoadingModes } from '../../data/enums';
-import { errorDetailsSet} from '../../redux/reducer';
+import { errorDetailsSet } from '../../redux/dialogParamsSlice';
 import { RouteInfoInputRUSA } from './RouteInfoInputRUSA';
 import { RouteInfoInputRWGPS } from './RouteInfoInputRWGPS';
 import { RouteInfoInputStrava } from './RouteInfoInputStrava'

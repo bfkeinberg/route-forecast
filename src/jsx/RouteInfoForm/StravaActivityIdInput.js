@@ -1,9 +1,8 @@
 import { FormGroup,InputGroup } from '@blueprintjs/core'
 import PropTypes from 'prop-types';
-import * as React from 'react';
 import { connect } from 'react-redux';
 
-import { stravaActivitySet } from '../../redux/reducer';
+import { stravaActivitySet } from '../../redux/stravaSlice';
 
 const StravaActivityIdInput = ({ stravaActivitySet, strava_activity, canAnalyze }) => {
     return (

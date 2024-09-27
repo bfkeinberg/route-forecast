@@ -1,8 +1,11 @@
-import resources from "../data/resources"
+import enNs from "../../data/en.json"
+import frNs from "../../data/fr.json"
 
 declare module 'i18next' {
   interface CustomTypeOptions {
-    defaultNS: 'ns1';
-    resources: typeof resources
+    resources: {
+        en: typeof enNs;
+        fr: typeof frNs;
+      };
   }
 }

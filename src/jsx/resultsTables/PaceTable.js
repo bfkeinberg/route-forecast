@@ -6,7 +6,6 @@ import React, { useState } from 'react';
 import cookie from 'react-cookies';
 import {connect} from 'react-redux';
 
-import { mapRangeToggled,mapSubrangeSet } from '../../redux/reducer';
 import { zoomToRangeToggled } from '../../redux/forecastSlice';
 import { useActualPace, useFormatSpeed } from '../../utils/hooks';
 import stravaRouteParser from '../../utils/stravaRouteParser';
@@ -14,6 +13,7 @@ import ErrorBoundary from "../shared/ErrorBoundary";
 import { ToggleButton } from '../shared/ToggleButton';
 import StravaAnalysisIntervalInput from './StravaAnalysisIntervalInput';
 import {useTranslation} from 'react-i18next'
+import { mapSubrangeSet, mapRangeToggled } from '../../redux/stravaSlice';
 
 const PaceTable = ({activityData, activityStream, analysisInterval, mapSubrangeSet, mapRangeToggled, zoomToRange, zoomToRangeToggled}) =>  {
     const { t } = useTranslation()

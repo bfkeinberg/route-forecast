@@ -6,7 +6,7 @@ import ReactGA from "react-ga4"
 import { useDispatch,useSelector } from 'react-redux';
 
 import { loadFromRideWithGps } from '../../redux/actions';
-import { errorDetailsSet } from '../../redux/reducer';
+import { errorDetailsSet } from '../../redux/dialogParamsSlice';
 import { rusaIdLookupApiSlice } from '../../redux/rusaLookupApiSlice';
 import { rusaPermRouteIdSet, rwgpsRouteSet } from '../../redux/routeParamsSlice';
 

@@ -3,7 +3,7 @@ import { providerValues, defaultProvider } from './providerValues'
 import { routeLoadingModes } from '../data/enums';
 import type { Segment } from '../utils/gpxParser';
 import { DateTime } from 'luxon';
-import { stravaRouteSet } from './reducer';
+import { stravaRouteSet } from './stravaSlice';
 import { weatherProviderSet } from './forecastSlice';
 import { getRouteNumberFromValue } from '../utils/util';
 import { rwgpsRouteLoaded, gpxRouteLoaded } from './routeInfoSlice';

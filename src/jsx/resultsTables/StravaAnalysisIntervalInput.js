@@ -1,10 +1,9 @@
 import {Button, FormGroup, MenuItem, Tooltip} from "@blueprintjs/core";
 import { Select } from "@blueprintjs/select";
 import PropTypes from 'prop-types';
-import * as React from 'react';
 import { connect } from 'react-redux';
 import {useTranslation} from 'react-i18next'
-import { analysisIntervalSet } from '../../redux/reducer';
+import { analysisIntervalSet } from "../../redux/stravaSlice";
 
 const renderInterval = (interval, { handleClick, modifiers }) => {
     if (!modifiers.matchesPredicate) {

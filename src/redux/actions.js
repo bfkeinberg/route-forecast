@@ -7,15 +7,12 @@ import { updateHistory } from "../jsx/app/updateHistory";
 import { doForecast, requestTimeZoneForRoute } from '../utils/forecastUtilities';
 import { loadRwgpsRoute } from '../utils/rwgpsUtilities';
 import { controlsMeaningfullyDifferent, extractControlsFromRoute, getForecastRequest,getRouteNumberFromValue, getRwgpsRouteName } from '../utils/util';
-import { errorDetailsSet,forecastFetchBegun, forecastFetchCanceled,
- forecastFetchFailed, gpxRouteLoadingFailed,
-routeLoadingBegun, rwgpsRouteLoadingFailed, shortUrlSet,
-stravaActivitySet, errorMessageListSet,
-stravaErrorSet, stravaFetchBegun, stravaFetched, stravaFetchFailed,
-    stravaTokenSet } from './reducer';
+import { stravaActivitySet, stravaFetchBegun, stravaFetchFailed, stravaTokenSet } from "./stravaSlice";
+import { routeLoadingBegun, errorDetailsSet, errorMessageListSet, forecastFetchBegun, 
+    forecastFetchCanceled, forecastFetchFailed, gpxRouteLoadingFailed,
+     shortUrlSet, rwgpsRouteLoadingFailed } from "./dialogParamsSlice";
 import { weatherProviderSet, forecastAppended, forecastFetched, forecastInvalidated } from "./forecastSlice";
 import { timeZoneSet, intervalSet, paceSet, startTimeSet, initialStartTimeSet } from "./routeParamsSlice"
-
 import { loadingFromUrlSet, gpxRouteLoaded, rwgpsRouteLoaded } from "./routeInfoSlice";
 import { displayControlTableUiSet, userControlsUpdated } from "./controlsSlice";
 export const componentLoader = (lazyComponent, attemptsLeft) => {

@@ -13,13 +13,12 @@ import cookie from 'react-cookies';
 import { useDispatch, useSelector } from 'react-redux';
 import  {useMediaQuery} from 'react-responsive';
 import {useTranslation} from 'react-i18next'
-import ReactGA from "react-ga4";
-
+import { stravaErrorSet } from "../../redux/dialogParamsSlice";
+import { stravaActivitySet, stravaRefreshTokenSet, stravaRouteSet, stravaTokenSet } from "../../redux/stravaSlice";
 import {
     actionUrlAdded, apiKeysSet, querySet,
     rwgpsTokenSet,
-    stravaActivitySet, stravaErrorSet, stravaRefreshTokenSet,
-    stravaRouteSet, stravaTokenSet, usePinnedRoutesSet
+    usePinnedRoutesSet
 } from "../../redux/reducer";
 import { fetchAqiSet, zoomToRangeSet } from "../../redux/forecastSlice";
 import { stopAfterLoadSet, rusaPermRouteIdSet, routeLoadingModeSet, startTimestampSet, rwgpsRouteSet, reset } from "../../redux/routeParamsSlice";

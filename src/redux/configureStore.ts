@@ -1,10 +1,11 @@
 import { combineReducers, configureStore } from '@reduxjs/toolkit'
 import * as Sentry from '@sentry/react';
 import {createLogger} from 'redux-logger';
-
+import { dialogParamsReducer } from './dialogParamsSlice';
+import { stravaReducer } from './stravaSlice';
 import { forecastApiSlice } from './forecastApiSlice'
 import {
-    dialogParamsReducer, paramsReducer, rwgpsInfoReducer, stravaReducer
+    paramsReducer, rwgpsInfoReducer
 } from './reducer';
 import { rusaIdLookupApiSlice} from './rusaLookupApiSlice'
 import { routeInfoReducer } from './routeInfoSlice';

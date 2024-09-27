@@ -5,7 +5,7 @@ import * as React from "react";
 import {connect, useDispatch,useSelector} from 'react-redux';
 import { Link, MemoryRouter, Route, Routes, useLocation, useNavigate } from "react-router-dom";
 
-import { errorDetailsSet, lastErrorCleared } from "../redux/reducer";
+import { errorDetailsSet, lastErrorCleared } from "../redux/dialogParamsSlice";
 import { useForecastDependentValues,useWhenChanged } from "../utils/hooks";
 import { ForecastSettings } from "./ForecastSettings/ForecastSettings";
 import MapLoader from "./Map/MapLoader";

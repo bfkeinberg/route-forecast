@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
-import { gpxRouteLoadingFailed } from './reducer'
-import { defaultProvider, providerValues } from './providerValues'
+import { gpxRouteLoadingFailed } from './dialogParamsSlice'
+import { defaultProvider } from './providerValues'
 import { rwgpsRouteSet, reset } from './routeParamsSlice'
 import { gpxRouteLoaded } from './routeInfoSlice'
 
