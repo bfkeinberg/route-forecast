@@ -47,10 +47,10 @@ import {
     loadRouteFromURL,
     saveCookie,
     setInterval,
-    setPace,
     setWeatherProvider,
     updateUserControls,
 } from "../../redux/actions";
+import { setPace } from "../../redux/actions_";
 import { useForecastMutation, useGetAqiMutation } from '../../redux/forecastApiSlice';
 import { inputPaceToSpeed,parseControls } from '../../utils/util';
 

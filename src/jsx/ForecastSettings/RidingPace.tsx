@@ -1,19 +1,31 @@
 import "./RidingPace.css"
 
-import { Button, FormGroup,MenuItem } from "@blueprintjs/core";
-import { Select } from "@blueprintjs/select";
-import PropTypes from 'prop-types';
-import * as React from 'react';
-import {connect, useSelector} from 'react-redux';
+import { Button, FormGroup, MenuItem } from "@blueprintjs/core";
+import { Select, ItemRenderer } from "@blueprintjs/select";
+import {connect, ConnectedProps} from 'react-redux';
 
-import {saveCookie, setPace} from "../../redux/actions";
+import {saveCookie} from "../../redux/actions";
+import { setPace } from "../../redux/actions_";
 import { useActualPace, useFormatSpeed } from '../../utils/hooks';
 import { inputPaceToSpeed, metricPaceToSpeed, paceToSpeed } from '../../utils/util';
 import { DesktopTooltip } from '../shared/DesktopTooltip';
 import {useTranslation} from 'react-i18next'
 import { milesToMeters } from '../../utils/util'
+import { RootState } from "../app/topLevel";
 
-const paceValues = {
+type PropsFromRedux = ConnectedProps<typeof connector>
+
+type PaceValue = {
+    name:string
+    number:number
+}
+interface PaceTable {
+    imperialLikeAPenguin: {values:Array<PaceValue>, label:string}
+}
+interface PaceTable {
+    metric: {values:Array<PaceValue>, label:string}
+}
+const paceValues : PaceTable = {
     imperialLikeAPenguin: {
         values: [
             {name: "Q", number: 3},
@@ -59,14 +71,14 @@ const paceValues = {
     }
 }
 
-const getAlphaPace = function(pace) {
-    let alpha = 'A';     // default
+const getAlphaPace = function(pace : number) {
+    let alpha : string | undefined = 'A';     // default
     alpha = Object.keys(paceToSpeed).reverse().find(value => {
         return (pace >= paceToSpeed[value])});
-    return alpha;
+    return alpha?alpha:'A';
 };
 
-const getPaceTooltipId = function(realPace, predictedPace) {
+const getPaceTooltipId = function(realPace : number, predictedPace : number) {
     if (realPace < predictedPace) {
         return 'red-tooltip';
     } else {
@@ -74,7 +86,7 @@ const getPaceTooltipId = function(realPace, predictedPace) {
     }
 };
 
-const correctPaceValue = (paceAlpha, setPace) => {
+const correctPaceValue = (paceAlpha : string, setPace : (pace:string) => void) : string => {
     let paceNumeric = paceToSpeed[paceAlpha];
     if (paceNumeric === undefined) {
         paceNumeric = inputPaceToSpeed[paceAlpha];
@@ -86,7 +98,12 @@ const correctPaceValue = (paceAlpha, setPace) => {
     }
 }
 
-const renderPaceImperial = (pace, { handleClick, modifiers }) => {
+interface Pace {
+    name: string
+    number: number
+}
+
+const renderPaceImperial : ItemRenderer<Pace> = (pace, { handleClick, modifiers }) => {
     if (!modifiers.matchesPredicate) {
         return null;
     }
@@ -100,7 +117,7 @@ const renderPaceImperial = (pace, { handleClick, modifiers }) => {
     );
 };
 
-const renderPaceMetric = (pace, { handleClick, modifiers }) => {
+const renderPaceMetric : ItemRenderer<Pace> = (pace, { handleClick, modifiers }) => {
     if (!modifiers.matchesPredicate) {
         return null;
     }
@@ -114,13 +131,13 @@ const renderPaceMetric = (pace, { handleClick, modifiers }) => {
     );
 };
 
-const RidingPace = ({ pace, setPace, metric }) => {
+const RidingPace = ({ pace, setPace, metric } : PropsFromRedux) => {
     const { t } = useTranslation()
     const actualPace = useActualPace()
     
     // convert mph to kph if we are using metric
-    const cvtMilesToKm = distance => {
-        return metric ? ((distance * milesToMeters) / 1000).toFixed(1) : distance;
+    const cvtMilesToKm = (distance : number) => {
+        return metric ? ((distance * milesToMeters) / 1000) : distance;
     };
 
     const formatSpeed = useFormatSpeed()
@@ -141,7 +158,7 @@ const RidingPace = ({ pace, setPace, metric }) => {
     return (
         <DesktopTooltip content={pace_text} className={pace_tooltip_class}>
             <FormGroup style={{ flex: 3, fontSize: "90%" }} label={<span><b>{t('labels.ridingPace')}</b></span>} labelFor={'paceInput'}>
-                <Select tabIndex="0"
+                <Select
                     items={dropdownValues.values}
                     itemsEqual={"number"}
                     itemRenderer={metric ? renderPaceMetric : renderPaceImperial}
@@ -157,13 +174,7 @@ const RidingPace = ({ pace, setPace, metric }) => {
     );
 };
 
-RidingPace.propTypes = {
-    pace:PropTypes.string.isRequired,
-    setPace:PropTypes.func.isRequired,
-    metric:PropTypes.bool.isRequired
-};
-
-const mapStateToProps = (state) =>
+const mapStateToProps = (state : RootState) =>
     ({
         pace: state.uiInfo.routeParams.pace,
         metric: state.controls.metric
@@ -173,4 +184,5 @@ const mapDispatchToProps = {
     setPace
 };
 
-export default connect(mapStateToProps,mapDispatchToProps)(RidingPace);
+const connector = connect(mapStateToProps,mapDispatchToProps)
+export default connector(RidingPace);

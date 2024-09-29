@@ -12,7 +12,7 @@ import { routeLoadingBegun, errorDetailsSet, errorMessageListSet, forecastFetchB
     forecastFetchCanceled, forecastFetchFailed, gpxRouteLoadingFailed,
      shortUrlSet, rwgpsRouteLoadingFailed } from "./dialogParamsSlice";
 import { weatherProviderSet, forecastAppended, forecastFetched, forecastInvalidated } from "./forecastSlice";
-import { timeZoneSet, intervalSet, paceSet, startTimeSet, initialStartTimeSet } from "./routeParamsSlice"
+import { timeZoneSet, intervalSet, startTimeSet, initialStartTimeSet } from "./routeParamsSlice"
 import { loadingFromUrlSet, gpxRouteLoaded, rwgpsRouteLoaded } from "./routeInfoSlice";
 import { displayControlTableUiSet, userControlsUpdated } from "./controlsSlice";
 export const componentLoader = (lazyComponent, attemptsLeft) => {
@@ -71,13 +71,6 @@ export const setTimeFromIso = (startAsIso,zone) => {
 export const setStart = function (start) {
     return function(dispatch) {
         dispatch(startTimeSet(start))
-        dispatch(cancelForecast())
-    }
-};
-
-export const setPace = function (pace) {
-    return function(dispatch) {
-        dispatch(paceSet(pace))
         dispatch(cancelForecast())
     }
 };
