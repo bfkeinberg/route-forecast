@@ -4,8 +4,9 @@ import {createLogger} from 'redux-logger';
 import { dialogParamsReducer } from './dialogParamsSlice';
 import { stravaReducer } from './stravaSlice';
 import { forecastApiSlice } from './forecastApiSlice'
+import { rwgpsInfoReducer } from './rideWithGpsSlice';
 import {
-    paramsReducer, rwgpsInfoReducer
+    paramsReducer
 } from './reducer';
 import { rusaIdLookupApiSlice} from './rusaLookupApiSlice'
 import { routeInfoReducer } from './routeInfoSlice';

@@ -2,29 +2,6 @@ import { createSlice } from '@reduxjs/toolkit'
 import { reset } from './routeParamsSlice';
 export const finishTimeFormat = 'EEE, MMM dd yyyy h:mma';
 
-const rideWithGpsInfoSlice = createSlice({
-    name: 'rideWithGpsInfo',
-    initialState: {
-        pinnedRoutes: [], token: null, usePinnedRoutes: false, loadingRoutes: false
-    },
-    reducers: {
-        rwgpsTokenSet(state, action) {
-            state.token = action.payload
-        },
-        pinnedRoutesSet(state, action) {
-            state.pinnedRoutes = action.payload
-        },
-        loadingPinnedSet(state, action) {
-            state.loadingRoutes = action.payload
-        },
-        usePinnedRoutesSet(state, action) {
-            state.usePinnedRoutes = action.payload
-        }
-    }
-})
-
-export const {rwgpsTokenSet,pinnedRoutesSet,loadingPinnedSet,usePinnedRoutesSet} = rideWithGpsInfoSlice.actions
-
 const paramsSlice = createSlice({
     name:'params',
     initialState:{},
@@ -57,7 +34,5 @@ const paramsSlice = createSlice({
 })
 
 export const paramsReducer = paramsSlice.reducer
-
-export const rwgpsInfoReducer = rideWithGpsInfoSlice.reducer
 
 export const {actionUrlAdded, apiKeysSet, querySet, queryCleared} = paramsSlice.actions

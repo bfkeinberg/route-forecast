@@ -1,13 +1,14 @@
 import { FormGroup,InputGroup } from '@blueprintjs/core'
-import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
-
+import {connect, ConnectedProps} from 'react-redux';
+import { RootState } from "../app/topLevel";
 import { stravaRouteSet } from '../../redux/stravaSlice';
 
-const StravaRouteIdInput = ({ stravaRouteSet, strava_route }) => {
+type PropsFromRedux = ConnectedProps<typeof connector>
+
+const StravaRouteIdInput = ({ stravaRouteSet, strava_route } : PropsFromRedux) => {
     return (
         <FormGroup label={<span><b>Strava Route Id</b></span>} labelFor={"stravaRoute"}>
-            <InputGroup style={{fontSize:"16px"}} id='stravaRoute' tabIndex='1' type="text"
+            <InputGroup style={{fontSize:"16px"}} id='stravaRoute' tabIndex={1} type="text"
                 onDrop={event => {
                     let dt = event.dataTransfer;
                     if (dt.items) {
@@ -43,16 +44,7 @@ const StravaRouteIdInput = ({ stravaRouteSet, strava_route }) => {
     );
 };
 
-StravaRouteIdInput.propTypes = {
-    strava_route:PropTypes.oneOfType([
-        PropTypes.string,
-        // eslint-disable-next-line array-element-newline
-        PropTypes.oneOf([''])
-    ]).isRequired,
-    stravaRouteSet:PropTypes.func.isRequired,
-};
-
-const mapStateToProps = (state) =>
+const mapStateToProps = (state : RootState) =>
     ({
         strava_route: state.strava.route
     });
@@ -61,4 +53,5 @@ const mapDispatchToProps = {
     stravaRouteSet
 };
 
-export default connect(mapStateToProps,mapDispatchToProps)(StravaRouteIdInput);
+const connector = connect(mapStateToProps,mapDispatchToProps)
+export default connector(StravaRouteIdInput)

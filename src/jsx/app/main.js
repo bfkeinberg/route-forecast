@@ -14,11 +14,10 @@ import { useDispatch, useSelector } from 'react-redux';
 import  {useMediaQuery} from 'react-responsive';
 import {useTranslation} from 'react-i18next'
 import { stravaErrorSet } from "../../redux/dialogParamsSlice";
+import { usePinnedRoutesSet, rwgpsTokenSet } from "../../redux/rideWithGpsSlice";
 import { stravaActivitySet, stravaRefreshTokenSet, stravaRouteSet, stravaTokenSet } from "../../redux/stravaSlice";
 import {
-    actionUrlAdded, apiKeysSet, querySet,
-    rwgpsTokenSet,
-    usePinnedRoutesSet
+    actionUrlAdded, apiKeysSet, querySet
 } from "../../redux/reducer";
 import { fetchAqiSet, zoomToRangeSet } from "../../redux/forecastSlice";
 import { stopAfterLoadSet, rusaPermRouteIdSet, routeLoadingModeSet, startTimestampSet, rwgpsRouteSet, reset } from "../../redux/routeParamsSlice";

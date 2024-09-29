@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
-import { pinnedRoutesSet } from './reducer'
+import { pinnedRoutesSet } from './rideWithGpsSlice'
 import { rwgpsRouteLoaded, gpxRouteLoaded } from './routeInfoSlice'
 import { stravaFetched, stravaFetchFailed } from './stravaSlice'
 

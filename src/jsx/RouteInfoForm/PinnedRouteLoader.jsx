@@ -7,7 +7,7 @@ import {Suspense, useEffect, lazy} from 'react';
 import ReactGA from "react-ga4";
 import {connect} from 'react-redux';
 import {useTranslation} from 'react-i18next'
-import { loadingPinnedSet, pinnedRoutesSet, rwgpsTokenSet, usePinnedRoutesSet } from '../../redux/reducer';
+import { loadingPinnedSet, pinnedRoutesSet, rwgpsTokenSet, usePinnedRoutesSet } from '../../redux/rideWithGpsSlice';
 import { errorDetailsSet } from '../../redux/dialogParamsSlice';
 
 const addBreadcrumb = (msg) => {
