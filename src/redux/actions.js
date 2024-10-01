@@ -23,6 +23,7 @@ export const componentLoader = (lazyComponent, attemptsLeft) => {
             .catch((error)=>{
                 // let us retry after 1500 ms
                 setTimeout(() => {
+                    Sentry.addBreadcrumb({category:"No stack", level:"info", message:"componentLoader"})
                     if (attemptsLeft === 1) {
                         // instead of rejecting reload the window
                         Sentry.captureException(error);

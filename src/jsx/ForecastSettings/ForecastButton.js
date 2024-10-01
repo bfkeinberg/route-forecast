@@ -8,7 +8,7 @@ import { useMediaQuery } from 'react-responsive';
 
 import { shortenUrl, msgFromError } from "../../redux/actions";
 import { useForecastMutation, useGetAqiMutation } from '../../redux/forecastApiSlice';
-import { forecastAppended,forecastFetchBegun,forecastFetched, forecastFetchFailed, 
+import { forecastAppended,forecastFetchBegun,forecastFetched, forecastFetchFailed,
     querySet, errorMessageListSet, errorMessageListAppend } from '../../redux/reducer';
 import { generateUrl } from '../../utils/queryStringUtils';
 import { getForecastRequest } from '../../utils/util';

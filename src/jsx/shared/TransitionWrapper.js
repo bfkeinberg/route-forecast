@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React, {useEffect,useState} from 'react';
+import * as Sentry from "@sentry/react";
 
 export const TransitionWrapper = ({diffData, children, transitionTime, transitionType, width}) => {
 
@@ -36,6 +37,7 @@ setTransitionState
       if (cachedRenderContent !== null) {
         setTransitionState("inactive")
         setTimeout(() => {
+          Sentry.addBreadcrumb({category:"No stack", level:"info", message:"TransitionWrapper"})
           setCachedRenderContent(children)
           setTransitionState("active")
         }, transitionTime * 1000 / 2)
@@ -90,6 +92,7 @@ setInitial
     setTeleporting(true)
     setPosition(translateOrigin)
     setTimeout(() => {
+      Sentry.addBreadcrumb({category:"No stack", level:"info", message:"TransitioningContent"})
       setTeleporting(false)
       setPosition(translateTarget)
     }, 0)

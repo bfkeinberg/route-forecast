@@ -30,12 +30,20 @@ const addBreadcrumb = (msg) => {
         message: msg
     })
 }
+
+const reloadPage = () => {
+    Sentry.addBreadcrumb({category:"No stack", level:"info", message:"reloadPage"})
+    if (window && window["location"] && window.location["reload"]) {
+        window.location.reload()
+    }
+}
+
 const LoadableDesktop = lazy(() => {addBreadcrumb('loading desktop UI'); return import( /* webpackChunkName: "DesktopUI" */'../DesktopUI').catch((error) => {
-    setTimeout(() => window.location.reload(), 5000);
+    setTimeout(() => reloadPage(), 5000);
     return { default: () => <div>{`Error ${error} loading the component. Window will reload in five seconds`}</div> };
 })})
 const LoadableMobile = lazy(() => {addBreadcrumb('loading mobile UI'); return import( /* webpackChunkName: "MobileUI" */'../MobileUI').catch((error) => {
-    setTimeout(() => window.location.reload(), 5000);
+    setTimeout(() => reloadPage(), 5000);
     return { default: () => <div>{`Error ${error} loading the component. Window will reload in five seconds`}</div> };
 })})
 

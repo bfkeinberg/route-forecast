@@ -15,6 +15,7 @@ setReady
   useEffect(() => {
     if (startCondition) {
       setTimeout(() => {
+        Sentry.addBreadcrumb({category:"No stack", level:"info", message:"useDelay"})
         setReady(true)
       }, delay)
     }
@@ -48,6 +49,7 @@ setRestartedAt
     }
     if (startCondition) {
       timeout.current = setTimeout(() => {
+        Sentry.addBreadcrumb({category:"No stack", level:"info", message:"useReusableDelay"})
         setReady(true)
         timeout.current = null
       }, delay)
