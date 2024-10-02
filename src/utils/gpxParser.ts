@@ -1,7 +1,7 @@
 let gpxParser = require('gpxparser')
 import { DateTime } from 'luxon';
 
-import {finishTimeFormat} from '../redux/reducer';
+import { finishTimeFormat } from '../jsx/ForecastSettings/TimeFields';
 import { inputPaceToSpeed, setMinMaxCoords } from './util';
 import {getPowerOrVelocity} from "./windUtils"
 import * as Sentry from "@sentry/browser"

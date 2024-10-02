@@ -7,7 +7,8 @@ import { DateTime } from 'luxon';
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 
-import {setStart, setTimeFromIso} from "../../redux/actions";
+import {setStart} from "../../redux/actions";
+import { setTimeFromIso } from "../../redux/actions_";
 import { initialStartTimeSet } from "../../redux/routeParamsSlice";
 import { DesktopTooltip } from '../shared/DesktopTooltip';
 import {useTranslation} from 'react-i18next'

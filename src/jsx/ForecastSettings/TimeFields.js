@@ -1,7 +1,7 @@
 import { DateTime } from "luxon";
-import * as React from "react";
 
-import { finishTimeFormat } from "../../redux/reducer.js";
+export const finishTimeFormat = 'EEE, MMM dd yyyy h:mma';
+
 import { useActualFinishTime, useForecastDependentValues } from '../../utils/hooks';
 import DateSelect from "./DateSelect";
 import {useTranslation} from 'react-i18next'

@@ -1,21 +1,38 @@
-import { createSlice } from '@reduxjs/toolkit'
+import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { reset } from './routeParamsSlice';
-export const finishTimeFormat = 'EEE, MMM dd yyyy h:mma';
+
+interface Params {
+    action: string
+    maps_api_key: string
+    timezone_api_key : string
+    bitly_token : string
+    queryString : string | null
+    searchString: string | null
+}
+
+const initialParams : Params = {
+    action: '',
+    maps_api_key: '',
+    timezone_api_key: '',
+    bitly_token: '',
+    queryString: null,
+    searchString: null
+}
 
 const paramsSlice = createSlice({
     name:'params',
-    initialState:{},
+    initialState: initialParams,
     reducers:{
-        actionUrlAdded(state, action) {
+        actionUrlAdded(state, action : PayloadAction<string>) {
             const url = action.payload
             state.action = url
         },
-        apiKeysSet(state, action) {
+        apiKeysSet(state, action:PayloadAction<{maps_api_key:string,timezone_api_key:string,bitly_token:string}>) {
             state.maps_api_key= action.payload.maps_api_key
             state.timezone_api_key = action.payload.timezone_api_key
             state.bitly_token = action.payload.bitly_token
         },
-        querySet(state, action) {
+        querySet(state, action : PayloadAction<{url:string, search:string}>) {
             const query = action.payload.url
             state.queryString = query
             state.searchString = action.payload.search

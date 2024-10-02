@@ -1,20 +1,29 @@
 import PropTypes from 'prop-types';
-import React, {useEffect,useState} from 'react';
+import { useEffect, useState } from 'react';
+import * as Sentry from "@sentry/react";
 
-export const TransitionWrapper = ({diffData, children, transitionTime, transitionType, width}) => {
+interface TransitionWrapperInput {
+  diffData: number
+  children: React.ReactNode
+  transitionTime: number
+  transitionType: string
+  width: number
+}
+
+export const TransitionWrapper = ({ diffData, children, transitionTime, transitionType, width }:TransitionWrapperInput) => {
 
   const [
-cachedRenderContent,
-setCachedRenderContent
-] = useState(null)
+    cachedRenderContent,
+    setCachedRenderContent
+  ] = useState<React.ReactNode>(null)
   const [
-currentData,
-setCurrentData
-] = useState(null)
+    currentData,
+    setCurrentData
+  ] = useState<number|null>(null)
   const [
-transitionState,
-setTransitionState
-] = useState("active")
+    transitionState,
+    setTransitionState
+  ] = useState<string>("active")
 
   // don't animate initial load or no-op re-renders
   useEffect(() => {
@@ -36,6 +45,7 @@ setTransitionState
       if (cachedRenderContent !== null) {
         setTransitionState("inactive")
         setTimeout(() => {
+          Sentry.addBreadcrumb({ category: "No stack", level: "info", message: "TransitionWrapper" })
           setCachedRenderContent(children)
           setTransitionState("active")
         }, transitionTime * 1000 / 2)
@@ -46,7 +56,7 @@ setTransitionState
   }, [diffData])
 
   return (
-    <div style={{overflow: "hidden"}}>
+    <div style={{ overflow: "hidden" }}>
       <TransitioningContent transitionTime={transitionTime} transitioning={transitionState === "inactive"} transitionType={transitionType} width={width}>
         {cachedRenderContent}
       </TransitioningContent>
@@ -54,31 +64,31 @@ setTransitionState
   );
 }
 
-TransitionWrapper.propTypes = {
-  diffData:PropTypes.number,
-  children:PropTypes.object,
-  transitionTime:PropTypes.number,
-  transitionType:PropTypes.string,
-  width:PropTypes.number
-};
+interface TransitionContentInput {
+  children: React.ReactNode
+  transitionTime: number
+  transitioning: boolean
+  transitionType: string
+  width: number
+}
 
-const TransitioningContent = ({children, transitionTime, transitioning, transitionType, width}) => {
+const TransitioningContent = ({ children, transitionTime, transitioning, transitionType, width }: TransitionContentInput) => {
   const translateOrigin = transitioning ? 0 : (transitionType === "slideRight" ? width * -1 : width)
   const translateTarget = transitioning ? width * (transitionType === "slideRight" ? 1 : -1) : 0
 
   const [
-position,
-setPosition
-] = useState(transitioning ? translateTarget : 0)
+    position,
+    setPosition
+  ] = useState(transitioning ? translateTarget : 0)
   const [
-teleporting,
-setTeleporting
-] = useState(false)
+    teleporting,
+    setTeleporting
+  ] = useState(false)
 
   const [
-initial,
-setInitial
-] = useState(transitioning)
+    initial,
+    setInitial
+  ] = useState<boolean|null>(transitioning)
 
   useEffect(() => {
     if (transitionType === "none" || initial === transitioning) {
@@ -90,6 +100,7 @@ setInitial
     setTeleporting(true)
     setPosition(translateOrigin)
     setTimeout(() => {
+      Sentry.addBreadcrumb({ category: "No stack", level: "info", message: "TransitioningContent" })
       setTeleporting(false)
       setPosition(translateTarget)
     }, 0)
@@ -98,12 +109,12 @@ setInitial
   const easingFunction = "cubic-bezier(.39,1.38,.78,1)"
 
   const wrapperStyle = transitionType !== undefined ?
-  {
-    transform: `translateX(${position}px)`,
-    // this below is very hacky but i don't care
-    transition: (teleporting && transitionType !== "slideLeftRight") ? "none" : `transform ${transitionTime / 2}s ${easingFunction}`
-  } :
-  {}
+    {
+      transform: `translateX(${position}px)`,
+      // this below is very hacky but i don't care
+      transition: (teleporting && transitionType !== "slideLeftRight") ? "none" : `transform ${transitionTime / 2}s ${easingFunction}`
+    } :
+    {}
 
   return (
     <div style={wrapperStyle}>
@@ -111,11 +122,3 @@ setInitial
     </div>
   )
 }
-
-TransitioningContent.propTypes = {
-  children:PropTypes.object,
-  transitionTime:PropTypes.number,
-  transitioning:PropTypes.bool,
-  transitionType:PropTypes.string,
-  width:PropTypes.number
-};

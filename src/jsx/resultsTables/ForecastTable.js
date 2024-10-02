@@ -14,7 +14,7 @@ import cookie from 'react-cookies';
 import {useDispatch,useSelector} from 'react-redux'
 import MediaQuery, {useMediaQuery} from 'react-responsive';
 import { maxWidthForMobile } from '../../utils/util';
-import {finishTimeFormat} from '../../redux/reducer';
+import { finishTimeFormat } from '../ForecastSettings/TimeFields';
 import { fetchAqiToggled, weatherRangeSet, weatherRangeToggled, zoomToRangeToggled, tableViewedSet } from '../../redux/forecastSlice';
 import { useForecastDependentValues, useFormatSpeed } from '../../utils/hooks';
 import { milesToMeters } from '../../utils/util';

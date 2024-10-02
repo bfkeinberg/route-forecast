@@ -25,6 +25,7 @@ const useDelay = (delay: number, startCondition = true) => {
   useEffect(() => {
     if (startCondition) {
       setTimeout(() => {
+        Sentry.addBreadcrumb({category:"No stack", level:"info", message:"useDelay"})
         setReady(true)
       }, delay)
     }
@@ -58,6 +59,7 @@ const useReusableDelay = <Type>(delay: number, startCondition = true) => {
     }
     if (startCondition) {
       timeout.current = setTimeout(() => {
+        Sentry.addBreadcrumb({category:"No stack", level:"info", message:"useReusableDelay"})
         setReady(true)
         timeout.current = null
       }, delay)

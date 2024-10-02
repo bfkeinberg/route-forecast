@@ -16,9 +16,7 @@ import {useTranslation} from 'react-i18next'
 import { stravaErrorSet } from "../../redux/dialogParamsSlice";
 import { usePinnedRoutesSet, rwgpsTokenSet } from "../../redux/rideWithGpsSlice";
 import { stravaActivitySet, stravaRefreshTokenSet, stravaRouteSet, stravaTokenSet } from "../../redux/stravaSlice";
-import {
-    actionUrlAdded, apiKeysSet, querySet
-} from "../../redux/reducer";
+import { apiKeysSet, querySet, actionUrlAdded } from "../../redux/paramsSlice";
 import { fetchAqiSet, zoomToRangeSet } from "../../redux/forecastSlice";
 import { stopAfterLoadSet, rusaPermRouteIdSet, routeLoadingModeSet, startTimestampSet, rwgpsRouteSet, reset } from "../../redux/routeParamsSlice";
 import { metricSet, displayControlTableUiSet } from "../../redux/controlsSlice";
@@ -31,20 +29,26 @@ const addBreadcrumb = (msg) => {
         message: msg
     })
 }
+const reloadPage = () => {
+    Sentry.addBreadcrumb({category:"No stack", level:"info", message:"reloadPage"})
+    if (window && window["location"] && window.location["reload"]) {
+        window.location.reload()
+    }
+}
+
 const LoadableDesktop = lazy(() => {addBreadcrumb('loading desktop UI'); return import( /* webpackChunkName: "DesktopUI" */'../DesktopUI').catch((error) => {
-    setTimeout(() => window.location.reload(), 5000);
+    setTimeout(() => reloadPage(), 5000);
     return { default: () => <div>{`Error ${error} loading the component. Window will reload in five seconds`}</div> };
 })})
 const LoadableMobile = lazy(() => {addBreadcrumb('loading mobile UI'); return import( /* webpackChunkName: "MobileUI" */'../MobileUI').catch((error) => {
-    setTimeout(() => window.location.reload(), 5000);
+    setTimeout(() => reloadPage(), 5000);
     return { default: () => <div>{`Error ${error} loading the component. Window will reload in five seconds`}</div> };
 })})
 
 import { routeLoadingModes } from '../../data/enums';
+import { loadCookie, saveCookie } from "../../utils/util";
 import {
-    loadCookie,
     loadRouteFromURL,
-    saveCookie,
     setInterval,
     setWeatherProvider,
     updateUserControls,

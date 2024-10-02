@@ -4,7 +4,7 @@ import { Button, FormGroup, MenuItem } from "@blueprintjs/core";
 import { Select, ItemRenderer } from "@blueprintjs/select";
 import {connect, ConnectedProps} from 'react-redux';
 
-import {saveCookie} from "../../redux/actions";
+import { saveCookie } from "../../utils/util";
 import { setPace } from "../../redux/actions_";
 import { useActualPace, useFormatSpeed } from '../../utils/hooks';
 import { inputPaceToSpeed, metricPaceToSpeed, paceToSpeed } from '../../utils/util';

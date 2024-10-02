@@ -1,4 +1,5 @@
 import { DateTime } from 'luxon';
+import cookie from 'react-cookies';
 
 import gpxParser from "./gpxParser";
 import type {ControlsState, UserControl} from '../redux/controlsSlice'
@@ -170,3 +171,14 @@ export const getRouteNumberFromValue = (value : string) => {
   return value;
 }
 
+const sanitizeCookieName = (cookieName : string) => {
+  return encodeURIComponent(cookieName.replace(/[ =/]/,''));
+};
+
+export const saveCookie = (name : string,value : string) => {
+      cookie.save(sanitizeCookieName(name),value,{maxAge:60*60*24*7});
+};
+
+export const loadCookie = (name : string) => {
+  return cookie.load(sanitizeCookieName(name));
+};

@@ -7,9 +7,9 @@ import {connect, useDispatch, useSelector} from 'react-redux';
 import { useMediaQuery } from 'react-responsive';
 
 import { shortenUrl, msgFromError } from "../../redux/actions";
-import { useGetAqiMutation } from '../../redux/forecastApiSlice';
+import { useForecastMutation, useGetAqiMutation } from '../../redux/forecastApiSlice';
 import { forecastFetched, forecastAppended } from '../../redux/forecastSlice';
-import { querySet } from '../../redux/reducer';
+import { querySet } from '../../redux/paramsSlice';
 import { forecastFetchBegun, forecastFetchFailed } from '../../redux/dialogParamsSlice';
 import { errorMessageListSet, errorMessageListAppend } from '../../redux/dialogParamsSlice';
 import { generateUrl } from '../../utils/queryStringUtils';
@@ -168,7 +168,7 @@ const ForecastButton = ({fetchingForecast,submitDisabled, routeNumber, startTime
             dispatch(errorMessageListAppend(aqiResults.filter(result => result.status === 'rejected').map(result => msgFromError(result))))
         // })
         const url = generateUrl(startTimestamp, routeNumber, pace, interval, metric, controls,
-            strava_activity, strava_route, provider, origin, true, dispatch, zone, rusaRouteId)
+            strava_activity, strava_route, provider, origin, true, zone, rusaRouteId)
         querySet({url:url.url,search:url.search})
         Sentry.setContext("query", {queryString:url.search})
         // don't shorten localhost with bitly

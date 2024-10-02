@@ -1,4 +1,4 @@
-export const newton = function(aero, hw, tr, tran, p)  {        /* Newton's method */
+export const newton = function(aero : number, hw : number, tr : number, tran : number, p : number)  {        /* Newton's method */
     var vel = 20;       // Initial guess
     var MAX = 10;       // maximum iterations
     var TOL = 0.05;     // tolerance
@@ -29,7 +29,7 @@ const aeroValues = [
     0.200
 ];
 
-export const getPowerOrVelocity = function(distance, elevation, grade, headwind, power, speed) {
+export const getPowerOrVelocity = function(distance : number, elevation : number, grade : number, headwind : number, power : number|undefined, speed : number) {
     // all done in metric units, JIT conversion to/from
     // but velocity returned in mph
 

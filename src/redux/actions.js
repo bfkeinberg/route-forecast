@@ -1,6 +1,5 @@
 import * as Sentry from "@sentry/react";
 import queryString from 'query-string'
-import cookie from 'react-cookies';
 import ReactGA from "react-ga4";
 
 import { updateHistory } from "../jsx/app/updateHistory";
@@ -12,7 +11,7 @@ import { routeLoadingBegun, errorDetailsSet, errorMessageListSet, forecastFetchB
     forecastFetchCanceled, forecastFetchFailed, gpxRouteLoadingFailed,
      shortUrlSet, rwgpsRouteLoadingFailed } from "./dialogParamsSlice";
 import { weatherProviderSet, forecastAppended, forecastFetched, forecastInvalidated } from "./forecastSlice";
-import { timeZoneSet, intervalSet, startTimeSet, initialStartTimeSet } from "./routeParamsSlice"
+import { timeZoneSet, intervalSet, startTimeSet } from "./routeParamsSlice"
 import { loadingFromUrlSet, gpxRouteLoaded, rwgpsRouteLoaded } from "./routeInfoSlice";
 import { displayControlTableUiSet, userControlsUpdated } from "./controlsSlice";
 export const componentLoader = (lazyComponent, attemptsLeft) => {
@@ -23,6 +22,7 @@ export const componentLoader = (lazyComponent, attemptsLeft) => {
             .catch((error)=>{
                 // let us retry after 1500 ms
                 setTimeout(() => {
+                    Sentry.addBreadcrumb({category:"No stack", level:"info", message:"componentLoader"})
                     if (attemptsLeft === 1) {
                         // instead of rejecting reload the window
                         Sentry.captureException(error);
@@ -39,19 +39,7 @@ export const componentLoader = (lazyComponent, attemptsLeft) => {
 
 let fetchAbortMethod = null;
 
-const sanitizeCookieName = (cookieName) => {
-    return encodeURIComponent(cookieName.replace(/[ =/]/,''));
-};
-
-export const saveCookie = (name,value) => {
-        cookie.save(sanitizeCookieName(name),value,{maxAge:60*60*24*7});
-};
-
-export const loadCookie = (name) => {
-    return cookie.load(sanitizeCookieName(name));
-};
-
-const cancelForecast = () => {
+export const cancelForecast = () => {
     return function(dispatch) {
         const cancel = fetchAbortMethod
         if (cancel !== null) {
@@ -60,13 +48,6 @@ const cancelForecast = () => {
         dispatch(forecastInvalidated())
     }
 };
-
-export const setTimeFromIso = (startAsIso,zone) => {
-    return function(dispatch) {
-        dispatch(initialStartTimeSet({start:startAsIso,zone:zone}))
-        dispatch(forecastInvalidated())
-    }
-}
 
 export const setStart = function (start) {
     return function(dispatch) {
@@ -91,16 +72,6 @@ export const setInterval = function (interval) {
 
     const parser = await componentLoader(import(/* webpackChunkName: "RwgpsParser" */ '../utils/gpxParser'), 5);
     return parser.default;
-};
-
-const getRouteName = function(routeData) {
-    if (routeData.route !== undefined) {
-        return routeData.route.name;
-    } else if (routeData.trip !== undefined) {
-        return routeData.trip.name;
-    } else {
-        return null;
-    }
 };
 
 const getRouteDistanceInKm = function(routeData) {
