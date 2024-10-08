@@ -2,6 +2,7 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { pinnedRoutesSet } from './rideWithGpsSlice'
 import { rwgpsRouteLoaded, gpxRouteLoaded } from './routeInfoSlice'
 import { stravaFetched, stravaFetchFailed } from './stravaSlice'
+import { act } from 'react'
 
 interface ErrorMessage {
     message:string
@@ -53,7 +54,7 @@ const dialogParamsInitialState : DialogParams = {
     fetchingRoute: false
 }
 
-type ErrorPayload = Error|ErrorDetails
+export type ErrorPayload = Error|ErrorDetails|string
 
 const dialogParamsSlice = createSlice({
     name: 'dialogParams',
@@ -87,6 +88,8 @@ const dialogParamsSlice = createSlice({
             if (action.payload instanceof Error) {
                 state.errorDetails = action.payload.toString()
             } else if (!action.payload) {
+                state.errorDetails = action.payload
+            } else if (typeof action.payload === "string") {
                 state.errorDetails = action.payload
             } else if (action.payload.data) {
                 state.errorDetails = action.payload.data.details

@@ -1,7 +1,14 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 
+export interface Favorite {
+    name: string
+    id: number
+    associated_object_id: string
+    associated_object_type: string
+}
+
 interface RideWithGpsInfoState {
-    pinnedRoutes:Array<string>
+    pinnedRoutes:Array<Favorite>
     token:string|null
     usePinnedRoutes:boolean
     loadingRoutes:boolean
@@ -15,10 +22,10 @@ const rideWithGpsInfoSlice = createSlice({
     name: 'rideWithGpsInfo',
     initialState : rideWithGpsInfoInitialState,
     reducers: {
-        rwgpsTokenSet(state, action : PayloadAction<string>) {
+        rwgpsTokenSet(state, action : PayloadAction<string|null>) {
             state.token = action.payload
         },
-        pinnedRoutesSet(state, action:PayloadAction<Array<string>>) {
+        pinnedRoutesSet(state, action:PayloadAction<Array<Favorite>>) {
             state.pinnedRoutes = action.payload
         },
         loadingPinnedSet(state, action:PayloadAction<boolean>) {

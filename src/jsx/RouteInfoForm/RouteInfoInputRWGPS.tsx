@@ -1,21 +1,21 @@
 
 import { Button,Intent } from '@blueprintjs/core';
-import React, { useRef,useState } from 'react';
-import { useDispatch,useSelector } from 'react-redux';
+import { useRef,useState } from 'react';
 
-import { loadFromRideWithGps } from '../../redux/actions';
-import ErrorBoundary from "../shared/ErrorBoundary";
-import PinnedRouteLoader from './PinnedRouteLoader.jsx';
-import RideWithGpsId from './RideWithGpsId';
+import { loadFromRideWithGps } from '../../redux/actions.js';
+import ErrorBoundary from "../shared/ErrorBoundary.js";
+import PinnedRouteLoader from './PinnedRouteLoader';
+import RideWithGpsId from './RideWithGpsId.js';
 import {useTranslation} from 'react-i18next'
-
+import type { RefObject } from 'react';
+import { useAppSelector, useAppDispatch } from '../../utils/hooks.js';
 export const RouteInfoInputRWGPS = () => {
-  const usingPinnedRoutes = useSelector(state => state.rideWithGpsInfo.usePinnedRoutes)
+  const usingPinnedRoutes = useAppSelector(state => state.rideWithGpsInfo.usePinnedRoutes)
   const [
 showPinnedRoutes,
 setShowPinnedRoutes
-] = useState(usingPinnedRoutes)
-  const loadButtonRef = useRef(null)
+] = useState<boolean>(usingPinnedRoutes)
+  const loadButtonRef = useRef<HTMLButtonElement>(null)
 
   return (
     <>
@@ -42,12 +42,12 @@ null :
 }
 
 // eslint-disable-next-line react/prop-types
-const RWGPSLoadRouteButton = ({loadButtonRef}) => {
+const RWGPSLoadRouteButton = ({loadButtonRef}:{loadButtonRef:RefObject<HTMLButtonElement>}) => {
   const { t } = useTranslation()
-  const loading = useSelector(state => state.uiInfo.dialogParams.fetchingRoute)
-  const hasRwgpsRouteId = useSelector(state => state.uiInfo.routeParams.rwgpsRoute!=='')
-  const hasStravaRouteId = useSelector(state => state.strava.route!=='')
-  const dispatch = useDispatch()
+  const loading = useAppSelector(state => state.uiInfo.dialogParams.fetchingRoute)
+  const hasRwgpsRouteId = useAppSelector(state => state.uiInfo.routeParams.rwgpsRoute!=='')
+  const hasStravaRouteId = useAppSelector(state => state.strava.route!=='')
+  const dispatch = useAppDispatch()
   return (
     <Button ref={loadButtonRef} intent={Intent.PRIMARY} disabled={loading || (!hasRwgpsRouteId && !hasStravaRouteId)}
       fill loading={loading} onClick={() => dispatch(loadFromRideWithGps())}>

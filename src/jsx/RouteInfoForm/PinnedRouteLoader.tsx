@@ -1,16 +1,18 @@
 import { Button, Spinner } from '@blueprintjs/core';
 import * as Sentry from "@sentry/react";
 import axios from 'axios';
-import PropTypes from 'prop-types';
 import queryString from 'query-string';
-import {Suspense, useEffect, lazy} from 'react';
+import {Suspense, useEffect, lazy, SetStateAction, Dispatch, ComponentType} from 'react';
 import ReactGA from "react-ga4";
-import {connect} from 'react-redux';
+import {connect, ConnectedProps} from 'react-redux';
 import {useTranslation} from 'react-i18next'
-import { loadingPinnedSet, pinnedRoutesSet, rwgpsTokenSet, usePinnedRoutesSet } from '../../redux/rideWithGpsSlice';
+import { Favorite, loadingPinnedSet, pinnedRoutesSet, rwgpsTokenSet, usePinnedRoutesSet } from '../../redux/rideWithGpsSlice';
 import { errorDetailsSet } from '../../redux/dialogParamsSlice';
+import type { ErrorPayload } from '../../redux/dialogParamsSlice';
+import { RootState } from '../app/topLevel';
+import { ActionCreatorWithPayload } from '@reduxjs/toolkit';
 
-const addBreadcrumb = (msg) => {
+const addBreadcrumb = (msg : string) => {
     Sentry.addBreadcrumb({
         category: 'loading',
         level: "info",
@@ -18,20 +20,25 @@ const addBreadcrumb = (msg) => {
     })
 }
 
-const LoadableRouteList = lazy(() => {addBreadcrumb('loading route list'); return import(/* webpackChunkName: "RouteList" */ './RWGPSRouteList').catch((err) => {
+type PropsFromRedux = ConnectedProps<typeof connector>
+type RouteListType = Promise<typeof import(/* webpackChunkName: "RouteList" */ './RWGPSRouteList')>
+type DynamicRouteListType = RouteListType | Promise<{default:() => JSX.Element}>
+const LoadableRouteList = lazy(() : DynamicRouteListType => {addBreadcrumb('loading route list'); return import(/* webpackChunkName: "RouteList" */ './RWGPSRouteList').catch((err) => {
     addBreadcrumb(`failed to load pinned routes : ${JSON.stringify(err)}`)
     return {default: () => <div>Failed to load pinned route list - {err.message}</div>}
 })
 
 });
 
-const getPinnedRoutes = async (rwgpsToken, setErrorDetails, rwgpsTokenSet) => {
+const getPinnedRoutes = async (rwgpsToken : string, 
+    setErrorDetails : ActionCreatorWithPayload<ErrorPayload, "dialogParams/errorDetailsSet">, 
+    rwgpsTokenSet : ActionCreatorWithPayload<string|null, "rideWithGpsInfo/rwgpsTokenSet">,) => {
 
     const url = `/pinned_routes?token=${rwgpsToken}`;
     try {
         const response = await axios.get(url);
         return response.data;
-    } catch (e) {
+    } catch (e : any) {
         Sentry.captureException(e)
         const errorMessage = e.response ? (e.response.data ? JSON.stringify(e.response.data) : JSON.stringify(e.response)) : e
         setErrorDetails(`Ride with GPS login failure: ${errorMessage}`);
@@ -40,7 +47,10 @@ const getPinnedRoutes = async (rwgpsToken, setErrorDetails, rwgpsTokenSet) => {
     }
 }
 
-const setRoutes = async (rwgpsToken, setRwgpsToken, setError, setPinnedRoutes, setLoadingPinned, usingPinnedRoutes, hasRoutes) => {
+const setRoutes = async (rwgpsToken : string|null|undefined, setRwgpsToken : ActionCreatorWithPayload<string|null, "rideWithGpsInfo/rwgpsTokenSet">,
+    setError : ActionCreatorWithPayload<ErrorPayload, "dialogParams/errorDetailsSet">,
+    setPinnedRoutes : ActionCreatorWithPayload<Array<Favorite>, "rideWithGpsInfo/pinnedRoutesSet">, 
+    setLoadingPinned : ActionCreatorWithPayload<boolean, "rideWithGpsInfo/loadingPinnedSet">, usingPinnedRoutes : boolean, hasRoutes : boolean) => {
     if (rwgpsToken === '' || !rwgpsToken || rwgpsToken===undefined || !usingPinnedRoutes || hasRoutes) {
         return null;
     }
@@ -52,7 +62,8 @@ const setRoutes = async (rwgpsToken, setRwgpsToken, setError, setPinnedRoutes, s
     setLoadingPinned(false);
 }
 
-const togglePinnedRoutes = (setUsePinnedRoutes, setShowPinnedRoutes, usingPinnedRoutes) => {
+const togglePinnedRoutes = (setUsePinnedRoutes : ActionCreatorWithPayload<boolean>, 
+    setShowPinnedRoutes : Dispatch<SetStateAction<boolean>>, usingPinnedRoutes : boolean) => {
     // if usingPinnedRoutes is false then we're about to turn it on
     if (!usingPinnedRoutes) {
         ReactGA.event('join_group', {group_id:'pinned_routes'});
@@ -61,7 +72,14 @@ const togglePinnedRoutes = (setUsePinnedRoutes, setShowPinnedRoutes, usingPinned
     setShowPinnedRoutes(!usingPinnedRoutes);
 };
 
-const PinnedRouteLoader = ({rwgpsToken, rwgpsTokenSet, credentialsValid, pinnedRoutesSet, errorDetailsSet, hasRoutes, loadingPinnedRoutes, loadingPinnedSet, usePinnedRoutesSet, setShowPinnedRoutes, usingPinnedRoutes}) => {
+interface PinnedRouteProps extends PropsFromRedux {
+    showPinnedRoutes:boolean,
+    setShowPinnedRoutes: Dispatch<SetStateAction<boolean>>
+}
+
+const PinnedRouteLoader = ({rwgpsToken, rwgpsTokenSet, credentialsValid, 
+    pinnedRoutesSet, errorDetailsSet, hasRoutes, loadingPinnedRoutes, loadingPinnedSet, 
+    usePinnedRoutesSet, setShowPinnedRoutes, usingPinnedRoutes} : PinnedRouteProps) => {
     useEffect(() => {if (usingPinnedRoutes && (!rwgpsToken || rwgpsToken===undefined)) {window.location.href = `/rwgpsAuthReq?state=${JSON.stringify(queryString.parse(location.search))}`}}, [
         usingPinnedRoutes,
          credentialsValid
@@ -73,7 +91,7 @@ const PinnedRouteLoader = ({rwgpsToken, rwgpsTokenSet, credentialsValid, pinnedR
         usingPinnedRoutes
     ])
     const { t } = useTranslation()
-    let button_class = usingPinnedRoutes ? null : 'glowing_input'
+    let button_class = usingPinnedRoutes ? undefined : 'glowing_input'
     Sentry.addBreadcrumb({
         category: 'load',
         level: 'info',
@@ -109,24 +127,9 @@ const PinnedRouteLoader = ({rwgpsToken, rwgpsTokenSet, credentialsValid, pinnedR
     )
 };
 
-PinnedRouteLoader.propTypes = {
-    rwgpsToken:PropTypes.string,
-    credentialsValid:PropTypes.bool.isRequired,
-    pinnedRoutesSet:PropTypes.func.isRequired,
-    errorDetailsSet:PropTypes.func.isRequired,
-    rwgpsTokenSet:PropTypes.func.isRequired,
-    hasRoutes:PropTypes.bool.isRequired,
-    loadingPinnedRoutes:PropTypes.bool.isRequired,
-    loadingPinnedSet:PropTypes.func.isRequired,
-    showPinnedRoutes:PropTypes.bool.isRequired,
-    usePinnedRoutesSet:PropTypes.func.isRequired,
-    usingPinnedRoutes:PropTypes.bool.isRequired,
-    setShowPinnedRoutes:PropTypes.func.isRequired
-};
+const isValid = (field : string|null|undefined) => {return (field !== undefined && field !== null && field !== '')};
 
-const isValid = (field) => {return (field !== undefined && field !== null && field !== '')};
-
-const mapStateToProps = (state) =>
+const mapStateToProps = (state : RootState) =>
 ({
     rwgpsToken:state.rideWithGpsInfo.token,
     credentialsValid:isValid(state.rideWithGpsInfo.token),
@@ -139,4 +142,5 @@ const mapDispatchToProps = {
     pinnedRoutesSet, errorDetailsSet, loadingPinnedSet, usePinnedRoutesSet, rwgpsTokenSet
 };
 
-export default connect(mapStateToProps,mapDispatchToProps)(PinnedRouteLoader);
+const connector = connect(mapStateToProps,mapDispatchToProps)
+export default connector(PinnedRouteLoader);
