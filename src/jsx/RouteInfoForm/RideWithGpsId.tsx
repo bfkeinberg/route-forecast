@@ -1,12 +1,13 @@
 import {Button,FormGroup, InputGroup} from '@blueprintjs/core';
-import PropTypes from 'prop-types';
-import {connect} from 'react-redux';
+import {connect, ConnectedProps} from 'react-redux';
 import {useTranslation} from 'react-i18next'
 import * as Sentry from "@sentry/react";
 import { routeDataCleared} from '../../redux/routeInfoSlice';
 import { rwgpsRouteSet } from '../../redux/routeParamsSlice';
+import { RootState } from '../app/topLevel';
+import { RefObject } from 'react';
 
-export const decideValidationStateFor = (type, methodUsed, loadingSuccess) => {
+export const decideValidationStateFor = (type : string, methodUsed : string|null, loadingSuccess : boolean) => {
     if (type === methodUsed) {
         if (loadingSuccess) {
             return {'valid':null};
@@ -18,16 +19,21 @@ export const decideValidationStateFor = (type, methodUsed, loadingSuccess) => {
     }
 }
 
-const RideWithGpsId = ({rwgpsRouteSet,loadingSource,loadingSuccess,rwgpsRoute,routeDataCleared,loadButtonRef}) => {
+type PropsFromRedux = ConnectedProps<typeof connector>
+interface RideWithGpsIdProps extends PropsFromRedux {
+    loadButtonRef:RefObject<HTMLButtonElement>
+}
+
+const RideWithGpsId = ({rwgpsRouteSet,loadingSource,loadingSuccess,rwgpsRoute,routeDataCleared,loadButtonRef} : RideWithGpsIdProps) => {
     const { t } = useTranslation()
-    const isNumberKey = function(event) {
+    const isNumberKey = function(event:React.KeyboardEvent<HTMLInputElement>) {
         const charCode = (event.which) ? event.which : event.keyCode;
-        if (charCode === 13) {
+        if (charCode === 13 && loadButtonRef.current) {
             loadButtonRef.current.click()
         }
     };
 
-    const settingRoute = (route) => {
+    const settingRoute = (route : string) => {
         rwgpsRouteSet(route);
         routeDataCleared();
     };
@@ -40,7 +46,7 @@ const RideWithGpsId = ({rwgpsRouteSet,loadingSource,loadingSuccess,rwgpsRoute,ro
         // set size to keep Mobile Safari from zooming
         <FormGroup inline={false} label={<span style={{fontSize:"90%"}} ><b>{t('titles.rwgpsId')}</b></span>} labelFor={'rwgps_route'} >
             <InputGroup id={'rwgps_route'} style={{fontSize:"16px"}} className={'glowing_input'} autoComplete='on'
-                   autoFocus tabIndex='0' type="text" rightElement={<Button minimal icon="delete" onClick={clearRoute}></Button>}
+                   autoFocus tabIndex={0} type="text" rightElement={<Button minimal icon="delete" onClick={clearRoute}></Button>}
                    {...decideValidationStateFor('rwgps',loadingSource,loadingSuccess)}
                  onKeyDown={isNumberKey}
                  onValueChange={settingRoute}
@@ -78,22 +84,7 @@ const RideWithGpsId = ({rwgpsRouteSet,loadingSource,loadingSuccess,rwgpsRoute,ro
     );
 };
 
-RideWithGpsId.propTypes = {
-    loadingSource:PropTypes.string,
-    rwgpsRouteSet:PropTypes.func.isRequired,
-    routeDataCleared:PropTypes.func.isRequired,
-    loadingSuccess:PropTypes.bool,
-    rwgpsRoute:PropTypes.oneOfType([
-        PropTypes.number,
-        PropTypes.string
-    ]),
-    loadButtonRef:PropTypes.oneOfType([
-        PropTypes.func,
-        PropTypes.shape({ current: PropTypes.instanceOf(Object) })
-    ])
-};
-
-const mapStateToProps = (state) =>
+const mapStateToProps = (state : RootState) =>
     ({
         loadingSource: state.uiInfo.dialogParams.loadingSource,
         loadingSuccess: state.uiInfo.dialogParams.succeeded,
@@ -104,4 +95,5 @@ const mapDispatchToProps = {
     rwgpsRouteSet, routeDataCleared
 };
 
-export default connect(mapStateToProps,mapDispatchToProps)(RideWithGpsId);
+const connector = connect(mapStateToProps,mapDispatchToProps)
+export default connector(RideWithGpsId);

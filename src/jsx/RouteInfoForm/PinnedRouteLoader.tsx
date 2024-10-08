@@ -2,7 +2,7 @@ import { Button, Spinner } from '@blueprintjs/core';
 import * as Sentry from "@sentry/react";
 import axios from 'axios';
 import queryString from 'query-string';
-import {Suspense, useEffect, lazy, SetStateAction, Dispatch, ComponentType} from 'react';
+import {Suspense, useEffect, lazy, SetStateAction, Dispatch} from 'react';
 import ReactGA from "react-ga4";
 import {connect, ConnectedProps} from 'react-redux';
 import {useTranslation} from 'react-i18next'

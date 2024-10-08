@@ -5,7 +5,7 @@ import { useRef,useState } from 'react';
 import { loadFromRideWithGps } from '../../redux/actions.js';
 import ErrorBoundary from "../shared/ErrorBoundary.js";
 import PinnedRouteLoader from './PinnedRouteLoader';
-import RideWithGpsId from './RideWithGpsId.js';
+import RideWithGpsId from './RideWithGpsId';
 import {useTranslation} from 'react-i18next'
 import type { RefObject } from 'react';
 import { useAppSelector, useAppDispatch } from '../../utils/hooks.js';
