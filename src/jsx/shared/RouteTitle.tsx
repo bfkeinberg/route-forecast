@@ -1,7 +1,12 @@
 import { useMediaQuery } from "react-responsive";
 import { useAppSelector } from "../../utils/hooks";
 
-export const RouteTitle = ({style, className}:{style:{},className:string}) => {
+interface RouteTitleProps {
+  style?: {}
+  className? : string
+}
+
+export const RouteTitle = ({style, className}: RouteTitleProps) => {
   const titleFont = useMediaQuery({ query: '(min-width: 1300px)' }) ? "20px" : "15px"
   const routeName = useAppSelector(state => state.routeInfo.name || (state.strava.activityData && state.strava.activityData.name))
 

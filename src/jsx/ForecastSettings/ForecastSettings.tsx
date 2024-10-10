@@ -19,13 +19,15 @@ import WeatherProviderSelector from "./WeatherProviderSelector"
 import Segment from './Segment'
 import i18n from '../app/i18n';
 
+import { useAppSelector, useAppDispatch } from '../../utils/hooks';
+
 export const ForecastSettings = () => {
-    const metric = useSelector(state => state.controls.metric)
-    const celsius = useSelector(state => state.controls.celsius)
-    const dispatch = useDispatch()
-    const errorDetails = useSelector(state => state.uiInfo.dialogParams.errorDetails)
+    const metric = useAppSelector(state => state.controls.metric)
+    const celsius = useAppSelector(state => state.controls.celsius)
+    const dispatch = useAppDispatch()
+    const errorDetails = useAppSelector(state => state.uiInfo.dialogParams.errorDetails)
     const { t } = useTranslation()
-    const showControlPoints = useSelector(state => state.controls.displayControlTableUI)
+    const showControlPoints = useAppSelector(state => state.controls.displayControlTableUI)
     const setShowControlPoints = () => { ReactGA.event('select_content', { content_type: 'controls' });return dispatch(displayControlTableUiSet(!showControlPoints)) }
     const onDesktop = useMediaQuery({query:`(min-width: ${maxWidthForMobile})`})
     return (
@@ -66,7 +68,7 @@ export const ForecastSettings = () => {
                     </LocationContext.Consumer>
                 </div>
             </div>
-            <ToggleButtonOpaque icon={"chevron-down"} active={showControlPoints} onClick={() => {setShowControlPoints(!showControlPoints)}}>{t('buttons.stops')}</ToggleButtonOpaque>
+            <ToggleButtonOpaque icon={"chevron-down"} active={showControlPoints} onClick={() => {setShowControlPoints()}}>{t('buttons.stops')}</ToggleButtonOpaque>
             {showControlPoints && <ControlTableContainer />}
         </div>
     )

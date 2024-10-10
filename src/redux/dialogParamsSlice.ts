@@ -54,7 +54,7 @@ const dialogParamsInitialState : DialogParams = {
     fetchingRoute: false
 }
 
-export type ErrorPayload = Error|ErrorDetails|string
+export type ErrorPayload = Error|ErrorDetails|string|null
 
 const dialogParamsSlice = createSlice({
     name: 'dialogParams',

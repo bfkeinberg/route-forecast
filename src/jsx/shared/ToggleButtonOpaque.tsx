@@ -1,8 +1,17 @@
-import { Button,Icon } from "@blueprintjs/core";
+import { Button,Icon, MaybeElement } from "@blueprintjs/core";
+import { BlueprintIcons_16Id } from "@blueprintjs/icons/lib/esm/generated/16px/blueprint-icons-16";
 import PropTypes from 'prop-types';
-import * as React from "react";
+import { ReactNode } from "react";
 
-export const ToggleButtonOpaque = ({children, active, onClick, icon = null, style = {}}) => {
+interface ToggleButtonOpaqueProps {
+  children: ReactNode
+  active: boolean
+  onClick: React.MouseEventHandler
+  icon: BlueprintIcons_16Id | MaybeElement | null
+  style?: {}
+}
+
+export const ToggleButtonOpaque = ({children, active, onClick, icon = null, style = {}} : ToggleButtonOpaqueProps) => {
 
   return (
     <Button style={{border: "1px solid #6c757d80", display: "flex", alignItems: "center", justifyContent: "center", ...style}} onClick={onClick} intent={active ? "none" : "primary"} small={true}>
