@@ -31,7 +31,7 @@ const bannedActionKeys = [
 export default function configureReduxStore(preloadedState, mode) {
     const sentryReduxEnhancer = Sentry.createReduxEnhancer({
         actionTransformer: action => {
-            if (action.type === 'paramsSlice/apiKeysSet') {
+            if (action.type === 'params/apiKeysSet') {
                 // Return null to not log the action to Sentry
                 return null;
             }
