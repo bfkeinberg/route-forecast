@@ -25,7 +25,9 @@ const LoadableRouteList = lazy(() => {addBreadcrumb('loading route list'); retur
 });
 
 const getPinnedRoutes = async (rwgpsToken, setErrorDetails, rwgpsTokenSet) => {
-
+    if (rwgpsToken === undefined) {
+        return null
+    }
     const url = `/pinned_routes?token=${rwgpsToken}`;
     try {
         const response = await axios.get(url);
