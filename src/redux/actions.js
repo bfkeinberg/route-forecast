@@ -339,8 +339,10 @@ export const loadRouteFromURL = (forecastFunc, aqiFunc) => {
         await dispatch(loadingFromUrlSet(true))
         if (getState().uiInfo.routeParams.rwgpsRoute !== '') {
             await dispatch(loadFromRideWithGps())
-        } else {
+        } else if (getState().strava.route !== '') {
             await dispatch(loadStravaRoute())
+        } else if (getState().uiInfo.routeParams.rusaPermRouteId !== '') {
+            
         }
         const error = getState().uiInfo.dialogParams.errorDetails
         if (getState().uiInfo.routeParams.stopAfterLoad) {

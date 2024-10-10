@@ -1,13 +1,19 @@
 import { FormGroup,InputGroup } from '@blueprintjs/core'
-import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
+import { connect, ConnectedProps } from 'react-redux';
 
 import { stravaActivitySet } from '../../redux/stravaSlice';
-
-const StravaActivityIdInput = ({ stravaActivitySet, strava_activity, canAnalyze }) => {
+import { ActionCreatorWithPayload } from '@reduxjs/toolkit';
+import { RootState } from '../app/topLevel';
+type StravaActivityIdProps = {
+    canAnalyze: boolean
+    strava_activity: string
+    stravaActivitySet: ActionCreatorWithPayload<string, "strava/stravaActivitySet">
+}
+type PropsFromRedux = ConnectedProps<typeof connector>
+const StravaActivityIdInput = ({ stravaActivitySet, strava_activity, canAnalyze } : StravaActivityIdProps) => {
     return (
         <FormGroup label={<span><b>Strava Activity Id</b></span>} labelFor={"stravaActivity"}>
-            <InputGroup style={{fontSize:"16px"}} autoFocus id='stravaActivity' tabIndex='0' type="text"
+            <InputGroup style={{fontSize:"16px"}} autoFocus id='stravaActivity' tabIndex={0} type="text"
                 onDrop={event => {
                     let dt = event.dataTransfer;
                     if (dt.items) {
@@ -54,17 +60,7 @@ const StravaActivityIdInput = ({ stravaActivitySet, strava_activity, canAnalyze 
     );
 };
 
-StravaActivityIdInput.propTypes = {
-    strava_activity:PropTypes.oneOfType([
-        PropTypes.number,
-        PropTypes.string,
-        PropTypes.oneOf([''])
-    ]).isRequired,
-    stravaActivitySet:PropTypes.func.isRequired,
-    canAnalyze:PropTypes.bool.isRequired
-};
-
-const mapStateToProps = (state) =>
+const mapStateToProps = (state : RootState) =>
     ({
         strava_activity: state.strava.activity,
         canAnalyze: state.strava.activity !== '' && state.strava.access_token != null
@@ -74,4 +70,5 @@ const mapDispatchToProps = {
     stravaActivitySet
 };
 
-export default connect(mapStateToProps,mapDispatchToProps)(StravaActivityIdInput);
+const connector = connect(mapStateToProps,mapDispatchToProps)
+export default connector(StravaActivityIdInput);

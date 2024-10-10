@@ -1,28 +1,27 @@
 
 import { Button } from '@blueprintjs/core';
 import stravaImage from 'Images/api_logo_pwrdBy_strava_stack_light.png';
-import * as React from 'react';
 import ReactGA from "react-ga4";
-import { useDispatch,useSelector } from 'react-redux';
 
 import { loadStravaActivity, loadStravaRoute } from "../../redux/actions";
 import stravaRouteParser from '../../utils/stravaRouteParser';
 import ErrorBoundary from '../shared/ErrorBoundary';
 import StravaActivityIdInput from './StravaActivityIdInput';
 import StravaRouteIdInput from './StravaRouteIdInput';
+import { useAppSelector, useAppDispatch } from '../../utils/hooks';
 
 export const RouteInfoInputStrava = () => {
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
 
-  const strava_activity_id = useSelector(state => state.strava.activity);
-  const strava_route_id = useSelector(state => state.strava.route);
+  const strava_activity_id = useAppSelector(state => state.strava.activity);
+  const strava_route_id = useAppSelector(state => state.strava.route);
   const fetchRoute = () => {
     ReactGA.event('earn_virtual_currency', {virtual_currency_name:strava_activity_id});
     dispatch(loadStravaActivity())
   }
 
-  const fetchingFromStrava = useSelector(state => state.strava.fetching)
-  const accessToken = useSelector(state => state.strava.access_token)
+  const fetchingFromStrava = useAppSelector(state => state.strava.fetching)
+  const accessToken = useAppSelector(state => state.strava.access_token)
 
   const validActivityId = strava_activity_id != ''
 
@@ -36,7 +35,7 @@ export const RouteInfoInputStrava = () => {
               <StravaActivityIdInput/>
               <Button
                 id='analyze'
-                tabIndex='0'
+                tabIndex={0}
                 intent="primary"
                 onClick={fetchRoute}
                 disabled={fetchingFromStrava || !validActivityId}

@@ -227,9 +227,11 @@ class StravaActivityParser {
         return api.get(`activities/${activityId}/streams?keys=distance,time,altitude,velocity_smooth,moving,latlng&key_by_type=true`);
     }
 
-    authenticate(activityId : string) {
+    authenticate(zactivityId? : string ) : void {
         let params = queryString.parse(location.search);
-        params['strava_activity'] = activityId;
+        if (zactivityId !== undefined) {
+            params['strava_activity'] = zactivityId;
+        }
         params['strava_analysis'] = 'true';
         window.location.href = '/stravaAuthReq?state=' + encodeURIComponent(JSON.stringify(params));
     }
