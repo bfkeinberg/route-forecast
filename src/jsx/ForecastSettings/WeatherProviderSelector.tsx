@@ -1,15 +1,22 @@
 import {Button, FormGroup, MenuItem} from "@blueprintjs/core";
-import { Select } from "@blueprintjs/select";
-import PropTypes from 'prop-types';
-import {connect} from 'react-redux';
-import {setWeatherProvider} from "../../redux/actions";
+import { Select, ItemRenderer } from "@blueprintjs/select";
+import {connect, ConnectedProps} from 'react-redux';
+import {setWeatherProvider} from "../../redux/actions_";
 import { providerValues } from "../../redux/providerValues";
 import { DesktopTooltip } from '../shared/DesktopTooltip';
 import {useTranslation} from 'react-i18next'
 import {useForecastRequestData} from "../../utils/hooks"
-import * as Sentry from "@sentry/react"
+import { RootState } from "../app/topLevel";
 
-const renderProvider = (provider, { handleClick, handleFocus, modifiers }) => {
+type PropsFromRedux = ConnectedProps<typeof connector>
+
+interface Provider {
+    enabled: boolean
+    key: string
+    name: string
+}
+
+const renderProvider : ItemRenderer<Provider> = (provider, { handleClick, handleFocus, modifiers }) => {
     if (!modifiers.matchesPredicate) {
         return null;
     }
@@ -25,14 +32,14 @@ const renderProvider = (provider, { handleClick, handleFocus, modifiers }) => {
     );
 };
 
-const WeatherProviderSelector = ({weatherProvider,setWeatherProvider}) => {
+const WeatherProviderSelector = ({weatherProvider,setWeatherProvider} : PropsFromRedux) => {
     const { t } = useTranslation()
     const forecastData = useForecastRequestData()
 
     return (
         <FormGroup label={<span><b>{t('labels.source')}</b></span>} labelFor={'provider'}>
             <DesktopTooltip content={t('tooltips.provider')} placement={"right"}>
-                <Select tabIndex="0"
+                <Select
                     items={Object.entries(providerValues).
                         filter(entry => entry[1].maxCallsPerHour === undefined || 
                             entry[1].maxCallsPerHour > forecastData.length).
@@ -53,12 +60,7 @@ const WeatherProviderSelector = ({weatherProvider,setWeatherProvider}) => {
     );
 };
 
-WeatherProviderSelector.propTypes = {
-    weatherProvider:PropTypes.string.isRequired,
-    setWeatherProvider:PropTypes.func.isRequired,
-};
-
-const mapStateToProps = (state) =>
+const mapStateToProps = (state : RootState) =>
     ({
         weatherProvider: state.forecast.weatherProvider
     });
@@ -67,5 +69,5 @@ const mapDispatchToProps = {
     setWeatherProvider
 };
 
-export default connect(mapStateToProps,mapDispatchToProps)(WeatherProviderSelector);
-
+const connector = connect(mapStateToProps,mapDispatchToProps)
+export default connector(WeatherProviderSelector);

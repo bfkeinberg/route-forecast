@@ -33,7 +33,10 @@ const LoadableRouteList = lazy(() : DynamicRouteListType => {addBreadcrumb('load
 const getPinnedRoutes = async (rwgpsToken : string, 
     setErrorDetails : ActionCreatorWithPayload<ErrorPayload, "dialogParams/errorDetailsSet">, 
     rwgpsTokenSet : ActionCreatorWithPayload<string|null, "rideWithGpsInfo/rwgpsTokenSet">,) => {
-
+    if (rwgpsToken === undefined) {
+        return null
+    }
+    
     const url = `/pinned_routes?token=${rwgpsToken}`;
     try {
         const response = await axios.get(url);

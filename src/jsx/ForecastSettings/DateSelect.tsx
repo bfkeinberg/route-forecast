@@ -4,30 +4,37 @@ import "@blueprintjs/datetime2/node_modules/@blueprintjs/datetime/lib/css/bluepr
 import {Icon} from '@blueprintjs/core';
 import { DateInput3, TimePrecision } from "@blueprintjs/datetime2";
 import { DateTime } from 'luxon';
-import PropTypes from 'prop-types';
-import {connect} from 'react-redux';
+import {connect, ConnectedProps} from 'react-redux';
 
-import {setStart} from "../../redux/actions";
+import {setStart} from "../../redux/actions_";
 import { setTimeFromIso } from "../../redux/actions_";
 import { initialStartTimeSet } from "../../redux/routeParamsSlice";
 import { DesktopTooltip } from '../shared/DesktopTooltip';
 import {useTranslation} from 'react-i18next'
+import { RootState } from "../app/topLevel";
+import { ActionCreatorWithPayload } from "@reduxjs/toolkit";
+type PropsFromRedux = ConnectedProps<typeof connector>
 
-export const setDateOnly = (start, setInitialStart) => {
+export const setDateOnly = (start : DateTime, setInitialStart : ActionCreatorWithPayload<{
+    start: string;
+    zone: string;
+}, "routeParams/initialStartTimeSet">) => {
     let now = DateTime.now();
     let newStart = start.set({day: now.day, month:now.month, year:now.year});
-    setInitialStart({start:newStart.toISO(), zone:newStart.zone.name});
+    setInitialStart({start: newStart.toISO()!, zone:newStart.zone.name});
 };
 
 //"EEE MMM dd yyyy HH:mm:ss 'GMT'ZZZ"
-const DateSelect = ({ start, zone, setStart, initialStartTimeSet, maxDaysInFuture, canForecastPast, setTimeFromIso }) => {
+const DateSelect = ({ start, zone, setStart, initialStartTimeSet, maxDaysInFuture, canForecastPast, setTimeFromIso } : PropsFromRedux) => {
     const { t, i18n } = useTranslation()
-    const setDateWithZone = (zone) => {
-        setTimeFromIso(start.toISO({includeOffset:false}), zone)
+    const setDateWithZone = (zone : string) => {
+        setTimeFromIso(start.toISO({includeOffset:false})!, zone)
     }
 
-    const setDateFromPicker = (dateIsoString) => {
-        setStart(DateTime.fromISO(dateIsoString).toMillis());
+    const setDateFromPicker = (dateIsoString : string|null) => {
+        if (dateIsoString) {
+            setStart(DateTime.fromISO(dateIsoString).toMillis());
+        }
     }
 
     // allow us to continue to show the start time if the route was forecast for a time before the present
@@ -35,7 +42,10 @@ const DateSelect = ({ start, zone, setStart, initialStartTimeSet, maxDaysInFutur
     let later = new Date();
     const daysToAdd = maxDaysInFuture;
     later.setDate(now.getDate() + daysToAdd);
-    let otherAttributes = {}
+    interface OtherAttributes {
+        minDate? : Date
+    }
+    let otherAttributes : OtherAttributes = {}
     if (!canForecastPast) {
         otherAttributes.minDate = now
     }
@@ -69,17 +79,7 @@ const DateSelect = ({ start, zone, setStart, initialStartTimeSet, maxDaysInFutur
     );
 };
 
-DateSelect.propTypes = {
-    start:PropTypes.instanceOf(DateTime).isRequired,
-    zone:PropTypes.string,
-    setStart:PropTypes.func.isRequired,
-    initialStartTimeSet:PropTypes.func.isRequired,
-    maxDaysInFuture:PropTypes.number.isRequired,
-    canForecastPast:PropTypes.bool.isRequired,
-    setTimeFromIso:PropTypes.func.isRequired
-};
-
-const mapStateToProps = (state) =>
+const mapStateToProps = (state : RootState) =>
     ({
         start: DateTime.fromMillis(state.uiInfo.routeParams.startTimestamp, {zone:state.uiInfo.routeParams.zone}),
         zone: state.uiInfo.routeParams.zone,
@@ -91,4 +91,5 @@ const mapDispatchToProps = {
     setStart, initialStartTimeSet, setTimeFromIso
 };
 
-export default connect(mapStateToProps,mapDispatchToProps)(DateSelect);
+const connector = connect(mapStateToProps,mapDispatchToProps)
+export default connector(DateSelect);

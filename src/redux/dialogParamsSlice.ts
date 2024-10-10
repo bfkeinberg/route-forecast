@@ -22,7 +22,7 @@ interface ErrorError {
     error:string
 }
 
-type ErrorObject = ErrorMessage | ErrorDetails | ErrorError
+type ErrorObject = ErrorMessage | ErrorDetails | ErrorError | string
 
 const getMessageFromError = 
 (error : ErrorObject) : string => {

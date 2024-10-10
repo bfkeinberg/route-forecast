@@ -36,7 +36,7 @@ interface ExtractedControl {
     name: string
 }
 export type Segment = [number, number]
-type ForecastRequest = {
+export type ForecastRequest = {
     lat: number
     lon: number
     distance: number

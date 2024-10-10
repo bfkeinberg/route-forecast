@@ -4,7 +4,7 @@ export const finishTimeFormat = 'EEE, MMM dd yyyy h:mma';
 
 import { useActualFinishTime, useForecastDependentValues } from '../../utils/hooks';
 import DateSelect from "./DateSelect";
-import {useTranslation} from 'react-i18next'
+import { useTranslation } from 'react-i18next'
 // const LoadableDatePicker = lazy(() => componentLoader(import(/* webpackChunkName: "DateSelect" */ /* webpackPrefetch: true */ './DateSelect'), 5));
 
 // const DatePickerLoader = (props) => {
@@ -26,6 +26,7 @@ export const TimeFields = () => {
     DateTime.fromFormat(predictedFinishTime, finishTimeFormat).toFormat(newDateFormat) :
     t('data.noForecastPlaceholder')
 
+
   const timeFieldStyle = {
     width: "240px",
     fontSize: "16px",
@@ -33,7 +34,7 @@ export const TimeFields = () => {
     padding: "5px 0px",
     borderRadius: "3px",
     whiteSpace: "nowrap",
-    textAlign: "center"
+    textAlign: "center" as const
   }
 
   return (
@@ -42,17 +43,17 @@ export const TimeFields = () => {
       <div>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "center", margin: "10px 0px" }}>
           <span style={{ fontSize: ".875rem", fontWeight: "bolder", flex: 1, padding: "0px 5px" }}>{t('labels.projectedFinish')}</span>
-            <span style={{flex: 2.5}}>
-              <div style={{...timeFieldStyle, backgroundColor: predictedFinishTimeExists ? "rgb(19, 124, 189)" : "rgba(0, 0, 0, 0.05)", fontStyle: predictedFinishTimeExists ? "" : "oblique", color: predictedFinishTimeExists ? "white" : "rgba(0, 0, 0, 0.5)"}}>
-                {displayPredictedFinishTime}
-              </div>
-            </span>
+          <span style={{ flex: 2.5 }}>
+            <div style={{ ...timeFieldStyle, backgroundColor: predictedFinishTimeExists ? "rgb(19, 124, 189)" : "rgba(0, 0, 0, 0.05)", fontStyle: predictedFinishTimeExists ? "" : "oblique", color: predictedFinishTimeExists ? "white" : "rgba(0, 0, 0, 0.5)" }}>
+              {displayPredictedFinishTime}
+            </div>
+          </span>
         </div>
         {actualFinishTime !== null &&
           <div style={{ display: "flex", alignItems: "center", justifyContent: "center", margin: "10px 0px" }}>
             <span style={{ fontSize: ".875rem", fontWeight: "bolder", flex: 1, padding: "0px 5px" }}>Actual finish time</span>
-            <span style={{flex: 2.5}}>
-              <div style={{...timeFieldStyle, backgroundColor: "rgba(234, 89, 41, 0.8)", color: "white"}}>
+            <span style={{ flex: 2.5 }}>
+              <div style={{ ...timeFieldStyle, backgroundColor: "rgba(234, 89, 41, 0.8)", color: "white" }}>
                 {actualFinishTime}
               </div>
             </span>

@@ -3,17 +3,17 @@ import queryString from 'query-string'
 import ReactGA from "react-ga4";
 
 import { updateHistory } from "../jsx/app/updateHistory";
-import { doForecast, requestTimeZoneForRoute } from '../utils/forecastUtilities';
+import { requestTimeZoneForRoute } from '../utils/forecastUtilities';
 import { loadRwgpsRoute } from '../utils/rwgpsUtilities';
-import { controlsMeaningfullyDifferent, extractControlsFromRoute, getForecastRequest,getRouteNumberFromValue, getRwgpsRouteName } from '../utils/util';
+import { extractControlsFromRoute, getForecastRequest,getRouteNumberFromValue, getRwgpsRouteName } from '../utils/util';
 import { stravaActivitySet, stravaFetchBegun, stravaFetchFailed, stravaTokenSet } from "./stravaSlice";
 import { routeLoadingBegun, errorDetailsSet, errorMessageListSet, forecastFetchBegun, 
-    forecastFetchCanceled, forecastFetchFailed, gpxRouteLoadingFailed,
-     shortUrlSet, rwgpsRouteLoadingFailed } from "./dialogParamsSlice";
-import { weatherProviderSet, forecastAppended, forecastFetched, forecastInvalidated } from "./forecastSlice";
-import { timeZoneSet, intervalSet, startTimeSet } from "./routeParamsSlice"
+    forecastFetchFailed, gpxRouteLoadingFailed,
+     rwgpsRouteLoadingFailed } from "./dialogParamsSlice";
+import { forecastAppended, forecastFetched, forecastInvalidated } from "./forecastSlice";
+import { timeZoneSet } from "./routeParamsSlice"
 import { loadingFromUrlSet, gpxRouteLoaded, rwgpsRouteLoaded } from "./routeInfoSlice";
-import { displayControlTableUiSet, userControlsUpdated } from "./controlsSlice";
+import { displayControlTableUiSet } from "./controlsSlice";
 export const componentLoader = (lazyComponent, attemptsLeft) => {
     return new Promise((resolve, reject) => {
         Sentry.addBreadcrumb({category:'loading',level:'info',message:'in component loader'})
@@ -49,20 +49,6 @@ export const cancelForecast = () => {
     }
 };
 
-export const setStart = function (start) {
-    return function(dispatch) {
-        dispatch(startTimeSet(start))
-        dispatch(cancelForecast())
-    }
-};
-
-export const setInterval = function (interval) {
-    return function(dispatch) {
-        dispatch(intervalSet(interval))
-        dispatch(cancelForecast())
-    }
-};
-
  const getRouteParser = async function () {
     Sentry.addBreadcrumb({
         category: 'load',
@@ -91,50 +77,6 @@ const getRouteId = function(routeData) {
         return routeData.trip.id;
     } else {
         return null;
-    }
-};
-
-export const updateUserControls = function(controls) {
-    return function(dispatch,getState) {
-        const different = controlsMeaningfullyDifferent(controls, getState().controls.userControlPoints)
-        dispatch(userControlsUpdated(controls))
-        if (different) {
-            dispatch(cancelForecast())
-        }
-    }
-};
-
-export const requestForecast = function (routeInfo) {
-    return async function (dispatch, getState) {
-        await Sentry.startSpan({ name: "requestForecast" }, async () => {
-            if (routeInfo.rwgpsRouteData) {
-                ReactGA.event('add_payment_info', {
-                    value: getRouteDistanceInKm(routeInfo.rwgpsRouteData), coupon:getRwgpsRouteName(routeInfo.rwgpsRouteData),
-                    currency:getRouteId(routeInfo.rwgpsRouteData),
-                    items: [{ item_id:'', item_name:''}]
-                });
-            } else if (routeInfo.gpxData) {
-                ReactGA.event('add_payment_info', {
-                    value: routeInfo.gpxRouteData.tracks[0].distance.total, coupon:routeInfo.gpxRouteData.name,
-                    currency:getRouteNumberFromValue(routeInfo.gpxRouteData.tracks[0].link),
-                    items: [{item_id:'', item_name:''}]
-                });
-            }
-            const fetchController = new AbortController()
-            const abortMethod = fetchController.abort.bind(fetchController)
-            fetchAbortMethod = abortMethod;
-            dispatch(forecastFetchBegun());
-            const { result, value, error } = await doForecast(getState(), fetchController.signal);
-            fetchAbortMethod = null;
-            if (result === "success") {
-                const { forecast, timeZoneId } = value
-                dispatch(forecastFetched({ forecastInfo: forecast, timeZoneId: timeZoneId }));
-            } else if (result === "error") {
-                dispatch(forecastFetchFailed(error));
-            } else {
-                dispatch(forecastFetchCanceled());
-            }
-        })
     }
 };
 
@@ -187,35 +129,6 @@ export const loadFromRideWithGps = function (routeNumber, isTrip) {
             );
         })
     };
-};
-
-/*
- * @param {String} url the URL to shortern
- * @returns {function(*=, *): Promise<T | never>} return value
- */
-export const shortenUrl = function (url) {
-    return function (dispatch) {
-        return Sentry.startSpan({ name: "shortenUrl" }, () => {
-            return fetch("/bitly",
-                {
-                    headers: {
-                        Accept: 'application/json',
-                        'Content-Type': 'application/json'
-                    },
-                    method: 'POST',
-                    body: JSON.stringify({ longUrl: url })
-                })
-                .then(response => response.json())
-                .catch(error => { return errorDetailsSet(error) })
-                .then(responseJson => {
-                    if (responseJson.error === null) {
-                        return dispatch(shortUrlSet(responseJson.url));
-                    } else {
-                        return dispatch(errorDetailsSet(responseJson.error));
-                    }
-                })
-        })
-    }
 };
 
 import { Api } from 'rest-api-handler';
@@ -452,20 +365,6 @@ export const loadRouteFromURL = (forecastFunc, aqiFunc) => {
     }
 }
 
-export const addControl = function() {
-    return function (dispatch, getState) {
-        dispatch(updateUserControls([
-...getState().controls.userControlPoints,
-{ name: "", distance: 0, duration: 0 }
-]))
-    }
-};
-export const removeControl = function(indexToRemove) {
-    return function (dispatch, getState) {
-        dispatch(updateUserControls(getState().controls.userControlPoints.filter((control, index) => index !== indexToRemove)))
-    }
-};
-
 const getStravaParser = async function() {
     const parser = await import(/* webpackChunkName: "StravaRouteParser" */ '../utils/stravaRouteParser');
     return parser.default;
@@ -496,9 +395,3 @@ export const loadStravaActivity = function() {
     }
 };
 
-export const setWeatherProvider = (weatherProvider) => {
-    return function(dispatch) {
-        dispatch(weatherProviderSet(weatherProvider));
-        dispatch(cancelForecast());
-    }
-}

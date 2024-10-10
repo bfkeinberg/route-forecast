@@ -1,12 +1,12 @@
 import { Button } from '@blueprintjs/core';
 import * as Sentry from "@sentry/react";
-import PropTypes from 'prop-types';
 import React, {useRef, useState} from 'react';
 import ReactGA from "react-ga4";
-import {connect, useDispatch, useSelector} from 'react-redux';
+import {connect, ConnectedProps} from 'react-redux';
 import { useMediaQuery } from 'react-responsive';
 
-import { shortenUrl, msgFromError } from "../../redux/actions";
+import { msgFromError } from "../../redux/actions";
+import { shortenUrl } from '../../redux/actions_';
 import { useForecastMutation, useGetAqiMutation } from '../../redux/forecastApiSlice';
 import { forecastFetched, forecastAppended } from '../../redux/forecastSlice';
 import { querySet } from '../../redux/paramsSlice';
@@ -19,31 +19,46 @@ import {useTranslation} from 'react-i18next'
 import { providerValues } from '../../redux/providerValues';
 import { useForecastRequestData } from '../../utils/hooks';
 import { removeDuplicateForecasts } from '../../redux/actions';
+import { RootState } from '../app/topLevel';
+import { useAppSelector, useAppDispatch } from '../../utils/hooks';
+import type {ForecastRequest} from '../../utils/gpxParser'
 
+declare module 'react' {
+    interface HTMLAttributes<T> extends AriaAttributes, DOMAttributes<T> {
+        // extends React's HTMLAttributes
+        cursor?:string
+    }
+}
+
+type PropsFromRedux = ConnectedProps<typeof connector>
+type ForecastButtonProps = PropsFromRedux & {
+    href: string
+    origin: string
+}
 const ForecastButton = ({fetchingForecast,submitDisabled, routeNumber, startTimestamp, pace, interval,
-     metric, controls, strava_activity, strava_route, provider, href, urlIsShortened, querySet, zone}) => {
+     metric, controls, strava_activity, strava_route, provider, href, urlIsShortened, querySet, zone} : ForecastButtonProps) => {
         const [forecast, forecastFetchResult] = useForecastMutation()
         const [getAQI, aqiFetchResult] = useGetAqiMutation()
-        const dispatch = useDispatch()
-        const type = useSelector(state => ((state.routeInfo.rwgpsRouteData !== null) ? "rwgps" : "gpx"))
-        const routeName = useSelector(state => state.routeInfo.name)
-        const routeData = useSelector(state => ((type === "rwgps") ? state.routeInfo.rwgpsRouteData : state.routeInfo.gpxRouteData))
-        const userControlPoints = useSelector(state => state.controls.userControlPoints)
-        const distanceInKm = useSelector(state => state.routeInfo.distanceInKm)
-        const fetchAqi = useSelector(state => state.forecast.fetchAqi)
-        const rusaRouteId = useSelector(state => state.uiInfo.routeParams.rusaPermRouteId)
-        const segmentRange = useSelector(state => state.uiInfo.routeParams.segment)
+        const dispatch = useAppDispatch()
+        const type = useAppSelector(state => ((state.routeInfo.rwgpsRouteData !== null) ? "rwgps" : "gpx"))
+        const routeName = useAppSelector(state => state.routeInfo.name)
+        const routeData = useAppSelector(state => ((type === "rwgps") ? state.routeInfo.rwgpsRouteData : state.routeInfo.gpxRouteData))
+        const userControlPoints = useAppSelector(state => state.controls.userControlPoints)
+        const distanceInKm = useAppSelector(state => state.routeInfo.distanceInKm)
+        const fetchAqi = useAppSelector(state => state.forecast.fetchAqi)
+        const rusaRouteId = useAppSelector(state => state.uiInfo.routeParams.rusaPermRouteId)
+        const segmentRange = useAppSelector(state => state.uiInfo.routeParams.segment)
         const { t } = useTranslation()
         const forecastRequestData = useRef(useForecastRequestData())
         const [optionPressed, setOptionPressed] = useState(false)
 
-    const keyIsDown = (event) => {
+    const keyIsDown = (event : KeyboardEvent) => {
         if (event.code === "AltLeft" || event.code === "AltRight"   ) {
             setOptionPressed(true)
         }
     }
 
-    const keyIsUp = (event) => {
+    const keyIsUp = (event : KeyboardEvent) => {
         if (event.code === "AltLeft" || event.code === "AltRight") {
             setOptionPressed(false)
         }
@@ -59,7 +74,7 @@ const ForecastButton = ({fetchingForecast,submitDisabled, routeNumber, startTime
         }
     }, [optionPressed])
 
-    const forecastByParts = (forecastRequest, zone, service, routeName, routeNumber) => {
+    const forecastByParts = (forecastRequest : Array<ForecastRequest>, zone : string, service : string, routeName : string, routeNumber : string) => {
         let requestCopy = Object.assign(forecastRequest)
         let forecastResults = []
         let aqiResults = []
@@ -79,8 +94,8 @@ const ForecastButton = ({fetchingForecast,submitDisabled, routeNumber, startTime
         }
         return [Promise.allSettled(forecastResults),fetchAqi?Promise.allSettled(aqiResults):[]]    
     }
-    const doForecastByParts = (provider) => {
-        const forecastRequest = getForecastRequest(routeData, startTimestamp, type, zone, 
+    const doForecastByParts = (provider : string) => {
+        const forecastRequest = getForecastRequest(routeData!, startTimestamp, type, zone, 
             pace, interval, userControlPoints, segmentRange)
         return forecastByParts(forecastRequest, zone, provider, routeName, routeNumber)
     }
@@ -88,12 +103,12 @@ const ForecastButton = ({fetchingForecast,submitDisabled, routeNumber, startTime
     let tooltipContent = submitDisabled ?
         t('tooltips.forecast.disabled') :
         t('tooltips.forecast.enabled')
-    let buttonStyle = submitDisabled ? { pointerEvents: 'none', display: 'inline-flex' } : null;
+    let buttonStyle = submitDisabled ? { pointerEvents: 'none' as const, display: 'inline-flex' } : null;
     
-    const getForecastForProvider = async (provider) => {
+    const getForecastForProvider = async (provider : string) => {
         const forecastAndAqiResults = doForecastByParts(provider)
         const forecastResults = await forecastAndAqiResults[0]
-        let filteredResults = forecastResults.filter(result => result.status === "fulfilled").map(result => result.value)
+        let filteredResults = forecastResults.filter(result => result.status === "fulfilled").map(result => (result as PromiseFulfilledResult<{forecast:Forecast}>).value)
         filteredResults.sort((l,r) => l.forecast.distance-r.forecast.distance)
         filteredResults = removeDuplicateForecasts(filteredResults)
         const firstForecastResult = filteredResults.shift()
@@ -101,15 +116,24 @@ const ForecastButton = ({fetchingForecast,submitDisabled, routeNumber, startTime
             const firstForecast = { ...firstForecastResult.forecast }
             let returnedForecast = [firstForecast]
             while (filteredResults.length > 0) {
-                returnedForecast.push({ ...filteredResults.shift().forecast })
+                returnedForecast.push({ ...filteredResults.shift()!.forecast })
             }
             return returnedForecast
         }
         return []
     }
 
-    const grabAllPossibleForecasts = async (forecastData) => {
-        let allForecasts = {}
+    interface ForecastData {
+        length: number
+        daysInFuture: number
+    }
+
+    interface AllForecasts {
+        [index:string]:any
+    }
+
+    const grabAllPossibleForecasts = async (forecastData : ForecastData) => {
+        let allForecasts = {} as AllForecasts
         await Promise.all(Object.entries(providerValues).
                         filter(entry => entry[1].maxCallsPerHour === undefined || 
                             entry[1].maxCallsPerHour > forecastData.length).
@@ -118,14 +142,29 @@ const ForecastButton = ({fetchingForecast,submitDisabled, routeNumber, startTime
         // download the file
         const aElement = document.createElement('a');
         aElement.setAttribute('download', 'forecasts.json');
-        const href = URL.createObjectURL(new Blob([JSON.stringify(allForecasts)]), {type:'application/json'})
+
+        const href = URL.createObjectURL(new Blob([JSON.stringify(allForecasts)], {type:'application/json'}))
         aElement.href = href;
         aElement.setAttribute('target', '_blank');
         aElement.click();
         URL.revokeObjectURL(href)
     }
 
-    const forecastClick = async (event) => {
+    interface Forecast {
+        distance:number
+        aqi?:number
+        temperature: number
+        feel: number
+        humidity: number
+        zone: string
+        cloudCover: number
+        windSpeed: number
+        gust: number
+        relBearing: number
+        windBearing: number
+    }
+
+    const forecastClick = async (event : React.MouseEvent) => {
         if (event.altKey) {
             //ReactGA.event()
             grabAllPossibleForecasts(forecastRequestData.current)
@@ -145,20 +184,20 @@ const ForecastButton = ({fetchingForecast,submitDisabled, routeNumber, startTime
                 return
             }
             const aqiResults = await forecastAndAqiResults[1]
-            let filteredResults = forecastResults.filter(result => result.status === "fulfilled").map(result => result.value)
+            let filteredResults = forecastResults.filter(result => result.status === "fulfilled").map(result => (result as PromiseFulfilledResult<{forecast:Forecast}>).value)
             filteredResults.sort((l, r) => l.forecast.distance - r.forecast.distance)
-            let filteredAqi = aqiResults.filter(result => result.status === "fulfilled").map(result => result.value)
+            let filteredAqi = aqiResults.filter(result => result.status === "fulfilled").map(result => (result as PromiseFulfilledResult<{aqi:{aqi:number}}>).value)
             const firstForecastResult = filteredResults.shift()
             if (firstForecastResult) {
                 const firstForecast = { ...firstForecastResult.forecast }
                 if (filteredAqi.length > 0) {
-                    firstForecast.aqi = filteredAqi.shift().aqi.aqi
+                    firstForecast.aqi = filteredAqi.shift()!.aqi.aqi
                 }
                 dispatch(forecastFetched({ forecastInfo: { forecast: [firstForecast] }, timeZoneId: zone }))
                 while (filteredResults.length > 0) {
-                    const nextForecast = { ...filteredResults.shift().forecast }
+                    const nextForecast = { ...filteredResults.shift()!.forecast }
                     if (filteredAqi.length > 0) {
-                        nextForecast.aqi = filteredAqi.shift().aqi.aqi
+                        nextForecast.aqi = filteredAqi.shift()!.aqi.aqi
                     }
                     dispatch(forecastAppended(nextForecast))
                 }
@@ -179,58 +218,31 @@ const ForecastButton = ({fetchingForecast,submitDisabled, routeNumber, startTime
 
     const smallScreen = useMediaQuery({query: "(max-width: 800px)"})
     forecastRequestData.current = useForecastRequestData()
+
     return (
         <DesktopTooltip content={tooltipContent}>
             <div id='forecast' style={{ 'display': 'flex', width: '100%', justifyContent: "center", margin: "10px 0px 0px 10px", flex: 1.6 }} cursor='not-allowed'>
                 <Button
-                    tabIndex='0'
+                    tabIndex={0}
                     intent="primary"
                     onClick={forecastClick}
-                    onKeyDown={keyIsDown}
-                    onKeyUp={keyIsUp}
+                    onKeyDown={keyIsDown as unknown as (ev:React.KeyboardEvent)=>void}
+                    onKeyUp={keyIsUp as unknown as (ev:React.KeyboardEvent)=>void}
                     style={{ ...buttonStyle, width: "100%", backgroundColor: "#137cbd", borderColor: "#137cbd", }}
                     disabled={submitDisabled || fetchingForecast}
                     small={smallScreen}
                     large={!smallScreen}
                     fill={true}
-                    loading={forecastFetchResult.loading || aqiFetchResult.loading || fetchingForecast}
+                    loading={forecastFetchResult.isLoading || aqiFetchResult.isLoading || fetchingForecast}
                 >
                     {forecastFetchResult.isLoading ? t('buttons.forecastPending') : (optionPressed ? "Download all forecasts" : t("buttons.forecast"))}
                 </Button>
             </div>
         </DesktopTooltip>
     )
-};
+}
 
-ForecastButton.propTypes = {
-    fetchingForecast:PropTypes.bool.isRequired,
-    submitDisabled:PropTypes.bool.isRequired,
-    routeNumber: PropTypes.oneOfType([
-        PropTypes.number,
-        PropTypes.string
-    ]),
-    strava_activity: PropTypes.oneOfType([
-        PropTypes.string,
-        PropTypes.oneOf([''])
-    ]),
-    strava_route: PropTypes.oneOfType([
-        PropTypes.string,
-        PropTypes.oneOf([''])
-    ]),
-    startTimestamp: PropTypes.number.isRequired,
-    zone: PropTypes.string.isRequired,
-    pace: PropTypes.string.isRequired,
-    interval: PropTypes.number.isRequired,
-    metric: PropTypes.bool.isRequired,
-    controls: PropTypes.arrayOf(PropTypes.object).isRequired,
-    origin: PropTypes.string.isRequired,
-    provider: PropTypes.string.isRequired,
-    urlIsShortened: PropTypes.bool.isRequired,
-    href: PropTypes.string.isRequired,
-    querySet: PropTypes.func.isRequired
-};
-
-const mapStateToProps = (state) =>
+const mapStateToProps = (state : RootState) =>
     ({
         fetchingForecast: state.uiInfo.dialogParams.fetchingForecast,
         // can't request a forecast without a route loaded
@@ -253,4 +265,5 @@ const mapDispatchToProps = {
     querySet
 };
 
-export default connect(mapStateToProps,mapDispatchToProps)(ForecastButton);
+const connector = connect(mapStateToProps,mapDispatchToProps)
+export default connector(ForecastButton);

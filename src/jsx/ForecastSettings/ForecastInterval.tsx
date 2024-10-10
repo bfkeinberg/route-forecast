@@ -2,7 +2,7 @@ import { FormGroup } from "@blueprintjs/core";
 import { Slider, Tooltip } from "@mui/material"
 import {connect, ConnectedProps} from 'react-redux';
 import { RootState } from "../app/topLevel";
-import {setInterval} from "../../redux/actions";
+import {setInterval} from "../../redux/actions_";
 import {useTranslation} from 'react-i18next'
 
 type PropsFromRedux = ConnectedProps<typeof connector>
@@ -30,7 +30,7 @@ const ForecastInterval = (props: PropsFromRedux) => {
                     ]}
                     valueLabelDisplay="off"
                     // TODO: GA event for interval here
-                    onChange={(event, selected) => {props.setInterval(selected)}} />
+                    onChange={(event, selected) => {props.setInterval(selected as number)}} />
             </Tooltip>
         </FormGroup>
     );

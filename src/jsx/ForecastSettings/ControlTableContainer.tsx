@@ -1,8 +1,7 @@
 
 import { Button, Card, Elevation } from "@blueprintjs/core";
 import { useAppDispatch, useAppSelector } from "../../utils/hooks";
-import { addControl } from "../../redux/actions";
-import { bankedDisplayToggled } from "../../redux/controlsSlice";
+import { bankedDisplayToggled, controlAdded } from "../../redux/controlsSlice";
 import ErrorBoundary from '../shared/ErrorBoundary';
 import { ToggleButton } from '../shared/ToggleButton';
 import { ControlTable } from './ControlTable';
@@ -38,7 +37,7 @@ export const ControlTableContainer = () => {
 const AddRowButton = () => {
   const dispatch = useAppDispatch()
   return (
-    <div style={{border: "1px solid black", width: "100%"}} onClick={() => dispatch(addControl())}>
+    <div style={{border: "1px solid black", width: "100%"}} onClick={() => dispatch(controlAdded())}>
       <Button id={'addButton'} style={{width: "100%"}} minimal={true} tabIndex={0} icon={"add"}>Add</Button>
     </div>
   )

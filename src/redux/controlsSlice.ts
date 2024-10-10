@@ -45,6 +45,12 @@ const controlsSlice = createSlice({
         bankedDisplayToggled(state) {
             state.displayBanked = !state.displayBanked
         },
+        controlAdded(state) {
+            state.userControlPoints.push({ name: "", distance: 0, duration: 0 })
+        },
+        controlRemoved(state, action: PayloadAction<number>) {
+            state.userControlPoints = state.userControlPoints.filter((control, index) => index !== action.payload)
+        },
         userControlsUpdated(state, action : PayloadAction<UserControl[]>) {
             state.userControlPoints = action.payload
         },
@@ -61,5 +67,6 @@ const controlsSlice = createSlice({
     }
 })
 
-export const { metricSet, metricToggled, celsiusToggled, bankedDisplayToggled, userControlsUpdated, displayControlTableUiSet} = controlsSlice.actions
+export const { metricSet, metricToggled, celsiusToggled, bankedDisplayToggled, controlRemoved,
+    userControlsUpdated, displayControlTableUiSet, controlAdded} = controlsSlice.actions
 export const controlsReducer = controlsSlice.reducer

@@ -1,12 +1,13 @@
 import { Icon } from '@blueprintjs/core';
 
-import { removeControl as removeControlAction, updateUserControls } from '../../redux/actions';
+import { controlRemoved } from '../../redux/controlsSlice';
+import { updateUserControls } from '../../redux/actions_';
 import { useActualArrivalTimes, useForecastDependentValues } from '../../utils/hooks';
 import { milesToMeters,stringIsOnlyDecimal, stringIsOnlyNumeric } from '../../utils/util';
 import { Table } from "./Table"
 import {useTranslation} from 'react-i18next'
 import { useAppSelector, useAppDispatch } from '../../utils/hooks';
-const minSuffixFunction = (value : (string | number)) => `${value} min`
+const minSuffixFunction = (value : string) => `${value} min`
 import type { UserControl } from '../../redux/controlsSlice';
 
 export const ControlTable = () => {
@@ -23,7 +24,7 @@ export const ControlTable = () => {
     const actualArrivalTimes = useActualArrivalTimes()
     const dispatch = useAppDispatch()
     const updateControls = (controls : UserControl[]) => dispatch(updateUserControls(controls))
-    const removeControl = (indexToRemove : number) => dispatch(removeControlAction(indexToRemove))
+    const removeControl = (indexToRemove : number) => dispatch(controlRemoved(indexToRemove))
 
     const onCellValueChanged = (rowIndex : number, field : string, value : (string | number)) => {
         if (field === "duration") {
@@ -51,12 +52,14 @@ export const ControlTable = () => {
 
     const rwgpsCellStyle = calculatedValues !== null ? {backgroundColor: "rgb(19, 124, 189)", color: "white"} : {}
 
-    const transformDistance = (distance : number) => {
-        return metric ? ((distance * milesToMeters) / 1000).toFixed(1) : distance;
+    const transformDistance = (distanceValue : string) : string => {
+        const distance = Number(distanceValue)
+        return metric ? ((distance * milesToMeters) / 1000).toFixed(1) : distance.toString();
     };
 
-    const reverseTransformDistance = (distance : number) => {
-        return metric ? ((distance * 1000) / milesToMeters).toFixed(1) : distance;
+    const reverseTransformDistance = (distanceValue : string) => {
+        const distance = Number(distanceValue)
+        return metric ? ((distance * 1000) / milesToMeters).toFixed(1) : distance.toString();
     }
 
     interface ColumnData {
@@ -64,11 +67,11 @@ export const ControlTable = () => {
         render: JSX.Element | string,
         width: number,
         editable? : boolean,
-        editCompleteFunction? : (value: number) => number | string,
-        editTransformFunction? : (value: number) => number | string,
-        valueTransformFunction? : (value: number) => string | number,
+        editCompleteFunction? : (value: string) => string,
+        editTransformFunction? : (value: string) => string,
+        valueTransformFunction? : (value: string) => string,
         editValidateFunction? : (value: string) => boolean,
-        cellStyle? : {},
+        cellStyle? : JSX.Element | {},
         headerStyle? : {}
     }
     interface TableData { 

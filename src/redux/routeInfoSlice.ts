@@ -17,6 +17,7 @@ export interface RwgpsRoute {
         distance: number,
         name: string,
         track_points: {d:number}[]
+        id: number
     },
     trip?: never,
     type: string,
@@ -28,6 +29,7 @@ export interface RwgpsTrip {
         distance: number,
         name: string,
         track_points: {d:number}[]
+        id: number
     },
     route?: never,
     type: string,
@@ -35,12 +37,14 @@ export interface RwgpsTrip {
 }
 
 export interface GpxRouteData {
+    name: string
     tracks: Array<{
         distance: {
             total: number
         },
         points: Array<GpxPoint>,
-        name: string
+        name: string,
+        link: string
     }>
 }
 
