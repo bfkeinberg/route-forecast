@@ -6,7 +6,7 @@ import { updateHistory } from "../jsx/app/updateHistory";
 import { requestTimeZoneForRoute } from '../utils/forecastUtilities';
 import { loadRwgpsRoute } from '../utils/rwgpsUtilities';
 import { extractControlsFromRoute, getForecastRequest,getRouteNumberFromValue, getRwgpsRouteName } from '../utils/util';
-import { stravaActivitySet, stravaFetchBegun, stravaFetchFailed, stravaTokenSet } from "./stravaSlice";
+import { stravaFetched, stravaActivitySet, stravaFetchBegun, stravaFetchFailed, stravaTokenSet } from "./stravaSlice";
 import { routeLoadingBegun, errorDetailsSet, errorMessageListSet, forecastFetchBegun, 
     forecastFetchFailed, gpxRouteLoadingFailed,
      rwgpsRouteLoadingFailed } from "./dialogParamsSlice";
