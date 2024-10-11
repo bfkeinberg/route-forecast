@@ -2,7 +2,7 @@ import { Button, MenuItem } from "@blueprintjs/core";
 import { Select, ItemRenderer } from "@blueprintjs/select";
 import {useRef} from 'react';
 
-import {loadFromRideWithGps} from "../../redux/actions";
+import {loadFromRideWithGps} from "../../redux/actions_";
 import { routeIsTripSet, rwgpsRouteSet } from "../../redux/routeParamsSlice";
 import { useAppSelector, useAppDispatch } from "../../utils/hooks";
 import { Favorite } from "../../redux/rideWithGpsSlice";

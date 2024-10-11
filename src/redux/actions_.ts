@@ -1,16 +1,18 @@
 import { paceSet } from "./routeParamsSlice";
 import { forecastInvalidated, weatherProviderSet, forecastFetched } from "./forecastSlice";
-import { intervalSet, startTimeSet, initialStartTimeSet } from "./routeParamsSlice"
-import { UserControl, userControlsUpdated } from "./controlsSlice";
-import { shortUrlSet, forecastFetchBegun, forecastFetchCanceled, forecastFetchFailed, errorDetailsSet } from "./dialogParamsSlice";
+import { rwgpsRouteLoaded } from "./routeInfoSlice";
+import { requestTimeZoneForRoute, doForecast } from '../utils/forecastUtilities';
+import { intervalSet, startTimeSet, initialStartTimeSet, timeZoneSet } from "./routeParamsSlice"
+import { UserControl, userControlsUpdated, displayControlTableUiSet } from "./controlsSlice";
+import { shortUrlSet, forecastFetchBegun, forecastFetchCanceled, forecastFetchFailed, errorDetailsSet, routeLoadingBegun, rwgpsRouteLoadingFailed } from "./dialogParamsSlice";
 import type { Dispatch, Action } from "redux";
-import {controlsMeaningfullyDifferent, getRwgpsRouteName, getRouteNumberFromValue} from "../utils/util"
+import {controlsMeaningfullyDifferent, getRwgpsRouteName, getRouteNumberFromValue, extractControlsFromRoute} from "../utils/util"
 import { RootState } from "../jsx/app/topLevel";
 import { AppDispatch } from "../jsx/app/topLevel";
 import * as Sentry from "@sentry/react";
 import ReactGA from "react-ga4";
 import type { RouteInfoState, RwgpsRoute, RwgpsTrip } from "./routeInfoSlice"
-import {doForecast} from '../utils/forecastUtilities'
+import { loadRwgpsRoute } from '../utils/rwgpsUtilities';
 
 type abmtype = (reason?:any) => void
 type abortMethodType = abmtype | null
@@ -153,3 +155,53 @@ export const shortenUrl = function (url : string) {
         })
     }
 };
+
+const mergeControls = (oldCtrls : Array<UserControl>, newCtrls : Array<UserControl>) => {
+    let oldCtrlsCopy = oldCtrls.slice()
+    let old = oldCtrlsCopy.shift()
+    const merged = newCtrls.map(ctrl => {
+        if (old && ctrl.distance === old.distance) {
+            const result =  {name:ctrl.name, distance:ctrl.distance, duration:old.duration}
+            old = oldCtrlsCopy.shift()
+            return result
+        } else {
+            return ctrl
+        }
+    })
+    return merged
+}
+
+export const loadFromRideWithGps = function (routeNumber? : string, isTrip? : boolean) {
+    return function (dispatch : AppDispatch, getState: () => RootState) {
+        return Sentry.startSpan({ name: "loadingRwgpsRoute" }, () => {
+            routeNumber = routeNumber || getState().uiInfo.routeParams.rwgpsRoute
+            ReactGA.event('login', { method: routeNumber });
+            isTrip = isTrip || getState().uiInfo.routeParams.rwgpsRouteIsTrip
+            dispatch(routeLoadingBegun('rwgps'));
+            dispatch(cancelForecast())
+            return loadRwgpsRoute(routeNumber, isTrip, getState().rideWithGpsInfo.token).then(async (routeData) => {
+                dispatch(rwgpsRouteLoaded(routeData));
+                const extractedControls = extractControlsFromRoute(routeData);
+                if (extractedControls.length !== 0) {
+                    const oldControls = getState().controls.userControlPoints
+                    if (oldControls.length === 0) {
+                        dispatch(updateUserControls(extractedControls))
+                    } else {
+                        const merged = mergeControls(oldControls, extractedControls)
+                        dispatch(updateUserControls(merged))
+                    }
+                    dispatch(displayControlTableUiSet(true))
+                }
+                const timeZoneResults = await requestTimeZoneForRoute(getState())
+                if (timeZoneResults.result === "error") {
+                    dispatch(rwgpsRouteLoadingFailed(timeZoneResults.error?timeZoneResults.error:"Unknown error fetching time zone"))
+                } else {
+                    Sentry.addBreadcrumb({category:'timezone',level:'info',message:`TimeZone API call returned ${timeZoneResults.result}`})
+                    dispatch(timeZoneSet(timeZoneResults.result))
+                }
+            }, error => { return dispatch(rwgpsRouteLoadingFailed(error.message?error.message:error)) }
+            );
+        })
+    };
+};
+

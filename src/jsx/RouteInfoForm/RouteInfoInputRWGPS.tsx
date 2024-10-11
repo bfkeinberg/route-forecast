@@ -2,7 +2,7 @@
 import { Button,Intent } from '@blueprintjs/core';
 import { useRef,useState } from 'react';
 
-import { loadFromRideWithGps } from '../../redux/actions.js';
+import { loadFromRideWithGps } from '../../redux/actions_.js';
 import ErrorBoundary from "../shared/ErrorBoundary.js";
 import PinnedRouteLoader from './PinnedRouteLoader';
 import RideWithGpsId from './RideWithGpsId';

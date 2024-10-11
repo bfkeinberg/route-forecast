@@ -136,7 +136,7 @@ class AnalyzeRoute {
         }
     }
 
-    parseCoursePoints = (routeData : RwgpsRoute, type : string) =>
+    parseCoursePoints = (routeData : RwgpsRoute|RwgpsTrip, type : string) =>
         ((type === "rwgps" && routeData.type) ?
         routeData[routeData.type]['course_points'] :
         [])
@@ -150,7 +150,7 @@ class AnalyzeRoute {
     controlFromCoursePoint = (coursePoint : RwgpsCoursePoint) : ExtractedControl =>
         ({name:coursePoint.n.replace(':','_'), duration:1, distance:Math.round((coursePoint.d*kmToMiles)/1000)})
 
-    extractControlPoints = (routeData : RwgpsRoute, type : string) =>
+    extractControlPoints = (routeData : RwgpsRoute|RwgpsTrip, type : string) =>
         this.parseCoursePoints(routeData, type).filter((point : RwgpsCoursePoint) => this.isControl(point)).map((point : RwgpsCoursePoint) => this.controlFromCoursePoint(point))
 
     parseGpxRouteStream ( routeData : GpxRouteData) : Array<Point> {

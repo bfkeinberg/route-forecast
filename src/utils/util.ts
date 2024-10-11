@@ -139,7 +139,7 @@ export const controlsMeaningfullyDifferent = (controls1 : Array<UserControl>, co
     )
 }
 
-export const extractControlsFromRoute = (routeData : RwgpsRoute) => {
+export const extractControlsFromRoute = (routeData : RwgpsRoute|RwgpsTrip) => {
   return gpxParser.extractControlPoints(routeData, 'rwgps');
 }
 

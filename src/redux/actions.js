@@ -3,17 +3,13 @@ import queryString from 'query-string'
 import ReactGA from "react-ga4";
 
 import { updateHistory } from "../jsx/app/updateHistory";
-import { requestTimeZoneForRoute } from '../utils/forecastUtilities';
-import { loadRwgpsRoute } from '../utils/rwgpsUtilities';
-import { extractControlsFromRoute, getForecastRequest,getRouteNumberFromValue, getRwgpsRouteName } from '../utils/util';
+import { getForecastRequest,getRouteNumberFromValue, getRwgpsRouteName } from '../utils/util';
 import { stravaFetched, stravaActivitySet, stravaFetchBegun, stravaFetchFailed, stravaTokenSet } from "./stravaSlice";
 import { routeLoadingBegun, errorDetailsSet, errorMessageListSet, forecastFetchBegun, 
     forecastFetchFailed, gpxRouteLoadingFailed,
-     rwgpsRouteLoadingFailed } from "./dialogParamsSlice";
+     } from "./dialogParamsSlice";
 import { forecastAppended, forecastFetched, forecastInvalidated } from "./forecastSlice";
-import { timeZoneSet } from "./routeParamsSlice"
-import { loadingFromUrlSet, gpxRouteLoaded, rwgpsRouteLoaded } from "./routeInfoSlice";
-import { displayControlTableUiSet } from "./controlsSlice";
+import { loadingFromUrlSet, gpxRouteLoaded } from "./routeInfoSlice";
 export const componentLoader = (lazyComponent, attemptsLeft) => {
     return new Promise((resolve, reject) => {
         Sentry.addBreadcrumb({category:'loading',level:'info',message:'in component loader'})
@@ -78,57 +74,6 @@ const getRouteId = function(routeData) {
     } else {
         return null;
     }
-};
-
-const mergeControls = (oldCtrls, newCtrls) => {
-    let oldCtrlsCopy = oldCtrls.slice()
-    let old = oldCtrlsCopy.shift()
-    const merged = newCtrls.map(ctrl => {
-        if (old && ctrl.distance === old.distance) {
-            const result =  {name:ctrl.name, distance:ctrl.distance, duration:old.duration}
-            old = oldCtrlsCopy.shift()
-            return result
-        } else {
-            return ctrl
-        }
-    })
-    return merged
-}
-
-export const loadFromRideWithGps = function (routeNumber, isTrip) {
-    return function (dispatch, getState) {
-        return Sentry.startSpan({ name: "loadingRwgpsRoute" }, () => {
-            routeNumber = routeNumber || getState().uiInfo.routeParams.rwgpsRoute
-            ReactGA.event('login', { method: routeNumber });
-            isTrip = isTrip || getState().uiInfo.routeParams.rwgpsRouteIsTrip
-            dispatch(routeLoadingBegun('rwgps'));
-            dispatch(cancelForecast())
-            return loadRwgpsRoute(routeNumber, isTrip, getState().rideWithGpsInfo.token).then(async (routeData) => {
-                dispatch(rwgpsRouteLoaded(routeData));
-                // if (getState().controls.userControlPoints.length === 0) {
-                    const extractedControls = extractControlsFromRoute(routeData);
-                    if (extractedControls.length !== 0) {
-                        const oldControls = getState().controls.userControlPoints
-                        if (oldControls.length === 0) {
-                            dispatch(updateUserControls(extractedControls))
-                        } else {
-                            const merged = mergeControls(oldControls, extractedControls)
-                            dispatch(updateUserControls(merged))
-                        }
-                        dispatch(displayControlTableUiSet(true))
-                    }
-                // }
-                const timeZoneResults = await requestTimeZoneForRoute(getState())
-                if (timeZoneResults.result === "error") {
-                    dispatch(rwgpsRouteLoadingFailed(timeZoneResults.error))
-                } else {
-                    Sentry.addBreadcrumb({category:'timezone',level:'info',message:`TimeZone API call returned ${timeZoneResults.result}`})
-                    dispatch(timeZoneSet(timeZoneResults.result))
-                }
-            }, error => { return dispatch(rwgpsRouteLoadingFailed(error.message?error.message:error)) }
-            );
-        })
-    };
 };
 
 import { Api } from 'rest-api-handler';
