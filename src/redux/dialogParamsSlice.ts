@@ -113,8 +113,8 @@ const dialogParamsSlice = createSlice({
         shortUrlSet(state, action:PayloadAction<string>) {
             state.shortUrl = action.payload
         },
-        stravaErrorSet(state,action:PayloadAction<string>) {
-            if (action.payload !== undefined && action.payload !== "") {
+        stravaErrorSet(state,action:PayloadAction<Error>) {
+            if (action.payload !== undefined ) {
                 state.errorDetails = `Error loading route from Strava: ${action.payload}`
             }
         }

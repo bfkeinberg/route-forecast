@@ -36,11 +36,13 @@ class StravaActivityParser {
     fetchStravaActivity(activityId : string, token : string) {
         if (token === null) {
             this.authenticate(activityId);
-            return new Promise((_resolve, reject) => reject(new Error('fetching authentication token')));
+            return new Promise<{activity: StravaActivityData;
+                stream: StravaActivityStream}>((_resolve, reject) => reject(new Error('fetching authentication token')));
         }
         this.api.setDefaultHeader('Authorization', `Bearer ${token}`);
         let activityPromise = this.fetchActivity(activityId, this.api);
-        return new Promise((resolve, reject) => {
+        return new Promise<{activity: StravaActivityData;
+            stream: StravaActivityStream}>((resolve, reject) => {
             activityPromise.then((activityData : StravaActivityData) => {
                 let activityDataPromise = this.processActivityStream(activityId, this.api);
                 activityDataPromise.then((activityStream : StravaActivityStream) => {

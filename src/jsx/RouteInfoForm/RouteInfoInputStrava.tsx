@@ -3,7 +3,8 @@ import { Button } from '@blueprintjs/core';
 import stravaImage from 'Images/api_logo_pwrdBy_strava_stack_light.png';
 import ReactGA from "react-ga4";
 
-import { loadStravaActivity, loadStravaRoute } from "../../redux/actions";
+import { loadStravaActivity } from 'redux/actions_';
+import { loadStravaRoute } from "../../redux/actions";
 import stravaRouteParser from '../../utils/stravaRouteParser';
 import ErrorBoundary from '../shared/ErrorBoundary';
 import StravaActivityIdInput from './StravaActivityIdInput';

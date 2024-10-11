@@ -35,7 +35,7 @@ type StravaState = {
     route: string
     access_token: string | null
     refresh_token: string | null
-    expires_at: string | null
+    expires_at: number | null
     fetching: boolean
     activityData: StravaActivityData | null
     activityStream: StravaActivityStream | null
@@ -59,7 +59,7 @@ const stravaSlice = createSlice({
     name:'strava',
     initialState: stravaInitialState,
     reducers: {
-        stravaTokenSet(state,action:PayloadAction<{token:string,expires_at:string}>) {
+        stravaTokenSet(state,action:PayloadAction<{token:string,expires_at:number}>) {
             if (action.payload && action.payload.token) {
                 state.access_token = action.payload.token
                 state.expires_at = action.payload.expires_at

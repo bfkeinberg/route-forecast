@@ -4,7 +4,9 @@ import { rwgpsRouteLoaded } from "./routeInfoSlice";
 import { requestTimeZoneForRoute, doForecast } from '../utils/forecastUtilities';
 import { intervalSet, startTimeSet, initialStartTimeSet, timeZoneSet } from "./routeParamsSlice"
 import { UserControl, userControlsUpdated, displayControlTableUiSet } from "./controlsSlice";
-import { shortUrlSet, forecastFetchBegun, forecastFetchCanceled, forecastFetchFailed, errorDetailsSet, routeLoadingBegun, rwgpsRouteLoadingFailed } from "./dialogParamsSlice";
+import { stravaFetchBegun, stravaFetched, stravaFetchFailed, stravaTokenSet, stravaActivitySet } from "./stravaSlice";
+import { shortUrlSet, forecastFetchBegun, forecastFetchCanceled, forecastFetchFailed,
+     stravaErrorSet, errorDetailsSet, routeLoadingBegun, rwgpsRouteLoadingFailed } from "./dialogParamsSlice";
 import type { Dispatch, Action } from "redux";
 import {controlsMeaningfullyDifferent, getRwgpsRouteName, getRouteNumberFromValue, extractControlsFromRoute} from "../utils/util"
 import { RootState } from "../jsx/app/topLevel";
@@ -205,3 +207,70 @@ export const loadFromRideWithGps = function (routeNumber? : string, isTrip? : bo
     };
 };
 
+const getStravaParser = async function() {
+    const parser = await import(/* webpackChunkName: "StravaRouteParser" */ '../utils/stravaRouteParser');
+    return parser.default;
+};
+
+const stravaTokenTooOld = (getState: () => RootState) => {
+    if (getState().strava.expires_at == null) {
+        return false;
+    }
+    return (getState().strava.expires_at! < Math.round(Date.now()/1000));
+};
+
+export const refreshOldToken = (dispatch : AppDispatch, getState: () => RootState) => {
+    if (stravaTokenTooOld(getState)) {
+        return new Promise<string|null>((resolve, reject) => {
+            fetch(`/refreshStravaToken?refreshToken=${getState().strava.refresh_token}`).then(response => {
+                if (response.status === 200) {
+                    return response.json();
+                }
+            }).then(response => {
+                if (response === undefined) {
+                    dispatch(stravaErrorSet(Error("Received undefined response from Strava auth service")));
+                    reject(Error("Received undefined response from Strava auth service"));
+                }
+                else {
+                    dispatch(stravaTokenSet({token:response.access_token, expires_at:response.expires_at}));
+                    resolve(response.access_token);
+                }
+            }, error => {
+                dispatch(stravaErrorSet(error));
+                reject(error);
+            });
+        });
+    } else {
+        return new Promise<string|null>((resolve) => {resolve(getState().strava.access_token)});
+    }
+}
+
+export const loadStravaActivity = function() {
+    return async function (dispatch : AppDispatch, getState: () => RootState) {
+        const parser = await getStravaParser().catch((err) => {
+            dispatch(stravaFetchFailed(err));
+            return null
+        });
+        // handle failed load, error has already been dispatched
+        if (parser == null) {
+            return Promise.resolve(Error('Cannot load parser'));
+        }
+
+        const access_token = await refreshOldToken(dispatch, getState)
+        if (!access_token) {
+            dispatch(stravaFetchFailed(Error("Failed to get Strava access token")));
+            dispatch(stravaActivitySet(''))
+            return
+        }
+        dispatch(stravaFetchBegun());
+        const activityId = getState().strava.activity
+        ReactGA.event('login', {method:activityId});
+        return parser.fetchStravaActivity(activityId, access_token).then(result => {
+            dispatch(stravaFetched(result));
+        }).catch(error => {
+            dispatch(stravaFetchFailed(error));
+            dispatch(stravaActivitySet(''))
+        });
+
+    }
+};

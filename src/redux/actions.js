@@ -4,7 +4,7 @@ import ReactGA from "react-ga4";
 
 import { updateHistory } from "../jsx/app/updateHistory";
 import { getForecastRequest,getRouteNumberFromValue, getRwgpsRouteName } from '../utils/util';
-import { stravaFetched, stravaActivitySet, stravaFetchBegun, stravaFetchFailed, stravaTokenSet } from "./stravaSlice";
+import { stravaTokenSet } from "./stravaSlice";
 import { routeLoadingBegun, errorDetailsSet, errorMessageListSet, forecastFetchBegun, 
     forecastFetchFailed, gpxRouteLoadingFailed,
      } from "./dialogParamsSlice";
@@ -311,34 +311,4 @@ export const loadRouteFromURL = (forecastFunc, aqiFunc) => {
         dispatch(loadingFromUrlSet(false))
     }
 }
-
-const getStravaParser = async function() {
-    const parser = await import(/* webpackChunkName: "StravaRouteParser" */ '../utils/stravaRouteParser');
-    return parser.default;
-};
-
-export const loadStravaActivity = function() {
-    return async function (dispatch, getState) {
-        const parser = await getStravaParser().catch((err) => {
-            dispatch(stravaFetchFailed(err));
-            return null
-        });
-        // handle failed load, error has already been dispatched
-        if (parser == null) {
-            return Promise.resolve(Error('Cannot load parser'));
-        }
-
-        const access_token = await refreshOldToken(dispatch, getState)
-        dispatch(stravaFetchBegun());
-        const activityId = getState().strava.activity
-        ReactGA.event('login', {method:activityId});
-        return parser.fetchStravaActivity(activityId, access_token).then(result => {
-            dispatch(stravaFetched(result));
-        }).catch(error => {
-            dispatch(stravaFetchFailed(error));
-            dispatch(stravaActivitySet(''))
-        });
-
-    }
-};
 

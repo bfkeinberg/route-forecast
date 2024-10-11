@@ -4,6 +4,12 @@ export const routeLoadingModes = {
   RUSA_PERM: 3
 }
 
+export enum RouteLoadingModes {
+  RWGPS = 1,
+  STRAVA = 2,
+  RUSA_PERM = 3
+}
+
 export const routeLoadingModeProps = [
   {},
   {name:"Ride with GPS", key:routeLoadingModes.RWGPS},
