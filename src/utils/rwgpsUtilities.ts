@@ -1,5 +1,7 @@
-export const loadRwgpsRoute = (route : string, isTrip : boolean, token : string) => {
-  return new Promise((resolve, reject) => {
+import { RwgpsRoute, RwgpsTrip } from "redux/routeInfoSlice";
+
+export const loadRwgpsRoute = (route : string, isTrip : boolean, token? : string|null) => {
+  return new Promise<RwgpsRoute|RwgpsTrip >((resolve, reject) => {
       let url = '/rwgps_route?route=' + route + '&trip=' + isTrip;
       if (token) {
         url += `&token=${token}`;
