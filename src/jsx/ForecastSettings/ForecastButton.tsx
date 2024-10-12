@@ -5,7 +5,7 @@ import ReactGA from "react-ga4";
 import {connect, ConnectedProps} from 'react-redux';
 import { useMediaQuery } from 'react-responsive';
 
-import { msgFromError } from "../../redux/actions";
+import { msgFromError } from 'redux/forecastActions';
 import { shortenUrl } from '../../redux/actions_';
 import { useForecastMutation, useGetAqiMutation } from '../../redux/forecastApiSlice';
 import { forecastFetched, forecastAppended } from '../../redux/forecastSlice';
@@ -18,10 +18,11 @@ import { DesktopTooltip } from '../shared/DesktopTooltip';
 import {useTranslation} from 'react-i18next'
 import { providerValues } from '../../redux/providerValues';
 import { useForecastRequestData } from '../../utils/hooks';
-import { removeDuplicateForecasts } from '../../redux/actions';
+import { removeDuplicateForecasts } from 'redux/forecastActions';
 import { RootState } from '../app/topLevel';
 import { useAppSelector, useAppDispatch } from '../../utils/hooks';
 import type {ForecastRequest} from '../../utils/gpxParser'
+import { extractRejectedResults } from 'redux/forecastActions';
 
 declare module 'react' {
     interface HTMLAttributes<T> extends AriaAttributes, DOMAttributes<T> {
@@ -162,6 +163,8 @@ const ForecastButton = ({fetchingForecast,submitDisabled, routeNumber, startTime
         gust: number
         relBearing: number
         windBearing: number
+        time: string
+        isControl: boolean    
     }
 
     const forecastClick = async (event : React.MouseEvent) => {
@@ -202,9 +205,10 @@ const ForecastButton = ({fetchingForecast,submitDisabled, routeNumber, startTime
                     dispatch(forecastAppended(nextForecast))
                 }
             }
+            
             // handle any errors
-            dispatch(errorMessageListSet(forecastResults.filter(result => result.status === 'rejected').map(result => msgFromError(result))))
-            dispatch(errorMessageListAppend(aqiResults.filter(result => result.status === 'rejected').map(result => msgFromError(result))))
+            dispatch(errorMessageListSet(extractRejectedResults(forecastResults).map(result => msgFromError(result))))
+            dispatch(errorMessageListAppend(extractRejectedResults(aqiResults).map(result => msgFromError(result))))
         // })
         const url = generateUrl(startTimestamp, routeNumber, pace, interval, metric, controls,
             strava_activity, strava_route, provider, origin, true, zone, rusaRouteId)

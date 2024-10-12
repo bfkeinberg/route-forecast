@@ -1,5 +1,5 @@
-import { Button, Classes} from "@blueprintjs/core"
-import  faq from "../../static/faq.htm"
+import {Classes} from "@blueprintjs/core"
+import faq from "../../static/faq.htm"
 import React, {useState} from "react"
 import { Drawer } from "@blueprintjs/core"
 import Typography from "@mui/material/Typography"
@@ -12,7 +12,6 @@ const FaqImage = () => {
     )
 }
 
-//filter="url(#outline)" 
 const FaqButton = () => {
     const [faqVisible, setFaqVisible] = useState(false)
     const showFaq = () => {

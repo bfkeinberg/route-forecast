@@ -6,7 +6,6 @@ import { inputPaceToSpeed, setMinMaxCoords } from './util';
 import {getPowerOrVelocity} from "./windUtils"
 import * as Sentry from "@sentry/browser"
 import { UserControl} from '../redux/controlsSlice';
-import { RouteInfoState } from '../redux/routeInfoSlice';
 import type { GpxRouteData, RwgpsRoute, RwgpsTrip } from '../redux/routeInfoSlice';
 const kmToMiles = 0.62137;
 /**

@@ -16,7 +16,11 @@ export type Forecast = {
     summary?: string
     relBearing: number
     windBearing: number
+    time: string
+    isControl: boolean
+    aqi?: number
 }
+
 export type ForecastInfo = {
     timeZoneId: string | null
     valid: boolean

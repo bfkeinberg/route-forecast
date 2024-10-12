@@ -1,35 +1,14 @@
 import { paceSet } from "./routeParamsSlice";
-import { forecastInvalidated, weatherProviderSet, forecastFetched } from "./forecastSlice";
-import { rwgpsRouteLoaded } from "./routeInfoSlice";
-import { requestTimeZoneForRoute, doForecast } from '../utils/forecastUtilities';
-import { intervalSet, startTimeSet, initialStartTimeSet, timeZoneSet } from "./routeParamsSlice"
-import { UserControl, userControlsUpdated, displayControlTableUiSet } from "./controlsSlice";
-import { stravaFetchBegun, stravaFetched, stravaFetchFailed, stravaTokenSet, stravaActivitySet } from "./stravaSlice";
-import { shortUrlSet, forecastFetchBegun, forecastFetchCanceled, forecastFetchFailed,
-     stravaErrorSet, errorDetailsSet, routeLoadingBegun, rwgpsRouteLoadingFailed } from "./dialogParamsSlice";
+import { forecastInvalidated, weatherProviderSet } from "./forecastSlice";
+import { intervalSet, startTimeSet, initialStartTimeSet } from "./routeParamsSlice"
+import { UserControl, userControlsUpdated } from "./controlsSlice";
+import { shortUrlSet, errorDetailsSet } from "./dialogParamsSlice";
 import type { Dispatch, Action } from "redux";
-import {controlsMeaningfullyDifferent, getRwgpsRouteName, getRouteNumberFromValue, extractControlsFromRoute} from "../utils/util"
+import {controlsMeaningfullyDifferent} from "../utils/util"
 import { RootState } from "../jsx/app/topLevel";
 import { AppDispatch } from "../jsx/app/topLevel";
 import * as Sentry from "@sentry/react";
-import ReactGA from "react-ga4";
-import type { RouteInfoState, RwgpsRoute, RwgpsTrip } from "./routeInfoSlice"
-import { loadRwgpsRoute } from '../utils/rwgpsUtilities';
-
-type abmtype = (reason?:any) => void
-type abortMethodType = abmtype | null
-let fetchAbortMethod : abortMethodType = null
-
-const cancelForecast = () => {
-    return function(dispatch : Dispatch<Action<"forecast/forecastInvalidated">>) {
-        const cancel : abortMethodType = fetchAbortMethod
-        if (cancel !== null) {
-            const cancelMethod : abmtype = cancel
-            cancelMethod()
-        }
-        dispatch(forecastInvalidated())
-    }
-}
+import { cancelForecast } from "./forecastActions";
 
 export const setPace = function (pace : string) {
     return function(dispatch : AppDispatch) {
@@ -75,60 +54,6 @@ export const setWeatherProvider = (weatherProvider : string) => {
     }
 }
 
-const getRouteDistanceInKm = (routeData : RwgpsRoute|RwgpsTrip) => {
-    if (routeData.route !== undefined) {
-        return routeData.route.distance/1000;
-    } else if (routeData.trip !== undefined) {
-        return routeData.trip.distance/1000;
-    } else {
-        return null;
-    }
-}
-
-const getRouteId = (routeData : RwgpsRoute|RwgpsTrip) => {
-    if (routeData.route !== undefined) {
-        return routeData.route.id;
-    } else if (routeData.trip !== undefined) {
-        return routeData.trip.id;
-    } else {
-        return null;
-    }
-};
-
-export const requestForecast = function (routeInfo : RouteInfoState) {
-    return async function (dispatch : AppDispatch, getState : () => RootState) {
-        await Sentry.startSpan({ name: "requestForecast" }, async () => {
-            if (routeInfo.rwgpsRouteData) {
-                ReactGA.event('add_payment_info', {
-                    value: getRouteDistanceInKm(routeInfo.rwgpsRouteData), coupon:getRwgpsRouteName(routeInfo.rwgpsRouteData),
-                    currency:getRouteId(routeInfo.rwgpsRouteData),
-                    items: [{ item_id:'', item_name:''}]
-                });
-            } else if (routeInfo.gpxRouteData) {
-                ReactGA.event('add_payment_info', {
-                    value: routeInfo.gpxRouteData.tracks[0].distance.total, coupon:routeInfo.gpxRouteData.name,
-                    currency:getRouteNumberFromValue(routeInfo.gpxRouteData.tracks[0].link),
-                    items: [{item_id:'', item_name:''}]
-                });
-            }
-            const fetchController = new AbortController()
-            const abortMethod = fetchController.abort.bind(fetchController)
-            fetchAbortMethod = abortMethod;
-            dispatch(forecastFetchBegun());
-            const { result, value, error } = await doForecast(getState(), fetchController.signal);
-            fetchAbortMethod = null;
-            if (result === "success" && value) {
-                const { forecast, timeZoneId } = value
-                dispatch(forecastFetched({ forecastInfo: forecast, timeZoneId: timeZoneId }));
-            } else if (result === "error") {
-                dispatch(forecastFetchFailed(error));
-            } else {
-                dispatch(forecastFetchCanceled());
-            }
-        })
-    }
-};
-
 /*
  * @param {String} url the URL to shortern
  * @returns {function(*=, *): Promise<T | never>} return value
@@ -158,119 +83,4 @@ export const shortenUrl = function (url : string) {
     }
 };
 
-const mergeControls = (oldCtrls : Array<UserControl>, newCtrls : Array<UserControl>) => {
-    let oldCtrlsCopy = oldCtrls.slice()
-    let old = oldCtrlsCopy.shift()
-    const merged = newCtrls.map(ctrl => {
-        if (old && ctrl.distance === old.distance) {
-            const result =  {name:ctrl.name, distance:ctrl.distance, duration:old.duration}
-            old = oldCtrlsCopy.shift()
-            return result
-        } else {
-            return ctrl
-        }
-    })
-    return merged
-}
 
-export const loadFromRideWithGps = function (routeNumber? : string, isTrip? : boolean) {
-    return function (dispatch : AppDispatch, getState: () => RootState) {
-        return Sentry.startSpan({ name: "loadingRwgpsRoute" }, () => {
-            routeNumber = routeNumber || getState().uiInfo.routeParams.rwgpsRoute
-            ReactGA.event('login', { method: routeNumber });
-            isTrip = isTrip || getState().uiInfo.routeParams.rwgpsRouteIsTrip
-            dispatch(routeLoadingBegun('rwgps'));
-            dispatch(cancelForecast())
-            return loadRwgpsRoute(routeNumber, isTrip, getState().rideWithGpsInfo.token).then(async (routeData) => {
-                dispatch(rwgpsRouteLoaded(routeData));
-                const extractedControls = extractControlsFromRoute(routeData);
-                if (extractedControls.length !== 0) {
-                    const oldControls = getState().controls.userControlPoints
-                    if (oldControls.length === 0) {
-                        dispatch(updateUserControls(extractedControls))
-                    } else {
-                        const merged = mergeControls(oldControls, extractedControls)
-                        dispatch(updateUserControls(merged))
-                    }
-                    dispatch(displayControlTableUiSet(true))
-                }
-                const timeZoneResults = await requestTimeZoneForRoute(getState())
-                if (timeZoneResults.result === "error") {
-                    dispatch(rwgpsRouteLoadingFailed(timeZoneResults.error?timeZoneResults.error:"Unknown error fetching time zone"))
-                } else {
-                    Sentry.addBreadcrumb({category:'timezone',level:'info',message:`TimeZone API call returned ${timeZoneResults.result}`})
-                    dispatch(timeZoneSet(timeZoneResults.result))
-                }
-            }, error => { return dispatch(rwgpsRouteLoadingFailed(error.message?error.message:error)) }
-            );
-        })
-    };
-};
-
-const getStravaParser = async function() {
-    const parser = await import(/* webpackChunkName: "StravaRouteParser" */ '../utils/stravaRouteParser');
-    return parser.default;
-};
-
-const stravaTokenTooOld = (getState: () => RootState) => {
-    if (getState().strava.expires_at == null) {
-        return false;
-    }
-    return (getState().strava.expires_at! < Math.round(Date.now()/1000));
-};
-
-export const refreshOldToken = (dispatch : AppDispatch, getState: () => RootState) => {
-    if (stravaTokenTooOld(getState)) {
-        return new Promise<string|null>((resolve, reject) => {
-            fetch(`/refreshStravaToken?refreshToken=${getState().strava.refresh_token}`).then(response => {
-                if (response.status === 200) {
-                    return response.json();
-                }
-            }).then(response => {
-                if (response === undefined) {
-                    dispatch(stravaErrorSet(Error("Received undefined response from Strava auth service")));
-                    reject(Error("Received undefined response from Strava auth service"));
-                }
-                else {
-                    dispatch(stravaTokenSet({token:response.access_token, expires_at:response.expires_at}));
-                    resolve(response.access_token);
-                }
-            }, error => {
-                dispatch(stravaErrorSet(error));
-                reject(error);
-            });
-        });
-    } else {
-        return new Promise<string|null>((resolve) => {resolve(getState().strava.access_token)});
-    }
-}
-
-export const loadStravaActivity = function() {
-    return async function (dispatch : AppDispatch, getState: () => RootState) {
-        const parser = await getStravaParser().catch((err) => {
-            dispatch(stravaFetchFailed(err));
-            return null
-        });
-        // handle failed load, error has already been dispatched
-        if (parser == null) {
-            return Promise.resolve(Error('Cannot load parser'));
-        }
-
-        const access_token = await refreshOldToken(dispatch, getState)
-        if (!access_token) {
-            dispatch(stravaFetchFailed(Error("Failed to get Strava access token")));
-            dispatch(stravaActivitySet(''))
-            return
-        }
-        dispatch(stravaFetchBegun());
-        const activityId = getState().strava.activity
-        ReactGA.event('login', {method:activityId});
-        return parser.fetchStravaActivity(activityId, access_token).then(result => {
-            dispatch(stravaFetched(result));
-        }).catch(error => {
-            dispatch(stravaFetchFailed(error));
-            dispatch(stravaActivitySet(''))
-        });
-
-    }
-};
