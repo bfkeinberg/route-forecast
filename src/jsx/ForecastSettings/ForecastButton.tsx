@@ -5,24 +5,21 @@ import ReactGA from "react-ga4";
 import {connect, ConnectedProps} from 'react-redux';
 import { useMediaQuery } from 'react-responsive';
 
-import { msgFromError } from 'redux/forecastActions';
-import { shortenUrl } from '../../redux/actions_';
+import { msgFromError, removeDuplicateForecasts, extractRejectedResults } from '../../redux/forecastActions';
+import { shortenUrl } from '../../redux/actions';
 import { useForecastMutation, useGetAqiMutation } from '../../redux/forecastApiSlice';
 import { forecastFetched, forecastAppended } from '../../redux/forecastSlice';
 import { querySet } from '../../redux/paramsSlice';
-import { forecastFetchBegun, forecastFetchFailed } from '../../redux/dialogParamsSlice';
-import { errorMessageListSet, errorMessageListAppend } from '../../redux/dialogParamsSlice';
+import { errorMessageListSet, errorMessageListAppend, forecastFetchBegun, forecastFetchFailed } from '../../redux/dialogParamsSlice';
 import { generateUrl } from '../../utils/queryStringUtils';
 import { getForecastRequest } from '../../utils/util';
 import { DesktopTooltip } from '../shared/DesktopTooltip';
 import {useTranslation} from 'react-i18next'
 import { providerValues } from '../../redux/providerValues';
 import { useForecastRequestData } from '../../utils/hooks';
-import { removeDuplicateForecasts } from 'redux/forecastActions';
 import { RootState } from '../app/topLevel';
 import { useAppSelector, useAppDispatch } from '../../utils/hooks';
 import type {ForecastRequest} from '../../utils/gpxParser'
-import { extractRejectedResults } from 'redux/forecastActions';
 
 declare module 'react' {
     interface HTMLAttributes<T> extends AriaAttributes, DOMAttributes<T> {

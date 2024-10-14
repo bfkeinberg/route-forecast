@@ -1,7 +1,7 @@
 import { Icon } from '@blueprintjs/core';
 
 import { controlRemoved } from '../../redux/controlsSlice';
-import { updateUserControls } from '../../redux/actions_';
+import { updateUserControls } from '../../redux/actions';
 import { useActualArrivalTimes, useForecastDependentValues } from '../../utils/hooks';
 import { milesToMeters,stringIsOnlyDecimal, stringIsOnlyNumeric } from '../../utils/util';
 import { Table } from "./Table"

@@ -39,16 +39,14 @@ export const setMinMaxCoords = (trackPoint : Point,bounds : Bounds) => {
   return bounds;
 };
 
-//  {routeInfo, uiInfo: {routeParams}, controls}
 type StateForRouteInfo = {
   routeInfo: RouteInfoState
   controls: ControlsState
   uiInfo: {routeParams: RouteParamsState}
 }
 
-export const getRouteInfo = (state : StateForRouteInfo, type : string,
-   timeZoneId : string, segment : Segment) => {
-    if (type === "rwgps") {
+export const getRouteInfo = (state : StateForRouteInfo, timeZoneId : string, segment : Segment) => {
+    if (state.routeInfo.type === "rwgps") {
       return gpxParser.walkRwgpsRoute(
         state.routeInfo["rwgpsRouteData"]!,
         DateTime.fromMillis(state.uiInfo.routeParams.startTimestamp, {zone:timeZoneId}),
@@ -128,7 +126,7 @@ export const parseControls = function (controlPointString : string, deleteFirstE
   }
 }
 
-export const getRwgpsRouteName = (route : RwgpsRoute | RwgpsTrip) => route[route.type].name
+export const getRwgpsRouteName = (route : RwgpsRoute | RwgpsTrip) => route[route.type]!.name
 export const getGpxRouteName = (route : GpxRouteData) => route.tracks[0].name
 
 export const controlsMeaningfullyDifferent = (controls1 : Array<UserControl>, controls2 : Array<UserControl>) => {
@@ -140,7 +138,7 @@ export const controlsMeaningfullyDifferent = (controls1 : Array<UserControl>, co
 }
 
 export const extractControlsFromRoute = (routeData : RwgpsRoute|RwgpsTrip) => {
-  return gpxParser.extractControlPoints(routeData, 'rwgps');
+  return gpxParser.extractControlPoints(routeData);
 }
 
 export const stringIsOnlyNumeric = (string : string) => string.match(/^[0-9]*$/) !== null

@@ -14,7 +14,6 @@ import { getRouteInfo, getForecastRequest, milesToMeters } from "./util"
 import type {ControlsState} from '../redux/controlsSlice'
 import type { RouteInfoState } from "../redux/routeInfoSlice";
 import type { WindAdjustResults, Point } from "./gpxParser";
-import type { StravaActivityStream, StravaActivityData } from "./stravaRouteParser";
 import type {Bounds} from './util'
 
 const useDelay = (delay: number, startCondition = true) => {
@@ -243,7 +242,7 @@ const calculateWindResult = (inputs : WindResultInputs) : WindAdjustResults => {
 
   let result
   if (forecast.length > 0 && (routeInfo?.rwgpsRouteData || routeInfo?.gpxRouteData)) {
-    const { points, values, finishTime} = getRouteInfo(stateStuff, routeInfo.rwgpsRouteData !== null ? "rwgps" : "gpx", timeZoneId, segment)
+    const { points, values, finishTime} = getRouteInfo(stateStuff, timeZoneId, segment)
 
     let sortedControls = controls.userControlPoints.slice();
     sortedControls?.sort((a,b) => a['distance']-b['distance']);

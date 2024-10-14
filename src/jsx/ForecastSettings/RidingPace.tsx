@@ -5,7 +5,7 @@ import { Select, ItemRenderer } from "@blueprintjs/select";
 import {connect, ConnectedProps} from 'react-redux';
 
 import { saveCookie } from "../../utils/util";
-import { setPace } from "../../redux/actions_";
+import { setPace } from "../../redux/actions";
 import { useActualPace, useFormatSpeed } from '../../utils/hooks';
 import { inputPaceToSpeed, metricPaceToSpeed, paceToSpeed } from '../../utils/util';
 import { DesktopTooltip } from '../shared/DesktopTooltip';

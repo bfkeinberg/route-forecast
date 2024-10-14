@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { getRwgpsRouteName, getGpxRouteName } from '../utils/util';
-import type { GpxPoint } from '../utils/gpxParser';
+import type { GpxPoint, RwgpsCoursePoint, RwgpsPoint } from '../utils/gpxParser';
 
 const routeInfoInitialState : RouteInfoState = {
     name: '',
@@ -9,18 +9,19 @@ const routeInfoInitialState : RouteInfoState = {
     loadingFromURL: false,
     distanceInKm: 0,
     canDoUserSegment:false,
-    type: null,
+    type: "none",
 }
 
 export interface RwgpsRoute {
+    type: "route",
     route: {
         distance: number,
         name: string,
-        track_points: {d:number}[]
+        track_points: RwgpsPoint[]
+        course_points: Array<RwgpsCoursePoint>
         id: number
     },
     trip?: never,
-    type: string,
     [index:string]:any
 }
 
@@ -28,11 +29,12 @@ export interface RwgpsTrip {
     trip: {
         distance: number,
         name: string,
-        track_points: {d:number}[]
+        track_points: RwgpsPoint[]
+        course_points: Array<RwgpsCoursePoint>
         id: number
     },
     route?: never,
-    type: string,
+    type: "trip",
     [index:string]:any
 }
 
@@ -48,31 +50,35 @@ export interface GpxRouteData {
     }>
 }
 
-export interface RouteInfoState  {
+export interface BaseRouteInfoState  {
     name: string,
-    rwgpsRouteData: RwgpsRoute | RwgpsTrip | null,
-    gpxRouteData: GpxRouteData | null,
     loadingFromURL: boolean,
     distanceInKm: number,
     canDoUserSegment: boolean,
-    type: string | null
+    type: "rwgps" | "gpx" | "none"
     [index:string]:any
 }
 
-interface RwgpsRouteInfoState extends RouteInfoState {
+interface RwgpsRouteInfoState extends BaseRouteInfoState {
     type: "rwgps"
     rwgpsRouteData: RwgpsRoute | RwgpsTrip
-    gpxRouteData: never
+    gpxRouteData: null
 }
 
-interface GpxRouteInfoState extends RouteInfoState {
-    type: null
-    rwgpsRouteData: never
+interface GpxRouteInfoState extends BaseRouteInfoState {
+    type: "gpx"
+    rwgpsRouteData: null
     gpxRouteData: GpxRouteData
 }
 
+export interface NullRouteInfoState extends BaseRouteInfoState {
+    // type: "none"
+    // rwgpsRouteData: never
+    // gpxRouteData: never
+}
+
 type RwGpsData = RwgpsRoute | RwgpsTrip
-export type RouteInfo = RwgpsRouteInfoState | GpxRouteInfoState
+export type RouteInfoState = RwgpsRouteInfoState | GpxRouteInfoState | NullRouteInfoState
 
 const routeInfoSlice = createSlice({
     name:'routeInfo',
@@ -80,7 +86,8 @@ const routeInfoSlice = createSlice({
     reducers:{
         rwgpsRouteLoaded(state, action: PayloadAction<RwGpsData>) {
             state.rwgpsRouteData = action.payload
-            state.gpxRouteData = null
+            state.type = "rwgps"
+            state.gpxRouteData = routeInfoInitialState.gpxRouteData
             state.name = getRwgpsRouteName(action.payload)
             if (action.payload.route) {
                 state.distanceInKm = action.payload.route.distance/1000
@@ -89,20 +96,19 @@ const routeInfoSlice = createSlice({
                 state.distanceInKm = action.payload.trip.distance/1000
                 state.canDoUserSegment = action.payload.trip.track_points[0].d !== undefined
             }
-            state.type = "rwgps"
         },
         gpxRouteLoaded(state, action : PayloadAction<GpxRouteData>) {
+            state.type = "gpx"
             state.gpxRouteData = action.payload
             state.rwgpsRouteData = routeInfoInitialState.rwgpsRouteData
             state.name = getGpxRouteName(action.payload)
-            state.type = "gpx"
             state.distanceInKm = action.payload.tracks[0].distance.total/1000
         },
         routeDataCleared(state) {
             state.rwgpsRouteData = routeInfoInitialState.rwgpsRouteData
             state.gpxRouteData = routeInfoInitialState.gpxRouteData
             state.name = routeInfoInitialState.name
-            state.type = null
+            state.type = routeInfoInitialState.type
             state.distanceInKm = routeInfoInitialState.distanceInKm
         },
         loadingFromUrlSet(state, action : PayloadAction<boolean>) {

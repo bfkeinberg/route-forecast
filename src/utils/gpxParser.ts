@@ -26,8 +26,8 @@ type SingleForecast = {
 type ForecastInfo = Array<SingleForecast>
 export type Point = {lat : number, lon: number, dist?: number, elevation: number}
 export type CalculatedValue = {arrival : string, banked: number, val: number, distance: number, [index:string]:any}
-type RwgpsCoursePoint = {d:number, t:string, n:string, x:number, y:number, i:number}
-type RwgpsPoint = {x:number, y:number, d:number, e:number}
+export type RwgpsCoursePoint = {d:number, t:string, n:string, x:number, y:number, i:number}
+export type RwgpsPoint = {x:number, y:number, d:number, e:number}
 export type GpxPoint = {lat: number, lon: number, ele: number}
 interface ExtractedControl {
     distance: number,
@@ -135,10 +135,8 @@ class AnalyzeRoute {
         }
     }
 
-    parseCoursePoints = (routeData : RwgpsRoute|RwgpsTrip, type : string) =>
-        ((type === "rwgps" && routeData.type) ?
-        routeData[routeData.type]['course_points'] :
-        [])
+    parseCoursePoints = (routeData : RwgpsRoute|RwgpsTrip) =>
+        routeData.type === "route" ? routeData[routeData.type]['course_points'] : routeData[routeData.type]['course_points']
 
     isControl = (coursePoint : RwgpsCoursePoint) => {
         const controlRegexp = /^control|rest stop|regroup|lunch/i;
@@ -149,8 +147,8 @@ class AnalyzeRoute {
     controlFromCoursePoint = (coursePoint : RwgpsCoursePoint) : ExtractedControl =>
         ({name:coursePoint.n.replace(':','_'), duration:1, distance:Math.round((coursePoint.d*kmToMiles)/1000)})
 
-    extractControlPoints = (routeData : RwgpsRoute|RwgpsTrip, type : string) =>
-        this.parseCoursePoints(routeData, type).filter((point : RwgpsCoursePoint) => this.isControl(point)).map((point : RwgpsCoursePoint) => this.controlFromCoursePoint(point))
+    extractControlPoints = (routeData : RwgpsRoute|RwgpsTrip) =>
+        this.parseCoursePoints(routeData).filter((point : RwgpsCoursePoint) => this.isControl(point)).map((point : RwgpsCoursePoint) => this.controlFromCoursePoint(point))
 
     parseGpxRouteStream ( routeData : GpxRouteData) : Array<Point> {
         return routeData.tracks.reduce((accum : Array<GpxPoint>, current: {points: Array<GpxPoint>}) => accum.concat(current.points, []), []).
@@ -158,9 +156,15 @@ class AnalyzeRoute {
     }
 
     parseRwgpsRouteStream( routeData : RwgpsRoute|RwgpsTrip) : Array<Point> {
-        return routeData[routeData.type]['track_points']
+        if (routeData.type === "route") {
+            return routeData['route']['track_points']
             .filter((point : RwgpsPoint) => point.x !== undefined && point.y !== undefined)
             .map((point : RwgpsPoint)  => ({ lat: point.y, lon: point.x, elevation: point.e, dist: point.d }))
+        } else {
+            return routeData['trackroute']['track_points']
+            .filter((point : RwgpsPoint) => point.x !== undefined && point.y !== undefined)
+            .map((point : RwgpsPoint)  => ({ lat: point.y, lon: point.x, elevation: point.e, dist: point.d }))
+        }
     }
 
     computePointsAndBounds = (stream:Array<Point>) => {

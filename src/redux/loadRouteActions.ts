@@ -7,13 +7,14 @@ import * as Sentry from "@sentry/react";
 import { routeLoadingBegun, rwgpsRouteLoadingFailed } from "./dialogParamsSlice";
 import { loadRwgpsRoute } from '../utils/rwgpsUtilities';
 import { rwgpsRouteLoaded } from "./routeInfoSlice";
-import { extractControlsFromRoute } from "utils/util";
+import { extractControlsFromRoute } from "../utils/util";
 import { displayControlTableUiSet, UserControl } from "./controlsSlice";
 import { timeZoneSet } from "./routeParamsSlice";
-import { updateUserControls, shortenUrl } from "./actions_";
-import { requestTimeZoneForRoute } from "utils/forecastUtilities";
+import { updateUserControls, shortenUrl } from "./actions";
+import { requestTimeZoneForRoute } from "../utils/forecastUtilities";
 import { loadStravaRoute, loadStravaActivity } from "./loadFromStravaActions";
 import { cancelForecast, forecastWithHook, requestForecast } from "./forecastActions";
+import { DateTime } from "luxon";
 
 const mergeControls = (oldCtrls : Array<UserControl>, newCtrls : Array<UserControl>) => {
     let oldCtrlsCopy = oldCtrls.slice()
@@ -51,7 +52,13 @@ export const loadFromRideWithGps = function (routeNumber? : string, isTrip? : bo
                     }
                     dispatch(displayControlTableUiSet(true))
                 }
-                const timeZoneResults = await requestTimeZoneForRoute(getState())
+                const routeInfo = getState().routeInfo
+                if (routeInfo.type === null) {
+                    return
+                }
+                const timeZoneResults = await requestTimeZoneForRoute(routeInfo,
+                    DateTime.fromMillis(getState().uiInfo.routeParams.startTimestamp, { zone: getState().uiInfo.routeParams.zone }),
+                    getState().params.timezone_api_key)
                 if (timeZoneResults.result === "error") {
                     dispatch(rwgpsRouteLoadingFailed(timeZoneResults.error?timeZoneResults.error:"Unknown error fetching time zone"))
                 } else {

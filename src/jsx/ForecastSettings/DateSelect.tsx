@@ -6,8 +6,8 @@ import { DateInput3, TimePrecision } from "@blueprintjs/datetime2";
 import { DateTime } from 'luxon';
 import {connect, ConnectedProps} from 'react-redux';
 
-import {setStart} from "../../redux/actions_";
-import { setTimeFromIso } from "../../redux/actions_";
+import {setStart} from "../../redux/actions";
+import { setTimeFromIso } from "../../redux/actions";
 import { initialStartTimeSet } from "../../redux/routeParamsSlice";
 import { DesktopTooltip } from '../shared/DesktopTooltip';
 import {useTranslation} from 'react-i18next'

@@ -1,7 +1,7 @@
 import {Button, FormGroup, MenuItem} from "@blueprintjs/core";
 import { Select, ItemRenderer } from "@blueprintjs/select";
 import {connect, ConnectedProps} from 'react-redux';
-import {setWeatherProvider} from "../../redux/actions_";
+import {setWeatherProvider} from "../../redux/actions";
 import { providerValues } from "../../redux/providerValues";
 import { DesktopTooltip } from '../shared/DesktopTooltip';
 import {useTranslation} from 'react-i18next'

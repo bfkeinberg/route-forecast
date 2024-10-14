@@ -2,7 +2,7 @@ import { FormGroup } from "@blueprintjs/core";
 import { Slider, Tooltip } from "@mui/material"
 import {connect, ConnectedProps} from 'react-redux';
 import { RootState } from "../app/topLevel";
-import {setInterval} from "../../redux/actions_";
+import {setInterval} from "../../redux/actions";
 import {useTranslation} from 'react-i18next'
 
 type PropsFromRedux = ConnectedProps<typeof connector>

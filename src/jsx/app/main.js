@@ -49,8 +49,8 @@ import { routeLoadingModes } from '../../data/enums';
 import { loadCookie, saveCookie } from "../../utils/util";
 import {
     loadRouteFromURL,
-} from "../../redux/actions";
-import { setPace, updateUserControls, setInterval, setWeatherProvider } from "../../redux/actions_";
+} from "../../redux/loadRouteActions";
+import { setPace, updateUserControls, setInterval, setWeatherProvider } from "../../redux/actions";
 import { useForecastMutation, useGetAqiMutation } from '../../redux/forecastApiSlice';
 import { inputPaceToSpeed,parseControls } from '../../utils/util';
 

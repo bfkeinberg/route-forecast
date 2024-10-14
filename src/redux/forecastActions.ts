@@ -7,8 +7,8 @@ import {getRwgpsRouteName, getRouteNumberFromValue} from "../utils/util"
 import { RouteInfoState, RwgpsRoute, RwgpsTrip } from "./routeInfoSlice";
 import { MutationWrapper } from "./loadRouteActions";
 import { getForecastRequest } from "../utils/util";
-import { ForecastRequest } from "utils/gpxParser";
-import { doForecast } from "utils/forecastUtilities";
+import { ForecastRequest } from "../utils/gpxParser";
+import { doForecast } from "../utils/forecastUtilities";
 import { Action, Dispatch } from "@reduxjs/toolkit";
 
 const getRouteDistanceInKm = (routeData : RwgpsRoute|RwgpsTrip) => {

@@ -4,7 +4,7 @@ import * as Sentry from "@sentry/react";
 import React, { useRef } from 'react';
 import ReactGA from "react-ga4"
 
-import { loadFromRideWithGps } from '../../redux/actions_';
+import { loadFromRideWithGps } from '../../redux/loadRouteActions';
 import { errorDetailsSet } from '../../redux/dialogParamsSlice';
 import { rusaIdLookupApiSlice } from '../../redux/rusaLookupApiSlice';
 import { rusaPermRouteIdSet, rwgpsRouteSet } from '../../redux/routeParamsSlice';

@@ -1,18 +1,19 @@
 import * as Sentry from '@sentry/browser';
 import { DateTime } from 'luxon';
-import { getRouteInfo } from '../utils/util';
+import { getRouteInfo } from './util';
+import { RootState } from 'jsx/app/topLevel';
 
-const findTimezoneForPoint = (lat, lon, time, timezone_api_key, abortSignal) => {
+interface TimeZoneResult {
+    offset: number
+    zoneId: string
+}
+const findTimezoneForPoint = (lat : number, lon : number, time : DateTime, timezone_api_key : string, abortSignal : AbortSignal): Promise<TimeZoneResult|Error> => {
     return fetch(`https://maps.googleapis.com/maps/api/timezone/json?location=${lat},${lon}&timestamp=${time.toSeconds()}&key=${timezone_api_key}`, {signal: abortSignal})
     .then( response => {
         if (response.ok) {
             return response.json();
         }
-        if (response.error) {
-            throw Error(response.error());
-        } else {
-            throw Error(JSON.stringify(response))
-        }
+        throw Error(response.statusText);
     })
     .then (body => {
         // check for error in body of message
@@ -26,12 +27,26 @@ const findTimezoneForPoint = (lat, lon, time, timezone_api_key, abortSignal) => 
     .catch(error => {return Error(error.message + " time zone")});
 }
 
-const getTimeZoneId = async (routeInfo, routeStart, timezoneApiKey, type, abortSignal) => {
+import type { RouteInfoState } from 'redux/routeInfoSlice';
+interface TimeZoneIdSuccess {
+    result: "success"
+    value: {offset: number, zoneId: string}
+}
+interface TimeZoneIdFailure {
+    result: "error"
+    error: string | Error
+}
+type TimeZoneIdType = TimeZoneIdSuccess | TimeZoneIdFailure
+
+const getTimeZoneId = async (routeInfo : RouteInfoState, routeStart : DateTime, timezoneApiKey : string, abortSignal : AbortSignal) : Promise<TimeZoneIdType> => {
   const rwgpsRouteData = routeInfo.rwgpsRouteData
-  if (type === "rwgps") {
-      const type = rwgpsRouteData.trip === undefined ? 'route' : 'trip';
-      const rwgpsRouteDatum = rwgpsRouteData[type];
-      const point = rwgpsRouteDatum['track_points'][0];
+  if (routeInfo.type === "rwgps") {
+      const rwgpsType = rwgpsRouteData.type
+      const rwgpsRouteDatum = rwgpsRouteData[rwgpsType];
+      if (!rwgpsRouteDatum) {
+        return { result: "error", error: "RWGPS route data missing" }  
+      }
+      const point = rwgpsRouteDatum['track_points'][0]
       const zoneInfo = await findTimezoneForPoint(point.y, point.x, routeStart, timezoneApiKey, abortSignal);
       if (zoneInfo instanceof Error) {
           return { result : "error", error : zoneInfo}
@@ -43,13 +58,17 @@ const getTimeZoneId = async (routeInfo, routeStart, timezoneApiKey, type, abortS
           return { result: "error", error: "GPX route missing tracks" }
       }
       const point = routeInfo.gpxRouteData.tracks[0].points[0];
-      return { result: "success", value: await findTimezoneForPoint(point.lat, point.lon, routeStart, timezoneApiKey, abortSignal) }
+      const zoneInfo = await findTimezoneForPoint(point.lat, point.lon, routeStart, timezoneApiKey, abortSignal)
+      if (zoneInfo instanceof Error) {
+        return { result : "error", error : zoneInfo}
+    }
+    return { result: "success", value: zoneInfo }
   } else {
-      return { result: "error", error: "GPX route data missing" }
+      return { result: "error", error: "Route data missing" }
   }
 }
 
-const getError = async (response) => {
+const getError = async (response : Response) => {
     try {
         let details = await response.clone().json();
         return details;
@@ -59,7 +78,7 @@ const getError = async (response) => {
     }
 }
 
-const doForecastFetch = async (path, formData, abortSignal) => {
+const doForecastFetch = async (path : string, formData : BodyInit, abortSignal : AbortSignal) => {
   try {
       const response = await fetch(path, {
           method: 'POST',
@@ -77,36 +96,34 @@ const doForecastFetch = async (path, formData, abortSignal) => {
                   throw new Error(details.status);
               }
           }
-          let error = response.statusText !== undefined ? response.statusText : response['status'];
+          let error = response.statusText !== undefined ? response.statusText : response.status.toString();
           throw new Error(error);
       }
-  } catch (error) {
-      let errorMessage = error.message !== undefined ? error.message : error;
+  } catch (error : any) {
+      let errorMessage = "message" in error ? error.message : error;
       return { result: "error", error: errorMessage }
   }
 }
 
-export const requestTimeZoneForRoute = async (state) => {
+export const requestTimeZoneForRoute = async (routeInfo : RouteInfoState, routeStart: DateTime, apiKey: string) => {
     const fetchController = new AbortController()
-    const type = state.routeInfo.rwgpsRouteData !== null ? "rwgps" : "gpx"
-    const { result, value, error } = await getTimeZoneId(state.routeInfo, DateTime.fromMillis(state.uiInfo.routeParams.startTimestamp, { zone: state.uiInfo.routeParams.zone }),
-        state.params.timezone_api_key, type, fetchController.signal)
-    if (result === "error") {
-        return { result: "error", error }
+    const timeZoneResults = await getTimeZoneId(routeInfo, routeStart, apiKey, fetchController.signal)
+    if (timeZoneResults.result === "error") {
+        return { result: "error", error: timeZoneResults.error }
     }
-    return { result: value.zoneId }
+        
+    return { result: timeZoneResults.value.zoneId }
 }
 
-export const doForecast = async (state, abortSignal) => {
-    const type = state.routeInfo.rwgpsRouteData !== null ? "rwgps" : "gpx"
-    const { result, value, error } = await getTimeZoneId(state.routeInfo, DateTime.fromMillis(state.uiInfo.routeParams.startTimestamp, { zone: state.uiInfo.routeParams.zone }),
-        state.params.timezone_api_key, type, abortSignal)
-    if (result === "error") {
-        return { result: "error", error }
+export const doForecast = async (state : RootState, abortSignal : AbortSignal) => {
+    const timeZoneResults = await getTimeZoneId(state.routeInfo, DateTime.fromMillis(state.uiInfo.routeParams.startTimestamp, { zone: state.uiInfo.routeParams.zone }),
+        state.params.timezone_api_key, abortSignal)
+    if (timeZoneResults.result === "error") {
+        return { result: "error", error: timeZoneResults.error }
     }
-    const { zoneId: timeZoneId } = value
+    const { zoneId: timeZoneId } = timeZoneResults.value
 
-    const parsedRouteInfo = getRouteInfo(state, type, timeZoneId, state.uiInfo.routeParams.segment)
+    const parsedRouteInfo = getRouteInfo(state, timeZoneId, state.uiInfo.routeParams.segment)
     if (parsedRouteInfo === undefined) {
         return { result: "error", error: "No route could be loaded" }
     }
