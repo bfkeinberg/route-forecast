@@ -104,7 +104,8 @@
             },
             "analysis": {
                 "overallPace":"Overall climb-adjusted pace was",
-                "interval":"hour"
+                "interval":"hour",
+                "halfHourInterval": "half hour"
             }
         }
     },
@@ -213,7 +214,8 @@
             },
             "analysis": {
                 "overallPace":"Le rythme global ajusté en fonction de la montée était",
-                "interval":"heure"
+                "interval":"heure",
+                "halfHourInterval": "une demi-heure"
             }
         }
     }

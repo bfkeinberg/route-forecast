@@ -1,10 +1,9 @@
 import 'animate.css/animate.min.css';
 
 import { HTMLTable, Tooltip } from '@blueprintjs/core';
-import PropTypes from 'prop-types';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import cookie from 'react-cookies';
-import {connect} from 'react-redux';
+import {connect, ConnectedProps} from 'react-redux';
 
 import { zoomToRangeToggled } from '../../redux/forecastSlice';
 import { useActualPace, useFormatSpeed } from '../../utils/hooks';
@@ -14,42 +13,70 @@ import { ToggleButton } from '../shared/ToggleButton';
 import StravaAnalysisIntervalInput from './StravaAnalysisIntervalInput';
 import {useTranslation} from 'react-i18next'
 import { mapSubrangeSet, mapRangeToggled } from '../../redux/stravaSlice';
+import { RootState } from 'jsx/app/topLevel';
+type PropsFromRedux = ConnectedProps<typeof connector>
 
-const PaceTable = ({activityData, activityStream, analysisInterval, mapSubrangeSet, mapRangeToggled, zoomToRange, zoomToRangeToggled}) =>  {
+declare module 'react' {
+    interface HTMLAttributes<T> extends AriaAttributes, DOMAttributes<T> {
+        // extends React's HTMLAttributes
+        start?:number
+        end?: number
+    }
+}
+
+const PaceTable = ({activityData, activityStream, analysisInterval, mapSubrangeSet, mapRangeToggled, zoomToRange, zoomToRangeToggled} : PropsFromRedux) =>  {
     const { t } = useTranslation()
     const [
         selectedRow,
         setSelectedRow
-    ] = useState(null)
+    ] = useState<string|null>(null)
 
-    const updateSubrange = (event) => {
-        // TODO
-        // for inexplicable reasons, broken if a forecast is also loaded. so disabling this entirely for now
+    const updateSubrange = (event: React.MouseEvent) => {
+        const startDistance = event.currentTarget.getAttribute('start');
+        const endDistance = event.currentTarget.getAttribute('end');
+        if (!startDistance || !endDistance) {
+            return
+        }
         mapSubrangeSet({
-            start: parseInt(event.currentTarget.getAttribute('start'), 10),
-            finish: parseInt(event.currentTarget.getAttribute('end'), 10)
+            start: startDistance,
+            finish: endDistance
         }
         );
     };
 
     const toggleZoom = () => {
         zoomToRangeToggled();
-        cookie.save('zoomToRange', !zoomToRange, { path: '/' });
+        cookie.save('zoomToRange', (!zoomToRange).toString(), { path: '/' });
     };
 
-    const toggleRange = (event) => {
-        const start = parseInt(event.currentTarget.getAttribute('start'));
-        mapRangeToggled({start:start, finish:parseInt(event.currentTarget.getAttribute('end'))});
-        if (selectedRow === start) {
+    const toggleRange = (event : React.MouseEvent) => {
+        const startDistance = event.currentTarget.getAttribute('start');
+        const endDistance = event.currentTarget.getAttribute('end');
+        if (!startDistance || !endDistance) {
+            return
+        }
+        mapRangeToggled({start:startDistance, finish:endDistance});
+        if (selectedRow === startDistance) {
             setSelectedRow(null)
         } else {
-            setSelectedRow(start)
+            setSelectedRow(startDistance)
         }
     };
 
     const formatSpeed = useFormatSpeed()
 
-    const expandTable = (paces) => {
+    interface Pace {
+        speed: number;
+        distance: number;
+        climb: number;
+        start: number;
+        end: number;
+        pace: number;
+        alphaPace: string | undefined;
+        time: string;
+        stoppedTimeSeconds: number;
+    }
+    const expandTable = (paces : Array<Pace>) => {
         return (
             <tbody>
             {paces.map((pace) =>
@@ -70,7 +97,7 @@ const PaceTable = ({activityData, activityStream, analysisInterval, mapSubrangeS
 
     const actualPace = useActualPace()
 
-    if (activityData === null) {
+    if (activityData === null || activityStream === null || !actualPace) {
         return null
     }
     const paceOverTime = stravaRouteParser.findMovingAverages(activityData, activityStream, analysisInterval)
@@ -107,17 +134,7 @@ const PaceTable = ({activityData, activityStream, analysisInterval, mapSubrangeS
     );
 }
 
-PaceTable.propTypes = {
-    mapSubrangeSet:PropTypes.func.isRequired,
-    mapRangeToggled:PropTypes.func.isRequired,
-    activityData:PropTypes.object,
-    activityStream:PropTypes.object,
-    analysisInterval:PropTypes.number,
-    zoomToRange:PropTypes.bool.isRequired,
-    zoomToRangeToggled:PropTypes.func.isRequired
-};
-
-const mapStateToProps = (state) =>
+const mapStateToProps = (state : RootState) =>
     ({
         activityData: state.strava.activityData,
         activityStream: state.strava.activityStream,
@@ -129,4 +146,5 @@ const mapDispatchToProps = {
     mapSubrangeSet, mapRangeToggled, zoomToRangeToggled
 };
 
-export default connect(mapStateToProps,mapDispatchToProps)(PaceTable);
+const connector = connect(mapStateToProps,mapDispatchToProps)
+export default connector(PaceTable);

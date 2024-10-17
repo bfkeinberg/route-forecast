@@ -58,7 +58,7 @@ const useReusableDelay = <Type>(delay: number, startCondition = true) => {
     }
     if (startCondition) {
       timeout.current = setTimeout(() => {
-        Sentry.addBreadcrumb({category:"No stack", level:"info", message:"useReusableDelay"})
+        Sentry.addBreadcrumb({ category: "No stack", level: "info", message: "useReusableDelay" })
         setReady(true)
         timeout.current = null
       }, delay)
@@ -84,7 +84,7 @@ const useReusableDelay = <Type>(delay: number, startCondition = true) => {
   ]
 }
 
-const useValueHasChanged = <Type>(value : Type, startValue? : Type) => {
+const useValueHasChanged = <Type>(value: Type, startValue?: Type) => {
   const [
     oldValue,
     setOldValue
@@ -105,7 +105,7 @@ const useValueHasChanged = <Type>(value : Type, startValue? : Type) => {
   return hasChanged
 }
 
-const usePreviousPersistent = <Type>(value : Type) => {
+const usePreviousPersistent = <Type>(value: Type) => {
   const [
     oldValue,
     setOldValue

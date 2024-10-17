@@ -3,6 +3,7 @@ import { getRouteNumberFromValue } from '../utils/util';
 import { StravaActivityData, StravaActivityStream } from '../utils/stravaRouteParser';
 import { reset } from './routeParamsSlice';
 import { rwgpsRouteSet } from './routeParamsSlice';
+import { act } from 'react';
 const defaultAnalysisIntervalInHours = 1;
 
 const getAnalysisIntervalFromRouteDuration = (durationInHours: number) => {
@@ -111,13 +112,15 @@ const stravaSlice = createSlice({
                 parseFloat(action.payload.finish)
             ]
         },
-        mapRangeToggled(state,action:PayloadAction<{start:number,finish:number}>) {
-            if (state.subrange[0] === action.payload.start && state.subrange[1] === action.payload.finish) {
+        mapRangeToggled(state,action:PayloadAction<{start:string,finish:string}>) {
+            const start = parseFloat(action.payload.start)
+            const finish = parseFloat(action.payload.finish)
+            if (state.subrange[0] === start && state.subrange[1] === finish) {
                 state.subrange = []
             } else {
                 state.subrange = [
-                    action.payload.start,
-                    action.payload.finish
+                    start,
+                    finish
                 ]
                 }
         }
