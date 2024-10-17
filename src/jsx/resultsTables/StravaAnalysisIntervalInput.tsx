@@ -1,11 +1,15 @@
 import {Button, FormGroup, MenuItem, Tooltip} from "@blueprintjs/core";
-import { Select } from "@blueprintjs/select";
-import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
+import { Select, ItemRenderer } from "@blueprintjs/select";
+import { connect, ConnectedProps } from 'react-redux';
 import {useTranslation} from 'react-i18next'
 import { analysisIntervalSet } from "../../redux/stravaSlice";
+import { RootState } from "jsx/app/topLevel";
 
-const renderInterval = (interval, { handleClick, modifiers }) => {
+interface AnalysisInterval {
+    number: string
+    text: string
+}
+const renderInterval : ItemRenderer<AnalysisInterval>= (interval, { handleClick, modifiers }) => {
     if (!modifiers.matchesPredicate) {
         return null;
     }
@@ -19,7 +23,13 @@ const renderInterval = (interval, { handleClick, modifiers }) => {
     );
 };
 
-const StravaAnalysisIntervalInput = ({ interval, setInterval }) => {
+const findInterval = (intervals: Array<AnalysisInterval>, interval: number) : AnalysisInterval => {
+    const found = intervals.find(elem => elem.number == interval.toString())
+    return found || intervals[1]
+}
+
+type PropsFromRedux = ConnectedProps<typeof connector>
+const StravaAnalysisIntervalInput = ({ interval, setInterval } : PropsFromRedux) => {
     const { t } = useTranslation()
     const analysisIntervals = [
         {number: "0.5", text: "Half hour"},
@@ -34,7 +44,7 @@ const StravaAnalysisIntervalInput = ({ interval, setInterval }) => {
         
     const interval_tooltip_text = t('tooltips.analysisInterval');
     return (
-        <FormGroup size='sm' style={{ flex: '1' }}>
+        <FormGroup style={{ flex: '1' }}>
             <div style={{fontSize: "14px", fontWeight: "bold"}}>Analysis Interval</div>
             <Tooltip placement="bottom" content={interval_tooltip_text}>
             <Select
@@ -43,22 +53,17 @@ const StravaAnalysisIntervalInput = ({ interval, setInterval }) => {
                 itemRenderer={renderInterval}
                 filterable={false}
                 fill={true}
-                activeItem={{ number: interval.toString(), text:analysisIntervals.find(elem => elem.number == interval).text }}
+                activeItem={{ number: interval.toString(), text:findInterval(analysisIntervals, interval).text }}
                 onItemSelect={(selected) => { setInterval(selected.number) }}
             >
-            <Button text={analysisIntervals.find(elem => elem.number == interval).text} rightIcon="symbol-triangle-down" />
+            <Button text={findInterval(analysisIntervals, interval).text} rightIcon="symbol-triangle-down" />
             </Select>
             </Tooltip>
         </FormGroup>
     );
 };
 
-StravaAnalysisIntervalInput.propTypes = {
-    interval:PropTypes.number.isRequired,
-    setInterval:PropTypes.func.isRequired
-};
-
-const mapStateToProps = (state) =>
+const mapStateToProps = (state : RootState) =>
     ({
         interval: state.strava.analysisInterval
     });
@@ -67,4 +72,5 @@ const mapDispatchToProps = {
     setInterval:analysisIntervalSet
 };
 
-export default connect(mapStateToProps,mapDispatchToProps)(StravaAnalysisIntervalInput);
+const connector = connect(mapStateToProps,mapDispatchToProps)
+export default connector(StravaAnalysisIntervalInput);

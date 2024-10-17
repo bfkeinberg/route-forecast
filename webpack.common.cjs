@@ -24,7 +24,7 @@ module.exports = (env,argv) => {
         cache: {
             type:'filesystem'
         },
-        entry: [path.resolve(APP_DIR, 'app/app.jsx')],
+        entry: [path.resolve(APP_DIR, 'app/app.tsx')],
         module: {
             rules: [
                 {

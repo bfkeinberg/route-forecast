@@ -1,12 +1,14 @@
 import * as Sentry from "@sentry/react";
 import lazyRetry from "@tdotcode/react-lazy-retry";
-import React, {Suspense} from 'react';
-import {connect, useSelector} from 'react-redux';
+import {Suspense} from 'react';
+import {connect, ConnectedProps} from 'react-redux';
 
 import { routeLoadingModes } from '../../data/enums';
 import ErrorBoundary from "../shared/ErrorBoundary";
+import { RootState } from "jsx/app/topLevel";
+import { useAppSelector } from "../../utils/hooks";
 
-const addBreadcrumb = (msg) => {
+const addBreadcrumb = (msg : string) => {
     Sentry.addBreadcrumb({
         category: 'loading',
         level: "info",
@@ -16,10 +18,12 @@ const addBreadcrumb = (msg) => {
 
 const LoadableMap = lazyRetry(() => {addBreadcrumb('loading map');return import(/* webpackChunkName: "Map" */ './RouteForecastMap')}, 7, 1200);
 
-const MapLoader = (props) => {
+type PropsFromRedux = ConnectedProps<typeof connector>
+
+const MapLoader = (props : PropsFromRedux) => {
     // debug empty points and bounds
-    const rwgpsRouteData = useSelector(state => state.routeInfo.rwgpsRouteData)
-    const gpxRouteData = useSelector(state => state.routeInfo.gpxRouteData)
+    const rwgpsRouteData = useAppSelector(state => state.routeInfo.rwgpsRouteData)
+    const gpxRouteData = useAppSelector(state => state.routeInfo.gpxRouteData)
     let length = 0
     if (rwgpsRouteData && rwgpsRouteData[rwgpsRouteData.type] && rwgpsRouteData[rwgpsRouteData.type]['track_points']) {
         length = rwgpsRouteData[rwgpsRouteData.type]['track_points'].length
@@ -42,7 +46,7 @@ const MapLoader = (props) => {
     }
 };
 
-const mapStateToProps = (state) =>
+const mapStateToProps = (state : RootState) =>
     ({
         hasRouteData: (state.routeInfo.rwgpsRouteData || state.routeInfo.gpxRouteData || state.strava.activityStream),
         // TODO
@@ -51,5 +55,5 @@ const mapStateToProps = (state) =>
         hasMap: (state.forecast.forecast.length > 0 || state.uiInfo.routeParams.routeLoadingMode === routeLoadingModes.STRAVA)
     });
 
-// eslint-disable-next-line new-cap
-export default connect(mapStateToProps)(MapLoader);
+const connector = connect(mapStateToProps)
+export default connector(MapLoader);
