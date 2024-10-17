@@ -9,9 +9,9 @@ import RouteWeatherUI from './main';
 let script = document.scripts.namedItem('routeui')
 const mode = script!.getAttribute('mode');
 
-const store = configureReduxStore({ _preloadedState: {}, mode: mode! })
-const TopLevel = ({ mode, action, maps_api_key, timezone_api_key, bitly_token, preloaded_state }:
-    { mode: string, action: string, maps_api_key: string, timezone_api_key: string, bitly_token: string, preloaded_state: object }) => {
+const store = configureReduxStore({ _preloadedState: {}, mode: mode?mode:"production" })
+const TopLevel = ({ action, maps_api_key, timezone_api_key, bitly_token, preloaded_state }:
+    { action: string, maps_api_key: string, timezone_api_key: string, bitly_token: string, preloaded_state?: object }) => {
         const {href, search, origin} = useContext(LocationContext)
     return (
         <ErrorBoundary>

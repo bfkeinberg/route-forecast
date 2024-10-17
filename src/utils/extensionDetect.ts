@@ -35,7 +35,7 @@ export const extensionIsInstalled = () => {
         if (chrome === undefined || chrome.runtime === undefined || chrome.runtime.sendMessage === undefined) {
             return Promise.resolve(false);
         }
-        return new Promise((resolve => {
+        return new Promise<boolean>((resolve => {
             chrome.runtime.sendMessage('bgodmjchmhnpgccglldbfddddignglep', { message: "version" },
             (reply) => {
                 if (chrome.runtime.lastError) {
@@ -63,7 +63,7 @@ export const extensionIsInstalled = () => {
         }
     } else if (browserIsSafari())
     {
-        return new Promise(( resolve => {
+        return new Promise<boolean>(( resolve => {
             try {
                 // eslint-disable-next-line no-undef
                 browser.runtime.sendMessage("com.randoplan.extension.Extension (2B6A6N9QBQ)", {message: "version"}, function(response: { version: number; }) {
@@ -78,5 +78,9 @@ export const extensionIsInstalled = () => {
                     return resolve(false)
                 }
         }))
+    }
+    else {
+        // for no known browser
+        return Promise.resolve(false)
     }
 }

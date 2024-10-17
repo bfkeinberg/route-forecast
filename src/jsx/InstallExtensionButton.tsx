@@ -8,12 +8,12 @@ export const InstallExtensionButton = () => {
     const [
         promptForExtensionInstall,
         setPromptForExtensionInstall
-    ] = useState(!cookie.load('muteExtensionInstallPrompt'))
+    ] = useState<boolean>(!cookie.load('muteExtensionInstallPrompt'))
 
     const [
         isInstalled,
         setIsInstalled
-    ] = useState(undefined);
+    ] = useState<boolean|undefined>(undefined);
 
     useEffect(() => {
         const checkIfInstalled = async () => {
@@ -23,7 +23,7 @@ export const InstallExtensionButton = () => {
     })
 
     const mutePrompt = () => {
-        cookie.save('muteExtensionInstallPrompt', true, { path: '/' } )
+        cookie.save('muteExtensionInstallPrompt', "true", { path: '/' } )
         setPromptForExtensionInstall(false)
     }
 
