@@ -1,7 +1,5 @@
 import "./TopBar.css"
 
-import PropTypes from 'prop-types';
-import * as React from "react";
 import MediaQuery, { useMediaQuery } from "react-responsive";
 
 import { useForecastDependentValues,usePreviousPersistent, useReusableDelay, useValueHasChanged } from "../../utils/hooks";
@@ -12,8 +10,9 @@ import DonationRequest from "./DonationRequest";
 import ShortUrl from "./ShortUrl";
 import {useTranslation} from 'react-i18next'
 import FaqButton from "./FaqButton";
+import React, { ReactElement } from "react";
 
-const TitleAndFinishTime = ({finishTime, fontSize, alignment}) => {
+const TitleAndFinishTime = ({finishTime, fontSize, alignment} : {finishTime : string, fontSize: string, alignment: "left" | "right"}) => {
   return (
     <div style={{display:'flex', flexDirection:'column'}}>
       <RouteTitle style={{width:'21rem'}} className={'truncated_title'}/>
@@ -23,7 +22,15 @@ const TitleAndFinishTime = ({finishTime, fontSize, alignment}) => {
     </div>
   )
 }
-export const TopBar = ({sidePaneOptions, activeSidePane, setActiveSidePane, sidebarWidth, panesVisible}) => {
+
+interface TopBarProps {
+  sidePaneOptions: Array<string>
+  activeSidePane: number
+  setActiveSidePane: (pane: number) => void
+  sidebarWidth: number
+  panesVisible: Set<string>
+}
+export const TopBar = ({sidePaneOptions, activeSidePane, setActiveSidePane, sidebarWidth, panesVisible} : TopBarProps) => {
   const roomForTitle = useMediaQuery({ query: '(min-width: 1610px)' });
   const roomForFinishTime = useMediaQuery({ query: '(min-width: 1000px)' });
   const titleAdjacent = roomForFinishTime && roomForTitle
@@ -58,15 +65,14 @@ export const TopBar = ({sidePaneOptions, activeSidePane, setActiveSidePane, side
   )
 }
 
-TopBar.propTypes = {
-  sidePaneOptions:PropTypes.array.isRequired,
-  activeSidePane:PropTypes.number.isRequired,
-  setActiveSidePane:PropTypes.func.isRequired,
-  sidebarWidth:PropTypes.number,
-  panesVisible:PropTypes.object.isRequired
-};
-
-const Tabs = ({ sidePaneOptions, activeSidePane, setActiveSidePane, sidebarWidth, panesVisible }) => {
+interface TabsOptions {
+  sidePaneOptions: Array<string>
+  activeSidePane: number
+  setActiveSidePane: (pane: number) => void
+  sidebarWidth: number
+  panesVisible: Set<string>
+}
+const Tabs = ({ sidePaneOptions, activeSidePane, setActiveSidePane, sidebarWidth, panesVisible } : TabsOptions) => {
 
   const [
     loadingFromURLStarted,
@@ -126,14 +132,6 @@ const Tabs = ({ sidePaneOptions, activeSidePane, setActiveSidePane, sidebarWidth
     </div>
   )
 }
-Tabs.propTypes = {
-  sidePaneOptions:PropTypes.array.isRequired,
-  activeSidePane:PropTypes.number.isRequired,
-  setActiveSidePane:PropTypes.func.isRequired,
-  sidebarWidth:PropTypes.number.isRequired,
-  panesVisible:PropTypes.object.isRequired
-};
-
 const NonexistentLogo = () => {
   return (
     <div style={{userSelect: "none", padding: "0px 10px"}}>
@@ -144,7 +142,17 @@ const NonexistentLogo = () => {
   )
 }
 
-const TopBarItem = ({children, active, leftNeighborActive, rightNeighborActive, last, onClick, visible}) => {
+interface TopBarItemProps {
+  children: ReactElement
+  active: boolean
+  leftNeighborActive: boolean
+  rightNeighborActive: boolean
+  last: boolean
+  onClick: (ev: React.MouseEvent) => void
+  visible: boolean
+
+}
+const TopBarItem = ({children, active, leftNeighborActive, rightNeighborActive, last, onClick, visible} : TopBarItemProps) => {
   const style = {
     cursor: "pointer",
     borderLeft: `1px solid #000000${leftNeighborActive ? "50" : "00"}`,
@@ -153,7 +161,7 @@ const TopBarItem = ({children, active, leftNeighborActive, rightNeighborActive, 
     height: "100%",
     display: "flex",
     alignItems: "center",
-    userSelect: "none",
+    userSelect: "none" as const,
     backgroundColor: active ? "" : "#00000030",
     justifyContent: "center",
     transition: "background-color 0.3s",
@@ -165,7 +173,7 @@ const TopBarItem = ({children, active, leftNeighborActive, rightNeighborActive, 
   const wasEverVisible = useValueHasChanged(visible) || visible
   const previouslyVisible = usePreviousPersistent(visible)
   const newlyVisible = !previouslyVisible && visible
-  const newlyNonvisible = previouslyVisible && !visible
+  const newlyNonvisible = !!previouslyVisible && !visible
   const [exitAnimationFinished] = useReusableDelay(1500, newlyNonvisible)
 
   if (exitAnimationFinished || !wasEverVisible) {
@@ -179,13 +187,3 @@ const TopBarItem = ({children, active, leftNeighborActive, rightNeighborActive, 
     </div>
   )
 }
-
-TopBarItem.propTypes = {
-  children:PropTypes.object.isRequired,
-  active:PropTypes.bool.isRequired,
-  leftNeighborActive:PropTypes.bool.isRequired,
-  rightNeighborActive:PropTypes.bool.isRequired,
-  last:PropTypes.bool,
-  onClick:PropTypes.func,
-  visible:PropTypes.bool.isRequired
-};

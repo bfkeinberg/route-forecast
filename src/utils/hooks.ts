@@ -84,7 +84,7 @@ const useReusableDelay = <Type>(delay: number, startCondition = true) => {
   ]
 }
 
-const useValueHasChanged = <Type>(value : Type, startValue : Type) => {
+const useValueHasChanged = <Type>(value : Type, startValue? : Type) => {
   const [
     oldValue,
     setOldValue
