@@ -11,7 +11,7 @@ const maxControlNameLength = 10;
 const shrinkControls = (controls, dispatch) => {
     const truncatedControls = controls.map(control => {
         return {
-            name: control.name.replace(/control/i,'').slice(0, maxControlNameLength),
+            name: control.name.replace(/control/i,'').replace(',','_').slice(0, maxControlNameLength),
             distance: control.distance, duration: control.duration
         }
     });
