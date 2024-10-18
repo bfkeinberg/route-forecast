@@ -5,20 +5,21 @@ import { rwgpsRouteSet, reset } from './routeParamsSlice'
 import { gpxRouteLoaded } from './routeInfoSlice'
 
 export type Forecast = {
-    temperature:number
+    temp:string
     feel: number
     humidity:number
     zone:string
     distance:number
     cloudCover:number
-    windSpeed:number
-    gust:number
+    windSpeed:string
+    gust:string
     summary?: string
     relBearing: number
     windBearing: number
     time: string
     isControl: boolean
     aqi?: number
+    precip: string
 }
 
 export type ForecastInfo = {

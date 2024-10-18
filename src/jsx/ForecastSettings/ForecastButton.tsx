@@ -8,7 +8,7 @@ import { useMediaQuery } from 'react-responsive';
 import { msgFromError, removeDuplicateForecasts, extractRejectedResults } from '../../redux/forecastActions';
 import { shortenUrl } from '../../redux/actions';
 import { useForecastMutation, useGetAqiMutation } from '../../redux/forecastApiSlice';
-import { forecastFetched, forecastAppended } from '../../redux/forecastSlice';
+import { forecastFetched, forecastAppended, Forecast } from '../../redux/forecastSlice';
 import { querySet } from '../../redux/paramsSlice';
 import { errorMessageListSet, errorMessageListAppend, forecastFetchBegun, forecastFetchFailed } from '../../redux/dialogParamsSlice';
 import { generateUrl } from '../../utils/queryStringUtils';
@@ -146,22 +146,6 @@ const ForecastButton = ({fetchingForecast,submitDisabled, routeNumber, startTime
         aElement.setAttribute('target', '_blank');
         aElement.click();
         URL.revokeObjectURL(href)
-    }
-
-    interface Forecast {
-        distance:number
-        aqi?:number
-        temperature: number
-        feel: number
-        humidity: number
-        zone: string
-        cloudCover: number
-        windSpeed: number
-        gust: number
-        relBearing: number
-        windBearing: number
-        time: string
-        isControl: boolean    
     }
 
     const forecastClick = async (event : React.MouseEvent) => {
