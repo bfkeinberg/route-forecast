@@ -103,7 +103,8 @@
             },
             "analysis": {
                 "overallPace":"Le rythme global ajusté en fonction de la montée était",
-                "interval":"heure"
+                "interval":"heure",
+                "halfHourInterval": "une demi-heure"
             }
         }
     }

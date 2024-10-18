@@ -15,7 +15,6 @@ i18n
   .init({
     debug: true,
     fallbackLng: 'en-US',
-    defaultNS:  'ns1',
     nonExplicitSupportedLngs: true,
     supportedLngs: ['en-US', 'en-GB', 'en', 'fr'],
     interpolation: {

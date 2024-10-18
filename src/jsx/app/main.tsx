@@ -8,7 +8,7 @@ import * as Sentry from "@sentry/react";
 import {Info} from "luxon";
 import PropTypes from 'prop-types';
 import queryString from 'query-string';
-import React, {Context, Dispatch, lazy, NamedExoticComponent, ReactElement, SetStateAction, Suspense,useEffect} from 'react';
+import React, {lazy,  ReactElement, Suspense,useEffect} from 'react';
 import cookie from 'react-cookies';
 import { useAppDispatch, useAppSelector } from "../../utils/hooks";
 import { AppDispatch } from "./topLevel";
@@ -309,7 +309,7 @@ const useLoadControlPointsFromURL = (queryParams: QueryParams) => {
 
     const dispatch = useAppDispatch()
     useEffect(() => {
-        if (queryParams.hasOwnProperty("controlPoints") || queryParams.controlPoints === "") {
+        if (!("controlPoints" in queryParams) || queryParams.controlPoints === "") {
             dispatch(updateUserControls([]))
         } else {
             dispatch(updateUserControls(parseControls(queryParams.controlPoints, false)))

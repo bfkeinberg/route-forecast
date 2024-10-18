@@ -103,7 +103,8 @@
             },
             "analysis": {
                 "overallPace":"Overall climb-adjusted pace was",
-                "interval":"hour"
+                "interval":"hour",
+                "halfHourInterval": "half hour"
             }
         }
     }
