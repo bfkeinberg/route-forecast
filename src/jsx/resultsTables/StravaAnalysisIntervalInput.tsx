@@ -32,7 +32,7 @@ type PropsFromRedux = ConnectedProps<typeof connector>
 const StravaAnalysisIntervalInput = ({ interval, setInterval } : PropsFromRedux) => {
     const { t } = useTranslation()
     const analysisIntervals = [
-        {number: "0.5", text: "Half hour"},
+        {number: "0.5", text: t('analysis.halfHourInterval')},
         {number: "1", text: `1 ${t('analysis.interval')}`},
         {number:"2", text:`2 ${t('analysis.interval')}s`},
         {number:"4", text:`4 ${t('analysis.interval')}s`},

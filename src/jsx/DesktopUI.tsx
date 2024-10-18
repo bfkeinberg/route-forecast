@@ -2,10 +2,8 @@ import "./DesktopUI.css"
 
 import { Spinner } from "@blueprintjs/core";
 import lazyRetry from "@tdotcode/react-lazy-retry";
-import PropTypes from "prop-types";
-import React, { Suspense,useState,StrictMode } from "react";
-import { useSelector, useDispatch } from "react-redux";
-
+import React, { Suspense,useState,StrictMode, SetStateAction, Dispatch } from "react";
+import { useAppDispatch, useAppSelector } from "../utils/hooks";
 import { routeLoadingModes } from "../data/enums";
 import { useDelay, useForecastDependentValues,usePrevious, useValueHasChanged, useWhenChanged } from "../utils/hooks";
 import { ForecastSettings } from "./ForecastSettings/ForecastSettings";
@@ -23,9 +21,14 @@ import {useTranslation} from 'react-i18next'
 import { lastErrorCleared } from '../redux/dialogParamsSlice'
 import DisplayErrorList from "./app/DisplayErrorList";
 
-const DesktopUI = ({mapsApiKey, orientationChanged, setOrientationChanged}) => {
+export type DesktopUIProps = {
+    mapsApiKey: string
+    orientationChanged: boolean
+    setOrientationChanged: Dispatch<SetStateAction<boolean>>
+}
+const DesktopUI = ({mapsApiKey, orientationChanged, setOrientationChanged} : DesktopUIProps) => {
     const { t } = useTranslation()
-    const dispatch = useDispatch()
+    const dispatch = useAppDispatch()
 
     const LoadableForecastTable = lazyRetry(() => import(/* webpackChunkName: "ForecastTable" */ './resultsTables/ForecastTable'));
     const {adjustedTimes } = useForecastDependentValues()
@@ -34,7 +37,7 @@ const DesktopUI = ({mapsApiKey, orientationChanged, setOrientationChanged}) => {
     const titleForecast = t("titles.forecast")
     const titlePaceAnalyis = t("titles.paceAnalysis")
     const sidePaneOptions = [
-        {title: titleRouteInfo, content: <ErrorBoundary><RouteInfoForm routeProps={{}} /></ErrorBoundary>},
+        {title: titleRouteInfo, content: <ErrorBoundary><RouteInfoForm /></ErrorBoundary>},
         {title: titleForecastSettings, content: <ErrorBoundary><ForecastSettings/></ErrorBoundary>},
         {title: titleForecast, content: <ErrorBoundary><Suspense fallback={<div>Loading ForecastTable...</div>}>{<LoadableForecastTable adjustedTimes={adjustedTimes}/>}</Suspense></ErrorBoundary>},
         {title: titlePaceAnalyis, content: <ErrorBoundary>{<PaceTable/>}</ErrorBoundary>}
@@ -45,18 +48,18 @@ const DesktopUI = ({mapsApiKey, orientationChanged, setOrientationChanged}) => {
     ] = useState(0)
     const sidebarWidth = 703
 
-    const rwgpsRouteData = useSelector(state => state.routeInfo.rwgpsRouteData)
-    const gpxRouteData = useSelector(state => state.routeInfo.gpxRouteData)
+    const rwgpsRouteData = useAppSelector(state => state.routeInfo.rwgpsRouteData)
+    const gpxRouteData = useAppSelector(state => state.routeInfo.gpxRouteData)
     const routeData = rwgpsRouteData ? rwgpsRouteData : gpxRouteData
-    const stravaActivityData = useSelector(state => state.strava.activityData)
-    const forecastData = useSelector(state => state.forecast.forecast)
-    const errorMessageList = useSelector(state => state.uiInfo.dialogParams.errorMessageList)
+    const stravaActivityData = useAppSelector(state => state.strava.activityData)
+    const forecastData = useAppSelector(state => state.forecast.forecast)
+    const errorMessageList = useAppSelector(state => state.uiInfo.dialogParams.errorMessageList)
 
     const closeErrorList = () => {
         dispatch(lastErrorCleared())
     }
     
-    const panesVisible = new Set()
+    const panesVisible = new Set<string>()
     panesVisible.add(titleRouteInfo)
     if (routeData !== null) {
         panesVisible.add(titleForecastSettings)
@@ -93,8 +96,8 @@ const DesktopUI = ({mapsApiKey, orientationChanged, setOrientationChanged}) => {
         }
     }, [orientationChanged])
 
-    const routeLoadingMode = useSelector(state => state.uiInfo.routeParams.routeLoadingMode)
-    const hasStravaRoute = useSelector(state => state.strava.route) !== ''
+    const routeLoadingMode = useAppSelector(state => state.uiInfo.routeParams.routeLoadingMode)
+    const hasStravaRoute = useAppSelector(state => state.strava.route) !== ''
     const mapDataExists = (routeLoadingMode === routeLoadingModes.RWGPS ||
          routeLoadingMode === routeLoadingModes.RUSA_PERM || 
          (routeLoadingMode === routeLoadingModes.STRAVA && hasStravaRoute)) ?
@@ -113,7 +116,7 @@ const DesktopUI = ({mapsApiKey, orientationChanged, setOrientationChanged}) => {
                         panesVisible={panesVisible}
                     />
                 </div>
-                <div style={{ display: "flex", flex: 1, flexGrow: 8, /* flexShrink:0,  */minHeight: '0px', flexBasis: { sidebarWidth } }}>
+                <div style={{ display: "flex", flex: 1, flexGrow: 8, /* flexShrink:0,  */minHeight: '0px', flexBasis: sidebarWidth }}>
                     <div style={{ maxHeight: '100%', overflowY: 'scroll', width: `${sidebarWidth}px` }}>
                         <Sidebar sidePaneOptions={sidePaneOptions} activeSidePane={activeSidePane} sidebarWidth={sidebarWidth} />
                     </div>
@@ -140,14 +143,10 @@ const DesktopUI = ({mapsApiKey, orientationChanged, setOrientationChanged}) => {
     );
 };
 
-DesktopUI.propTypes = {
-    mapsApiKey: PropTypes.string
-};
-
 export const useLoadingFromURLStatus = () => {
     const delay = 1000
 
-    const loadingFromURL = useSelector(state => state.routeInfo.loadingFromURL)
+    const loadingFromURL = useAppSelector(state => state.routeInfo.loadingFromURL)
     const started = useValueHasChanged(loadingFromURL, false)
     const finished = useValueHasChanged(loadingFromURL, true)
     const delayFinished = useDelay(delay, finished) || !started
@@ -159,7 +158,12 @@ export const useLoadingFromURLStatus = () => {
     ]
 }
 
-const Sidebar = ({sidePaneOptions, activeSidePane, sidebarWidth}) => {
+type SidebarProps = {
+    sidePaneOptions: Array<{content:JSX.Element}>
+    activeSidePane: number
+    sidebarWidth: number
+}
+const Sidebar = ({sidePaneOptions, activeSidePane, sidebarWidth} : SidebarProps) => {
 
     const [
         loadingFromURLStarted,
@@ -170,7 +174,7 @@ const Sidebar = ({sidePaneOptions, activeSidePane, sidebarWidth}) => {
     const previousActivePane = usePrevious(activeSidePane)
     return (
         displayContent ?
-        <TransitionWrapper diffData={activeSidePane} transitionTime={1} transitionType={previousActivePane < activeSidePane ? "slideLeft" : "slideRight"} width={sidebarWidth}>
+        <TransitionWrapper diffData={activeSidePane} transitionTime={1} transitionType={!previousActivePane || previousActivePane < activeSidePane ? "slideLeft" : "slideRight"} width={sidebarWidth}>
             <div style={{width: `${sidebarWidth}px`}} className={loadingFromURLStarted ? "fade-in" : ""}>
                 {sidePaneOptions[activeSidePane].content}
             </div>
@@ -193,15 +197,9 @@ const Sidebar = ({sidePaneOptions, activeSidePane, sidebarWidth}) => {
     )
 }
 
-Sidebar.propTypes = {
-    sidePaneOptions:PropTypes.array.isRequired,
-    activeSidePane:PropTypes.number.isRequired,
-    sidebarWidth:PropTypes.number.isRequired
-};
-
 const LoadingFromURLOverlay = () => {
-    const type = useSelector(state => state.routeInfo.type)
-    const routeData = useSelector(state => state.routeInfo[type === "rwgps" ? "rwgpsRouteData" : "gpxRouteData"])
+    const type = useAppSelector(state => state.routeInfo.type)
+    const routeData = useAppSelector(state => state.routeInfo[type === "rwgps" ? "rwgpsRouteData" : "gpxRouteData"])
 
     return (
         <>
@@ -212,4 +210,4 @@ const LoadingFromURLOverlay = () => {
     )
 }
 
-export default React.memo(DesktopUI)
+export default DesktopUI

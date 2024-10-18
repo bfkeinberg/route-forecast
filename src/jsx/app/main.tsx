@@ -8,9 +8,10 @@ import * as Sentry from "@sentry/react";
 import {Info} from "luxon";
 import PropTypes from 'prop-types';
 import queryString from 'query-string';
-import React, {lazy, Suspense,useEffect} from 'react';
+import React, {Context, Dispatch, lazy, NamedExoticComponent, ReactElement, SetStateAction, Suspense,useEffect} from 'react';
 import cookie from 'react-cookies';
-import { useDispatch, useSelector } from 'react-redux';
+import { useAppDispatch, useAppSelector } from "../../utils/hooks";
+import { AppDispatch } from "./topLevel";
 import  {useMediaQuery} from 'react-responsive';
 import {useTranslation} from 'react-i18next'
 import { stravaErrorSet } from "../../redux/dialogParamsSlice";
@@ -21,8 +22,8 @@ import { fetchAqiSet, zoomToRangeSet } from "../../redux/forecastSlice";
 import { stopAfterLoadSet, rusaPermRouteIdSet, routeLoadingModeSet, startTimestampSet, rwgpsRouteSet, reset } from "../../redux/routeParamsSlice";
 import { metricSet, displayControlTableUiSet } from "../../redux/controlsSlice";
 import { defaultProvider, providerValues } from "../../redux/providerValues";
-
-const addBreadcrumb = (msg) => {
+import { DesktopUIProps } from "../DesktopUI";
+const addBreadcrumb = (msg : string) => {
     Sentry.addBreadcrumb({
         category: 'loading',
         level: "info",
@@ -35,8 +36,10 @@ const reloadPage = () => {
         window.location.reload()
     }
 }
-
-const LoadableDesktop = lazy(() => {addBreadcrumb('loading desktop UI'); return import( /* webpackChunkName: "DesktopUI" */'../DesktopUI').catch((error) => {
+  
+type DesktopUIType = Promise<typeof import(/* webpackChunkName: "DesktopUI" */ '../DesktopUI')>
+type DynamicDesktopUIType = DesktopUIType | Promise<{default:({ mapsApiKey, orientationChanged, setOrientationChanged }: DesktopUIProps) => ReactElement; }>
+const LoadableDesktop = lazy(() : DynamicDesktopUIType => {addBreadcrumb('loading desktop UI'); return import( /* webpackChunkName: "DesktopUI" */'../DesktopUI').catch((error) => {
     setTimeout(() => reloadPage(), 5000);
     return { default: () => <div>{`Error ${error} loading the component. Window will reload in five seconds`}</div> };
 })})
@@ -49,18 +52,19 @@ import { routeLoadingModes } from '../../data/enums';
 import { loadCookie, saveCookie } from "../../utils/util";
 import {
     loadRouteFromURL,
+    MutationWrapper,
 } from "../../redux/loadRouteActions";
 import { setPace, updateUserControls, setInterval, setWeatherProvider } from "../../redux/actions";
 import { useForecastMutation, useGetAqiMutation } from '../../redux/forecastApiSlice';
 import { inputPaceToSpeed,parseControls } from '../../utils/util';
 
 const checkCredentialsInterface = () => {
-    return typeof PasswordCredential !== 'undefined' && typeof PublicKeyCredential !== 'undefined' && 
+    return 'PasswordCredential' in window &&
         "credentials" in navigator && "store" in navigator.credentials && "get" in navigator.credentials &&
         "password" in PasswordCredential && "name" in PasswordCredential
 }
 
-export const saveRwgpsCredentials = (token) => {
+export const saveRwgpsCredentials = (token : string) => {
     Sentry.addBreadcrumb({
         category: 'rwgps',
         level: 'info',
@@ -89,7 +93,7 @@ export const saveRwgpsCredentials = (token) => {
     }
 };
 
-const loadAndStoreRwgpsCredentialsViaCookie = (dispatch) => {
+const loadAndStoreRwgpsCredentialsViaCookie = (dispatch : AppDispatch) => {
     const token = loadCookie("rwgpsToken");
     if (token) {
         dispatch(rwgpsTokenSet(token))
@@ -97,7 +101,7 @@ const loadAndStoreRwgpsCredentialsViaCookie = (dispatch) => {
     }
 }
 
-const setupRideWithGps = async (dispatch) => {
+const setupRideWithGps = async (dispatch : AppDispatch) => {
     Sentry.addBreadcrumb({
         category: 'rwgps',
         level: 'info',
@@ -112,8 +116,10 @@ const setupRideWithGps = async (dispatch) => {
                 loadAndStoreRwgpsCredentialsViaCookie(dispatch)
             } else {
                 console.info('Rwgps login info retrieved from manager');
-                dispatch(rwgpsTokenSet(credentials.password))
-                saveRwgpsCredentials(credentials.password);
+                if ("password" in credentials && credentials.password) {
+                    dispatch(rwgpsTokenSet(credentials.password))
+                    saveRwgpsCredentials(credentials.password);    
+                }
             }
         } catch (err) {
             console.info(`failed to load rwgps login info with ${err}`)
@@ -126,7 +132,27 @@ const setupRideWithGps = async (dispatch) => {
     }
 }
 
-const setupBrowserForwardBack = (dispatch, origin, forecastFunc, aqiFunc) => {
+type QueryParams = {
+    controlPoints: string
+    strava_access_token?: string
+    strava_refresh_token? : string
+    strava_token_expires_at? : number
+    provider: string
+    interval: number
+    rwgpsRoute: string
+    startTimestamp: number
+    zone: string
+    pace: string
+    metric: boolean
+    strava_activity: string
+    strava_route: string
+    strava_error: string
+    strava_analysis: boolean
+    rusa_route_id: string
+    rwgpsToken: string
+    stopAfterLoad: boolean
+}
+const setupBrowserForwardBack = (dispatch : AppDispatch, origin : string, forecastFunc : MutationWrapper, aqiFunc : MutationWrapper) => {
     if (typeof window !== 'undefined') {
         window.onpopstate = (event) => {
             Sentry.addBreadcrumb({
@@ -147,7 +173,7 @@ const setupBrowserForwardBack = (dispatch, origin, forecastFunc, aqiFunc) => {
                 // reload previous or next route when moving throw browser history with forward or back buttons
                 let queryParams = queryString.parse(event.state);
                 dispatch(querySet({url:`${origin}/?${event.state}`,search:event.state}))
-                updateFromQueryParams(dispatch, queryParams);
+                updateFromQueryParams(dispatch, queryParams as unknown as QueryParams);
                 if (queryParams.rwgpsRoute !== undefined || queryParams.strava_route) {
                     dispatch(loadRouteFromURL(forecastFunc, aqiFunc))
                 }
@@ -156,11 +182,11 @@ const setupBrowserForwardBack = (dispatch, origin, forecastFunc, aqiFunc) => {
     }    
 }
 
-const getStravaToken = (queryParams, dispatch) => {
-    if (queryParams.strava_access_token !== undefined) {
+const getStravaToken = (queryParams : QueryParams, dispatch : AppDispatch) => {
+    if (queryParams.strava_access_token !== undefined && queryParams.strava_refresh_token && queryParams.strava_token_expires_at) {
         saveCookie('strava_access_token', queryParams.strava_access_token);
         saveCookie('strava_refresh_token', queryParams.strava_refresh_token);
-        saveCookie('strava_token_expires_at', queryParams.strava_token_expires_at);
+        saveCookie('strava_token_expires_at', queryParams.strava_token_expires_at.toString());
         dispatch(stravaTokenSet({ token: queryParams.strava_access_token, expires_at: queryParams.strava_token_expires_at }))
         dispatch(stravaRefreshTokenSet(queryParams.strava_refresh_token))
         return queryParams.strava_access_token;
@@ -172,15 +198,15 @@ const getStravaToken = (queryParams, dispatch) => {
     }
 }
 
-const hasProvider = (provider) => {
+const hasProvider = (provider? : string) => {
     return provider && Object.keys(providerValues).includes(provider)
 }
 
-const hasZone = (zone) => {
+const hasZone = (zone? : string) => {
     return zone && Info.isValidIANAZone(zone);
 }
 
-const updateFromQueryParams = (dispatch, queryParams) => {
+const updateFromQueryParams = (dispatch : AppDispatch, queryParams : QueryParams) => {
     if (!queryParams) {
         return;
     }
@@ -207,7 +233,7 @@ const updateFromQueryParams = (dispatch, queryParams) => {
         }
     }
     dispatch(setInterval(queryParams.interval))
-    dispatch(metricSet(queryParams.metric === "true"))
+    dispatch(metricSet(queryParams.metric))
     dispatch(stravaActivitySet(queryParams.strava_activity))
     dispatch(stravaRouteSet(queryParams.strava_route))
     dispatch(stravaErrorSet(queryParams.strava_error))
@@ -226,21 +252,31 @@ const updateFromQueryParams = (dispatch, queryParams) => {
     dispatch(stopAfterLoadSet(queryParams.stopAfterLoad))
 }
 
-const RouteWeatherUI = ({search, href, action, maps_api_key, timezone_api_key, bitly_token, origin}) => {
-    const dispatch = useDispatch()
+interface RouteWeatherUIProps {
+    search: string
+    href: string
+    action: string
+    maps_api_key: string
+    timezone_api_key: string
+    bitly_token: string
+    origin: string
+}
+const RouteWeatherUI = ({search, href, action, maps_api_key, timezone_api_key, bitly_token, origin} : RouteWeatherUIProps) => {
+    const dispatch = useAppDispatch()
     const [forecast] = useForecastMutation()
     const [getAqi] = useGetAqiMutation()
     const { i18n } = useTranslation()
 
-    let queryParams = queryString.parse(search);
+    let queryParams = queryString.parse(search, {parseBooleans: true, parseNumbers:true});
+    const queryParamsAsObj = queryParams as unknown as QueryParams
     dispatch(querySet({url:href,search:search}))
     Sentry.setContext("query", {queryString:search})
-    updateFromQueryParams(dispatch, queryParams);
+    updateFromQueryParams(dispatch, queryParamsAsObj);
     dispatch(actionUrlAdded(action))
     dispatch(apiKeysSet({maps_api_key:maps_api_key,timezone_api_key:timezone_api_key, bitly_token:bitly_token}))
     setupRideWithGps(dispatch);
     setupBrowserForwardBack(dispatch, origin, forecast, getAqi)
-    dispatch(updateUserControls(queryParams.controlPoints?parseControls(queryParams.controlPoints,true):[]))
+    dispatch(updateUserControls(queryParams.controlPoints?parseControls(queryParamsAsObj.controlPoints, true):[]))
     const zoomToRange = loadCookie('zoomToRange');
     if (zoomToRange !== undefined) {
         dispatch(zoomToRangeSet(zoomToRange==="true"))
@@ -253,15 +289,15 @@ const RouteWeatherUI = ({search, href, action, maps_api_key, timezone_api_key, b
         // ReactGA.event()
     }
     return (
-        <FunAppWrapperThingForHooksUsability maps_api_key={maps_api_key} queryParams={queryString.parse(search)}/>
+        <FunAppWrapperThingForHooksUsability maps_api_key={maps_api_key} queryParams={queryParamsAsObj}/>
     )
 
 }
 
 export default React.memo(RouteWeatherUI)
 
-const useLoadRouteFromURL = (queryParams, forecastFunc, aqiFunc) => {
-    const dispatch = useDispatch()
+const useLoadRouteFromURL = (queryParams : QueryParams, forecastFunc : MutationWrapper, aqiFunc : MutationWrapper) => {
+    const dispatch = useAppDispatch()
     useEffect(() => {
         if (queryParams.rwgpsRoute || queryParams.strava_route) {
             dispatch(loadRouteFromURL(forecastFunc, aqiFunc))
@@ -269,11 +305,11 @@ const useLoadRouteFromURL = (queryParams, forecastFunc, aqiFunc) => {
     }, [queryParams])
 }
 
-const useLoadControlPointsFromURL = (queryParams) => {
+const useLoadControlPointsFromURL = (queryParams: QueryParams) => {
 
-    const dispatch = useDispatch()
+    const dispatch = useAppDispatch()
     useEffect(() => {
-        if (queryParams.controlPoints === undefined || queryParams.controlPoints === "") {
+        if (queryParams.hasOwnProperty("controlPoints") || queryParams.controlPoints === "") {
             dispatch(updateUserControls([]))
         } else {
             dispatch(updateUserControls(parseControls(queryParams.controlPoints, false)))
@@ -284,7 +320,7 @@ const useLoadControlPointsFromURL = (queryParams) => {
 
 const useSetPageTitle = () => {
 
-    const routeInfo = useSelector(state => state.routeInfo)
+    const routeInfo = useAppSelector(state => state.routeInfo)
 
     useEffect(() => {
         if (routeInfo.name !== '') {
@@ -293,14 +329,18 @@ const useSetPageTitle = () => {
     }, [routeInfo.name])
 }
 
-const FunAppWrapperThingForHooksUsability = ({maps_api_key, queryParams}) => {
+interface FunWrapperProps {
+    maps_api_key: string
+    queryParams: QueryParams
+}
+const FunAppWrapperThingForHooksUsability = ({maps_api_key, queryParams} : FunWrapperProps) => {
     const [forecast] = useForecastMutation()
     const [getAqi] = useGetAqiMutation()
-    const [orientationChanged, setOrientationChanged] = React.useState(false)
-    const [mobileOrientationChanged, setMobileOrientationChanged] = React.useState(false)
+    const [orientationChanged, setOrientationChanged] = React.useState<boolean>(false)
+    const [mobileOrientationChanged, setMobileOrientationChanged] = React.useState<boolean>(false)
     const screenOrientationType = (window.screen ? (window.screen.orientation ? window.screen.orientation.type : 'N/A') : 'N/A')
     const screenChangeListener = React.useCallback(
-        (event) => {
+        (event : Event) => {
             // const type = event.target.type;
             // const angle = event.target.angle;
             // console.log(`ScreenOrientation change: ${type}, ${angle} degrees.`)

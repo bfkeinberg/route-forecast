@@ -1,8 +1,6 @@
-import { Alignment,Button, IconSize, Intent, Navbar, NavbarDivider, NavbarGroup, NavbarHeading, Divider } from "@blueprintjs/core";
+import { Alignment,Button, Intent, Navbar, NavbarDivider, NavbarGroup, NavbarHeading, Divider } from "@blueprintjs/core";
 import {Cloud, Cycle,Globe, Map as MapIcon, Shop } from "@blueprintjs/icons";
-import PropTypes from "prop-types";
 import * as React from "react";
-import {connect, useDispatch,useSelector} from 'react-redux';
 import { Link, MemoryRouter, Route, Routes, useLocation, useNavigate } from "react-router-dom";
 
 import { errorDetailsSet, lastErrorCleared } from "../redux/dialogParamsSlice";
@@ -15,8 +13,16 @@ import RouteInfoForm from "./RouteInfoForm/RouteInfoForm";
 import ErrorBoundary from "./shared/ErrorBoundary";
 import DonationRequest from "./TopBar/DonationRequest";
 import DisplayErrorList from "./app/DisplayErrorList";
+import { useAppDispatch, useAppSelector } from "../utils/hooks";
+import { Dispatch, SetStateAction } from "react";
 
-const MobileUI = (props) => {
+export interface MobileUIPropTypes {
+    mapsApiKey:string, 
+    orientationChanged:boolean
+    setOrientationChanged: Dispatch<SetStateAction<boolean>>
+}
+
+const MobileUI = (props : MobileUIPropTypes) => {
     return (
         <MemoryRouter>
             <MobileUITabs {...props} />
@@ -24,30 +30,18 @@ const MobileUI = (props) => {
     )
 };
 
-MobileUI.propTypes = {
-    mapsApiKey: PropTypes.string.isRequired,
-    needToViewTable: PropTypes.bool.isRequired,
-    needToViewMap: PropTypes.bool.isRequired
-};
+export default MobileUI;
 
-const mapStateToProps = (state) =>
-    ({
-        needToViewTable:state.forecast.valid && !state.forecast.tableViewed,
-        needToViewMap:state.forecast.valid && !state.forecast.mapViewed
-    });
-
-export default connect(mapStateToProps)(MobileUI);
-
-const MobileUITabs = (props) => {
-    const dispatch = useDispatch()
+const MobileUITabs = (props : MobileUIPropTypes) => {
+    const dispatch = useAppDispatch()
     const location = useLocation()
     const { pathname } = location
     try {
         const navigate = useNavigate()
-        const type = useSelector(state => state.routeInfo.type)
-        const routeData = useSelector(state => state.routeInfo[type === "rwgps" ? "rwgpsRouteData" : "gpxRouteData"])
-        const stravaActivityData = useSelector(state => state.strava.activityData)
-        const forecastData = useSelector(state => state.forecast.forecast)
+        const type = useAppSelector(state => state.routeInfo.type)
+        const routeData = useAppSelector(state => state.routeInfo[type === "rwgps" ? "rwgpsRouteData" : "gpxRouteData"])
+        const stravaActivityData = useAppSelector(state => state.strava.activityData)
+        const forecastData = useAppSelector(state => state.forecast.forecast)
         // if we've been reset while displaying another tab
         if (pathname !== '/' && routeData === null) {
             navigate('/')
@@ -74,12 +68,15 @@ const MobileUITabs = (props) => {
         }, [props.orientationChanged])
     
         const { adjustedTimes } = useForecastDependentValues()
-        const errorMessageList = useSelector(state => state.uiInfo.dialogParams.errorMessageList)
+        const errorMessageList = useAppSelector(state => state.uiInfo.dialogParams.errorMessageList)
 
         const closeErrorList = () => {
             dispatch(lastErrorCleared())
         }
-            
+
+        const needToViewTable = useAppSelector(state => state.forecast.valid && !state.forecast.tableViewed)
+        const needToViewMap = useAppSelector(state => state.forecast.valid && !state.forecast.mapViewed)
+
         return (
             <>
                 <DisplayErrorList errorList={errorMessageList} onClose={closeErrorList}/>
@@ -94,22 +91,22 @@ const MobileUITabs = (props) => {
                         <NavbarDivider />
                         <ErrorBoundary>
                             <Link to={"/controlPoints/"} className={'nav-link'}>
-                                <Button small icon={<Shop/>} size={IconSize.STANDARD} title={"controls"} intent={pathname.startsWith('/controlPoints')?Intent.PRIMARY:Intent.NONE} />
+                                <Button small icon={<Shop/>} title={"controls"} intent={pathname.startsWith('/controlPoints')?Intent.PRIMARY:Intent.NONE} />
                             </Link>
                         </ErrorBoundary>
                         <NavbarDivider />
                         <Link to={"/forecastTable/"} className={'nav-link'}>
-                            <Button small icon={<Cloud/>} size={IconSize.STANDARD} title={"forecast"} intent={props.needToViewTable ? Intent.WARNING : (pathname.startsWith('/forecastTable')?Intent.PRIMARY:Intent.NONE)} />
+                            <Button small icon={<Cloud/>} title={"forecast"} intent={needToViewTable ? Intent.WARNING : (pathname.startsWith('/forecastTable')?Intent.PRIMARY:Intent.NONE)} />
                         </Link>
                         <NavbarDivider />
                         <Link to={"/map/"} className={'nav-link'}>
-                        <Button small icon={<Globe/>} size={IconSize.STANDARD} title={"map"} intent={props.needToViewMap ? Intent.WARNING : (pathname.startsWith('/map')?Intent.PRIMARY:Intent.NONE)} />
+                        <Button small icon={<Globe/>} title={"map"} intent={needToViewMap ? Intent.WARNING : (pathname.startsWith('/map')?Intent.PRIMARY:Intent.NONE)} />
                         </Link>
                         <NavbarDivider />
                         {
                             stravaActivityData &&
                             <Link to={"/paceTable/"} className={'nav-link'}>
-                                <Button small icon={<Cycle />} color="orange" disabled={!stravaActivityData} title={"strava"} size={IconSize.STANDARD} intent={props.needToViewTable ? Intent.WARNING : pathname.startsWith('/paceTable') ? Intent.PRIMARY : Intent.NONE} />
+                                <Button small icon={<Cycle />} color="orange" disabled={!stravaActivityData} title={"strava"} intent={needToViewTable ? Intent.WARNING : pathname.startsWith('/paceTable') ? Intent.PRIMARY : Intent.NONE} />
                             </Link>
                         }
                     </NavbarGroup>
@@ -125,13 +122,7 @@ const MobileUITabs = (props) => {
                 <DonationRequest wacky={false}/>
             </>
         )
-    } catch (err) {
+    } catch (err : any) {
         dispatch(errorDetailsSet(err.message))
     }
 }
-
-MobileUITabs.propTypes = {
-    mapsApiKey:PropTypes.string.isRequired,
-    needToViewTable:PropTypes.bool.isRequired,
-    needToViewMap:PropTypes.bool.isRequired
-};

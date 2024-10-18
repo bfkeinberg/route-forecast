@@ -19,8 +19,10 @@ const addBreadcrumb = (msg : string) => {
 const LoadableMap = lazyRetry(() => {addBreadcrumb('loading map');return import(/* webpackChunkName: "Map" */ './RouteForecastMap')}, 7, 1200);
 
 type PropsFromRedux = ConnectedProps<typeof connector>
-
-const MapLoader = (props : PropsFromRedux) => {
+type MapLoaderProps = PropsFromRedux & {
+    [maps_api_key: string] : string
+}
+const MapLoader = (props : MapLoaderProps) => {
     // debug empty points and bounds
     const rwgpsRouteData = useAppSelector(state => state.routeInfo.rwgpsRouteData)
     const gpxRouteData = useAppSelector(state => state.routeInfo.gpxRouteData)

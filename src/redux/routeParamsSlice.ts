@@ -70,8 +70,8 @@ const routeParamsSlice = createSlice({
     name: 'routeParams',
     initialState: routeParamsInitialState,
     reducers: {
-        stopAfterLoadSet(state, action : PayloadAction<string>) {
-            state.stopAfterLoad = action.payload === "true"
+        stopAfterLoadSet(state, action : PayloadAction<boolean>) {
+            state.stopAfterLoad = action.payload
         },
         rwgpsRouteSet(state,action : PayloadAction<string>) {
             if (action.payload) {
@@ -107,9 +107,9 @@ const routeParamsSlice = createSlice({
                 }
             }
         },
-        startTimestampSet(state,action:PayloadAction<{start:string, zone:string}>) {
+        startTimestampSet(state,action:PayloadAction<{start:number, zone?:string}>) {
             if (action.payload) {
-                const start = DateTime.fromSeconds(parseInt(action.payload.start), {zone:action.payload.zone===undefined?"local":action.payload.zone})
+                const start = DateTime.fromSeconds(action.payload.start, {zone:action.payload.zone===undefined?"local":action.payload.zone})
                 if (start.isValid) {
                     state.startTimestamp = checkedStartDate(start, state.canForecastPast).toMillis()
                 }
