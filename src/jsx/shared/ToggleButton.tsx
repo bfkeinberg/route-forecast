@@ -1,8 +1,14 @@
-import { Button,Icon } from "@blueprintjs/core";
-import PropTypes from 'prop-types';
-import * as React from "react";
+import { Button,Icon, MaybeElement } from "@blueprintjs/core";
+import { BlueprintIcons_16Id } from "@blueprintjs/icons/lib/esm/generated/16px/blueprint-icons-16";
 
-export const ToggleButton = ({children, active, onClick, icon = null, style = {}}) => {
+interface ToggleButtonProps {
+  children: string
+  active: boolean
+  onClick: (event : React.MouseEvent) => void
+  icon?: BlueprintIcons_16Id | MaybeElement
+  style?: {}
+}
+export const ToggleButton = ({children, active, onClick, icon = null, style = {}} : ToggleButtonProps) => {
 
   return (
     <Button style={{height: '100%', border: "1px solid #6c757d80", display: "flex", alignItems: "center", justifyContent: "center", padding: '.25rem .5rem', ...style}} onClick={onClick} intent={active ? "success" : "none"} small={true}>
@@ -15,11 +21,3 @@ export const ToggleButton = ({children, active, onClick, icon = null, style = {}
     </Button>
   )
 }
-
-ToggleButton.propTypes = {
-  children:PropTypes.string,
-  active:PropTypes.bool,
-  onClick:PropTypes.func,
-  icon:PropTypes.string,
-  style:PropTypes.object
-};

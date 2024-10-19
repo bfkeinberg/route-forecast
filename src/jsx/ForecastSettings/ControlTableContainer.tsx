@@ -2,28 +2,30 @@
 import { Button, Card, Elevation } from "@blueprintjs/core";
 import { useAppDispatch, useAppSelector } from "../../utils/hooks";
 import { bankedDisplayToggled, controlAdded } from "../../redux/controlsSlice";
-import ErrorBoundary from '../shared/ErrorBoundary';
+import * as Sentry from "@sentry/react"
 import { ToggleButton } from '../shared/ToggleButton';
 import { ControlTable } from './ControlTable';
 import { DesktopTooltip } from "../shared/DesktopTooltip";
+import {useTranslation} from 'react-i18next'
 
 export const ControlTableContainer = () => {
   const displayBanked = useAppSelector(state => state.controls.displayBanked)
   const dispatch = useAppDispatch()
+  const { t } = useTranslation()
 
   return (
     <>
-      <ErrorBoundary>
+      <Sentry.ErrorBoundary fallback={<h2>Something went wrong.</h2>}>
         <Card interactive={true} elevation={Elevation.TWO} style={{ margin: '10px', display: "flex", flexFlow: "column", alignItems: "center" }} >
-            <ErrorBoundary>
+            <Sentry.ErrorBoundary fallback={<h2>Something else went wrong.</h2>}>
               <ControlTable />
               <AddRowButton/>
-              <DesktopTooltip usePortal={true} placement='bottom' content='Show how many minutes remain to be within ACP/RUSA brevet finishing times'>
-                  <ToggleButton style={{marginTop: "10px"}} active={displayBanked} onClick={() => dispatch(bankedDisplayToggled())}>Display banked time</ToggleButton>
+              <DesktopTooltip usePortal={true} placement='bottom' content={t('tooltips.banked')}>
+                  <ToggleButton style={{marginTop: "10px"}} active={displayBanked} onClick={() => dispatch(bankedDisplayToggled())}>{t("buttons.banked")}</ToggleButton>
               </DesktopTooltip>
-            </ErrorBoundary>
+            </Sentry.ErrorBoundary>
         </Card>
-      </ErrorBoundary>
+      </Sentry.ErrorBoundary>
       <div tabIndex={98} onFocus={() => {
         let button = document.getElementById('addButton');
         if (button !== undefined && button !== null) {

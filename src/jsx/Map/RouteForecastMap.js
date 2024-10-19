@@ -11,7 +11,6 @@ import { routeLoadingModes } from '../../data/enums';
 import { useForecastDependentValues, usePointsAndBounds } from '../../utils/hooks';
 import { milesToMeters } from '../../utils/util';
 import { formatTemperature } from "../resultsTables/ForecastTable";
-import ErrorBoundary from "../shared/ErrorBoundary"
 import { Polyline } from './polyline';
 import {useTranslation} from 'react-i18next'
 import { mapViewedSet } from '../../redux/forecastSlice';
@@ -134,7 +133,7 @@ const RouteForecastMap = ({maps_api_key}) => {
     const initialBounds = {north:37.34544, south:37.30822, east:-121.98912, west:-122.06169}
     try {
         return (
-            <ErrorBoundary>
+            <Sentry.ErrorBoundary fallback={<h2>Something went wrong.</h2>}>
                 <div id="map" style={{ width:'auto', height: "calc(100vh - 115px)", position: "relative" }}>
                     {(forecast.length > 0 || routeLoadingMode === routeLoadingModes.STRAVA) && bounds !== null ?
                     <APIProvider apiKey={maps_api_key}>
@@ -157,7 +156,7 @@ const RouteForecastMap = ({maps_api_key}) => {
                         <h2 style={{ padding: '18px', textAlign: "center" }}>{t('titles.map')}</h2>
                     }
                 </div>
-            </ErrorBoundary>
+            </Sentry.ErrorBoundary>
         )
     } catch (err) {
         Sentry.captureException(err, 'Error rendering Google Map')

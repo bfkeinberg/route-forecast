@@ -3,7 +3,7 @@ import { Provider } from 'react-redux';
 import { useContext } from "react";
 import configureReduxStore from '../../redux/configureStore';
 import LocationContext from '../locationContext';
-import ErrorBoundary from '../shared/ErrorBoundary';
+import * as Sentry from "@sentry/react"
 import RouteWeatherUI from './main';
 
 let script = document.scripts.namedItem('routeui')
@@ -14,7 +14,7 @@ const TopLevel = ({ action, maps_api_key, timezone_api_key, bitly_token, preload
     { action: string, maps_api_key: string, timezone_api_key: string, bitly_token: string, preloaded_state?: object }) => {
         const {href, search, origin} = useContext(LocationContext)
     return (
-        <ErrorBoundary>
+        <Sentry.ErrorBoundary  fallback={<h2>Something went wrong.</h2>}>
             <Provider store={store}>
                 <OverlaysProvider>
                     <HotkeysProvider>
@@ -23,7 +23,7 @@ const TopLevel = ({ action, maps_api_key, timezone_api_key, bitly_token, preload
                     </HotkeysProvider>
                 </OverlaysProvider>
             </Provider>
-        </ErrorBoundary>
+        </Sentry.ErrorBoundary>
     )
 };
 

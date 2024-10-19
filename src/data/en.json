@@ -9,7 +9,8 @@
                 "stops":"Add Stops",
                 "forecast":"Forecast",
                 "forecastPending":"Creating forecast...",
-                "zoomToSegment":"Zoom"
+                "zoomToSegment":"Zoom",
+                "banked":"Display banked time"
             },
             "labels": {
                 "language": "Select language",
@@ -57,7 +58,8 @@
                 "customSegment":"Forecast only this portion of the route",
                 "bearingHeader":"Click to toggle between absolute and relative wind bearing",
                 "copyTable":"Copy forecast table",
-                "scrollToRain":"Bring first forecast line with change of rain into view"
+                "scrollToRain":"Bring first forecast line with change of rain into view",
+                "banked": "Show how many minutes remain to be within ACP/RUSA brevet finishing times"
             },
             "data": {
                 "noForecastPlaceholder":"Find forecast to create",

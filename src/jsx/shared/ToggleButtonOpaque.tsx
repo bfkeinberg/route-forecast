@@ -1,6 +1,5 @@
 import { Button,Icon, MaybeElement } from "@blueprintjs/core";
 import { BlueprintIcons_16Id } from "@blueprintjs/icons/lib/esm/generated/16px/blueprint-icons-16";
-import PropTypes from 'prop-types';
 import { ReactNode } from "react";
 
 interface ToggleButtonOpaqueProps {
@@ -24,11 +23,3 @@ export const ToggleButtonOpaque = ({children, active, onClick, icon = null, styl
     </Button>
   )
 }
-
-ToggleButtonOpaque.propTypes = {
-  children:PropTypes.string,
-  active:PropTypes.bool,
-  onClick:PropTypes.func,
-  icon:PropTypes.string,
-  style:PropTypes.object
-};

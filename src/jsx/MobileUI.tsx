@@ -10,12 +10,11 @@ import MapLoader from "./Map/MapLoader";
 import ForecastTable from "./resultsTables/ForecastTable";
 import PaceTable from "./resultsTables/PaceTable";
 import RouteInfoForm from "./RouteInfoForm/RouteInfoForm";
-import ErrorBoundary from "./shared/ErrorBoundary";
 import DonationRequest from "./TopBar/DonationRequest";
 import DisplayErrorList from "./app/DisplayErrorList";
 import { useAppDispatch, useAppSelector } from "../utils/hooks";
 import { Dispatch, SetStateAction } from "react";
-
+import * as Sentry from "@sentry/react"
 export interface MobileUIPropTypes {
     mapsApiKey:string, 
     orientationChanged:boolean
@@ -83,17 +82,17 @@ const MobileUITabs = (props : MobileUIPropTypes) => {
                 <Navbar>
                     <NavbarGroup align={Alignment.CENTER}>
                         <NavbarHeading>Randoplan</NavbarHeading>
-                        <ErrorBoundary>
+                        <Sentry.ErrorBoundary fallback={<h2>Something went wrong.</h2>}>
                             <Link to={"/"} className={'nav-link'}>
                                 <Button small icon={<MapIcon />} title={"home"} intent={pathname==='/'?Intent.PRIMARY:Intent.NONE}></Button>
                             </Link>
-                        </ErrorBoundary>
+                        </Sentry.ErrorBoundary>
                         <NavbarDivider />
-                        <ErrorBoundary>
+                        <Sentry.ErrorBoundary fallback={<h2>Something went wrong.</h2>}>
                             <Link to={"/controlPoints/"} className={'nav-link'}>
                                 <Button small icon={<Shop/>} title={"controls"} intent={pathname.startsWith('/controlPoints')?Intent.PRIMARY:Intent.NONE} />
                             </Link>
-                        </ErrorBoundary>
+                        </Sentry.ErrorBoundary>
                         <NavbarDivider />
                         <Link to={"/forecastTable/"} className={'nav-link'}>
                             <Button small icon={<Cloud/>} title={"forecast"} intent={needToViewTable ? Intent.WARNING : (pathname.startsWith('/forecastTable')?Intent.PRIMARY:Intent.NONE)} />

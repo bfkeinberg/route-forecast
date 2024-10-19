@@ -11,7 +11,6 @@ import { InstallExtensionButton } from "./InstallExtensionButton";
 import MapLoader from "./Map/MapLoader";
 import PaceTable from "./resultsTables/PaceTable";
 import RouteInfoForm from "./RouteInfoForm/RouteInfoForm";
-import ErrorBoundary from "./shared/ErrorBoundary";
 import { RouteTitle } from "./shared/RouteTitle";
 import { TransitionWrapper } from "./shared/TransitionWrapper";
 import { TitleScreen } from "./TitleScreen";
@@ -20,6 +19,7 @@ import LangSwitcher from "./app/LangSwitcher";
 import {useTranslation} from 'react-i18next'
 import { lastErrorCleared } from '../redux/dialogParamsSlice'
 import DisplayErrorList from "./app/DisplayErrorList";
+import * as Sentry from "@sentry/react"
 
 export type DesktopUIProps = {
     mapsApiKey: string
@@ -37,10 +37,10 @@ const DesktopUI = ({mapsApiKey, orientationChanged, setOrientationChanged} : Des
     const titleForecast = t("titles.forecast")
     const titlePaceAnalyis = t("titles.paceAnalysis")
     const sidePaneOptions = [
-        {title: titleRouteInfo, content: <ErrorBoundary><RouteInfoForm /></ErrorBoundary>},
-        {title: titleForecastSettings, content: <ErrorBoundary><ForecastSettings/></ErrorBoundary>},
-        {title: titleForecast, content: <ErrorBoundary><Suspense fallback={<div>Loading ForecastTable...</div>}>{<LoadableForecastTable adjustedTimes={adjustedTimes}/>}</Suspense></ErrorBoundary>},
-        {title: titlePaceAnalyis, content: <ErrorBoundary>{<PaceTable/>}</ErrorBoundary>}
+        {title: titleRouteInfo, content: <Sentry.ErrorBoundary fallback={<h2>Something went wrong.</h2>}><RouteInfoForm /></Sentry.ErrorBoundary>},
+        {title: titleForecastSettings, content: <Sentry.ErrorBoundary fallback={<h2>Something went wrong.</h2>}><ForecastSettings/></Sentry.ErrorBoundary>},
+        {title: titleForecast, content: <Sentry.ErrorBoundary fallback={<h2>Something went wrong.</h2>}><Suspense fallback={<div>Loading ForecastTable...</div>}>{<LoadableForecastTable adjustedTimes={adjustedTimes}/>}</Suspense></Sentry.ErrorBoundary>},
+        {title: titlePaceAnalyis, content: <Sentry.ErrorBoundary fallback={<h2>Something went wrong.</h2>}>{<PaceTable/>}</Sentry.ErrorBoundary>}
     ]
     const [
         activeSidePane,

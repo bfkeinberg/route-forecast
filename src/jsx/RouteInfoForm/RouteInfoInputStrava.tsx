@@ -2,10 +2,9 @@
 import { Button } from '@blueprintjs/core';
 import stravaImage from 'Images/api_logo_pwrdBy_strava_stack_light.png';
 import ReactGA from "react-ga4";
-
+import * as Sentry from "@sentry/react"
 import { loadStravaActivity, loadStravaRoute } from '../../redux/loadFromStravaActions';
 import stravaRouteParser from '../../utils/stravaRouteParser';
-import ErrorBoundary from '../shared/ErrorBoundary';
 import StravaActivityIdInput from './StravaActivityIdInput';
 import StravaRouteIdInput from './StravaRouteIdInput';
 import { useAppSelector, useAppDispatch } from '../../utils/hooks';
@@ -27,7 +26,7 @@ export const RouteInfoInputStrava = () => {
 
   return (
     <div style={{display: "flex", flexFlow: "column", alignItems: "flex-end"}}>
-      <ErrorBoundary>
+      <Sentry.ErrorBoundary fallback={<h2>Something went wrong.</h2>}>
         <div style={{width: "100%"}}>
           {accessToken === null ?
             <StravaLoginButton/> :
@@ -54,7 +53,7 @@ export const RouteInfoInputStrava = () => {
             </div>
           }
         </div>
-      </ErrorBoundary>
+      </Sentry.ErrorBoundary>
       <img style={{marginTop: "10px"}} id='stravaImage' src={stravaImage}/>
     </div>
   )

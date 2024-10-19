@@ -9,7 +9,8 @@
                 "stops":"Ajouter des Contrôles",
                 "forecast":"Prévisions",
                 "forecastPending":"Création de prévisions...",
-                "zoomToSegment":"Zoom"
+                "zoomToSegment":"Zoom",
+                "banked":"Afficher le temps accumulé"
             },
             "labels": {
                 "language": "Choisissez la langue",
@@ -57,7 +58,8 @@
                 "customSegment":"Prévoir uniquement cette partie de le parcours",
                 "bearingHeader":"Cliquez pour basculer entre le relèvement du vent absolu et relatif",
                 "copyTable":"Copier le tableau de prévisions",
-                "scrollToRain":"Afficher la première ligne de prévision avec changement de pluie"
+                "scrollToRain":"Afficher la première ligne de prévision avec changement de pluie",
+                "banked": "Affichez le nombre de minutes restant pour être dans les temps d'arrivée du brevet ACP/RUSA"
             },
             "data":{
                 "noForecastPlaceholder":"Cliquez sur « Prévisions »",

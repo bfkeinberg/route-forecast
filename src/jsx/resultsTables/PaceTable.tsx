@@ -4,11 +4,10 @@ import { HTMLTable, Tooltip } from '@blueprintjs/core';
 import { useState } from 'react';
 import cookie from 'react-cookies';
 import {connect, ConnectedProps} from 'react-redux';
-
+import * as Sentry from "@sentry/react"
 import { zoomToRangeToggled } from '../../redux/forecastSlice';
 import { useActualPace, useFormatSpeed } from '../../utils/hooks';
 import stravaRouteParser from '../../utils/stravaRouteParser';
-import ErrorBoundary from "../shared/ErrorBoundary";
 import { ToggleButton } from '../shared/ToggleButton';
 import StravaAnalysisIntervalInput from './StravaAnalysisIntervalInput';
 import {useTranslation} from 'react-i18next'
@@ -105,7 +104,7 @@ const PaceTable = ({activityData, activityStream, analysisInterval, mapSubrangeS
     // TODO: localize table headers
     return (
             <div className="animated slideInRight">
-                <ErrorBoundary>
+                <Sentry.ErrorBoundary fallback={<h2>Something went wrong.</h2>}>
                     <div style={{padding: "16px", display: "flex", flexFlow: "column", alignItems: "center"}}>
                         <StravaAnalysisIntervalInput />
                         <div id="paceSpan" style={{fontSize: "14px", marginTop: "10px"}}>{t('analysis.overallPace')} <span style={{fontWeight: "bold"}}>{formatSpeed(actualPace)}</span>.</div>
@@ -129,7 +128,7 @@ const PaceTable = ({activityData, activityStream, analysisInterval, mapSubrangeS
                         </thead>
                         {expandTable(paceOverTime)}
                     </HTMLTable>
-                </ErrorBoundary>
+                </Sentry.ErrorBoundary>
             </div>
     );
 }

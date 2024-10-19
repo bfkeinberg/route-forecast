@@ -3,7 +3,7 @@ import { Button,Intent } from '@blueprintjs/core';
 import { useRef,useState } from 'react';
 
 import { loadFromRideWithGps } from "../../redux/loadRouteActions"
-import ErrorBoundary from "../shared/ErrorBoundary.js";
+import * as Sentry from "@sentry/react"
 import PinnedRouteLoader from './PinnedRouteLoader';
 import RideWithGpsId from './RideWithGpsId';
 import {useTranslation} from 'react-i18next'
@@ -27,14 +27,14 @@ null :
             <div className="or-divider" style={{flex: 0.3, fontSize: "13px", textAlign: "center"}}>- OR -</div>
           </>
         }
-        <ErrorBoundary>
+        <Sentry.ErrorBoundary fallback={<h2>Something went wrong.</h2>}>
           <div style={{flex: 1, padding: "5px"}}>
             <PinnedRouteLoader
               showPinnedRoutes={showPinnedRoutes}
               setShowPinnedRoutes={setShowPinnedRoutes}
             />
           </div>
-        </ErrorBoundary>
+        </Sentry.ErrorBoundary>
       </div>
       <RWGPSLoadRouteButton loadButtonRef={loadButtonRef}/>
     </>

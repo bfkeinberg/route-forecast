@@ -4,7 +4,6 @@ import {Suspense} from 'react';
 import {connect, ConnectedProps} from 'react-redux';
 
 import { routeLoadingModes } from '../../data/enums';
-import ErrorBoundary from "../shared/ErrorBoundary";
 import { RootState } from "jsx/app/topLevel";
 import { useAppSelector } from "../../utils/hooks";
 
@@ -38,11 +37,11 @@ const MapLoader = (props : MapLoaderProps) => {
             level: 'info',
             message:`Loading map with ${length} route points`
         })
-        return <ErrorBoundary>
+        return <Sentry.ErrorBoundary fallback={<h2>Something went wrong.</h2>}>
             <Suspense fallback={<div>Loading Map...</div>}>
                 <LoadableMap {...props} />
             </Suspense>
-        </ErrorBoundary>;
+        </Sentry.ErrorBoundary>;
     } else {
         return <div>Map for forecast</div>
     }
