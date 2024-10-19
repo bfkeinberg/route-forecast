@@ -6,7 +6,6 @@ import 'Images/style.css';
 
 import * as Sentry from "@sentry/react";
 import {Info} from "luxon";
-import PropTypes from 'prop-types';
 import queryString from 'query-string';
 import React, {lazy,  ReactElement, Suspense,useEffect} from 'react';
 import cookie from 'react-cookies';
@@ -365,8 +364,3 @@ const FunAppWrapperThingForHooksUsability = ({maps_api_key, queryParams} : FunWr
         </div>
     )
 }
-
-FunAppWrapperThingForHooksUsability.propTypes = {
-        maps_api_key: PropTypes.string.isRequired,
-        queryParams: PropTypes.object.isRequired
-};
