@@ -1,4 +1,4 @@
-const moment = require('moment-timezone');
+const { DateTime } = require("luxon");
 const axios = require('axios');
 const Sentry = require("@sentry/node")
 
@@ -20,10 +20,8 @@ const Sentry = require("@sentry/node")
  */
 const callVisualCrossing = async function (lat, lon, currentTime, distance, zone, bearing, getBearingDifference, isControl) {
     const visualCrossingKey = process.env.VISUAL_CROSSING_KEY;
-    const startTime = moment(currentTime);
-    const endTime = startTime.clone();
-    endTime.add(1, 'hours');
-    const startTimeString = startTime.unix();
+    const startTime = DateTime.fromISO(currentTime, { zone: 'utc' });
+    const startTimeString = startTime.toUnixInteger();
     const url = `https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/${lat},${lon}/${startTimeString}?unitGroup=us&include=current&options=nonulls&key=${visualCrossingKey}`;
     const weatherResult = await axios.get(url).catch(error => {Sentry.captureMessage(`axios error ${error.response?error.response.data:error}`,'error')
         throw error.response?error.response.data:error});
@@ -37,14 +35,14 @@ const callVisualCrossing = async function (lat, lon, currentTime, distance, zone
         Sentry.captureMessage(`Throwing error because no current conditions were returned`,'error');
         throw Error({details:"No current conditions"});
     }
-    const now = moment.unix(current.datetimeEpoch).tz(zone);
+    const now = DateTime.fromSeconds(current.datetimeEpoch, {zone: zone})
     const hasWind = current.windspeed !== undefined;
     const windBearing = current.winddir;
     const relativeBearing = hasWind && windBearing !== undefined ? getBearingDifference(bearing, windBearing) : null;
     const rainy = current.precip !== 0;
     const precip = current.precipprob !== undefined ? current.precipprob : 0;
     return new Promise((resolve) => {resolve({
-        'time':now.toISOString(),
+        'time':now.toISO(),
         zone:zone,
         'distance':distance,
         'summary':forecast.days[0].conditions,
