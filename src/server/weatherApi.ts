@@ -1,10 +1,10 @@
-const { DateTime } = require("luxon");
-const axios = require('axios');
-const Sentry = require("@sentry/node")
-
-//
 //
 /* eslint-disable max-params*/
+
+import axios from "axios";
+import { DateTime } from "luxon";
+import { WeatherFunc } from "./weatherForecastDispatcher";
+const Sentry = require('@sentry/node')
 
 /**
  *
@@ -20,7 +20,8 @@ const Sentry = require("@sentry/node")
  * lat: *, lon: *, temp: string, relBearing: null, rainy: boolean, windBearing: number,
  * vectorBearing: *, gust: string} | never>} a promise to evaluate to get the forecast results
  */
-const callWeatherApi = async function callWeatherApi (lat, lon, currentTime, distance, zone, bearing, getBearingDifference, isControl) {
+const callWeatherApi = async function (lat : number, lon : number, currentTime : string, 
+    distance : number, zone : string, bearing : number, getBearingDifference : (bearing: number, windBearing: number) => number, isControl : boolean) {
     const weatherApiKey = process.env.WEATHER_API_KEY;
     const startTime = DateTime.fromISO(currentTime, {zone:zone});
     let hour = startTime.minute > 30 ? startTime.hour + 1 : startTime.hour;
@@ -31,18 +32,18 @@ const callWeatherApi = async function callWeatherApi (lat, lon, currentTime, dis
     const historyUrl = `https://api.weatherapi.com/v1/history.json?key=${weatherApiKey}&q=${lat},${lon}&hour=${hour}&unixdt=${startTime.toUnixInteger()}`;
     const url = startTime < DateTime.now() ? historyUrl : forecastUrl;
     Sentry.setContext('url',{'url':url})
-    const forecastResult = await axios.get(url).catch(error => {
+    const forecastResult = await axios.get(url).catch((error : any) => {
         throw Error(error.response.data.error.message);
     });
     if (forecastResult.data.error !== undefined && forecastResult.data.error.code !== undefined) {
-        Sentry.captureMessage(`WeatherAPI error ${forecastResult.error.message}`,'error')
-        throw Error(forecastResult.error.message);
+        Sentry.captureMessage(`WeatherAPI error ${forecastResult.data.error.message}`,'error')
+        throw Error(forecastResult.data.error.message);
     }
     const current = forecastResult.data.forecast.forecastday[0].hour[0];
     const now = DateTime.fromSeconds(current.time_epoch, {zone:zone});
     const hasWind = current.wind_mph !== undefined;
     const windBearing = current.wind_degree;
-    const relativeBearing = hasWind && windBearing !== undefined ? getBearingDifference(bearing, windBearing) : null;
+    const relativeBearing = getBearingDifference(bearing, windBearing)
     const rainy = current.will_it_rain !== 0;
     return {
         'time':now.toISO(),
@@ -65,6 +66,6 @@ const callWeatherApi = async function callWeatherApi (lat, lon, currentTime, dis
         'aqi':forecastResult.data.current.air_quality.pm2_5,
         isControl:isControl
     }
-};
+} as WeatherFunc;
 
-module.exports = callWeatherApi;
+export default callWeatherApi;

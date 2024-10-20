@@ -1,10 +1,13 @@
+import { AxiosError } from "axios";
+import { WeatherFunc } from "./weatherForecastDispatcher";
+
 const { DateTime } = require("luxon");
 const axios = require('axios');
 const axiosInstance = axios.create()
 const Sentry = require("@sentry/node")
 const axiosRetry = require('axios-retry').default
 
-const weatherCodes = {
+const weatherCodes  : {[index: string]: any} = {
     "0": "Unknown",
     "1000": "Clear",
     "1001": "Cloudy",
@@ -31,13 +34,13 @@ const weatherCodes = {
     "7000": "Ice Pellets",
     "7101": "Heavy Ice Pellets",
     "7102": "Light Ice Pellets",
-    "8000": "Thunderstorm"
-};
+    "8000": "Thunderstorm"    
+}
 
 axiosRetry(axiosInstance, {
     retries: 4,
     retryDelay: axiosRetry.exponentialDelay,
-    retryCondition: (error) => {
+    retryCondition: (error: { response: { status: any; }; }) => {
         switch (error.response.status) {
         case 429:
             return true;
@@ -45,18 +48,18 @@ axiosRetry(axiosInstance, {
             return false;
         }
     },
-    onRetry: (retryCount) => {
+    onRetry: (retryCount : number) => {
         console.info(`tommorow.io axios retry count: ${retryCount}`);
     },
-    onMaxRetryTimesExceeded: (err) => {
+    onMaxRetryTimesExceeded: (err: any) => {
         console.log(`last tomorrow.io axios error after retrying was ${err}`)
     }
 });
 
-const getFromTomorrowIoWithBackoff = async (forecastUrl) => {
-    const forecastResult = await axiosInstance.get(forecastUrl).catch(error => {
+const getFromTomorrowIoWithBackoff = async (forecastUrl : string) => {
+    const forecastResult = await axiosInstance.get(forecastUrl).catch((error : AxiosError) => {
         // Sentry.captureException(error)
-        console.error('Axios error', error.response.statusText)
+        console.error('Axios error', error.response?.statusText)
         throw Error(`Failed to get Tomorrow.io forecast from ${forecastUrl}:${error}`)
     })
     if (forecastResult !== undefined) {
@@ -101,7 +104,6 @@ const callTomorrowIo = async function callTomorrowIo (lat, lon, currentTime, dis
     const forecast = await getFromTomorrowIoWithBackoff(url);
 
     const current = forecast.data.timelines[0];
-    const now = DateTime.fromISO(current.startTime, {zone:zone})
     const values = current.intervals[0].values;
     const hasWind = values.windSpeed !== undefined;
     const windBearing = values.windDirection;
@@ -128,6 +130,6 @@ const callTomorrowIo = async function callTomorrowIo (lat, lon, currentTime, dis
         'aqi':values.epaIndex,
         isControl:isControl
     }
-};
+} as WeatherFunc;
 
 module.exports = callTomorrowIo

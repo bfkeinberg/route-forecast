@@ -7,12 +7,38 @@ const callWeatherKit = require('./weatherKit');
 const callOneCall = require('./oneCall')
 const Sentry = require('@sentry/node')
 
-const getBearingDifference = function (bearing,windBearing) {
+const getBearingDifference = function (bearing : number,windBearing : number) {
     return Math.min(bearing - windBearing < 0 ? bearing - windBearing + 360 : bearing - windBearing,
         windBearing - bearing < 0 ? windBearing - bearing + 360 : windBearing - bearing);
 };
 
 /* eslint-disable max-params*/
+
+export type WeatherFunc =
+    (lat : number, lon : number, 
+        currentTime : string, distance : number, zone : string, bearing : number, 
+        getBearingDifference : (bearing: number, windBearing: number) => number, isControl : boolean) =>
+        Promise<{
+        time: string
+        zone: string,
+        distance:number
+        summary: string
+        precip: string
+        humidity: number
+        cloudCover: string
+        windSpeed: string
+        lat: number
+        lon: number
+        temp: string
+        relBearing: number
+        rainy: boolean
+        windBearing: number
+        vectorBearing: number
+        gust: string
+        feel: number
+        aqi?: number
+        isControl: boolean
+        }>
 
 /**
  *
@@ -28,7 +54,8 @@ const getBearingDifference = function (bearing,windBearing) {
  * lat: *, lon: *, temp: string, relBearing: null, rainy: boolean, windBearing: number,
  * vectorBearing: *, gust: string} | never>} a promise to evaluate to get the forecast results
  */
-const callWeatherService = function (service, lat, lon, currentTime, distance, zone, bearing, isControl) {
+const callWeatherService = function (service : string, lat : number, lon : number, 
+    currentTime : string, distance : number, zone : string, bearing : number, isControl : boolean) {
     switch (service) {
     case 'climacell':
         return Sentry.startSpan({ name: "tomorrow.io" }, () => {

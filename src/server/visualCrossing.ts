@@ -1,8 +1,9 @@
-const { DateTime } = require("luxon");
-const axios = require('axios');
-const Sentry = require("@sentry/node")
-
 /* eslint-disable max-params, max-lines-per-function */
+
+import axios from "axios";
+import { DateTime } from "luxon";
+import { WeatherFunc } from "./weatherForecastDispatcher";
+const Sentry = require('@sentry/node')
 
 /**
  *
@@ -18,12 +19,13 @@ const Sentry = require("@sentry/node")
  * lat: *, lon: *, temp: string, relBearing: null, rainy: boolean, windBearing: number,
  * vectorBearing: *, gust: string} | never>} a promise to evaluate to get the forecast results
  */
-const callVisualCrossing = async function (lat, lon, currentTime, distance, zone, bearing, getBearingDifference, isControl) {
+const callVisualCrossing = async function (lat : number, lon : number, currentTime : string, 
+    distance : number, zone : string, bearing : number, getBearingDifference : (bearing: number, windBearing: number) => number, isControl : boolean) {
     const visualCrossingKey = process.env.VISUAL_CROSSING_KEY;
     const startTime = DateTime.fromISO(currentTime, { zone: 'utc' });
     const startTimeString = startTime.toUnixInteger();
     const url = `https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/${lat},${lon}/${startTimeString}?unitGroup=us&include=current&options=nonulls&key=${visualCrossingKey}`;
-    const weatherResult = await axios.get(url).catch(error => {Sentry.captureMessage(`axios error ${error.response?error.response.data:error}`,'error')
+    const weatherResult = await axios.get(url).catch((error : any)=> {Sentry.captureMessage(`axios error ${error.response?error.response.data:error}`,'error')
         throw error.response?error.response.data:error});
     const forecast = weatherResult.data;
     if (forecast.code !== undefined) {
@@ -33,12 +35,12 @@ const callVisualCrossing = async function (lat, lon, currentTime, distance, zone
     const current = forecast.currentConditions;
     if (current === undefined) {
         Sentry.captureMessage(`Throwing error because no current conditions were returned`,'error');
-        throw Error({details:"No current conditions"});
+        throw Error("No current conditions");
     }
     const now = DateTime.fromSeconds(current.datetimeEpoch, {zone: zone})
     const hasWind = current.windspeed !== undefined;
     const windBearing = current.winddir;
-    const relativeBearing = hasWind && windBearing !== undefined ? getBearingDifference(bearing, windBearing) : null;
+    const relativeBearing = getBearingDifference(bearing, windBearing)
     const rainy = current.precip !== 0;
     const precip = current.precipprob !== undefined ? current.precipprob : 0;
     return new Promise((resolve) => {resolve({
@@ -61,6 +63,6 @@ const callVisualCrossing = async function (lat, lon, currentTime, distance, zone
         'feel':current.feelslike===undefined?Math.round(current.temperature):Math.round(current.feelslike),
         isControl:isControl
     })})
-};
+} as WeatherFunc;
 
-module.exports = callVisualCrossing;
+export default callVisualCrossing;
