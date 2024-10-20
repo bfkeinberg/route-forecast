@@ -1,6 +1,5 @@
 import { Toast2 } from '@blueprintjs/core';
 import ReactGA from "react-ga4";i18n
-import { useDispatch,useSelector } from "react-redux";
 import {useTranslation} from 'react-i18next'
 import  {useMediaQuery} from 'react-responsive';
 import { maxWidthForMobile } from '../../utils/util';

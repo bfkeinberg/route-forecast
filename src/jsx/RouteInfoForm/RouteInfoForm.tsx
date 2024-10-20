@@ -12,6 +12,7 @@ import {useTranslation} from 'react-i18next'
 import bicycle from 'Images/bicycle.svg'
 import { routeLoadingModeSet } from '../../redux/routeParamsSlice';
 import { RootState } from 'jsx/app/topLevel';
+import { ReactNode } from 'react';
 type PropsFromRedux = ConnectedProps<typeof connector>
 
 const getInputForMode = (mode : RouteLoadingModes ) => {
@@ -52,8 +53,9 @@ const RouteInfoForm = ({ errorDetails, errorDetailsSet, routeLoadingMode, routeL
     );
 }
 
-const sliderLabelRenderer = (value : number, index : number) => {
-    return routeLoadingModeProps[index].name
+const sliderLabelRenderer = (value : number, index : number) : ReactNode => {
+    console.log(routeLoadingModeProps[value].name)
+    return <span>{routeLoadingModeProps[value].name}</span>
 }
 
 const RouteLoadingModeSelector = ({ mode, modeSwitched } : {mode:RouteLoadingModes, modeSwitched: (item: Event, value: number|number[]) => void}) => {

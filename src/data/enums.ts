@@ -12,7 +12,7 @@ export enum RouteLoadingModes {
 
 export const routeLoadingModeProps = [
   {},
-  {name:"Ride with GPS", key:routeLoadingModes.RWGPS},
-  {name:"Strava", key:routeLoadingModes.STRAVA},
-  {name:"RUSA perm id", key:routeLoadingModes.RUSA_PERM}
+  {name:"Ride with GPS route or trip", key:routeLoadingModes.RWGPS},
+  {name:"Strava route or activity", key:routeLoadingModes.STRAVA},
+  {name:"RUSA permanent id", key:routeLoadingModes.RUSA_PERM}
 ]

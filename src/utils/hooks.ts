@@ -156,7 +156,15 @@ const useFormatSpeed = () => {
     `${speed.toFixed(1)} mph`);
 }
 
-const usePointsAndBounds = () => {
+export type MapPoint = {lat:number, lng:number, dist?:number}
+export type MapPointList = Array<MapPoint>
+
+export type PointsAndBounds = {
+  points?: MapPointList
+  pointList: Array<Point>
+  bounds: Bounds
+}
+const usePointsAndBounds = () : PointsAndBounds => {
   const rwgpsRouteData = useAppSelector(state => state.routeInfo.rwgpsRouteData)
   const gpxRouteData = useAppSelector(state => state.routeInfo.gpxRouteData)
 
@@ -165,12 +173,7 @@ const usePointsAndBounds = () => {
   const stravaActivityStream = useAppSelector(state => state.strava.activityStream)
   const stravaMode = routeLoadingMode === routeLoadingModes.STRAVA
 
-  type PointsAndBounds = {
-    points?: Array<{lat:number, lng:number, dist?:number}>
-    pointList: Array<Point>
-    bounds: Bounds
-  }
-  let pointsAndBounds : PointsAndBounds | null = null
+  let pointsAndBounds : PointsAndBounds = {pointList:[], bounds:{min_latitude: 90, min_longitude: 180, max_latitude: -90, max_longitude: -180}}
 
   if (stravaMode) {
     if (stravaActivityStream !== null) {
@@ -191,14 +194,13 @@ const usePointsAndBounds = () => {
   } else if (gpxRouteData !== null) {
     pointsAndBounds = useMemo(() => gpxParser.computePointsAndBounds(gpxParser.parseGpxRouteStream(gpxRouteData)), [gpxRouteData])
   }
-  if (!pointsAndBounds) {
-    Sentry.captureMessage(`Empty points and bounds :Strava=${stravaActivityStream === null} Strava route: ${stravaRouteUsed} RWGPS:${rwgpsRouteData === null} GPX:${gpxRouteData === null}`)
+  if (pointsAndBounds.pointList.length === 0) {
+    Sentry.captureMessage(
+      `Empty points and bounds :Strava activity empty=${stravaActivityStream === null} Strava route empty: ${stravaRouteUsed} RWGPS empty:${rwgpsRouteData === null} GPX empty:${gpxRouteData === null}`)
   }
-  if (pointsAndBounds && pointsAndBounds.pointList && pointsAndBounds.pointList.length > 0) {
+  if (pointsAndBounds.pointList.length > 0) {
     pointsAndBounds.points = useMemo(() => pointsAndBounds.pointList
       .map(point => ({ lat: point.lat, lng: point.lon, dist: point.dist })), [pointsAndBounds.pointList])
-    // pointsAndBounds.points = pointsAndBounds.pointList
-    // .map(point => ({ lat: point.lat, lng: point.lon, dist: point.dist }))
   }
 
   return pointsAndBounds

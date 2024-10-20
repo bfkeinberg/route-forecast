@@ -4,32 +4,33 @@ import circus_tent from 'Images/circus tent.png';
 import rainCloud from "Images/lightning-and-blue-rain-cloud-16533.svg"
 import PropTypes from 'prop-types';
 import React, { useEffect, useState } from 'react';
-import { useDispatch,useSelector } from 'react-redux';
 import 'Images/style.css';
 import { DateTime } from 'luxon';
 import { routeLoadingModes } from '../../data/enums';
-import { useForecastDependentValues, usePointsAndBounds } from '../../utils/hooks';
-import { milesToMeters } from '../../utils/util';
+import { MapPoint, MapPointList, useForecastDependentValues, usePointsAndBounds } from '../../utils/hooks';
+import { Bounds, milesToMeters } from '../../utils/util';
 import { formatTemperature } from "../resultsTables/ForecastTable";
 import { Polyline } from './polyline';
 import {useTranslation} from 'react-i18next'
-import { mapViewedSet } from '../../redux/forecastSlice';
-
+import { Forecast, mapViewedSet } from '../../redux/forecastSlice';
+import { CalculatedValue } from 'utils/gpxParser';
+import { useAppSelector, useAppDispatch } from '../../utils/hooks';
 const arrowPath = "m-.232.134c-1.104 0-2-.224-2-.5v-31.634c0-.276.896-.5 2-.5s2 .224 2 .5v31.634C1.768-.09.876.134-.232.134m12.651-20.5c-.128 0-.256-.049-.354-.146l-12.179-12.183-12.184 12.183c-.195.195-.512.195-.707 0s-.195-.512 0-.707l12.538-12.537c.093-.093.22-.146.353-.146l0 0c.133 0 .26.053.354.146l12.533 12.536c.195.195.195.512 0 .707-.098.098-.226.147-.354.147z"
 
-const findMarkerInfo = (forecast, subrange) => {
+const findMarkerInfo = (forecast : Array<Forecast>, subrange : [number,number] | []) => {
     if (!subrange || subrange.length !== 2) {
         return [];
     }
     return forecast.filter((point) => Math.round(point.distance * milesToMeters) >= subrange[0] && Math.round(point.distance * milesToMeters) <= subrange[1]);
 }
 
-const matchesSegment = (point, range) => {
+const matchesSegment = (point : MapPoint, range : Array<number>) => {
     return ((point.dist===undefined) ||
     (point.dist >= range[0] && point.dist <= range[1]))
 }
 
-const getMapBounds = (points, bounds, zoomToRange, subrange, userSubrange) => {
+type calculatedBounds = { min_latitude: number, min_longitude: number, max_latitude: number, max_longitude: number };
+const getMapBounds = (points : MapPointList, bounds : Bounds, zoomToRange : boolean, subrange  : [number,number] | [], userSubrange : [number,number]) => {
     const defaultBounds = {north:bounds.max_latitude, south:bounds.min_latitude, east:bounds.max_longitude, west:bounds.min_longitude}
     const preferDefault = userSubrange[0] === userSubrange[1]
     if (preferDefault && subrange.length !== 2) {
@@ -50,45 +51,38 @@ const getMapBounds = (points, bounds, zoomToRange, subrange, userSubrange) => {
     return preferDefault ? defaultBounds : userBounds;
 }
 
-const cvtDistance = (distance, metric) => {
-    return (metric ? ((distance * milesToMeters) / 1000) : Number.parseInt(distance));
+const cvtDistance = (distanceStr : string, metric : boolean) => {
+    const distance = Number.parseInt(distanceStr)
+    return (metric ? ((distance * milesToMeters) / 1000).toFixed(1) : distanceStr);
 };
 
-const addBreadcrumb = (msg) => {
-    Sentry.addBreadcrumb({
-        category: 'map centering',
-        level: "info",
-        message: msg
-    })
-}
-
-const findMapBounds = (points, bounds, zoomToRange, subrange, userSubrange) => {
+const findMapBounds = (points : MapPointList, bounds : Bounds, zoomToRange : boolean, subrange : [number,number] | [], userSubrange : [number,number]) => {
     const mapBounds = getMapBounds(points, bounds, zoomToRange, subrange, userSubrange)
     return mapBounds
 }
 
-const RouteForecastMap = ({maps_api_key}) => {
-    const userControlPoints = useSelector(state => state.controls.userControlPoints)
-    const forecast = useSelector(state => state.forecast.forecast)
-    const doingAnalysis = useSelector(state=>state.strava.activityData) !== null
-    let subrange = useSelector(state => state.strava.activityData !== null ? state.strava.subrange : state.forecast.range)
+const RouteForecastMap = ({maps_api_key} : {maps_api_key: string}) => {
+    const userControlPoints = useAppSelector(state => state.controls.userControlPoints)
+    const forecast = useAppSelector(state => state.forecast.forecast)
+    const doingAnalysis = useAppSelector(state=>state.strava.activityData) !== null
+    let subrange = useAppSelector(state => state.strava.activityData !== null ? state.strava.subrange : state.forecast.range)
     if (subrange.length == 2 && isNaN(subrange[1])) {
         subrange = []
     }
-    const routeLoadingMode = useSelector(state => state.uiInfo.routeParams.routeLoadingMode)
-    const metric = useSelector(state => state.controls.metric)
-    const celsius = useSelector(state => state.controls.celsius)
-    const zoomToRange = useSelector(state => state.forecast.zoomToRange)
+    const routeLoadingMode = useAppSelector(state => state.uiInfo.routeParams.routeLoadingMode)
+    const metric = useAppSelector(state => state.controls.metric)
+    const celsius = useAppSelector(state => state.controls.celsius)
+    const zoomToRange = useAppSelector(state => state.forecast.zoomToRange)
     const { t } = useTranslation()
-    const userSegment = useSelector(state => state.uiInfo.routeParams.segment)
+    const userSegment = useAppSelector(state => state.uiInfo.routeParams.segment)
 
     const { calculatedControlPointValues: controls } = useForecastDependentValues()
 
-    const dispatch = useDispatch()
+    const dispatch = useAppDispatch()
     useEffect(() => { dispatch(mapViewedSet()) }, [])
     
-    const BoundSetter = () => {
-        const [mapBounds, setMapBounds] = useState([])
+    const BoundSetter = ({points} : {points: MapPointList}) => {
+        const [mapBounds, setMapBounds] = useState<google.maps.LatLngBounds|google.maps.LatLngBoundsLiteral>({north: 90, south: 180, east: -90, west: -180})
         const apiIsLoaded = useApiIsLoaded()
         const map = useMap()
         useEffect(() => {
@@ -101,9 +95,13 @@ const RouteForecastMap = ({maps_api_key}) => {
         useEffect(() => {
             if (map && (Object.keys(mapBounds).length===2 || Object.keys(mapBounds).length == 4)) {
                 map.fitBounds(mapBounds, 0)
-                map.setZoom(map.getZoom()-1)
+                const zoom = map.getZoom()
+                if (zoom) {
+                    map.setZoom(zoom-1)
+                }
             }
         }, [map, mapBounds])
+        return <div/>
     }
     
     const controlNames = userControlPoints.map(control => control.name)
@@ -111,18 +109,20 @@ const RouteForecastMap = ({maps_api_key}) => {
     let markedInfo = findMarkerInfo(forecast, subrange);
 
     const { points, bounds } = usePointsAndBounds()
-    
+    if (!points || points === undefined) {
+        return (<h2>No map points to display</h2>)
+    }
     let infoVisible = false;
     if (!doingAnalysis && markedInfo.length > 0) {
         infoVisible = true;
     }
 
-    const getInfoWindow  = (markedInfo) => {
+    const getInfoWindow  = (markedInfo : Forecast[]) => {
         const infoContents = (<span>
             {t('data.info.temperature')} &nbsp;
             <strong>{formatTemperature(markedInfo[0].temp, celsius)}</strong> &nbsp;
             {t('data.wind.speed')} &nbsp;
-            <strong>{cvtDistance(markedInfo[0].windSpeed, metric).toFixed(1)}</strong> &nbsp;
+            <strong>{cvtDistance(markedInfo[0].windSpeed, metric)}</strong> &nbsp;
             {t('tableHeaders.windBearing')} &nbsp;
             <strong>{markedInfo[0].windBearing}</strong>
         </span>)
@@ -133,15 +133,15 @@ const RouteForecastMap = ({maps_api_key}) => {
     const initialBounds = {north:37.34544, south:37.30822, east:-121.98912, west:-122.06169}
     try {
         return (
-            <Sentry.ErrorBoundary fallback={<h2>Something went wrong.</h2>}>
+            <Sentry.ErrorBoundary fallback=<h2>Cannot render map</h2>>
                 <div id="map" style={{ width:'auto', height: "calc(100vh - 115px)", position: "relative" }}>
                     {(forecast.length > 0 || routeLoadingMode === routeLoadingModes.STRAVA) && bounds !== null ?
                     <APIProvider apiKey={maps_api_key}>
-                        <BoundSetter/>
+                        <BoundSetter points={points}/>
                         <Map
                             mapTypeId={'roadmap'}
                             mapId={"11147ffcb9b103dc"}
-                            options={{ scaleControl: true }}
+                            scaleControl={true}
                             defaultBounds={initialBounds}
                         >
                             {controls !== null && <MapMarkers forecast={forecast}
@@ -158,26 +158,32 @@ const RouteForecastMap = ({maps_api_key}) => {
                 </div>
             </Sentry.ErrorBoundary>
         )
-    } catch (err) {
-        Sentry.captureException(err, 'Error rendering Google Map')
+    } catch (err : any) {
+        Sentry.captureException(err, {tags: {where:'Error rendering Google Map'}})
         return (<div>No map due to error</div>)
     }
 }
 
-const MapMarkers = ({ forecast, controls, controlNames, subrange, metric }) => {
+interface MapMarkerProps {
+    forecast: Array<Forecast>
+    controls : Array<CalculatedValue>
+    metric: boolean
+    controlNames: string[]
+    subrange: [number, number] | []
+}
+const MapMarkers = ({ forecast, controls, controlNames, subrange, metric} : MapMarkerProps) => {
     const { i18n } = useTranslation()
-    const celsius = useSelector(state => state.controls.celsius)
+    const celsius = useAppSelector(state => state.controls.celsius)
     // marker title now contains both temperature and mileage
     return (forecast.map((point) =>
                 <TempMarker latitude={point.lat}
                     longitude={point.lon}
-                    value={cvtDistance(point.distance, metric)}
+                    value={cvtDistance(point.distance.toString(), metric)}
                     title={`${DateTime.fromISO(point.time, {zone:point.zone, locale:i18n.language}).toFormat('EEE MMM d h:mma yyyy')}\n${formatTemperature(point.temp, celsius)}`}
                     bearing={point.windBearing}
                     relBearing={point.relBearing}
                     windSpeed={point.windSpeed}
-                    subrange={subrange}
-                    key={`${point.lat}${point.lon}_${cvtDistance(point.distance, metric)}_temp_${Math.random().toString(10)}`}
+                    key={`${point.lat}${point.lon}_${cvtDistance(point.distance.toString(), metric)}_temp_${Math.random().toString(10)}`}
                 />
             )
         ).concat(
@@ -196,16 +202,16 @@ const MapMarkers = ({ forecast, controls, controlNames, subrange, metric }) => {
                 <RainIcon
                     latitude={point.lat}
                     longitude={point.lon}
-                    value={cvtDistance(point.distance, metric)}
+                    value={parseInt(cvtDistance(point.distance.toString(), metric))}
                     title={`${DateTime.fromISO(point.time, {zone:point.zone, locale:i18n.language}).toFormat('EEE MMM d h:mma yyyy')}\n${formatTemperature(point.temp, celsius)}`}
                     isRainy={point.rainy}
-                    key={`${point.lat}${point.lon}_${cvtDistance(point.distance, metric)}_rain_${Math.random().toString(10)}`}
+                    key={`${point.lat}${point.lon}_${cvtDistance(point.distance.toString(), metric)}_rain_${Math.random().toString(10)}`}
                 />
             )
         )
 }
 
-const RainIcon = ({ latitude, longitude, value, title, isRainy }) => {
+const RainIcon = ({ latitude, longitude, value, title, isRainy } : {latitude: number, longitude: number, value: number, title: string, isRainy: boolean}) => {
     if (isRainy) {
         return <AdvancedMarker position={{ lat: latitude, lng: longitude }} /* label={value.toFixed(0)} */ title={title}>
             <img style={{position:'relative',margin:'2px'}} src={rainCloud} width={45} height={50} />
@@ -214,15 +220,7 @@ const RainIcon = ({ latitude, longitude, value, title, isRainy }) => {
     return null;
 }
 
-RainIcon.propTypes = {
-    latitude: PropTypes.number.isRequired,
-    longitude: PropTypes.number.isRequired,
-    value: PropTypes.number.isRequired,
-    title: PropTypes.string.isRequired,
-    isRainy: PropTypes.bool.isRequired
-};
-
-const pickArrowColor = (relBearing, windSpeed) => {
+const pickArrowColor = (relBearing : number, windSpeed : number) => {
     if (relBearing <90) {
         if (Math.cos((Math.PI / 180) * relBearing) * windSpeed >= 10) {
             return '#e60a0a'
@@ -239,28 +237,34 @@ const viewbox_90 = "-20 -20 55 55"
 const viewbox_180 = "-35 -20 55 55"
 const viewbox_270 = "-33 -35 60 60"
 
-const pickViewbox = (rotation) => {
+const pickViewbox = (rotation : number) => {
     if (rotation < 90) return viewbox_0
     if (rotation < 180) return viewbox_90
     if (rotation < 270) return viewbox_180
     return viewbox_270
 }
 
-const pickWidth = (rotation) => {
+const pickWidth = (rotation : number) => {
     if (rotation < 90) return 55
     if (rotation < 180) return 55
     if (rotation < 270) return 55
     return 60
 }
 
-const pickHeight = (rotation) => {
+const pickHeight = (rotation : number) => {
     if (rotation < 90) return 50
     if (rotation < 180) return 55
     if (rotation < 270) return 55
     return 60
 }
 
-export const RotatedArrow = ({rotation, distance, relBearing, windSpeed}) => {
+type ArrowProps = {
+    rotation: number
+    distance: string
+    relBearing: number
+    windSpeed: number
+}
+export const RotatedArrow = ({rotation, distance, relBearing, windSpeed} : ArrowProps) => {
     return (
         <svg viewBox={pickViewbox(rotation)}
             xmlns="http://www.w3.org/2000/svg"
@@ -292,7 +296,16 @@ export const RotatedArrow = ({rotation, distance, relBearing, windSpeed}) => {
     )
 }
 
-const TempMarker = ({ latitude, longitude, value, title, bearing, relBearing, windSpeed }) => {
+type TempMarkerProps = {
+    latitude: number
+    longitude: number
+    value: string
+    title: string
+    bearing: number
+    relBearing: number
+    windSpeed: string
+}
+const TempMarker = ({ latitude, longitude, value, title, bearing, relBearing, windSpeed } : TempMarkerProps ) => {
     // Add the marker at the specified location
     if (parseInt(windSpeed) > 3) {
         const flippedBearing = (bearing > 180) ? bearing - 180 : bearing + 180;
@@ -314,7 +327,7 @@ const TempMarker = ({ latitude, longitude, value, title, bearing, relBearing, wi
                     display: 'flex',
                     justifyContent: 'center',
                     alignItems: 'center'
-                }}>{value.toFixed(0)}</div>
+                }}>{value}</div>
             </>
         </AdvancedMarker>
     }
@@ -332,44 +345,31 @@ const TempMarker = ({ latitude, longitude, value, title, bearing, relBearing, wi
                 display: 'flex',
                 justifyContent: 'center',
                 alignItems: 'center'
-            }}>{value.toFixed(0)}</div>
+            }}>{value}</div>
         </AdvancedMarker>
     }
 }
 
-TempMarker.propTypes = {
-    latitude: PropTypes.number.isRequired,
-    longitude: PropTypes.number.isRequired,
-    value: PropTypes.number,
-    title: PropTypes.string,
-    bearing: PropTypes.number.isRequired,
-    windSpeed: PropTypes.string.isRequired,
-    subrange: PropTypes.arrayOf(PropTypes.number)
-};
-
-const ControlMarker = ({ latitude, longitude, value = '' }) => {
+interface ControlMarkerProps {
+    latitude: number
+    longitude: number
+    value: string
+}
+const ControlMarker = ({ latitude, longitude, value = '' } : ControlMarkerProps) => {
     return <AdvancedMarker position={{ lat: latitude, lng: longitude }} title={value} >
         <img src={circus_tent} width={32} height={32} />
     </AdvancedMarker>;
 }
 
-ControlMarker.propTypes = {
-    latitude: PropTypes.number.isRequired,
-    longitude: PropTypes.number.isRequired,
-    value: PropTypes.string.isRequired
-};
-
-const MapHighlight = ({ points, subrange }) => {
+const MapHighlight = ({ points, subrange } : { points: MapPointList, subrange: [number,number]|[]}) => {
     if (subrange.length !== 2) {
         return null;
     }
-    const highlightPoints = points.filter(point => point.dist >= subrange[0] &&
+    const highlightPoints = points.filter(point => point.dist && point.dist >= subrange[0] &&
         (isNaN(subrange[1]) || point.dist <= subrange[1]));
-        return <Polyline path={highlightPoints} options={{
-        strokeColor: '#ff9900', //'#67ff99',
-        strokeOpacity: 1.0,
-        strokeWeight: 5
-    }} />;
+    return <Polyline path={highlightPoints} strokeColor='#ff9900' //'#67ff99',
+        strokeOpacity={1.0} strokeWeight={5}
+    />;
 }
 
 MapHighlight.propTypes = {
