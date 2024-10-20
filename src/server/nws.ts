@@ -1,4 +1,6 @@
-const { DateTime, Interval } = require("luxon");
+import { WeatherFunc } from "./weatherForecastDispatcher";
+
+import { DateTime, Interval } from "luxon"
 const axios = require('axios');
 const axiosInstance = axios.create()
 const Sentry = require("@sentry/node")
@@ -7,8 +9,8 @@ const axiosRetry = require('axios-retry').default
 
 axiosRetry(axiosInstance, {
     retries: 5,
-    retryDelay: (...arg) => axiosRetry.exponentialDelay(...arg, 400),
-    retryCondition: (error) => {
+    retryDelay: (...arg: any) => axiosRetry.exponentialDelay(...arg, 400),
+    retryCondition: (error: { response: { status: any; }; message: any; }) => {
         // in the weird case that we don't get a response field in the error then report to Sentry and fail the request
         if (!error.response) {
             Sentry.addBreadcrumb({category:'nws',level:'error',message:`NWS error ${error.message}`})
@@ -21,18 +23,18 @@ axiosRetry(axiosInstance, {
             return false;
         }
     },
-    onRetry: (retryCount, error, requestConfig) => {
+    onRetry: (retryCount: any, error: any, requestConfig: { url: any; }) => {
         console.log(`nws axios retry count: ${retryCount} for ${requestConfig.url}`)
     },
-    onMaxRetryTimesExceeded: (err) => {
+    onMaxRetryTimesExceeded: (err: any) => {
         console.log(`last nws axios error after retrying was ${err}`)
     }
 })
 
-const getForecastUrl = async (lat, lon) => {
+const getForecastUrl = async (lat : number, lon : number) => {
     const url = `https://api.weather.gov/points/${lat},${lon}`;
     const gridResult = await axiosInstance.get(url).catch(
-        error => {throw error.response.data.detail});
+        (        error: { response: { data: { detail: any; }; }; }) => {throw error.response.data.detail});
     if (!gridResult.data.properties.forecastGridData) {
         Sentry.addBreadcrumb({category:'nws', 
             level:'error',
@@ -42,7 +44,25 @@ const getForecastUrl = async (lat, lon) => {
     return gridResult.data.properties.forecastGridData;
 }
 
-const findNearestTime = (data, time) => {
+interface ValueType<T> {
+    values: Array<{validTime: string, value: T}>
+}
+interface ForecastGridType {
+    data : {
+        properties: {
+            temperature: ValueType<number>
+            apparentTemperature: ValueType<number>
+            skyCover: ValueType<number>
+            windDirection : ValueType<number>
+            windSpeed: ValueType<number>
+            windGust: ValueType<number>
+            probabilityOfPrecipitation : ValueType<number>
+            weather: ValueType<{weather:string}>
+            relativeHumidity : ValueType<number>
+        }
+    }
+}
+const findNearestTime = <T>(data : {values: Array<{validTime: string, value: T}>}, time : DateTime) : T => {
     let newerThan = data.values.filter(value => {return Interval.fromISO(value.validTime).contains(time)});
     if (newerThan.length === 0) {
         throw Error("No matching weather data");
@@ -50,7 +70,7 @@ const findNearestTime = (data, time) => {
     return newerThan[0].value;
 };
 
-const extractForecast = (forecastGridData, currentTime) => {
+const extractForecast = (forecastGridData : ForecastGridType, currentTime : DateTime) => {
     const temperatureInC = findNearestTime(forecastGridData.data.properties.temperature, currentTime);
     const apparentTemperatureInC = findNearestTime(forecastGridData.data.properties.apparentTemperature, currentTime);
     const cloudCover = findNearestTime(forecastGridData.data.properties.skyCover, currentTime);
@@ -58,7 +78,7 @@ const extractForecast = (forecastGridData, currentTime) => {
     const windSpeed = findNearestTime(forecastGridData.data.properties.windSpeed, currentTime);
     const gust = findNearestTime(forecastGridData.data.properties.windGust, currentTime);
     const precip = findNearestTime(forecastGridData.data.properties.probabilityOfPrecipitation, currentTime);
-    const summary = findNearestTime(forecastGridData.data.properties.weather, currentTime).weather;
+    const summary = findNearestTime<{weather:string}>(forecastGridData.data.properties.weather, currentTime).weather;
     const humidity = findNearestTime(forecastGridData.data.properties.relativeHumidity, currentTime);
 
     return {
@@ -74,9 +94,9 @@ const extractForecast = (forecastGridData, currentTime) => {
     }
 };
 
-const getForecastFromNws = async (forecastUrl) => {
+const getForecastFromNws = async (forecastUrl : string) => {
     const forecastGridData = await axiosInstance.get(forecastUrl, { headers: { "User-Agent": '(randoplan.com, randoplan.ltd@gmail.com)' } }).catch(
-        error => {
+        (        error: any) => {
             Sentry.addBreadcrumb({
                 category:'nws',level:'error',message:`Failed to get NWS forecast from ${forecastUrl}`
             })
@@ -108,7 +128,7 @@ const callNWS = async function (lat, lon, currentTime, distance, zone, bearing, 
     }
     const forecastGridData = await getForecastFromNws(forecastUrl);
     const startTime = DateTime.fromISO(currentTime, {zone:zone});
-    const forecastValues = extractForecast(forecastGridData, startTime, bearing, getBearingDifference);
+    const forecastValues = extractForecast(forecastGridData, startTime);
     const rainy = forecastValues.precip > 30;
     // eslint-disable-next-line no-mixed-operators
     const temperatureInF = forecastValues.temperatureInC * 9/5 + 32;
@@ -140,6 +160,6 @@ const callNWS = async function (lat, lon, currentTime, distance, zone, bearing, 
     )
     }
  )
-};
+} as WeatherFunc
 
 module.exports = callNWS;

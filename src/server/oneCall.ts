@@ -1,3 +1,6 @@
+import { AxiosError } from "axios";
+import { WeatherFunc } from "./weatherForecastDispatcher";
+
 const { DateTime } = require("luxon");
 const axios = require('axios');
 const Sentry = require("@sentry/node")
@@ -7,7 +10,7 @@ const axiosRetry = require('axios-retry').default
 axiosRetry(axiosInstance, {
     retries: 5,
     retryDelay: axiosRetry.exponentialDelay,
-    retryCondition: (error) => {
+    retryCondition: (error: { response: { status: any; }; }) => {
         // in the weird case that we don't get a response field in the error then report to Sentry and fail the request
         if (!error.response) {
             Sentry.captureMessage(`Error object reported to OneCall was missing the response`)
@@ -22,10 +25,10 @@ axiosRetry(axiosInstance, {
             return false;
         }
     },
-    onRetry: (retryCount, error, requestConfig) => {
+    onRetry: (retryCount: number, error: any, requestConfig: { url: string; }) => {
         console.log(`OneCall axios retry count ${retryCount} for ${requestConfig.url}`);
     },
-    onMaxRetryTimesExceeded: (err) => {
+    onMaxRetryTimesExceeded: (err: any) => {
         console.log(`last OneCall axios error after retrying was ${err}`)
     }
 });
@@ -51,8 +54,12 @@ const callOneCall = async function callWeatherApi (lat, lon, currentTime, distan
     const startTime = DateTime.fromISO(currentTime, {zone:zone});
     const url = `https://api.openweathermap.org/data/3.0/onecall/timemachine?lat=${lat}&lon=${lon}&units=imperial&dt=${startTime.toUTC().toUnixInteger()}&appid=${oneCallKey}`
     Sentry.setContext('url',{'url':url})
-    const forecastResult = await axios.get(url).catch(error => {
-        throw Error(error.response.data.message);
+    const forecastResult = await axios.get(url).catch((error : AxiosError) => {
+        if ("response" in error && error.response && "data" in error.response && error.response.data && error.response.data) {
+            throw Error((error.response.data as string));
+        } else {
+            throw Error(error.message);
+        }
     });
     if (forecastResult.data.error !== undefined && forecastResult.data.error.code !== undefined) {
         Sentry.captureMessage(`OneCall error ${forecastResult.error.message}`,'error')
@@ -83,6 +90,6 @@ const callOneCall = async function callWeatherApi (lat, lon, currentTime, distan
         'feel':Math.round(current.feels_like),
         isControl:isControl
     }
-};
+} as WeatherFunc
 
 module.exports = callOneCall;
