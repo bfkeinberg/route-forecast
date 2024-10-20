@@ -20,6 +20,9 @@ export type Forecast = {
     isControl: boolean
     aqi?: number
     precip: string
+    lat: number
+    lon: number
+    rainy: boolean
 }
 
 export type ForecastInfo = {
