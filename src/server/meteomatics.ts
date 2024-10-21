@@ -1,3 +1,5 @@
+import { WeatherFunc } from "./weatherForecastDispatcher";
+
 const { DateTime } = require("luxon");
 const axios = require('axios');
 const MeteomaticsUser = process.env.METEOMATICS_USERNAME;
@@ -11,11 +13,11 @@ const axiosConfig = {
     }
 }
 
-const getForecastUrl = (lat, lon, time) => {
-    return `https://api.meteomatics.com/${time}/t_2m:F,wind_speed_FL10:mph,wind_dir_FL10:d,wind_gusts_10m_1h:mph,prob_precip_1h:p,low_cloud_cover_10y_mean:p,t_apparent:F,weather_code_1h:idx,weather_symbol_20min:idx/${lat},${lon}/json?model=mix`;
+const getForecastUrl = (lat : number, lon : number, time : string) => {
+    return `https://api.meteomatics.com/${time}/t_2m:F,wind_speed_FL10:mph,wind_dir_FL10:d,wind_gusts_10m_1h:mph,prob_precip_1h:p,low_cloud_cover_10y_mean:p,t_apparent:F,weather_code_1h:idx,weather_symbol_20min:idx,relative_humidity_2m:p/${lat},${lon}/json?model=mix`;
 }
 
-const extractForecast = (forecastGridData) => {
+const extractForecast = (forecastGridData: { coordinates: { dates: { value: any; }[]; }[]; }[]) => {
     const temperatureInF = forecastGridData[0].coordinates[0].dates[0].value;
     const apparentTemperatureInF = forecastGridData[6].coordinates[0].dates[0].value;
     const cloudCover = forecastGridData[5].coordinates[0].dates[0].value;
@@ -24,6 +26,7 @@ const extractForecast = (forecastGridData) => {
     const windGustInMph = forecastGridData[3].coordinates[0].dates[0].value;
     const precipitationProbability = forecastGridData[4].coordinates[0].dates[0].value;
     const summary = forecastGridData[7].coordinates[0].dates[0].value;
+    const humidity = forecastGridData[8].coordinates[0].dates[0].value;
 
     return {
         temperatureInF:temperatureInF,
@@ -33,13 +36,14 @@ const extractForecast = (forecastGridData) => {
         windSpeedInMph:windSpeedInMph,
         windGustInMph:windGustInMph,
         precipitationProbability:precipitationProbability,
-        summary:summary
+        summary:summary,
+        humidity: humidity
     }
 };
 
 const get_API_usage = async () => {
     const usageData = await axios.get("https://api.meteomatics.com/user_stats_json", axiosConfig).catch(
-        error => {console.error(`Failed to get Meteomatics usage ${error}}`);return 0}
+        (error : any) => {console.error(`Failed to get Meteomatics usage ${error}}`);return 0}
     );
     if (usageData === 0) {
         return usageData;
@@ -47,7 +51,7 @@ const get_API_usage = async () => {
     return usageData.data["user statistics"]["requests total"].used;
 }
 
-const getForecastFromMeteomatics = async (forecastUrl) => {
+const getForecastFromMeteomatics = async (forecastUrl : string) => {
     const MAX_API_CALLS_PER_DAY = 950;
     const usage = await get_API_usage();
     console.log(`Meteomatics API usage ${usage}`);
@@ -55,7 +59,7 @@ const getForecastFromMeteomatics = async (forecastUrl) => {
         throw Error(`Daily count exceeded - ${usage} > ${MAX_API_CALLS_PER_DAY}`);
     }
     const forecastGridData = await axios.get(forecastUrl, axiosConfig).catch(
-        error => {console.error(`Failed to get Meteomatics forecast from ${forecastUrl}:${JSON.stringify(error.response.data)}`);throw Error(JSON.stringify(error.response.data))});
+        (error : any) => {console.error(`Failed to get Meteomatics forecast from ${forecastUrl}:${JSON.stringify(error.response.data)}`);throw Error(JSON.stringify(error.response.data))});
     if (forecastGridData !== undefined) {
         if (forecastGridData.data !== undefined && forecastGridData.data.status === "OK") {
             return forecastGridData.data;
@@ -102,11 +106,12 @@ const callMeteomatics = async function (lat, lon, currentTime, distance, zone, b
         'vectorBearing':bearing,
         'gust':`${Math.round(forecastValues.windGustInMph)}`,
         'feel':Math.round(forecastValues.apparentTemperatureInF),
-        isControl:isControl
+        isControl:isControl,
+        humidity: forecastValues.humidity
     }
     )
     }
  )
-};
+} as WeatherFunc
 
 module.exports = callMeteomatics;

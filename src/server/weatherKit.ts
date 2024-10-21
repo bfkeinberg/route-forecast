@@ -1,3 +1,5 @@
+import { WeatherFunc } from "./weatherForecastDispatcher";
+
 const { DateTime } = require("luxon");
 const jwt = require("jsonwebtoken");
 const Sentry = require("@sentry/node")
@@ -33,7 +35,7 @@ const makeJwt = () => {
 axiosRetry(axiosInstance, {
     retries: 5,
     retryDelay: axiosRetry.exponentialDelay, // (...arg) => axiosRetry.exponentialDelay(...arg, 200),
-    retryCondition: (error) => {
+    retryCondition: (error: { response: { status: any; }; }) => {
         // in the weird case that we don't get a response field in the error then report to Sentry and fail the request
         if (!error.response) {
             Sentry.captureMessage(`Error object reported to Apple WeatherKit was missing the response`)
@@ -48,10 +50,10 @@ axiosRetry(axiosInstance, {
             return false;
         }
     },
-    onRetry: (retryCount, error, requestConfig) => {
+    onRetry: (retryCount: number, error: any, requestConfig: { url: string; }) => {
         console.log(`weatherKit axios retry count ${retryCount} for ${requestConfig.url}`);
     },
-    onMaxRetryTimesExceeded: (err) => {
+    onMaxRetryTimesExceeded: (err: any) => {
         console.log(`last weatherKit axios error after retrying was ${err}`)
     }
 });
@@ -79,7 +81,7 @@ const callWeatherKit = async function (lat, lon, currentTime, distance, zone, be
     const url = `https://weatherkit.apple.com/api/v1/weather/en/${lat}/${lon}?timezone=${zone}&dataSets=currentWeather,forecastHourly,forecastNextHour,&countryCode=US&currentAsOf=${when}&hourlyStart=${when}&hourlyEnd=${later}`;
     Sentry.setContext('url', { 'url': url })
     const forecastResult = await axiosInstance.get(url, { headers: { 'Authorization': `Bearer ${weatherKitKey}` } }).
-        catch(error => {
+        catch((error: any) => {
             throw error;
         });
     const forecast = forecastResult.data
@@ -112,6 +114,6 @@ const callWeatherKit = async function (lat, lon, currentTime, distance, zone, be
         'feel': Math.round(forecast.currentWeather.temperatureApparent * 9 / 5 + 32),
         isControl:isControl
     }
-};
+} as WeatherFunc
 
 module.exports = callWeatherKit;

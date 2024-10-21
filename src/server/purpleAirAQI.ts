@@ -1,3 +1,5 @@
+import { isAxiosError } from "axios";
+
 const axios = require('axios');
 // const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
 
@@ -28,10 +30,10 @@ const axios = require('axios');
 //         });
 // };
 
-const toDegrees = (radians) => radians * 180 / Math.PI;
-const toRadians = (degrees) => degrees * Math.PI / 180;
+const toDegrees = (radians : number) => radians * 180 / Math.PI;
+const toRadians = (degrees: number) => degrees * Math.PI / 180;
 
-const calcBoundingBox = (lat, lon, distInKm) => {
+const calcBoundingBox = (lat : number, lon : number, distInKm : number) => {
     const Radius = 6371;   // radius of Earth in km
 
     let widthInDegrees = toDegrees(distInKm / Radius / Math.cos(toRadians(lat)));
@@ -51,12 +53,12 @@ const greatCircleRadius = {
     miles: 3956,
     km: 6367
 };
-const toRad = function (val) {
+const toRad = function (val : number) {
     return val * Math.PI / 180;
 };
 
 // eslint-disable-next-line max-params
-const calculateDistance = (lat1, lon1, lat2, lon2) => {
+const calculateDistance = (lat1 : number, lon1 : number, lat2 : number, lon2 : number) => {
     var dLat = toRad(lat2 - lat1),
         dLon = toRad(lon2 - lon1);
 
@@ -71,8 +73,8 @@ const calculateDistance = (lat1, lon1, lat2, lon2) => {
     return greatCircleRadius.km * c_var;
 };
 
-const makeUrl = (lat, lon, rangeInKm) => {
-    let boundingBox = calcBoundingBox(parseFloat(lat), parseFloat(lon), rangeInKm);
+const makeUrl = (lat : number, lon : number, rangeInKm : number) => {
+    let boundingBox = calcBoundingBox(lat, lon, rangeInKm);
 
     const purpleAirKey = process.env.PURPLE_AIR_KEY;
     let purpleAirUrl =
@@ -82,7 +84,7 @@ const makeUrl = (lat, lon, rangeInKm) => {
 };
 
 // eslint-disable-next-line max-params
-const calcAQI = function (Cp, Ih, Il, BPh, BPl) {
+const calcAQI = function (Cp : number, Ih : number, Il : number, BPh : number, BPl : number) {
 
     var a_var = Ih - Il;
     var b_var = BPh - BPl;
@@ -92,7 +94,7 @@ const calcAQI = function (Cp, Ih, Il, BPh, BPl) {
 
 };
 
-const aqiFromPM = function (pm) {
+const aqiFromPM = function (pm : number) {
 
     if (isNaN(pm)) {return "-";}
     // eslint-disable-next-line eqeqeq
@@ -159,18 +161,18 @@ const aqiFromPM = function (pm) {
 //     return 0;
 // }
 
-const usEPAfromPm = (pm, rh) => {
+const usEPAfromPm = (pm : number, rh : number) => {
     // eslint-disable-next-line no-mixed-operators
     const aqi = aqiFromPM(0.534 * pm - 0.0844 * rh + 5.604);
-    if (aqi < 0) {
-        console.warn(`weird AQI: PM=${pm} humidity=${rh}`);
+    if (aqi == undefined || typeof aqi == "string" || aqi < 0) {
+        Sentry.captureMessage(`weird AQI: PM=${pm} humidity=${rh}`)
         return pm;
     }
     return aqi;
 };
 
 // sort the results so that we take aqi from the closest sensor
-const processPurpleResults = (lat, lon, results) => {
+const processPurpleResults = (lat : number, lon : number, results: { fields: string | string[]; data: any[]; }) => {
     let pm25index = results.fields.indexOf('pm2.5_cf_1');
     let humidityIndex = results.fields.indexOf('humidity');
     let sensorLatitude = results.fields.indexOf('latitude');
@@ -185,7 +187,7 @@ const processPurpleResults = (lat, lon, results) => {
 };
 
 
-const getPurpleAirAQI = async function (lat, lon) {
+const getPurpleAirAQI = async function (lat : number, lon : number) {
     let ranges = [
         0.5,
         2,
@@ -198,7 +200,10 @@ const getPurpleAirAQI = async function (lat, lon) {
         for (let range of ranges) {
             let purpleAirUrl = makeUrl(lat, lon, range);
             // eslint-disable-next-line no-await-in-loop
-            let purpleairResult = await axios.get(purpleAirUrl).catch(error => {
+            let purpleairResult = await axios.get(purpleAirUrl).catch((error : any) => {
+                if (isAxiosError(error)) {
+                    console.error('found an Axios error ', error.status)
+                }
                 if (error.response !== undefined) {
                     console.error(`[AXIOS] error at ${lat} ${lon}`, error.response.data);
                     if (error.response.data.error !== undefined) {
@@ -266,4 +271,4 @@ const getPurpleAirAQI = async function (lat, lon) {
 // }
 
 
-module.exports = getPurpleAirAQI;
+export default getPurpleAirAQI;
