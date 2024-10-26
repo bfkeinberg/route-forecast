@@ -1,6 +1,6 @@
-import { isAxiosError } from "axios";
+import axios, { isAxiosError } from "axios";
+import * as Sentry from "@sentry/node"
 
-const axios = require('axios');
 // const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
 
 // const iqAirHandler = (lat, lon) => {
