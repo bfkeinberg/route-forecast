@@ -22,7 +22,7 @@ import getPurpleAirAQI from'./purpleAirAQI'
 import getAirNowAQI from './airNowAQI'
 const querystring = require('querystring');
 import * as Sentry from "@sentry/node"
-import axios, { AxiosError } from 'axios';
+import axios, { AxiosError, isAxiosError } from 'axios';
 
 import RateLimit from 'express-rate-limit'
 var limiter = RateLimit({
@@ -665,9 +665,27 @@ app.get('/pinned_routes', async (req : Request, res : Response) => {
     let url = `https://ridewithgps.com/users/current.json`;
     let options = {headers:{'Authorization':`Bearer ${token}`}};
     try {
-        const response = await axios.get(url, options).catch((error: { response: { data: { error: string; }; status: number; }; }) => {
-            Sentry.captureMessage(`Error fetching pinned routes for ${req.query.username} ${error.response.data.error}`);
-            res.status(error.response.status).json(error.response.data.error);
+        interface RwgpsUserInfo {
+            user: {
+                id: string
+                email: string
+            }
+            data: {
+                error: string;
+            };
+            status: number;
+        }
+        interface ErrorResponse {
+            error: string
+        }
+        const response = await axios.get<RwgpsUserInfo>(url, options).catch((error: AxiosError) => {
+            if (error.response && isAxiosError(error) && error.response.data) {
+                Sentry.captureMessage(`Error fetching pinned routes for ${req.query.username} ${(error.response.data as ErrorResponse).error}`);
+                res.status(error.response.status).json((error.response.data as ErrorResponse).error);    
+            } else {
+                Sentry.captureMessage(`Error fetching pinned routes for ${req.query.username} ${error.response}`);
+                res.status(500).json(error.response)
+            }
         });
         if (response === undefined) {
             return;
