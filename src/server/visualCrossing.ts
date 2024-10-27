@@ -21,6 +21,12 @@ const Sentry = require('@sentry/node')
  */
 const callVisualCrossing = async function (lat : number, lon : number, currentTime : string, 
     distance : number, zone : string, bearing : number, getBearingDifference : (bearing: number, windBearing: number) => number, isControl : boolean) {
+    if (typeof lat !== 'number' || lat < -90 || lat > 90) {
+        throw new Error('Invalid latitude value');
+    }
+    if (typeof lon !== 'number' || lon < -180 || lon > 180) {
+        throw new Error('Invalid longitude value');
+    }
     const visualCrossingKey = process.env.VISUAL_CROSSING_KEY;
     const startTime = DateTime.fromISO(currentTime, { zone: 'utc' });
     const startTimeString = startTime.toUnixInteger();
