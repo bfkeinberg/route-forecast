@@ -164,8 +164,8 @@ const buildRouteUrl = (routeNumber : string, apiKey : string) => {
 
 app.get('/rwgps_route', (req : Request, res : Response) => {
     const routeNumber = req.query.route;
-    if (!routeNumber || typeof routeNumber !== 'string') {
-        res.status(400).json({'status': 'Missing route number'})
+    if (!routeNumber || typeof routeNumber !== 'string' || !/^[a-zA-Z0-9_-]+$/.test(routeNumber)) {
+        res.status(400).json({'status': 'Invalid route number'})
         return;
     }
     console.log(`request for route ${routeNumber}`);
