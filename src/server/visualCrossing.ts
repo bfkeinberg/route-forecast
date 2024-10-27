@@ -28,6 +28,9 @@ const callVisualCrossing = async function (lat : number, lon : number, currentTi
         throw new Error('Invalid longitude value');
     }
     const visualCrossingKey = process.env.VISUAL_CROSSING_KEY;
+    if (!visualCrossingKey) {
+        throw new Error("Missing Visual Crossing key")
+    }
     const startTime = DateTime.fromISO(currentTime, { zone: 'utc' });
     const startTimeString = startTime.toUnixInteger();
     const url = new URL(`https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/${lat},${lon}/${startTimeString}`);
