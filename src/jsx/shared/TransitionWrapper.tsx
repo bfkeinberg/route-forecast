@@ -1,4 +1,3 @@
-import PropTypes from 'prop-types';
 import { useEffect, useState } from 'react';
 import * as Sentry from "@sentry/react";
 

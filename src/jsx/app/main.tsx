@@ -153,7 +153,7 @@ type QueryParams = {
 }
 const setupBrowserForwardBack = (dispatch : AppDispatch, origin : string, forecastFunc : MutationWrapper, aqiFunc : MutationWrapper) => {
     if (typeof window !== 'undefined') {
-        window.onpopstate = (event) => {
+        window.addEventListener( "popstate", (event) => {
             Sentry.addBreadcrumb({
                     category: 'history',
                     level: "info",
@@ -178,7 +178,8 @@ const setupBrowserForwardBack = (dispatch : AppDispatch, origin : string, foreca
                 }
             }
         }
-    }    
+        )
+    }
 }
 
 const getStravaToken = (queryParams : QueryParams, dispatch : AppDispatch) => {

@@ -28,7 +28,7 @@ export const maxWidthForMobile = '501px'
 // ask wtf is up with this & parseControls()
 export const formatControlsForUrl = (controlPoints : Array<UserControl>, filter: boolean) => {
   const filteredControlPoints = filter ? controlPoints.filter(point => point.name !== '').filter(point => {return !isNaN(point.distance) && !isNaN(point.duration)}) : controlPoints
-  return filteredControlPoints.reduce((queryParam,point) => {return formatOneControl(queryParam) + ':' + formatOneControl(point)},'');
+  return filteredControlPoints.reduce((queryParam,point) => {return queryParam + ':' + formatOneControl(point)},'');
 };
 
 export const setMinMaxCoords = (trackPoint : Point,bounds : Bounds) => {

@@ -50,6 +50,13 @@ const MobileUITabs = (props : MobileUIPropTypes) => {
         useWhenChanged(stravaActivityData, () => navigate("/paceTable", { replace: true }))
 
         React.useEffect(() => {
+            // if we've been reset while displaying another tab
+            if (pathname !== '/' && routeData === null) {
+                navigate('/')
+            }
+        }), [pathname, routeData]
+
+        React.useEffect(() => {
             if (props.orientationChanged) {
                 if (forecastData.length > 0) {
                     navigate("/forecastTable", { replace: true })

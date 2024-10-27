@@ -124,6 +124,8 @@ const ForecastTable = (adjustedTimes : AdjustedTimes) => {
 
     // TODO: GA event for gusts viewed vs wind speed
     const toggleGustDisplay = () => {return setShowGusts(!showGusts)}
+    // TODO: GA event for gusts viewed vs wind speed
+    const toggleGustDisplay = () => {return setShowGusts(!showGusts)}
     const windHeaderText = <Button small onClick={toggleGustDisplay} >{showGusts ? t('data.wind.gust') : t('data.wind.speed')}</Button>;
     const windHeader = <DesktopTooltip content={t('tooltips.windHeader')} placement={'top'}>{windHeaderText}</DesktopTooltip>
 
@@ -227,23 +229,27 @@ const ForecastTable = (adjustedTimes : AdjustedTimes) => {
         )
     }
 
-    const getDayForComparison = (time : string, index : number, forecastLength : number, zone : string) => {
+    const getDayForComparison = (time : string, index : number, forecastLength : number, zone : string, finishTime : string | null) => {
         if (index === forecastLength-1) {
-            const { finishTime } = useForecastDependentValues()
-            return DateTime.fromFormat(finishTime ? finishTime : "??", finishTimeFormat, {zone:zone}).day
+            if (finishTime) {
+                return DateTime.fromFormat(finishTime, finishTimeFormat, {zone:zone}).day
+            }
+            else {
+                return DateTime.fromISO(time, {zone:zone}).day
+            }
         } else {
             return DateTime.fromISO(time, {zone:zone}).day
         }
     }
 
-    const expandTable = (forecast : Forecast[], metric : boolean, adjustedTimes : AdjustedTimes) => {
+    const expandTable = (forecast : Forecast[], metric : boolean, adjustedTimes : AdjustedTimes, finishTime : string|null) => {
         const { i18n } = useTranslation()
         if (forecast.length > 0) {
             return (
                 <tbody>
                 {forecast.map((point,index) =>
                 <React.Fragment key={index}>
-                    {(index > 0 && (DateTime.fromISO(forecast[index-1].time, {zone:point.zone}).day !== getDayForComparison(point.time, index, forecast.length, point.zone)))?
+                    {(index > 0 && (DateTime.fromISO(forecast[index-1].time, {zone:point.zone}).day !== getDayForComparison(point.time, index, forecast.length, point.zone, finishTime)))?
                         <tr style={{outline:'thin solid'}}>
                             <td>{DateTime.fromISO(point.time, {locale:i18n.language}).toFormat('cccc')}</td>
                         </tr>:null}
@@ -377,7 +383,7 @@ const ForecastTable = (adjustedTimes : AdjustedTimes) => {
                                 </MediaQuery>
                             </tr>
                         </thead>
-                        {expandTable(forecast, metric, adjustedTimes)}
+                        {expandTable(forecast, metric, adjustedTimes, finishTime)}
                     </HTMLTable>
                 </div>
             </Sentry.ErrorBoundary>

@@ -26,7 +26,14 @@ type SingleForecast = {
 type ForecastInfo = Array<SingleForecast>
 export type Point = {lat : number, lon: number, dist?: number, elevation: number}
 export type CalculatedValue = {arrival : string, banked: number, val: number, distance: number, [index:string]:any}
-export type RwgpsCoursePoint = {d:number, t:string, n:string, x:number, y:number, i:number}
+interface RwgpsCoursePointWithN {
+    d:number, t:string, n:string, x:number, y:number, i:number, description:never
+}
+interface RwgpsCoursePointWithDescription {
+    d:number, t:string, n:never, x:number, y:number, i:number, description:string
+}
+
+export type RwgpsCoursePoint = RwgpsCoursePointWithN|RwgpsCoursePointWithDescription
 export type RwgpsPoint = {x:number, y:number, d:number, e:number}
 export type GpxPoint = {lat: number, lon: number, ele: number}
 interface ExtractedControl {
@@ -145,7 +152,7 @@ class AnalyzeRoute {
     }
 
     controlFromCoursePoint = (coursePoint : RwgpsCoursePoint) : ExtractedControl =>
-        ({name:coursePoint.n.replace(':','_'), duration:1, distance:Math.round((coursePoint.d*kmToMiles)/1000)})
+        ({name:coursePoint.n?coursePoint.n.replace(':','_'):coursePoint.description.replace(':','_'), duration:1, distance:Math.round((coursePoint.d*kmToMiles)/1000)})
 
     extractControlPoints = (routeData : RwgpsRoute|RwgpsTrip) =>
         this.parseCoursePoints(routeData).filter((point : RwgpsCoursePoint) => this.isControl(point)).map((point : RwgpsCoursePoint) => this.controlFromCoursePoint(point))
