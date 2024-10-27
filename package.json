@@ -197,9 +197,6 @@
     "testEnvironmentOptions": {
       "url": "http://localhost/"
     },
-    "setupFiles": [
-      "<rootDir>/setupFile.js"
-    ],
     "transform": {
       "\\.[jt]sx?$": "babel-jest"
     },
