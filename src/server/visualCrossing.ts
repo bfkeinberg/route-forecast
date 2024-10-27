@@ -30,10 +30,12 @@ const callVisualCrossing = async function (lat : number, lon : number, currentTi
     const visualCrossingKey = process.env.VISUAL_CROSSING_KEY;
     const startTime = DateTime.fromISO(currentTime, { zone: 'utc' });
     const startTimeString = startTime.toUnixInteger();
-    lat = lat + 0
-    lon = lon + 0
-    const url = `https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/${lat},${lon}/${startTimeString}?unitGroup=us&include=current&options=nonulls&key=${visualCrossingKey}`;
-    const weatherResult = await axios.get(url).catch((error : any)=> {Sentry.captureMessage(`axios error ${error.response?error.response.data:error}`,'error')
+    const url = new URL(`https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/${lat},${lon}/${startTimeString}`);
+    url.searchParams.append('unitGroup', 'us');
+    url.searchParams.append('include', 'current');
+    url.searchParams.append('options', 'nonulls');
+    url.searchParams.append('key', visualCrossingKey);
+    const weatherResult = await axios.get(url.toString()).catch((error : any)=> {Sentry.captureMessage(`axios error ${error.response?error.response.data:error}`,'error')
         throw error.response?error.response.data:error});
     const forecast = weatherResult.data;
     if (forecast.code !== undefined) {
