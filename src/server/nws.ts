@@ -162,4 +162,4 @@ const callNWS = async function (lat, lon, currentTime, distance, zone, bearing, 
  )
 } as WeatherFunc
 
-module.exports = callNWS;
+export default callNWS
