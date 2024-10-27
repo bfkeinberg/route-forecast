@@ -124,8 +124,6 @@ const ForecastTable = (adjustedTimes : AdjustedTimes) => {
 
     // TODO: GA event for gusts viewed vs wind speed
     const toggleGustDisplay = () => {return setShowGusts(!showGusts)}
-    // TODO: GA event for gusts viewed vs wind speed
-    const toggleGustDisplay = () => {return setShowGusts(!showGusts)}
     const windHeaderText = <Button small onClick={toggleGustDisplay} >{showGusts ? t('data.wind.gust') : t('data.wind.speed')}</Button>;
     const windHeader = <DesktopTooltip content={t('tooltips.windHeader')} placement={'top'}>{windHeaderText}</DesktopTooltip>
 
