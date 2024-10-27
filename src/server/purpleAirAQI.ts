@@ -172,8 +172,12 @@ const usEPAfromPm = (pm : number, rh : number) => {
     return aqi;
 };
 
+interface PurpleAirData {
+    fields: Array<string>
+    data: Array<Array<number>>
+}
 // sort the results so that we take aqi from the closest sensor
-const processPurpleResults = (lat : number, lon : number, results: { fields: string | string[]; data: any[]; }) => {
+const processPurpleResults = (lat : number, lon : number, results: PurpleAirData) => {
     let pm25index = results.fields.indexOf('pm2.5_cf_1');
     let humidityIndex = results.fields.indexOf('humidity');
     let sensorLatitude = results.fields.indexOf('latitude');
@@ -204,10 +208,10 @@ axiosRetry(axiosInstance, {
         }
     },
     onRetry: (retryCount: number, error, requestConfig) => {
-        console.log(`weatherKit axios retry count ${retryCount} for ${requestConfig.url}`);
+        console.log(`PurpleAir axios retry count ${retryCount} for ${requestConfig.url}`);
     },
     onMaxRetryTimesExceeded: (err: any) => {
-        console.log(`last weatherKit axios error after retrying was ${err}`)
+        console.log(`last PurpleAir axios error after retrying was ${err}`)
     }
 });
 
@@ -224,7 +228,7 @@ const getPurpleAirAQI = async function (lat : number, lon : number) {
         for (let range of ranges) {
             let purpleAirUrl = makeUrl(lat, lon, range);
             // eslint-disable-next-line no-await-in-loop
-            let purpleairResult = await axiosInstance.get(purpleAirUrl).catch((error : any) => {
+            let purpleairResult = await axiosInstance.get<PurpleAirData>(purpleAirUrl).catch((error : any) => {
                 if (isAxiosError(error)) {
                     console.error('found an Axios error ', error.status)
                 }
