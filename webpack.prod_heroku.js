@@ -12,11 +12,39 @@ const zlib = require("zlib");
 module.exports = (env, argv) => merge(common(env, argv), {
     plugins: [
         new TerserPlugin({
-            parallel: true
+            parallel: true,
+            terserOptions: {
+                ecma: 6,
+            }
         }),
         new webpack.IgnorePlugin({
             resourceRegExp: /^\.\/locale$/,
             contextRegExp: /moment$/,
+        }),
+        sentryWebpackPlugin({
+            applicationKey: process.env.SENTRY_APP_ID,
+            include: '.',
+            ignoreFile: '.sentrycliignore',
+            ignore: [
+                'node_modules',
+                'webpack.prod.js',
+                'webpack.prod_heroku.js',
+                'webpack.common.cjs',
+                'webpack.dev.js',
+                'setupFile.js'
+            ],
+            configFile: 'sentry.properties',
+            org: 'brian-feinberg',
+            project: 'randoplan',
+            rewrite: true,
+            stripPrefix: ['/dist'],
+            stripCommonPrefix: true,
+            urlPrefix: '/static',
+            debug: true,
+            setCommits: { auto: true },
+            authToken: process.env.SENTRY_AUTH_TOKEN,
+            release: {name: process.env.SOURCE_VERSION},
+            deploy: { env: 'production', name: 'latest' }
         }),
         new CompressionPlugin({
             minRatio: 0.85,
@@ -33,33 +61,7 @@ module.exports = (env, argv) => merge(common(env, argv), {
                 /\.ico/,
                 /\.html/
             ]
-        }),
-        sentryWebpackPlugin({
-            applicationKey: process.env.SENTRY_APP_ID,
-            include: '.',
-            ignoreFile: '.sentrycliignore',
-            ignore: [
-                'node_modules',
-                'webpack.prod.js',
-                'webpack.common.js',
-                'webpack.dev.js',
-                'setupFile.js'
-            ],
-            configFile: 'sentry.properties',
-            org: 'brian-feinberg',
-            project: 'randoplan',
-            rewrite: true,
-            stripPrefix: ['/dist'],
-            stripCommonPrefix: true,
-            urlPrefix: '/static',
-            debug: true,
-            setCommits: { auto: true },
-            authToken: process.env.SENTRY_AUTH_TOKEN,
-            release: {name: process.env.SOURCE_VERSION},
-            reactComponentAnnotation: {enabled:true},
-            deploy: { env: 'production', name: 'latest' }
-        }),
-        // new BundleAnalyzerPlugin()
+        })
     ],
     optimization: {
         minimizer: [
