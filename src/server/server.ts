@@ -18,11 +18,17 @@ const url = require('url');
 const strava = require('strava-v3');
 // const { Datastore } = require('@google-cloud/datastore');
 // const cors = require('cors');
-const getPurpleAirAQI = require('./purpleAirAQI');
-const getAirNowAQI = require('./airNowAQI');
+import getPurpleAirAQI from'./purpleAirAQI'
+import getAirNowAQI from './airNowAQI'
 const querystring = require('querystring');
 import * as Sentry from "@sentry/node"
 import axios, { AxiosError } from 'axios';
+
+import RateLimit from 'express-rate-limit'
+var limiter = RateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // max 100 requests per windowMs
+});
 
 let logger = console;
 var compression = require('compression');
@@ -50,10 +56,12 @@ app.use('/static', expressStaticGzip(path.resolve(__dirname, '../'), {
 }));
 app.use('/static', publicPath);
 
+app.use('/worker.js', limiter)
 app.get('/worker.js', (req: Request, res : Response) => {
     res.sendFile(path.resolve(__dirname,'../static/worker.js'));
 })
 
+app.use('/lib/localforage.js', limiter)
 app.get('/lib/localforage.js', (req : Request, res : Response) => {
     res.sendFile(path.resolve(__dirname,'../static/lib/localforage.js'));
 })
