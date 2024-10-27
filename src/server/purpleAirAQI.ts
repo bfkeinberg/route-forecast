@@ -1,7 +1,8 @@
 import axios, { isAxiosError } from "axios";
 import * as Sentry from "@sentry/node"
+import axiosRetry from 'axios-retry'
 
-// const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
+const axiosInstance = axios.create()
 
 // const iqAirHandler = (lat, lon) => {
 
@@ -186,6 +187,29 @@ const processPurpleResults = (lat : number, lon : number, results: { fields: str
     return usEPAfromPm(data[0][pm25index], data[0][humidityIndex]);
 };
 
+axiosRetry(axiosInstance, {
+    retries: 5,
+    retryDelay: axiosRetry.exponentialDelay,
+    retryCondition: (error) => {
+        // in the weird case that we don't get a response field in the error then report to Sentry and fail the request
+        if (!error.response) {
+            Sentry.captureMessage(`Defective error object from PurpleAir:${JSON.stringify(error)}`)
+            return false
+        }
+        switch (error.response.status) {
+        case 429:
+            return true;
+        default:
+            return false;
+        }
+    },
+    onRetry: (retryCount: number, error, requestConfig) => {
+        console.log(`weatherKit axios retry count ${retryCount} for ${requestConfig.url}`);
+    },
+    onMaxRetryTimesExceeded: (err: any) => {
+        console.log(`last weatherKit axios error after retrying was ${err}`)
+    }
+});
 
 const getPurpleAirAQI = async function (lat : number, lon : number) {
     let ranges = [
@@ -200,7 +224,7 @@ const getPurpleAirAQI = async function (lat : number, lon : number) {
         for (let range of ranges) {
             let purpleAirUrl = makeUrl(lat, lon, range);
             // eslint-disable-next-line no-await-in-loop
-            let purpleairResult = await axios.get(purpleAirUrl).catch((error : any) => {
+            let purpleairResult = await axiosInstance.get(purpleAirUrl).catch((error : any) => {
                 if (isAxiosError(error)) {
                     console.error('found an Axios error ', error.status)
                 }
