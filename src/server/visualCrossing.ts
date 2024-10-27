@@ -30,6 +30,8 @@ const callVisualCrossing = async function (lat : number, lon : number, currentTi
     const visualCrossingKey = process.env.VISUAL_CROSSING_KEY;
     const startTime = DateTime.fromISO(currentTime, { zone: 'utc' });
     const startTimeString = startTime.toUnixInteger();
+    lat = lat + 0
+    lon = lon + 0
     const url = `https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/${lat},${lon}/${startTimeString}?unitGroup=us&include=current&options=nonulls&key=${visualCrossingKey}`;
     const weatherResult = await axios.get(url).catch((error : any)=> {Sentry.captureMessage(`axios error ${error.response?error.response.data:error}`,'error')
         throw error.response?error.response.data:error});
