@@ -521,8 +521,6 @@ const getRwgpsTokenFromCode = async (code : string) => {
     return null;
 };
 
-app.get('/ip', (request :Request, response : Response) => {response.send(request.ip)})
-
 app.get('/rwgpsAuthReply', async (req: Request, res : Response) => {
     const state = req.query.state;
     let restoredState = {rwgpsToken:''};
