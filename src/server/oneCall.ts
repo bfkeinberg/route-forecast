@@ -2,7 +2,7 @@ import { AxiosError } from "axios";
 import { WeatherFunc } from "./weatherForecastDispatcher";
 
 const { DateTime } = require("luxon");
-const axios = require('axios');
+import axios from 'axios'
 const Sentry = require("@sentry/node")
 const axiosInstance = axios.create()
 const axiosRetry = require('axios-retry').default
@@ -49,21 +49,39 @@ axiosRetry(axiosInstance, {
  * lat: *, lon: *, temp: string, relBearing: null, rainy: boolean, windBearing: number,
  * vectorBearing: *, gust: string} | never>} a promise to evaluate to get the forecast results
  */
+interface OneCallData {
+    data: Array<{dt: number, 
+        wind_deg: number, 
+        temp: number, 
+        humidity: number, 
+        feels_like: number, 
+        wind_gust: number, 
+        rain?: string,
+        clouds: number
+        wind_speed: number
+        weather: Array<{main:string, 
+            description:string}>}>
+    error?: {
+        code?: number
+        message: string
+    },
+}
 const callOneCall = async function callWeatherApi (lat, lon, currentTime, distance, zone, bearing, getBearingDifference, isControl) {
     const oneCallKey = process.env.OPEN_WEATHER_KEY;
     const startTime = DateTime.fromISO(currentTime, {zone:zone});
     const url = `https://api.openweathermap.org/data/3.0/onecall/timemachine?lat=${lat}&lon=${lon}&units=imperial&dt=${startTime.toUTC().toUnixInteger()}&appid=${oneCallKey}`
     Sentry.setContext('url',{'url':url})
-    const forecastResult = await axios.get(url).catch((error : AxiosError) => {
+    const forecastResult = await axios.get<OneCallData>(url).catch((error : AxiosError<{cod:number, message:string}>) => {
         if ("response" in error && error.response && "data" in error.response && error.response.data && error.response.data) {
-            throw Error((error.response.data as string));
+            throw Error(error.response.data.message);
         } else {
             throw Error(error.message);
         }
     });
     if (forecastResult.data.error !== undefined && forecastResult.data.error.code !== undefined) {
-        Sentry.captureMessage(`OneCall error ${forecastResult.error.message}`,'error')
-        throw Error(forecastResult.error.message);
+        Sentry.captureMessage(`OneCall error ${forecastResult.data.error.message}`,'error')
+        console.log('now throwing ', forecastResult.data.error.message)
+        throw Error(forecastResult.data.error.message);
     }
     const current = forecastResult.data.data[0]
     const now = DateTime.fromSeconds(current.dt, {zone:zone});
