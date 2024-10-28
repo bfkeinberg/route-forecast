@@ -190,10 +190,10 @@ table.bp4-html-table.bp4-html-table-bordered.bp4-html-table-striped.bp4-interact
     white-space: normal;
 }
 
-.MuiSlider-valueLabelLabel {
-    text-align: center;
+.MuiSlider-valueLabelOpen {
+    position: relative;
 }
 
-.MuiSlider-valueLabelOpen {
-    text-align: left;
+.MuiSlider-valueLabelCircle {
+    background-color: 'white';
 }

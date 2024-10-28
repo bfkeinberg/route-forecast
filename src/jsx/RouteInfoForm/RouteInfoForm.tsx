@@ -54,8 +54,13 @@ const RouteInfoForm = ({ errorDetails, errorDetailsSet, routeLoadingMode, routeL
 }
 
 const sliderLabelRenderer = (value : number, index : number) : ReactNode => {
-    console.log(routeLoadingModeProps[value].name)
-    return <span>{routeLoadingModeProps[value].name}</span>
+    let offset = 0;
+    switch (value) {
+        case 2: offset = -25; break;
+        case 3: offset = -80; break;
+        default: 
+    }
+    return <div style={{position:'relative', left:`${offset}px`, backgroundColor:'#757575', color:'white'}}>{routeLoadingModeProps[value].name}</div>
 }
 
 const RouteLoadingModeSelector = ({ mode, modeSwitched } : {mode:RouteLoadingModes, modeSwitched: (item: Event, value: number|number[]) => void}) => {
