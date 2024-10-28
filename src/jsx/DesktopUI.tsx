@@ -105,7 +105,7 @@ const DesktopUI = ({mapsApiKey, orientationChanged, setOrientationChanged} : Des
 
     return (
         <StrictMode>
-            <div style={{ display: 'flex', flexDirection: 'column', maxHeight: '98vh' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', maxHeight: '97vh' }}>
                 {!mapDataExists ? <InstallExtensionButton /> : null}
                 <div /* style={{ display:'flex',  flexShrink: 0 }} */>
                     <TopBar
@@ -116,7 +116,7 @@ const DesktopUI = ({mapsApiKey, orientationChanged, setOrientationChanged} : Des
                         panesVisible={panesVisible}
                     />
                 </div>
-                <div style={{ display: "flex", flex: 1, flexGrow: 8, /* flexShrink:0,  */minHeight: '0px', flexBasis: sidebarWidth }}>
+                <div style={{ display: "flex", flex: 1, flexGrow: 8, minHeight: '0px' }}>
                     <div style={{ maxHeight: '100%', overflowY: 'scroll', width: `${sidebarWidth}px` }}>
                         <Sidebar sidePaneOptions={sidePaneOptions} activeSidePane={activeSidePane} sidebarWidth={sidebarWidth} />
                     </div>
