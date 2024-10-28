@@ -162,7 +162,7 @@
     "testDbg": "node --inspect-brk node_modules/.bin/jest",
     "testUTCDbg": "TZ=utc node --inspect-brk node_modules/.bin/jest",
     "start": "node dist/server/index.js",
-    "build": "tsc -p tsconfig_server.json; ./node_modules/.bin/webpack --mode production --config webpack.prod_heroku.js --env sentryRelease"
+    "build": "tsc -p tsconfig_server.json && echo 'running webpack' &&  ./node_modules/.bin/webpack --mode production --config webpack.prod_heroku.js --env sentryRelease"
   },
   "repository": {
     "type": "git",
