@@ -92,4 +92,4 @@ const callOneCall = async function callWeatherApi (lat, lon, currentTime, distan
     }
 } as WeatherFunc
 
-module.exports = callOneCall;
+export default callOneCall

@@ -3,6 +3,8 @@ require('./instrument');
 import express from 'express'
 import { Request, Response } from 'express'
 const app = express();
+app.set('trust proxy', 1 /* number of proxies between user and server */)
+
 const apicache = require('node-cache-32')
 require('source-map-support').install();
 const expressStaticGzip = require("express-static-gzip");
@@ -13,7 +15,7 @@ const multer = require('multer'); // v1.0.5
 const upload = multer({
     limits: { fieldSize: 2 * 1024 * 1024 }
 }); // for parsing multipart/form-data
-const callWeatherService = require('./weatherForecastDispatcher');
+import callWeatherService from './weatherForecastDispatcher'
 const url = require('url');
 const strava = require('strava-v3');
 // const { Datastore } = require('@google-cloud/datastore');
@@ -258,6 +260,10 @@ app.post('/forecast_one', cache.middleware(), upload.none(), async (req : Reques
     if (req.body.service !== undefined) {
         service = req.body.service;
     }
+    if (!service) {
+        res.status(400).json({'status':'Missing weather service'})
+        return
+    }
     if (!process.env.NO_LOGGING) {
         logger.info(`Request from ${req.ip} for single point from ${service}`);
     }
@@ -308,6 +314,10 @@ app.post('/forecast', upload.none(), async (req : Request, res : Response) => {
     if (req.body.service !== undefined) {
         service = req.body.service;
     }
+    if (!service) {
+        res.status(400).json({'status':'Missing weather service'})
+        return
+    }
     // if (req.body.routeName !== undefined && req.body.routeName !== '') {
     //     let dbRecord = makeRecord(forecastPoints[0], req.body.routeNumber);
     //     try {
@@ -322,7 +332,7 @@ app.post('/forecast', upload.none(), async (req : Request, res : Response) => {
         while (forecastPoints.length > 0) {
             let point = forecastPoints.shift();
             // eslint-disable-next-line no-await-in-loop
-            const result = await callWeatherService(service, point.lat, point.lon, point.time, point.distance, zone, point.bearing).catch((error: any) => {
+            const result = await callWeatherService(service, point.lat, point.lon, point.time, point.distance, zone, point.bearing, point.isControl).catch((error: any) => {
                 throw error;
             });
             // we explicitly do not want to parallelize to avoid swamping the servers we are calling and being throttled
@@ -511,6 +521,7 @@ const getRwgpsTokenFromCode = async (code : string) => {
     return null;
 };
 
+app.get('/ip', (request :Request, response : Response) => {response.send(request.ip)})
 
 app.get('/rwgpsAuthReply', async (req: Request, res : Response) => {
     const state = req.query.state;

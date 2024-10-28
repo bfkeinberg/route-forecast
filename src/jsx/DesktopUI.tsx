@@ -105,7 +105,7 @@ const DesktopUI = ({mapsApiKey, orientationChanged, setOrientationChanged} : Des
 
     return (
         <StrictMode>
-            <div style={{ display: 'flex', flexDirection: 'column', maxHeight: '97vh' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', maxHeight: '98vh' }}>
                 {!mapDataExists ? <InstallExtensionButton /> : null}
                 <div /* style={{ display:'flex',  flexShrink: 0 }} */>
                     <TopBar
