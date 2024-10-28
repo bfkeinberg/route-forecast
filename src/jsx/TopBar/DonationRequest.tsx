@@ -1,0 +1,63 @@
+import { AnchorButton } from "@blueprintjs/core";
+import { useEffect, useState } from 'react';
+import ReactGA from "react-ga4";
+import { useMediaQuery } from "react-responsive";
+import {DesktopTooltip} from "../shared/DesktopTooltip"
+import {useTranslation} from 'react-i18next'
+import cookie from 'react-cookies';
+import { i18n } from "i18next";
+
+const english_donation_image = 'https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif'
+const french_donation_image = 'https://www.paypalobjects.com/fr_XC/i/btn/btn_donate_LG.gif'
+const donationImage = (i18next : i18n) => {
+    return (i18next.resolvedLanguage && i18next.resolvedLanguage.startsWith('fr')) ? french_donation_image : english_donation_image 
+}
+
+declare module 'react' {
+    interface HTMLAttributes<T> extends AriaAttributes, DOMAttributes<T> {
+        // extends React's HTMLAttributes
+        border?: string;
+    }
+}
+
+const DonationRequest = ({wacky} : {wacky: boolean}) =>  {
+    const [
+        transform,
+        setTransform
+    ] = useState<string>("")
+    const [
+        filter,
+        setFilter
+    ] = useState<string>("")
+
+    const donateWasClicked = cookie.load('clickedDonate')
+    const buttonImageWidth = useMediaQuery({ query: '(min-width: 1300px)' }) ?'106px' : '80px'
+    useEffect(() => {
+        if (wacky && !donateWasClicked) {
+            const interval = setInterval(() => {
+                setTransform(`rotate3d(${Math.random()}, ${Math.random()}, ${Math.random()}, ${Math.random() * 90 - 45}deg)`)
+                setFilter(`hue-rotate(${Math.random() * 360}deg)`)
+            }, 1500)
+            return () => {
+                clearInterval(interval)
+            }
+        }
+    }, [wacky])
+
+    const { t, i18n } = useTranslation()
+        
+    return (
+        // eslint-disable-next-line react/jsx-no-comment-textnodes
+        <div style={{ transform: transform, transition: "transform 1.5s, filter 1.5s linear", filter: filter, zIndex: 1 }}>
+            <DesktopTooltip content={'Hi, if you would like to support randoplan, please consider donating'}>
+                <AnchorButton id={'donate'} href="https://paypal.me/BFeinberg" target="_blank"
+                    onClick={() => { cookie.save('clickedDonate', "true", { path: '/' }); ReactGA.event('purchase', { currency: 'dollars' }) }}>
+                    <img alt="" border="0" src={donationImage(i18n)} width={buttonImageWidth} /* height="30" */ />
+                </AnchorButton>
+            </DesktopTooltip>
+        </div>
+    );
+}
+
+export default DonationRequest;
+

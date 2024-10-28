@@ -24,36 +24,9 @@ module.exports = (env,argv) => {
         cache: {
             type:'filesystem'
         },
-        entry: [path.resolve(APP_DIR, 'app/app.jsx')],
+        entry: [path.resolve(APP_DIR, 'app/app.tsx')],
         module: {
             rules: [
-                {test: /\.jsx?$/,
-                    include: APP_DIR,
-                    exclude: /node_modules/,
-                    // how to include specific modules in babel
-                    // include: [APP_DIR,QUERY_STRING_DIR,STRICT_URI_ENCODE_DIR],
-                    // exclude: /node_modules\/(?!(query-string|strict-uri-encode)\/).*/,
-                    loader: "babel-loader",
-                    options: {
-                        cacheDirectory: true,
-                        babelrc: false,
-                        presets: [
-                            "@babel/env",
-                            "@babel/preset-react"
-                        ],
-                        // how to target specific browsers
-                        // presets: [["babel-preset-env",{targets:{browsers:["last 3 versions","Explorer 11"]}}],"babel-preset-react","babel-preset-stage-0"],
-                        plugins: [
-                            '@babel/transform-runtime',
-                            "react-html-attrs",
-                            "transform-class-properties",
-                            "@babel/plugin-syntax-dynamic-import"
-                        ],
-                        // if we want to remove arrow functions as well
-                        // plugins: ['babel-plugin-transform-runtime',"react-html-attrs", "transform-class-properties","transform-es2015-arrow-functions"],
-                        comments: true
-                    }
-                },
                 {
                     test: /\.(js|css|scss)$/,
                     enforce: "pre",
@@ -64,8 +37,9 @@ module.exports = (env,argv) => {
                     ],
                 },
                 {
-                    test: /\.([cm]?ts|tsx)$/,
-                    loader: 'ts-loader'
+                    test: /\.(t|j)sx?$/,
+                    use: {loader: 'ts-loader'} ,
+                    exclude: /node_modules/
                 },
                 {
                     test: /\.scss$/,
@@ -126,8 +100,7 @@ module.exports = (env,argv) => {
                 {from: 'manifest.json', to: path.resolve(STATIC_DIR, "[name][ext]")},
                 {from: 'src/pwa/worker.js', to: path.resolve(STATIC_DIR, "[name][ext]")},
                 {from: 'node_modules/localforage/dist/localforage.min.js', to: path.resolve(STATIC_DIR, "lib/localforage.js")},
-                {from: 'source-context.json', to: path.resolve(SERVER_DIR, "[name][ext]")},
-                {from:SRC_SERVER_DIR + '/*.js', to:path.resolve(SERVER_DIR, "[name][ext]"), info: { minimized: true }}
+                {from: 'source-context.json', to: path.resolve(SERVER_DIR, "[name][ext]")}
                 ]})
         ],
         output:
@@ -158,6 +131,6 @@ module.exports = (env,argv) => {
             {
                 Images: SRC_STATIC_DIR
             },
-        }
+        },
     }
 };

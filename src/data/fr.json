@@ -1,115 +1,4 @@
 {
-    "en": {
-        "translation": {
-            "buttons": {
-                "bugReport": "Report a bug",
-                "donate": "Donate",
-                "loadRoute":"Load Route",
-                "usePinned":"Use pinned routes",
-                "dontUsePinned":"Don't use pinned routes",
-                "stops":"Add Stops",
-                "forecast":"Forecast",
-                "forecastPending":"Creating forecast...",
-                "zoomToSegment":"Zoom"
-            },
-            "labels": {
-                "language": "Select language",
-                "routeType":"Route type",
-                "ridingPace":"Pace on flat ground",
-                "startingTime":"Starting time",
-                "miles":"Units are miles etc",
-                "englishSystem":"Imperial",
-                "metricSystem":"Metric",
-                "kilometers":"Units in metric",
-                "projectedFinish":"Projected finish time",
-                "interval":"Forecast Interval in minutes",
-                "source":"Weather forecast source",
-                "customSegment":"Use custom segment length",
-                "degreesF":"Temperature in degrees F",
-                "degreesC":"Temperature in degrees C"
-            },
-            "titles": {
-                "routeInfo": "Route info",
-                "forecastSettings": "Forecast Settings",
-                "forecast":"Forecast",
-                "paceAnalysis": "Pace Analysis",
-                "rwgpsId":"Ride with GPS Route ID",
-                "loading":"Route loading",
-                "forecastControls":"Forecast controls",
-                "map":"Forecast map"
-            },
-            "tooltips": {
-                "ridingPace":"Speed on flat ground, which will be reduced by climbing",
-                "actualPace":"Actual riding pace was",
-                "interval":"How often to generate weather forecast in minutes",
-                "provider":"The weather provider to use for forecasts",
-                "forecast": {
-                    "enabled":"Request a ride forecast",
-                    "disabled":"Must provide an rwgps route id"
-                },
-                "startingTime":"When you plan to begin riding",
-                "distHeader":"Distance at start of segment",
-                "windHeader":"Click to toggle between average wind speed and wind gusts",
-                "temperatureHeader":"Click to toggle between temperature and apparent temperature",
-                "aqiHeader":"Air quality shows current conditions, not forecasted. Click to toggle for the next forecast requested",
-                "overallPace":"Pace is average speed adjusted for climb",
-                "analysisInterval":"Interval in hours at which to calculate effective pace",
-                "zoom":"Whether to zoom into route segments when hovering over their line in the table",
-                "customSegment":"Forecast only this portion of the route",
-                "bearingHeader":"Click to toggle between absolute and relative wind bearing",
-                "copyTable":"Copy forecast table",
-                "scrollToRain":"Bring first forecast line with change of rain into view"
-            },
-            "data": {
-                "noForecastPlaceholder":"Find forecast to create",
-                "wind": {
-                    "lost":"lost",
-                    "gained":"gained",
-                    "to": "to wind",
-                    "from": "from wind",
-                    "gust":"Wind gust",
-                    "speed":"Wind speed"
-                },
-                "info":{
-                    "temperature":"Temperature"
-                },
-                "summary":"Use weather and terrain data to create a route plan for your rides.",
-                "loading":" can load routes from Ride with GPS, Strava, or using the ids of permanent routes on RUSA.org. You can paste in the url of a route from Ride with GPS or Strava, or grab the id from the info of a RUSA perm route.Alternatively if you pin a route that you are viewing on Ride with GPS, the button to the right will list those. It will prompt you to log into RWGPS if you haven't already.",
-                "tableHeadersDoc":"Buttons above the column headings allow changing the information displayed, for example absolute temperature vs 'feels like' temperature"
-            },
-            "tableHeaders": {
-                "temperature":"Feels like",
-                "time":"Time",
-                "summary":"Summary",
-                "precipitation":"Chance of rain",
-                "humidity":"Humidity",
-                "cloudCover":"Cloud cover",
-                "windBearing":"Wind bearing",
-                "relBearing":"Relative wind"
-            },
-            "toasts":{
-                "aqi": {
-                    "enabled":"Aqi fetch enabled",
-                    "disabled":"AQI fetch disabled"
-                },
-                "tableCopied":"Forecast table copied"
-            },
-            "controls":{
-                "name":"Name",
-                "distanceMiles":"Miles",
-                "distanceKilometers":"Kilometers",
-                "duration":"Expected Time Spent",
-                "arrival":"Estimated Arrival Time",
-                "delete":"Delete"
-            },
-            "analysis": {
-                "overallPace":"Overall climb-adjusted pace was",
-                "interval":"hour",
-                "halfHourInterval": "half hour"
-            }
-        }
-    },
-    "fr": {
         "translation": {
             "buttons": {
                 "bugReport": "Signaler un bogue",
@@ -120,7 +9,8 @@
                 "stops":"Ajouter des Contrôles",
                 "forecast":"Prévisions",
                 "forecastPending":"Création de prévisions...",
-                "zoomToSegment":"Zoom"
+                "zoomToSegment":"Zoom",
+                "banked":"Afficher le temps accumulé"
             },
             "labels": {
                 "language": "Choisissez la langue",
@@ -168,7 +58,8 @@
                 "customSegment":"Prévoir uniquement cette partie de le parcours",
                 "bearingHeader":"Cliquez pour basculer entre le relèvement du vent absolu et relatif",
                 "copyTable":"Copier le tableau de prévisions",
-                "scrollToRain":"Afficher la première ligne de prévision avec changement de pluie"
+                "scrollToRain":"Afficher la première ligne de prévision avec changement de pluie",
+                "banked": "Affichez le nombre de minutes restant pour être dans les temps d'arrivée du brevet ACP/RUSA"
             },
             "data":{
                 "noForecastPlaceholder":"Cliquez sur « Prévisions »",
@@ -219,4 +110,3 @@
             }
         }
     }
-}
