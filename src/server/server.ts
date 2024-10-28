@@ -3,7 +3,8 @@ require('./instrument');
 import express from 'express'
 import { Request, Response } from 'express'
 const app = express();
-app.set('trust proxy', 1 /* number of proxies between user and server */)
+app.set('trust proxy', false /* number of proxies between user and server */)
+// app.set('trust proxy', 1 /* number of proxies between user and server */)
 
 const apicache = require('node-cache-32')
 require('source-map-support').install();
