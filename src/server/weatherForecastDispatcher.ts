@@ -4,7 +4,7 @@ import callVisualCrossing from './visualCrossing'
 import callNWS from './nws'
 const callMeteomatics = require('./meteomatics');
 const callWeatherKit = require('./weatherKit');
-const callOneCall = require('./oneCall')
+import callOneCall from './oneCall'
 const Sentry = require('@sentry/node')
 
 const getBearingDifference = function (bearing : number,windBearing : number) {
@@ -88,4 +88,4 @@ const callWeatherService = function (service : string, lat : number, lon : numbe
     }
 }
 
-module.exports = callWeatherService;
+export default callWeatherService;
