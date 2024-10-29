@@ -220,7 +220,7 @@ const ForecastTable = (adjustedTimes : AdjustedTimes) => {
         userControls: Array<UserControl>
     }
     const MakeSummaryLine = ({startTime, finishTime, finishTimeFormat, userControls} : MakeSummaryProps) => {
-        const elapsedTimeInterval = Interval.fromDateTimes(startTime, DateTime.fromFormat(finishTime, finishTimeFormat))
+        const elapsedTimeInterval = Interval.fromDateTimes(startTime, DateTime.fromFormat(finishTime, finishTimeFormat, {zone:zone}))
         const minutesOfIdling = userControls.reduce((accum,current) => accum += Number.parseInt(current.duration.toString()), 0)
         return (
             <div style={{border:'3px solid black'}}>Elapsed time <strong>{elapsedTimeInterval.length('hours').toFixed(1)} hours</strong>, <strong>{(minutesOfIdling/60).toFixed(1)}</strong> off bike</div>

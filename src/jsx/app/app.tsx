@@ -26,7 +26,7 @@ else {
     const sentry_app_id = script.getAttribute('sentry_app_id')
     const trace_sample_rate = script.getAttribute('sentry_trace_sample_rate')
     // console.log('NPM version : ' + process.env.npm_package_version)
-    const allowedHosts = ['zlocalhost', '127.0.0.1', 'Brians-MacBook-Pro.local'];
+    const allowedHosts = ['localhost', '127.0.0.1', 'Brians-MacBook-Pro.local'];
     const url = new URL(window.origin);
     if (!allowedHosts.includes(url.hostname)) {
         ReactGA.initialize("G-0R3J1W9ECC");
