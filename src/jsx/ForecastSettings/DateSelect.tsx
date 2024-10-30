@@ -1,8 +1,10 @@
 import "@blueprintjs/datetime2/lib/css/blueprint-datetime2.css";
 
 import {Icon} from '@blueprintjs/core';
-import {TimePrecision} from "@blueprintjs/datetime"
-import { DateInput3 } from "@blueprintjs/datetime2";
+// this is what Blueprint wants me to do but it leads to failures
+// to install due to dependency conflicts with React >= 18
+// import {TimePrecision} from "@blueprintjs/datetime"
+import { DateInput3, TimePrecision } from "@blueprintjs/datetime2";
 import { DateTime } from 'luxon';
 import {connect, ConnectedProps} from 'react-redux';
 
