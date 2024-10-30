@@ -36,7 +36,6 @@ let logger = console;
 var compression = require('compression');
 
 app.use(compression());
-app.set('trust proxy', true);
 // Instantiate a datastore client
 // const datastore = new Datastore();
 
