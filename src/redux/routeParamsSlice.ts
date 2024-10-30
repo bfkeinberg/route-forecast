@@ -7,6 +7,7 @@ import { stravaRouteSet } from './stravaSlice';
 import { weatherProviderSet } from './forecastSlice';
 import { getRouteNumberFromValue } from '../utils/util';
 import { rwgpsRouteLoaded, gpxRouteLoaded } from './routeInfoSlice';
+import * as Sentry from "@sentry/react";
 
 const defaultIntervalInHours = 1;
 const defaultPace = 'D';
@@ -107,11 +108,15 @@ const routeParamsSlice = createSlice({
                 }
             }
         },
-        startTimestampSet(state,action:PayloadAction<{start:number, zone?:string}>) {
+        startTimestampSet(state, action: PayloadAction<{ start: number, zone?: string }>) {
             if (action.payload) {
-                const start = DateTime.fromSeconds(action.payload.start, {zone:action.payload.zone===undefined?"local":action.payload.zone})
-                if (start.isValid) {
-                    state.startTimestamp = checkedStartDate(start, state.canForecastPast).toMillis()
+                try {
+                    const start = DateTime.fromSeconds(action.payload.start, { zone: action.payload.zone === undefined ? "local" : action.payload.zone })
+                    if (start.isValid) {
+                        state.startTimestamp = checkedStartDate(start, state.canForecastPast).toMillis()
+                    }
+                } catch (error: any) {
+                    Sentry.captureException(error, { tags: { what: `Payload was ${action.payload.start}` } })
                 }
             }
         },
