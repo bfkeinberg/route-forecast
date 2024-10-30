@@ -10,7 +10,7 @@ type PropsFromRedux = ConnectedProps<typeof connector>
 const ForecastInterval = (props: PropsFromRedux) => {
     const { t } = useTranslation()
     return (
-        <FormGroup style={{flex: 1}} label={t('labels.interval')} labelFor="intervalRange">
+        <FormGroup style={{flex: 1}} label={t('labels.interval')} >
             <Tooltip arrow placement='bottom' title={t('tooltips.interval')}>
                 <Slider
                     value={props.interval}
