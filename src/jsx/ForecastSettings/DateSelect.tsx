@@ -1,15 +1,16 @@
 import "@blueprintjs/datetime2/lib/css/blueprint-datetime2.css";
-import "@blueprintjs/datetime2/node_modules/@blueprintjs/datetime/lib/css/blueprint-datetime.css";
 
 import {Icon} from '@blueprintjs/core';
-import { DateInput3, TimePrecision } from "@blueprintjs/datetime2";
+import {TimePrecision} from "@blueprintjs/datetime"
+import { DateInput3 } from "@blueprintjs/datetime2";
 import { DateTime } from 'luxon';
 import {connect, ConnectedProps} from 'react-redux';
 
 import {setStart} from "../../redux/actions";
 import { setTimeFromIso } from "../../redux/actions";
 import { initialStartTimeSet } from "../../redux/routeParamsSlice";
-import { DesktopTooltip } from '../shared/DesktopTooltip';
+import {useMediaQuery} from 'react-responsive'
+import { Tooltip } from "@blueprintjs/core";
 import {useTranslation} from 'react-i18next'
 import { RootState } from "../app/topLevel";
 import { ActionCreatorWithPayload } from "@reduxjs/toolkit";
@@ -42,6 +43,7 @@ const DateSelect = ({ start, zone, setStart, initialStartTimeSet, maxDaysInFutur
     let later = new Date();
     const daysToAdd = maxDaysInFuture;
     later.setDate(now.getDate() + daysToAdd);
+    const hideTooltip = useMediaQuery({query:'(maxWidth={500}'})
     interface OtherAttributes {
         minDate? : Date
     }
@@ -56,10 +58,10 @@ const DateSelect = ({ start, zone, setStart, initialStartTimeSet, maxDaysInFutur
                 {t('labels.startingTime')}
             </span>
             <div style={{ flex: 2.5 } }>
-                <DesktopTooltip content={t('tooltips.startingTime')} placement={'top'}>
+                <Tooltip disabled={hideTooltip} targetTagName={'div'} content={t('tooltips.startingTime')} placement={'top'}>
                     <DateInput3
-                        inputProps={{id:'startDatePicker'}}
                         onChange={setDateFromPicker}
+                        fill={false}
                         closeOnSelection={false}
                         onTimezoneChange={setDateWithZone}
                         {...otherAttributes}
@@ -73,7 +75,7 @@ const DateSelect = ({ start, zone, setStart, initialStartTimeSet, maxDaysInFutur
                         timezone={zone}
                         locale={i18n.language}
                     />
-                </DesktopTooltip>
+                    </Tooltip>
             </div>
         </div>
     );
