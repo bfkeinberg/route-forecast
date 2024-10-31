@@ -36,7 +36,8 @@ export const ForecastSettings = () => {
                 <TimeFields />
                 <div style={{ display: "flex" }}>
                     <RidingPace />
-                    <div style={{ flex: 1, cursor: "pointer", display: "flex", flexFlow: "column", alignItems: "flex-end" }} onClick={() => {/*TODO: GA event for metric*/dispatch(metricToggled())}}>
+                    <div style={{ flex: 1, cursor: "pointer", display: "flex", flexFlow: "column", alignItems: "flex-end" }} 
+                        onClick={() => {ReactGA.event('select_content', {content_type: 'metric'}); dispatch(metricToggled())}}>
                         <div style={{ width: "fit-content", borderBottom: !metric ? "1px solid #106ba3" : "1px solid #0000" }}>{t('labels.englishSystem')}</div>
                         <div style={{ fontSize: "10px", color: "grey", opacity: !metric ? 1 : 0, transition: "opacity 0.3s", marginTop: "3px", textAlign: "end" }}>{t('labels.miles')}</div>
                     </div>

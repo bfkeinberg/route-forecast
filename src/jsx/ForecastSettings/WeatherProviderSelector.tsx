@@ -7,6 +7,7 @@ import { DesktopTooltip } from '../shared/DesktopTooltip';
 import {useTranslation} from 'react-i18next'
 import {useForecastRequestData} from "../../utils/hooks"
 import { RootState } from "../app/topLevel";
+import ReactGA from "react-ga4";
 
 type PropsFromRedux = ConnectedProps<typeof connector>
 
@@ -50,8 +51,8 @@ const WeatherProviderSelector = ({weatherProvider,setWeatherProvider} : PropsFro
                     filterable={false}
                     fill={true}
                     activeItem={{ key: weatherProvider, ...providerValues[weatherProvider] }}
-                    // TODO: GA event for weather forecast providers
-                    onItemSelect={(selected) => { setWeatherProvider(selected.key) }}
+                    onItemSelect={(selected) => { 
+                        ReactGA.event('unlock_achievement', {achievement_id: selected.key}); setWeatherProvider(selected.key) }}
                 >
                     <Button id={'provider'} text={providerValues[weatherProvider].name} rightIcon="symbol-triangle-down" />
                 </Select>

@@ -4,6 +4,7 @@ import "@blueprintjs/icons/lib/css/blueprint-icons.css";
 import "@blueprintjs/select/lib/css/blueprint-select.css";
 import 'Images/style.css';
 
+import ReactGA from "react-ga4";
 import * as Sentry from "@sentry/react";
 import {Info} from "luxon";
 import queryString from 'query-string';
@@ -288,7 +289,7 @@ const RouteWeatherUI = ({search, href, action, maps_api_key, timezone_api_key, b
         dispatch(fetchAqiSet(fetchAqi==="true"))
     }
     if (i18n.language === 'fr') {
-        // ReactGA.event()
+        ReactGA.event('tutorial_begin')
     }
     return (
         <FunAppWrapperThingForHooksUsability maps_api_key={maps_api_key} queryParams={queryParamsAsObj}/>

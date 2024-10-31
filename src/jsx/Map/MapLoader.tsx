@@ -18,7 +18,7 @@ const LoadableMap = lazy(() => {addBreadcrumb('loading map');return import(/* we
 
 type PropsFromRedux = ConnectedProps<typeof connector>
 type MapLoaderProps = PropsFromRedux & {
-    [maps_api_key: string] : string
+    maps_api_key: string
 }
 const MapLoader = (props : MapLoaderProps) => {
     // debug empty points and bounds
