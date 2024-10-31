@@ -25,6 +25,8 @@ import ShortUrl from '../TopBar/ShortUrl'
 import { useAppSelector, useAppDispatch } from '../../utils/hooks';
 import { UserControl } from 'redux/controlsSlice';
 import { i18n } from 'i18next';
+import ReactGA from "react-ga4";
+
 const displayBacklink = (provider : string) => {
     switch (provider) {
         case 'climacell':
@@ -122,19 +124,19 @@ const ForecastTable = (adjustedTimes : AdjustedTimes) => {
     const distHeaderText = <span>{metric ? 'KM' : 'Mile'}</span>
     const distHeader = <DesktopTooltip content={t('tooltips.distHeader')} placement={'top'}>{distHeaderText}</DesktopTooltip>
 
-    // TODO: GA event for gusts viewed vs wind speed
+    ReactGA.event('select_content', {content_type : 'gusts'})
     const toggleGustDisplay = () => {return setShowGusts(!showGusts)}
     const windHeaderText = <Button small onClick={toggleGustDisplay} >{showGusts ? t('data.wind.gust') : t('data.wind.speed')}</Button>;
     const windHeader = <DesktopTooltip content={t('tooltips.windHeader')} placement={'top'}>{windHeaderText}</DesktopTooltip>
 
-    // TODO: GA4 event for showing apparent temperature
+    ReactGA.event('select_content', {content_type : 'feelsLike'})
     const toggleApparentDisplay = () => {return setShowApparentTemp(!showApparentTemp)}
 
     const temperatureHeaderText = <Button small onClick={toggleApparentDisplay}>{showApparentTemp ? t('tableHeaders.temperature') : <Icon icon="temperature"/>}</Button>
     const temperatureHeader = <DesktopTooltip content={t('tooltips.temperatureHeader')} placement={'top'}>{temperatureHeaderText}</DesktopTooltip>
 
     const copyTable = async (event: React.MouseEvent) => {
-        // TODO: GA4 event for copying forecast table
+        ReactGA.event('tutorial_complete')
         var htmlTable = document.getElementById('forecastTable')
         var range = document.createRange()
         const selection = window.getSelection();
@@ -150,13 +152,13 @@ const ForecastTable = (adjustedTimes : AdjustedTimes) => {
     }
 
     const toggleZoom = () => {
-        //ReactGA.event()
+        ReactGA.event('select_content', {content_type: 'zoom'})
         dispatch(zoomToRangeToggled())
         cookie.save('zoomToRange', (!zoomToRange).toString(), { path: '/' })
     }
 
     const toggleRelBearing = () => {
-        // TODO: GA4 event for showing relative vs absolute bearing
+        ReactGA.event('select_content', {content_type: 'relativeBearing'})
         setShowRelativeBearing(!showRelativeBearing)
     }
 
@@ -196,9 +198,7 @@ const ForecastTable = (adjustedTimes : AdjustedTimes) => {
     }
 
     const toggleAqi = async () => {
-        if (!fetchAqi) {
-            //ReactGA.event()
-        }
+        ReactGA.event('select_content', {content_type: 'aqi'})
         dispatch(fetchAqiToggled())
         cookie.save('fetchAqi', (!fetchAqi).toString(), { path: '/' });
         // whatever the value in props is will be toggled by this
