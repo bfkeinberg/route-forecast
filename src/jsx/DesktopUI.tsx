@@ -1,8 +1,7 @@
 import "./DesktopUI.css"
 
 import { Spinner } from "@blueprintjs/core";
-import lazyRetry from "@tdotcode/react-lazy-retry";
-import React, { Suspense,useState,StrictMode, SetStateAction, Dispatch } from "react";
+import React, { Suspense,useState,StrictMode, SetStateAction, Dispatch, lazy } from "react";
 import { useAppDispatch, useAppSelector } from "../utils/hooks";
 import { routeLoadingModes } from "../data/enums";
 import { useDelay, useForecastDependentValues,usePrevious, useValueHasChanged, useWhenChanged } from "../utils/hooks";
@@ -30,7 +29,7 @@ const DesktopUI = ({mapsApiKey, orientationChanged, setOrientationChanged} : Des
     const { t } = useTranslation()
     const dispatch = useAppDispatch()
 
-    const LoadableForecastTable = lazyRetry(() => import(/* webpackChunkName: "ForecastTable" */ './resultsTables/ForecastTable'));
+    const LoadableForecastTable = lazy(() => import(/* webpackChunkName: "ForecastTable" */ './resultsTables/ForecastTable'));
     const {adjustedTimes } = useForecastDependentValues()
     const titleRouteInfo = t("titles.routeInfo")
     const titleForecastSettings = t("titles.forecastSettings")

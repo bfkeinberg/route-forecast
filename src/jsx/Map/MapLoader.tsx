@@ -1,6 +1,5 @@
 import * as Sentry from "@sentry/react";
-import lazyRetry from "@tdotcode/react-lazy-retry";
-import {Suspense} from 'react';
+import {Suspense, lazy} from 'react';
 import {connect, ConnectedProps} from 'react-redux';
 
 import { routeLoadingModes } from '../../data/enums';
@@ -15,7 +14,7 @@ const addBreadcrumb = (msg : string) => {
     })
 }
 
-const LoadableMap = lazyRetry(() => {addBreadcrumb('loading map');return import(/* webpackChunkName: "Map" */ './RouteForecastMap')}, 7, 1200);
+const LoadableMap = lazy(() => {addBreadcrumb('loading map');return import(/* webpackChunkName: "Map" */ './RouteForecastMap')});
 
 type PropsFromRedux = ConnectedProps<typeof connector>
 type MapLoaderProps = PropsFromRedux & {

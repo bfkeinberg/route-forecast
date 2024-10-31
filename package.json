@@ -23,7 +23,6 @@
     "@sentry/profiling-node": "^8.35.0",
     "@sentry/react": "^8.4.0",
     "@sentry/tracing": "^7.114.0",
-    "@tdotcode/react-lazy-retry": "^1.0.5",
     "@types/luxon": "^3.4.2",
     "@types/webappsec-credential-management": "^0.6.8",
     "@vis.gl/react-google-maps": "^1.0.0",
