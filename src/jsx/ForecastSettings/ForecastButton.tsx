@@ -20,6 +20,7 @@ import { useForecastRequestData } from '../../utils/hooks';
 import { RootState } from '../app/topLevel';
 import { useAppSelector, useAppDispatch } from '../../utils/hooks';
 import type {ForecastRequest} from '../../utils/gpxParser'
+import { GpxRouteData, RwgpsRoute, RwgpsTrip } from 'redux/routeInfoSlice';
 
 declare module 'react' {
     interface HTMLAttributes<T> extends AriaAttributes, DOMAttributes<T> {
@@ -38,9 +39,9 @@ const ForecastButton = ({fetchingForecast,submitDisabled, routeNumber, startTime
         const [forecast, forecastFetchResult] = useForecastMutation()
         const [getAQI, aqiFetchResult] = useGetAqiMutation()
         const dispatch = useAppDispatch()
-        const type = useAppSelector(state => ((state.routeInfo.rwgpsRouteData !== null) ? "rwgps" : "gpx"))
+        const rwgpsRouteData = useAppSelector(state => state.routeInfo.rwgpsRouteData)
+        const gpxRouteData = useAppSelector(state => state.routeInfo.gpxRouteData)
         const routeName = useAppSelector(state => state.routeInfo.name)
-        const routeData = useAppSelector(state => ((type === "rwgps") ? state.routeInfo.rwgpsRouteData : state.routeInfo.gpxRouteData))
         const userControlPoints = useAppSelector(state => state.controls.userControlPoints)
         const distanceInKm = useAppSelector(state => state.routeInfo.distanceInKm)
         const fetchAqi = useAppSelector(state => state.forecast.fetchAqi)
@@ -92,8 +93,9 @@ const ForecastButton = ({fetchingForecast,submitDisabled, routeNumber, startTime
         }
         return [Promise.allSettled(forecastResults),fetchAqi?Promise.allSettled(aqiResults):[]]    
     }
-    const doForecastByParts = (provider : string) => {
-        const forecastRequest = getForecastRequest(routeData!, startTimestamp, type, zone, 
+
+    const doForecastByParts = (provider : string, routeData :RwgpsRoute|RwgpsTrip|GpxRouteData) => {
+        const forecastRequest = getForecastRequest(routeData, startTimestamp, zone, 
             pace, interval, userControlPoints, segmentRange)
         return forecastByParts(forecastRequest, zone, provider, routeName, routeNumber)
     }
@@ -104,7 +106,12 @@ const ForecastButton = ({fetchingForecast,submitDisabled, routeNumber, startTime
     let buttonStyle = submitDisabled ? { pointerEvents: 'none' as const, display: 'inline-flex' } : null;
     
     const getForecastForProvider = async (provider : string) => {
-        const forecastAndAqiResults = doForecastByParts(provider)
+        if (!rwgpsRouteData && !gpxRouteData) {
+            // only call when there is data
+            return []
+        }
+        const routeData = rwgpsRouteData && rwgpsRouteData || gpxRouteData
+        const forecastAndAqiResults = doForecastByParts(provider, routeData)
         const forecastResults = await forecastAndAqiResults[0]
         let filteredResults = forecastResults.filter(result => result.status === "fulfilled").map(result => (result as PromiseFulfilledResult<{forecast:Forecast}>).value)
         filteredResults.sort((l,r) => l.forecast.distance-r.forecast.distance)
@@ -160,8 +167,12 @@ const ForecastButton = ({fetchingForecast,submitDisabled, routeNumber, startTime
                 value: distanceInKm, currency:routeNumber, coupon:routeName,
                 items: [{ item_id: '', item_name: '' }]
             }
-            ReactGA.event('add_payment_info', reactEventParams);    
-            const forecastAndAqiResults = doForecastByParts(provider)
+            ReactGA.event('add_payment_info', reactEventParams);
+            const routeData = rwgpsRouteData && rwgpsRouteData || gpxRouteData
+            // below makes Typescript happy but should not be neccessary given that the button ought to be
+            // disabled via submitDisabled in this case
+            if (!routeData) {return}
+            const forecastAndAqiResults = doForecastByParts(provider, routeData)
             const forecastResults = await forecastAndAqiResults[0]
             if (forecastResults.length===0) {
                 dispatch(forecastFetchFailed('No forecast was returned'))
@@ -231,7 +242,7 @@ const mapStateToProps = (state : RootState) =>
     ({
         fetchingForecast: state.uiInfo.dialogParams.fetchingForecast,
         // can't request a forecast without a route loaded
-        submitDisabled: state.uiInfo.routeParams.rwgpsRoute === '' && state.routeInfo.gpxRouteData === null,
+        submitDisabled: !state.uiInfo.routeParams.rwgpsRouteData && !state.routeInfo.gpxRouteData === null,
         queryString: state.params.queryString,
         routeNumber: state.uiInfo.routeParams.rwgpsRoute !== '' ? state.uiInfo.routeParams.rwgpsRoute : state.strava.route,
         startTimestamp: state.uiInfo.routeParams.startTimestamp,

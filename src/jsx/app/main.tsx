@@ -173,7 +173,6 @@ const setupBrowserForwardBack = (dispatch : AppDispatch, origin : string, foreca
                 // reload previous or next route when moving throw browser history with forward or back buttons
                 let queryParams = queryString.parse(event.state, {parseBooleans: true, parseNumbers:true});
                 const startTimestamp = queryParams.startTimestamp
-                Sentry.captureMessage(`Type of start timestamp from history state is ${typeof startTimestamp} for value ${startTimestamp}`)
                 dispatch(querySet({url:`${origin}/?${event.state}`,search:event.state}))
                 updateFromQueryParams(dispatch, queryParams as unknown as QueryParams);
                 if (queryParams.rwgpsRoute !== undefined || queryParams.strava_route) {

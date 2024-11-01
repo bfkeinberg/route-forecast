@@ -70,10 +70,10 @@ export const getRouteInfo = (state : StateForRouteInfo, timeZoneId : string, seg
 }
 
 export const getForecastRequest = (routeData : GpxRouteData | RwgpsRoute | RwgpsTrip, 
-  startTimestamp : number, type : string, timeZoneId : string, pace : string, interval : number,
+  startTimestamp : number, timeZoneId : string, pace : string, interval : number,
   userControlPoints : Array<UserControl>, segment : Segment) =>
 {
-  if (type === "rwgps") {
+  if (routeData.type === "route" || routeData.type === "trip") {
     return gpxParser.walkRwgpsRoute(
       routeData as RwgpsRoute|RwgpsTrip,
       DateTime.fromMillis(startTimestamp, {zone:timeZoneId}),

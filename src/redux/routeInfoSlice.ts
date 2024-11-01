@@ -48,6 +48,7 @@ export interface GpxRouteData {
         name: string,
         link: string
     }>
+    type: "gpx"
 }
 
 export interface BaseRouteInfoState  {
@@ -100,6 +101,7 @@ const routeInfoSlice = createSlice({
         gpxRouteLoaded(state, action : PayloadAction<GpxRouteData>) {
             state.type = "gpx"
             state.gpxRouteData = action.payload
+            state.gpxRouteData.type = "gpx"
             state.rwgpsRouteData = routeInfoInitialState.rwgpsRouteData
             state.name = getGpxRouteName(action.payload)
             state.distanceInKm = action.payload.tracks[0].distance.total/1000

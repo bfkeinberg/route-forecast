@@ -311,7 +311,7 @@ const useForecastRequestData = () => {
     const forecastRequest = getForecastRequest(
       routeData,
       startTimestamp,
-      type, timeZoneId, pace,
+      timeZoneId, pace,
       interval, controlPoints,
       segment)
     return { length: forecastRequest.length, last: forecastRequest[forecastRequest.length - 1].time }

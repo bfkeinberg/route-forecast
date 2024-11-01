@@ -1,7 +1,7 @@
 import { RootState } from "../jsx/app/topLevel";
 import { AppDispatch } from "../jsx/app/topLevel";
 import ReactGA from "react-ga4";
-import { forecastFetchBegun, errorMessageListSet, forecastFetchFailed, forecastFetchCanceled } from "./dialogParamsSlice";
+import { forecastFetchBegun, errorMessageListSet, forecastFetchFailed, forecastFetchCanceled, errorMessageListAppend } from "./dialogParamsSlice";
 import { forecastFetched, forecastAppended, Forecast, forecastInvalidated } from "./forecastSlice";
 import {getRwgpsRouteName, getRouteNumberFromValue} from "../utils/util"
 import { RouteInfoState, RwgpsRoute, RwgpsTrip } from "./routeInfoSlice";
@@ -87,13 +87,16 @@ const doForecastByParts = (forecastFunc : MutationWrapper, aqiFunc : MutationWra
     const rwgpsRouteData = getState().routeInfo.rwgpsRouteData
     const gpxRouteData = getState().routeInfo.gpxRouteData
     const routeData = rwgpsRouteData ? rwgpsRouteData : (gpxRouteData ? gpxRouteData : null)
-    // TODO: error check this when we can do so without breaking the contract with the caller
-    // if (!routeData) {
-    //     return { result: "error", error: "Missing any route data, cannot perform forecast" }
-    // }
-    const forecastRequest = getForecastRequest(routeData!,
+    if (!routeData) {
+        return [Promise.allSettled([new Promise<{result: "error"}>((resolve, reject) => {
+            reject({data:{details:"Missing any route data, cannot perform forecast"}})
+        })
+
+        ]),[]]
+    }
+    const forecastRequest = getForecastRequest(routeData,
          getState().uiInfo.routeParams.startTimestamp,
-        type, getState().uiInfo.routeParams.zone, getState().uiInfo.routeParams.pace,
+        getState().uiInfo.routeParams.zone, getState().uiInfo.routeParams.pace,
         getState().uiInfo.routeParams.interval, getState().controls.userControlPoints,
         getState().uiInfo.routeParams.segment
     )
@@ -174,7 +177,7 @@ export const forecastWithHook = async (forecastFunc: MutationWrapper, aqiFunc: M
 
     // handle any errors
     dispatch(errorMessageListSet(extractRejectedResults(forecastResults).map(result => msgFromError(result))))
-    dispatch(errorMessageListSet(extractRejectedResults(aqiResults).map(result => msgFromError(result))))
+    dispatch(errorMessageListAppend(extractRejectedResults(aqiResults).map(result => msgFromError(result))))
 }
 
 export const requestForecast = function (routeInfo: RouteInfoState) {
