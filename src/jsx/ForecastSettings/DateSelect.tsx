@@ -1,4 +1,5 @@
 import "@blueprintjs/datetime2/lib/css/blueprint-datetime2.css";
+import "@blueprintjs/datetime2/node_modules/@blueprintjs/datetime/lib/css/blueprint-datetime.css"
 
 import {Icon} from '@blueprintjs/core';
 // this is what Blueprint wants me to do but it leads to failures
@@ -60,10 +61,9 @@ const DateSelect = ({ start, zone, setStart, initialStartTimeSet, maxDaysInFutur
                 {t('labels.startingTime')}
             </span>
             <div style={{ flex: 2.5 } }>
-                <Tooltip disabled={hideTooltip} targetTagName={'div'} content={t('tooltips.startingTime')} placement={'top'}>
+                {/* <Tooltip disabled={hideTooltip} targetTagName={'div'} content={t('tooltips.startingTime')} placement={'top'}> */}
                     <DateInput3
                         onChange={setDateFromPicker}
-                        fill={false}
                         closeOnSelection={false}
                         onTimezoneChange={setDateWithZone}
                         {...otherAttributes}
@@ -77,7 +77,7 @@ const DateSelect = ({ start, zone, setStart, initialStartTimeSet, maxDaysInFutur
                         timezone={zone}
                         locale={i18n.language}
                     />
-                    </Tooltip>
+                    {/* </Tooltip> */}
             </div>
         </div>
     );
