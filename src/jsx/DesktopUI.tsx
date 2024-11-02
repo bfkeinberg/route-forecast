@@ -7,7 +7,7 @@ import { routeLoadingModes } from "../data/enums";
 import { useDelay, useForecastDependentValues,usePrevious, useValueHasChanged, useWhenChanged } from "../utils/hooks";
 import { ForecastSettings } from "./ForecastSettings/ForecastSettings";
 import { InstallExtensionButton } from "./InstallExtensionButton";
-import MapLoader from "./Map/MapLoader";
+import MapLoader, {addBreadcrumb} from "./Map/MapLoader";
 import PaceTable from "./resultsTables/PaceTable";
 import RouteInfoForm from "./RouteInfoForm/RouteInfoForm";
 import { RouteTitle } from "./shared/RouteTitle";
@@ -25,21 +25,22 @@ export type DesktopUIProps = {
     orientationChanged: boolean
     setOrientationChanged: Dispatch<SetStateAction<boolean>>
 }
+const LoadableForecastTable = lazy(() => {addBreadcrumb('loading forecast table'); return import(/* webpackChunkName: "ForecastTable" */ './resultsTables/ForecastTable')});
+
 const DesktopUI = ({mapsApiKey, orientationChanged, setOrientationChanged} : DesktopUIProps) => {
     const { t } = useTranslation()
     const dispatch = useAppDispatch()
 
-    const LoadableForecastTable = lazy(() => import(/* webpackChunkName: "ForecastTable" */ './resultsTables/ForecastTable'));
     const {adjustedTimes } = useForecastDependentValues()
     const titleRouteInfo = t("titles.routeInfo")
     const titleForecastSettings = t("titles.forecastSettings")
     const titleForecast = t("titles.forecast")
     const titlePaceAnalyis = t("titles.paceAnalysis")
     const sidePaneOptions = [
-        {title: titleRouteInfo, content: <Sentry.ErrorBoundary fallback={<h2>Something went wrong.</h2>}><RouteInfoForm /></Sentry.ErrorBoundary>},
-        {title: titleForecastSettings, content: <Sentry.ErrorBoundary fallback={<h2>Something went wrong.</h2>}><ForecastSettings/></Sentry.ErrorBoundary>},
-        {title: titleForecast, content: <Sentry.ErrorBoundary fallback={<h2>Something went wrong.</h2>}><Suspense fallback={<div>Loading ForecastTable...</div>}>{<LoadableForecastTable adjustedTimes={adjustedTimes}/>}</Suspense></Sentry.ErrorBoundary>},
-        {title: titlePaceAnalyis, content: <Sentry.ErrorBoundary fallback={<h2>Something went wrong.</h2>}>{<PaceTable/>}</Sentry.ErrorBoundary>}
+        {title: titleRouteInfo, content: <Sentry.ErrorBoundary fallback={<h2>Something went wrong loading the route selector.</h2>}><RouteInfoForm /></Sentry.ErrorBoundary>},
+        {title: titleForecastSettings, content: <Sentry.ErrorBoundary fallback={<h2>Something went wrong loading the forecast settings.</h2>}><ForecastSettings/></Sentry.ErrorBoundary>},
+        {title: titleForecast, content: <Sentry.ErrorBoundary fallback={<h2>Something went wrong loading the forecast.</h2>}><Suspense fallback={<div>Loading ForecastTable...</div>}>{<LoadableForecastTable adjustedTimes={adjustedTimes}/>}</Suspense></Sentry.ErrorBoundary>},
+        {title: titlePaceAnalyis, content: <Sentry.ErrorBoundary fallback={<h2>Something went wrong loading the table of paces.</h2>}>{<PaceTable/>}</Sentry.ErrorBoundary>}
     ]
     const [
         activeSidePane,

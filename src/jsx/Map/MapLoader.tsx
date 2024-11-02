@@ -6,7 +6,7 @@ import { routeLoadingModes } from '../../data/enums';
 import { RootState } from "jsx/app/topLevel";
 import { useAppSelector } from "../../utils/hooks";
 
-const addBreadcrumb = (msg : string) => {
+export const addBreadcrumb = (msg : string) => {
     Sentry.addBreadcrumb({
         category: 'loading',
         level: "info",
@@ -36,7 +36,7 @@ const MapLoader = (props : MapLoaderProps) => {
             level: 'info',
             message:`Loading map with ${length} route points`
         })
-        return <Sentry.ErrorBoundary fallback={<h2>Something went wrong.</h2>}>
+        return <Sentry.ErrorBoundary fallback={<h2>Something went wrong loading the map.</h2>}>
             <Suspense fallback={<div>Loading Map...</div>}>
                 <LoadableMap {...props} />
             </Suspense>
