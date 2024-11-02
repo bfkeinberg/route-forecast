@@ -80,7 +80,7 @@ const Tabs = ({ sidePaneOptions, activeSidePane, setActiveSidePane, sidebarWidth
     displayContent
   ] = useLoadingFromURLStatus()
   const { t } = useTranslation()
-  console.info(`loadingFromUrlFinished=${loadingFromURLFinished}`)
+  // console.info(`loadingFromUrlFinished=${loadingFromURLFinished}`)
   return (
     <div style={{
       width: `${sidebarWidth}px`
