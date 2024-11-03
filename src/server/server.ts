@@ -487,9 +487,9 @@ const getStravaToken = (code : string) => {
     });
 };
  */
-// const randoplan_uri='https://www.randoplan.com/rwgpsAuthReply';
+const randoplan_uri='https://www.randoplan.com/rwgpsAuthReply';
 // uncomment the line below and comment the one above when testing pinned route functions locally
-const randoplan_uri='http://localhost:8080/rwgpsAuthReply';
+// const randoplan_uri='http://localhost:8080/rwgpsAuthReply';
 
 app.get('/rwgpsAuthReq', (req, res) => {
     const state = req.query.state;
