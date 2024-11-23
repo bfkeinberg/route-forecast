@@ -497,7 +497,6 @@ class AnalyzeRoute {
                         }
                     }
                     let effectiveWindSpeed = Math.cos((Math.PI / 180)*relativeBearing)*averageWindSpeed;
-                    let effectiveCrosswind = Math.sin((Math.PI / 180)*relativeBearing)*averageWindSpeed
                     // sometimes the route data is missing elevation, so don't try to compute with it
                     if (previousPoint.elevation!==undefined && currentPoint.elevation!==undefined) {
                         let grade = this.getGrade(previousPoints, currentPoint);
@@ -525,7 +524,7 @@ class AnalyzeRoute {
             previousPoints.push(currentPoint);
         });
 
-        calculatedValues.sort((a,b) => a.val-b.val);
+        // calculatedValues.sort((a,b) => a.val-b.val);
         // in case there is one more forecast line to update
         if (forecast.length > 0) {
             currentForecast = forecast.pop();

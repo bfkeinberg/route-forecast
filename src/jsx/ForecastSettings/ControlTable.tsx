@@ -39,7 +39,7 @@ export const ControlTable = () => {
 
     const controlsData = controls.map((control, index) => {
         const controlObject = {...control}
-        if (calculatedValues !== null) {
+        if (calculatedValues !== null && calculatedValues[index] && controlObject.distance === calculatedValues[index].distance) {
             Object.assign(controlObject, calculatedValues[index])
         }
         if (actualArrivalTimes !== null && actualArrivalTimes[index] !== undefined) {

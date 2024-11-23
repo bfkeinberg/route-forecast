@@ -18,17 +18,18 @@ import { DateTime } from "luxon";
 
 const mergeControls = (oldCtrls : Array<UserControl>, newCtrls : Array<UserControl>) => {
     let oldCtrlsCopy = oldCtrls.slice()
-    let old = oldCtrlsCopy.shift()
     const merged = newCtrls.map(ctrl => {
-        if (old && ctrl.distance === old.distance) {
-            const result =  {name:ctrl.name, distance:ctrl.distance, duration:old.duration}
-            old = oldCtrlsCopy.shift()
+        const matchingOldCtrl = oldCtrlsCopy.find(item => item.distance === ctrl.distance)
+        if (matchingOldCtrl) {
+            const result =  {name:ctrl.name, distance:ctrl.distance, duration:matchingOldCtrl.duration}
+            oldCtrlsCopy = oldCtrlsCopy.filter( item => item.distance !== ctrl.distance)
             return result
         } else {
             return ctrl
         }
     })
-    return merged
+    // add in any old controls that are not present
+    return merged.concat(oldCtrlsCopy).sort((control1, control2) => control1.distance - control2.distance)
 }
 
 export const loadFromRideWithGps = function (routeNumber? : string, isTrip? : boolean) {
