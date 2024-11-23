@@ -141,7 +141,7 @@ export const extractControlsFromRoute = (routeData : RwgpsRoute|RwgpsTrip) => {
   return gpxParser.extractControlPoints(routeData);
 }
 
-export const stringIsOnlyNumeric = (string : string) => string.match(/^[0-9]*$/) !== null
+export const stringIsOnlyNumeric = (string : string) => string.match(/^[0-9]+$/) !== null
 export const stringIsOnlyDecimal = (string : string) => string.match(/^[0-9.]*$/) !== null
 
 export const milesToMeters = 1609.34;

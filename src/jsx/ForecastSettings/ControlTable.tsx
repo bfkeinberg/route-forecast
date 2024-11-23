@@ -29,6 +29,10 @@ export const ControlTable = () => {
     const onCellValueChanged = (rowIndex : number, field : string, value : (string | number)) => {
         if (field === "duration") {
             value = Number(value)
+            // do not allow bogus duration values to be entered
+            if (Number.isNaN(value)) {
+                value = 0
+            }
         }
         updateControls(controls.map((control, index) => (index === rowIndex ? {...control, [field]: value} : control)))
     }
