@@ -3,7 +3,6 @@ import { getRouteNumberFromValue } from '../utils/util';
 import { StravaActivityData, StravaActivityStream } from '../utils/stravaRouteParser';
 import { reset } from './routeParamsSlice';
 import { rwgpsRouteSet } from './routeParamsSlice';
-import { act } from 'react';
 const defaultAnalysisIntervalInHours = 1;
 
 const getAnalysisIntervalFromRouteDuration = (durationInHours: number) => {

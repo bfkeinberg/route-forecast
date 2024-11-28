@@ -141,7 +141,7 @@ export const forecastWithHook = async (forecastFunc: MutationWrapper, aqiFunc: M
     } else if (routeInfo.gpxRouteData) {
         ReactGA.event('add_payment_info', {
             value: routeInfo.gpxRouteData.tracks[0].distance.total, coupon: routeInfo.gpxRouteData.name,
-            currency: getRouteNumberFromValue(routeInfo.gpxRouteData.tracks[0].link),
+            currency: getRouteNumberFromValue(routeInfo.gpxRouteData.tracks[0].link?routeInfo.gpxRouteData.tracks[0].link.href:''),
             items: [{ item_id: '', item_name: '' }]
         });
     }
@@ -191,7 +191,7 @@ export const requestForecast = function (routeInfo: RouteInfoState) {
         } else if (routeInfo.gpxRouteData) {
             ReactGA.event('add_payment_info', {
                 value: routeInfo.gpxRouteData.tracks[0].distance.total, coupon: routeInfo.gpxRouteData.name,
-                currency: getRouteNumberFromValue(routeInfo.gpxRouteData.tracks[0].link),
+                currency: getRouteNumberFromValue(routeInfo.gpxRouteData.tracks[0].link?routeInfo.gpxRouteData.tracks[0].link.href:''),
                 items: [{ item_id: '', item_name: '' }]
             });
         }

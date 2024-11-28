@@ -140,7 +140,7 @@ type QueryParams = {
     provider: string
     interval: number
     rwgpsRoute: string
-    startTimestamp: number
+    startTimestamp: string
     zone: string
     pace: string
     metric: boolean
@@ -221,9 +221,9 @@ const updateFromQueryParams = (dispatch : AppDispatch, queryParams : QueryParams
     getStravaToken(queryParams, dispatch);
     if (queryParams.startTimestamp) {
         if (hasZone(queryParams.zone)) {
-            dispatch(startTimestampSet({ start: queryParams.startTimestamp, zone: queryParams.zone }))
+            dispatch(startTimestampSet({ start: Number.parseInt(queryParams.startTimestamp), zone: queryParams.zone }))
         } else {
-            dispatch(startTimestampSet({ start: queryParams.startTimestamp }))
+            dispatch(startTimestampSet({ start: Number.parseInt(queryParams.startTimestamp) }))
         }
     }
     if (queryParams.pace && inputPaceToSpeed[queryParams.pace.trim()]) {
@@ -269,7 +269,7 @@ const RouteWeatherUI = ({search, href, action, maps_api_key, timezone_api_key, b
     const [getAqi] = useGetAqiMutation()
     const { i18n } = useTranslation()
 
-    let queryParams = queryString.parse(search, {parseBooleans: true, parseNumbers:true});
+    let queryParams = queryString.parse(search, {parseBooleans: true, parseNumbers:false});
     const queryParamsAsObj = queryParams as unknown as QueryParams
     dispatch(querySet({url:href,search:search}))
     Sentry.setContext("query", {queryString:search})

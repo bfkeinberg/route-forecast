@@ -156,15 +156,8 @@ export const metricPaceToSpeed : PaceTable = {"Q":5, "R":6, "S":8, "T":10, 'A-':
 
 export const getRouteNumberFromValue = (value : string) => {
   if (value !== '' && value !== null) {
-      // is this just a number or a full url?
-      let route : number | string = parseInt(value);
-      if (isNaN(route)) {
         // the id may be too large to fit into a Number, so don't rely on that
-          route = value.substring(value.lastIndexOf('/') + 1)
-      } else {
-        return value
-      }
-      return route;
+        return value.substring(value.lastIndexOf('/') + 1)
   }
   return value;
 }
