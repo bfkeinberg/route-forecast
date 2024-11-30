@@ -156,8 +156,12 @@ export const metricPaceToSpeed : PaceTable = {"Q":5, "R":6, "S":8, "T":10, 'A-':
 
 export const getRouteNumberFromValue = (value : string) => {
   if (value !== '' && value !== null) {
-        // the id may be too large to fit into a Number, so don't rely on that
-        return value.substring(value.lastIndexOf('/') + 1)
+    const lastSlashIndex = value.lastIndexOf('/');
+    if (lastSlashIndex >= 0) {
+      return value.substring(lastSlashIndex + 1)
+    } else {
+      return value
+    }
   }
   return value;
 }
