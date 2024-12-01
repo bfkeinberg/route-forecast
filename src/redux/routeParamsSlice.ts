@@ -73,6 +73,12 @@ const routeParamsSlice = createSlice({
         stopAfterLoadSet(state, action : PayloadAction<boolean>) {
             state.stopAfterLoad = action.payload
         },
+        rwgpsRouteSetAsNumber(state, action: PayloadAction<number>) {
+            state.rwgpsRoute = action.payload.toString()
+            state.loadingSource = null
+            state.succeeded = null
+            state.segment = routeParamsInitialState.segment
+        },
         rwgpsRouteSet(state,action : PayloadAction<string>) {
             if (action.payload) {
                 let route = getRouteNumberFromValue(action.payload);
@@ -184,4 +190,4 @@ export const routeParamsReducer = routeParamsSlice.reducer
 export const {stopAfterLoadSet,rwgpsRouteSet,startTimeSet,initialStartTimeSet,
         startTimestampSet,paceSet,intervalSet,routeIsTripSet,
         routeLoadingModeSet,reset, timeZoneSet, rusaPermRouteIdSet,
-        segmentSet} = routeParamsSlice.actions
+        segmentSet, rwgpsRouteSetAsNumber} = routeParamsSlice.actions

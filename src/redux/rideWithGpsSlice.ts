@@ -3,7 +3,7 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 export interface Favorite {
     name: string
     id: number
-    associated_object_id: string
+    associated_object_id: number
     associated_object_type: string
 }
 

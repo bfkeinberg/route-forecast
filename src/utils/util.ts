@@ -155,7 +155,7 @@ export const inputPaceToSpeed : PaceTable = {'Q':3, 'R':4, 'S':5, 'T':6, 'A-':9,
 export const metricPaceToSpeed : PaceTable = {"Q":5, "R":6, "S":8, "T":10, 'A-':15, 'A':16, 'A+':18, 'B-':18, 'B':19, 'B+':21, 'C-':21, 'C':22, 'C+':24, 'D-':24, 'D':26, 'D+':27, 'E-':27, 'E':29, "E+":31, "F":32, "F+":34};
 
 export const getRouteNumberFromValue = (value : string) => {
-  if (value !== '' && value !== null) {
+  if (value &&  typeof value === 'string') {
     const lastSlashIndex = value.lastIndexOf('/');
     if (lastSlashIndex >= 0) {
       return value.substring(lastSlashIndex + 1)

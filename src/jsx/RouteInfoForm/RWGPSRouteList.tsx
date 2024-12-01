@@ -3,7 +3,7 @@ import { Select, ItemRenderer } from "@blueprintjs/select";
 import {useRef} from 'react';
 
 import { loadFromRideWithGps } from "../../redux/loadRouteActions";
-import { routeIsTripSet, rwgpsRouteSet } from "../../redux/routeParamsSlice";
+import { routeIsTripSet, rwgpsRouteSetAsNumber } from "../../redux/routeParamsSlice";
 import { useAppSelector, useAppDispatch } from "../../utils/hooks";
 import { Favorite } from "../../redux/rideWithGpsSlice";
 
@@ -37,9 +37,9 @@ const RWGPSRouteList = ({}) => {
                         itemsEqual="associated_object_id"
                         onItemSelect={(selected) => {
                             dispatch(routeIsTripSet(selected.associated_object_type=="trip"))
-                            dispatch(rwgpsRouteSet(selected.associated_object_id))
+                            dispatch(rwgpsRouteSetAsNumber(selected.associated_object_id))
                             selectedName.current = selected.name
-                            dispatch(loadFromRideWithGps(selected.associated_object_id, selected.associated_object_type=="trip"))
+                            dispatch(loadFromRideWithGps(selected.associated_object_id.toString(), selected.associated_object_type=="trip"))
                         }}
             >
         <Button icon="map" text={selectedName.current === '' ? route_id : selectedName.current} rightIcon="double-caret-vertical" className={'glowing_input'}/>
