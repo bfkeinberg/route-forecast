@@ -83,7 +83,7 @@ interface PinnedRouteProps extends PropsFromRedux {
 const PinnedRouteLoader = ({rwgpsToken, rwgpsTokenSet, credentialsValid, 
     pinnedRoutesSet, errorDetailsSet, hasRoutes, loadingPinnedRoutes, loadingPinnedSet, 
     usePinnedRoutesSet, setShowPinnedRoutes, usingPinnedRoutes} : PinnedRouteProps) => {
-    useEffect(() => {if (usingPinnedRoutes && (!rwgpsToken || rwgpsToken===undefined)) {window.location.href = `/rwgpsAuthReq?state=${JSON.stringify(queryString.parse(location.search))}`}}, [
+    useEffect(() => {if (usingPinnedRoutes && (!rwgpsToken || rwgpsToken===undefined)) {window.location.href = `/rwgpsAuthReq?state=${location.search}`}}, [
         usingPinnedRoutes,
          credentialsValid
         ]);

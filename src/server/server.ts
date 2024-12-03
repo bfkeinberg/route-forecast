@@ -491,7 +491,7 @@ const randoplan_uri='https://www.randoplan.com/rwgpsAuthReply';
 // uncomment the line below and comment the one above when testing pinned route functions locally
 // const randoplan_uri='http://localhost:8080/rwgpsAuthReply';
 
-app.get('/rwgpsAuthReq', (req, res) => {
+app.get('/rwgpsAuthReq', (req: Request, res : Response) => {
     const state = req.query.state;
     if (state === undefined) {
         res.status(400).json({ 'status': 'Missing OAuth keys for RideWithGPS auth' });
@@ -525,7 +525,7 @@ app.get('/rwgpsAuthReply', async (req: Request, res : Response) => {
     let restoredState = {rwgpsToken:''};
     if (state && typeof state === 'string' && state !== '') {
         try {
-            restoredState = JSON.parse(decodeURIComponent(state));
+            restoredState = querystring.parse(decodeURIComponent(state.slice(1)));
         } catch (error) {
             Sentry.captureMessage(`error in state restored from RWGPS:${error} ${decodeURIComponent(state)}`)
         }
