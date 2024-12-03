@@ -166,7 +166,7 @@ const usEPAfromPm = (pm : number, rh : number) => {
     // eslint-disable-next-line no-mixed-operators
     const aqi = aqiFromPM(0.534 * pm - 0.0844 * rh + 5.604);
     if (aqi == undefined || typeof aqi == "string" || aqi < 0) {
-        Sentry.captureMessage(`weird AQI: PM=${pm} humidity=${rh}`)
+        Sentry.captureMessage(`weird AQI: ${aqi} PM=${pm} humidity=${rh}`)
         return pm;
     }
     return aqi;
