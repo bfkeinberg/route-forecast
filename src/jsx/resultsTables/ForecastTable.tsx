@@ -124,13 +124,11 @@ const ForecastTable = (adjustedTimes : AdjustedTimes) => {
     const distHeaderText = <span>{metric ? 'KM' : 'Mile'}</span>
     const distHeader = <DesktopTooltip content={t('tooltips.distHeader')} placement={'top'}>{distHeaderText}</DesktopTooltip>
 
-    ReactGA.event('select_content', {content_type : 'gusts'})
-    const toggleGustDisplay = () => {return setShowGusts(!showGusts)}
+    const toggleGustDisplay = () => {ReactGA.event('select_content', {content_type : 'gusts'}); return setShowGusts(!showGusts)}
     const windHeaderText = <Button small onClick={toggleGustDisplay} >{showGusts ? t('data.wind.gust') : t('data.wind.speed')}</Button>;
     const windHeader = <DesktopTooltip content={t('tooltips.windHeader')} placement={'top'}>{windHeaderText}</DesktopTooltip>
 
-    ReactGA.event('select_content', {content_type : 'feelsLike'})
-    const toggleApparentDisplay = () => {return setShowApparentTemp(!showApparentTemp)}
+    const toggleApparentDisplay = () => {ReactGA.event('select_content', {content_type : 'feelsLike'}); return setShowApparentTemp(!showApparentTemp)}
 
     const temperatureHeaderText = <Button small onClick={toggleApparentDisplay}>{showApparentTemp ? t('tableHeaders.temperature') : <Icon icon="temperature"/>}</Button>
     const temperatureHeader = <DesktopTooltip content={t('tooltips.temperatureHeader')} placement={'top'}>{temperatureHeaderText}</DesktopTooltip>
