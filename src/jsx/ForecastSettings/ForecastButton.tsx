@@ -242,7 +242,7 @@ const mapStateToProps = (state : RootState) =>
     ({
         fetchingForecast: state.uiInfo.dialogParams.fetchingForecast,
         // can't request a forecast without a route loaded
-        submitDisabled: !state.uiInfo.routeParams.rwgpsRouteData && !state.routeInfo.gpxRouteData === null,
+        submitDisabled: !state.uiInfo.routeParams.rwgpsRouteData && !state.routeInfo.gpxRouteData,
         queryString: state.params.queryString,
         routeNumber: state.uiInfo.routeParams.rwgpsRoute !== '' ? state.uiInfo.routeParams.rwgpsRoute : state.strava.route,
         startTimestamp: state.uiInfo.routeParams.startTimestamp,
