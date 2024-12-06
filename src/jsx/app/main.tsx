@@ -154,7 +154,7 @@ type QueryParams = {
 }
 const setupBrowserForwardBack = (dispatch : AppDispatch, origin : string, forecastFunc : MutationWrapper, aqiFunc : MutationWrapper) => {
     if (typeof window !== 'undefined') {
-        window.addEventListener( "popstate", (event) => {
+        window.onpopstate = (event) => {
             Sentry.addBreadcrumb({
                     category: 'history',
                     level: "info",
@@ -172,7 +172,6 @@ const setupBrowserForwardBack = (dispatch : AppDispatch, origin : string, foreca
             } else {
                 // reload previous or next route when moving throw browser history with forward or back buttons
                 let queryParams = queryString.parse(event.state, {parseBooleans: true, parseNumbers:true});
-                const startTimestamp = queryParams.startTimestamp
                 dispatch(querySet({url:`${origin}/?${event.state}`,search:event.state}))
                 updateFromQueryParams(dispatch, queryParams as unknown as QueryParams);
                 if (queryParams.rwgpsRoute !== undefined || queryParams.strava_route) {
@@ -180,7 +179,6 @@ const setupBrowserForwardBack = (dispatch : AppDispatch, origin : string, foreca
                 }
             }
         }
-        )
     }
 }
 
