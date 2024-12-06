@@ -168,7 +168,7 @@ class AnalyzeRoute {
             .filter((point : RwgpsPoint) => point.x !== undefined && point.y !== undefined)
             .map((point : RwgpsPoint)  => ({ lat: point.y, lon: point.x, elevation: point.e, dist: point.d }))
         } else {
-            return routeData['trackroute']['track_points']
+            return routeData['trip']['track_points']
             .filter((point : RwgpsPoint) => point.x !== undefined && point.y !== undefined)
             .map((point : RwgpsPoint)  => ({ lat: point.y, lon: point.x, elevation: point.e, dist: point.d }))
         }
