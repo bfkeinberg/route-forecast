@@ -97,7 +97,7 @@ const MobileUITabs = (props : MobileUIPropTypes) => {
                         <NavbarDivider />
                         <Sentry.ErrorBoundary fallback={<h2>Something went wrong.</h2>}>
                             <Link to={"/controlPoints/"} className={'nav-link'}>
-                                <Button small icon={<Shop/>} title={"controls"} intent={pathname.startsWith('/controlPoints')?Intent.PRIMARY:Intent.NONE} />
+                                <Button small disabled={!routeData} icon={<Shop/>} title={"controls"} intent={pathname.startsWith('/controlPoints')?Intent.PRIMARY:Intent.NONE} />
                             </Link>
                         </Sentry.ErrorBoundary>
                         <NavbarDivider />

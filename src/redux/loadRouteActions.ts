@@ -40,6 +40,11 @@ export const loadFromRideWithGps = function (routeNumber? : string, isTrip? : bo
             isTrip = isTrip || getState().uiInfo.routeParams.rwgpsRouteIsTrip
             dispatch(routeLoadingBegun('rwgps'));
             dispatch(cancelForecast())
+            Sentry.addBreadcrumb({
+                category: 'loading',
+                level: "info",
+                message: `Loading route ${routeNumber}`
+            })            
             return loadRwgpsRoute(routeNumber, isTrip, getState().rideWithGpsInfo.token).then(async (routeData) => {
                 dispatch(rwgpsRouteLoaded(routeData));
                 const extractedControls = extractControlsFromRoute(routeData);
