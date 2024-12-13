@@ -130,43 +130,10 @@ const aqiFromPM = function (pm : number) {
     return undefined;
 }
 
-// function bplFromPM (pm) {
-//     if (isNaN(pm)) {return 0;}
-//     if (pm == undefined) {return 0;}
-//     if (pm < 0) {return 0;}
-
-//     //
-//     //       Good                              0 - 50         0.0 - 15.0         0.0 – 12.0
-//     // Moderate                        51 - 100           >15.0 - 40        12.1 – 35.4
-//     // Unhealthy for Sensitive Groups   101 – 150     >40 – 65          35.5 – 55.4
-//     // Unhealthy                                 151 – 200         > 65 – 150       55.5 – 150.4
-//     // Very Unhealthy                    201 – 300 > 150 – 250     150.5 – 250.4
-//     // Hazardous                                 301 – 400         > 250 – 350     250.5 – 350.4
-//     // Hazardous                                 401 – 500         > 350 – 500     350.5 – 500
-//     //
-//     if (pm > 350.5) {
-//         return 401;
-//     } else if (pm > 250.5) {
-//         return 301;
-//     } else if (pm > 150.5) {
-//         return 201;
-//     } else if (pm > 55.5) {
-//         return 151;
-//     } else if (pm > 35.5) {
-//         return 101;
-//     } else if (pm > 12.1) {
-//         return 51;
-//     } else if (pm >= 0) {
-//         return 0;
-//     }
-//     return 0;
-// }
-
 const usEPAfromPm = (pm : number, rh : number) => {
     // eslint-disable-next-line no-mixed-operators
     const aqi = aqiFromPM(0.534 * pm - 0.0844 * rh + 5.604);
     if (aqi == undefined || typeof aqi == "string" || aqi < 0) {
-        Sentry.captureMessage(`weird AQI: ${aqi} PM=${pm} humidity=${rh}`)
         return pm;
     }
     return aqi;
