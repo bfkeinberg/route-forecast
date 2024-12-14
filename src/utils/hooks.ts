@@ -185,9 +185,8 @@ const usePointsAndBounds = () : PointsAndBounds => {
         gpxParser.parseGpxRouteStream(gpxRouteData)), [gpxRouteData])
     }
   } else if (rwgpsRouteData !== null) {
-    console.log('computing points and bounds for RWGPS case');
-    // pointsAndBounds = useMemo(() => gpxParser.computePointsAndBounds(rwgpsRouteData, "rwgps"), [rwgpsRouteData])
-    pointsAndBounds = gpxParser.computePointsAndBounds(gpxParser.parseRwgpsRouteStream(rwgpsRouteData))
+    pointsAndBounds = useMemo(() => gpxParser.computePointsAndBounds(gpxParser.parseRwgpsRouteStream(rwgpsRouteData)), [rwgpsRouteData])
+    // pointsAndBounds = gpxParser.computePointsAndBounds(gpxParser.parseRwgpsRouteStream(rwgpsRouteData))
     if (!pointsAndBounds) {
       console.log(`no points and bounds from RWGPS data with ${rwgpsRouteData[rwgpsRouteData.type].track_points.length} points`)
     }
