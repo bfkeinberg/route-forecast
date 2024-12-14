@@ -41,21 +41,24 @@ app.use(compression());
 
 const bitly_token = process.env.BITLY_TOKEN
 if (!bitly_token) {
+    console.error('No Bitly token')
     process.exit(1)
 }
 
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
-
-const publicPath = express.static(path.resolve(__dirname, '../static'), { fallthrough: false, index: false });
-app.use('/static', expressStaticGzip(path.resolve(__dirname, '../'), {
+const publicPath = express.static(path.resolve(__dirname, '../static'), { maxAge: 864000 });
+// commented out to see if this actually affects performance one way or another (12/14/24)
+/* app.use('/static', expressStaticGzip(path.resolve(__dirname, '../'), {
     enableBrotli: true,
     orderPreference: [
         'br',
         'gz'
     ]
 }));
+ */
 app.use('/static', publicPath);
+
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use('/worker.js', limiter)
 app.get('/worker.js', (req: Request, res : Response) => {
