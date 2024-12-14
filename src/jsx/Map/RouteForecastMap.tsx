@@ -15,8 +15,8 @@ import {useTranslation} from 'react-i18next'
 import { Forecast, mapViewedSet } from '../../redux/forecastSlice';
 import { CalculatedValue } from 'utils/gpxParser';
 import { useAppSelector, useAppDispatch } from '../../utils/hooks';
-const arrowPath = "m-.232.134c-1.104 0-2-.224-2-.5v-31.634c0-.276.896-.5 2-.5s2 .224 2 .5v31.634C1.768-.09.876.134-.232.134m12.651-20.5c-.128 0-.256-.049-.354-.146l-12.179-12.183-12.184 12.183c-.195.195-.512.195-.707 0s-.195-.512 0-.707l12.538-12.537c.093-.093.22-.146.353-.146l0 0c.133 0 .26.053.354.146l12.533 12.536c.195.195.195.512 0 .707-.098.098-.226.147-.354.147z"
-
+const arrowPath = "m-73.637-56.784c-2.8921-.0141-6.6497 2.8952-10.656 10-12.45 22.079-15.664 65.233 25.767 88.08 40.568 22.371 83.426 4.9745 100.5 1.1419l2.9688 14.406 48.125-42.781-61.125-20.281 3.3438 16.156c-18.421 6.6331-55.449 17.699-79.125 9.375-31.372-11.03-33.61-33.618-29.106-47.628 4.9119-15.28 5.6751-28.438-.6875-28.469z"
+const curvedArrowPath = "m-74.637-54.784c-2.8921-.0141-6.6497 2.8952-10.656 10-12.45 22.079-15.664 65.233 25.767 88.08 40.568 22.371 83.426 4.9745 100.5 1.1419l2.9688 14.406 48.125-42.781-61.125-20.281 3.3438 16.156c-18.421 6.6331-55.449 17.699-79.125 9.375-31.372-11.03-33.61-33.618-29.106-47.628 4.9119-15.28 5.6751-28.438-.6875-28.469z"
 const findMarkerInfo = (forecast : Array<Forecast>, subrange : [number,number] | []) => {
     if (!subrange || subrange.length !== 2) {
         return [];
@@ -228,14 +228,14 @@ const pickArrowColor = (relBearing : number, windSpeed : number) => {
             return '#ff9900'
         }
     } else {
-        return '#4169E1 ';
+        return '#2a57df '
     }
 }
 
-const viewbox_0 = "-25 -35 55 50"
-const viewbox_90 = "-20 -20 55 55"
-const viewbox_180 = "-35 -20 55 55"
-const viewbox_270 = "-33 -35 60 60"
+const viewbox_0 = "-93 -93 380 299"
+const viewbox_90 = "-93 -93 380 299"
+const viewbox_180 = "-93 -93 380 299"
+const viewbox_270 = "-93 -93 380 299"
 
 const pickViewbox = (rotation : number) => {
     if (rotation < 90) return viewbox_0
@@ -245,53 +245,54 @@ const pickViewbox = (rotation : number) => {
 }
 
 const pickWidth = (rotation : number) => {
-    if (rotation < 90) return 55
-    if (rotation < 180) return 55
-    if (rotation < 270) return 55
-    return 60
+    if (rotation < 90) return 93
+    if (rotation < 180) return 93
+    if (rotation < 270) return 93
+    return 93
 }
 
 const pickHeight = (rotation : number) => {
-    if (rotation < 90) return 50
-    if (rotation < 180) return 55
-    if (rotation < 270) return 55
-    return 60
+    if (rotation < 90) return 93
+    if (rotation < 180) return 93
+    if (rotation < 270) return 93
+    return 93
 }
 
 type ArrowProps = {
     rotation: number
-    distance: string
     relBearing: number
     windSpeed: number
+    distance: string
 }
-export const RotatedArrow = ({rotation, distance, relBearing, windSpeed} : ArrowProps) => {
+export const RotatedArrow = ({rotation, relBearing, windSpeed, distance} : ArrowProps) => {
+    const gradientId = `gradualFill-${distance}`
     return (
         <svg viewBox={pickViewbox(rotation)}
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
             width={pickWidth(rotation)}
             height={pickHeight(rotation)}
-            x="-24"
-            y="-35"
+            x="-93"
+            y="-93"
         >
             <defs>
-                <radialGradient id="movingShade" fy="25%">
-                    <stop offset="0%" stopColor={pickArrowColor(relBearing, windSpeed)} stopOpacity="95%"></stop>
-                    <stop offset="50%" stopColor="#ffb833" stopOpacity="50%"/>
-                    <stop offset="75%" stopColor="#ffd280" stopOpacity="25%"/>
-                    <stop offset="100%" stopColor='#ffff80' stopOpacity="5%"></stop>
-                    <animate attributeName="fy" dur="1900ms" from="90%" to="10%" repeatCount="indefinite" />
-                </radialGradient>
+                <linearGradient id={gradientId} >
+                    <stop offset="0" stopColor={pickArrowColor(relBearing, windSpeed)}>
+                        <animate dur="1s" attributeName='offset' from="0" to="1" begin="1s" fill="freeze" repeatCount="4" />
+                    </stop>
+                    <stop offset='0' stopColor='#ffffff'>
+                        <animate dur="1s" attributeName='offset' from="0" to="1" begin="1s" fill="freeze" repeatCount="4" />
+                    </stop>
+                </linearGradient>
             </defs>
             <path
                 stroke='gray'
                 strokeLinecap="round"
                 strokeOpacity={'40%'}
-                d={arrowPath}
-                fill={`url(#movingShade)`}
-                transform={`rotate(${rotation},-0.234,0.134)`}
+                d={curvedArrowPath}
+                fill={`url(#${gradientId}`}
+                transform={`rotate(${rotation}, 0, 0)`}
             />
-            {/* <text x={rotation<179?"7":"5"} y={rotation>90&&rotation<180?"-10":"13"} fill="black" fontSize={14}>{distance.toFixed()}</text> */}
         </svg>
     )
 }
@@ -314,7 +315,7 @@ const TempMarker = ({ latitude, longitude, value, title, bearing, relBearing, wi
             title={title}
         >
             <>
-            <RotatedArrow rotation={flippedBearing} distance={value} relBearing={relBearing} windSpeed={parseInt(windSpeed)} />
+            <RotatedArrow rotation={flippedBearing} relBearing={relBearing} windSpeed={parseInt(windSpeed)} distance={value}/>
             <div style={{
                     width: 30,
                     height: 30,
