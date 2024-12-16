@@ -156,6 +156,10 @@ const ForecastButton = ({fetchingForecast,submitDisabled, routeNumber, startTime
     }
 
     const forecastClick = async (event : React.MouseEvent) => {
+        const replay = Sentry.getReplay();
+        if (replay) {
+            replay.startBuffering();
+        }
         if (event.altKey) {
             //ReactGA.event()
             grabAllPossibleForecasts(forecastRequestData.current)

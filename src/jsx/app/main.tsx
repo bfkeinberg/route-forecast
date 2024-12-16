@@ -170,6 +170,11 @@ const setupBrowserForwardBack = (dispatch : AppDispatch, origin : string, foreca
                     message:'Moving back and resetting state'
                 })
             } else {
+                Sentry.addBreadcrumb({
+                    category: 'reset',
+                    level: 'info',
+                    message:'Moving through history'
+                })
                 // reload previous or next route when moving throw browser history with forward or back buttons
                 let queryParams = queryString.parse(event.state, {parseBooleans: true, parseNumbers:true});
                 dispatch(querySet({url:`${origin}/?${event.state}`,search:event.state}))

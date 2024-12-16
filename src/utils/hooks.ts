@@ -305,6 +305,10 @@ const useForecastRequestData = () => {
   const getForecastRequestData = () => {
     if (!type || !routeData) {
       Sentry.captureMessage(`useForecastRequestData() called before route loaded : ${!!rwgpsRouteData} ${!!gpxRouteData}`)
+        const replay = Sentry.getReplay();
+        if (replay) {
+            replay.stop();
+        }
       return { length: 0, daysInFuture:0, last:DateTime.now().toString() }
     }
     const forecastRequest = getForecastRequest(

@@ -231,10 +231,10 @@ const pickArrowColor = (relBearing : number, windSpeed : number) => {
     }
 }
 
-const viewbox_0 = "-93 -93 380 299"
+const viewbox_0 = "-93 -93 380 235"
 const viewbox_90 = "-93 -93 380 299"
-const viewbox_180 = "-93 -93 380 299"
-const viewbox_270 = "-93 -93 380 299"
+const viewbox_180 = "-93 -93 380 235"
+const viewbox_270 = "-93 -93 380 235"
 
 const pickViewbox = (rotation : number) => {
     if (rotation < 90) return viewbox_0
@@ -251,10 +251,10 @@ const pickWidth = (rotation : number) => {
 }
 
 const pickHeight = (rotation : number) => {
-    if (rotation < 90) return 93
+    if (rotation < 90) return 45
     if (rotation < 180) return 93
-    if (rotation < 270) return 93
-    return 93
+    if (rotation < 270) return 45
+    return 40
 }
 
 type ArrowProps = {
@@ -267,6 +267,7 @@ export const RotatedArrow = ({rotation, relBearing, windSpeed, distance} : Arrow
     const gradientId = `gradualFill-${distance}`
     return (
         <svg viewBox={pickViewbox(rotation)}
+            preserveAspectRatio='meet'
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
             width={pickWidth(rotation)}
