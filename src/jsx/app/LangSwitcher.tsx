@@ -2,6 +2,7 @@ import { Button, ButtonGroup } from '@blueprintjs/core';
 import i18n from 'i18next'
 import * as React from 'react';
 import {useTranslation} from 'react-i18next'
+import * as Sentry from "@sentry/react";
 
 type language = { 'nativeName' : string}
 type languages = { [languageName : string] : language}
@@ -11,6 +12,14 @@ const lngs: languages = {
   fr: { nativeName: 'Français' }
 };
 
+const addBreadcrumb = (msg : string) => {
+    Sentry.addBreadcrumb({
+        category: 'language',
+        level: "info",
+        message: msg
+    })
+}
+
 const LangSwitcher = () => {
     const { t } = useTranslation();
     return (
@@ -18,7 +27,8 @@ const LangSwitcher = () => {
             <ButtonGroup style={{ position: 'absolute', bottom: '0px' }}>
                 <Button minimal active disabled>{t('labels.language')}</Button>
                 {Object.keys(lngs).map((lng) => (
-                    <Button key={lng} style={{ fontWeight: i18n.language === lng ? 'bold' : 'normal' }} type="submit" onClick={() => i18n.changeLanguage(lng)}>
+                    <Button key={lng} style={{ fontWeight: i18n.language === lng ? 'bold' : 'normal' }} type="submit" 
+                    onClick={() => {addBreadcrumb(`Switching to ${lng}`); i18n.changeLanguage(lng)}}>
                         {lngs[lng].nativeName}
                     </Button>
                 ))}

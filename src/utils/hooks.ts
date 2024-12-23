@@ -304,11 +304,8 @@ const useForecastRequestData = () => {
   const segment = useAppSelector(state => state.uiInfo.routeParams.segment)
   const getForecastRequestData = () => {
     if (!type || !routeData) {
-      Sentry.captureMessage(`useForecastRequestData() called before route loaded : ${!!rwgpsRouteData} ${!!gpxRouteData}`)
-        const replay = Sentry.getReplay();
-        if (replay) {
-            replay.stop();
-        }
+      // removed Sentry message here because this can happen when the language selection buttons are used
+      // after a route has already been loaded
       return { length: 0, daysInFuture:0, last:DateTime.now().toString() }
     }
     const forecastRequest = getForecastRequest(
