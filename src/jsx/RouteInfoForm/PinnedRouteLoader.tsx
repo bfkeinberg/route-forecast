@@ -37,7 +37,11 @@ const getPinnedRoutes = async (rwgpsToken : string,
         return null
     }
     
-    const url = `/pinned_routes?token=${rwgpsToken}`;
+    const url = `/pinned_routes?token=${rwgpsToken}`
+    if (url.endsWith('undefined')) {
+        rwgpsTokenSet(null);
+        return null
+    }
     try {
         const response = await axios.get(url);
         return response.data;
