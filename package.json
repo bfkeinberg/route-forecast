@@ -1,6 +1,6 @@
 {
   "name": "route_weather",
-  "version": "4.2.5",
+  "version": "4.2.6",
   "description": "Forecast weather along a route from RideWithGps or Strava. Support for others may be added if there is demand",
   "main": "jsx/server/index.js",
   "engines": {
@@ -9,7 +9,7 @@
   "dependencies": {
     "@babel/runtime": "^7.14.0",
     "@blueprintjs/core": "^5.0.1",
-    "@blueprintjs/datetime2": "^2.3.11",
+    "@blueprintjs/datetime2": "^2.3.21",
     "@blueprintjs/icons": "^5.0.0",
     "@blueprintjs/select": "^5.0.1",
     "@emotion/react": "^11.7.1",
@@ -99,7 +99,7 @@
     "@babel/preset-react": "^7.10.4",
     "@sentry/webpack-plugin": "^2.17.0",
     "@tsconfig/node22": "^22.0.0",
-    "@types/chrome": "^0.0.287",
+    "@types/chrome": "^0.0.296",
     "@types/google.maps": "^3.58.1",
     "@types/jest": "^29.5.12",
     "@types/node": "^22.5.0",
