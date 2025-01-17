@@ -181,6 +181,7 @@ const ForecastButton = ({fetchingForecast,submitDisabled, routeNumber, startTime
             const aqiResults = await forecastAndAqiResults[1]
             let filteredResults = forecastResults.filter(result => result.status === "fulfilled").map(result => (result as PromiseFulfilledResult<{forecast:Forecast}>).value)
             filteredResults.sort((l, r) => l.forecast.distance - r.forecast.distance)
+            filteredResults = removeDuplicateForecasts(filteredResults)            
             let filteredAqi = aqiResults.filter(result => result.status === "fulfilled").map(result => (result as PromiseFulfilledResult<{aqi:{aqi:number}}>).value)
             const firstForecastResult = filteredResults.shift()
             if (firstForecastResult) {

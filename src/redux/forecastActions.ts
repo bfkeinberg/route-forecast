@@ -117,7 +117,7 @@ export const removeDuplicateForecasts = (results : Array<{forecast:Forecast}>) =
             }
         }
     }
-    for (let i = 0; i < results.length-1; ++i) {
+    for (let i = 0; i < results.length; ++i) {
         if (!resultsToRemove.includes(i)) {
             deduplicatedResults.push(results[i])
         }

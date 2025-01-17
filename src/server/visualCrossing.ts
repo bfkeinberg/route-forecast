@@ -5,6 +5,24 @@ import { DateTime } from "luxon";
 import { WeatherFunc } from "./weatherForecastDispatcher";
 const Sentry = require('@sentry/node')
 
+const convertToValidStart = (currentTime : string) => {
+    let startTime = DateTime.fromISO(currentTime, { zone: 'utc' });
+    // round up to nearest hour
+    if (startTime.minute >= 25) {
+        let startTimeObj = startTime.toObject()
+        if (startTimeObj.hour && startTimeObj.day) {
+            if (startTimeObj.hour < 23) {
+                startTimeObj.hour++
+                startTimeObj.minute = 0
+            } else {
+                startTimeObj.hour = 0
+                startTimeObj.day++
+            }
+            startTime = DateTime.fromObject(startTimeObj,{ zone: 'utc' })
+        }
+    }
+    return startTime
+}
 /**
  *
  * @param {number} lat latitude
@@ -31,7 +49,7 @@ const callVisualCrossing = async function (lat : number, lon : number, currentTi
     if (!visualCrossingKey) {
         throw new Error("Missing Visual Crossing key")
     }
-    const startTime = DateTime.fromISO(currentTime, { zone: 'utc' });
+    const startTime = convertToValidStart(currentTime)
     const startTimeString = startTime.toUnixInteger();
     const url = new URL(`https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/${lat},${lon}/${startTimeString}`);
     url.searchParams.append('unitGroup', 'us');
