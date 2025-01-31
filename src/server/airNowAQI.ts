@@ -21,7 +21,7 @@ axiosRetry(axiosInstance, {
         console.log(`AirNow axios retry count ${retryCount} for ${requestConfig.url}`);
     },
     onMaxRetryTimesExceeded: (err: any) => {
-        console.log(`last AirNow axios error after retrying was ${err}`)
+        Sentry.captureMessage(`last AirNow axios error after retrying was ${err}`)
     }
 });
 
