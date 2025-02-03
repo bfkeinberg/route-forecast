@@ -19,7 +19,7 @@
     "@mui/material": "^6.1.4",
     "@reduxjs/toolkit": "^2.2.3",
     "@sentry/browser": "^8.4.0",
-    "@sentry/node": "^8.28.0",
+    "@sentry/node": "^8.54.0",
     "@sentry/profiling-node": "^8.35.0",
     "@sentry/react": "^8.4.0",
     "@sentry/tracing": "^7.114.0",
