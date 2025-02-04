@@ -267,7 +267,7 @@ export const RotatedArrow = ({rotation, relBearing, windSpeed, distance} : Arrow
     const gradientId = `gradualFill-${distance}`
     return (
         <svg viewBox={pickViewbox(rotation)}
-            preserveAspectRatio='meet'
+            preserveAspectRatio='xMaxYMax meet'
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
             width={pickWidth(rotation)}
