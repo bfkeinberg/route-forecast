@@ -6,11 +6,12 @@ type CloseHandler = (event?: React.SyntheticEvent | Event, reason?: SnackbarClos
 
 const ErrorDisplayer = ({ errorDetails, onClose } : {errorDetails : string, onClose: CloseHandler}) => {
     return (
-        <Snackbar sx={{ height: "100%" }} open={true} autoHideDuration={6000} onClose={onClose} anchorOrigin={{ vertical: 'top', horizontal: 'left' }}>
+        <Snackbar sx={{ height: "100%" }} open={true} autoHideDuration={3000} onClose={onClose} anchorOrigin={{ vertical: 'top', horizontal: 'left' }}>
             <Alert
                 severity="error"
                 // variant="outlined"
                 sx={{ width: '100%' }}
+                onClose={() => {}}  // providing this should result in a close button showing
             >
                 {errorDetails}
             </Alert>
