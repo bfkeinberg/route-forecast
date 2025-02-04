@@ -21,6 +21,7 @@ import { RootState } from '../app/topLevel';
 import { useAppSelector, useAppDispatch } from '../../utils/hooks';
 import type {ForecastRequest} from '../../utils/gpxParser'
 import { GpxRouteData, RwgpsRoute, RwgpsTrip } from 'redux/routeInfoSlice';
+import { writeObjToFile } from '../../utils/writeToFile';
 
 declare module 'react' {
     interface HTMLAttributes<T> extends AriaAttributes, DOMAttributes<T> {
@@ -134,7 +135,7 @@ const ForecastButton = ({fetchingForecast,submitDisabled, routeNumber, startTime
     }
 
     interface AllForecasts {
-        [index:string]:any
+        [index:string]:Forecast[]
     }
 
     const grabAllPossibleForecasts = async (forecastData : ForecastData) => {
@@ -145,14 +146,7 @@ const ForecastButton = ({fetchingForecast,submitDisabled, routeNumber, startTime
                         filter(entry => entry[1].max_days >= forecastData.daysInFuture).
                         map(async (provider) => allForecasts[provider[0]] = await getForecastForProvider(provider[0])))
         // download the file
-        const aElement = document.createElement('a');
-        aElement.setAttribute('download', 'forecasts.json');
-
-        const href = URL.createObjectURL(new Blob([JSON.stringify(allForecasts)], {type:'application/json'}))
-        aElement.href = href;
-        aElement.setAttribute('target', '_blank');
-        aElement.click();
-        URL.revokeObjectURL(href)
+        writeObjToFile(allForecasts, true)
     }
 
     const forecastClick = async (event : React.MouseEvent) => {
@@ -261,6 +255,10 @@ const mapStateToProps = (state : RootState) =>
 const mapDispatchToProps = {
     querySet
 };
+
+export     interface AllForecasts {
+    [index:string]:Forecast[]
+}
 
 const connector = connect(mapStateToProps,mapDispatchToProps)
 export default connector(ForecastButton);

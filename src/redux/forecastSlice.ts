@@ -23,6 +23,7 @@ export type Forecast = {
     lat: number
     lon: number
     rainy: boolean
+    provider?: string
 }
 
 export type ForecastInfo = {
