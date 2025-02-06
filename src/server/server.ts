@@ -17,7 +17,7 @@ const upload = multer({
 }); // for parsing multipart/form-data
 import callWeatherService from './weatherForecastDispatcher'
 const url = require('url');
-const strava = require('strava-v3');
+import strava from 'strava-v3'
 // const { Datastore } = require('@google-cloud/datastore');
 // const cors = require('cors');
 import getPurpleAirAQI from'./purpleAirAQI'
@@ -456,14 +456,14 @@ app.post('/bitly', async (req : Request, res: Response) => {
     res.json({ error, url })
 });
 
-const getStravaAuthUrl = (baseUrl : string, state: string) => {
+const getStravaAuthUrl = async (baseUrl : string, state: string) => {
     if (baseUrl === 'http://localhost:8080') {
         process.env.STRAVA_REDIRECT_URI = baseUrl + '/stravaAuthReply';
     }
     else {
         process.env.STRAVA_REDIRECT_URI = 'https://www.randoplan.com/stravaAuthReply';
     }
-    return strava.oauth.getRequestAccessURL({ scope: 'activity:read_all,read_all', state: encodeURIComponent(state) });
+    return await strava.oauth.getRequestAccessURL({ scope: 'activity:read_all,read_all', state: encodeURIComponent(state) });
 };
 
 interface StravaToken {
@@ -471,13 +471,15 @@ interface StravaToken {
         access_token: string
         refresh_token: string
         expires_at: string
+        message: string
+        errors: Array<{resource:string, field:string, code:string}>
     }
+    statusCode: number
+    statusMessage: string
 }
 const getStravaToken = (code : string) => {
     process.env.STRAVA_ACCESS_TOKEN = 'fake';
-    return new Promise<StravaToken>((resolve, reject) => {
-        strava.oauth.getToken(code, (err: { msg: any; } | null, payload: StravaToken) => {if (err !== null) {reject(err.msg)} else {resolve(payload)}});
-    });
+    return strava.oauth.getToken(code, (err: { msg: any; } | null, payload: StravaToken) => {console.log(`token was ${JSON.stringify(payload.body)}`)})
 };
 
 /* const insertFeatureRecord = (record, featureName, user : string) => {
@@ -543,7 +545,7 @@ app.get('/rwgpsAuthReply', async (req: Request, res : Response) => {
     }
 });
 
-app.get('/stravaAuthReq', (req : Request, res : Response) => {
+app.get('/stravaAuthReq', async (req : Request, res : Response) => {
     const state = req.query.state;
     if (!state || typeof state !== 'string') {
         res.status(400).json({ 'status': 'Missing OAuth state from Strava' });
@@ -564,7 +566,7 @@ app.get('/stravaAuthReq', (req : Request, res : Response) => {
         protocol: req.protocol,
         host: req.get('host')
     });
-    res.redirect(getStravaAuthUrl(baseUrl, state));
+    res.redirect(await getStravaAuthUrl(baseUrl, state));
 
 });
 
@@ -588,32 +590,28 @@ app.get('/stravaAuthReply', async (req : Request, res : Response) => {
     }
     if (error === undefined && typeof code === "string") {
         process.env.STRAVA_CLIENT_SECRET = process.env.STRAVA_API_KEY;
-        try {
-            const token = await getStravaToken(code)
-                .catch(error => { 
-                    Sentry.captureMessage('got bad auth reply'); 
-                    res.status(400).json({ 'status': `Bad Strava auth reply ${error}` })
-                });
-            if (!token) return
-            restoredState.strava_access_token = token.body.access_token;
-            restoredState.strava_refresh_token = token.body.refresh_token;
-            restoredState.strava_token_expires_at = token.body.expires_at;
-        } catch (err : any) {
-            Sentry.captureException(err, {tags: {where:'Fetching Strava token'}})
-            res.status(400).json({ 'status': `Bad Strava auth reply ${err.message}` })
-            error = err.message
-        }
+        getStravaToken(code).then(token => {
+            restoredState.strava_access_token = token.access_token;
+            restoredState.strava_refresh_token = token.refresh_token;
+            restoredState.strava_token_expires_at = token.expires_at;   
+            delete restoredState.strava_error 
+            res.redirect(url.format('/?') + querystring.stringify(restoredState));
+        }).catch(err => {
+            Sentry.captureMessage(`got bad Strava auth reply ${err.message}`); 
+            restoredState.strava_error = error = err.message
+            res.redirect(url.format('/?') + querystring.stringify(restoredState));
+        })
     }
     else {
         restoredState.strava_activity = undefined;
+        if (typeof error === 'string') restoredState.strava_error = error;
+        res.redirect(url.format('/?') + querystring.stringify(restoredState));
     }
-    if (typeof error === 'string') restoredState.strava_error = error;
-    res.redirect(url.format('/?') + querystring.stringify(restoredState));
 });
 
 app.get('/refreshStravaToken', async (req: Request, res : Response) => {
     const refreshToken = req.query.refreshToken;
-    if (refreshToken === undefined) {
+    if (typeof refreshToken !== 'string') {
         res.status(400).json({ 'status': 'Bad call to refresh Strava token' });
         return;
     }
