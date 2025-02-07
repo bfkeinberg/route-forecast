@@ -505,7 +505,7 @@ app.get('/rwgpsAuthReq', (req: Request, res : Response) => {
     const rwgpsBaseOAuth = 'https://ridewithgps.com/oauth/authorize';
     const oauth_client = process.env.RWGPS_OAUTH_CLIENT_ID;
     const rwgpsUrl = `${rwgpsBaseOAuth}?client_id=${oauth_client}&redirect_uri=${randoplan_uri}&response_type=code&state=${state}`;
-
+    Sentry.addBreadcrumb({category:'rwgps', level:'info', message: rwgpsUrl})
     res.redirect(rwgpsUrl);
 });
 
