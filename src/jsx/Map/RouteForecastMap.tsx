@@ -357,6 +357,9 @@ interface ControlMarkerProps {
     value: string
 }
 const ControlMarker = ({ latitude, longitude, value = '' } : ControlMarkerProps) => {
+    if (!latitude || !longitude) {
+        return <div/>
+    }
     return <AdvancedMarker position={{ lat: latitude, lng: longitude }} title={value} >
         <img src={circus_tent} width={32} height={32} />
     </AdvancedMarker>;
