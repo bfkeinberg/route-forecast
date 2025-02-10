@@ -8,7 +8,7 @@
   },
   "dependencies": {
     "@babel/runtime": "^7.14.0",
-    "@blueprintjs/core": "^5.0.1",
+    "@blueprintjs/core": "^5.16.5",
     "@blueprintjs/datetime2": "^2.3.21",
     "@blueprintjs/icons": "^5.0.0",
     "@blueprintjs/select": "^5.0.1",
