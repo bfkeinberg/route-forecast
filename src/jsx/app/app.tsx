@@ -34,7 +34,6 @@ else {
             Sentry.init({
                 dsn: 'https://ea4c472ff9054dab8c18d594b95d8da2@sentry.io/298059',
                 environment: 'production',
-                autoSessionTracking: true,
                 ignoreErrors: [
                     "Non-Error exception captured",
                     "Non-Error promise rejection captured"
@@ -46,6 +45,7 @@ else {
                         filterKeys: [sentry_app_id],
                         behaviour: "drop-error-if-exclusively-contains-third-party-frames"
                     }),
+                    Sentry.browserSessionIntegration(),
                     Sentry.browserTracingIntegration(),
                     Sentry.replayIntegration({
                         maskAllText: false,
@@ -57,7 +57,6 @@ else {
                     })
                 ],
                 denyUrls: ["https://maps.googleapis"],
-                enableTracing: true,
                 // To set a uniform sample rate
                 tracesSampleRate: Number.parseFloat(trace_sample_rate?trace_sample_rate:'0.1'),
                 tracePropagationTargets: ["localhost", /^https:\/\/www\.randoplan\.com/],
