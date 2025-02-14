@@ -151,7 +151,7 @@ const ForecastButton = ({fetchingForecast,submitDisabled, routeNumber, startTime
 
     const forecastClick = async (event : React.MouseEvent) => {
         if (event.altKey) {
-            //ReactGA.event()
+            ReactGA.event('generate_lead', {currency:'USD', value: distanceInKm})
             grabAllPossibleForecasts(forecastRequestData.current)
             return
         }
