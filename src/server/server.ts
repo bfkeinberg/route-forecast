@@ -566,6 +566,7 @@ app.get('/stravaAuthReq', async (req : Request, res : Response) => {
         protocol: req.protocol,
         host: req.get('host')
     });
+    Sentry.addBreadcrumb({category:'strava', level:'info', message: state})
     res.redirect(await getStravaAuthUrl(baseUrl, state));
 
 });
