@@ -298,7 +298,7 @@ const ForecastTable = (adjustedTimes : AdjustedTimes) => {
 
     const isLandscape = useMediaQuery({query:'(orientation:landscape)'})
     const isLargeEnough = useMediaQuery({query:'(min-width: 950px)'})
-    const hasStdDev = forecast[0].stdDev
+    const hasStdDev = forecast[0] && forecast[0].stdDev
 
     return (
 
