@@ -260,6 +260,7 @@ const ForecastTable = (adjustedTimes : AdjustedTimes) => {
                         <td>{showApparentTemp?
                             // eslint-disable-next-line multiline-ternary
                             <i>{formatTemperature(point.feel.toString(), celsius)}</i>:formatTemperature(point.temp, celsius)}</td>
+                        {point.stdDev?<td>{point.stdDev?point.stdDev.toFixed(1):<span/>}</td>:<></>}
                         <td className='chanceRain'>{point.precip}</td>
                         <MediaQuery minWidth={maxWidthForMobile}>
                             <td>{point.humidity}</td>
@@ -297,7 +298,8 @@ const ForecastTable = (adjustedTimes : AdjustedTimes) => {
 
     const isLandscape = useMediaQuery({query:'(orientation:landscape)'})
     const isLargeEnough = useMediaQuery({query:'(min-width: 950px)'})
-    
+    const hasStdDev = forecast[0].stdDev
+
     return (
 
         <div className="animated slideInLeft">
@@ -356,6 +358,9 @@ const ForecastTable = (adjustedTimes : AdjustedTimes) => {
                                 <th><span className={'headerCell'}>{distHeader}</span></th>
                                 <th><span style={{display:"inline-block", width:"60px"}}className={'headerCell'}>{t('tableHeaders.summary')}</span></th>
                                 <th id={'temp'} className={'clickableHeaderCell'}>{temperatureHeader}</th>
+                                {hasStdDev?<th>
+                                    <span className={'symbolHeaderCell'}>&#x3c3;<Icon icon="temperature"/></span>
+                                </th>:<></>}
                                 <th>
                                     <span className={'headerCell'}>
                                         <DesktopTooltip content={t('tooltips.scrollToRain')} placement={'top'}>

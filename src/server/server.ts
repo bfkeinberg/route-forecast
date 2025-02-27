@@ -245,8 +245,58 @@ app.get('/cache/index', (req : Request, res : Response) => {
 
 let cache = apicache.options(
     {
-        trackPerformance:true,
-        appendKey: (req : Request, res : Response) => req.body.locations.lat.toString() + req.body.locations.lon.toString() + req.body.locations.time + req.body.service})
+        trackPerformance: true,
+        appendKey: (req: Request, res: Response) => req.body.locations.lat.toString() + req.body.locations.lon.toString() + req.body.locations.time + req.body.service
+    })
+
+import {std} from "mathjs"
+
+const stdDevPrecip = (forecastPoint: { lat: number; lon: number; time: string; distance: number; bearing: number; isControl: boolean; }, 
+    zone: string, services: string, res: Response, ip? : string) => {
+    const serviceList = services.split(",").filter(service => service != "climacell")
+    try {
+        const multipleResults = serviceList.map((service: string) => {
+            const result = callWeatherService(service, forecastPoint.lat,
+                 forecastPoint.lon, forecastPoint.time, forecastPoint.distance, 
+                 zone, forecastPoint.bearing, forecastPoint.isControl).catch((error: Error) => {
+                throw error;
+            })
+            if (!process.env.NO_LOGGING) {
+                logger.info(`Done with request to ${service} from ${ip}`);
+            }
+            return result
+        })
+        Promise.all(multipleResults).then(awaitedResults => {
+            const tempArray = awaitedResults.map(result => parseInt(result.temp)).sort((a, b) => a - b)
+            // total the results
+            const stdDev = std(tempArray)
+            const resultsWithStdDev = {
+                ...awaitedResults[0], 
+                stdDev: stdDev
+            }
+            res.status(200).json({ 'forecast': resultsWithStdDev });
+        })
+    } catch (error) {
+        if (!process.env.NO_LOGGING) {
+            logger.info(`Error with request from ${ip}`);
+        }
+        res.status(500).json({ 'details': `Error calling weather service : ${error}` });
+        return
+    }
+}
+    
+/* const calculateMedian = (arr: Array<number>) => {
+    const len = arr.length;
+
+    if (len % 2 === 0) {
+        const mid1 = arr[len / 2 - 1];
+        const mid2 = arr[len / 2];
+        return (mid1 + mid2) / 2;
+    } else {
+        return arr[Math.floor(len / 2)];
+    }
+}
+ */
 
 app.post('/forecast_one', cache.middleware(), upload.none(), async (req : Request, res : Response) => {
     if (req.body.locations === undefined) {
@@ -278,6 +328,10 @@ app.post('/forecast_one', cache.middleware(), upload.none(), async (req : Reques
     //     }
     // }
     const zone = req.body.timezone;
+    if (service.indexOf(',') >= 0) {
+        stdDevPrecip(forecastPoints, zone, service, res, req.ip)
+        return
+    }
     try {
         const point = forecastPoints
         const result = await callWeatherService(service, point.lat, point.lon, point.time, point.distance, zone, point.bearing, point.isControl).catch((error: Error) => {

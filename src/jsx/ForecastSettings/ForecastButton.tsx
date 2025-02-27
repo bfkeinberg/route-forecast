@@ -51,10 +51,14 @@ const ForecastButton = ({fetchingForecast,submitDisabled, routeNumber, startTime
         const { t } = useTranslation()
         const forecastRequestData = useRef(useForecastRequestData())
         const [optionPressed, setOptionPressed] = useState(false)
+        const [shiftPressed, setShiftPressed] = useState(false)
 
     const keyIsDown = (event : KeyboardEvent) => {
-        if (event.code === "AltLeft" || event.code === "AltRight"   ) {
+        if (event.code === "AltLeft" || event.code === "AltRight") {
             setOptionPressed(true)
+        }
+        if (event.code === "ShiftLeft" || event.code === "ShiftRight") {
+            setShiftPressed(true)
         }
     }
 
@@ -62,17 +66,20 @@ const ForecastButton = ({fetchingForecast,submitDisabled, routeNumber, startTime
         if (event.code === "AltLeft" || event.code === "AltRight") {
             setOptionPressed(false)
         }
+        if (event.code === "ShiftLeft" || event.code === "ShiftRight") {
+            setShiftPressed(false)
+        }
     }
 
     React.useEffect(() => {
         window.addEventListener('keydown', keyIsDown);
         window.addEventListener('keyup', keyIsUp);
         
-        return () => {
+/*         return () => {
             window.removeEventListener('keydown', keyIsDown);
             window.removeEventListener('keyup', keyIsUp);
         }
-    }, [optionPressed])
+ */    }, [optionPressed, shiftPressed])
 
     const forecastByParts = (forecastRequest : Array<ForecastRequest>, zone : string, service : string, routeName : string, routeNumber : string) => {
         let requestCopy = Object.assign(forecastRequest)
@@ -149,12 +156,28 @@ const ForecastButton = ({fetchingForecast,submitDisabled, routeNumber, startTime
         writeObjToFile(allForecasts, true)
     }
 
+    const getValidProviders = (forecastData: ForecastData, provider: string) =>
+    {
+        ReactGA.event('level_end', {level_name:'USD', success: true})
+        const providerList = Object.entries(providerValues).
+            filter(entry => entry[1].maxCallsPerHour === undefined ||
+                entry[1].maxCallsPerHour > forecastData.length).
+            filter(entry => entry[1].max_days >= forecastData.daysInFuture).
+            map(value => value[0]);
+        // put the primary forecast provider at the front
+        const index = providerList.indexOf(provider);
+        providerList.splice(index, 1);
+        providerList.unshift(provider);
+        return providerList.join(",")
+    }
+
     const forecastClick = async (event : React.MouseEvent) => {
-        if (event.altKey) {
+        if (event.altKey && !event.shiftKey) {
             ReactGA.event('generate_lead', {currency:'USD', value: distanceInKm})
             grabAllPossibleForecasts(forecastRequestData.current)
             return
         }
+        let forecastProvider = (event.altKey && event.shiftKey) ? getValidProviders(forecastRequestData.current, provider) : provider
         // await Sentry.startSpan({ name: "forecastClick" }, async () => {
             dispatch(forecastFetchBegun())
             const reactEventParams = {
@@ -166,7 +189,7 @@ const ForecastButton = ({fetchingForecast,submitDisabled, routeNumber, startTime
             // below makes Typescript happy but should not be neccessary given that the button ought to be
             // disabled via submitDisabled in this case
             if (!routeData) {return}
-            const forecastAndAqiResults = doForecastByParts(provider, routeData)
+            const forecastAndAqiResults = doForecastByParts(forecastProvider, routeData)
             const forecastResults = await forecastAndAqiResults[0]
             if (forecastResults.length===0) {
                 dispatch(forecastFetchFailed('No forecast was returned'))
@@ -210,6 +233,7 @@ const ForecastButton = ({fetchingForecast,submitDisabled, routeNumber, startTime
     const smallScreen = useMediaQuery({query: "(max-width: 800px)"})
     forecastRequestData.current = useForecastRequestData()
 
+    const buttonText = (optionPressed && shiftPressed) ? "Compute standard deviation" : (optionPressed ? "Download all forecasts" : t("buttons.forecast"))
     return (
         <DesktopTooltip content={tooltipContent}>
             <div id='forecast' style={{ 'display': 'flex', width: '100%', justifyContent: "center", margin: "10px 0px 0px 10px", flex: 1.6 }} cursor='not-allowed'>
@@ -226,7 +250,7 @@ const ForecastButton = ({fetchingForecast,submitDisabled, routeNumber, startTime
                     fill={true}
                     loading={forecastFetchResult.isLoading || aqiFetchResult.isLoading || fetchingForecast}
                 >
-                    {forecastFetchResult.isLoading ? t('buttons.forecastPending') : (optionPressed ? "Download all forecasts" : t("buttons.forecast"))}
+                    {forecastFetchResult.isLoading ? t('buttons.forecastPending') : buttonText}
                 </Button>
             </div>
         </DesktopTooltip>
