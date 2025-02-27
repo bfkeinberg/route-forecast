@@ -24,6 +24,7 @@ export type Forecast = {
     lon: number
     rainy: boolean
     provider?: string
+    stdDev?: number
 }
 
 export type ForecastInfo = {

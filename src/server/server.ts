@@ -249,19 +249,9 @@ let cache = apicache.options(
         appendKey: (req: Request, res: Response) => req.body.locations.lat.toString() + req.body.locations.lon.toString() + req.body.locations.time + req.body.service
     })
 
-const calculateMedian = (arr: Array<number>) => {
-    const len = arr.length;
+import {std} from "mathjs"
 
-    if (len % 2 === 0) {
-        const mid1 = arr[len / 2 - 1];
-        const mid2 = arr[len / 2];
-        return (mid1 + mid2) / 2;
-    } else {
-        return arr[Math.floor(len / 2)];
-    }
-}
-
-const averageForecasts = (forecastPoint: { lat: number; lon: number; time: string; distance: number; bearing: number; isControl: boolean; }, 
+const stdDevPrecip = (forecastPoint: { lat: number; lon: number; time: string; distance: number; bearing: number; isControl: boolean; }, 
     zone: string, services: string, res: Response, ip? : string) => {
     const serviceList = services.split(",").filter(service => service != "climacell")
     try {
@@ -277,70 +267,36 @@ const averageForecasts = (forecastPoint: { lat: number; lon: number; time: strin
             return result
         })
         Promise.all(multipleResults).then(awaitedResults => {
-            //calculate medians
-            const precipArray = awaitedResults.map(result => parseFloat(result.precip)).sort((a, b) => a - b)
-            const humidityArray = awaitedResults.map(result => result.humidity).sort((a, b) => a - b)
-            const cloudCoverArray = awaitedResults.map(result => parseFloat(result.cloudCover)).sort((a, b) => a - b)
-            const windSpeedArray = awaitedResults.map(result => parseInt(result.windSpeed)).sort((a, b) => a - b)
-            const windBearingArray = awaitedResults.map(result => parseInt(result.windBearing)).sort((a, b) => a - b)
-            const gustArray = awaitedResults.map(result => parseInt(result.gust)).sort((a, b) => a - b)
             const tempArray = awaitedResults.map(result => parseInt(result.temp)).sort((a, b) => a - b)
-            const relBearingArray = awaitedResults.map(result => result.relBearing).sort((a, b) => a - b)
-            const vectorBearingArray = awaitedResults.map(result => result.vectorBearing).sort((a, b) => a - b)
-            const feelArray = awaitedResults.map(result => result.feel).sort((a, b) => a - b)
             // total the results
-/*             const totaledResults = awaitedResults.reduce((accum, current) => {
-                return {...current, 
-                    precip:accum.precip+parseFloat(current.precip),
-                    humidity:accum.humidity+current.humidity,
-                    cloudCover:accum.cloudCover+parseFloat(current.cloudCover),
-                    windSpeed:accum.windSpeed+parseInt(current.windSpeed),
-                    temp:accum.temp+parseInt(current.temp),
-                    relBearing:accum.relBearing+current.relBearing,
-                    vectorBearing:accum.vectorBearing+current.vectorBearing,
-                    windBearing:accum.windBearing+current.windBearing,
-                    gust:accum.gust+parseInt(current.gust),
-                    feel:accum.feel+current.feel
-                }
-            }, {temp:0, windSpeed:0, cloudCover:0, humidity:0, precip:0, gust:0, feel:0, vectorBearing:0, relBearing:0,windBearing:0})
- */            // and average them
-/*             const averagedResults = 
-                {...totaledResults, 
-                    precip:(totaledResults.precip/awaitedResults.length).toFixed(1) + "%",
-                    humidity:Math.round(totaledResults.humidity/awaitedResults.length),
-                    cloudCover:Math.round(totaledResults.cloudCover/awaitedResults.length),
-                    windSpeed:Math.round(totaledResults.windSpeed/awaitedResults.length),
-                    temp:Math.round(totaledResults.temp/awaitedResults.length),
-                    relBearing:Math.round(totaledResults.relBearing/awaitedResults.length),
-                    vectorBearing:Math.round(totaledResults.vectorBearing/awaitedResults.length),
-                    gust:Math.round(totaledResults.gust/awaitedResults.length),
-                    feel:Math.round(totaledResults.feel/awaitedResults.length),
-                    windBearing:Math.round(totaledResults.windBearing/awaitedResults.length)
-                } 
-            } */
-           // get the medians
-            const medianResults = {...awaitedResults[0],
-                precip:calculateMedian(precipArray).toFixed(1) + "%",
-                humidity:Math.round(calculateMedian(humidityArray)),
-                temp:Math.round(calculateMedian(tempArray)),
-                feel:Math.round(calculateMedian(feelArray)),
-                cloudCover:Math.round(calculateMedian(cloudCoverArray)),
-                windSpeed:Math.round(calculateMedian(windSpeedArray)),
-                gust:Math.round(calculateMedian(gustArray)),
-                windBearing:Math.round(calculateMedian(windBearingArray)),
-                vectorBearing:Math.round(calculateMedian(vectorBearingArray)),
-                relBearing:Math.round(calculateMedian(relBearingArray))
+            const stdDev = std(tempArray)
+            const resultsWithStdDev = {
+                ...awaitedResults[0], 
+                stdDev: stdDev
             }
-            res.status(200).json({ 'forecast': medianResults });
+            res.status(200).json({ 'forecast': resultsWithStdDev });
         })
     } catch (error) {
         if (!process.env.NO_LOGGING) {
             logger.info(`Error with request from ${ip}`);
         }
         res.status(500).json({ 'details': `Error calling weather service : ${error}` });
+        return
     }
-    return
 }
+    
+/* const calculateMedian = (arr: Array<number>) => {
+    const len = arr.length;
+
+    if (len % 2 === 0) {
+        const mid1 = arr[len / 2 - 1];
+        const mid2 = arr[len / 2];
+        return (mid1 + mid2) / 2;
+    } else {
+        return arr[Math.floor(len / 2)];
+    }
+}
+ */
 
 app.post('/forecast_one', cache.middleware(), upload.none(), async (req : Request, res : Response) => {
     if (req.body.locations === undefined) {
@@ -373,7 +329,7 @@ app.post('/forecast_one', cache.middleware(), upload.none(), async (req : Reques
     // }
     const zone = req.body.timezone;
     if (service.indexOf(',') >= 0) {
-        averageForecasts(forecastPoints, zone, service, res, req.ip)
+        stdDevPrecip(forecastPoints, zone, service, res, req.ip)
         return
     }
     try {

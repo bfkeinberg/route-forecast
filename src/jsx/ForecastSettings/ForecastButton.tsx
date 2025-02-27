@@ -156,14 +156,19 @@ const ForecastButton = ({fetchingForecast,submitDisabled, routeNumber, startTime
         writeObjToFile(allForecasts, true)
     }
 
-    const getValidProviders = (forecastData: ForecastData) =>
+    const getValidProviders = (forecastData: ForecastData, provider: string) =>
     {
         ReactGA.event('level_end', {level_name:'USD', success: true})
-        return Object.entries(providerValues).
+        const providerList = Object.entries(providerValues).
             filter(entry => entry[1].maxCallsPerHour === undefined ||
                 entry[1].maxCallsPerHour > forecastData.length).
             filter(entry => entry[1].max_days >= forecastData.daysInFuture).
-            map(value => value[0]).join(",")
+            map(value => value[0]);
+        // put the primary forecast provider at the front
+        const index = providerList.indexOf(provider);
+        providerList.splice(index, 1);
+        providerList.unshift(provider);
+        return providerList.join(",")
     }
 
     const forecastClick = async (event : React.MouseEvent) => {
@@ -172,7 +177,7 @@ const ForecastButton = ({fetchingForecast,submitDisabled, routeNumber, startTime
             grabAllPossibleForecasts(forecastRequestData.current)
             return
         }
-        let forecastProvider = (event.altKey && event.shiftKey) ? getValidProviders(forecastRequestData.current) : provider
+        let forecastProvider = (event.altKey && event.shiftKey) ? getValidProviders(forecastRequestData.current, provider) : provider
         // await Sentry.startSpan({ name: "forecastClick" }, async () => {
             dispatch(forecastFetchBegun())
             const reactEventParams = {
@@ -228,7 +233,7 @@ const ForecastButton = ({fetchingForecast,submitDisabled, routeNumber, startTime
     const smallScreen = useMediaQuery({query: "(max-width: 800px)"})
     forecastRequestData.current = useForecastRequestData()
 
-    const buttonText = (optionPressed && shiftPressed) ? "Average forecasts" : (optionPressed ? "Download all forecasts" : t("buttons.forecast"))
+    const buttonText = (optionPressed && shiftPressed) ? "Compute standard deviation" : (optionPressed ? "Download all forecasts" : t("buttons.forecast"))
     return (
         <DesktopTooltip content={tooltipContent}>
             <div id='forecast' style={{ 'display': 'flex', width: '100%', justifyContent: "center", margin: "10px 0px 0px 10px", flex: 1.6 }} cursor='not-allowed'>

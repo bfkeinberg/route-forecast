@@ -39,6 +39,12 @@ img#bugImage {
     /* width: 60% */
 }
 
+.symbolHeaderCell {
+    font-size: 120%;
+    width: 28px;
+    display: block;
+}
+
 .clickableHeaderCell {
     font-size: 80%;
     /* width: 60%; */
