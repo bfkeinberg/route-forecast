@@ -16,15 +16,16 @@ const upload = multer({
     limits: { fieldSize: 2 * 1024 * 1024 }
 }); // for parsing multipart/form-data
 import callWeatherService from './weatherForecastDispatcher'
-const url = require('url');
+import url from 'url'
 import strava from 'strava-v3'
 // const { Datastore } = require('@google-cloud/datastore');
 // const cors = require('cors');
 import getPurpleAirAQI from'./purpleAirAQI'
 import getAirNowAQI from './airNowAQI'
-const querystring = require('querystring');
+import querystring from 'querystring';
 import * as Sentry from "@sentry/node"
 import axios, { AxiosError, isAxiosError } from 'axios';
+import {std} from "mathjs";
 
 import RateLimit from 'express-rate-limit'
 var limiter = RateLimit({
@@ -249,7 +250,6 @@ let cache = apicache.options(
         appendKey: (req: Request, res: Response) => req.body.locations.lat.toString() + req.body.locations.lon.toString() + req.body.locations.time + req.body.service
     })
 
-import {std} from "mathjs"
 
 const stdDevPrecip = (forecastPoint: { lat: number; lon: number; time: string; distance: number; bearing: number; isControl: boolean; }, 
     zone: string, services: string, res: Response, ip? : string) => {
@@ -581,7 +581,7 @@ const getRwgpsTokenFromCode = async (code : string) => {
 
 app.get('/rwgpsAuthReply', async (req: Request, res : Response) => {
     const state = req.query.state;
-    let restoredState = {rwgpsToken:''};
+    let restoredState;// = {rwgpsToken:''};
     if (state && typeof state === 'string' && state !== '') {
         try {
             restoredState = querystring.parse(decodeURIComponent(state.slice(1)));
@@ -589,7 +589,7 @@ app.get('/rwgpsAuthReply', async (req: Request, res : Response) => {
             Sentry.captureMessage(`error in state restored from RWGPS:${error} ${decodeURIComponent(state)}`)
         }
     }
-    if (req.query.code && typeof req.query.code === 'string') {
+    if (req.query.code && typeof req.query.code === 'string' && restoredState) {
         const token = await getRwgpsTokenFromCode(req.query.code);
         restoredState.rwgpsToken = token;
         res.redirect(url.format('/?') + querystring.stringify(restoredState));
@@ -638,6 +638,7 @@ app.get('/stravaAuthReply', async (req : Request, res : Response) => {
         strava_refresh_token: string
         strava_token_expires_at: string
         strava_error: string | undefined
+        [index:string]:any
     }
     let restoredState = {} as RestoredState;
     if (state && typeof state === 'string' && state !== '') {
