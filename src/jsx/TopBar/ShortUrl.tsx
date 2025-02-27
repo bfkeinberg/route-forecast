@@ -11,7 +11,7 @@ const ShortUrl = ({shortUrl} : {shortUrl:string}) => {
             <div style={{width: "150px", display: "flex", alignItems: "center"}}>
                 <div>Shareable link:</div>
             </div>
-            <InputGroup id={'shortUrl'} size="small" readOnly type="text" value={shortUrl}
+            <InputGroup id={'shortUrl'} size="small" readOnly fill={false} type="text" value={shortUrl}
                    onClick={async event => {
                        try {
                             await navigator.clipboard.writeText((event.target as HTMLInputElement).value);
