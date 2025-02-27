@@ -590,9 +590,13 @@ app.get('/rwgpsAuthReply', async (req: Request, res : Response) => {
             Sentry.captureMessage(`error in state restored from RWGPS:${error} ${decodeURIComponent(state)}`)
         }
     }
-    if (req.query.code && typeof req.query.code === 'string' && restoredState) {
+    if (req.query.code && typeof req.query.code === 'string') {
         const token = await getRwgpsTokenFromCode(req.query.code);
-        restoredState.rwgpsToken = token;
+        if (restoredState) {
+            restoredState.rwgpsToken = token;
+        } else {
+            restoredState = {rwgpsToken : token}
+        }
         res.redirect(url.format('/?') + querystring.stringify(restoredState));
     } else {
         Sentry.captureMessage(`redirected with no code provided - ${JSON.stringify(req.query)}`);
