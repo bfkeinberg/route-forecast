@@ -25,7 +25,8 @@ import getAirNowAQI from './airNowAQI'
 import querystring from 'querystring';
 import * as Sentry from "@sentry/node"
 import axios, { AxiosError, isAxiosError } from 'axios';
-import {std} from "mathjs";
+// import {std} from "mathjs";
+const math = require('mathjs');
 
 import RateLimit from 'express-rate-limit'
 var limiter = RateLimit({
@@ -269,7 +270,7 @@ const stdDevPrecip = (forecastPoint: { lat: number; lon: number; time: string; d
         Promise.all(multipleResults).then(awaitedResults => {
             const tempArray = awaitedResults.map(result => parseInt(result.temp)).sort((a, b) => a - b)
             // total the results
-            const stdDev = std(tempArray)
+            const stdDev = math.std(tempArray)
             const resultsWithStdDev = {
                 ...awaitedResults[0], 
                 stdDev: stdDev
