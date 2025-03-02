@@ -9,7 +9,8 @@ type languages = { [languageName : string] : language}
 
 const lngs: languages = {
   'en-US': { nativeName: 'English' },
-  fr: { nativeName: 'Français' }
+  fr: { nativeName: 'Français' },
+  es: {nativeName: 'Español'}
 };
 
 const addBreadcrumb = (msg : string) => {
@@ -25,7 +26,7 @@ const LangSwitcher = () => {
     return (
         <div>
             <ButtonGroup style={{ position: 'absolute', bottom: '0px' }}>
-                <Button minimal active disabled>{t('labels.language')}</Button>
+                <Button variant='minimal' active disabled>{t('labels.language')}</Button>
                 {Object.keys(lngs).map((lng) => (
                     <Button key={lng} style={{ fontWeight: i18n.language === lng ? 'bold' : 'normal' }} type="submit" 
                     onClick={() => {addBreadcrumb(`Switching to ${lng}`); i18n.changeLanguage(lng)}}>

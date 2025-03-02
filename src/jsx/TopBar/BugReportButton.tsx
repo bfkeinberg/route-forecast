@@ -20,7 +20,7 @@ const BugReportButton = () => {
                 <Button className="pt-intent-warning"
                         style={{ height: buttonHeight }}
                         text={t('buttons.bugReport')}
-                        small
+                        size="small"
                         ref={buttonRef}
                 >
                         <img style={buttonDimensions} id='bugImage' src={LadyBug} />

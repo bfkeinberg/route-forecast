@@ -40,7 +40,7 @@ const AddRowButton = () => {
   const dispatch = useAppDispatch()
   return (
     <div style={{border: "1px solid black", width: "100%"}} onClick={() => dispatch(controlAdded())}>
-      <Button id={'addButton'} style={{width: "100%"}} minimal={true} tabIndex={0} icon={"add"}>Add</Button>
+      <Button id={'addButton'} style={{width: "100%"}} variant='minimal' tabIndex={0} icon={"add"}>Add</Button>
     </div>
   )
 }

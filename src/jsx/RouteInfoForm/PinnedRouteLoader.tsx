@@ -108,8 +108,8 @@ const PinnedRouteLoader = ({rwgpsToken, rwgpsTokenSet, credentialsValid,
     return (
         <>
             <Button intent="primary"
-                small={true}
-                outlined={usingPinnedRoutes}
+                size='small'
+                variant={usingPinnedRoutes?'outlined':'solid'}
                 active={usingPinnedRoutes}
                 icon="star"
                 loading={loadingPinnedRoutes}

@@ -1,0 +1,112 @@
+{
+  "translation": {
+    "buttons": {
+      "bugReport": "Informar un error",
+      "donate": "Donar",
+      "loadRoute": "Cargar ruta",
+      "usePinned": "Usar rutas marcadas",
+      "dontUsePinned": "No usar rutas marcadas",
+      "stops": "Agregar paradas",
+      "forecast": "Pronóstico",
+      "forecastPending": "Creando pronóstico...",
+      "zoomToSegment": "Zoom",
+      "banked": "Mostrar tiempo acumulado"
+    },
+    "labels": {
+      "language": "Seleccionar idioma",
+      "routeType": "Tipo de ruta",
+      "ridingPace": "Ritmo en terreno llano",
+      "startingTime": "Hora de inicio",
+      "miles": "Las unidades son millas, etc.",
+      "englishSystem": "Imperial",
+      "metricSystem": "Métrico",
+      "kilometers": "Unidades en métrico",
+      "projectedFinish": "Hora de finalización proyectada",
+      "interval": "Intervalo de pronóstico en minutos",
+      "source": "Fuente de pronóstico del tiempo",
+      "customSegment": "Usar longitud de segmento personalizada",
+      "degreesF": "Temperatura en grados F",
+      "degreesC": "Temperatura en grados C"
+    },
+    "titles": {
+      "routeInfo": "Información de la ruta",
+      "forecastSettings": "Pronóstico Ajustes",
+      "forecast": "Pronóstico",
+      "paceAnalysis": "Análisis de ritmo",
+      "rwgpsId": "Recorrido con ID de ruta GPS",
+      "loading": "Carga de ruta",
+      "forecastControls": "Controles de pronóstico",
+      "map": "Mapa de pronóstico"
+    },
+    "tooltips": {
+      "ridingPace": "Velocidad en terreno llano, que se reducirá al ascender",
+      "actualPace": "El ritmo de recorrido real fue",
+      "interval": "Con qué frecuencia generar pronósticos meteorológicos en minutos",
+      "provider": "El proveedor meteorológico que se utilizará para los pronósticos",
+      "forecast": {
+        "enabled": "Solicitar un pronóstico de recorrido",
+        "disabled": "Debe proporcionar un ID de ruta rwgps"
+      },
+      "startingTime": "Cuándo planea comenzar a recorrer",
+      "distHeader": "Distancia al inicio del segmento",
+      "windHeader": "Haga clic para alternar entre la velocidad promedio del viento y las ráfagas de viento",
+      "temperatureHeader": "Haga clic para alternar entre la temperatura y la temperatura aparente",
+      "aqiHeader": "La calidad del aire muestra las condiciones actuales, no las pronosticadas. Haga clic para alternar entre el próximo pronóstico solicitado",
+      "overallPace": "El ritmo es la velocidad promedio ajustada para el ascenso",
+      "analysisInterval": "Intervalo en horas en el que se calcula el ritmo efectivo",
+      "zoom": "Si se debe hacer zoom en los segmentos de la ruta al pasar el cursor sobre su línea en la tabla",
+      "customSegment": "Pronosticar solo esta parte de la ruta",
+      "bearingHeader": "Haga clic para alternar entre rumbo de viento absoluto y relativo",
+      "copyTable": "Copiar tabla de pronóstico",
+      "scrollToRain": "Traer a la vista la primera línea de pronóstico con cambio de lluvia",
+      "banked": "Muestra cuántos minutos quedan para llegar a los tiempos de finalización del brevet ACP/RUSA"
+    },
+    "data": {
+      "noForecastPlaceholder": "Buscar pronóstico para crear",
+      "wind": {
+        "lost": "perdido",
+        "gained": "ganado",
+        "to": "al viento",
+        "from": "del viento",
+        "gust": "Ráfaga de viento",
+        "speed": "Velocidad del viento"
+      },
+      "info": {
+        "temperature": "Temperatura"
+      },
+      "summary": "Usa datos meteorológicos y del terreno para crear un plan de ruta para tus recorridos.",
+      "loading": "Puedes cargar rutas desde Ride with GPS, Strava o usar los identificadores de rutas permanentes en RUSA.org. Puedes pegar la URL de una ruta desde Ride with GPS o Strava, o tomar el identificador de la información de una ruta permanente de RUSA. Alternativamente, si fijas una ruta que estás viendo en Ride with GPS, el botón a la derecha las mostrará. Te solicitará que inicies sesión en RWGPS si aún no lo has hecho.",
+      "tableHeadersDoc": "Los botones sobre los encabezados de las columnas permiten cambiar la información que se muestra, por ejemplo, temperatura absoluta vs. temperatura 'sensación térmica'"
+    },
+    "tableHeaders": {
+      "temperature": "Sensación térmica",
+      "time": "Hora",
+      "summary": "Resumen",
+      "precipitation": "Probabilidad de lluvia",
+      "humidity": "Humedad",
+      "cloudCover": "Nubosidad",
+      "windBearing": "Rumbo del viento",
+      "relBearing": "Viento relativo"
+    },
+    "toasts": {
+      "aqi": {
+        "enabled": "Obtención de AQI habilitada",
+        "disabled": "Obtención de AQI deshabilitada"
+      },
+      "tableCopied": "Tabla de pronóstico copiada"
+    },
+    "controls": {
+      "name": "Nombre",
+      "distanceMiles": "Millas",
+      "distanceKilometers": "Kilómetros",
+      "duration": "Tiempo estimado empleado",
+      "arrival": "Hora estimada de llegada",
+      "delete": "Eliminar"
+    },
+    "analysis": {
+      "overallPace": "El ritmo general ajustado a la subida fue",
+      "interval": "hora",
+      "halfHourInterval": "media hora"
+    }
+  }
+}

@@ -125,12 +125,12 @@ const ForecastTable = (adjustedTimes : AdjustedTimes) => {
     const distHeader = <DesktopTooltip content={t('tooltips.distHeader')} placement={'top'}>{distHeaderText}</DesktopTooltip>
 
     const toggleGustDisplay = () => {ReactGA.event('select_content', {content_type : 'gusts'}); return setShowGusts(!showGusts)}
-    const windHeaderText = <Button small onClick={toggleGustDisplay} >{showGusts ? t('data.wind.gust') : t('data.wind.speed')}</Button>;
+    const windHeaderText = <Button size='small' onClick={toggleGustDisplay} >{showGusts ? t('data.wind.gust') : t('data.wind.speed')}</Button>;
     const windHeader = <DesktopTooltip content={t('tooltips.windHeader')} placement={'top'}>{windHeaderText}</DesktopTooltip>
 
     const toggleApparentDisplay = () => {ReactGA.event('select_content', {content_type : 'feelsLike'}); return setShowApparentTemp(!showApparentTemp)}
 
-    const temperatureHeaderText = <Button small onClick={toggleApparentDisplay}>{showApparentTemp ? t('tableHeaders.temperature') : <Icon icon="temperature"/>}</Button>
+    const temperatureHeaderText = <Button size='small' onClick={toggleApparentDisplay}>{showApparentTemp ? t('tableHeaders.temperature') : <Icon icon="temperature"/>}</Button>
     const temperatureHeader = <DesktopTooltip content={t('tooltips.temperatureHeader')} placement={'top'}>{temperatureHeaderText}</DesktopTooltip>
 
     const copyTable = async (event: React.MouseEvent) => {
@@ -364,7 +364,7 @@ const ForecastTable = (adjustedTimes : AdjustedTimes) => {
                                 <th>
                                     <span className={'headerCell'}>
                                         <DesktopTooltip content={t('tooltips.scrollToRain')} placement={'top'}>
-                                            <Button small onClick={scrollToChanceOfRain}>{t('tableHeaders.precipitation')}</Button>
+                                            <Button size='small' onClick={scrollToChanceOfRain}>{t('tableHeaders.precipitation')}</Button>
                                         </DesktopTooltip>
                                     </span>
                                 </th>
@@ -373,14 +373,14 @@ const ForecastTable = (adjustedTimes : AdjustedTimes) => {
                                     <th><span className={'headerCell'}>{t('tableHeaders.cloudCover')}</span></th>
                                     <th className={'clickableHeaderCell'} id={'aqi'}>
                                         <DesktopTooltip content={t('tooltips.aqiHeader')} placement={'top'}>
-                                            <Button small active={fetchAqi} onClick={toggleAqi}><span className={fetchAqi ? 'largerClickableHeaderCell' : 'largerStruckClickableHeaderCell'}>AQI</span></Button></DesktopTooltip>
+                                            <Button size='small' active={fetchAqi} onClick={toggleAqi}><span className={fetchAqi ? 'largerClickableHeaderCell' : 'largerStruckClickableHeaderCell'}>AQI</span></Button></DesktopTooltip>
                                     </th>
                                 </MediaQuery>
                                 <th id={'wind'}>{windHeader}</th>
                                 <MediaQuery minWidth={501}>
                                     <th><span className={'headerCell'}>
                                         <Tooltip content={t('tooltips.bearingHeader')}>
-                                            <Button small onClick={toggleRelBearing} >{showRelativeBearing ? t('tableHeaders.relBearing') : t('tableHeaders.windBearing')}</Button></Tooltip></span></th>
+                                            <Button size='small' onClick={toggleRelBearing} >{showRelativeBearing ? t('tableHeaders.relBearing') : t('tableHeaders.windBearing')}</Button></Tooltip></span></th>
                                 </MediaQuery>
                             </tr>
                         </thead>

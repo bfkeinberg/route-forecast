@@ -293,6 +293,9 @@ const RouteWeatherUI = ({search, href, action, maps_api_key, timezone_api_key, b
     if (i18n.language === 'fr') {
         ReactGA.event('tutorial_begin')
     }
+    if (i18n.language === 'es') {
+        ReactGA.event('select_promotion', {creative_name:'es'})
+    }
     return (
         <FunAppWrapperThingForHooksUsability maps_api_key={maps_api_key} queryParams={queryParamsAsObj}/>
     )
