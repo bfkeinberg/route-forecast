@@ -9,8 +9,17 @@ import { i18n } from "i18next";
 
 const english_donation_image = 'https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif'
 const french_donation_image = 'https://www.paypalobjects.com/fr_XC/i/btn/btn_donate_LG.gif'
+const spanish_donation_image = 'https://www.paypalobjects.com/es_XC/i/btn/btn_donate_LG.gif'
+
 const donationImage = (i18next : i18n) => {
-    return (i18next.resolvedLanguage && i18next.resolvedLanguage.startsWith('fr')) ? french_donation_image : english_donation_image 
+    if (i18next.resolvedLanguage) {
+        if (i18next.resolvedLanguage.startsWith('fr')) {
+            return french_donation_image
+        } else if (i18next.resolvedLanguage.startsWith('es')) {
+            return spanish_donation_image
+        }
+    }
+    return english_donation_image
 }
 
 declare module 'react' {
