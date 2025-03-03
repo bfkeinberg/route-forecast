@@ -259,7 +259,7 @@ const stdDevPrecip = (forecastPoint: { lat: number; lon: number; time: string; d
         const multipleResults = serviceList.map((service: string) => {
             const result = callWeatherService(service, forecastPoint.lat,
                  forecastPoint.lon, forecastPoint.time, forecastPoint.distance, 
-                 zone, forecastPoint.bearing, forecastPoint.isControl).catch((error: Error) => {
+                 zone, forecastPoint.bearing, forecastPoint.isControl, 'en').catch((error: Error) => {
                 throw error;
             })
             if (!process.env.NO_LOGGING) {
@@ -329,13 +329,18 @@ app.post('/forecast_one', cache.middleware(), upload.none(), async (req : Reques
     //     }
     // }
     const zone = req.body.timezone;
+    let lang = req.body.lang
+    if (!lang) {
+        lang = 'en'
+    }
+    
     if (service.indexOf(',') >= 0) {
         stdDevPrecip(forecastPoints, zone, service, res, req.ip)
         return
     }
     try {
         const point = forecastPoints
-        const result = await callWeatherService(service, point.lat, point.lon, point.time, point.distance, zone, point.bearing, point.isControl).catch((error: Error) => {
+        const result = await callWeatherService(service, point.lat, point.lon, point.time, point.distance, zone, point.bearing, point.isControl, lang).catch((error: Error) => {
             throw error;
         })
         if (!process.env.NO_LOGGING) {
@@ -351,6 +356,7 @@ app.post('/forecast_one', cache.middleware(), upload.none(), async (req : Reques
 });
 
 app.post('/forecast', upload.none(), async (req : Request, res : Response) => {
+    Sentry.captureMessage('Forecast rather than forecast_one called');
     if (req.body.locations === undefined) {
         res.status(400).json({ 'status': 'Missing location key' });
         return;
@@ -389,7 +395,7 @@ app.post('/forecast', upload.none(), async (req : Request, res : Response) => {
         while (forecastPoints.length > 0) {
             let point = forecastPoints.shift();
             // eslint-disable-next-line no-await-in-loop
-            const result = await callWeatherService(service, point.lat, point.lon, point.time, point.distance, zone, point.bearing, point.isControl).catch((error: any) => {
+            const result = await callWeatherService(service, point.lat, point.lon, point.time, point.distance, zone, point.bearing, point.isControl, 'en').catch((error: any) => {
                 throw error;
             });
             // we explicitly do not want to parallelize to avoid swamping the servers we are calling and being throttled

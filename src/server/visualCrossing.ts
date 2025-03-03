@@ -38,7 +38,9 @@ const convertToValidStart = (currentTime : string) => {
  * vectorBearing: *, gust: string} | never>} a promise to evaluate to get the forecast results
  */
 const callVisualCrossing = async function (lat : number, lon : number, currentTime : string, 
-    distance : number, zone : string, bearing : number, getBearingDifference : (bearing: number, windBearing: number) => number, isControl : boolean) {
+    distance : number, zone : string, bearing : number, 
+    getBearingDifference : (bearing: number, windBearing: number) => number, 
+    isControl : boolean, lang: string) {
     if (typeof lat !== 'number' || lat < -90 || lat > 90 || isNaN(lat)) {
         throw new Error('Invalid latitude value');
     }
@@ -55,6 +57,7 @@ const callVisualCrossing = async function (lat : number, lon : number, currentTi
     url.searchParams.append('unitGroup', 'us');
     url.searchParams.append('include', 'current');
     url.searchParams.append('options', 'nonulls');
+    url.searchParams.append('lang', lang)
     url.searchParams.append('key', visualCrossingKey);
     const weatherResult = await axios.get(url.toString()).catch((error : any)=> {Sentry.captureMessage(`axios error ${error.response?error.response.data:error}`,'error')
         throw error.response?error.response.data:error});

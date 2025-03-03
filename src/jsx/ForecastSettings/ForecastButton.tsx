@@ -22,7 +22,7 @@ import { useAppSelector, useAppDispatch } from '../../utils/hooks';
 import type {ForecastRequest} from '../../utils/gpxParser'
 import { GpxRouteData, RwgpsRoute, RwgpsTrip } from 'redux/routeInfoSlice';
 import { writeObjToFile } from '../../utils/writeToFile';
-
+import { i18n } from 'i18next';
 declare module 'react' {
     interface HTMLAttributes<T> extends AriaAttributes, DOMAttributes<T> {
         // extends React's HTMLAttributes
@@ -52,6 +52,7 @@ const ForecastButton = ({fetchingForecast,submitDisabled, routeNumber, startTime
         const forecastRequestData = useRef(useForecastRequestData())
         const [optionPressed, setOptionPressed] = useState(false)
         const [shiftPressed, setShiftPressed] = useState(false)
+        const { i18n } = useTranslation()
 
     const keyIsDown = (event : KeyboardEvent) => {
         if (event.code === "AltLeft" || event.code === "AltRight") {
@@ -88,7 +89,8 @@ const ForecastButton = ({fetchingForecast,submitDisabled, routeNumber, startTime
         let locations = requestCopy.shift();
         let which = 0
         while (requestCopy.length >= 0 && locations) {
-            const request = {locations:locations, timezone:zone, service:service, routeName:routeName, routeNumber:routeNumber, which}
+            const request = {locations:locations, timezone:zone, service:service, routeName:routeName,
+                 routeNumber:routeNumber, lang: i18n.language, which}
             const result = forecast(request).unwrap()
             forecastResults.push(result)
             if (fetchAqi) {

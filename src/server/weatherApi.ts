@@ -21,14 +21,16 @@ const Sentry = require('@sentry/node')
  * vectorBearing: *, gust: string} | never>} a promise to evaluate to get the forecast results
  */
 const callWeatherApi = async function (lat : number, lon : number, currentTime : string, 
-    distance : number, zone : string, bearing : number, getBearingDifference : (bearing: number, windBearing: number) => number, isControl : boolean) {
+    distance : number, zone : string, bearing : number, 
+    getBearingDifference : (bearing: number, windBearing: number) => number, 
+    isControl : boolean, lang: string) {
     const weatherApiKey = process.env.WEATHER_API_KEY;
     const startTime = DateTime.fromISO(currentTime, {zone:zone});
     let hour = startTime.minute > 30 ? startTime.hour + 1 : startTime.hour;
     if (hour > 23) {
         hour = 0;
     }
-    const forecastUrl = `https://api.weatherapi.com/v1/forecast.json?key=${weatherApiKey}&q=${lat},${lon}&days=1&hour=${hour}&aqi=yes&dt=${startTime.toISODate()}`;
+    const forecastUrl = `https://api.weatherapi.com/v1/forecast.json?key=${weatherApiKey}&q=${lat},${lon}&days=1&hour=${hour}&lang=${lang}&aqi=yes&dt=${startTime.toISODate()}`;
     const historyUrl = `https://api.weatherapi.com/v1/history.json?key=${weatherApiKey}&q=${lat},${lon}&hour=${hour}&unixdt=${startTime.toUnixInteger()}`;
     const url = startTime < DateTime.now() ? historyUrl : forecastUrl;
     Sentry.setContext('url',{'url':url})

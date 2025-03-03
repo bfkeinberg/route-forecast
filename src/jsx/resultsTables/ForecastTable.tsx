@@ -14,7 +14,7 @@ import { maxWidthForMobile } from '../../utils/util';
 import { finishTimeFormat } from '../ForecastSettings/TimeFields';
 import { fetchAqiToggled, weatherRangeSet, weatherRangeToggled, zoomToRangeToggled, tableViewedSet, Forecast } from '../../redux/forecastSlice';
 import { useForecastDependentValues, useFormatSpeed } from '../../utils/hooks';
-import { milesToMeters } from '../../utils/util';
+import { milesToMeters, timeFormatForLang } from '../../utils/util';
 import { InstallExtensionButton } from "../InstallExtensionButton";
 import { AppToaster } from '../shared/toast';
 import { ToggleButton } from '../shared/ToggleButton';
@@ -47,15 +47,24 @@ const displayBacklink = (provider : string) => {
     }
 }
 
-const formatReturnedTime = (point : {time: string, zone: string}, i18n : i18n) => DateTime.fromISO(point.time, {zone:point.zone, locale:i18n.language}).toFormat('h:mm a')
+const getTimeFormat = (i18n: i18n) => {
+    let timeFormat = timeFormatForLang[i18n.language]
+    if (!timeFormat) {
+        timeFormat = timeFormatForLang['en']
+    }
+    return timeFormat
+}
+
+const formatReturnedTime = (point : {time: string, zone: string}, i18n : i18n, timeFormat: string) => DateTime.fromISO(point.time, {zone:point.zone, locale:i18n.language}).toFormat(timeFormat)
 type AdjustedTimes = {adjustedTimes:Array<{time:DateTime, index:number}>}
 const getAdjustedTime = (point : Forecast, index : number, adjustedTimes : AdjustedTimes, i18n : i18n) => {
+    const timeFormat = getTimeFormat(i18n)
     if (adjustedTimes && adjustedTimes.adjustedTimes && adjustedTimes.adjustedTimes.length > 0 &&
         adjustedTimes.adjustedTimes.findIndex(element => element.index === index) !== -1) {
         const adjustedTimeFound = adjustedTimes.adjustedTimes.find(element => element.index === index);
-        return adjustedTimeFound ? adjustedTimeFound.time.setLocale(i18n.language).toFormat('h:mm a') : formatReturnedTime(point, i18n)
+        return adjustedTimeFound ? adjustedTimeFound.time.setLocale(i18n.language).toFormat(timeFormat) : formatReturnedTime(point, i18n, timeFormat)
     } else {
-        return formatReturnedTime(point, i18n)
+        return formatReturnedTime(point, i18n, timeFormat)
     }
 }
 
@@ -254,7 +263,7 @@ const ForecastTable = (adjustedTimes : AdjustedTimes) => {
                         end={index!==forecast.length-1?forecast[index+1].distance*milesToMeters:maxDistanceInKm*1000}
                         className={selectedRow===point.distance*milesToMeters?'highlighted':undefined}
                         onClick={toggleRange} onMouseEnter={updateWeatherRange}>
-                        <td><span style={styleForControl(point)} className='timeCell'><Time time={index === forecast.length-1 ? undefined : getAdjustedTime(point,index,adjustedTimes, i18n)} zone={point.zone}/></span></td>
+                        <td><span style={styleForControl(point)} className='timeCell'><Time time={index === forecast.length-1 ? undefined : getAdjustedTime(point,index,adjustedTimes, i18n)} zone={point.zone} i18n={i18n}/></span></td>
                         <td style={styleForControl(point)}>{metric ? ((point.distance*milesToMeters)/1000).toFixed(0) : point.distance}</td>
                         <td>{point.summary}</td>
                         <td>{showApparentTemp?
@@ -401,7 +410,7 @@ const WindSpeed = ({gust, windSpeed, showGusts} : {gust: string, windSpeed: stri
     )
 }
 
-const Time = ({time, zone} : {time?: string, zone: string}) => {
+const Time = ({time, zone, i18n} : {time?: string, zone: string, i18n: i18n}) => {
     const { finishTime } = useForecastDependentValues()
     if (!finishTime) {
         Sentry.addBreadcrumb({
@@ -411,8 +420,9 @@ const Time = ({time, zone} : {time?: string, zone: string}) => {
         })                                    
     }
 
+    const timeFormat = getTimeFormat(i18n)
     return (
-        time || finishTime && DateTime.fromFormat(finishTime, finishTimeFormat, {zone:zone}).toFormat('h:mm a') || "N/A"
+        time || finishTime && DateTime.fromFormat(finishTime, finishTimeFormat, {zone:zone}).toFormat(timeFormat) || "N/A"
     )
 }
 

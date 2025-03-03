@@ -10,7 +10,8 @@
                 "forecast":"Forecast",
                 "forecastPending":"Creating forecast...",
                 "zoomToSegment":"Zoom",
-                "banked":"Display banked time"
+                "banked":"Display banked time",
+                "addControl":"Add"
             },
             "labels": {
                 "language": "Select language",

@@ -73,12 +73,12 @@ axiosRetry(axiosInstance, {
  * lat: *, lon: *, temp: string, relBearing: null, rainy: boolean, windBearing: number,
  * vectorBearing: *, gust: string} | never>} a promise to evaluate to get the forecast results
  */
-const callWeatherKit = async function (lat, lon, currentTime, distance, zone, bearing, getBearingDifference, isControl) {
+const callWeatherKit = async function (lat, lon, currentTime, distance, zone, bearing, getBearingDifference, isControl, lang) {
     const startTime = DateTime.fromISO(currentTime, { zone: 'utc' });
     const weatherKitKey = makeJwt();
     const when = startTime.toISO({ suppressMilliseconds: true });
     const later = startTime.plus({ hours: 1 }).toISO({ suppressMilliseconds: true });
-    const url = `https://weatherkit.apple.com/api/v1/weather/en/${lat}/${lon}?timezone=${zone}&dataSets=currentWeather,forecastHourly,forecastNextHour,&countryCode=US&currentAsOf=${when}&hourlyStart=${when}&hourlyEnd=${later}`;
+    const url = `https://weatherkit.apple.com/api/v1/weather/${lang}/${lat}/${lon}?timezone=${zone}&dataSets=currentWeather,forecastHourly,forecastNextHour,&countryCode=US&currentAsOf=${when}&hourlyStart=${when}&hourlyEnd=${later}`;
     Sentry.setContext('url', { 'url': url })
     const forecastResult = await axiosInstance.get(url, { headers: { 'Authorization': `Bearer ${weatherKitKey}` } }).
         catch((error: any) => {

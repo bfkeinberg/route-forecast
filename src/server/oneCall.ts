@@ -66,10 +66,11 @@ interface OneCallData {
         message: string
     },
 }
-const callOneCall = async function callWeatherApi (lat, lon, currentTime, distance, zone, bearing, getBearingDifference, isControl) {
+const callOneCall = async function callWeatherApi (lat, lon, currentTime, distance, zone, bearing, 
+    getBearingDifference, isControl, lang) {
     const oneCallKey = process.env.OPEN_WEATHER_KEY;
     const startTime = DateTime.fromISO(currentTime, {zone:zone});
-    const url = `https://api.openweathermap.org/data/3.0/onecall/timemachine?lat=${lat}&lon=${lon}&units=imperial&dt=${startTime.toUTC().toUnixInteger()}&appid=${oneCallKey}`
+    const url = `https://api.openweathermap.org/data/3.0/onecall/timemachine?lat=${lat}&lon=${lon}&units=imperial&dt=${startTime.toUTC().toUnixInteger()}&appid=${oneCallKey}&lang=${lang}`
     Sentry.setContext('url',{'url':url})
     const forecastResult = await axios.get<OneCallData>(url).catch((error : AxiosError<{cod:number, message:string}>) => {
         if ("response" in error && error.response && "data" in error.response && error.response.data && error.response.data) {

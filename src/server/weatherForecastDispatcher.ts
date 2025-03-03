@@ -16,8 +16,9 @@ const getBearingDifference = function (bearing : number,windBearing : number) {
 
 export type WeatherFunc =
     (lat : number, lon : number, 
-        currentTime : string, distance : number, zone : string, bearing : number, 
-        getBearingDifference : (bearing: number, windBearing: number) => number, isControl : boolean) =>
+        currentTime : string, distance : number, zone : string, bearing : number,
+        getBearingDifference : (bearing: number, windBearing: number) => number, isControl : boolean,
+        lang: string) =>
         Promise<{
         time: string
         zone: string,
@@ -55,33 +56,34 @@ export type WeatherFunc =
  * vectorBearing: *, gust: string} | never>} a promise to evaluate to get the forecast results
  */
 const callWeatherService = function (service : string, lat : number, lon : number, 
-    currentTime : string, distance : number, zone : string, bearing : number, isControl : boolean) {
+    currentTime : string, distance : number, zone : string, bearing : number, isControl : boolean,
+    lang: string) {
     switch (service) {
     case 'climacell':
         return Sentry.startSpan({ name: "tomorrow.io" }, () => {
-            return callTomorrowIo(lat, lon, currentTime, distance, zone, bearing, getBearingDifference, isControl)
+            return callTomorrowIo(lat, lon, currentTime, distance, zone, bearing, getBearingDifference, isControl, lang)
         })
     case 'weatherapi':
         return Sentry.startSpan({ name: "weatherapi" }, () => {
-            return callWeatherApi(lat, lon, currentTime, distance, zone, bearing, getBearingDifference, isControl)
+            return callWeatherApi(lat, lon, currentTime, distance, zone, bearing, getBearingDifference, isControl, lang)
         })
     case 'visualcrossing':
         return Sentry.startSpan({ name: "visualcrossing" }, () => {
-            return callVisualCrossing(lat, lon, currentTime, distance, zone, bearing, getBearingDifference, isControl)
+            return callVisualCrossing(lat, lon, currentTime, distance, zone, bearing, getBearingDifference, isControl, lang)
         })
     case 'nws':
         return Sentry.startSpan({ name: "nws" }, () => {
-            return callNWS(lat, lon, currentTime, distance, zone, bearing, getBearingDifference, isControl)
+            return callNWS(lat, lon, currentTime, distance, zone, bearing, getBearingDifference, isControl, lang)
         })
     case 'meteomatics':
-        return callMeteomatics(lat, lon, currentTime, distance, zone, bearing, getBearingDifference, isControl);
+        return callMeteomatics(lat, lon, currentTime, distance, zone, bearing, getBearingDifference, isControl, lang);
     case 'weatherKit':
         return Sentry.startSpan({ name: "weatherkit" }, () => {
-            return callWeatherKit(lat, lon, currentTime, distance, zone, bearing, getBearingDifference, isControl)
+            return callWeatherKit(lat, lon, currentTime, distance, zone, bearing, getBearingDifference, isControl, lang)
         })
     case 'oneCall':
         return Sentry.startSpan({ name: "oneCall" }, () => {
-            return callOneCall(lat, lon, currentTime, distance, zone, bearing, getBearingDifference, isControl)
+            return callOneCall(lat, lon, currentTime, distance, zone, bearing, getBearingDifference, isControl, lang)
         })
     default:
         return null;

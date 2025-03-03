@@ -57,6 +57,7 @@ import {
 import { setPace, updateUserControls, setInterval, setWeatherProvider } from "../../redux/actions";
 import { useForecastMutation, useGetAqiMutation } from '../../redux/forecastApiSlice';
 import { inputPaceToSpeed,parseControls } from '../../utils/util';
+import i18n from "./i18n";
 
 const checkCredentialsInterface = () => {
     return 'PasswordCredential' in window &&
@@ -152,7 +153,7 @@ type QueryParams = {
     rwgpsToken: string
     stopAfterLoad: boolean
 }
-const setupBrowserForwardBack = (dispatch : AppDispatch, origin : string, forecastFunc : MutationWrapper, aqiFunc : MutationWrapper) => {
+const setupBrowserForwardBack = (dispatch : AppDispatch, origin : string, forecastFunc : MutationWrapper, aqiFunc : MutationWrapper, lang: string) => {
     if (typeof window !== 'undefined') {
         window.onpopstate = (event) => {
             Sentry.addBreadcrumb({
@@ -180,7 +181,7 @@ const setupBrowserForwardBack = (dispatch : AppDispatch, origin : string, foreca
                 dispatch(querySet({url:`${origin}/?${event.state}`,search:event.state}))
                 updateFromQueryParams(dispatch, queryParams as unknown as QueryParams);
                 if (queryParams.rwgpsRoute !== undefined || queryParams.strava_route) {
-                    dispatch(loadRouteFromURL(forecastFunc, aqiFunc))
+                    dispatch(loadRouteFromURL(forecastFunc, aqiFunc, lang))
                 }
             }
         }
@@ -280,7 +281,7 @@ const RouteWeatherUI = ({search, href, action, maps_api_key, timezone_api_key, b
     dispatch(actionUrlAdded(action))
     dispatch(apiKeysSet({maps_api_key:maps_api_key,timezone_api_key:timezone_api_key, bitly_token:bitly_token}))
     setupRideWithGps(dispatch);
-    setupBrowserForwardBack(dispatch, origin, forecast, getAqi)
+    setupBrowserForwardBack(dispatch, origin, forecast, getAqi, i18n.language)
     dispatch(updateUserControls(queryParams.controlPoints?parseControls(queryParamsAsObj.controlPoints, true):[]))
     const zoomToRange = loadCookie('zoomToRange');
     if (zoomToRange !== undefined) {
@@ -297,18 +298,18 @@ const RouteWeatherUI = ({search, href, action, maps_api_key, timezone_api_key, b
         ReactGA.event('select_promotion', {creative_name:'es'})
     }
     return (
-        <FunAppWrapperThingForHooksUsability maps_api_key={maps_api_key} queryParams={queryParamsAsObj}/>
+        <FunAppWrapperThingForHooksUsability maps_api_key={maps_api_key} queryParams={queryParamsAsObj} lang={i18n.language}/>
     )
 
 }
 
 export default React.memo(RouteWeatherUI)
 
-const useLoadRouteFromURL = (queryParams : QueryParams, forecastFunc : MutationWrapper, aqiFunc : MutationWrapper) => {
+const useLoadRouteFromURL = (queryParams : QueryParams, forecastFunc : MutationWrapper, aqiFunc : MutationWrapper, lang: string) => {
     const dispatch = useAppDispatch()
     useEffect(() => {
         if (queryParams.rwgpsRoute || queryParams.strava_route) {
-            dispatch(loadRouteFromURL(forecastFunc, aqiFunc))
+            dispatch(loadRouteFromURL(forecastFunc, aqiFunc, lang))
         }
     }, [queryParams])
 }
@@ -339,9 +340,10 @@ const useSetPageTitle = () => {
 
 interface FunWrapperProps {
     maps_api_key: string
-    queryParams: QueryParams
+    queryParams: QueryParams,
+    lang: string
 }
-const FunAppWrapperThingForHooksUsability = ({maps_api_key, queryParams} : FunWrapperProps) => {
+const FunAppWrapperThingForHooksUsability = ({maps_api_key, queryParams, lang} : FunWrapperProps) => {
     const [forecast] = useForecastMutation()
     const [getAqi] = useGetAqiMutation()
     const [orientationChanged, setOrientationChanged] = React.useState<boolean>(false)
@@ -362,7 +364,8 @@ const FunAppWrapperThingForHooksUsability = ({maps_api_key, queryParams} : FunWr
         window.screen.orientation.onchange = screenChangeListener
     }
     useSetPageTitle()
-    useLoadRouteFromURL(queryParams, forecast, getAqi)
+    console.log('sending lang', lang)
+    useLoadRouteFromURL(queryParams, forecast, getAqi, lang)
     useLoadControlPointsFromURL(queryParams)
     const isLandscape = useMediaQuery({query:'(orientation:landscape)'})
     const isLargeEnough = useMediaQuery({query:'(min-width: 950px)'})

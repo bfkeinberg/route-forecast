@@ -56,7 +56,8 @@ export const cancelForecast = () => {
 
 const forecastByParts = (forecastFunc : MutationWrapper, aqiFunc : MutationWrapper, 
     forecastRequest : Array<ForecastRequest>, zone : string, service : string, 
-    routeName : string, routeNumber : string, dispatch : AppDispatch, fetchAqi : boolean) => {
+    routeName : string, routeNumber : string, dispatch : AppDispatch, fetchAqi : boolean,
+    lang: string) => {
     let requestCopy = Object.assign(forecastRequest)
     let forecastResults = []
     let aqiResults = []
@@ -64,7 +65,7 @@ const forecastByParts = (forecastFunc : MutationWrapper, aqiFunc : MutationWrapp
     let which = 0
     while (requestCopy.length >= 0 && locations) {
         try {
-            const request = {locations:locations, timezone:zone, service:service, routeName:routeName, routeNumber:routeNumber, which}
+            const request = {locations:locations, timezone:zone, service:service, routeName:routeName, routeNumber:routeNumber, lang:lang, which}
             const result = forecastFunc(request).unwrap()
             forecastResults.push(result)
             if (fetchAqi) {
@@ -81,7 +82,8 @@ const forecastByParts = (forecastFunc : MutationWrapper, aqiFunc : MutationWrapp
     return [Promise.allSettled(forecastResults),fetchAqi?Promise.allSettled(aqiResults):[]]
 }
 
-const doForecastByParts = (forecastFunc : MutationWrapper, aqiFunc : MutationWrapper, dispatch : AppDispatch, getState : () => RootState) => {
+const doForecastByParts = (forecastFunc : MutationWrapper, aqiFunc : MutationWrapper,
+     dispatch : AppDispatch, getState : () => RootState, lang : string) => {
     const type = ((getState().routeInfo.rwgpsRouteData !== null) ? "rwgps" : "gpx")
     const routeNumber = (type === "rwgps") ? getState().uiInfo.routeParams.rwgpsRoute : getState().strava.route
     const rwgpsRouteData = getState().routeInfo.rwgpsRouteData
@@ -102,7 +104,7 @@ const doForecastByParts = (forecastFunc : MutationWrapper, aqiFunc : MutationWra
     )
     return forecastByParts(forecastFunc, aqiFunc, forecastRequest, getState().uiInfo.routeParams.zone,
         getState().forecast.weatherProvider, getState().routeInfo.name, routeNumber, dispatch,
-        getState().forecast.fetchAqi)
+        getState().forecast.fetchAqi, lang)
 }
 
 export const removeDuplicateForecasts = (results : Array<{forecast:Forecast}>) => {
@@ -129,7 +131,8 @@ export function extractRejectedResults<T>(results: PromiseSettledResult<T>[]): P
     return results.filter((result): result is PromiseRejectedResult => result.status === 'rejected');
 }    
 
-export const forecastWithHook = async (forecastFunc: MutationWrapper, aqiFunc: MutationWrapper, dispatch: AppDispatch, getState: () => RootState) => {
+export const forecastWithHook = async (forecastFunc: MutationWrapper, aqiFunc: MutationWrapper,
+     dispatch: AppDispatch, getState: () => RootState, lang: string) => {
     const routeInfo = getState().routeInfo
 
     if (routeInfo.rwgpsRouteData) {
@@ -151,7 +154,7 @@ export const forecastWithHook = async (forecastFunc: MutationWrapper, aqiFunc: M
     fetchAbortMethod = abortMethod;
 
     dispatch(forecastFetchBegun())
-    const forecastAndAqiResults = doForecastByParts(forecastFunc, aqiFunc, dispatch, getState)
+    const forecastAndAqiResults = doForecastByParts(forecastFunc, aqiFunc, dispatch, getState, lang)
     const forecastResults = await forecastAndAqiResults[0]
     const aqiResults = await forecastAndAqiResults[1]
     let filteredResults = forecastResults.filter(result => result.status === "fulfilled").map(result => (result as PromiseFulfilledResult<{forecast:Forecast}>).value)

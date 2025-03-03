@@ -84,7 +84,7 @@ export const loadFromRideWithGps = function (routeNumber? : string, isTrip? : bo
 
 export type MutationWrapper = (request:{}) => {unwrap: () => Promise<any>}
 
-export const loadRouteFromURL = (forecastFunc : MutationWrapper, aqiFunc : MutationWrapper) => {
+export const loadRouteFromURL = (forecastFunc : MutationWrapper, aqiFunc : MutationWrapper, lang: string) => {
     return async function(dispatch : AppDispatch, getState: () => RootState) {
         // ReactGA.send({ hitType: "pageview", page: "/loadRoute" });
         // ReactGA.event('login', {method:getState().uiInfo.routeParams.rwgpsRoute});
@@ -102,7 +102,7 @@ export const loadRouteFromURL = (forecastFunc : MutationWrapper, aqiFunc : Mutat
         }
         if (error === null && !getState().uiInfo.routeParams.stopAfterLoad) {
             if (forecastFunc && aqiFunc) {
-                await forecastWithHook(forecastFunc, aqiFunc, dispatch, getState)
+                await forecastWithHook(forecastFunc, aqiFunc, dispatch, getState, lang)
             } else {
                 await dispatch(requestForecast(getState().routeInfo));
             }

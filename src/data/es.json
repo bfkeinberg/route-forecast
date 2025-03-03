@@ -10,7 +10,8 @@
       "forecast": "Pronóstico",
       "forecastPending": "Creando pronóstico...",
       "zoomToSegment": "Zoom",
-      "banked": "Mostrar tiempo acumulado"
+      "banked": "Mostrar tiempo acumulado",
+      "addControl":"Añadir"
     },
     "labels": {
       "language": "Seleccionar idioma",

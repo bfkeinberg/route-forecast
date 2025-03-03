@@ -177,3 +177,8 @@ export const saveCookie = (name : string,value : string) => {
 export const loadCookie = (name : string) => {
   return cookie.load(sanitizeCookieName(name));
 };
+
+type TimeFormats = {
+  [index:string]:string
+}
+export const timeFormatForLang : TimeFormats = {'en':'h:mm a', 'en-US':'h:mm a', 'fr':'H:mm', 'es':'H:mm'}
