@@ -87,7 +87,7 @@ const MobileUITabs = (props : MobileUIPropTypes) => {
             <>
                 <DisplayErrorList errorList={errorMessageList} onClose={closeErrorList}/>
                 <Navbar>
-                    <NavbarGroup align={Alignment.CENTER}>
+                    <NavbarGroup>
                         <NavbarHeading>Randoplan</NavbarHeading>
                         <Sentry.ErrorBoundary fallback={<h2>Something went wrong.</h2>}>
                             <Link to={"/"} className={'nav-link'}>
