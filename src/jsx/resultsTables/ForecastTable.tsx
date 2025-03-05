@@ -10,11 +10,10 @@ import oneCallLogo from 'Images/OpenWeather-Master-Logo RGB.png'
 import { DateTime, Interval } from 'luxon';
 import cookie from 'react-cookies';
 import MediaQuery, {useMediaQuery} from 'react-responsive';
-import { maxWidthForMobile } from '../../utils/util';
 import { finishTimeFormat } from '../ForecastSettings/TimeFields';
 import { fetchAqiToggled, weatherRangeSet, weatherRangeToggled, zoomToRangeToggled, tableViewedSet, Forecast } from '../../redux/forecastSlice';
-import { useForecastDependentValues, useFormatSpeed } from '../../utils/hooks';
-import { milesToMeters, timeFormatForLang } from '../../utils/util';
+import { useForecastDependentValues, useFormatSpeed, useAppSelector, useAppDispatch } from '../../utils/hooks';
+import { maxWidthForMobile, milesToMeters } from '../../utils/util';
 import { InstallExtensionButton } from "../InstallExtensionButton";
 import { AppToaster } from '../shared/toast';
 import { ToggleButton } from '../shared/ToggleButton';
@@ -22,11 +21,15 @@ import { WeatherCorrections } from './WeatherCorrections';
 import {useTranslation} from 'react-i18next'
 import { DesktopTooltip } from '../shared/DesktopTooltip';
 import ShortUrl from '../TopBar/ShortUrl'
-import { useAppSelector, useAppDispatch } from '../../utils/hooks';
 import { UserControl } from 'redux/controlsSlice';
 import { i18n } from 'i18next';
 import ReactGA from "react-ga4";
 
+type TimeFormats = {
+    [index:string]:string
+  }
+const timeFormatForLang : TimeFormats = {'en':'h:mm a', 'en-US':'h:mm a', 'fr':'H:mm', 'es':'H:mm'}
+  
 const displayBacklink = (provider : string) => {
     switch (provider) {
         case 'climacell':
@@ -48,6 +51,9 @@ const displayBacklink = (provider : string) => {
 }
 
 const getTimeFormat = (i18n: i18n) => {
+    if (!timeFormatForLang) {
+        return 'h:mm a'
+    }
     let timeFormat = timeFormatForLang[i18n.language]
     if (!timeFormat) {
         timeFormat = timeFormatForLang['en']
