@@ -17,10 +17,20 @@ import { CalculatedValue } from 'utils/gpxParser';
 import { useAppSelector, useAppDispatch } from '../../utils/hooks';
 const curvedArrowPath = "m-68.4149 61.4815c-.5904 2.8312 1.5113 7.0934 7.6748 12.4358 19.1536 16.6019 60.8005 28.3549 91.4489-7.6894 30.0099-35.2935 21.5071-80.7594 21.1555-98.2548l14.7087-.0371-32.3276-55.688-32.0602 55.8545 16.4983-.0557c2.8274 19.3736 6.2889 57.8645-6.5882 79.4056-17.0631 28.5432-39.6439 26.2329-52.4747 19.0262-13.994-7.8596-26.7357-11.2308-28.0345-5.0021z"
 const findMarkerInfo = (forecast : Array<Forecast>, subrange : [number,number] | []) => {
+    if (!forecast || !Array.isArray(forecast) || forecast.length === 0) {
+        return [];
+    }
+    
     if (!subrange || subrange.length !== 2) {
         return [];
     }
-    return forecast.filter((point) => Math.round(point.distance * milesToMeters) >= subrange[0] && Math.round(point.distance * milesToMeters) <= subrange[1]);
+    
+    return forecast.filter((point) => 
+        point && 
+        typeof point.distance === 'number' &&
+        Math.round(point.distance * milesToMeters) >= subrange[0] && 
+        Math.round(point.distance * milesToMeters) <= subrange[1]
+    );
 }
 
 const matchesSegment = (point : MapPoint, range : Array<number>) => {
@@ -103,38 +113,34 @@ const RouteForecastMap = ({maps_api_key} : {maps_api_key: string}) => {
         return <div/>
     }
     
+    
     const controlNames = userControlPoints.map(control => control.name)
 
-    let markedInfo = findMarkerInfo(forecast, subrange);
+    // Check if forecast is an array and has elements before calling findMarkerInfo
+    let markedInfo = Array.isArray(forecast) && forecast.length > 0 ? findMarkerInfo(forecast, subrange) : [];
 
     const { points, bounds } = usePointsAndBounds()
-    if (!points || points === undefined) {
+    if (!points || points === undefined || !Array.isArray(points) || points.length === 0) {
         return (<h2>No map points to display</h2>)
     }
+    
+    // Safely check if we should show info window
     let infoVisible = false;
     if (!doingAnalysis && markedInfo.length > 0) {
         infoVisible = true;
     }
 
-    const getInfoWindow  = (markedInfo : Forecast[]) => {
-        const infoContents = (<span>
-            {t('data.info.temperature')} &nbsp;
-            <strong>{formatTemperature(markedInfo[0].temp, celsius)}</strong> &nbsp;
-            {t('data.wind.speed')} &nbsp;
-            <strong>{cvtDistance(markedInfo[0].windSpeed, metric)}</strong> &nbsp;
-            {t('tableHeaders.windBearing')} &nbsp;
-            <strong>{markedInfo[0].windBearing}</strong>
-        </span>)
-        const infoWindow = (<InfoWindow disableAutoPan headerDisabled position={{ lat: markedInfo[0].lat, lng: markedInfo[0].lon }}>{infoContents}</InfoWindow>)
-        return infoWindow
-    }
+    // Check if forecast data is ready to be rendered
+    const readyToRender = Array.isArray(forecast) && forecast.length > 0 && 
+                          (routeLoadingMode === routeLoadingModes.STRAVA) && 
+                          bounds !== null;
 
     const initialBounds = {north:37.34544, south:37.30822, east:-121.98912, west:-122.06169}
     try {
         return (
             <Sentry.ErrorBoundary fallback=<h2>Cannot render map</h2>>
                 <div id="map" style={{ width:'auto', height: "calc(100vh - 115px)", position: "relative" }}>
-                    {(forecast.length > 0 || routeLoadingMode === routeLoadingModes.STRAVA) && bounds !== null ?
+                    {readyToRender ?
                     <APIProvider apiKey={maps_api_key}>
                         <BoundSetter points={points}/>
                         <Map
@@ -173,8 +179,42 @@ interface MapMarkerProps {
 const MapMarkers = ({ forecast, controls, controlNames, subrange, metric} : MapMarkerProps) => {
     const { i18n } = useTranslation()
     const celsius = useAppSelector(state => state.controls.celsius)
+    
+    // Filter forecast points to ensure they have all required properties
+    const validForecastPoints = Array.isArray(forecast) ? forecast.filter(point => 
+        point && 
+        typeof point.lat === 'number' && 
+        typeof point.lon === 'number' &&
+        point.time !== undefined &&
+        point.zone !== undefined &&
+        point.temp !== undefined &&
+        typeof point.distance === 'number' &&
+        point.windBearing !== undefined &&
+        point.relBearing !== undefined &&
+        point.windSpeed !== undefined
+    ) : [];
+    
+    // Filter controls to ensure they have required properties
+    const validControls = Array.isArray(controls) ? controls.filter(control => 
+        control && 
+        typeof control.lat === 'number' && 
+        typeof control.lon === 'number'
+    ) : [];
+    
+    // Filter rainy forecast points
+    const validRainPoints = Array.isArray(forecast) ? forecast.filter(point => 
+        point && 
+        typeof point.lat === 'number' && 
+        typeof point.lon === 'number' &&
+        typeof point.distance === 'number' &&
+        point.time !== undefined &&
+        point.zone !== undefined &&
+        point.temp !== undefined &&
+        point.rainy !== undefined
+    ) : [];
+    
     // marker title now contains both temperature and mileage
-    return (forecast.map((point) =>
+    return (validForecastPoints.map((point) =>
                 <TempMarker latitude={point.lat}
                     longitude={point.lon}
                     value={cvtDistance(point.distance.toString(), metric)}
@@ -186,18 +226,17 @@ const MapMarkers = ({ forecast, controls, controlNames, subrange, metric} : MapM
                 />
             )
         ).concat(
-            controls
-                .filter(control => control.lat !== undefined && control.lon !== undefined)
+            validControls
                 .map((control, index) =>
                     <ControlMarker
                         latitude={control.lat}
                         longitude={control.lon}
-                        value={controlNames[index]}
-                        key={`${control.lat}${control.lon}_${controlNames[index]}${index}_control_${Math.random().toString(10)}`}
+                        value={index < controlNames.length ? controlNames[index] : ''}
+                        key={`${control.lat}${control.lon}_${index < controlNames.length ? controlNames[index] : ''}${index}_control_${Math.random().toString(10)}`}
                     />
                 )
         ).concat(
-            forecast.map((point) =>
+            validRainPoints.map((point) =>
                 <RainIcon
                     latitude={point.lat}
                     longitude={point.lon}
