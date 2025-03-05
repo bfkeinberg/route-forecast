@@ -364,7 +364,6 @@ const FunAppWrapperThingForHooksUsability = ({maps_api_key, queryParams, lang} :
         window.screen.orientation.onchange = screenChangeListener
     }
     useSetPageTitle()
-    console.log('sending lang', lang)
     useLoadRouteFromURL(queryParams, forecast, getAqi, lang)
     useLoadControlPointsFromURL(queryParams)
     const isLandscape = useMediaQuery({query:'(orientation:landscape)'})
