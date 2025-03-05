@@ -1,4 +1,4 @@
-import {APIProvider, Map, InfoWindow, useMap, AdvancedMarker, useApiIsLoaded} from '@vis.gl/react-google-maps';
+import {APIProvider, Map, InfoWindow, useMap, AdvancedMarker, useApiIsLoaded, CollisionBehavior} from '@vis.gl/react-google-maps';
 import * as Sentry from "@sentry/react"
 import circus_tent from 'Images/circus tent.png';
 import rainCloud from "Images/lightning-and-blue-rain-cloud-16533.svg"
@@ -17,10 +17,13 @@ import { CalculatedValue } from 'utils/gpxParser';
 import { useAppSelector, useAppDispatch } from '../../utils/hooks';
 const curvedArrowPath = "m-68.4149 61.4815c-.5904 2.8312 1.5113 7.0934 7.6748 12.4358 19.1536 16.6019 60.8005 28.3549 91.4489-7.6894 30.0099-35.2935 21.5071-80.7594 21.1555-98.2548l14.7087-.0371-32.3276-55.688-32.0602 55.8545 16.4983-.0557c2.8274 19.3736 6.2889 57.8645-6.5882 79.4056-17.0631 28.5432-39.6439 26.2329-52.4747 19.0262-13.994-7.8596-26.7357-11.2308-28.0345-5.0021z"
 const findMarkerInfo = (forecast : Array<Forecast>, subrange : [number,number] | []) => {
-    if (!subrange || subrange.length !== 2) {
+    if (!forecast || !forecast.length || !subrange || subrange.length !== 2) {
         return [];
     }
-    return forecast.filter((point) => Math.round(point.distance * milesToMeters) >= subrange[0] && Math.round(point.distance * milesToMeters) <= subrange[1]);
+    return forecast.filter((point) => point &&
+        typeof point.distance === 'number' && 
+        Math.round(point.distance * milesToMeters) >= subrange[0] && 
+        Math.round(point.distance * milesToMeters) <= subrange[1]);
 }
 
 const matchesSegment = (point : MapPoint, range : Array<number>) => {
@@ -117,15 +120,25 @@ const RouteForecastMap = ({maps_api_key} : {maps_api_key: string}) => {
     }
 
     const getInfoWindow  = (markedInfo : Forecast[]) => {
+        if (!markedInfo || !markedInfo.length || !markedInfo[0]) {
+            return null;
+        }
+        
+        const point = markedInfo[0];
+        if (!point.temp || !point.windSpeed || !point.windBearing || 
+            !point.lat || !point.lon) {
+            return null;
+        }
+                
         const infoContents = (<span>
             {t('data.info.temperature')} &nbsp;
-            <strong>{formatTemperature(markedInfo[0].temp, celsius)}</strong> &nbsp;
+            <strong>{formatTemperature(point.temp, celsius)}</strong> &nbsp;
             {t('data.wind.speed')} &nbsp;
-            <strong>{cvtDistance(markedInfo[0].windSpeed, metric)}</strong> &nbsp;
+            <strong>{cvtDistance(point.windSpeed, metric)}</strong> &nbsp;
             {t('tableHeaders.windBearing')} &nbsp;
-            <strong>{markedInfo[0].windBearing}</strong>
+            <strong>{point.windBearing}</strong>
         </span>)
-        const infoWindow = (<InfoWindow disableAutoPan headerDisabled position={{ lat: markedInfo[0].lat, lng: markedInfo[0].lon }}>{infoContents}</InfoWindow>)
+        const infoWindow = (<InfoWindow disableAutoPan headerDisabled position={{ lat: point.lat, lng: point.lon }}>{infoContents}</InfoWindow>)
         return infoWindow
     }
 
@@ -134,7 +147,7 @@ const RouteForecastMap = ({maps_api_key} : {maps_api_key: string}) => {
         return (
             <Sentry.ErrorBoundary fallback=<h2>Cannot render map</h2>>
                 <div id="map" style={{ width:'auto', height: "calc(100vh - 115px)", position: "relative" }}>
-                    {(forecast.length > 0 || routeLoadingMode === routeLoadingModes.STRAVA) && bounds !== null ?
+                    {(Array.isArray(forecast) && forecast.length > 0 || routeLoadingMode === routeLoadingModes.STRAVA) && bounds !== null ?
                     <APIProvider apiKey={maps_api_key}>
                         <BoundSetter points={points}/>
                         <Map
@@ -173,8 +186,39 @@ interface MapMarkerProps {
 const MapMarkers = ({ forecast, controls, controlNames, subrange, metric} : MapMarkerProps) => {
     const { i18n } = useTranslation()
     const celsius = useAppSelector(state => state.controls.celsius)
+
+    const validForecastPoints = forecast.filter(point => 
+        point && 
+        typeof point.lat === 'number' && 
+        typeof point.lon === 'number' &&
+        point.time &&
+        point.zone &&
+        point.temp &&
+        point.windBearing !== undefined &&
+        point.relBearing !== undefined &&
+        point.windSpeed
+    );
+
+    const validControls = Array.isArray(controls) ? controls.filter(control => 
+        control && 
+        typeof control.lat === 'number' && 
+        typeof control.lon === 'number'
+    ) : [];
+
+    // Filter rainy forecast points
+    const validRainPoints = Array.isArray(forecast) ? forecast.filter(point => 
+        point && 
+        typeof point.lat === 'number' && 
+        typeof point.lon === 'number' &&
+        typeof point.distance === 'number' &&
+        point.time !== undefined &&
+        point.zone !== undefined &&
+        point.temp !== undefined &&
+        point.rainy !== undefined
+    ) : [];
+
     // marker title now contains both temperature and mileage
-    return (forecast.map((point) =>
+    return (validForecastPoints.map((point) =>
                 <TempMarker latitude={point.lat}
                     longitude={point.lon}
                     value={cvtDistance(point.distance.toString(), metric)}
@@ -186,18 +230,17 @@ const MapMarkers = ({ forecast, controls, controlNames, subrange, metric} : MapM
                 />
             )
         ).concat(
-            controls
-                .filter(control => control.lat !== undefined && control.lon !== undefined)
+            validControls
                 .map((control, index) =>
                     <ControlMarker
                         latitude={control.lat}
                         longitude={control.lon}
-                        value={controlNames[index]}
-                        key={`${control.lat}${control.lon}_${controlNames[index]}${index}_control_${Math.random().toString(10)}`}
+                        value={index < controlNames.length ? controlNames[index] : ''}
+                        key={`${control.lat}${control.lon}_${index < controlNames.length ? controlNames[index] : ''}${index}_control_${Math.random().toString(10)}`}
                     />
                 )
         ).concat(
-            forecast.map((point) =>
+            validRainPoints.map((point) =>
                 <RainIcon
                     latitude={point.lat}
                     longitude={point.lon}
@@ -360,8 +403,11 @@ const ControlMarker = ({ latitude, longitude, value = '' } : ControlMarkerProps)
     if (!latitude || !longitude) {
         return <div/>
     }
-    return <AdvancedMarker position={{ lat: latitude, lng: longitude }} title={value} >
-        <img src={circus_tent} width={32} height={32} />
+    return <AdvancedMarker position={{ lat: latitude, lng: longitude }} title={`${value}`} zIndex={5}>
+        <div style={{fontSize: '15px', fontWeight: 'bold'}} >
+            <img src={circus_tent} width={32} height={32} />
+            {value}
+        </div>
     </AdvancedMarker>;
 }
 
