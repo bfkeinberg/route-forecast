@@ -694,6 +694,7 @@ app.get('/', (req : Request, res : Response) => {
         'bitly_token': process.env.BITLY_TOKEN,
         'sentry_trace_sample_rate': process.env.SENTRY_TRACE_SAMPLE_RATE,
         'sentry_app_id': process.env.SENTRY_APP_ID,
+        'version': process.env.npm_package_version,
         'preloaded_state': '',
         'reactDom': '',
         delimiter: '?'

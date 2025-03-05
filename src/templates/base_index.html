@@ -61,6 +61,7 @@
                     element.setAttribute('mode', '<%= htmlWebpackPlugin.options.mode %>');
                     element.setAttribute('src', '<%= htmlWebpackPlugin.files.js %>');
                     element.setAttribute('sentry_trace_sample_rate', '<?= sentry_trace_sample_rate ?>')
+                    element.setAttribute('version', '<?= version ?>')
                     document.body.appendChild(element);
                 } else {
                     document.write("Sorry, this browser is not supported. Please try a newer one such as Chrome or Firefox");

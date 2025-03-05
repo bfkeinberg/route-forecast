@@ -1,7 +1,7 @@
 import * as Sentry from "@sentry/react";
 import { createRoot } from 'react-dom/client';
 import ReactGA from "react-ga4";
-
+import VersionContext from "../versonContext";
 import LocationContext from '../locationContext';
 import TopLevel from './topLevel';
 import "./i18n";
@@ -75,6 +75,7 @@ else {
     const maps_api_key = script.getAttribute('maps_api_key');
     const timezone_api_key = script.getAttribute('timezone_api_key');
     const bitly_token = script.getAttribute('bitly_token');
+    let version = script.getAttribute('version');
 
     interface TopLevelProps {
         action: string, 
@@ -91,11 +92,17 @@ else {
         if (!action || !maps_api_key || !timezone_api_key || !bitly_token) {
             return (<div>Missing required configuration variables</div>)
         }
+        if (!version) {
+            version = '0.0.0'
+        }
         const root = createRoot(container);
         root.render(
-            <LocationContext.Provider value={{ href: location.href, search: location.search, origin: location.origin }}>
-                <Component action={action} maps_api_key={maps_api_key} timezone_api_key={timezone_api_key} bitly_token={bitly_token} />
-            </LocationContext.Provider>);
+            <VersionContext.Provider value={version}>
+                <LocationContext.Provider value={{ href: location.href, search: location.search, origin: location.origin }}>
+                    <Component action={action} maps_api_key={maps_api_key} timezone_api_key={timezone_api_key} bitly_token={bitly_token} />
+                </LocationContext.Provider>);
+            </VersionContext.Provider>
+        )
     };
 
     render(TopLevel);

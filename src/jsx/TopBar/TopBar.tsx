@@ -10,7 +10,8 @@ import DonationRequest from "./DonationRequest";
 import ShortUrl from "./ShortUrl";
 import {useTranslation} from 'react-i18next'
 import FaqButton from "./FaqButton";
-import React, { ReactElement } from "react";
+import React, { ReactElement, useContext } from "react";
+import VersionContext from "..//versonContext";
 
 const TitleAndFinishTime = ({finishTime, fontSize, alignment} : {finishTime : string, fontSize: string, alignment: "left" | "right"}) => {
   return (
@@ -133,10 +134,11 @@ const Tabs = ({ sidePaneOptions, activeSidePane, setActiveSidePane, sidebarWidth
   )
 }
 const NonexistentLogo = () => {
+  const version = useContext(VersionContext)
   return (
-    <div style={{userSelect: "none", padding: "0px 10px"}}>
-      <span style={{fontSize: "30px"}}>
-        Randoplan
+    <div style={{userSelect: "none", display:'block', padding: "0px 10px", width:'155px', height:'3rem'}} className='truncated_title'>
+      <span style={{fontSize: "30px", display: 'block'}} >
+        {'Randoplan v' + version}
       </span>
     </div>
   )
