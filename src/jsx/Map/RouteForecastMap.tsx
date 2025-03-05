@@ -403,10 +403,11 @@ const ControlMarker = ({ latitude, longitude, value = '' } : ControlMarkerProps)
     if (!latitude || !longitude) {
         return <div/>
     }
+    let shownValue = (value && typeof value === "string" && value.length <= 10 ? value : '')
     return <AdvancedMarker position={{ lat: latitude, lng: longitude }} title={`${value}`} zIndex={5}>
-        <div style={{fontSize: '15px', fontWeight: 'bold'}} >
+        <div style={{fontSize: '13px', fontWeight: 'bold'}} >
             <img src={circus_tent} width={32} height={32} />
-            {value}
+            {shownValue}
         </div>
     </AdvancedMarker>;
 }
