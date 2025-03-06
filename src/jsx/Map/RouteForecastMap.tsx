@@ -1,6 +1,6 @@
 import {APIProvider, Map, InfoWindow, useMap, AdvancedMarker, useApiIsLoaded, CollisionBehavior} from '@vis.gl/react-google-maps';
 import * as Sentry from "@sentry/react"
-import circus_tent from 'Images/circus tent.png';
+import sandwich from 'Images/sandwich.png'
 import rainCloud from "Images/lightning-and-blue-rain-cloud-16533.svg"
 import PropTypes from 'prop-types';
 import React, { useEffect, useState } from 'react';
@@ -15,6 +15,7 @@ import {useTranslation} from 'react-i18next'
 import { Forecast, mapViewedSet } from '../../redux/forecastSlice';
 import { CalculatedValue } from 'utils/gpxParser';
 import { useAppSelector, useAppDispatch } from '../../utils/hooks';
+
 const curvedArrowPath = "m-68.4149 61.4815c-.5904 2.8312 1.5113 7.0934 7.6748 12.4358 19.1536 16.6019 60.8005 28.3549 91.4489-7.6894 30.0099-35.2935 21.5071-80.7594 21.1555-98.2548l14.7087-.0371-32.3276-55.688-32.0602 55.8545 16.4983-.0557c2.8274 19.3736 6.2889 57.8645-6.5882 79.4056-17.0631 28.5432-39.6439 26.2329-52.4747 19.0262-13.994-7.8596-26.7357-11.2308-28.0345-5.0021z"
 const findMarkerInfo = (forecast : Array<Forecast>, subrange : [number,number] | []) => {
     if (!forecast || !forecast.length || !subrange || subrange.length !== 2) {
@@ -356,6 +357,7 @@ const TempMarker = ({ latitude, longitude, value, title, bearing, relBearing, wi
         return <AdvancedMarker
             position={{ lat: latitude, lng: longitude }}
             title={title}
+            collisionBehavior={CollisionBehavior.OPTIONAL_AND_HIDES_LOWER_PRIORITY}
         >
             <>
             <RotatedArrow rotation={flippedBearing} relBearing={relBearing} windSpeed={parseInt(windSpeed)} distance={value}/>
@@ -376,7 +378,8 @@ const TempMarker = ({ latitude, longitude, value, title, bearing, relBearing, wi
         </AdvancedMarker>
     }
     else {
-        return <AdvancedMarker position={{ lat: latitude, lng: longitude }} title={title}>
+        return <AdvancedMarker position={{ lat: latitude, lng: longitude }} 
+            title={title} collisionBehavior={CollisionBehavior.OPTIONAL_AND_HIDES_LOWER_PRIORITY}>
             <div style={{
                 width: 30,
                 height: 30,
@@ -394,21 +397,29 @@ const TempMarker = ({ latitude, longitude, value, title, bearing, relBearing, wi
     }
 }
 
+const ShowControlName = (latitude : number, longitude : number, name : string, closeFunc : React.Dispatch<React.SetStateAction<boolean>>) => {
+    return (<InfoWindow  headerDisabled pixelOffset={[-30 ,-30]} 
+        onClose={() => {closeFunc(false)}} maxWidth={320}
+        position={{ lat: latitude, lng: longitude }}>{name}</InfoWindow>)    
+}
 interface ControlMarkerProps {
     latitude: number
     longitude: number
     value: string
 }
 const ControlMarker = ({ latitude, longitude, value = '' } : ControlMarkerProps) => {
+    const [showTheText, setShowTheText] = React.useState<boolean>(false)
     if (!latitude || !longitude) {
         return <div/>
     }
-    let shownValue = (value && typeof value === "string" && value.length <= 10 ? value : '')
-    return <AdvancedMarker position={{ lat: latitude, lng: longitude }} title={`${value}`} zIndex={5}>
-        <div style={{fontSize: '13px', fontWeight: 'bold'}} >
-            <img src={circus_tent} width={32} height={32} />
-            {shownValue}
-        </div>
+    return <AdvancedMarker position={{ lat: latitude, lng: longitude }} 
+        zIndex={5} collisionBehavior={CollisionBehavior.REQUIRED_AND_HIDES_OPTIONAL}
+        onMouseEnter={(event : google.maps.MapMouseEvent['domEvent']) => {setShowTheText(true)}}
+        onMouseLeave={(event  : google.maps.MapMouseEvent['domEvent']) => {setShowTheText(false)}}
+        onClick={event => setShowTheText(false)}
+        >
+        <img src={sandwich} style={{backgroundColor: 'transparent'}}/>
+        {showTheText && ShowControlName(latitude, longitude, value, setShowTheText)}
     </AdvancedMarker>;
 }
 
