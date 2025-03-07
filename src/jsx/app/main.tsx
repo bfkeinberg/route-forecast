@@ -39,7 +39,10 @@ const reloadPage = () => {
   
 type DesktopUIType = Promise<typeof import(/* webpackChunkName: "DesktopUI" */ '../DesktopUI')>
 type DynamicDesktopUIType = DesktopUIType | Promise<{default:({ mapsApiKey, orientationChanged, setOrientationChanged }: DesktopUIProps) => ReactElement; }>
-const LoadableDesktop = lazy(() : DynamicDesktopUIType => {addBreadcrumb('loading desktop UI'); return import( /* webpackChunkName: "DesktopUI" */'../DesktopUI').catch((error) => {
+const LoadableDesktop = lazy(() : DynamicDesktopUIType => {addBreadcrumb('loading desktop UI'); 
+    return import( /* webpackChunkName: "DesktopUI" */'../DesktopUI')
+    .then(module => ({ default: module.default }))
+    .catch((error) => {
     setTimeout(() => reloadPage(), 5000);
     return { default: () => <div>{`Error ${error} loading the component. Window will reload in five seconds`}</div> };
 })})

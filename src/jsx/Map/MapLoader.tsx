@@ -22,8 +22,8 @@ type MapLoaderProps = PropsFromRedux & {
 }
 const MapLoader = (props : MapLoaderProps) => {
     // debug empty points and bounds
-    const rwgpsRouteData = useAppSelector(state => state.routeInfo.rwgpsRouteData)
-    const gpxRouteData = useAppSelector(state => state.routeInfo.gpxRouteData)
+    const rwgpsRouteData = useAppSelector(state => state.routeInfo.rwgpsRouteData) || null
+    const gpxRouteData = useAppSelector(state => state.routeInfo.gpxRouteData) || null
     let length = 0
     if (rwgpsRouteData && rwgpsRouteData[rwgpsRouteData.type] && rwgpsRouteData[rwgpsRouteData.type]['track_points']) {
         length = rwgpsRouteData[rwgpsRouteData.type]['track_points'].length

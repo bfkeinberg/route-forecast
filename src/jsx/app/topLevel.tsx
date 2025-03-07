@@ -12,7 +12,8 @@ const mode = script!.getAttribute('mode');
 const store = configureReduxStore({ _preloadedState: {}, mode: mode?mode:"production" })
 const TopLevel = ({ action, maps_api_key, timezone_api_key, bitly_token, preloaded_state }:
     { action: string, maps_api_key: string, timezone_api_key: string, bitly_token: string, preloaded_state?: object }) => {
-        const {href, search, origin} = useContext(LocationContext)
+        const locationContext = useContext(LocationContext);
+        const {href, search, origin} = locationContext;        
     return (
         <Sentry.ErrorBoundary  fallback={<h2>Something went wrong.</h2>}>
             <Provider store={store}>
