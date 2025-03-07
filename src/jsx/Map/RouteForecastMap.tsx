@@ -56,7 +56,7 @@ const getMapBounds = (points : MapPointList, bounds : Bounds, zoomToRange : bool
 
 const cvtDistance = (distanceStr : string, metric : boolean) => {
     const distance = Number.parseInt(distanceStr)
-    return (metric ? ((distance * milesToMeters) / 1000).toFixed(1) : distanceStr);
+    return (metric ? ((distance * milesToMeters) / 1000).toFixed(0) : distanceStr);
 };
 
 const findMapBounds = (points : MapPointList, bounds : Bounds, zoomToRange : boolean, subrange : [number,number] | [], userSubrange : [number,number]) => {
@@ -398,7 +398,7 @@ const TempMarker = ({ latitude, longitude, value, title, bearing, relBearing, wi
 }
 
 const ShowControlName = (latitude : number, longitude : number, name : string, closeFunc : React.Dispatch<React.SetStateAction<boolean>>) => {
-    return (<InfoWindow  headerDisabled pixelOffset={[-30 ,-30]} 
+    return (<InfoWindow  shouldFocus={true} headerDisabled pixelOffset={[-30 ,-30]} 
         onClose={() => {closeFunc(false)}} maxWidth={320}
         position={{ lat: latitude, lng: longitude }}>{name}</InfoWindow>)    
 }

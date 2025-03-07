@@ -67,6 +67,8 @@ const forecastSlice = createSlice({
             state.forecast = state.forecast.concat(action.payload)
         },
         forecastInvalidated(state) {
+            // debounce when called multiple times during a route load
+            if (!state.valid) return
             state.valid = false
             state.forecast = []
             state.timeZoneId = null
