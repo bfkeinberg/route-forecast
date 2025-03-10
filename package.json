@@ -1,6 +1,6 @@
 {
   "name": "route_weather",
-  "version": "4.5.9",
+  "version": "4.5.10",
   "description": "Forecast weather along a route from RideWithGps or Strava. Support for others may be added if there is demand",
   "main": "jsx/server/index.js",
   "engines": {
@@ -104,7 +104,7 @@
     "@tsconfig/node22": "^22.0.0",
     "@types/chrome": "^0.0.308",
     "@types/google.maps": "^3.58.1",
-    "@types/jest": "^29.5.12",
+    "@types/jest": "^29.5.14",
     "@types/node": "^22.5.0",
     "@types/react": "^18.3.2",
     "@types/react-cookies": "^0.1.3",

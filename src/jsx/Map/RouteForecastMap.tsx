@@ -1,4 +1,4 @@
-import {APIProvider, Map, InfoWindow, useMap, AdvancedMarker, useApiIsLoaded, CollisionBehavior} from '@vis.gl/react-google-maps';
+import {APIProvider, Map, InfoWindow, useMap, useApiIsLoaded, CollisionBehavior} from '@vis.gl/react-google-maps';
 import * as Sentry from "@sentry/react"
 import sandwich from 'Images/sandwich.png'
 import rainCloud from "Images/lightning-and-blue-rain-cloud-16533.svg"
@@ -15,6 +15,7 @@ import {useTranslation} from 'react-i18next'
 import { Forecast, mapViewedSet } from '../../redux/forecastSlice';
 import { CalculatedValue } from 'utils/gpxParser';
 import { useAppSelector, useAppDispatch } from '../../utils/hooks';
+import SafeAdvancedMarker from './SafeMarker';
 
 const curvedArrowPath = "m-68.4149 61.4815c-.5904 2.8312 1.5113 7.0934 7.6748 12.4358 19.1536 16.6019 60.8005 28.3549 91.4489-7.6894 30.0099-35.2935 21.5071-80.7594 21.1555-98.2548l14.7087-.0371-32.3276-55.688-32.0602 55.8545 16.4983-.0557c2.8274 19.3736 6.2889 57.8645-6.5882 79.4056-17.0631 28.5432-39.6439 26.2329-52.4747 19.0262-13.994-7.8596-26.7357-11.2308-28.0345-5.0021z"
 const findMarkerInfo = (forecast : Array<Forecast>, subrange : [number,number] | []) => {
@@ -78,20 +79,35 @@ const RouteForecastMap = ({maps_api_key} : {maps_api_key: string}) => {
     const zoomToRange = useAppSelector(state => state.forecast.zoomToRange)
     const { t } = useTranslation()
     const userSegment = useAppSelector(state => state.uiInfo.routeParams.segment)
+    const [isMapApiReady, setIsMapApiReady] = useState(false)
 
     const { calculatedControlPointValues: controls } = useForecastDependentValues()
 
     const dispatch = useAppDispatch()
     useEffect(() => { dispatch(mapViewedSet()) }, [])
     
+    const handleApiLoad = () => {
+        setIsMapApiReady(true)
+    }
+
+    const handleApiError = (error: unknown) => {
+        Sentry.captureException(error, {tags: {where:'Google Maps API Load Error'}})
+        setIsMapApiReady(false)
+    }
+        
     const BoundSetter = ({points} : {points: MapPointList}) => {
         const [mapBounds, setMapBounds] = useState<google.maps.LatLngBounds|google.maps.LatLngBoundsLiteral>({north: 90, south: 180, east: -90, west: -180})
         const apiIsLoaded = useApiIsLoaded()
         const map = useMap()
         useEffect(() => {
             if (!apiIsLoaded) return;
-            const theBounds = findMapBounds(points, bounds, zoomToRange, subrange, userSegment)
-            setMapBounds(theBounds)
+            try {
+                const theBounds = findMapBounds(points, bounds, zoomToRange, subrange, userSegment)
+                setMapBounds(theBounds)    
+            } catch (error) {
+                console.error("Error setting map bounds:", error)
+                Sentry.captureException(error, {tags: {where:'Error setting map bounds'}})
+            }
             // when the maps library is loaded, apiIsLoaded will be true and the API can be
             // accessed using the global `google.maps` namespace.
         }, [apiIsLoaded, zoomToRange, subrange, userSegment[0], userSegment[1]])
@@ -149,22 +165,28 @@ const RouteForecastMap = ({maps_api_key} : {maps_api_key: string}) => {
             <Sentry.ErrorBoundary fallback=<h2>Cannot render map</h2>>
                 <div id="map" style={{ width:'auto', height: "calc(100vh - 115px)", position: "relative" }}>
                     {(Array.isArray(forecast) && forecast.length > 0 || routeLoadingMode === routeLoadingModes.STRAVA) && bounds !== null ?
-                    <APIProvider apiKey={maps_api_key}>
-                        <BoundSetter points={points}/>
-                        <Map
-                            mapTypeId={'roadmap'}
-                            mapId={"11147ffcb9b103dc"}
-                            scaleControl={true}
-                            defaultBounds={initialBounds}
-                        >
-                            {controls !== null && <MapMarkers forecast={forecast}
-                                controls={controls} controlNames={controlNames} 
-                                subrange={subrange} metric={metric} 
-                            />}
-                            <Polyline path={points} strokeWeight={3} strokeColor={'#3244a8'} strokeOpacity={1.0} />
-                            {infoVisible && getInfoWindow(markedInfo)}
-                            <MapHighlight points={points} subrange={subrange} />
-                        </Map>
+                        <APIProvider apiKey={maps_api_key} onLoad={handleApiLoad} onError={handleApiError}>
+                            {isMapApiReady ? (
+                                <>
+                                    <BoundSetter points={points} />
+                                    <Map
+                                        mapTypeId={'roadmap'}
+                                        mapId={"11147ffcb9b103dc"}
+                                        scaleControl={true}
+                                        defaultBounds={initialBounds}
+                                    >
+                                        {controls !== null && <MapMarkers forecast={forecast}
+                                            controls={controls} controlNames={controlNames}
+                                            subrange={subrange} metric={metric}
+                                        />}
+                                        <Polyline path={points} strokeWeight={3} strokeColor={'#3244a8'} strokeOpacity={1.0} />
+                                        {infoVisible && getInfoWindow(markedInfo)}
+                                        <MapHighlight points={points} subrange={subrange} />
+                                    </Map>
+                                </>
+                            ) : (
+                                <div>Initializing map...</div>
+                            )}
                         </APIProvider> :
                         <h2 style={{ padding: '18px', textAlign: "center" }}>{t('titles.map')}</h2>
                     }
@@ -255,10 +277,14 @@ const MapMarkers = ({ forecast, controls, controlNames, subrange, metric} : MapM
 }
 
 const RainIcon = ({ latitude, longitude, value, title, isRainy } : {latitude: number, longitude: number, value: number, title: string, isRainy: boolean}) => {
+    const apiIsLoaded = useApiIsLoaded();
+    if (!apiIsLoaded) {
+      return null;
+    }
     if (isRainy) {
-        return <AdvancedMarker position={{ lat: latitude, lng: longitude }} /* label={value.toFixed(0)} */ title={title}>
+        return <SafeAdvancedMarker position={{ lat: latitude, lng: longitude }} /* label={value.toFixed(0)} */ title={title}>
             <img style={{position:'relative',margin:'2px'}} src={rainCloud} width={45} height={50} />
-        </AdvancedMarker>
+        </SafeAdvancedMarker>
     }
     return null;
 }
@@ -351,10 +377,14 @@ type TempMarkerProps = {
     windSpeed: string
 }
 const TempMarker = ({ latitude, longitude, value, title, bearing, relBearing, windSpeed } : TempMarkerProps ) => {
+    const apiIsLoaded = useApiIsLoaded();
+    if (!apiIsLoaded) {
+      return null;
+    }
     // Add the marker at the specified location
     if (parseInt(windSpeed) > 3) {
         const flippedBearing = (bearing > 180) ? bearing - 180 : bearing + 180;
-        return <AdvancedMarker
+        return <SafeAdvancedMarker
             position={{ lat: latitude, lng: longitude }}
             title={title}
             collisionBehavior={CollisionBehavior.OPTIONAL_AND_HIDES_LOWER_PRIORITY}
@@ -375,10 +405,10 @@ const TempMarker = ({ latitude, longitude, value, title, bearing, relBearing, wi
                     alignItems: 'center'
                 }}>{value}</div>
             </>
-        </AdvancedMarker>
+        </SafeAdvancedMarker>
     }
     else {
-        return <AdvancedMarker position={{ lat: latitude, lng: longitude }} 
+        return <SafeAdvancedMarker position={{ lat: latitude, lng: longitude }} 
             title={title} collisionBehavior={CollisionBehavior.OPTIONAL_AND_HIDES_LOWER_PRIORITY}>
             <div style={{
                 width: 30,
@@ -393,7 +423,7 @@ const TempMarker = ({ latitude, longitude, value, title, bearing, relBearing, wi
                 justifyContent: 'center',
                 alignItems: 'center'
             }}>{value}</div>
-        </AdvancedMarker>
+        </SafeAdvancedMarker>
     }
 }
 
@@ -408,19 +438,23 @@ interface ControlMarkerProps {
     value: string
 }
 const ControlMarker = ({ latitude, longitude, value = '' } : ControlMarkerProps) => {
+    const apiIsLoaded = useApiIsLoaded();
+    if (!apiIsLoaded) {
+      return null;
+    }
     const [showTheText, setShowTheText] = React.useState<boolean>(false)
     if (!latitude || !longitude) {
         return <div/>
     }
-    return <AdvancedMarker position={{ lat: latitude, lng: longitude }} 
+    return <SafeAdvancedMarker position={{ lat: latitude, lng: longitude }} 
         zIndex={5} collisionBehavior={CollisionBehavior.REQUIRED_AND_HIDES_OPTIONAL}
         onMouseEnter={(event : google.maps.MapMouseEvent['domEvent']) => {setShowTheText(true)}}
         onMouseLeave={(event  : google.maps.MapMouseEvent['domEvent']) => {setShowTheText(false)}}
-        onClick={event => setShowTheText(false)}
+        onClick={(event : google.maps.MapMouseEvent )=> setShowTheText(false)}
         >
         <img src={sandwich} style={{backgroundColor: 'transparent'}}/>
         {showTheText && ShowControlName(latitude, longitude, value, setShowTheText)}
-    </AdvancedMarker>;
+    </SafeAdvancedMarker>;
 }
 
 const MapHighlight = ({ points, subrange } : { points: MapPointList, subrange: [number,number]|[]}) => {
