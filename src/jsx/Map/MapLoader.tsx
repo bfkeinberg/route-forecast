@@ -21,6 +21,11 @@ type MapLoaderProps = PropsFromRedux & {
     maps_api_key: string
 }
 const MapLoader = (props : MapLoaderProps) => {
+    // Validate API key
+    if (!props.maps_api_key || props.maps_api_key.trim() === '') {
+        return <div>Error: Google Maps API key is missing or invalid</div>;
+    }
+    
     // debug empty points and bounds
     const rwgpsRouteData = useAppSelector(state => state.routeInfo.rwgpsRouteData) || null
     const gpxRouteData = useAppSelector(state => state.routeInfo.gpxRouteData) || null
