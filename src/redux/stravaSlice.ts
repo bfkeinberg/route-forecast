@@ -3,6 +3,7 @@ import { getRouteNumberFromValue } from '../utils/util';
 import { StravaActivityData, StravaActivityStream } from '../utils/stravaRouteParser';
 import { reset } from './routeParamsSlice';
 import { rwgpsRouteSet } from './routeParamsSlice';
+import { stravaErrorSet } from './dialogParamsSlice';
 const defaultAnalysisIntervalInHours = 1;
 
 const getAnalysisIntervalFromRouteDuration = (durationInHours: number) => {
@@ -135,6 +136,12 @@ const stravaSlice = createSlice({
                     state.subrange = stravaInitialState.subrange    
                 }
         })
+            .addCase(stravaErrorSet, (state, action: PayloadAction<string|Error>) => {
+                if (action.payload !== undefined && action.payload !== "" ) {
+                    state.access_token = null
+                    state.refresh_token = null
+                }
+            })
             .addCase(reset, () => stravaInitialState)
     }
 })

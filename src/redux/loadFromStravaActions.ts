@@ -17,7 +17,8 @@ const getStravaParser = async function() {
 
 const stravaTokenTooOld = (getState: () => RootState) => {
     if (getState().strava.expires_at == null) {
-        return false;
+        return true;        // in contrast to past, if we have no expires_at field,
+                            // assume that the token is too old and refresh it
     }
     return (getState().strava.expires_at! < Math.round(Date.now()/1000));
 };
