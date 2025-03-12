@@ -94,6 +94,8 @@ else {
         }
         if (!version) {
             version = '0.0.0'
+        } else {
+            ReactGA.set({'appVersion' : version})
         }
         const root = createRoot(container);
         root.render(
