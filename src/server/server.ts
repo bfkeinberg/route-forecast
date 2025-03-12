@@ -678,13 +678,17 @@ app.get('/stravaAuthReply', async (req : Request, res : Response) => {
 
 app.get('/refreshStravaToken', async (req: Request, res : Response) => {
     const refreshToken = req.query.refreshToken;
-    if (typeof refreshToken !== 'string') {
+    if (typeof refreshToken !== 'string' || refreshToken === 'null') {
         res.status(400).json({ 'status': 'Bad call to refresh Strava token' });
         return;
     }
     process.env.STRAVA_CLIENT_SECRET = process.env.STRAVA_API_KEY;
-    let refreshResult = await strava.oauth.refreshToken(refreshToken);
-    res.status(200).json(refreshResult);
+    try {
+        let refreshResult = await strava.oauth.refreshToken(refreshToken);
+        res.status(200).json(refreshResult);    
+    } catch (err) {
+        res.status(400).json(err)
+    }
 });
 
 app.get('/', (req : Request, res : Response) => {
