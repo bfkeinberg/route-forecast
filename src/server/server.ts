@@ -686,8 +686,8 @@ app.get('/refreshStravaToken', async (req: Request, res : Response) => {
     try {
         let refreshResult = await strava.oauth.refreshToken(refreshToken);
         res.status(200).json(refreshResult);    
-    } catch (err) {
-        res.status(400).json(err)
+    } catch (err : any) {
+        res.status(err.statusCode).json(err.error)
     }
 });
 
