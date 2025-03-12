@@ -23,7 +23,7 @@ const stravaTokenTooOld = (getState: () => RootState) => {
     return (getState().strava.expires_at! < Math.round(Date.now()/1000));
 };
 
-export const refreshOldToken = (dispatch : AppDispatch, getState: () => RootState) => {
+const refreshOldToken = (dispatch : AppDispatch, getState: () => RootState) => {
     if (stravaTokenTooOld(getState)) {
         return new Promise<string|null>((resolve, reject) => {
             fetch(`/refreshStravaToken?refreshToken=${getState().strava.refresh_token}`).then(response => {
@@ -49,6 +49,18 @@ export const refreshOldToken = (dispatch : AppDispatch, getState: () => RootStat
     }
 }
 
+const authenticate = (routeId : string) => {
+    let params = queryString.parse(location.search);
+    params['strava_route'] = routeId;
+    window.location.href = '/stravaAuthReq?state=' + encodeURIComponent(JSON.stringify(params));
+}
+
+const authenticateActivity = (activityId : string) => {
+    let params = queryString.parse(location.search);
+    params['strava_activity'] = activityId;
+    window.location.href = '/stravaAuthReq?state=' + encodeURIComponent(JSON.stringify(params));
+}
+
 export const loadStravaActivity = function() {
     return async function (dispatch : AppDispatch, getState: () => RootState) {
         const parser = await getStravaParser().catch((err) => {
@@ -59,7 +71,11 @@ export const loadStravaActivity = function() {
         if (parser == null) {
             return Promise.resolve(Error('Cannot load parser'));
         }
-
+        const refresh_token = getState().strava.refresh_token
+        const activityId = getState().strava.activity
+        if (!refresh_token) {
+            authenticateActivity(activityId)
+        }
         const access_token = await refreshOldToken(dispatch, getState)
         if (!access_token) {
             dispatch(stravaFetchFailed(Error("Failed to get Strava access token")));
@@ -67,7 +83,6 @@ export const loadStravaActivity = function() {
             return
         }
         dispatch(stravaFetchBegun());
-        const activityId = getState().strava.activity
         ReactGA.event('login', {method:activityId});
         return parser.fetchStravaActivity(activityId, access_token).then(result => {
             dispatch(stravaFetched(result));
@@ -77,12 +92,6 @@ export const loadStravaActivity = function() {
         });
 
     }
-}
-
-const authenticate = (routeId : string) => {
-    let params = queryString.parse(location.search);
-    params['strava_route'] = routeId;
-    window.location.href = '/stravaAuthReq?state=' + encodeURIComponent(JSON.stringify(params));
 }
 
 type ModuleType = Promise<any>
@@ -145,6 +154,10 @@ export const loadStravaRoute = (routeId : string) => {
         dispatch(routeLoadingBegun('gpx'));
         await Sentry.startSpan({ name: "loadingStravaRoute" }, async () => {
             const api = new Api('https://www.strava.com/api/v3', [(response) => Promise.resolve(response.text())])
+            const refresh_token = getState().strava.refresh_token
+            if (!refresh_token) {
+                authenticate(routeId)
+            }
             const access_token = await dispatch(refreshOldToken)
             if (!access_token) {
                 authenticate(routeId)
