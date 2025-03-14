@@ -74,7 +74,7 @@ export const ForecastSettings = () => {
                 </Collapse>
                 <div style={{ display: "flex", justifyContent: 'space-between' }}>
                     <WeatherProviderSelector />
-                    <MediaQuery maxDeviceWidth={500}>
+                    <MediaQuery maxDeviceWidth={1050}>
                         <Button size='small' variant='minimal' onClick={event => {setShowSettings(!showSettings)}} icon={<Cog/>}></Button>
                     </MediaQuery>
                 </div>
