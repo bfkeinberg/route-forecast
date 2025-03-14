@@ -11,7 +11,9 @@
       "forecastPending": "Creando pronóstico...",
       "zoomToSegment": "Zoom",
       "banked": "Mostrar tiempo acumulado",
-      "addControl":"Añadir"
+      "addControl":"Añadir",
+      "downloadAll":"Descargar todos los pronósticos",
+      "standardDeviation":"Calcular la desviación estándar"
     },
     "labels": {
       "language": "Seleccionar idioma",

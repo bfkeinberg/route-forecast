@@ -34,9 +34,12 @@ type PropsFromRedux = ConnectedProps<typeof connector>
 type ForecastButtonProps = PropsFromRedux & {
     href: string
     origin: string
+    computeStdDev: boolean
+    downloadAll: boolean
 }
 const ForecastButton = ({fetchingForecast,submitDisabled, routeNumber, startTimestamp, pace, interval,
-     metric, controls, strava_activity, strava_route, provider, href, urlIsShortened, querySet, zone} : ForecastButtonProps) => {
+     metric, controls, strava_activity, strava_route, provider, href, 
+     urlIsShortened, querySet, zone, computeStdDev, downloadAll} : ForecastButtonProps) => {
         const [forecast, forecastFetchResult] = useForecastMutation()
         const [getAQI, aqiFetchResult] = useGetAqiMutation()
         const dispatch = useAppDispatch()
@@ -174,12 +177,12 @@ const ForecastButton = ({fetchingForecast,submitDisabled, routeNumber, startTime
     }
 
     const forecastClick = async (event : React.MouseEvent) => {
-        if (event.altKey && !event.shiftKey) {
+        if (downloadAll || (event.altKey && !event.shiftKey)) {
             ReactGA.event('generate_lead', {currency:'USD', value: distanceInKm})
             grabAllPossibleForecasts(forecastRequestData.current)
             return
         }
-        let forecastProvider = (event.altKey && event.shiftKey) ? getValidProviders(forecastRequestData.current, provider) : provider
+        let forecastProvider = (computeStdDev || (event.altKey && event.shiftKey)) ? getValidProviders(forecastRequestData.current, provider) : provider
         // await Sentry.startSpan({ name: "forecastClick" }, async () => {
             dispatch(forecastFetchBegun())
             const reactEventParams = {
@@ -235,7 +238,8 @@ const ForecastButton = ({fetchingForecast,submitDisabled, routeNumber, startTime
     const smallScreen = useMediaQuery({query: "(max-width: 800px)"})
     forecastRequestData.current = useForecastRequestData()
 
-    const buttonText = (optionPressed && shiftPressed) ? "Compute standard deviation" : (optionPressed ? "Download all forecasts" : t("buttons.forecast"))
+    const buttonText = (computeStdDev || (optionPressed && shiftPressed)) ? t("buttons.standardDeviation") : 
+        ((optionPressed || downloadAll) ? t("buttons.downloadAll") : t("buttons.forecast"))
     return (
         <DesktopTooltip content={tooltipContent}>
             <div id='forecast' style={{ 'display': 'flex', width: '100%', justifyContent: "center", margin: "10px 0px 0px 10px", flex: 1.6 }} cursor='not-allowed'>

@@ -11,7 +11,9 @@
                 "forecastPending":"Creating forecast...",
                 "zoomToSegment":"Zoom",
                 "banked":"Display banked time",
-                "addControl":"Add"
+                "addControl":"Add",
+                "downloadAll":"Download all forecasts",
+                "standardDeviation":"Compute standard deviation"
             },
             "labels": {
                 "language": "Select language",

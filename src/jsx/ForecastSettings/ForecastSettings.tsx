@@ -1,7 +1,8 @@
-import { Toast2 } from '@blueprintjs/core';
+import { Button, Toast2, CheckboxCard, Collapse, FormGroup } from '@blueprintjs/core';
+import { Cog } from '@blueprintjs/icons';
 import ReactGA from "react-ga4";i18n
 import {useTranslation} from 'react-i18next'
-import  {useMediaQuery} from 'react-responsive';
+import  MediaQuery, {useMediaQuery} from 'react-responsive';
 import { maxWidthForMobile } from '../../utils/util';
 import { errorDetailsSet } from '../../redux/dialogParamsSlice';
 import { displayControlTableUiSet, metricToggled, celsiusToggled } from '../../redux/controlsSlice';
@@ -19,8 +20,12 @@ import Segment from './Segment'
 import i18n from '../app/i18n';
 
 import { useAppSelector, useAppDispatch } from '../../utils/hooks';
+import { useState } from 'react';
 
 export const ForecastSettings = () => {
+    const [showSettings, setShowSettings] = useState(false)
+    const [computeStdDev, setComputeStdDEv] = useState(false)
+    const [downloadAll, setDownloadAll] = useState(false)
     const metric = useAppSelector(state => state.controls.metric)
     const celsius = useAppSelector(state => state.controls.celsius)
     const dispatch = useAppDispatch()
@@ -61,10 +66,21 @@ export const ForecastSettings = () => {
                     <ForecastInterval />
                 </div>
                 {errorDetails !== null && <Toast2 message={errorDetails} timeout={0} onDismiss={() => dispatch(errorDetailsSet(null))} intent="danger"></Toast2>}
-                <WeatherProviderSelector />
+                <Collapse isOpen={showSettings}>
+                    <FormGroup>
+                        <CheckboxCard onChange={ev => setComputeStdDEv(ev.target.checked)} compact showAsSelectedWhenChecked={false}>{t("buttons.standardDeviation")}</CheckboxCard>
+                        <CheckboxCard onChange={ev => setDownloadAll(ev.target.checked)} compact showAsSelectedWhenChecked={false}>{t("buttons.downloadAll")}</CheckboxCard>
+                    </FormGroup>
+                </Collapse>
+                <div style={{ display: "flex", justifyContent: 'space-between' }}>
+                    <WeatherProviderSelector />
+                    <MediaQuery maxDeviceWidth={500}>
+                        <Button size='small' variant='minimal' onClick={event => {setShowSettings(!showSettings)}} icon={<Cog/>}></Button>
+                    </MediaQuery>
+                </div>
                 <div style={{ display: "flex", margin: "30px 0px" }}>
                     <LocationContext.Consumer>
-                        {value => <ForecastButton href={value.href} origin={value.origin} />}
+                        {value => <ForecastButton href={value.href} origin={value.origin} computeStdDev={computeStdDev} downloadAll={downloadAll} />}
                     </LocationContext.Consumer>
                 </div>
             </div>

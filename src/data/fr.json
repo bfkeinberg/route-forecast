@@ -11,7 +11,9 @@
                 "forecastPending":"Création de prévisions...",
                 "zoomToSegment":"Zoom",
                 "banked":"Afficher le temps accumulé",
-                "addControl":"Ajouter"
+                "addControl":"Ajouter",
+                "downloadAll":"Télécharger toutes les prévisions",
+                "standardDeviation":"Calculer l'écart type"
             },
             "labels": {
                 "language": "Choisissez la langue",

@@ -1,4 +1,4 @@
-import { Alignment,Button, Intent, Navbar, NavbarDivider, NavbarGroup, NavbarHeading, Divider } from "@blueprintjs/core";
+import { Button, Intent, Navbar, NavbarDivider, NavbarGroup, NavbarHeading, Divider } from "@blueprintjs/core";
 import {Cloud, Cycle,Globe, Map as MapIcon, Shop } from "@blueprintjs/icons";
 import * as React from "react";
 import { Link, MemoryRouter, Route, Routes, useLocation, useNavigate } from "react-router-dom";
@@ -91,28 +91,28 @@ const MobileUITabs = (props : MobileUIPropTypes) => {
                         <NavbarHeading>Randoplan</NavbarHeading>
                         <Sentry.ErrorBoundary fallback={<h2>Something went wrong.</h2>}>
                             <Link to={"/"} className={'nav-link'}>
-                                <Button small icon={<MapIcon />} title={"home"} intent={pathname==='/'?Intent.PRIMARY:Intent.NONE}></Button>
+                                <Button size='small' icon={<MapIcon />} title={"home"} intent={pathname==='/'?Intent.PRIMARY:Intent.NONE}></Button>
                             </Link>
                         </Sentry.ErrorBoundary>
                         <NavbarDivider />
                         <Sentry.ErrorBoundary fallback={<h2>Something went wrong.</h2>}>
                             <Link to={"/controlPoints/"} className={'nav-link'}>
-                                <Button small disabled={!routeData} icon={<Shop/>} title={"controls"} intent={pathname.startsWith('/controlPoints')?Intent.PRIMARY:Intent.NONE} />
+                                <Button size='small' disabled={!routeData} icon={<Shop/>} title={"controls"} intent={pathname.startsWith('/controlPoints')?Intent.PRIMARY:Intent.NONE} />
                             </Link>
                         </Sentry.ErrorBoundary>
                         <NavbarDivider />
                         <Link to={"/forecastTable/"} className={'nav-link'}>
-                            <Button small icon={<Cloud/>} title={"forecast"} intent={needToViewTable ? Intent.WARNING : (pathname.startsWith('/forecastTable')?Intent.PRIMARY:Intent.NONE)} />
+                            <Button size='small' icon={<Cloud/>} title={"forecast"} intent={needToViewTable ? Intent.WARNING : (pathname.startsWith('/forecastTable')?Intent.PRIMARY:Intent.NONE)} />
                         </Link>
                         <NavbarDivider />
                         <Link to={"/map/"} className={'nav-link'}>
-                        <Button small icon={<Globe/>} title={"map"} intent={needToViewMap ? Intent.WARNING : (pathname.startsWith('/map')?Intent.PRIMARY:Intent.NONE)} />
+                        <Button size='small' icon={<Globe/>} title={"map"} intent={needToViewMap ? Intent.WARNING : (pathname.startsWith('/map')?Intent.PRIMARY:Intent.NONE)} />
                         </Link>
                         <NavbarDivider />
                         {
                             stravaActivityData &&
                             <Link to={"/paceTable/"} className={'nav-link'}>
-                                <Button small icon={<Cycle />} color="orange" disabled={!stravaActivityData} title={"strava"} intent={needToViewTable ? Intent.WARNING : pathname.startsWith('/paceTable') ? Intent.PRIMARY : Intent.NONE} />
+                                <Button size='small' icon={<Cycle />} color="orange" disabled={!stravaActivityData} title={"strava"} intent={needToViewTable ? Intent.WARNING : pathname.startsWith('/paceTable') ? Intent.PRIMARY : Intent.NONE} />
                             </Link>
                         }
                     </NavbarGroup>
