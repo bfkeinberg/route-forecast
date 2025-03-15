@@ -16,13 +16,13 @@ const SERVER_DIR = path.resolve(BUILD_DIR, 'server');
 const VIEWS_DIR = path.resolve(SERVER_DIR, 'views');
 var webpack = require('webpack');
 
-module.exports = (env,argv) => {
+module.exports = (env, argv) => {
     const mode = argv === undefined ? 'development' : argv.mode;
     const devMode = process.env.NODE_ENV !== "production"
     return {
-        mode:mode,
+        mode: mode,
         cache: {
-            type:'filesystem'
+            type: 'filesystem'
         },
         entry: [path.resolve(APP_DIR, 'app/app.tsx')],
         module: {
@@ -30,7 +30,7 @@ module.exports = (env,argv) => {
                 {
                     test: /\.(js|css|scss)$/,
                     enforce: "pre",
-                    use: [{loader: "source-map-loader"}],
+                    use: [{ loader: "source-map-loader" }],
                     "exclude": [
                         path.join(process.cwd(), 'node_modules/react-responsive'),
                         path.join(process.cwd(), 'node_modules/@blueprintjs')
@@ -38,7 +38,7 @@ module.exports = (env,argv) => {
                 },
                 {
                     test: /\.(t|j)sx?$/,
-                    use: {loader: 'ts-loader'} ,
+                    use: { loader: 'ts-loader' },
                     exclude: /node_modules/
                 },
                 {
@@ -56,7 +56,8 @@ module.exports = (env,argv) => {
                         "css-loader"
                     ]
                 },
-                {test: /\.(png|woff2?|ttf|eot)$/,
+                {
+                    test: /\.(png|woff2?|ttf|eot)$/,
                     type: "asset",
                     parser: {
                         dataUrlCondition: {
@@ -64,8 +65,8 @@ module.exports = (env,argv) => {
                         }
                     }
                 },
-                {test: /\.(jpg|ico|svg|gif)$/, type: "asset/resource"},
-                {test: /\.htm$/, type: "asset/source"}
+                { test: /\.(jpg|ico|svg|gif)$/, type: "asset/resource" },
+                { test: /\.htm$/, type: "asset/source" }
             ]
         },
         plugins: [
@@ -74,7 +75,7 @@ module.exports = (env,argv) => {
             new webpack.ProvidePlugin({
                 Buffer: [
                     'buffer',
-                 'Buffer'
+                    'Buffer'
                 ]
             }),
             new MiniCssExtractPlugin({
@@ -88,20 +89,22 @@ module.exports = (env,argv) => {
                 filename: path.resolve(VIEWS_DIR, 'index.ejs'),
                 template: path.resolve(TEMPLATE_DIR, 'base_index.html'),
                 inject: false,
-                minify: {minifyURLs: true, removeComments: true},
+                minify: { minifyURLs: true, removeComments: true },
                 chunksSortMode: 'none',
                 sentryRelease: env.sentryRelease,
                 mode: mode
                 // favicon:'src/static/favicon.ico'
             }),
-            new CopyWebpackPlugin({patterns:[
-                {from: SRC_STATIC_DIR + '/favicon*.*', to: path.resolve(STATIC_DIR, "[name][ext]")},
-                {from: SRC_STATIC_DIR + '/apple-*.*', to: path.resolve(STATIC_DIR, "[name][ext]")},
-                {from: 'manifest.json', to: path.resolve(STATIC_DIR, "[name][ext]")},
-                {from: 'src/pwa/worker.js', to: path.resolve(STATIC_DIR, "[name][ext]")},
-                {from: 'node_modules/localforage/dist/localforage.min.js', to: path.resolve(STATIC_DIR, "lib/localforage.js")},
-                {from: 'source-context.json', to: path.resolve(SERVER_DIR, "[name][ext]")}
-                ]})
+            new CopyWebpackPlugin({
+                patterns: [
+                    { from: SRC_STATIC_DIR + '/favicon*.*', to: path.resolve(STATIC_DIR, "[name][ext]") },
+                    { from: SRC_STATIC_DIR + '/apple-*.*', to: path.resolve(STATIC_DIR, "[name][ext]") },
+                    { from: 'manifest.json', to: path.resolve(STATIC_DIR, "[name][ext]") },
+                    { from: 'src/pwa/worker.js', to: path.resolve(STATIC_DIR, "[name][ext]") },
+                    { from: 'node_modules/localforage/dist/localforage.min.js', to: path.resolve(STATIC_DIR, "lib/localforage.js") },
+                    { from: 'source-context.json', to: path.resolve(SERVER_DIR, "[name][ext]") }
+                ]
+            })
         ],
         output:
         {
@@ -132,5 +135,24 @@ module.exports = (env,argv) => {
                 Images: SRC_STATIC_DIR
             },
         },
+        // webpack.common.js
+        optimization: {
+            moduleIds: 'deterministic',
+            chunkIds: 'named',            
+            splitChunks: {
+                cacheGroups: {
+                    mapModules: {
+                        test: /[\\/]Map[\\/]/,
+                        name: 'map-components',
+                        priority: 10
+                    },
+                    forecastModules: {
+                        test: /(Forecast|forecast|Weather)/,
+                        name: 'forecast-components',
+                        priority: 5
+                    }
+                }
+            }
+        }
     }
 };

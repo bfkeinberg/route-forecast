@@ -25,7 +25,12 @@ export type DesktopUIProps = {
     orientationChanged: boolean
     setOrientationChanged: Dispatch<SetStateAction<boolean>>
 }
-const LoadableForecastTable = lazy(() => {addBreadcrumb('loading forecast table'); return import(/* webpackChunkName: "ForecastTable" */ './resultsTables/ForecastTable')});
+const LoadableForecastTable = lazy(() => { 
+    addBreadcrumb('loading forecast table'); 
+    return Promise.all([
+        import(/* webpackChunkName: "ForecastTable" */ './resultsTables/ForecastTable'),
+        import(/* webpackChunkName: "ForecastTable" */ './resultsTables/WeatherCorrections')
+    ]).then(([forecastTableModule]) => forecastTableModule);});
 
 const DesktopUI = ({mapsApiKey, orientationChanged, setOrientationChanged} : DesktopUIProps) => {
     const { t } = useTranslation()
