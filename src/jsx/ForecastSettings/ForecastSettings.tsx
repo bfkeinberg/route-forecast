@@ -20,7 +20,7 @@ import Segment from './Segment'
 import i18n from '../app/i18n';
 
 import { useAppSelector, useAppDispatch } from '../../utils/hooks';
-import { useState } from 'react';
+import { ChangeEvent, useState } from 'react';
 
 export const ForecastSettings = () => {
     const [showSettings, setShowSettings] = useState(false)
@@ -34,6 +34,17 @@ export const ForecastSettings = () => {
     const showControlPoints = useAppSelector(state => state.controls.displayControlTableUI)
     const setShowControlPoints = () => { ReactGA.event('select_content', { content_type: 'controls' });return dispatch(displayControlTableUiSet(!showControlPoints)) }
     const onDesktop = useMediaQuery({query:`(min-width: ${maxWidthForMobile})`})
+
+    const toggleStdDev = (ev : ChangeEvent<HTMLInputElement>) => {
+        if (ev.target.checked) setDownloadAll(false)
+        return setComputeStdDEv(ev.target.checked)
+    }
+
+    const toggleDownloadAll = (ev : ChangeEvent<HTMLInputElement>) => {
+        if (ev.target.checked) setComputeStdDEv(false)
+        return setDownloadAll(ev.target.checked)
+    }
+    
     return (
         <div style={{ display: "flex", flexFlow: "column", alignItems: "center", marginBottom: "5px" }}>
             <div style={{ padding: "10px" }}>
@@ -68,8 +79,8 @@ export const ForecastSettings = () => {
                 {errorDetails !== null && <Toast2 message={errorDetails} timeout={0} onDismiss={() => dispatch(errorDetailsSet(null))} intent="danger"></Toast2>}
                 <Collapse isOpen={showSettings}>
                     <FormGroup>
-                        <CheckboxCard onChange={ev => setComputeStdDEv(ev.target.checked)} compact showAsSelectedWhenChecked={false}>{t("buttons.standardDeviation")}</CheckboxCard>
-                        <CheckboxCard onChange={ev => setDownloadAll(ev.target.checked)} compact showAsSelectedWhenChecked={false}>{t("buttons.downloadAll")}</CheckboxCard>
+                        <CheckboxCard checked={computeStdDev} onChange={toggleStdDev} compact showAsSelectedWhenChecked={false}>{t("buttons.standardDeviation")}</CheckboxCard>
+                        <CheckboxCard checked={downloadAll} onChange={toggleDownloadAll} compact showAsSelectedWhenChecked={false}>{t("buttons.downloadAll")}</CheckboxCard>
                     </FormGroup>
                 </Collapse>
                 <div style={{ display: "flex", justifyContent: 'space-between' }}>
