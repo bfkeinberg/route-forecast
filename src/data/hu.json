@@ -1,0 +1,115 @@
+{
+  "translation": {
+    "buttons": {
+      "bugReport": "Hiba bejelentése",
+      "donate": "Adományoz",
+      "loadRoute": "Betöltési útvonal",
+      "usePinned": "Használjon rögzített útvonalakat",
+      "dontUsePinned": "Ne használjon rögzített útvonalakat",
+      "stops": "Megállók hozzáadása",
+      "forecast": "Előrejelzés",
+      "forecastPending": "Előrejelzés létrehozása...",
+      "zoomToSegment": "Zoomolás",
+      "banked": "A banki idő megjelenítése",
+      "addControl": "Hozzáadás",
+      "downloadAll": "Az összes előrejelzés letöltése",
+      "standardDeviation": "Számítsa ki a szórást"
+    },
+    "labels": {
+      "language": "Válasszon nyelvet",
+      "routeType": "Útvonal típusa",
+      "ridingPace": "Tempó sík terepen",
+      "startingTime": "Kezdési idő",
+      "miles": "A mértékegységek mérföldek stb",
+      "englishSystem": "Császári",
+      "metricSystem": "Metrikus",
+      "kilometers": "Egységek metrikusan",
+      "projectedFinish": "Tervezett befejezési idő",
+      "interval": "Előrejelzési intervallum percekben",
+      "source": "Időjárás-előrejelzés forrása",
+      "customSegment": "Egyéni szegmenshossz használata",
+      "degreesF": "A hőmérséklet F fokban",
+      "degreesC": "Hőmérséklet C fokban"
+    },
+    "titles": {
+      "routeInfo": "Útvonal info",
+      "forecastSettings": "Előrejelzési beállítások",
+      "forecast": "Előrejelzés",
+      "paceAnalysis": "Iramelemzés",
+      "rwgpsId": "Utazz GPS Route ID-vel",
+      "loading": "Útvonal betöltés",
+      "forecastControls": "Előrejelzési vezérlők",
+      "map": "Előrejelzési térkép"
+    },
+    "tooltips": {
+      "ridingPace": "Sebesség sík terepen, amelyet a mászás csökkent",
+      "actualPace": "A tényleges lovaglási tempó volt",
+      "interval": "Milyen gyakran generálhat időjárás-előrejelzést percekben",
+      "provider": "Az előrejelzésekhez használt időjárás-szolgáltató",
+      "forecast": {
+        "enabled": "Kérjen utazási előrejelzést",
+        "disabled": "Meg kell adnia egy rwgps útvonalazonosítót"
+      },
+      "startingTime": "Amikor azt tervezi, hogy elkezd lovagolni",
+      "distHeader": "Távolság a szegmens elején",
+      "windHeader": "Kattintson az átlagos szélsebesség és a széllökések közötti váltáshoz",
+      "temperatureHeader": "Kattintson a hőmérséklet és a látszólagos hőmérséklet közötti váltáshoz",
+      "aqiHeader": "A levegőminőség az aktuális állapotokat mutatja, nem előrejelzést. Kattintson ide a következő kért előrejelzés váltásához",
+      "overallPace": "A tempó az emelkedéshez igazított átlagos sebesség",
+      "analysisInterval": "Az effektív tempó kiszámításának időköze órákban",
+      "zoom": "Meghatározza, hogy nagyítson-e az útvonalszakaszokra, amikor az egérmutatót a táblázatban a vonaluk fölé viszi",
+      "customSegment": "Az útvonalnak csak ezt a részét előre jelezze",
+      "bearingHeader": "Kattintson az abszolút és a relatív szélcsapágy közötti váltáshoz",
+      "copyTable": "Előrejelzési táblázat másolása",
+      "scrollToRain": "Hozd az első előrejelzési sort az eső változásával",
+      "banked": "Mutassa meg, hány perc van még hátra az ACP/RUSA rövid befejezési időn belül"
+    },
+    "data": {
+      "noForecastPlaceholder": "Keressen előrejelzést a létrehozáshoz",
+      "wind": {
+        "lost": "elveszett",
+        "gained": "szerzett",
+        "to": "szélnek",
+        "from": "széltől",
+        "gust": "Széllökés",
+        "speed": "Szélsebesség"
+      },
+      "info": {
+        "temperature": "Hőmérséklet"
+      },
+      "summary": "Az időjárási és domborzati adatok segítségével készítsen útvonaltervet az utazásaihoz.",
+      "loading": "betölthet útvonalakat a Ride-ről a GPS-szel, a Stravával vagy a RUSA.org állandó útvonalainak azonosítóival. Beillesztheti egy útvonal URL-jét a Ride with GPS-ből vagy a Strava-ból, vagy megragadhatja az azonosítót egy RUSA perm-útvonal információi közül. Ha olyan útvonalat rögzít, amelyet a Ride with GPS-en tekint meg, a jobb oldali gomb felsorolja azokat. A rendszer kérni fogja, hogy jelentkezzen be az RWGPS-be, ha még nem tette meg.",
+      "tableHeadersDoc": "Az oszlopfejlécek feletti gombok lehetővé teszik a megjelenített információk megváltoztatását, például az abszolút hőmérséklet és a „érzések” között. hőmérséklet"
+    },
+    "tableHeaders": {
+      "temperature": "Úgy érzi",
+      "time": "Idő",
+      "summary": "Összegzés",
+      "precipitation": "Eső valószínű",
+      "humidity": "Nedvesség",
+      "cloudCover": "Felhőtakaró",
+      "windBearing": "Szélcsapágy",
+      "relBearing": "Relatív szél"
+    },
+    "toasts": {
+      "aqi": {
+        "enabled": "Aqi lekérés engedélyezve",
+        "disabled": "AQI lekérés letiltva"
+      },
+      "tableCopied": "Előrejelzési táblázat másolva"
+    },
+    "controls": {
+      "name": "Név",
+      "distanceMiles": "Mérföld",
+      "distanceKilometers": "Kilométer",
+      "duration": "Várható eltöltött idő",
+      "arrival": "Becsült érkezési idő",
+      "delete": "Töröl"
+    },
+    "analysis": {
+      "overallPace": "Összességében emelkedéshez igazított tempó volt",
+      "interval": "óra",
+      "halfHourInterval": "fél óra"
+    }
+  }
+}
