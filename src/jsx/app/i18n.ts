@@ -4,6 +4,8 @@ import LanguageDetector from 'i18next-browser-languagedetector';
 import enNs from "../../data/en.json"
 import frNs from "../../data/fr.json"
 import esNs from "../../data/es.json"
+import bgNs from "../../data/bg.json"
+import huNs from "../../data/hu.json"
 
 i18n
   // detect user language
@@ -17,14 +19,16 @@ i18n
     debug: true,
     fallbackLng: 'en-US',
     nonExplicitSupportedLngs: true,
-    supportedLngs: ['en-US', 'en-GB', 'en', 'fr', 'es'],
+    supportedLngs: ['en-US', 'en-GB', 'en', 'fr', 'es', 'bg', 'hu'],
     interpolation: {
       escapeValue: false, // not needed for react as it escapes by default
     },
     resources:{
       en:enNs,
       fr:frNs,
-      es:esNs
+      es:esNs,
+      bg:bgNs,
+      hu:huNs
     }
   });
 
