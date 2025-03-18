@@ -52,8 +52,14 @@ const callVisualCrossing = async function (lat : number, lon : number, currentTi
         throw new Error("Missing Visual Crossing key")
     }
     const startTime = convertToValidStart(currentTime)
-    const startTimeString = startTime.toUnixInteger();
-    const url = new URL(`https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/${lat},${lon}/${startTimeString}`);
+    if (!startTime.isValid) {
+        throw new Error(`Invalid start time for Visual Crossing request: ${startTime.invalidReason}`)
+    }
+    const startTimestamp = startTime.toUnixInteger();
+    if (isNaN(startTimestamp)) {
+        throw new Error(`Invalid start timestamp for Visual Crossing request - from ${startTime.toString()}`)
+    }
+    const url = new URL(`https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/${lat},${lon}/${startTimestamp}`);
     url.searchParams.append('unitGroup', 'us');
     url.searchParams.append('include', 'current');
     url.searchParams.append('options', 'nonulls');

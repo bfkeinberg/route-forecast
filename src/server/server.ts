@@ -318,7 +318,7 @@ app.post('/forecast_one', cache.middleware(), upload.none(), async (req : Reques
         return
     }
     if (!process.env.NO_LOGGING) {
-        logger.info(`Request from ${req.ip} for single point from ${service}`);
+        logger.info(`Request from ${req.ip} for single point from ${service} at ${forecastPoints.time}`);
     }
     // if (req.body.routeName !== undefined && req.body.routeName !== '' && req.body.which===0) {
     //     let dbRecord = makeRecord(forecastPoints, req.body.routeNumber);
