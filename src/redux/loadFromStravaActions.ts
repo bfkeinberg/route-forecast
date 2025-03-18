@@ -9,24 +9,25 @@ import { stravaFetchBegun, stravaFetched, stravaFetchFailed, stravaActivitySet, 
 import { stravaErrorSet, errorDetailsSet, gpxRouteLoadingFailed } from "./dialogParamsSlice";
 import { Api } from 'rest-api-handler';
 import queryString from 'query-string'
+import { stravaAuthApiSlice } from '../redux/stravaAuthApiSlice'
 
 const getStravaParser = async function() {
     const parser = await import(/* webpackChunkName: "StravaRouteParser" */ '../utils/stravaRouteParser');
     return parser.default;
 };
 
-const stravaTokenTooOld = (getState: () => RootState) => {
-    if (getState().strava.expires_at == null) {
+const stravaTokenTooOld = (expires_at : number) => {
+    if (expires_at == null) {
         return true;        // in contrast to past, if we have no expires_at field,
                             // assume that the token is too old and refresh it
     }
-    return (getState().strava.expires_at! < Math.round(Date.now()/1000));
+    return (expires_at! < Math.round(Date.now()/1000));
 };
 
-const refreshOldToken = (dispatch : AppDispatch, getState: () => RootState) => {
-    if (stravaTokenTooOld(getState)) {
+const refreshOldToken = (dispatch : AppDispatch, getState: () => RootState, refresh_token: string, expires_at: number) => {
+    if (stravaTokenTooOld(expires_at)) {
         return new Promise<string|null>((resolve, reject) => {
-            fetch(`/refreshStravaToken?refreshToken=${getState().strava.refresh_token}`).then(response => {
+            fetch(`/refreshStravaToken?refreshToken=${refresh_token}`).then(response => {
                 if (response.status === 200) {
                     return response.json();
                 }
@@ -72,11 +73,12 @@ export const loadStravaActivity = function() {
             return Promise.resolve(Error('Cannot load parser'));
         }
         const refresh_token = getState().strava.refresh_token
+        const expires_at = getState().strava.expires_at
         const activityId = getState().strava.activity
-        if (!refresh_token) {
-            authenticateActivity(activityId)
+        if (!refresh_token || !expires_at) {
+            return authenticateActivity(activityId)
         }
-        const access_token = await refreshOldToken(dispatch, getState)
+        const access_token = await refreshOldToken(dispatch, getState, refresh_token, expires_at)
         if (!access_token) {
             dispatch(stravaFetchFailed(Error("Failed to get Strava access token")));
             dispatch(stravaActivitySet(''))
@@ -155,10 +157,11 @@ export const loadStravaRoute = (routeId : string) => {
         await Sentry.startSpan({ name: "loadingStravaRoute" }, async () => {
             const api = new Api('https://www.strava.com/api/v3', [(response) => Promise.resolve(response.text())])
             const refresh_token = getState().strava.refresh_token
-            if (!refresh_token) {
-                authenticate(routeId)
+            const expires_at = getState().strava.expires_at
+            if (!refresh_token || !expires_at) {
+                return authenticate(routeId)
             }
-            const access_token = await dispatch(refreshOldToken)
+            const access_token = await refreshOldToken(dispatch, getState, refresh_token, expires_at)
             if (!access_token) {
                 authenticate(routeId)
             }
