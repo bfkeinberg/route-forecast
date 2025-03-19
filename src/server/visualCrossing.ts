@@ -53,10 +53,12 @@ const callVisualCrossing = async function (lat : number, lon : number, currentTi
     }
     const startTime = convertToValidStart(currentTime)
     if (!startTime.isValid) {
+        Sentry.captureMessage(`Invalid start time for Visual Crossing request: ${startTime.invalidReason}`)
         throw new Error(`Invalid start time for Visual Crossing request: ${startTime.invalidReason}`)
     }
     const startTimestamp = startTime.toUnixInteger();
     if (isNaN(startTimestamp)) {
+        Sentry.captureMessage(`Invalid start timestamp for Visual Crossing request - from ${startTime.toString()}`)
         throw new Error(`Invalid start timestamp for Visual Crossing request - from ${startTime.toString()}`)
     }
     const url = new URL(`https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/${lat},${lon}/${startTimestamp}`);
