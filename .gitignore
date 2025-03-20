@@ -16,3 +16,4 @@ sample_output/
 # Sentry Config File
 .env.sentry-build-plugin
 tsc.log
+translateTo.sh
