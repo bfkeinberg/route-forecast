@@ -3,6 +3,7 @@
 import axios from "axios";
 import { DateTime } from "luxon";
 import { WeatherFunc } from "./weatherForecastDispatcher";
+import { start } from "repl";
 const Sentry = require('@sentry/node')
 
 const convertToValidStart = (currentTime : string) => {
@@ -53,8 +54,8 @@ const callVisualCrossing = async function (lat : number, lon : number, currentTi
     }
     const startTime = convertToValidStart(currentTime)
     if (!startTime.isValid) {
-        Sentry.captureMessage(`Invalid start time for Visual Crossing request: ${startTime.invalidReason}`)
-        throw new Error(`Invalid start time for Visual Crossing request: ${startTime.invalidReason}`)
+        Sentry.captureMessage(`Invalid start time for Visual Crossing request: ${startTime.invalidReason} ${startTime.invalidExplanation} ${startTime.toString()}`)
+        throw new Error(`Invalid start time for Visual Crossing request: ${startTime.invalidReason} ${startTime.invalidExplanation} ${startTime.toString()}`)
     }
     const startTimestamp = startTime.toUnixInteger();
     if (isNaN(startTimestamp)) {
