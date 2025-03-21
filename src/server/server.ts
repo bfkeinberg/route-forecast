@@ -639,6 +639,7 @@ app.get('/stravaAuthReq', async (req : Request, res : Response) => {
 app.get('/stravaAuthReply', async (req : Request, res : Response) => {
     const code = req.query.code;
     let error = req.query.error;
+    const scope = req.query.scope
     if (error === undefined && code === undefined) {
         error = 'Strava authentication denied';
     }
@@ -656,6 +657,7 @@ app.get('/stravaAuthReply', async (req : Request, res : Response) => {
         restoredState = JSON.parse(decodeURIComponent(state));
     }
     if (error === undefined && typeof code === "string") {
+        console.log(`Requesting Strava token exchange with code ${code} and scope ${scope}`)
         process.env.STRAVA_CLIENT_SECRET = process.env.STRAVA_API_KEY;
         getStravaToken(code).then(token => {
             restoredState.strava_access_token = token.access_token;
@@ -670,6 +672,7 @@ app.get('/stravaAuthReply', async (req : Request, res : Response) => {
         })
     }
     else {
+        Sentry.captureMessage(`Error ${error} from Strava OAuth flow getting code`)
         restoredState.strava_activity = undefined;
         if (typeof error === 'string') restoredState.strava_error = error;
         res.redirect(url.format('/?') + querystring.stringify(restoredState));
