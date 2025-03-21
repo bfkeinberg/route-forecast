@@ -63,11 +63,11 @@ interface ForecastGridType {
     }
 }
 const findNearestTime = <T>(data : {values: Array<{validTime: string, value: T}>}, time : DateTime) : T => {
-    let newerThan = data.values.filter(value => {return Interval.fromISO(value.validTime).contains(time)});
-    if (newerThan.length === 0) {
-        throw Error("No matching weather data");
+    let newerThan = data.values.find(value => {return Interval.fromISO(value.validTime).contains(time)});
+    if (!newerThan) {
+        throw Error(`No matching weather data for ${time.toString()}`);
     }
-    return newerThan[0].value;
+    return newerThan.value;
 };
 
 const extractForecast = (forecastGridData : ForecastGridType, currentTime : DateTime) => {
