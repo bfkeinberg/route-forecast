@@ -49,7 +49,8 @@ else {
                     Sentry.browserTracingIntegration(),
                     Sentry.replayIntegration({
                         maskAllText: false,
-                        blockAllMedia: false                        
+                        blockAllMedia: false,
+                        maskAllInputs: false
                     }),
                     Sentry.replayCanvasIntegration(),
                     Sentry.feedbackIntegration({
