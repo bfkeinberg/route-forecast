@@ -98,6 +98,7 @@ else {
         } else {
             ReactGA.set({'appName': 'randoplan'})
             ReactGA.set({'appVersion' : version})
+            ReactGA.event('appVersion', {rpVersion: version})
         }
         const root = createRoot(container);
         root.render(
