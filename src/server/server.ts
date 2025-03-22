@@ -524,6 +524,8 @@ const getStravaAuthUrl = async (baseUrl : string, state: string) => {
     else {
         process.env.STRAVA_REDIRECT_URI = 'https://www.randoplan.com/stravaAuthReply';
     }
+    Sentry.captureMessage(`Strava auth request with state ${state}`)
+    process.env.STRAVA_CLIENT_SECRET = process.env.STRAVA_API_KEY;
     return await strava.oauth.getRequestAccessURL({ scope: 'activity:read_all,read_all', state: encodeURIComponent(state) });
 };
 
@@ -538,8 +540,9 @@ interface StravaToken {
     statusCode: number
     statusMessage: string
 }
+
 const getStravaToken = (code : string) => {
-    process.env.STRAVA_ACCESS_TOKEN = 'fake';
+    // process.env.STRAVA_ACCESS_TOKEN = 'fake';
     return strava.oauth.getToken(code, (err: { msg: any; } | null, payload: StravaToken) => {console.log(`token was ${JSON.stringify(payload.body)}`)})
 };
 
@@ -616,18 +619,18 @@ app.get('/stravaAuthReq', async (req : Request, res : Response) => {
         res.status(400).json({ 'status': 'Missing OAuth state from Strava' });
         return;
     }
-    try {
-        // let restoredState = JSON.parse(decodeURIComponent(state.replace(/\+/g, " ")));
-        // insertFeatureRecord({
-        //     timestamp: new Date(),
-        //     routeNumber: restoredState.rwgpsRoute === undefined ? null : restoredState.rwgpsRoute
-        // },
-        //     "strava");
+/*     try {
+        let restoredState = JSON.parse(decodeURIComponent(state.replace(/\+/g, " ")));
+        insertFeatureRecord({
+            timestamp: new Date(),
+            routeNumber: restoredState.rwgpsRoute === undefined ? null : restoredState.rwgpsRoute
+        },
+            "strava");
     } catch (error) {
         res.status(400).json({'status':`${error} : Invalid OAuth state ${state}`});
         return;
     }
-    const baseUrl = url.format({
+ */    const baseUrl = url.format({
         protocol: req.protocol,
         host: req.get('host')
     });

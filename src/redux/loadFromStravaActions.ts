@@ -17,15 +17,11 @@ const getStravaParser = async function() {
 };
 
 const stravaTokenTooOld = (expires_at : number) => {
-    if (expires_at == null) {
-        return true;        // in contrast to past, if we have no expires_at field,
-                            // assume that the token is too old and refresh it
-    }
     return (expires_at! < Math.round(Date.now()/1000));
 };
 
-const refreshOldToken = (dispatch : AppDispatch, getState: () => RootState, refresh_token: string, expires_at: number) => {
-    if (stravaTokenTooOld(expires_at)) {
+const refreshOldToken = (dispatch : AppDispatch, getState: () => RootState, refresh_token: string, expires_at: number|null) => {
+    if (!expires_at || stravaTokenTooOld(expires_at)) {
         return new Promise<string|null>((resolve, reject) => {
             fetch(`/refreshStravaToken?refreshToken=${refresh_token}`).then(response => {
                 if (response.status === 200) {
@@ -75,7 +71,7 @@ export const loadStravaActivity = function() {
         const refresh_token = getState().strava.refresh_token
         const expires_at = getState().strava.expires_at
         const activityId = getState().strava.activity
-        if (!refresh_token || !expires_at) {
+        if (!refresh_token) {
             return authenticateActivity(activityId)
         }
         const access_token = await refreshOldToken(dispatch, getState, refresh_token, expires_at)
@@ -158,7 +154,7 @@ export const loadStravaRoute = (routeId : string) => {
             const api = new Api('https://www.strava.com/api/v3', [(response) => Promise.resolve(response.text())])
             const refresh_token = getState().strava.refresh_token
             const expires_at = getState().strava.expires_at
-            if (!refresh_token || !expires_at) {
+            if (!refresh_token) {
                 return authenticate(routeId)
             }
             const access_token = await refreshOldToken(dispatch, getState, refresh_token, expires_at)
