@@ -524,7 +524,6 @@ const getStravaAuthUrl = async (baseUrl : string, state: string) => {
     else {
         process.env.STRAVA_REDIRECT_URI = 'https://www.randoplan.com/stravaAuthReply';
     }
-    Sentry.captureMessage(`Strava auth request with state ${state}`)
     process.env.STRAVA_CLIENT_SECRET = process.env.STRAVA_API_KEY;
     return await strava.oauth.getRequestAccessURL({ scope: 'activity:read_all,read_all', state: encodeURIComponent(state) });
 };
@@ -640,6 +639,7 @@ app.get('/stravaAuthReq', async (req : Request, res : Response) => {
 });
 
 app.get('/stravaAuthReply', async (req : Request, res : Response) => {
+    console.log(JSON.stringify(req.query))
     const code = req.query.code;
     let error = req.query.error;
     const scope = req.query.scope
