@@ -1,4 +1,5 @@
 import { FormGroup,InputGroup } from '@blueprintjs/core';
+import { IconNames } from '@blueprintjs/icons';
 import ReactGA from "react-ga4";
 import {connect} from 'react-redux';
 import * as Sentry from "@sentry/react";
@@ -11,7 +12,7 @@ const ShortUrl = ({shortUrl} : {shortUrl:string}) => {
             <div style={{width: "150px", display: "flex", alignItems: "center"}}>
                 <div>Shareable link:</div>
             </div>
-            <InputGroup id={'shortUrl'} size="small" readOnly fill={false} type="text" value={shortUrl}
+            <InputGroup leftIcon={IconNames.SHARE} id={'shortUrl'} size="small" readOnly fill={false} type="text" value={shortUrl}
                    onClick={async event => {
                        try {
                             await navigator.clipboard.writeText((event.target as HTMLInputElement).value);
