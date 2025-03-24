@@ -294,11 +294,14 @@ const RouteWeatherUI = ({search, href, action, maps_api_key, timezone_api_key, b
     if (fetchAqi) {
         dispatch(fetchAqiSet(fetchAqi==="true"))
     }
-    if (i18n.language === 'fr') {
+    if (i18n.resolvedLanguage === 'fr') {
         ReactGA.event('tutorial_begin')
     }
-    if (i18n.language === 'es') {
+    if (i18n.resolvedLanguage === 'es') {
         ReactGA.event('select_promotion', {creative_name:'es'})
+    }
+    if (i18n.resolvedLanguage === 'it') {
+        ReactGA.event('select_promotion', {creative_name:'it'})
     }
     return (
         <FunAppWrapperThingForHooksUsability maps_api_key={maps_api_key} queryParams={queryParamsAsObj} lang={i18n.language}/>

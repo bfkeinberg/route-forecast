@@ -28,7 +28,7 @@ import ReactGA from "react-ga4";
 type TimeFormats = {
     [index:string]:string
   }
-const timeFormatForLang : TimeFormats = {'en':'h:mm a', 'en-US':'h:mm a', 'fr':'H:mm', 'es':'H:mm'}
+const timeFormatForLang : TimeFormats = {'en':'h:mm a', 'en-US':'h:mm a', 'fr':'H:mm', 'es':'H:mm', 'it': 'H:mm'}
   
 const displayBacklink = (provider : string) => {
     switch (provider) {
