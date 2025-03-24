@@ -1,0 +1,115 @@
+{
+  "translation": {
+    "buttons": {
+      "bugReport": "Segnala un bug",
+      "donate": "Fai una donazione",
+      "loadRoute": "Carica percorso",
+      "usePinned": "Utilizza percorsi bloccati",
+      "dontUsePinned": "Non utilizzare percorsi bloccati",
+      "stops": "Aggiungi fermate",
+      "forecast": "Previsione",
+      "forecastPending": "Creazione previsione...",
+      "zoomToSegment": "Zoom",
+      "banked": "Visualizza tempo accumulato",
+      "addControl": "Aggiungi",
+      "downloadAll": "Scarica tutte le previsioni",
+      "standardDeviation": "Calcola deviazione standard"
+    },
+    "labels": {
+      "language": "Seleziona lingua",
+      "routeType": "Tipo di percorso",
+      "ridingPace": "Andatura su terreno pianeggiante",
+      "startingTime": "Ora di partenza",
+      "miles": "Le unità sono miglia ecc.",
+      "englishSystem": "Imperiale",
+      "metricSystem": "Metrico",
+      "kilometers": "Unità nel sistema metrico",
+      "projectedFinish": "Ora di arrivo prevista",
+      "interval": "Intervallo di previsione in minuti",
+      "source": "Previsioni meteo origine",
+      "customSegment": "Usa lunghezza segmento personalizzata",
+      "degreesF": "Temperatura in gradi F",
+      "degreesC": "Temperatura in gradi C"
+    },
+    "titles": {
+      "routeInfo": "Informazioni percorso",
+      "forecastSettings": "Impostazioni previsioni",
+      "forecast": "Previsioni",
+      "paceAnalysis": "Analisi andatura",
+      "rwgpsId": "Corsa con ID percorso GPS",
+      "loading": "Caricamento percorso",
+      "forecastControls": "Controlli previsioni",
+      "map": "Mappa previsioni"
+    },
+    "tooltips": {
+      "ridingPace": "Velocità su terreno pianeggiante, che verrà ridotta salendo",
+      "actualPace": "Il ritmo effettivo di guida era",
+      "interval": "Con quale frequenza generare le previsioni meteo in minuti",
+      "provider": "Il fornitore di servizi meteo da utilizzare per le previsioni",
+      "forecast": {
+        "enabled": "Richiedi una previsione di guida",
+        "disabled": "Devi fornire un ID percorso rwgps"
+      },
+      "startingTime": "Quando hai intenzione di iniziare a pedalare",
+      "distHeader": "Distanza all'inizio del segmento",
+      "windHeader": "Clicca per passare dalla velocità media del vento alla velocità del vento raffiche",
+      "temperatureHeader": "Clicca per passare dalla temperatura alla temperatura apparente e viceversa",
+      "aqiHeader": "La qualità dell'aria mostra le condizioni attuali, non quelle previste. Clicca per passare alla previsione successiva richiesta",
+      "overallPace": "Il ritmo è la velocità media aggiustata per la salita",
+      "analysisInterval": "Intervallo in ore in cui calcolare il ritmo effettivo",
+      "zoom": "Se ingrandire i segmenti del percorso quando si passa il mouse sulla loro linea nella tabella",
+      "customSegment": "Prevedi solo questa parte del percorso",
+      "bearingHeader": "Fai clic per alternare tra direzione del vento assoluta e relativa",
+      "copyTable": "Copia tabella previsioni",
+      "scrollToRain": "Visualizza la prima riga di previsione con variazione di pioggia",
+      "banked": "Mostra quanti minuti rimangono per essere entro i tempi di conclusione del brevetto ACP/RUSA"
+    },
+    "data": {
+      "noForecastPlaceholder": "Trova previsioni da creare",
+      "wind": {
+        "lost": "perso",
+        "gained": "guadagnato",
+        "to": "al vento",
+        "from": "dal vento",
+        "gust": "Raffica di vento",
+        "speed": "Velocità del vento"
+      },
+      "info": {
+        "temperature": "Temperatura"
+      },
+      "summary": "Utilizza dati meteorologici e del terreno per creare un piano di percorso per le tue corse.",
+      "loading": "puoi caricare percorsi da Ride with GPS, Strava o utilizzando gli ID dei percorsi permanenti su RUSA.org. Puoi incollare l'URL di un percorso da Ride with GPS o Strava, oppure prendere l'ID dalle informazioni di un percorso RUSA perm. In alternativa, se fissi un percorso che stai visualizzando su Ride with GPS, il pulsante a destra elencherà quelli. Ti chiederà di accedere a RWGPS se non l'hai già fatto.",
+      "tableHeadersDoc": "I pulsanti sopra le intestazioni delle colonne consentono di modificare le informazioni visualizzate, ad esempio temperatura assoluta rispetto a \"percezione\" temperatura"
+    },
+    "tableHeaders": {
+      "temperature": "Percepita",
+      "time": "Ora",
+      "summary": "Riepilogo",
+      "precipitation": "Possibilità di pioggia",
+      "humidity": "Umidità",
+      "cloudCover": "Nuvolosità",
+      "windBearing": "Direzione del vento",
+      "relBearing": "Vento relativo"
+    },
+    "toasts": {
+      "aqi": {
+        "enabled": "AQI fetch abilitato",
+        "disabled": "AQI fetch disabilitato"
+      },
+      "tableCopied": "Tabella delle previsioni copiata"
+    },
+    "controls": {
+      "name": "Nome",
+      "distanceMiles": "Miglia",
+      "distanceKilometers": "Chilometri",
+      "duration": "Tempo previsto trascorso",
+      "arrival": "Ora di arrivo stimata",
+      "delete": "Elimina"
+    },
+    "analysis": {
+      "overallPace": "Il ritmo complessivo aggiustato per la salita è stato",
+      "interval": "ora",
+      "halfHourInterval": "mezz'ora"
+    }
+  }
+}
