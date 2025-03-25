@@ -7,7 +7,7 @@
     "node": "22.x"
   },
   "dependencies": {
-    "@babel/runtime": "^7.14.0",
+    "@babel/runtime": "^7.27.0",
     "@blueprintjs/core": "^5.0.1",
     "@blueprintjs/datetime2": "^2.3.21",
     "@blueprintjs/icons": "^5.0.0",
