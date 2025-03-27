@@ -44,6 +44,11 @@ const getForecastUrl = async (lat : number, lon : number) => {
     return gridResult.data.properties.forecastGridData;
 }
 
+type Summary = {
+    coverage:string, 
+    intensity:string, 
+    weather:string
+}
 interface ValueType<T> {
     values: Array<{validTime: string, value: T}>
 }
@@ -57,7 +62,7 @@ interface ForecastGridType {
             windSpeed: ValueType<number>
             windGust: ValueType<number>
             probabilityOfPrecipitation : ValueType<number>
-            weather: ValueType<{weather:string}>
+            weather: ValueType<Array<Summary>>
             relativeHumidity : ValueType<number>
         }
     }
@@ -70,6 +75,14 @@ const findNearestTime = <T>(data : {values: Array<{validTime: string, value: T}>
     return newerThan.value;
 };
 
+const formatSummary = (summary : Summary) => {
+    if (summary.coverage && summary.intensity && summary.weather) {
+        return `${summary.coverage} of ${summary.intensity} ${summary.weather}`
+    } else {
+        return ""
+    }
+}
+
 const extractForecast = (forecastGridData : ForecastGridType, currentTime : DateTime) => {
     const temperatureInC = findNearestTime(forecastGridData.data.properties.temperature, currentTime);
     const apparentTemperatureInC = findNearestTime(forecastGridData.data.properties.apparentTemperature, currentTime);
@@ -78,7 +91,7 @@ const extractForecast = (forecastGridData : ForecastGridType, currentTime : Date
     const windSpeed = findNearestTime(forecastGridData.data.properties.windSpeed, currentTime);
     const gust = findNearestTime(forecastGridData.data.properties.windGust, currentTime);
     const precip = findNearestTime(forecastGridData.data.properties.probabilityOfPrecipitation, currentTime);
-    const summary = findNearestTime<{weather:string}>(forecastGridData.data.properties.weather, currentTime).weather;
+    const {attributes, visibility, ...summary} = findNearestTime<Array<any>>(forecastGridData.data.properties.weather, currentTime)[0];
     const humidity = findNearestTime(forecastGridData.data.properties.relativeHumidity, currentTime);
 
     return {
@@ -141,7 +154,7 @@ const callNWS = async function (lat, lon, currentTime, distance, zone, bearing, 
         'time':currentTime,
         'zone':zone,
         'distance':distance,
-        'summary':forecastValues.summary,
+        'summary':formatSummary(forecastValues.summary),
         'precip':`${forecastValues.precip.toFixed(1)}%`,
         'humidity':forecastValues.humidity,
         'cloudCover':`${forecastValues.cloudCover.toFixed(1)}%`,
