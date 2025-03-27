@@ -58,6 +58,8 @@ axiosRetry(axiosInstance, {
     }
 });
 
+const weatherKitKey = makeJwt();
+
 /* eslint-disable max-params*/
 /**
  *
@@ -75,7 +77,6 @@ axiosRetry(axiosInstance, {
  */
 const callWeatherKit = async function (lat, lon, currentTime, distance, zone, bearing, getBearingDifference, isControl, lang) {
     const startTime = DateTime.fromISO(currentTime, { zone: 'utc' });
-    const weatherKitKey = makeJwt();
     const when = startTime.toISO({ suppressMilliseconds: true });
     const later = startTime.plus({ hours: 1 }).toISO({ suppressMilliseconds: true });
     const url = `https://weatherkit.apple.com/api/v1/weather/${lang}/${lat}/${lon}?timezone=${zone}&dataSets=currentWeather,forecastHourly,forecastNextHour,&countryCode=US&currentAsOf=${when}&hourlyStart=${when}&hourlyEnd=${later}`;

@@ -86,6 +86,7 @@ const isValidRouteResult = (body: string | undefined, type : string) => {
             return true;
         }
     }
+    Sentry.captureMessage(`isValidRouteResult failed with check for ${type}`)
     return false;
 };
 
