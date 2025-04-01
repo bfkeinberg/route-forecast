@@ -574,6 +574,7 @@ app.get('/rwgpsAuthReq', (req: Request, res : Response) => {
 });
 
 const getRwgpsTokenFromCode = async (code : string) => {
+    Sentry.addBreadcrumb({category:'rwgps', level:'info', message: code})
     let response = await axios.post('https://ridewithgps.com/oauth/token.json',{
         grant_type: 'authorization_code',
         code: code,
@@ -581,7 +582,7 @@ const getRwgpsTokenFromCode = async (code : string) => {
         client_secret: process.env.RWGPS_OAUTH_SECRET,
         redirect_uri: randoplan_uri
     }).catch((error: any) => {
-        Sentry.captureException(error, {tags: {where:'Fetching Ride with GPS token'}})
+        Sentry.captureException(error, {tags: {where:'Fetching Ride with GPS token', code: code}})
     });
     if (response !== undefined) {
         return response.data.access_token;
