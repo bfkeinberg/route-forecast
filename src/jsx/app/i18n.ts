@@ -7,6 +7,7 @@ import esNs from "../../data/es.json"
 import bgNs from "../../data/bg.json"
 import huNs from "../../data/hu.json"
 import itNs from "../../data/it.json"
+import zhNs from "../../data/zh.json"
 
 i18n
   // detect user language
@@ -20,7 +21,7 @@ i18n
     debug: false,
     fallbackLng: 'en-US',
     nonExplicitSupportedLngs: true,
-    supportedLngs: ['en-US', 'en-GB', 'en', 'fr', 'es', 'bg', 'hu', 'it'],
+    supportedLngs: ['en-US', 'en-GB', 'en', 'fr', 'es', 'bg', 'hu', 'it', 'zh'],
     interpolation: {
       escapeValue: false, // not needed for react as it escapes by default
     },
@@ -30,7 +31,8 @@ i18n
       es:esNs,
       bg:bgNs,
       hu:huNs,
-      it:itNs
+      it:itNs,
+      zh:zhNs
     }
   });
 

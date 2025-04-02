@@ -105,7 +105,7 @@ else {
             <VersionContext.Provider value={version}>
                 <LocationContext.Provider value={{ href: location.href, search: location.search, origin: location.origin }}>
                     <Component action={action} maps_api_key={maps_api_key} timezone_api_key={timezone_api_key} bitly_token={bitly_token} />
-                </LocationContext.Provider>);
+                </LocationContext.Provider>
             </VersionContext.Provider>
         )
     };

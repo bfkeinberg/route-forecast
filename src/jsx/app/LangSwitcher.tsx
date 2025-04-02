@@ -10,7 +10,8 @@ type languages = { [languageName : string] : language}
 const lngs: languages = {
   'en-US': { nativeName: 'English' },
   fr: { nativeName: 'Français' },
-  es: {nativeName: 'Español'}
+  es: {nativeName: 'Español'},
+  zh: {nativeName: '中文'}
 };
 
 const addBreadcrumb = (msg : string) => {
@@ -22,7 +23,7 @@ const addBreadcrumb = (msg : string) => {
 }
 
 const LangSwitcher = () => {
-    const { t } = useTranslation();
+    const { t } = useTranslation()
     return (
         <div>
             <ButtonGroup style={{ position: 'absolute', bottom: '0px' }}>

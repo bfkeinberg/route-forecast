@@ -1,0 +1,115 @@
+{
+  "translation": {
+    "buttons": {
+      "bugReport": "报告错误",
+      "donate": "捐赠",
+      "loadRoute": "加载路线",
+      "usePinned": "使用固定路线",
+      "dontUsePinned": "不使用固定路线",
+      "stops": "添加站点",
+      "forecast": "预报",
+      "forecastPending": "正在创建预报...",
+      "zoomToSegment": "缩放",
+      "banked": "显示累积时间",
+      "addControl": "添加",
+      "downloadAll": "下载所有预报",
+      "standardDeviation": "计算标准偏差"
+    },
+    "labels": {
+      "language": "选择语言",
+      "routeType": "路线类型",
+      "ridingPace": "平地上的步速",
+      "startingTime": "开始时间",
+      "miles": "单位为英里等",
+      "englishSystem": "英制",
+      "metricSystem": "公制",
+      "kilometers": "公制单位",
+      "projectedFinish": "预计完成时间",
+      "interval": "预报间隔（分钟）",
+      "source": "天气预报来源",
+      "customSegment": "使用自定义路段长度",
+      "degreesF": "温度（华氏度）",
+      "degreesC": "温度（度） C"
+    },
+    "titles": {
+      "routeInfo": "路线信息",
+      "forecastSettings": "预报设置",
+      "forecast": "预报",
+      "paceAnalysis": "步速分析",
+      "rwgpsId": "使用 GPS 路线 ID 骑行",
+      "loading": "路线加载",
+      "forecastControls": "预报控制",
+      "map": "预报地图"
+    },
+    "tooltips": {
+      "ridingPace": "平地速度，爬坡时会降低速度",
+      "actualPace": "实际骑行速度为",
+      "interval": "以分钟为单位生成天气预报的频率",
+      "provider": "用于预报的天气提供商",
+      "forecast": {
+        "enabled": "请求骑行预报",
+        "disabled": "必须提供 rwgps 路线 ID"
+      },
+      "startingTime": "计划何时开始骑行",
+      "distHeader": "路段起点距离",
+      "windHeader": "单击可在平均风速和阵风之间切换",
+      "temperatureHeader": "单击可在温度和表观温度之间切换",
+      "aqiHeader": "空气质量显示当前状况，而非预测状况。单击可切换至下一个请求的预测",
+      "overallPace": "速度是针对爬升调整的平均速度",
+      "analysisInterval": "计算有效速度的间隔（以小时为单位）",
+      "zoom": "将鼠标悬停在表格中的线路上时是否放大到路线段",
+      "customSegment": "仅预测路线的这一部分",
+      "bearingHeader": "单击可在绝对和相对风向之间切换",
+      "copyTable": "复制预报表",
+      "scrollToRain": "将第一条降雨变化预报线带入视图",
+      "banked": "显示距离 ACP/RUSA brevet 完成时间还有多少分钟"
+    },
+    "data": {
+      "noForecastPlaceholder": "查找要创建的预报",
+      "wind": {
+        "lost": "丢失",
+        "gained": "获得",
+        "to": "迎风",
+        "from": "迎风",
+        "gust": "阵风",
+        "speed": "风速"
+      },
+      "info": {
+        "temperature": "温度"
+      },
+      "summary": "使用天气和地形数据为您的骑行创建路线计划。",
+      "loading": "可以从 Ride with GPS、Strava 或使用 RUSA.org 上的永久路线 ID 加载路线。您可以粘贴 Ride with GPS 或 Strava 中的路线网址，也可以从 RUSA 永久路线的信息中获取 ID。或者，如果您在 Ride with GPS 上固定正在查看的路线，则右侧的按钮将列出这些路线。如果您尚未登录，系统会提示您登录 RWGPS。",
+      "tableHeadersDoc": "列标题上方的按钮允许更改显示的信息，例如绝对温度与“体感”温度"
+    },
+    "tableHeaders": {
+      "temperature": "体感",
+      "time": "时间",
+      "summary": "摘要",
+      "precipitation": "降雨概率",
+      "humidity": "湿度",
+      "cloudCover": "云量",
+      "windBearing": "风向",
+      "relBearing": "相对风"
+    },
+    "toasts": {
+      "aqi": {
+        "enabled": "启用 Aqi 获取",
+        "disabled": "禁用 AQI 获取"
+      },
+      "tableCopied": "预测表已复制"
+    },
+    "controls": {
+      "name": "名称",
+      "distanceMiles": "英里",
+      "distanceKilometers": "公里",
+      "duration": "预计花费时间",
+      "arrival": "预计到达时间",
+      "delete": "删除"
+    },
+    "analysis": {
+      "overallPace": "整体爬升调整速度为",
+      "interval": "小时",
+      "halfHourInterval": "半小时"
+    }
+  }
+}
