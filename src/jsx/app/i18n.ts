@@ -25,6 +25,7 @@ i18n
     interpolation: {
       escapeValue: false, // not needed for react as it escapes by default
     },
+    detection: {order: ['querystring', 'cookie', 'sessionStorage', 'navigator', 'htmlTag', 'path', 'subdomain']},
     resources:{
       en:enNs,
       fr:frNs,
