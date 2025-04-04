@@ -60,6 +60,10 @@ import {
 import { setPace, updateUserControls, setInterval, setWeatherProvider } from "../../redux/actions";
 import { useForecastMutation, useGetAqiMutation } from '../../redux/forecastApiSlice';
 import { inputPaceToSpeed,parseControls } from '../../utils/util';
+import i18next from "i18next";
+i18next.on('languageChanged', (lng) => {
+    if (lng.startsWith('zh')) {ReactGA.event('chinese_detected')}
+})
 import i18n from "./i18n";
 
 const checkCredentialsInterface = () => {
@@ -300,7 +304,7 @@ const RouteWeatherUI = ({search, href, action, maps_api_key, timezone_api_key, b
     if (i18n.resolvedLanguage === 'es') {
         ReactGA.event('select_promotion', {creative_name:'es'})
     }
-    if (i18n.resolvedLanguage === 'it') {
+    if (i18n.resolvedLanguage?.startsWith('it')) {
         ReactGA.event('select_promotion', {creative_name:'it'})
     }
     return (
