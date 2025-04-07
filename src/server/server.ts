@@ -24,6 +24,7 @@ import getPurpleAirAQI from'./purpleAirAQI'
 import getAirNowAQI from './airNowAQI'
 import querystring from 'querystring';
 import * as Sentry from "@sentry/node"
+const { trace, debug, info, warn, error, fatal, fmt } = Sentry.logger;
 import axios, { AxiosError, isAxiosError } from 'axios';
 // import {std} from "mathjs";
 const {std} = require('mathjs');
@@ -526,6 +527,7 @@ const getStravaAuthUrl = async (baseUrl : string, state: string) => {
         process.env.STRAVA_REDIRECT_URI = 'https://www.randoplan.com/stravaAuthReply';
     }
     process.env.STRAVA_CLIENT_SECRET = process.env.STRAVA_API_KEY;
+    info("Getting Strava auth URL", {baseUrl: baseUrl, clientSecret: process.env.STRAVA_API_KEY});
     return await strava.oauth.getRequestAccessURL({ scope: 'activity:read_all,read_all', state: encodeURIComponent(state) });
 };
 
@@ -543,6 +545,7 @@ interface StravaToken {
 
 const getStravaToken = (code : string) => {
     // process.env.STRAVA_ACCESS_TOKEN = 'fake';
+    info('Getting Strava OAuth token', {code : code});
     return strava.oauth.getToken(code, (err: { msg: any; } | null, payload: StravaToken) => {console.log(`token was ${JSON.stringify(payload.body)}`)})
 };
 
@@ -636,12 +639,14 @@ app.get('/stravaAuthReq', async (req : Request, res : Response) => {
         host: req.get('host')
     });
     Sentry.addBreadcrumb({category:'strava', level:'info', message: state})
+    info('Getting Strava auth', {baseUrl: baseUrl, state: state});
     res.redirect(await getStravaAuthUrl(baseUrl, state));
 
 });
 
 app.get('/stravaAuthReply', async (req : Request, res : Response) => {
     console.log(JSON.stringify(req.query))
+    info("Strava auth callback", {query: req.query});
     const code = req.query.code;
     let error = req.query.error;
     const scope = req.query.scope
