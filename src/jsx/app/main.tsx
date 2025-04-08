@@ -298,10 +298,10 @@ const RouteWeatherUI = ({search, href, action, maps_api_key, timezone_api_key, b
     if (fetchAqi) {
         dispatch(fetchAqiSet(fetchAqi==="true"))
     }
-    if (i18n.resolvedLanguage === 'fr') {
+    if (i18n.resolvedLanguage?.startsWith('fr')) {
         ReactGA.event('tutorial_begin')
     }
-    if (i18n.resolvedLanguage === 'es') {
+    if (i18n.resolvedLanguage?.startsWith('es')) {
         ReactGA.event('select_promotion', {creative_name:'es'})
     }
     if (i18n.resolvedLanguage?.startsWith('it')) {
