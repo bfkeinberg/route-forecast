@@ -682,7 +682,6 @@ app.get('/stravaAuthReply', async (req : Request, res : Response) => {
         })
     }
     else {
-        Sentry.captureMessage(`Error ${error} from Strava OAuth flow getting code`)
         restoredState.strava_activity = undefined;
         if (typeof error === 'string') restoredState.strava_error = error;
         res.redirect(url.format('/?') + querystring.stringify(restoredState));
