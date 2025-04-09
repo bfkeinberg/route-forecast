@@ -546,6 +546,7 @@ interface StravaToken {
 const getStravaToken = (code : string) => {
     // process.env.STRAVA_ACCESS_TOKEN = 'fake';
     info('Getting Strava OAuth token', {code : code});
+    logger.info(`Getting Strava OAuth token from code ${code}`);
     return strava.oauth.getToken(code, (err: { msg: any; } | null, payload: StravaToken) => {console.log(`token was ${JSON.stringify(payload.body)}`)})
 };
 
@@ -640,6 +641,7 @@ app.get('/stravaAuthReq', async (req : Request, res : Response) => {
     });
     Sentry.addBreadcrumb({category:'strava', level:'info', message: state})
     info('Getting Strava auth', {baseUrl: baseUrl, state: state});
+    logger.info(`Getting Strava authorization ${baseUrl} ${JSON.stringify(state)}`);
     res.redirect(await getStravaAuthUrl(baseUrl, state));
 
 });
