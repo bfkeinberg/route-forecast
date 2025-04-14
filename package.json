@@ -132,7 +132,7 @@
     "jest-cli": "^29.0.1",
     "jest-haste-map": "^29.0.1",
     "jest-resolve": "^29.0.1",
-    "jsdom": "^26.0.0",
+    "jsdom": "^26.1.0",
     "json-loader": "^0.5.4",
     "mini-css-extract-plugin": "^2.1.0",
     "nyc": "^17.0.0",
