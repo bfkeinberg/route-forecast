@@ -1,6 +1,6 @@
 {
   "name": "route_weather",
-  "version": "4.11.3",
+  "version": "4.12.0",
   "description": "Forecast weather along a route from RideWithGps or Strava. Support for others may be added if there is demand",
   "main": "jsx/server/index.js",
   "engines": {
@@ -15,7 +15,6 @@
     "@emotion/react": "^11.7.1",
     "@emotion/styled": "^11.6.0",
     "@fast-csv/format": "^5.0.2",
-    "@google-cloud/datastore": "^9.0.0",
     "@loadable/component": "^5.13.2",
     "@mui/material": "^7.0.0",
     "@reduxjs/toolkit": "^2.2.3",
@@ -34,7 +33,6 @@
     "buffer": "^6.0.3",
     "compression": "^1.7.3",
     "core-js": "^3.33.1",
-    "cors": "^2.8.5",
     "ejs": "^3.1.6",
     "export-to-csv": "^1.4.0",
     "express": "^5.1.0",
@@ -56,6 +54,7 @@
     "node-cache-32": "^1.6.3",
     "node-fetch": "^3.3.2",
     "package-lock.json": "^1.0.0",
+    "pg": "^8.14.1",
     "prop-types": "^15.6.1",
     "query-string": "^9.0.0",
     "react": "^18.3.1",

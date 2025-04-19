@@ -18,8 +18,6 @@ const upload = multer({
 import callWeatherService from './weatherForecastDispatcher'
 import url from 'url'
 import strava from 'strava-v3'
-// const { Datastore } = require('@google-cloud/datastore');
-// const cors = require('cors');
 import getPurpleAirAQI from'./purpleAirAQI'
 import getAirNowAQI from './airNowAQI'
 import querystring from 'querystring';
@@ -28,6 +26,8 @@ const { trace, debug, info, warn, error, fatal, fmt } = Sentry.logger;
 import axios, { AxiosError, isAxiosError } from 'axios';
 // import {std} from "mathjs";
 const {std} = require('mathjs');
+import {Client} from "pg";
+// const pgTypes = require('pg').types
 
 import RateLimit from 'express-rate-limit'
 var limiter = RateLimit({
@@ -39,8 +39,6 @@ let logger = console;
 var compression = require('compression');
 
 app.use(compression());
-// Instantiate a datastore client
-// const datastore = new Datastore();
 
 const bitly_token = process.env.BITLY_TOKEN
 if (!bitly_token) {
@@ -77,6 +75,24 @@ app.get('/lib/localforage.js', (req : Request, res : Response) => {
 app.set('views', path.resolve(__dirname, 'views'));
 app.set('view engine', 'ejs');
 
+const setupPostgres = async () => {
+
+    const client = new Client({
+      connectionString: process.env.DATABASE_URL,
+      ssl: {
+        rejectUnauthorized: false
+      }
+    });
+    
+    try {
+        await client.connect((err:any) => {if (err) {console.error(err)}});
+        return client;
+    } catch (excpt) {
+        console.error(excpt);
+    }
+
+}
+
 const isValidRouteResult = (body: string | undefined, type : string) => {
     if (body !== undefined) {
         let obj = JSON.parse(body);
@@ -91,73 +107,32 @@ const isValidRouteResult = (body: string | undefined, type : string) => {
     return false;
 };
 
-/* const makeRecord = (point, routeNumber? : number) => {
-    // Create a visit record to be stored in the database
-    return {
-        timestamp: new Date(),
-        routeNumber: routeNumber === undefined ? null : routeNumber,
-        latitude: point.lat,
-        longitude: point.lon
-    };
-}
- */
-/* const insertRecord = async (record, routeName : string) => {
-    return await datastore.save({
-        key: datastore.key([
-            'RouteName',
-            routeName
-        ]),
-        data: record
-    }).catch(err=> console.error(`Caught ${err} in call to datastore.save`));
-};
- */
-/* const getVisits = () => {
-    const query = datastore
-        .createQuery('RouteName')
-        .order('timestamp', { descending: true });
+let postgresClient: Client | undefined;
 
-    return datastore.runQuery(query);
+const getVisits = async () => {
+    return await postgresClient?.query("SELECT * from randoplan ORDER BY timestamp DESC")
 };
- */
-/* app.get('/dbquery', cors(), async (req : Request, res : Response) => {
-    const [entities] = await getVisits();
-    const visits = entities.map(
-        entity => JSON.stringify({
-            "Time": entity.timestamp, "RouteName": entity[datastore.KEY].name, "RouteNumber": entity.routeNumber,
-            "Latitude": entity.latitude, "Longitude": entity.longitude
-        })
-    );
-    res
+
+app.get('/dbquery', async (req : Request, res : Response) => {
+    if (!postgresClient) {
+        postgresClient = await setupPostgres();
+    }
+    const results = await getVisits();
+    if (results && results.rows) {
+        const visits = results.rows.map(
+            (        entity: { timestamp: any; routename: string; routenumber: string; location: {x:number, y:number}; }) => JSON.stringify({
+                "Time": entity.timestamp, "RouteName": entity.routename, "RouteNumber": entity.routenumber,
+                "Latitude": entity.location.x, "Longitude": entity.location.y
+            })
+        );    
+        res
         .status(200)
         .set('Content-Type', 'text/plain')
         .send(`[\n${visits.join(',\n')}]`)
-        .end();
+        .end(); 
+    }
 });
- */
-/* const getOldUrlCalls = () => {
-    const query = datastore
-        .createQuery('OldUrl')
-        .order('timestamp', { descending: true });
 
-    return datastore.runQuery(query);
-};
-
- *//* app.get('/get_redirects', cors(), async (req : Request, res : Response) => {
-    const [entities] = await getOldUrlCalls();
-    console.info(`entities ${JSON.stringify(entities)}`);
-    const visits = entities.map(
-        entity => JSON.stringify({
-            "Time": entity.timestamp, "From": entity.caller,
-            "Host": entity.caller
-        })
-    );
-    res
-        .status(200)
-        .set('Content-Type', 'text/plain')
-        .send(`[\n${visits.join(',\n')}]`)
-        .end();
-});
- */
 app.use((req : Request, res : Response, next) => {
     // Switch to randoplan.com
     var host = req.hostname;
@@ -322,14 +297,19 @@ app.post('/forecast_one', cache.middleware(), upload.none(), async (req : Reques
     if (!process.env.NO_LOGGING) {
         logger.info(`Request from ${req.ip} for single point from ${service} at ${forecastPoints.time}`);
     }
-    // if (req.body.routeName !== undefined && req.body.routeName !== '' && req.body.which===0) {
-    //     let dbRecord = makeRecord(forecastPoints, req.body.routeNumber);
-    //     try {
-    //         await insertRecord(dbRecord, req.body.routeName);
-    //     } catch (err) {
-    //         console.error(`DB call from /forecast_one failed with ${err}`)
-    //     }
-    // }
+    if (req.body.routeName !== undefined && req.body.routeName !== '' && req.body.which===0) {
+        if (!postgresClient) {
+            postgresClient = await setupPostgres();
+        }
+        if (postgresClient && req.body.routeNumber && req.body.routeName) {
+            try {
+                await postgresClient.query("INSERT into randoplan VALUES($1,$2,$3,$4)", [req.body.routeName, req.body.routeNumber, 
+                    new Date(), `(${forecastPoints.lat},${forecastPoints.lon})`]);
+            } catch (err) {
+                console.error(`DB call from /forecast_one failed with ${err}`)
+            }    
+        }
+    }
     const zone = req.body.timezone;
     let lang = req.body.lang
     if (!lang) {
@@ -357,7 +337,7 @@ app.post('/forecast_one', cache.middleware(), upload.none(), async (req : Reques
     }
 });
 
-app.post('/forecast', upload.none(), async (req : Request, res : Response) => {
+/* app.post('/forecast', upload.none(), async (req : Request, res : Response) => {
     Sentry.captureMessage('Forecast rather than forecast_one called');
     if (req.body.locations === undefined) {
         res.status(400).json({ 'status': 'Missing location key' });
@@ -383,14 +363,6 @@ app.post('/forecast', upload.none(), async (req : Request, res : Response) => {
         res.status(400).json({'status':'Missing weather service'})
         return
     }
-    // if (req.body.routeName !== undefined && req.body.routeName !== '') {
-    //     let dbRecord = makeRecord(forecastPoints[0], req.body.routeNumber);
-    //     try {
-    //         await insertRecord(dbRecord, req.body.routeName);
-    //     } catch (err) {
-    //         console.error(`DB call from /forecast failed with ${err}`)
-    //     }
-    // }
     const zone = req.body.timezone;
     try {
         let results = [];
@@ -413,7 +385,7 @@ app.post('/forecast', upload.none(), async (req : Request, res : Response) => {
         }
         res.status(500).json({ 'details': `Error calling weather service : ${error}` });
     }
-});
+}); */
 
 app.post('/aqi_one', upload.none(), async (req, res) => {
     if (req.body.locations === undefined) {
@@ -722,6 +694,22 @@ app.get('/', (req : Request, res : Response) => {
     }
     try {
         res.render('index', ejsVariables)
+    } catch (err) {
+        Sentry.captureException(err, {tags: {where:'Top level rendering'}})
+    }
+});
+
+app.get('/visualize', (req : Request, res : Response) => {
+    const ejsVariables = {
+        'maps_key': process.env.MAPS_KEY,
+        'version': process.env.npm_package_version,
+        delimiter: '?'
+    };
+    if (Object.keys(req.query).length > 0) {
+        console.log(`request query ${JSON.stringify(req.query)}`);
+    }
+    try {
+        res.render('vis_index', ejsVariables)
     } catch (err) {
         Sentry.captureException(err, {tags: {where:'Top level rendering'}})
     }

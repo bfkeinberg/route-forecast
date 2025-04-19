@@ -24,7 +24,7 @@ module.exports = (env, argv) => {
         cache: {
             type: 'filesystem'
         },
-        entry: [path.resolve(APP_DIR, 'app/app.tsx')],
+        entry: {main: path.resolve(APP_DIR, 'app/app.tsx'), visualize: path.resolve(APP_DIR, 'app/visualize.tsx')},
         module: {
             rules: [
                 {
@@ -94,6 +94,15 @@ module.exports = (env, argv) => {
                 sentryRelease: env.sentryRelease,
                 mode: mode
                 // favicon:'src/static/favicon.ico'
+            }),
+            new HtmlWebpackPlugin({
+                title: 'Visualize randoplan usage on a world map',
+                filename: path.resolve(VIEWS_DIR, 'vis_index.ejs'),
+                template: path.resolve(TEMPLATE_DIR, 'visualize.html'),
+                inject: false,
+                minify: { minifyURLs: true, removeComments: true },
+                chunksSortMode: 'none',
+                mode: mode
             }),
             new CopyWebpackPlugin({
                 patterns: [
