@@ -11,7 +11,8 @@
             "skipFiles": [
                 "<node_internals>/**"
             ],
-            "program": "/Users/brian/Src/route-forecast/dist/server/index.js",
+            "runtimeExecutable": "/usr/local/bin/npm",
+            "args": ["start"],
             "localRoot": "/Users/brian/Src/route-forecast/src/server",
             "remoteRoot": "${workspaceFolder}/src/server",
             "runtimeArgs": ["--preserve-symlinks"],
@@ -20,7 +21,7 @@
             "outFiles": [
                 "${workspaceFolder}/dist/**/*.js"
             ],
-            "env": {"NODE_ENV": "development"}
+            "env": {"NODE_ENV": "development", "DATABASE_URL" : "postgres://localhost/brian?sslmode=disable"}
         },        
         {
             "type": "chrome",
