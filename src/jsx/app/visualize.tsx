@@ -170,7 +170,7 @@ const MapMaker = ({maps_key} : {maps_key: string}) => {
         const getUsage = async () => {
             if (visits.locations.length === 0) {
                 const visitData =
-                    await axios.get(viewingRandoplan ? '/dbquery' : 'http://localhost:7070/dbquery/'/*https://aqi-gateway.herokuapp.com/dbquery'*/);
+                    await axios.get(viewingRandoplan ? '/dbquery' : 'https://aqi-gateway.herokuapp.com/dbquery');
                 setVisits({type:viewingRandoplan?'randoplan':'aqi', locations:visitData.data})
             }
         }
