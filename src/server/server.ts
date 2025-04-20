@@ -303,11 +303,15 @@ app.post('/forecast_one', cache.middleware(), upload.none(), async (req : Reques
         }
         if (postgresClient && req.body.routeNumber && req.body.routeName) {
             try {
-                await postgresClient.query("INSERT into randoplan VALUES($1,$2,$3,$4)", [req.body.routeName, req.body.routeNumber, 
-                    new Date(), `(${forecastPoints.lat},${forecastPoints.lon})`]);
+                const insertResult = await
+                    postgresClient.query(
+                        "INSERT into randoplan VALUES($1,$2,$3,$4) ON CONFLICT (routeName) DO UPDATE SET timestamp=EXCLUDED.timestamp, location=EXCLUDED.location, routeNumber=EXCLUDED.routeNumber",
+                        [req.body.routeName, req.body.routeNumber,
+                        new Date(), `(${forecastPoints.lat},${forecastPoints.lon})`]);
+                console.info(insertResult);
             } catch (err) {
                 console.error(`DB call from /forecast_one failed with ${err}`)
-            }    
+            }
         }
     }
     const zone = req.body.timezone;

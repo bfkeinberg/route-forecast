@@ -20,18 +20,44 @@ const axios = require('axios');
 
 interface Location {
   Time : Date;
-  Model? : String;
   RouteName?: string
   RouteNumber: string
   Latitude : string;
   Longitude : string;
 }
-const garminModels = require("../../data/garminDeviceLookup.json");
+interface AQILocation {
+    Time : Date;
+    Model : string;
+    AQI: number;
+    Latitude : string;
+    Longitude : string;  
+}
+
+type RandoplanResults = {
+    locations: Location[];
+    type: 'randoplan'
+}
+
+type AQIResults = {
+    locations: AQILocation[];
+    type: 'aqi'
+}
+type Results = RandoplanResults | AQIResults;
+
+import garminModelsData from "../../data/garminDeviceLookup.json";
+  
+  // Define a type alias for the object with index signature
+  type GarminModels = {
+    [key: string]: string;
+  };
+  
+  // Cast the imported data to the defined type
+  const garminModels: GarminModels = garminModelsData;
 
 let script = document.scripts[document.scripts.length-1]
 const maps_key = script?.getAttribute('maps_key');        
 
-function makeBounds(locations : Location[]): google.maps.LatLngBounds {
+function makeBounds(locations : Location[]|AQILocation[]): google.maps.LatLngBounds {
     let bounds = new google.maps.LatLngBounds();
     locations.filter(location => location.Latitude != "0.0" && location.Latitude != "0" 
     && location.Latitude != "0.000000" && parseFloat(location.Latitude) < 179.9999 && location.Latitude!="180.000000").forEach ( location => {
@@ -41,35 +67,7 @@ function makeBounds(locations : Location[]): google.maps.LatLngBounds {
     return bounds;
 }
 
-/* function addMarkers(map: google.maps.Map, url: string, callback: (visit) => string, setLabel: (visit) => string,
-epilog: (visit, marker: google.maps.Marker, map: google.maps.Map) => void): void {
-  fetch(url).then(fetchResult => {
-    if (!fetchResult.ok) {
-      throw Error(fetchResult.status.toString())
-    }
-    return fetchResult.json()
-  })
-    .then(body => {
-      map.fitBounds(makeBounds(body));
-      body.filter(location => location.Latitude != "0.0" && location.Latitude != "0" && parseFloat(location.Latitude) < 179.9999 &&
-       location.Latitude != "0.000000" && location.Latitude!="180.000000").forEach(visit => {
-        let marker = new google.maps.Marker({
-          position: new google.maps.LatLng({ lat: parseFloat(visit.Latitude), lng: parseFloat(visit.Longitude) }),
-          map,
-          label: setLabel(visit),
-          title: callback(visit)
-        });
-        epilog(visit, marker, map);
-      });
-    }).catch(error => {
-      console.error('error', JSON.stringify(error));
-      throw error;
-    });
-}
-
-} */
-
-  const MarkerWithInfoWindow = ({location} : {location : Location}) => {
+  const MarkerWithInfoWindow = ({location} : {location : Location}) : JSX.Element => {
     // `markerRef` and `marker` are needed to establish the connection between
     // the marker and infowindow (if you're using the Marker component, you
     // can use the `useMarkerRef` hook instead).
@@ -105,20 +103,33 @@ epilog: (visit, marker: google.maps.Marker, map: google.maps.Map) => void): void
     );
   };
 
-const Markers = ({ locations }: { locations: Location[] }) => {
+const Markers = ({ locations }: { locations: Results }) => {
     return (
-        locations.
-            filter(location => location.Latitude != "0.0" && location.Latitude != "0" && parseFloat(location.Latitude) < 179.9999 &&
-                location.Latitude != "0.000000" && location.Latitude != "180.000000").
-            map((location, index) => {
-                return (
-                    <MarkerWithInfoWindow
-                        location={location}
-                        key={index}                        
-                    >
-                    </MarkerWithInfoWindow>
-                )
-            }
+        locations.type === 'randoplan' ?
+            (
+                locations.locations.
+                    filter(location => location.Latitude != "0.0" && location.Latitude != "0" && parseFloat(location.Latitude) < 179.9999 &&
+                        location.Latitude != "0.000000" && location.Latitude != "180.000000").
+                    map((location, index) =>
+                        <MarkerWithInfoWindow
+                            location={location}
+                            key={index}
+                        >
+                        </MarkerWithInfoWindow>
+                    )
+            ) :
+            (
+                locations.locations.
+                    filter(location => location.Latitude != "0.0" && location.Latitude != "0" && parseFloat(location.Latitude) < 179.9999 &&
+                        location.Latitude != "0.000000" && location.Latitude != "180.000000").
+                    map((location, index) =>
+                        <AdvancedMarker
+                            position={{ lat: parseFloat(location.Latitude), lng: parseFloat(location.Longitude) }}
+                            key={index}
+                            title={garminModels[location.Model] + '/ AQI: ' + location.AQI}
+                        >
+                        </AdvancedMarker>
+                    )
             )
     )
 }
@@ -128,7 +139,7 @@ const BoundSetter = ({mapBounds} : {mapBounds:google.maps.LatLngBounds|null}) =>
 
     useEffect(() => {
         if (map && mapBounds) {
-            map.fitBounds(mapBounds, 0)
+            map.fitBounds(mapBounds, 40)
         }
     }, [map, mapBounds])
 
@@ -137,9 +148,15 @@ const BoundSetter = ({mapBounds} : {mapBounds:google.maps.LatLngBounds|null}) =>
 
 const MapMaker = ({maps_key} : {maps_key: string}) => {
     const [isMapApiReady, setIsMapApiReady] = useState(false)
-    const [visits, setVisits] = useState([])
+    const [visits, setVisits] = useState<Results>({type:'randoplan',locations:[]})
     const [mapBounds, setMapBounds] = useState<google.maps.LatLngBounds|null>(null)
+    const [viewingRandoplan, setViewingRandoplan]= useState<boolean>(true)
 
+    const toggleMap = () => {
+        setViewingRandoplan(!viewingRandoplan)
+        setVisits({type:'randoplan',locations:[]})
+    }
+    
     const handleApiLoad = () => {
         setIsMapApiReady(true)
     }
@@ -151,28 +168,32 @@ const MapMaker = ({maps_key} : {maps_key: string}) => {
 
     useEffect(() => {
         const getUsage = async () => {
-            if (visits.length === 0) {
-                const visitData = await axios.get('/dbquery');
-                setVisits(visitData.data)    
+            if (visits.locations.length === 0) {
+                const visitData =
+                    await axios.get(viewingRandoplan ? '/dbquery' : 'http://localhost:7070/dbquery/'/*https://aqi-gateway.herokuapp.com/dbquery'*/);
+                setVisits({type:viewingRandoplan?'randoplan':'aqi', locations:visitData.data})
             }
         }
         getUsage()
-    })
+    }, [viewingRandoplan])
 
     useEffect(() => {
         if (!isMapApiReady) {
             return
         }
-        const computedBounds = makeBounds(visits)
-        if (!mapBounds || mapBounds.toJSON().north === -1) {
-            setMapBounds(computedBounds)
+        if (visits.locations.length > 0) {
+            const computedBounds = makeBounds(visits.locations)
+            setMapBounds(computedBounds)                
         }
     }, [isMapApiReady,visits])
+
+    const buttonText = viewingRandoplan ? "View AQI data field usage" : "View Randoplan usage"
 
     return (
         <APIProvider apiKey={maps_key} onLoad={handleApiLoad} onError={handleApiError}>
             {isMapApiReady ? (
                 <>
+                    <button onClick={toggleMap}>{buttonText}</button>
                     <BoundSetter mapBounds={mapBounds} />
                     <Map
                         mapTypeId={'roadmap'}
@@ -217,4 +238,4 @@ render()
   });
 } */
 
-import "../../static/vis_style.css"; // required for webpack
+import "../../static/vis_style.css"; // required for webpack    
