@@ -1,6 +1,6 @@
 {
   "name": "route_weather",
-  "version": "4.12.0",
+  "version": "4.12.1",
   "description": "Forecast weather along a route from RideWithGps or Strava. Support for others may be added if there is demand",
   "main": "jsx/server/index.js",
   "engines": {
@@ -41,7 +41,7 @@
     "express-winston": "^4.0.5",
     "gpxparser": "^3.0.8",
     "history": "^5.0.0",
-    "i18next": "^24.0.0",
+    "i18next": "^25.0.1",
     "i18next-browser-languagedetector": "^8.0.0",
     "i18next-resources-for-ts": "^1.5.0",
     "isomorphic-fetch": "^3.0.0",
@@ -101,7 +101,7 @@
     "@babel/preset-react": "^7.10.4",
     "@sentry/webpack-plugin": "^3.1.1",
     "@tsconfig/node22": "^22.0.0",
-    "@types/chrome": "^0.0.313",
+    "@types/chrome": "^0.0.315",
     "@types/google.maps": "^3.58.1",
     "@types/jest": "^29.5.14",
     "@types/node": "^22.5.0",
