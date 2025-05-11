@@ -92,10 +92,10 @@ const routeInfoSlice = createSlice({
             state.name = getRwgpsRouteName(action.payload)
             if (action.payload.route) {
                 state.distanceInKm = action.payload.route.distance/1000
-                state.canDoUserSegment = action.payload.route.track_points[0].d !== undefined
+                state.canDoUserSegment = action.payload.route.track_points[0] && action.payload.route.track_points[0].d !== undefined
             } else {
                 state.distanceInKm = action.payload.trip.distance/1000
-                state.canDoUserSegment = action.payload.trip.track_points[0].d !== undefined
+                state.canDoUserSegment = action.payload.route.track_points[0] && action.payload.trip.track_points[0].d !== undefined
             }
         },
         gpxRouteLoaded(state, action : PayloadAction<GpxRouteData>) {
