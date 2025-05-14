@@ -50,12 +50,22 @@ export type ForecastRequest = {
     time: string
     isControl: boolean
 }
+
+export type ChartData = {
+    distanceInKm:number
+    totalMinutesLost:number
+    // windSpeed:number
+}
+
+export type ChartDataType = ChartData[]
+
 export type WindAdjustResults = {
     weatherCorrectionMinutes:number, 
     calculatedControlPointValues:Array<CalculatedValue>
     maxGustSpeed:number
     finishTime:string | null
     adjustedTimes:Array<{time:DateTime,index:number}>
+    chartData:ChartDataType
 }
 
 const desiredSeparationInMeters = 25;       // meters of distance desired between two points for grade calculation
@@ -442,7 +452,7 @@ class AnalyzeRoute {
         previouslyCalculatedValues : Array<CalculatedValue>, start : DateTime, 
         finishTime : string, timeZoneId : string) : WindAdjustResults => {
         if (forecastInfo.length===0) {
-            return {weatherCorrectionMinutes:0,calculatedControlPointValues:[],maxGustSpeed:0, adjustedTimes:[], finishTime:finishTime};
+            return {weatherCorrectionMinutes:0,calculatedControlPointValues:[],maxGustSpeed:0, adjustedTimes:[], finishTime:finishTime, chartData:[]};
         }
 
         const gustThreshold = 50;   // above this incorporate some of the gust into the effect on the rider
@@ -459,6 +469,7 @@ class AnalyzeRoute {
         let maxGustSpeed = 0;
         let adjustedTimes = []
         let forecastIndex = 1
+        let chartData : Array<ChartData> = []
 
         stream.filter(point => point != null && point.lat !== undefined && point.lon !== undefined).forEach(currentPoint => {
             if (previousPoint !== null) {
@@ -513,6 +524,7 @@ class AnalyzeRoute {
                             grade, effectiveWindSpeed, power, effectiveSpeed);
                         // console.info(`grade was ${grade} power was ${power} wind:${effectiveWindSpeed} speed:${effectiveSpeed} modifiedVelocity was ${modifiedVelocity}`);
                         totalMinutesLost += AnalyzeRoute.windToTimeInMinutes(effectiveSpeed, distanceInMiles, modifiedVelocity);
+                        chartData.push( {distanceInKm:totalDistanceInKm, totalMinutesLost: totalMinutesLost/* , windSpeed: averageWindSpeed */})
                     }
                 }
 
@@ -543,7 +555,7 @@ class AnalyzeRoute {
         }
         return {weatherCorrectionMinutes:totalMinutesLost,calculatedControlPointValues:calculatedValues, maxGustSpeed:maxGustSpeed,
                 finishTime:DateTime.fromFormat(finishTime,finishTimeFormat).plus({minutes:totalMinutesLost}).toFormat(finishTimeFormat),
-                adjustedTimes:adjustedTimes
+                adjustedTimes:adjustedTimes, chartData:chartData
             };
     };
 

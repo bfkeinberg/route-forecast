@@ -233,7 +233,7 @@ type CachedWindResult = {
 }
 
 let lastWindResult : CachedWindResult = {result: {weatherCorrectionMinutes:0, calculatedControlPointValues:[],
-   maxGustSpeed:0, finishTime:"", adjustedTimes:[]}, dependencyValues: {}}
+   maxGustSpeed:0, finishTime:"", adjustedTimes:[], chartData:[]}, dependencyValues: {}}
 const calculateWindResult = (inputs : WindResultInputs) : WindAdjustResults => {
   if (dependencies.every(dependency => inputs[dependency] === lastWindResult.dependencyValues[dependency]) ) {
     return lastWindResult.result
@@ -251,7 +251,7 @@ const calculateWindResult = (inputs : WindResultInputs) : WindAdjustResults => {
     let sortedValues = values.slice();
     sortedValues.sort((a,b) => a['distance']-b['distance']);
 
-    const { weatherCorrectionMinutes, calculatedControlPointValues, maxGustSpeed, finishTime: adjustedFinishTime, adjustedTimes } = gpxParser.adjustForWind(
+    const { weatherCorrectionMinutes, calculatedControlPointValues, maxGustSpeed, finishTime: adjustedFinishTime, adjustedTimes, chartData } = gpxParser.adjustForWind(
         forecast,
         points,
         routeParams.pace,
@@ -261,9 +261,12 @@ const calculateWindResult = (inputs : WindResultInputs) : WindAdjustResults => {
         finishTime,
         timeZoneId
     )
-    result = { weatherCorrectionMinutes: weatherCorrectionMinutes, calculatedControlPointValues: calculatedControlPointValues, maxGustSpeed: maxGustSpeed, finishTime: adjustedFinishTime, adjustedTimes}
+    result = { weatherCorrectionMinutes: weatherCorrectionMinutes, 
+      calculatedControlPointValues: calculatedControlPointValues, maxGustSpeed: maxGustSpeed,
+      finishTime: adjustedFinishTime, adjustedTimes, chartData: chartData}
   } else {
-    result = { weatherCorrectionMinutes: 0, calculatedControlPointValues: [], maxGustSpeed: 0, finishTime: null, adjustedTimes:[] }
+    result = { weatherCorrectionMinutes: 0, calculatedControlPointValues: [], 
+      maxGustSpeed: 0, finishTime: null, adjustedTimes:[], chartData: [] }
   }
   lastWindResult = {result, dependencyValues: inputs}
   return result
