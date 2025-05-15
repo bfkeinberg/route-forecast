@@ -54,7 +54,7 @@ export type ForecastRequest = {
 export type ChartData = {
     distanceInKm:number
     totalMinutesLost:number
-    // windSpeed:number
+    windSpeedMph:number
 }
 
 export type ChartDataType = ChartData[]
@@ -523,8 +523,11 @@ class AnalyzeRoute {
                         const modifiedVelocity = getPowerOrVelocity(deltas.distance, Math.abs(previousPoint.elevation-currentPoint.elevation)/2,
                             grade, effectiveWindSpeed, power, effectiveSpeed);
                         // console.info(`grade was ${grade} power was ${power} wind:${effectiveWindSpeed} speed:${effectiveSpeed} modifiedVelocity was ${modifiedVelocity}`);
-                        totalMinutesLost += AnalyzeRoute.windToTimeInMinutes(effectiveSpeed, distanceInMiles, modifiedVelocity);
-                        chartData.push( {distanceInKm:totalDistanceInKm, totalMinutesLost: totalMinutesLost/* , windSpeed: averageWindSpeed */})
+                        if (modifiedVelocity > 0) {
+                            totalMinutesLost += AnalyzeRoute.windToTimeInMinutes(effectiveSpeed, distanceInMiles, modifiedVelocity);
+                            // flip the sign of effective wind speed for charting purposes, make headwinds look negative
+                            chartData.push( {distanceInKm:totalDistanceInKm, totalMinutesLost: totalMinutesLost , windSpeedMph: -effectiveWindSpeed })
+                        }
                     }
                 }
 
