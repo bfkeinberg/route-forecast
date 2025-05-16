@@ -10,6 +10,9 @@ export const TimeChangeChart = (chartData: ChartDataType, metric: boolean) => {
         .y((d: ChartData) => d.totalMinutesLost);
     sampler.bucketSize(Math.max(chartData.length / desiredDataSize, 5));
 
+    if (!chartData || chartData.length === 0) {
+        return <div></div>
+    }
     const sampledData = sampler(chartData);
     const kmToMiles = 0.62137;
 
