@@ -47,15 +47,14 @@ if (!bitly_token) {
 }
 
 const publicPath = express.static(path.resolve(__dirname, '../static'), { maxAge: 86400000 });
-// commented out to see if this actually affects performance one way or another (12/14/24)
-/* app.use('/static', expressStaticGzip(path.resolve(__dirname, '../'), {
+app.use('/static', expressStaticGzip(path.resolve(__dirname, '../'), {
     enableBrotli: true,
     orderPreference: [
         'br',
         'gz'
     ]
 }));
- */
+
 app.use('/static', publicPath);
 
 app.use(bodyParser.json());
