@@ -2,17 +2,18 @@
 import { largestTriangleThreeBucket } from 'd3fc-sample';
 import { ResponsiveContainer, LineChart, XAxis, YAxis, Tooltip, Legend, Line, CartesianGrid } from 'recharts';
 import type { ChartDataType, ChartData } from 'utils/gpxParser';
+import ReactGA from "react-ga4";
 
-export const TimeChangeChart = (chartData: ChartDataType, metric: boolean) => {
+export const TimeChangeChart = (chartData: ChartDataType, metric: boolean, popoverIsOpen: boolean) => {
+    if (!popoverIsOpen || !chartData || chartData.length === 0) {
+        return <div></div>
+    }
     const desiredDataSize = 250;
     const sampler = largestTriangleThreeBucket();
     sampler.x((d: ChartData) => d.distanceInKm)
         .y((d: ChartData) => d.totalMinutesLost);
     sampler.bucketSize(Math.max(chartData.length / desiredDataSize, 5));
 
-    if (!chartData || chartData.length === 0) {
-        return <div></div>
-    }
     const sampledData = sampler(chartData);
     const kmToMiles = 0.62137;
 
@@ -21,7 +22,7 @@ export const TimeChangeChart = (chartData: ChartDataType, metric: boolean) => {
     const formatWindSpeed = (speed: number, isMetric: boolean) => isMetric ? (speed/kmToMiles).toFixed(0) : speed.toFixed(0)
     const formatTooltipValue = (value: number, name: string, isMetric: boolean) => 
         (name === 'totalMinutesLost') ? value.toFixed(0) : isMetric ? [(value / kmToMiles).toFixed(0), "windSpeedKph"] : [value.toFixed(0), "windSpeedMph"]
-
+    ReactGA.event('time_lost_chart')
     return <ResponsiveContainer width="100%" height={"100%"} minWidth={550} minHeight={250} /* maxHeight={400} */>
         <LineChart
             width={550} height={250} data={sampledData}

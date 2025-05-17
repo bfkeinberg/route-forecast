@@ -3,8 +3,10 @@ import { useForecastDependentValues, useAppSelector } from '../../utils/hooks';
 const gustySpeedThreshold = 25;
 import { Popover } from '@blueprintjs/core';
 import { TimeChangeChart } from './TimeChangeChart';
+import {useState} from 'react'
 
 export const WeatherCorrections = () => {
+  const [popoverIsOpen, setPopoverIsOpen] = useState(false)
   const isMetric = useAppSelector(state => state.controls.metric)
 
   const { weatherCorrectionMinutes, maxGustSpeed, chartData } = useForecastDependentValues()
@@ -15,7 +17,7 @@ export const WeatherCorrections = () => {
   const lost = weatherCorrectionMinutes >= 0
 
   return (
-    <Popover interactionKind='hover' content={TimeChangeChart(chartData, isMetric)}>
+    <Popover onOpening={() => setPopoverIsOpen(true) } onClosing={() => setPopoverIsOpen(false)} interactionKind='hover' content={TimeChangeChart(chartData, isMetric, popoverIsOpen)}>
       <span id={weatherId} style={{ fontSize: "14px" }}>
         <span>
           {Math.abs(Math.round(weatherCorrectionMinutes))} minutes <span style={{ color: lost ? "darkorange" : "deepskyblue" }}>
