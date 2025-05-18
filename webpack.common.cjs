@@ -143,7 +143,7 @@ module.exports = (env, argv) => {
             {
                 Images: SRC_STATIC_DIR
             },
-        },
+        }/* ,
         // webpack.common.js
         optimization: {
             moduleIds: 'deterministic',
@@ -162,6 +162,6 @@ module.exports = (env, argv) => {
                     }
                 }
             }
-        }
+        } */
     }
 };
