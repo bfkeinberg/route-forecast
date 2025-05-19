@@ -5,13 +5,21 @@ import Alert from '@mui/material/Alert';
 type CloseHandler = (event?: React.SyntheticEvent | Event, reason?: SnackbarCloseReason) => void
 
 const ErrorDisplayer = ({ errorDetails, onClose } : {errorDetails : string, onClose: CloseHandler}) => {
+    const [open, setOpen] = React.useState(true)
+    const handleClose = (event?: React.SyntheticEvent | Event,
+        reason?: SnackbarCloseReason) => {
+            console.log('closing error details', reason)
+            setOpen(false)
+            onClose()
+    }
+
     return (
-        <Snackbar sx={{ height: "100%" }} open={true} autoHideDuration={3000} onClose={onClose} anchorOrigin={{ vertical: 'top', horizontal: 'left' }}>
+        <Snackbar sx={{ height: "100%" }} open={open} autoHideDuration={3000} onClose={handleClose} anchorOrigin={{ vertical: 'top', horizontal: 'left' }}>
             <Alert
                 severity="error"
                 // variant="outlined"
                 sx={{ width: '100%' }}
-                onClose={() => {}}  // providing this should result in a close button showing
+                onClose={handleClose}
             >
                 {errorDetails}
             </Alert>

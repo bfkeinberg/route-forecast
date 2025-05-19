@@ -253,6 +253,56 @@ const ForecastTable = (adjustedTimes : AdjustedTimes) => {
         }
     }
 
+    const timeIsAdjusted = (adjustedTimes: AdjustedTimes, index: number) => {
+        if (adjustedTimes && adjustedTimes.adjustedTimes && adjustedTimes.adjustedTimes.length > 0) {
+            return (adjustedTimes.adjustedTimes.findIndex(element => element.index === index) !== -1)
+        }
+        return false
+    }
+
+    const preferFinishTime = (index: number, forecastLength: number, finishTime: string|null) => (finishTime != null) && (index === forecastLength-1)
+
+    // determine whether two consecutive entries in the forecast are on different days
+    // requirements: take wind into account for both times before comparing the days
+    // use time zone as well
+    // also the last entry will be the forecasted finish time, and not in the forecast table itself
+    const compareDays = (earlier: string, later: string, zone: string, index: number,
+        forecastLength: number, finishTime: string|null, adjustedTimes: AdjustedTimes
+    ) => {
+        // I'm not using the method that I defined for this purpose because it seems that
+        // typescript doesn't understand that it protects against null values of finishTime
+        const compareAgainstFinish = finishTime && (index === forecastLength-1)
+        // adjust for wind before deciding the day of the forecast point
+        if (timeIsAdjusted(adjustedTimes, index)) {
+            const earlierDay = (adjustedTimes.adjustedTimes.findIndex(element => element.index === index-1) !== -1) ?
+                adjustedTimes.adjustedTimes.find(element => element.index === index-1)?.time.day :
+                DateTime.fromISO(earlier, {zone:zone}).day
+            let laterDay = adjustedTimes.adjustedTimes.find(element => element.index === index)?.time.day
+            if (compareAgainstFinish) {
+                laterDay = DateTime.fromFormat(finishTime, finishTimeFormat, {zone:zone}).day
+            }            
+            return earlierDay != laterDay
+        } else {
+            return DateTime.fromISO(earlier, {zone:zone}).day != 
+            (compareAgainstFinish ? 
+                DateTime.fromFormat(finishTime, finishTimeFormat, {zone:zone}).day : 
+                DateTime.fromISO(later, {zone:zone}).day)
+        }        
+    }
+
+    // before showing the day, adjust for wind and localize the language, also set the time zone appropriately
+    const forecastPointDayMarker = (point: Forecast, i18n: i18n, adjustedTimes: AdjustedTimes, 
+        index: number, forecastLength: number) => {
+        // this will be true even if several forecast entries are missing due to errors 
+        // from the provider
+        if (finishTime && (index === forecastLength-1)) {
+            return DateTime.fromFormat(finishTime, finishTimeFormat, {zone:zone}).toFormat('cccc')
+        }
+        return timeIsAdjusted(adjustedTimes, index) ?
+            adjustedTimes.adjustedTimes.find(element => element.index === index)?.time.setLocale(i18n.language).toFormat('cccc')
+            : DateTime.fromISO(point.time, { locale: i18n.language, zone: point.zone }).toFormat('cccc')
+    }
+
     const expandTable = (forecast : Forecast[], metric : boolean, adjustedTimes : AdjustedTimes, finishTime : string|null) => {
         const { i18n } = useTranslation()
         if (forecast.length > 0) {
@@ -260,9 +310,9 @@ const ForecastTable = (adjustedTimes : AdjustedTimes) => {
                 <tbody>
                 {forecast.map((point,index) =>
                 <React.Fragment key={index}>
-                    {(index > 0 && (DateTime.fromISO(forecast[index-1].time, {zone:point.zone}).day !== getDayForComparison(point.time, index, forecast.length, point.zone, finishTime)))?
+                    {(index > 0 && compareDays(forecast[index-1].time, point.time, point.zone, index, forecast.length, finishTime, adjustedTimes) )?
                         <tr style={{outline:'thin solid'}}>
-                            <td>{DateTime.fromISO(point.time, {locale:i18n.language}).toFormat('cccc')}</td>
+                            <td>{forecastPointDayMarker(point, i18n, adjustedTimes, index, forecast.length)}</td>
                         </tr>:null}
                     <tr id={`forecast_row_${index}`}
                         start={point.distance*milesToMeters}
