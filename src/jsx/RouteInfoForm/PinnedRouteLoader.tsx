@@ -1,8 +1,7 @@
 import { Button, Spinner } from '@blueprintjs/core';
 import * as Sentry from "@sentry/react";
 import axios from 'axios';
-import queryString from 'query-string';
-import {Suspense, useEffect, lazy, SetStateAction, Dispatch} from 'react';
+import {Suspense, useEffect, lazy, SetStateAction, Dispatch, useState} from 'react';
 import ReactGA from "react-ga4";
 import {connect, ConnectedProps} from 'react-redux';
 import {useTranslation} from 'react-i18next'
@@ -11,6 +10,7 @@ import { errorDetailsSet } from '../../redux/dialogParamsSlice';
 import type { ErrorPayload } from '../../redux/dialogParamsSlice';
 import type { RootState } from "../../redux/store";
 import { ActionCreatorWithPayload } from '@reduxjs/toolkit';
+import Snackbar, {SnackbarCloseReason} from '@mui/material/Snackbar';
 
 const addBreadcrumb = (msg : string) => {
     Sentry.addBreadcrumb({
@@ -98,12 +98,23 @@ const PinnedRouteLoader = ({rwgpsToken, rwgpsTokenSet, credentialsValid,
         usingPinnedRoutes
     ])
     const { t } = useTranslation()
+    const [displayRoutesError, setDisplayRoutesError] = useState(true)
     let button_class = usingPinnedRoutes ? undefined : 'glowing_input'
     Sentry.addBreadcrumb({
         category: 'load',
         level: 'info',
         message:'Loading pinned route list'
     })
+
+    const handleClose = (
+        event: React.SyntheticEvent | Event,
+        reason?: SnackbarCloseReason,
+    ) => {
+
+        setDisplayRoutesError(false);
+        usePinnedRoutesSet(false)
+        setShowPinnedRoutes(false)
+    }
 
     return (
         <>
@@ -116,7 +127,7 @@ const PinnedRouteLoader = ({rwgpsToken, rwgpsTokenSet, credentialsValid,
                 className={button_class}
                 text={usingPinnedRoutes ? t('buttons.dontUsePinned') : t('buttons.usePinned')}
                 style={{fontSize: "13px"}}
-                onClick={() => {togglePinnedRoutes(usePinnedRoutesSet, setShowPinnedRoutes, usingPinnedRoutes)}}
+                onClick={() => {setDisplayRoutesError(true); togglePinnedRoutes(usePinnedRoutesSet, setShowPinnedRoutes, usingPinnedRoutes)}}
             />
             {credentialsValid ?
             (
@@ -129,7 +140,8 @@ const PinnedRouteLoader = ({rwgpsToken, rwgpsTokenSet, credentialsValid,
              (
                 <div/>
             )}
-            {usingPinnedRoutes && !hasRoutes && !loadingPinnedRoutes && <Spinner/>}
+            <Snackbar message={"No pinned routes to display"} onClose={handleClose} 
+                open={usingPinnedRoutes && !loadingPinnedRoutes && !hasRoutes && displayRoutesError} autoHideDuration={5000} />
         </>
     )
 };

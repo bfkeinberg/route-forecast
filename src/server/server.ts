@@ -27,7 +27,6 @@ import axios, { AxiosError, isAxiosError } from 'axios';
 // import {std} from "mathjs";
 const {std} = require('mathjs');
 import {Client} from "pg";
-// const pgTypes = require('pg').types
 
 import RateLimit from 'express-rate-limit'
 var limiter = RateLimit({
@@ -340,56 +339,6 @@ app.post('/forecast_one', cache.middleware(), upload.none(), async (req : Reques
     }
 });
 
-/* app.post('/forecast', upload.none(), async (req : Request, res : Response) => {
-    Sentry.captureMessage('Forecast rather than forecast_one called');
-    if (req.body.locations === undefined) {
-        res.status(400).json({ 'status': 'Missing location key' });
-        return;
-    }
-    if (req.body.timezone === undefined || req.body.timezone === 'undefined') {
-        res.status(400).json({ 'status': 'Missing timezone key' });
-        return;
-    }
-    const forecastPoints = JSON.parse(req.body.locations);
-    if (!process.env.NO_LOGGING) {
-        logger.info(`Request from ${req.ip} for ${forecastPoints.length} forecast points`);
-    }
-    if (forecastPoints.length > 120) {
-        res.status(400).json({ 'details': 'Invalid request, increase forecast time interval' });
-        return;
-    }
-    let service = process.env.WEATHER_SERVICE;
-    if (req.body.service !== undefined) {
-        service = req.body.service;
-    }
-    if (!service) {
-        res.status(400).json({'status':'Missing weather service'})
-        return
-    }
-    const zone = req.body.timezone;
-    try {
-        let results = [];
-        while (forecastPoints.length > 0) {
-            let point = forecastPoints.shift();
-            // eslint-disable-next-line no-await-in-loop
-            const result = await callWeatherService(service, point.lat, point.lon, point.time, point.distance, zone, point.bearing, point.isControl, 'en').catch((error: any) => {
-                throw error;
-            });
-            // we explicitly do not want to parallelize to avoid swamping the servers we are calling and being throttled
-            results.push(result);
-        }
-        if (!process.env.NO_LOGGING) {
-            logger.info(`Done with request from ${req.ip}`);
-        }
-        res.status(200).json({ 'forecast': results });
-    } catch (error) {
-        if (!process.env.NO_LOGGING) {
-            logger.info(`Error with request from ${req.ip}`);
-        }
-        res.status(500).json({ 'details': `Error calling weather service : ${error}` });
-    }
-}); */
-
 app.post('/aqi_one', upload.none(), async (req, res) => {
     if (req.body.locations === undefined) {
         res.status(400).json({ 'status': 'Missing location key' });
@@ -535,9 +484,9 @@ const getStravaToken = (code : string) => {
     });
 };
  */
-const randoplan_uri='https://www.randoplan.com/rwgpsAuthReply';
+// const randoplan_uri='https://www.randoplan.com/rwgpsAuthReply';
 // uncomment the line below and comment the one above when testing pinned route functions locally
-// const randoplan_uri='http://localhost:8080/rwgpsAuthReply';
+const randoplan_uri='http://localhost:8080/rwgpsAuthReply';
 
 app.get('/rwgpsAuthReq', (req: Request, res : Response) => {
     const state = req.query.state;
