@@ -12,7 +12,8 @@ import { ToggleButton } from '../shared/ToggleButton';
 import StravaAnalysisIntervalInput from './StravaAnalysisIntervalInput';
 import {useTranslation} from 'react-i18next'
 import { mapSubrangeSet, mapRangeToggled } from '../../redux/stravaSlice';
-import { RootState } from 'jsx/app/topLevel';
+import type { RootState } from "../../redux/store";
+
 type PropsFromRedux = ConnectedProps<typeof connector>
 
 declare module 'react' {

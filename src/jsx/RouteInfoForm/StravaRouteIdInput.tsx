@@ -1,6 +1,6 @@
 import { FormGroup,InputGroup } from '@blueprintjs/core'
 import {connect, ConnectedProps} from 'react-redux';
-import { RootState } from "../app/topLevel";
+import type { RootState } from "../../redux/store";
 import { stravaRouteSet } from '../../redux/stravaSlice';
 
 type PropsFromRedux = ConnectedProps<typeof connector>

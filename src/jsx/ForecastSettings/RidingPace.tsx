@@ -11,7 +11,7 @@ import { inputPaceToSpeed, metricPaceToSpeed, paceToSpeed } from '../../utils/ut
 import { DesktopTooltip } from '../shared/DesktopTooltip';
 import {useTranslation} from 'react-i18next'
 import { milesToMeters } from '../../utils/util'
-import { RootState } from "../app/topLevel";
+import type { RootState } from "../../redux/store";
 
 type PropsFromRedux = ConnectedProps<typeof connector>
 

@@ -11,7 +11,7 @@ import { RouteInfoInputStrava } from './RouteInfoInputStrava'
 import {useTranslation} from 'react-i18next'
 import bicycle from 'Images/bicycle.svg'
 import { routeLoadingModeSet } from '../../redux/routeParamsSlice';
-import { RootState } from 'jsx/app/topLevel';
+import type { RootState } from "../../redux/store";
 import { ReactNode } from 'react';
 type PropsFromRedux = ConnectedProps<typeof connector>
 

@@ -5,8 +5,8 @@ import { UserControl, userControlsUpdated } from "./controlsSlice";
 import { shortUrlSet, errorDetailsSet } from "./dialogParamsSlice";
 import type { Dispatch, Action } from "redux";
 import {controlsMeaningfullyDifferent} from "../utils/util"
-import { RootState } from "../jsx/app/topLevel";
-import { AppDispatch } from "../jsx/app/topLevel";
+import type { RootState } from "../redux/store";
+import type { AppDispatch } from "../redux/store";
 import * as Sentry from "@sentry/react";
 import { cancelForecast } from "./forecastActions";
 

@@ -11,7 +11,6 @@ import { routeInfoReducer } from './routeInfoSlice';
 import { controlsReducer } from './controlsSlice';
 import {routeParamsReducer} from './routeParamsSlice'
 import { forecastReducer } from './forecastSlice';
-import { Tuple } from '@reduxjs/toolkit';
 export const loggerMiddleware = createLogger();
 
 const bannedActionKeys = [

@@ -11,7 +11,7 @@ import queryString from 'query-string';
 import React, {lazy,  ReactElement, Suspense,useEffect} from 'react';
 import cookie from 'react-cookies';
 import { useAppDispatch, useAppSelector } from "../../utils/hooks";
-import { AppDispatch } from "./topLevel";
+import type { AppDispatch } from "../../redux/store";
 import  {useMediaQuery} from 'react-responsive';
 import {useTranslation} from 'react-i18next'
 import { stravaErrorSet } from "../../redux/dialogParamsSlice";

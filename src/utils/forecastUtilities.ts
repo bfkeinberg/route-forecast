@@ -1,7 +1,7 @@
 import * as Sentry from '@sentry/browser';
 import { DateTime } from 'luxon';
 import { getRouteInfo } from './util';
-import { RootState } from 'jsx/app/topLevel';
+import type { RootState } from "../redux/store";
 
 interface TimeZoneResult {
     offset: number

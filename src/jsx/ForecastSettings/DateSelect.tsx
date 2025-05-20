@@ -13,9 +13,9 @@ import {setStart} from "../../redux/actions";
 import { setTimeFromIso } from "../../redux/actions";
 import { initialStartTimeSet } from "../../redux/routeParamsSlice";
 import {useMediaQuery} from 'react-responsive'
-import { Tooltip } from "@blueprintjs/core";
+// import { Tooltip } from "@blueprintjs/core";
 import {useTranslation} from 'react-i18next'
-import { RootState } from "../app/topLevel";
+import type { RootState } from "../../redux/store";
 import { ActionCreatorWithPayload } from "@reduxjs/toolkit";
 type PropsFromRedux = ConnectedProps<typeof connector>
 

@@ -3,7 +3,7 @@ import {Suspense, lazy} from 'react';
 import {connect, ConnectedProps} from 'react-redux';
 
 import { routeLoadingModes } from '../../data/enums';
-import { RootState } from "jsx/app/topLevel";
+import type { RootState } from "../../redux/store";
 import { useAppSelector } from "../../utils/hooks";
 
 export const addBreadcrumb = (msg : string) => {

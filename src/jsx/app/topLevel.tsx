@@ -1,15 +1,11 @@
 import { HotkeysProvider, OverlaysProvider } from "@blueprintjs/core";
 import { Provider } from 'react-redux';
 import { useContext } from "react";
-import configureReduxStore from '../../redux/configureStore';
 import LocationContext from '../locationContext';
 import * as Sentry from "@sentry/react"
 import RouteWeatherUI from './main';
+import { store } from '../../redux/store';
 
-let script = document.scripts.namedItem('routeui')
-const mode = script!.getAttribute('mode');
-
-const store = configureReduxStore({ _preloadedState: {}, mode: mode?mode:"production" })
 const TopLevel = ({ action, maps_api_key, timezone_api_key, bitly_token, preloaded_state }:
     { action: string, maps_api_key: string, timezone_api_key: string, bitly_token: string, preloaded_state?: object }) => {
         const locationContext = useContext(LocationContext);
@@ -27,10 +23,5 @@ const TopLevel = ({ action, maps_api_key, timezone_api_key, bitly_token, preload
         </Sentry.ErrorBoundary>
     )
 };
-
-// Infer the `RootState` and `AppDispatch` types from the store itself
-export type RootState = ReturnType<typeof store.getState>
-// Inferred type: {posts: PostsState, comments: CommentsState, users: UsersState}
-export type AppDispatch = typeof store.dispatch
 
 export default TopLevel;

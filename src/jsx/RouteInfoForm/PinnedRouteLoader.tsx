@@ -9,7 +9,7 @@ import {useTranslation} from 'react-i18next'
 import { Favorite, loadingPinnedSet, pinnedRoutesSet, rwgpsTokenSet, usePinnedRoutesSet } from '../../redux/rideWithGpsSlice';
 import { errorDetailsSet } from '../../redux/dialogParamsSlice';
 import type { ErrorPayload } from '../../redux/dialogParamsSlice';
-import { RootState } from '../app/topLevel';
+import type { RootState } from "../../redux/store";
 import { ActionCreatorWithPayload } from '@reduxjs/toolkit';
 
 const addBreadcrumb = (msg : string) => {

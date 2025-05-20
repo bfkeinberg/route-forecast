@@ -4,7 +4,7 @@ import ReactGA from "react-ga4";
 import {connect} from 'react-redux';
 import * as Sentry from "@sentry/react";
 import { AppToaster } from '../shared/toast';
-import { RootState } from  '../app/topLevel'
+import type { RootState } from "../../redux/store";
 
 const ShortUrl = ({shortUrl} : {shortUrl:string}) => {
     return (

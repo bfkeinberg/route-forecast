@@ -3,7 +3,8 @@ import { connect, ConnectedProps } from 'react-redux';
 
 import { stravaActivitySet } from '../../redux/stravaSlice';
 import { ActionCreatorWithPayload } from '@reduxjs/toolkit';
-import { RootState } from '../app/topLevel';
+import type { RootState } from "../../redux/store";
+
 type StravaActivityIdProps = {
     canAnalyze: boolean
     strava_activity: string

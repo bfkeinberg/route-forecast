@@ -17,7 +17,7 @@ import { DesktopTooltip } from '../shared/DesktopTooltip';
 import {useTranslation} from 'react-i18next'
 import { providerValues } from '../../redux/providerValues';
 import { useForecastRequestData } from '../../utils/hooks';
-import { RootState } from '../app/topLevel';
+import type { RootState } from "../../redux/store";
 import { useAppSelector, useAppDispatch } from '../../utils/hooks';
 import type {ForecastRequest} from '../../utils/gpxParser'
 import { GpxRouteData, RwgpsRoute, RwgpsTrip } from 'redux/routeInfoSlice';

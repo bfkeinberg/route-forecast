@@ -3,7 +3,7 @@ import { Select, ItemRenderer } from "@blueprintjs/select";
 import { connect, ConnectedProps } from 'react-redux';
 import {useTranslation} from 'react-i18next'
 import { analysisIntervalSet } from "../../redux/stravaSlice";
-import { RootState } from "jsx/app/topLevel";
+import type { RootState } from "../../redux/store";
 
 interface AnalysisInterval {
     number: string

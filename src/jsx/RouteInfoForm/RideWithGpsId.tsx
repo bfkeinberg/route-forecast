@@ -4,7 +4,7 @@ import {useTranslation} from 'react-i18next'
 import * as Sentry from "@sentry/react";
 import { routeDataCleared} from '../../redux/routeInfoSlice';
 import { rwgpsRouteSet } from '../../redux/routeParamsSlice';
-import { RootState } from '../app/topLevel';
+import type { RootState } from "../../redux/store";
 import { RefObject } from 'react';
 
 export const decideValidationStateFor = (type : string, methodUsed : string|null, loadingSuccess : boolean) => {

@@ -1,8 +1,8 @@
 import * as Sentry from "@sentry/react";
 import { DateTime, Interval } from 'luxon';
 import { useEffect, useMemo, useRef, useState } from "react"
-import { useDispatch, useSelector, useStore } from "react-redux"
-import type { AppDispatch, RootState } from '../jsx/app/topLevel'
+import { useDispatch, useSelector } from "react-redux"
+import type { AppDispatch, RootState } from '../redux/store'
 
 export const useAppDispatch = useDispatch.withTypes<AppDispatch>()
 export const useAppSelector = useSelector.withTypes<RootState>()

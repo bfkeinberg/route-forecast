@@ -1,5 +1,5 @@
-import { RootState } from "../jsx/app/topLevel";
-import { AppDispatch } from "../jsx/app/topLevel";
+import type { RootState } from "../redux/store";
+import type { AppDispatch } from "../redux/store";
 import ReactGA from "react-ga4";
 import { loadingFromUrlSet } from "./routeInfoSlice";
 import { updateHistory } from "../jsx/app/updateHistory";

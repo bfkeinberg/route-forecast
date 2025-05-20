@@ -6,7 +6,7 @@ import { providerValues } from "../../redux/providerValues";
 import { DesktopTooltip } from '../shared/DesktopTooltip';
 import {useTranslation} from 'react-i18next'
 import {useForecastRequestData} from "../../utils/hooks"
-import { RootState } from "../app/topLevel";
+import type { RootState } from "../../redux/store";
 import ReactGA from "react-ga4";
 
 type PropsFromRedux = ConnectedProps<typeof connector>
