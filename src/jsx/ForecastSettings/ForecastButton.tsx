@@ -95,10 +95,12 @@ const ForecastButton = ({fetchingForecast,submitDisabled, routeNumber, startTime
             const request = {locations:locations, timezone:zone, service:service, routeName:routeName,
                  routeNumber:routeNumber, lang: i18n.language, which}
             const result = forecast(request).unwrap()
+            result.catch(() => { /* Handled by Promise.allSettled */ });
             forecastResults.push(result)
             if (fetchAqi) {
                 const aqiRequest = {locations:locations}
                 const aqiResult = getAQI(aqiRequest).unwrap()
+                aqiResult.catch(() => { /* Handled by Promise.allSettled */ });
                 aqiResults.push(aqiResult)
             }
             locations = requestCopy.shift();

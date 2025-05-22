@@ -67,10 +67,12 @@ const forecastByParts = (forecastFunc : MutationWrapper, aqiFunc : MutationWrapp
         try {
             const request = {locations:locations, timezone:zone, service:service, routeName:routeName, routeNumber:routeNumber, lang:lang, which}
             const result = forecastFunc(request).unwrap()
+            result.catch(() => { /* Handled by Promise.allSettled */ });
             forecastResults.push(result)
             if (fetchAqi) {
                 const aqiRequest = {locations:locations}
                 const aqiResult = aqiFunc(aqiRequest).unwrap()
+                aqiResult.catch(() => { /* Handled by Promise.allSettled */ });
                 aqiResults.push(aqiResult)
             }
         locations = requestCopy.shift();
