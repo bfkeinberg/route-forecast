@@ -68,6 +68,9 @@ app.use('/lib/localforage.js', limiter)
 app.get('/lib/localforage.js', (req : Request, res : Response) => {
     res.sendFile(path.resolve(__dirname,'../static/lib/localforage.js'));
 })
+app.get('/robots.txt', (req : Request, res : Response) => {
+    res.sendFile(path.resolve(__dirname,'../static/robots.txt'));
+})
 
 // ejs
 app.set('views', path.resolve(__dirname, 'views'));
