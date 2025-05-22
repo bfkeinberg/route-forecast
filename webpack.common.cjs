@@ -109,6 +109,7 @@ module.exports = (env, argv) => {
                     { from: SRC_STATIC_DIR + '/favicon*.*', to: path.resolve(STATIC_DIR, "[name][ext]") },
                     { from: SRC_STATIC_DIR + '/apple-*.*', to: path.resolve(STATIC_DIR, "[name][ext]") },
                     { from: 'manifest.json', to: path.resolve(STATIC_DIR, "[name][ext]") },
+                    { from: 'robots.txt', to: path.resolve(STATIC_DIR, "[name][ext]") },
                     { from: 'src/pwa/worker.js', to: path.resolve(STATIC_DIR, "[name][ext]") },
                     { from: 'node_modules/localforage/dist/localforage.min.js', to: path.resolve(STATIC_DIR, "lib/localforage.js") },
                     { from: 'source-context.json', to: path.resolve(SERVER_DIR, "[name][ext]") }
