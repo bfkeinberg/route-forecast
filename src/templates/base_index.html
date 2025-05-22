@@ -71,6 +71,7 @@
         <% for (var css in htmlWebpackPlugin.files.css) { %>
         <link href="<%= htmlWebpackPlugin.files.css[css] %>" rel="stylesheet" type="text/css" >
         <% } %>
+        <link rel="canonical" href="https://www.randoplan.com"/>
     </head>
     <body onload="addScriptTag();measureCRP()">
         <div id="container">
