@@ -123,12 +123,14 @@ const routeInfoSlice = createSlice({
             state.gpxRouteData = routeInfoInitialState.gpxRouteData
             state.name = routeInfoInitialState.name
             state.distanceInKm = routeInfoInitialState.distanceInKm
+            state.type = routeInfoInitialState.type
         })
             .addCase("strava/stravaRouteSet", (state) => {
                 state.rwgpsRouteData = routeInfoInitialState.rwgpsRouteData
                 state.gpxRouteData = routeInfoInitialState.gpxRouteData
                 state.name = routeInfoInitialState.name
                 state.distanceInKm = routeInfoInitialState.distanceInKm
+                state.type = routeInfoInitialState.type
             })
             .addCase("routeParams/reset", () => routeInfoInitialState)
     }

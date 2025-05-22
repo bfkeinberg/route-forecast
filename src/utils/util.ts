@@ -45,28 +45,37 @@ type StateForRouteInfo = {
   uiInfo: {routeParams: RouteParamsState}
 }
 
-export const getRouteInfo = (state : StateForRouteInfo, timeZoneId : string, segment : Segment) => {
-    if (state.routeInfo.type === "rwgps") {
+export const getRouteInfo = (state: StateForRouteInfo, timeZoneId: string, segment: Segment) => {
+  if (state.routeInfo.type === "rwgps") {
+    if (state.routeInfo.rwgpsRouteData) {
       return gpxParser.walkRwgpsRoute(
         state.routeInfo["rwgpsRouteData"]!,
-        DateTime.fromMillis(state.uiInfo.routeParams.startTimestamp, {zone:timeZoneId}),
+        DateTime.fromMillis(state.uiInfo.routeParams.startTimestamp, { zone: timeZoneId }),
         state.uiInfo.routeParams.pace,
         state.uiInfo.routeParams.interval,
         state.controls.userControlPoints,
         timeZoneId,
         segment
-      )  
-    } else {
+      )
+    }
+  } else {
+    if (state.routeInfo.gpxRouteData) {
       return gpxParser.walkGpxRoute(
         state.routeInfo["gpxRouteData"]!,
-        DateTime.fromMillis(state.uiInfo.routeParams.startTimestamp, {zone:timeZoneId}),
+        DateTime.fromMillis(state.uiInfo.routeParams.startTimestamp, { zone: timeZoneId }),
         state.uiInfo.routeParams.pace,
         state.uiInfo.routeParams.interval,
         state.controls.userControlPoints,
         timeZoneId,
         segment
-      )  
+      )
     }
+  }
+  throw new Error(
+    `getRouteInfo: Cannot process route. Type is "${state.routeInfo.type}", ` +
+    `rwgpsData is ${state.routeInfo.rwgpsRouteData ? 'present' : 'null'}, ` +
+    `gpxData is ${state.routeInfo.gpxRouteData ? 'present' : 'null'}.`
+  );
 }
 
 export const getForecastRequest = (routeData : GpxRouteData | RwgpsRoute | RwgpsTrip, 
