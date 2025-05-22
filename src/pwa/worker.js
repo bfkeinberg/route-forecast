@@ -168,9 +168,16 @@ const getAndCachePOST = async (request) => {
 self.addEventListener('fetch', (event) => {
     const url = event.request.url;
     if (!url.startsWith(self.location.origin) &&
-    !url.startsWith("https://maps.googleaapis.com") && !url.startsWith("https://maps.googleapis.com/maps/api/js") &&
-    !url.startsWith("https://fonts.gstatic.com") && !url.startsWith("https://maps.googleapis.com/maps/api/timezone")) {
+        !url.startsWith("https://maps.googleaapis.com") && !url.startsWith("https://maps.googleapis.com/maps/api/js") &&
+        !url.startsWith("https://fonts.gstatic.com") && !url.startsWith("https://maps.googleapis.com/maps/api/timezone") &&
+        !url.includes('/rwgps_route')
+    ) {
+        console.log(`returning and not handling url ${url}`)
         return;
+    }
+    // we don't need to cache the pinned routes, the intent of caching is to preserve completed forecasts
+    if (url.includes('/pinned_routes')) {
+        return
     }
     // console.log(`responding to event for ${url} with method ${event.request.method}`);
 
