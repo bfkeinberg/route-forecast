@@ -12,6 +12,13 @@ if ('serviceWorker' in navigator) {
         if (registration.active) {
             console.log(`Worker details:${registration.active.state} ${registration.active.scriptURL}`);
         }
+    // reg.installing may or may not be set, depending on whether
+        // a new SW was registered.
+        registration.installing?.addEventListener('statechange', (event : Event) => {
+        if (event.target && (event.target as ServiceWorker).state === 'redundant') {
+            console.log(`Service worker did not install correctly`)
+        }
+        });        
     }).catch((error) => {
         console.warn('Error registering service worker:', error);
     });

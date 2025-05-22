@@ -15,15 +15,16 @@ self.addEventListener('install', (event) => {
         storeName: indexed_db_table_name
     });
     console.info('creating Cache');
-    event.waitUntil(caches.open(cacheName).then((cache) => {
+/*     event.waitUntil(caches.open(cacheName).then((cache) => {
         // `Cache` instance for later use.
         return cache.addAll([
             '/static/main.css',
             '/static/main.bundle.js',
             'static/favicon.ico',
             'static/manifest.json'
-        ]);
-    }));
+        ]));
+    })); */
+    self.skipWaiting()
 });
 
 self.addEventListener('activate', (e) => {
@@ -114,6 +115,7 @@ const getAndCacheGET = async (request) => {
         return response;
     } else {
         // If the network is unavailable, get
+        console.info(`Searching GET cache for ${url}`)
         let cachedResponse = await cache.match(url);
         if (cachedResponse === undefined) {
             // try while ignoring query parameters if /
@@ -170,16 +172,17 @@ self.addEventListener('fetch', (event) => {
     if (!url.startsWith(self.location.origin) &&
         !url.startsWith("https://maps.googleaapis.com") && !url.startsWith("https://maps.googleapis.com/maps/api/js") &&
         !url.startsWith("https://fonts.gstatic.com") && !url.startsWith("https://maps.googleapis.com/maps/api/timezone") &&
-        !url.includes('/rwgps_route')
+        !url.includes('/rwgps_route') && !url.includes('/forecast_oneack')
     ) {
         console.log(`returning and not handling url ${url}`)
         return;
     }
     // we don't need to cache the pinned routes, the intent of caching is to preserve completed forecasts
     if (url.includes('/pinned_routes')) {
-        return
+        console.log('Not handling pinned routes')
+        return;
     }
-    // console.log(`responding to event for ${url} with method ${event.request.method}`);
+    console.log(`responding to event for ${url} with method ${event.request.method}`);
 
     // Open the cache
     if (event.request.method === "POST") {
