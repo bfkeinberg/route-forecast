@@ -115,7 +115,7 @@ const getAndCacheGET = async (request) => {
         return response;
     } else {
         // If the network is unavailable, get
-        console.info(`Searching GET cache for ${url}`)
+        // console.info(`Searching GET cache for ${url}`)
         let cachedResponse = await cache.match(url);
         if (cachedResponse === undefined) {
             // try while ignoring query parameters if /
@@ -124,7 +124,7 @@ const getAndCacheGET = async (request) => {
             }
             if (cachedResponse == undefined) {
                 console.warn(`No matching cache entry for GET for ${url}`);
-                return new Response('', {status: 503, statusText: 'Service Unavailable'});
+                return new Response({details:'No cached GET response'}, {status: 503, statusText: 'Service Unavailable'});
             }
         }
         return cachedResponse;
@@ -133,10 +133,14 @@ const getAndCacheGET = async (request) => {
 
 const getAndCachePOST = async (request) => {
     // First try to fetch the request from the server
+    const requestClone = request.clone()
+    const formData = await requestClone.json();
+    const cacheKey = `${formData.locations.lat}:${formData.locations.lon}_${formData.locations.time}_${formData.service}`
+
     const response = await fetch(request.clone()).catch(() => console.warn("Could not POST, will try cache"));
     if (response !== undefined && response.ok) {
         // If it works, put the response into IndexedDB
-        const cacheKey = JSON.stringify(await serialize(request));
+        // console.info(`inserting item into POST cache with key ${cacheKey}`, response);
         if (postCache !== undefined) {
             postCache.setItem(cacheKey, serializeResponse(response.clone()));
         } else {
@@ -150,7 +154,6 @@ const getAndCachePOST = async (request) => {
     } else {
         // If it does not work, return the cached response. If the cache does not
         // contain a response for our request, it will give us a 503-response
-        const cacheKey = JSON.stringify(await serialize(request));
         // don't know how this could happen, but evidently it can
         if (postCache === undefined) {
             postCache = localforage.createInstance({
@@ -160,9 +163,10 @@ const getAndCachePOST = async (request) => {
         }
         let cachedResponse = await postCache.getItem(cacheKey);
         if (!cachedResponse) {
-            console.warn('Returning 503 for POST');
-            return response;
+            // console.warn('Returning 503 for POST');
+            return Response.json({details:'No cached POST response'}, {status:503, statusText: 'Service Unavailable'})
         }
+        // console.info('Returning cached copy', cachedResponse)
         return deserializeResponse(cachedResponse);
     }
 }
@@ -172,17 +176,17 @@ self.addEventListener('fetch', (event) => {
     if (!url.startsWith(self.location.origin) &&
         !url.startsWith("https://maps.googleaapis.com") && !url.startsWith("https://maps.googleapis.com/maps/api/js") &&
         !url.startsWith("https://fonts.gstatic.com") && !url.startsWith("https://maps.googleapis.com/maps/api/timezone") &&
-        !url.includes('/rwgps_route') && !url.includes('/forecast_oneack')
+        !url.includes('/rwgps_route') && !url.includes('/forecast_one') && !url.startsWith('https://www.weather.gov/images')
     ) {
-        console.log(`returning and not handling url ${url}`)
+        // console.log(`returning and not handling url ${url}`)
         return;
     }
     // we don't need to cache the pinned routes, the intent of caching is to preserve completed forecasts
     if (url.includes('/pinned_routes')) {
-        console.log('Not handling pinned routes')
+        // console.log('Not handling pinned routes')
         return;
     }
-    console.log(`responding to event for ${url} with method ${event.request.method}`);
+    // console.log(`responding to event for ${url} with method ${event.request.method}`);
 
     // Open the cache
     if (event.request.method === "POST") {
