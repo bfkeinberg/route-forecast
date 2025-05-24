@@ -164,11 +164,21 @@ export const loadStravaRoute = (routeId : string) => {
             api.setDefaultHeader('Authorization', `Bearer ${access_token}`)
             try {
                 const routeInfo = await api.get(`/routes/${routeId}/export_gpx`)
-                if (routeInfo && routeInfo.charAt(0)!=="{") {
-                    await dispatch(loadGpxRoute(routeInfo))
+                if (!routeInfo || typeof routeInfo !== 'string' || routeInfo.trim().length === 0) {
+                    dispatch(errorDetailsSet('Error fetching Strava route: Received empty or invalid data from Strava.'));
+                } else if (routeInfo.charAt(0) === '{') {
+                    try {
+                        const errorJson = JSON.parse(routeInfo);
+                        const message = errorJson.message || 'Unknown Strava error';
+                        dispatch(errorDetailsSet(`Error fetching Strava route: ${message}`));
+                    } catch (e) {
+                        dispatch(errorDetailsSet('Error fetching Strava route: Received an unparsable JSON error from Strava.'));
+                    }
+                } else if (routeInfo.includes('<gpx') || routeInfo.includes('<?xml')) {
+                    await dispatch(loadGpxRoute(routeInfo as unknown as GpxRouteData));
                 } else {
-                    dispatch(errorDetailsSet(`Error fetching Strava route: ${JSON.parse(routeInfo).message}`))
-                }    
+                    dispatch(errorDetailsSet('Error fetching Strava route: Data received from Strava was not recognized as GPX.'));
+                }
             } catch (err : any) {
                 dispatch(errorDetailsSet(`Error fetching Strava route: ${err.details}`))
             }

@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { providerValues, defaultProvider } from './providerValues'
-import { routeLoadingModes } from '../data/enums';
+import { RouteLoadingModes, routeLoadingModes } from '../data/enums';
 import type { Segment } from '../utils/gpxParser';
 import { DateTime } from 'luxon';
 import { stravaRouteSet } from './stravaSlice';
@@ -33,7 +33,6 @@ export type RouteParamsState = {
     maxDaysInFuture: number
     stopAfterLoad: boolean
     rusaPermRouteId: string
-    loadingSource: string | null
     succeeded: boolean | null
     segment: Segment
     [index:string]:any
@@ -62,7 +61,6 @@ const routeParamsInitialState : RouteParamsState = {
     maxDaysInFuture: providerValues[defaultProvider].max_days,
     stopAfterLoad: false,
     rusaPermRouteId: '',
-    loadingSource:null,
     succeeded:null,
     segment:[0,0]
 }
@@ -75,7 +73,6 @@ const routeParamsSlice = createSlice({
         },
         rwgpsRouteSetAsNumber(state, action: PayloadAction<number>) {
             state.rwgpsRoute = action.payload.toString()
-            state.loadingSource = null
             state.succeeded = null
             state.segment = routeParamsInitialState.segment
         },
@@ -86,7 +83,6 @@ const routeParamsSlice = createSlice({
             } else {
                 state.rwgpsRoute = ''
             }
-            state.loadingSource = null
             state.succeeded = null
             state.segment = routeParamsInitialState.segment
         },
@@ -149,7 +145,9 @@ const routeParamsSlice = createSlice({
             state.rwgpsRouteIsTrip = action.payload
         },
         routeLoadingModeSet(state,action) {
-            state.routeLoadingMode = action.payload
+            if (action.payload === routeLoadingModes.RWGPS || action.payload === routeLoadingModes.STRAVA || action.payload === routeLoadingModes.RUSA_PERM) {
+                state.routeLoadingMode = action.payload
+            }
         },
         reset(state) {
             for (const [key, value] of Object.entries(routeParamsInitialState)) {

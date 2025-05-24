@@ -2,7 +2,7 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { pinnedRoutesSet } from './rideWithGpsSlice'
 import { rwgpsRouteLoaded, gpxRouteLoaded } from './routeInfoSlice'
 import { stravaFetched, stravaFetchFailed } from './stravaSlice'
-import { act } from 'react'
+import {rwgpsRouteSetAsNumber, rwgpsRouteSet} from './routeParamsSlice'
 
 interface ErrorMessage {
     message:string
@@ -144,6 +144,11 @@ const dialogParamsSlice = createSlice({
             .addCase('forecast/forecastFetched', (state) => {
                 state.fetchingForecast = false
                 state.errorDetails = null
+            })
+            .addCase(rwgpsRouteSetAsNumber, (state) => {
+                state.loadingSource = null
+            }).addCase(rwgpsRouteSet, (state) => {
+                state.loadingSource = null
             })
     }
 })
