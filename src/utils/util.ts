@@ -46,27 +46,40 @@ type StateForRouteInfo = {
 }
 
 export const getRouteInfo = (state : StateForRouteInfo, timeZoneId : string, segment : Segment) => {
-    if (state.routeInfo.type === "rwgps") {
-      return gpxParser.walkRwgpsRoute(
-        state.routeInfo["rwgpsRouteData"]!,
-        DateTime.fromMillis(state.uiInfo.routeParams.startTimestamp, {zone:timeZoneId}),
-        state.uiInfo.routeParams.pace,
-        state.uiInfo.routeParams.interval,
-        state.controls.userControlPoints,
-        timeZoneId,
-        segment
-      )  
-    } else {
-      return gpxParser.walkGpxRoute(
-        state.routeInfo["gpxRouteData"]!,
-        DateTime.fromMillis(state.uiInfo.routeParams.startTimestamp, {zone:timeZoneId}),
-        state.uiInfo.routeParams.pace,
-        state.uiInfo.routeParams.interval,
-        state.controls.userControlPoints,
-        timeZoneId,
-        segment
-      )  
+    const routeInfo = state.routeInfo;
+
+    if (routeInfo.type === "rwgps") {
+        if (routeInfo.rwgpsRouteData) { // Explicit null check
+            return gpxParser.walkRwgpsRoute(
+                routeInfo.rwgpsRouteData,
+                DateTime.fromMillis(state.uiInfo.routeParams.startTimestamp, {zone:timeZoneId}),
+                state.uiInfo.routeParams.pace,
+                state.uiInfo.routeParams.interval,
+                state.controls.userControlPoints,
+                timeZoneId,
+                segment
+            )  
+        }
+    } else if (routeInfo.type === "gpx") {
+        if (routeInfo.gpxRouteData) { // Explicit null check
+            return gpxParser.walkGpxRoute(
+                routeInfo.gpxRouteData,
+                DateTime.fromMillis(state.uiInfo.routeParams.startTimestamp, {zone:timeZoneId}),
+                state.uiInfo.routeParams.pace,
+                state.uiInfo.routeParams.interval,
+                state.controls.userControlPoints,
+                timeZoneId,
+                segment
+            )  
+        }
     }
+
+    // Defensive error for inconsistent state
+    throw new Error(
+        `getRouteInfo: Cannot process route. Type is "${routeInfo.type}", ` +
+        `rwgpsData is ${routeInfo.rwgpsRouteData ? 'present' : 'null'}, ` +
+        `gpxData is ${routeInfo.gpxRouteData ? 'present' : 'null'}.`
+    );
 }
 
 export const getForecastRequest = (routeData : GpxRouteData | RwgpsRoute | RwgpsTrip, 
