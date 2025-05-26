@@ -96,7 +96,7 @@ const RouteForecastMap = ({maps_api_key} : {maps_api_key: string}) => {
     }
         
     const BoundSetter = ({points} : {points: MapPointList}) => {
-        const [mapBounds, setMapBounds] = useState<google.maps.LatLngBounds|google.maps.LatLngBoundsLiteral>({north: 90, south: 180, east: -90, west: -180})
+        const [mapBounds, setMapBounds] = useState<google.maps.LatLngBounds|google.maps.LatLngBoundsLiteral|null>(null)
         const apiIsLoaded = useApiIsLoaded()
         const map = useMap()
         useEffect(() => {
@@ -112,12 +112,23 @@ const RouteForecastMap = ({maps_api_key} : {maps_api_key: string}) => {
             // accessed using the global `google.maps` namespace.
         }, [apiIsLoaded, zoomToRange, subrange, userSegment[0], userSegment[1]])
         useEffect(() => {
-            if (map && (Object.keys(mapBounds).length===2 || Object.keys(mapBounds).length == 4)) {
+            if (!map || !mapBounds) {
+                return;
+            }
+            let isValidAndNotEmpty = false;
+            if ('north' in mapBounds && 'south' in mapBounds && 'east' in mapBounds && 'west' in mapBounds) {
+                isValidAndNotEmpty = true;
+            } else if (typeof (mapBounds as google.maps.LatLngBounds).isEmpty === 'function') {
+                if (!(mapBounds as google.maps.LatLngBounds).isEmpty()) {
+                    isValidAndNotEmpty = true;
+                }
+            }                        
+            if (isValidAndNotEmpty) {
                 map.fitBounds(mapBounds, 0)
                 const zoom = map.getZoom()
-                if (zoom) {
-                    map.setZoom(zoom-1)
-                }
+                if (typeof zoom === 'number' && zoom > 0) {
+                    map.setZoom(zoom - 1);
+                }                
             }
         }, [map, mapBounds])
         return <div/>
