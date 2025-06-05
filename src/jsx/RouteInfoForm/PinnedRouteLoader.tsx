@@ -33,7 +33,7 @@ const LoadableRouteList = lazy(() : DynamicRouteListType => {addBreadcrumb('load
 const getPinnedRoutes = async (rwgpsToken : string, 
     setErrorDetails : ActionCreatorWithPayload<ErrorPayload, "dialogParams/errorDetailsSet">, 
     rwgpsTokenSet : ActionCreatorWithPayload<string|null, "rideWithGpsInfo/rwgpsTokenSet">,) => {
-    if (rwgpsToken === undefined) {
+    if (!rwgpsToken || rwgpsToken === 'undefined') {
         return null
     }
     

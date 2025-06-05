@@ -692,7 +692,7 @@ interface FavoritesReply {
 app.get('/pinned_routes', async (req : Request, res : Response) => {
     const rwgpsApiKey = process.env.RWGPS_API_KEY;
     const token = req.query.token;
-    if (token === undefined) {
+    if (token === undefined || token === 'undefined') {
         res.status(400).json("{'status': 'Missing authentication token'}");
         return;
     }
@@ -718,10 +718,10 @@ app.get('/pinned_routes', async (req : Request, res : Response) => {
         }
         const response = await axios.get<RwgpsUserInfo>(url, options).catch((error: AxiosError) => {
             if (error.response && isAxiosError(error) && error.response.data) {
-                Sentry.captureMessage(`Error fetching pinned routes for ${req.query.username} ${(error.response.data as ErrorResponse).error}`);
+                Sentry.captureMessage(`Error fetching pinned routes for ${req.query.token} ${(error.response.data as ErrorResponse).error}`);
                 res.status(error.response.status).json((error.response.data as ErrorResponse).error);    
             } else {
-                Sentry.captureMessage(`Error fetching pinned routes for ${req.query.username} ${error.response}`);
+                Sentry.captureMessage(`Error fetching pinned routes for ${req.query.token} ${error.response}`);
                 res.status(500).json(error.response)
             }
         });
