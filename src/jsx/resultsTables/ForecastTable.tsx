@@ -478,7 +478,7 @@ const Time = ({time, zone, i18n} : {time?: string, zone: string, i18n: i18n}) =>
 
     const timeFormat = getTimeFormat(i18n)
     return (
-        time || finishTime && DateTime.fromFormat(finishTime, finishTimeFormat, {zone:zone}).toFormat(timeFormat) || "N/A"
+        time || (finishTime && DateTime.fromFormat(finishTime, finishTimeFormat, {zone:zone}).toFormat(timeFormat)) || "N/A"
     )
 }
 
