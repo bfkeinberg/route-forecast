@@ -24,6 +24,9 @@ import querystring from 'querystring';
 import * as Sentry from "@sentry/node"
 const { trace, debug, info, warn, error, fatal, fmt } = Sentry.logger;
 import axios, { AxiosError, isAxiosError } from 'axios';
+const axiosRetry = require('axios-retry').default
+const axiosInstance = axios.create()
+
 // import {std} from "mathjs";
 const {std} = require('mathjs');
 import {Client} from "pg";
@@ -689,6 +692,22 @@ interface FavoritesReply {
     }>
     [index:string]:any
 }
+
+axiosRetry(axiosInstance, {
+    retries: 5,
+    retryDelay: axiosRetry.exponentialDelay,
+    retryCondition: (error: { response: { status: any; }, message: string, code:string }) => {
+        const isNetworkError = error.message === 'Network Error' || (error.code && error.code === 'ECONNABORTED') || !error.response;
+        return isNetworkError;    
+    },
+    onRetry: (retryCount: number, error: any, requestConfig: { url: string; }) => {
+        console.log(`pinned route axios retry count ${retryCount} for ${requestConfig.url}`);
+    },
+    onMaxRetryTimesExceeded: (err: any) => {
+        console.log(`last pinned route axios error after retrying was ${err}`)
+    }
+});
+
 app.get('/pinned_routes', async (req : Request, res : Response) => {
     const rwgpsApiKey = process.env.RWGPS_API_KEY;
     const token = req.query.token;
@@ -716,7 +735,7 @@ app.get('/pinned_routes', async (req : Request, res : Response) => {
         interface ErrorResponse {
             error: string
         }
-        const response = await axios.get<RwgpsUserInfo>(url, options).catch((error: AxiosError) => {
+        const response = await axiosInstance.get<RwgpsUserInfo>(url, options).catch((error: AxiosError) => {
             if (error.response && isAxiosError(error) && error.response.data) {
                 Sentry.captureMessage(`Error fetching pinned routes for ${req.query.token} ${(error.response.data as ErrorResponse).error}`);
                 res.status(error.response.status).json((error.response.data as ErrorResponse).error);    
@@ -729,7 +748,7 @@ app.get('/pinned_routes', async (req : Request, res : Response) => {
             return;
         }
         // insertFeatureRecord(makeFeatureRecord(response), "pinned", response.data.user.email);
-        const favoritesReply = await axios.get<FavoritesReply>(`https://ridewithgps.com/users/${response.data.user.id}/favorites.json?version=2&apikey=${rwgpsApiKey}`, options).
+        const favoritesReply = await axiosInstance.get<FavoritesReply>(`https://ridewithgps.com/users/${response.data.user.id}/favorites.json?version=2&apikey=${rwgpsApiKey}`, options).
         catch((error : AxiosError) => {
             Sentry.captureMessage(`Favorites error ${error}`)
             if (error.response) {
