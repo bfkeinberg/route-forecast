@@ -42,11 +42,11 @@ else {
                 dsn: 'https://ea4c472ff9054dab8c18d594b95d8da2@sentry.io/298059',
                 _experiments: { enableLogs: true },
                 environment: 'production',
-                ignoreErrors: [
+/*                 ignoreErrors: [
                     "Non-Error exception captured",
                     "Non-Error promise rejection captured"
                 ],
-                // This enables automatic instrumentation (highly recommended), but is not
+ */                // This enables automatic instrumentation (highly recommended), but is not
                 // necessary for purely manual usage
                 integrations: [
                     Sentry.thirdPartyErrorFilterIntegration({
@@ -65,7 +65,7 @@ else {
                         autoInject: false
                     })
                 ],
-                denyUrls: ["https://maps.googleapis"],
+                // denyUrls: ["https://maps.googleapis"],
                 // To set a uniform sample rate
                 tracesSampleRate: Number.parseFloat(trace_sample_rate?trace_sample_rate:'0.1'),
                 tracePropagationTargets: ["localhost", /^https:\/\/www\.randoplan\.com/],
