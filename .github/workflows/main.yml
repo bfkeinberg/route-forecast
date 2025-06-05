@@ -24,13 +24,13 @@ jobs:
       matrix:
         node-version: [22.x]
     # Steps represent a sequence of tasks that will be executed as part of the job
-#    steps:
+    steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-#      - uses: actions/checkout@v4
-#      - name: Use Node.js ${{ matrix.node-version }}
-#        uses: actions/setup-node@v4
-#        with:
-#          node-version: ${{ matrix.node-version }}     
+      - uses: actions/checkout@v4
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}     
 #      - name: Install Packages
 #        run: npm install
 #      - name: Run tests
