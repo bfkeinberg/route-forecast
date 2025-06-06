@@ -490,9 +490,9 @@ const getStravaToken = (code : string) => {
     });
 };
  */
-const randoplan_uri='https://www.randoplan.com/rwgpsAuthReply';
+// const randoplan_uri='https://www.randoplan.com/rwgpsAuthReply';
 // uncomment the line below and comment the one above when testing pinned route functions locally
-// const randoplan_uri='http://localhost:8080/rwgpsAuthReply';
+const randoplan_uri='http://localhost:8080/rwgpsAuthReply';
 
 app.get('/rwgpsAuthReq', (req: Request, res : Response) => {
     const state = req.query.state;
@@ -543,8 +543,11 @@ app.get('/rwgpsAuthReply', async (req: Request, res : Response) => {
         }
         res.redirect(url.format('/?') + querystring.stringify(restoredState));
     } else {
-        Sentry.captureMessage(`redirected with no code provided - ${JSON.stringify(req.query)}`);
-        res.redirect(url.format('/?') + `rwgpsToken=${req.query.token}`);
+        if (restoredState) {
+            res.redirect(url.format('/?') + querystring.stringify(restoredState));
+        } else {
+            res.redirect(url.format('/'));
+        }
     }
 });
 
