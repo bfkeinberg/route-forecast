@@ -490,11 +490,14 @@ const getStravaToken = (code : string) => {
     });
 };
  */
-const randoplan_uri='https://www.randoplan.com/rwgpsAuthReply';
+const remote_randoplan_uri='https://www.randoplan.com/rwgpsAuthReply';
 // uncomment the line below and comment the one above when testing pinned route functions locally
-// const randoplan_uri='http://localhost:8080/rwgpsAuthReply';
+const local_randoplan_uri='http://localhost:8080/rwgpsAuthReply';
 
 app.get('/rwgpsAuthReq', (req: Request, res : Response) => {
+    const isLocal = req.socket.localAddress === req.socket.remoteAddress;
+    console.log(isLocal)
+    const randoplan_uri = isLocal ? local_randoplan_uri : remote_randoplan_uri
     const state = req.query.state;
     if (state === undefined) {
         res.status(400).json({ 'status': 'Missing OAuth keys for RideWithGPS auth' });
@@ -507,7 +510,7 @@ app.get('/rwgpsAuthReq', (req: Request, res : Response) => {
     res.redirect(rwgpsUrl);
 });
 
-const getRwgpsTokenFromCode = async (code : string) => {
+const getRwgpsTokenFromCode = async (code : string, randoplan_uri: string) => {
     Sentry.addBreadcrumb({category:'rwgps', level:'info', message: code})
     let response = await axios.post('https://ridewithgps.com/oauth/token.json',{
         grant_type: 'authorization_code',
@@ -525,6 +528,8 @@ const getRwgpsTokenFromCode = async (code : string) => {
 };
 
 app.get('/rwgpsAuthReply', async (req: Request, res : Response) => {
+    const isLocal = req.socket.localAddress === req.socket.remoteAddress;
+    const randoplan_uri = isLocal ? local_randoplan_uri : remote_randoplan_uri
     const state = req.query.state;
     let restoredState;// = {rwgpsToken:''};
     if (state && typeof state === 'string' && state !== '') {
@@ -535,7 +540,7 @@ app.get('/rwgpsAuthReply', async (req: Request, res : Response) => {
         }
     }
     if (req.query.code && typeof req.query.code === 'string') {
-        const token = await getRwgpsTokenFromCode(req.query.code);
+        const token = await getRwgpsTokenFromCode(req.query.code, randoplan_uri);
         if (restoredState) {
             restoredState.rwgpsToken = token;
         } else {
