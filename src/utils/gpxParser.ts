@@ -41,10 +41,10 @@ interface RwgpsCoursePointWithDescription {
 }
 
 export type RwgpsCoursePoint = RwgpsCoursePointWithN|RwgpsCoursePointWithDescription
-export type RwgpsPoi  = {lat: number, lng: number, n:string, t: number}
+export type RwgpsPoi  = {lat: number, lng: number, n:string, t: number, d?:string}
 export type RwgpsPoint = {x:number, y:number, d:number, e:number}
 export type GpxPoint = {lat: number, lon: number, ele: number}
-interface ExtractedControl {
+export interface ExtractedControl {
     distance: number,
     duration: number,
     name: string
@@ -180,9 +180,13 @@ class AnalyzeRoute {
         if (found) return Math.round((found.d*kmToMiles)/1000)
         return 0
     }
+
+    poiText = (poi : RwgpsPoi) => poi.n + (poi.d?'\n' + poi.d:'')
+
     controlFromPoi = (poi : RwgpsPoi, routeData : RwgpsRoute|RwgpsTrip) : ExtractedControl => (
-        {name: poi.n, duration:1, distance:this.findPoiDistance(poi, routeData)}
+        {name: this.poiText(poi), duration:1, distance:this.findPoiDistance(poi, routeData)}
     )
+
     extractControlsFromPois = (routeData : RwgpsRoute|RwgpsTrip) =>
         routeData[routeData.type]?.points_of_interest.filter((poi: RwgpsPoi) => poi.t===31).map((poi: RwgpsPoi) => this.controlFromPoi(poi, routeData))
 

@@ -6,7 +6,7 @@ import type {ControlsState, UserControl} from '../redux/controlsSlice'
 import type {Point} from './gpxParser'
 import type { GpxRouteData, RouteInfoState, RwgpsRoute, RwgpsTrip, } from '../redux/routeInfoSlice';
 import type { RouteParamsState } from '../redux/routeParamsSlice';
-import type { Segment } from './gpxParser';
+import type { Segment, ExtractedControl } from './gpxParser';
 
 export type Bounds = {
   min_latitude: number
@@ -145,12 +145,31 @@ export const controlsMeaningfullyDifferent = (controls1 : Array<UserControl>, co
                           control.duration !== controls2[index].duration
     )
 }
+export const removeDuplicateControl = (controls: Array<ExtractedControl>) => {
+  // let deduplicatedResults = []
+  let resultsToRemove = []
+  for (let i = 0; i < controls.length - 1; ++i) {
+    if (controls[i].distance === 0) {     // no one will add stop time at the ride start
+      resultsToRemove.push(controls[i])
+    }
+    else if (controls[i].distance === controls[i + 1].distance) {
+      if (controls[i].name && controls[i + 1].name) {
+        if (controls[i].name.length > controls[i + 1].name.length) {
+          resultsToRemove.push(controls[i + 1])
+        } else {
+          resultsToRemove.push(controls[i])
+        }
+      }
+    }
+  }
+  return controls.filter(control => !resultsToRemove.includes(control))
+}
 
 export const extractControlsFromRoute = (routeData : RwgpsRoute|RwgpsTrip) => {
   const controlsPointControls = gpxParser.extractControlPoints(routeData)
   const poiControls = gpxParser.extractControlsFromPois(routeData)
   if (poiControls) {
-    return controlsPointControls.concat(poiControls)
+    return removeDuplicateControl(controlsPointControls.concat(poiControls).sort((a,b) => a.distance - b.distance))
   } else {
     return controlsPointControls
   }
