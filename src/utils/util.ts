@@ -147,7 +147,13 @@ export const controlsMeaningfullyDifferent = (controls1 : Array<UserControl>, co
 }
 
 export const extractControlsFromRoute = (routeData : RwgpsRoute|RwgpsTrip) => {
-  return gpxParser.extractControlPoints(routeData);
+  const controlsPointControls = gpxParser.extractControlPoints(routeData)
+  const poiControls = gpxParser.extractControlsFromPois(routeData)
+  if (poiControls) {
+    return controlsPointControls.concat(poiControls)
+  } else {
+    return controlsPointControls
+  }
 }
 
 export const stringIsOnlyNumeric = (string : string) => string.match(/^[0-9]+$/) !== null

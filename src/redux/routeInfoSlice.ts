@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { getRwgpsRouteName, getGpxRouteName } from '../utils/util';
-import type { GpxPoint, RwgpsCoursePoint, RwgpsPoint } from '../utils/gpxParser';
+import type { GpxPoint, RwgpsCoursePoint, RwgpsPoint, RwgpsPoi } from '../utils/gpxParser';
 
 const routeInfoInitialState : RouteInfoState = {
     name: '',
@@ -19,6 +19,7 @@ export interface RwgpsRoute {
         name: string,
         track_points: RwgpsPoint[]
         course_points: Array<RwgpsCoursePoint>
+        points_of_interest: Array<RwgpsPoi>
         id: number
     },
     trip?: never,
@@ -31,6 +32,7 @@ export interface RwgpsTrip {
         name: string,
         track_points: RwgpsPoint[]
         course_points: Array<RwgpsCoursePoint>
+        points_of_interest: Array<RwgpsPoi>
         id: number
     },
     route?: never,

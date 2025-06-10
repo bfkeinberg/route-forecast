@@ -7,6 +7,13 @@ import {getPowerOrVelocity} from "./windUtils"
 import * as Sentry from "@sentry/browser"
 import { UserControl} from '../redux/controlsSlice';
 import type { GpxRouteData, RwgpsRoute, RwgpsTrip } from '../redux/routeInfoSlice';
+import { create, all } from 'mathjs'
+const config = {
+  relTol: 1e-5,
+  absTol: 1e-8,
+}
+const math = create(all, config)
+
 const kmToMiles = 0.62137;
 /**
  Begin section swiped from gpx parser
@@ -34,6 +41,7 @@ interface RwgpsCoursePointWithDescription {
 }
 
 export type RwgpsCoursePoint = RwgpsCoursePointWithN|RwgpsCoursePointWithDescription
+export type RwgpsPoi  = {lat: number, lng: number, n:string, t: number}
 export type RwgpsPoint = {x:number, y:number, d:number, e:number}
 export type GpxPoint = {lat: number, lon: number, ele: number}
 interface ExtractedControl {
@@ -166,6 +174,17 @@ class AnalyzeRoute {
 
     extractControlPoints = (routeData : RwgpsRoute|RwgpsTrip) =>
         this.parseCoursePoints(routeData).filter((point : RwgpsCoursePoint) => this.isControl(point)).map((point : RwgpsCoursePoint) => this.controlFromCoursePoint(point))
+
+    findPoiDistance = (poi : RwgpsPoi, routeData : RwgpsRoute|RwgpsTrip) => {
+        const found = routeData[routeData.type]?.track_points.find((value) => math.equal(value.x, poi.lng) && math.equal(value.y, poi.lat))
+        if (found) return Math.round((found.d*kmToMiles)/1000)
+        return 0
+    }
+    controlFromPoi = (poi : RwgpsPoi, routeData : RwgpsRoute|RwgpsTrip) : ExtractedControl => (
+        {name: poi.n, duration:1, distance:this.findPoiDistance(poi, routeData)}
+    )
+    extractControlsFromPois = (routeData : RwgpsRoute|RwgpsTrip) =>
+        routeData[routeData.type]?.points_of_interest.filter((poi: RwgpsPoi) => poi.t===31).map((poi: RwgpsPoi) => this.controlFromPoi(poi, routeData))
 
     parseGpxRouteStream ( routeData : GpxRouteData) : Array<Point> {
         return routeData.tracks.reduce((accum : Array<GpxPoint>, current: {points: Array<GpxPoint>}) => accum.concat(current.points, []), []).
