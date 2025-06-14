@@ -15,7 +15,7 @@ interface SafeAdvancedMarkerProps {
 const SafeAdvancedMarker = (props : SafeAdvancedMarkerProps) => {
   const apiIsLoaded = useApiIsLoaded();
   if (!apiIsLoaded) {
-    return null;
+    return <span>API not yet loaded</span>
   }
   return <AdvancedMarker {...props} />;
 };

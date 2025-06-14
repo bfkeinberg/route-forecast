@@ -84,6 +84,7 @@ const RouteForecastMap = ({maps_api_key} : {maps_api_key: string}) => {
     const { calculatedControlPointValues: controls } = useForecastDependentValues()
 
     const dispatch = useAppDispatch()
+    const apiIsLoaded = useApiIsLoaded();
     useEffect(() => { dispatch(mapViewedSet()) }, [])
     
     const handleApiLoad = () => {
@@ -177,7 +178,7 @@ const RouteForecastMap = ({maps_api_key} : {maps_api_key: string}) => {
                 <div id="map" style={{ width:'auto', height: "calc(100vh - 115px)", position: "relative" }}>
                     {(Array.isArray(forecast) && forecast.length > 0 || routeLoadingMode === routeLoadingModes.STRAVA) && bounds !== null ?
                         <APIProvider apiKey={maps_api_key} onLoad={handleApiLoad} onError={handleApiError}>
-                            {isMapApiReady ? (
+                            {(isMapApiReady && apiIsLoaded) ? (
                                 <>
                                     <BoundSetter points={points} />
                                     <Map
@@ -290,7 +291,7 @@ const MapMarkers = ({ forecast, controls, controlNames, subrange, metric} : MapM
 const RainIcon = ({ latitude, longitude, value, title, isRainy } : {latitude: number, longitude: number, value: number, title: string, isRainy: boolean}) => {
     const apiIsLoaded = useApiIsLoaded();
     if (!apiIsLoaded) {
-      return null;
+      return <div>API not yet loaded, no rain icon</div>
     }
     if (isRainy) {
         return <SafeAdvancedMarker position={{ lat: latitude, lng: longitude }} /* label={value.toFixed(0)} */ title={title}>
@@ -390,7 +391,7 @@ type TempMarkerProps = {
 const TempMarker = ({ latitude, longitude, value, title, bearing, relBearing, windSpeed } : TempMarkerProps ) => {
     const apiIsLoaded = useApiIsLoaded();
     if (!apiIsLoaded) {
-      return null;
+      return <div>API not yet loaded, no temperature marker</div>
     }
     // Add the marker at the specified location
     if (parseInt(windSpeed) > 3) {
@@ -451,7 +452,7 @@ interface ControlMarkerProps {
 const ControlMarker = ({ latitude, longitude, value = '' } : ControlMarkerProps) => {
     const apiIsLoaded = useApiIsLoaded();
     if (!apiIsLoaded) {
-      return null;
+      return <div/>
     }
     const [showTheText, setShowTheText] = React.useState<boolean>(false)
     if (!latitude || !longitude) {
