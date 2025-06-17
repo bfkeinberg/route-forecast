@@ -84,7 +84,6 @@ const RouteForecastMap = ({maps_api_key} : {maps_api_key: string}) => {
     const { calculatedControlPointValues: controls } = useForecastDependentValues()
 
     const dispatch = useAppDispatch()
-    const apiIsLoaded = useApiIsLoaded();
     useEffect(() => { dispatch(mapViewedSet()) }, [])
     
     const handleApiLoad = () => {
@@ -178,7 +177,7 @@ const RouteForecastMap = ({maps_api_key} : {maps_api_key: string}) => {
                 <div id="map" style={{ width:'auto', height: "calc(100vh - 115px)", position: "relative" }}>
                     {(Array.isArray(forecast) && forecast.length > 0 || routeLoadingMode === routeLoadingModes.STRAVA) && bounds !== null ?
                         <APIProvider apiKey={maps_api_key} onLoad={handleApiLoad} onError={handleApiError}>
-                            {(isMapApiReady && apiIsLoaded) ? (
+                            {(isMapApiReady) ? (
                                 <>
                                     <BoundSetter points={points} />
                                     <Map
