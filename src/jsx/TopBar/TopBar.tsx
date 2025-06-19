@@ -11,7 +11,7 @@ import ShortUrl from "./ShortUrl";
 import {useTranslation} from 'react-i18next'
 import FaqButton from "./FaqButton";
 import React, { ReactElement, useContext } from "react";
-import VersionContext from "..//versonContext";
+import VersionContext from "../versionContext";
 
 const TitleAndFinishTime = ({finishTime, fontSize, alignment} : {finishTime : string, fontSize: string, alignment: "left" | "right"}) => {
   return (
