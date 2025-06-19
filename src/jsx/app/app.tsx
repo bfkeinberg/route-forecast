@@ -1,7 +1,7 @@
 import * as Sentry from "@sentry/react";
 import { createRoot } from 'react-dom/client';
 import ReactGA from "react-ga4";
-import VersionContext from "../versonContext";
+import VersionContext from "../versionContext";
 import LocationContext from '../locationContext';
 import TopLevel from './topLevel';
 import "./i18n";
@@ -86,6 +86,8 @@ else {
     const bitly_token = script.getAttribute('bitly_token');
     let version = script.getAttribute('version');
 
+    Sentry.setTag('version', version)
+    
     interface TopLevelProps {
         action: string, 
         maps_api_key: string,
