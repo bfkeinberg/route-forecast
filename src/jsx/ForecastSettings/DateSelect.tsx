@@ -1,11 +1,7 @@
-import "@blueprintjs/datetime2/lib/css/blueprint-datetime2.css";
-import "@blueprintjs/datetime2/node_modules/@blueprintjs/datetime/lib/css/blueprint-datetime.css"
+import "@blueprintjs/datetime/lib/css/blueprint-datetime.css";
 
 import {Icon} from '@blueprintjs/core';
-// this is what Blueprint wants me to do but it leads to failures
-// to install due to dependency conflicts with React >= 18
-// import {TimePrecision} from "@blueprintjs/datetime"
-import { DateInput3, TimePrecision } from "@blueprintjs/datetime2";
+import { DateInput, TimePrecision } from "@blueprintjs/datetime";
 import { DateTime } from 'luxon';
 import {connect, ConnectedProps} from 'react-redux';
 
@@ -41,6 +37,8 @@ const DateSelect = ({ start, zone, setStart, initialStartTimeSet, maxDaysInFutur
         }
     }
 
+    const keyDownHandler = (ev: any, unit: any) => console.log(ev, unit)
+    
     // allow us to continue to show the start time if the route was forecast for a time before the present
     const now = new Date();
     let later = new Date();
@@ -62,7 +60,7 @@ const DateSelect = ({ start, zone, setStart, initialStartTimeSet, maxDaysInFutur
             </span>
             <div style={{ flex: 2.5 } }>
                 {/* <Tooltip disabled={hideTooltip} targetTagName={'div'} content={t('tooltips.startingTime')} placement={'top'}> */}
-                    <DateInput3
+                    <DateInput
                         onChange={setDateFromPicker}
                         closeOnSelection={false}
                         onTimezoneChange={setDateWithZone}
@@ -72,7 +70,7 @@ const DateSelect = ({ start, zone, setStart, initialStartTimeSet, maxDaysInFutur
                         showTimezoneSelect
                         maxDate={later}
                         timePrecision={TimePrecision.MINUTE}
-                        timePickerProps={{useAmPm:true, showArrowButtons:true}}
+                        timePickerProps={{useAmPm:true, showArrowButtons:true, selectAllOnFocus:true, onKeyDown:keyDownHandler}}
                         dateFnsFormat='MMMM d, yyyy h:mmaaa'
                         timezone={zone}
                         locale={i18n.language}
