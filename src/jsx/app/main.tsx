@@ -186,10 +186,8 @@ const setupBrowserForwardBack = (dispatch : AppDispatch, origin : string, foreca
                 // reload previous or next route when moving throw browser history with forward or back buttons
                 let queryParams = queryString.parse(event.state, {parseBooleans: true, parseNumbers:true});
                 dispatch(querySet({url:`${origin}/?${event.state}`,search:event.state}))
+                ReactGA.event('browser_history')
                 updateFromQueryParams(dispatch, queryParams as unknown as QueryParams);
-                if (queryParams.rwgpsRoute !== undefined || queryParams.strava_route) {
-                    dispatch(loadRouteFromURL(forecastFunc, aqiFunc, lang))
-                }
             }
         }
     }
@@ -315,13 +313,14 @@ const RouteWeatherUI = ({search, href, action, maps_api_key, timezone_api_key, b
 
 export default React.memo(RouteWeatherUI)
 
-const useLoadRouteFromURL = (queryParams : QueryParams, forecastFunc : MutationWrapper, aqiFunc : MutationWrapper, lang: string) => {
+const useLoadRouteFromURL = (queryParams : QueryParams, forecastFunc : MutationWrapper, aqiFunc : MutationWrapper, 
+    lang: string, rwgpsRoute: string, stravaRoute: string) => {
     const dispatch = useAppDispatch()
     useEffect(() => {
         if (queryParams.rwgpsRoute || queryParams.strava_route) {
             dispatch(loadRouteFromURL(forecastFunc, aqiFunc, lang))
         }
-    }, [queryParams])
+    }, [queryParams, rwgpsRoute, stravaRoute, forecastFunc, aqiFunc, lang])
 }
 
 const useLoadControlPointsFromURL = (queryParams: QueryParams) => {
@@ -369,12 +368,13 @@ const FunAppWrapperThingForHooksUsability = ({maps_api_key, queryParams, lang} :
         },
         [screenOrientationType]
     )
-
+    const rwgpsRoute = useAppSelector(state => state.uiInfo.routeParams.rwgpsRoute)
+    const stravaRoute = useAppSelector(state => state.strava.route)
     if (window.screen.orientation) {
         window.screen.orientation.onchange = screenChangeListener
     }
     useSetPageTitle()
-    useLoadRouteFromURL(queryParams, forecast, getAqi, lang)
+    useLoadRouteFromURL(queryParams, forecast, getAqi, lang, rwgpsRoute, stravaRoute)
     useLoadControlPointsFromURL(queryParams)
     const isLandscape = useMediaQuery({query:'(orientation:landscape)'})
     const isLargeEnough = useMediaQuery({query:'(min-width: 950px)'})

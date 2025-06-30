@@ -4,11 +4,10 @@ import ReactGA from "react-ga4";
 import { forecastFetchBegun, errorMessageListSet, forecastFetchFailed, forecastFetchCanceled, errorMessageListAppend } from "./dialogParamsSlice";
 import { forecastFetched, forecastAppended, Forecast, forecastInvalidated } from "./forecastSlice";
 import {getRwgpsRouteName, getRouteNumberFromValue} from "../utils/util"
-import { RouteInfoState, RwgpsRoute, RwgpsTrip } from "./routeInfoSlice";
+import { RwgpsRoute, RwgpsTrip } from "./routeInfoSlice";
 import { MutationWrapper } from "./loadRouteActions";
 import { getForecastRequest } from "../utils/util";
 import { ForecastRequest } from "../utils/gpxParser";
-import { doForecast } from "../utils/forecastUtilities";
 import { Action, Dispatch } from "@reduxjs/toolkit";
 
 const getRouteDistanceInKm = (routeData : RwgpsRoute|RwgpsTrip) => {
@@ -184,35 +183,3 @@ export const forecastWithHook = async (forecastFunc: MutationWrapper, aqiFunc: M
     dispatch(errorMessageListSet(extractRejectedResults(forecastResults).map(result => msgFromError(result))))
     dispatch(errorMessageListAppend(extractRejectedResults(aqiResults).map(result => msgFromError(result))))
 }
-
-export const requestForecast = function (routeInfo: RouteInfoState) {
-    return async function (dispatch: AppDispatch, getState: () => RootState) {
-        if (routeInfo.rwgpsRouteData) {
-            ReactGA.event('add_payment_info', {
-                value: getRouteDistanceInKm(routeInfo.rwgpsRouteData), coupon: getRwgpsRouteName(routeInfo.rwgpsRouteData),
-                currency: getRouteId(routeInfo.rwgpsRouteData),
-                items: [{ item_id: '', item_name: '' }]
-            });
-        } else if (routeInfo.gpxRouteData) {
-            ReactGA.event('add_payment_info', {
-                value: routeInfo.gpxRouteData.tracks[0].distance.total/1000, coupon: routeInfo.gpxRouteData.name,
-                currency: getRouteNumberFromValue(routeInfo.gpxRouteData.tracks[0].link?routeInfo.gpxRouteData.tracks[0].link.href:''),
-                items: [{ item_id: '', item_name: '' }]
-            });
-        }
-        const fetchController = new AbortController()
-        const abortMethod = fetchController.abort.bind(fetchController)
-        fetchAbortMethod = abortMethod;
-        dispatch(forecastFetchBegun());
-        const { result, value, error } = await doForecast(getState(), fetchController.signal);
-        fetchAbortMethod = null;
-        if (result === "success" && value) {
-            const { forecast, timeZoneId } = value
-            dispatch(forecastFetched({ forecastInfo: forecast, timeZoneId: timeZoneId }));
-        } else if (result === "error") {
-            dispatch(forecastFetchFailed(error));
-        } else {
-            dispatch(forecastFetchCanceled());
-        }
-    }
-};

@@ -13,7 +13,7 @@ import { timeZoneSet } from "./routeParamsSlice";
 import { updateUserControls, shortenUrl } from "./actions";
 import { requestTimeZoneForRoute } from "../utils/forecastUtilities";
 import { loadStravaRoute, loadStravaActivity } from "./loadFromStravaActions";
-import { cancelForecast, forecastWithHook, requestForecast } from "./forecastActions";
+import { cancelForecast, forecastWithHook } from "./forecastActions";
 import { DateTime } from "luxon";
 
 const mergeControls = (oldCtrls : Array<UserControl>, newCtrls : Array<UserControl>) => {
@@ -101,11 +101,7 @@ export const loadRouteFromURL = (forecastFunc : MutationWrapper, aqiFunc : Mutat
             ReactGA.event('search', {search_term:getState().uiInfo.routeParams.rwgpsRoute})
         }
         if (error === null && !getState().uiInfo.routeParams.stopAfterLoad) {
-            if (forecastFunc && aqiFunc) {
-                await forecastWithHook(forecastFunc, aqiFunc, dispatch, getState, lang)
-            } else {
-                await dispatch(requestForecast(getState().routeInfo));
-            }
+            await forecastWithHook(forecastFunc, aqiFunc, dispatch, getState, lang)
             const queryString = getState().params.queryString
             const searchString = getState().params.searchString
             if (queryString && searchString) {
