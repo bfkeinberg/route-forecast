@@ -32,7 +32,7 @@ export const browserIsSafari = () => {
 /*global chrome*/
 export const extensionIsInstalled = () => {
     if (browserIsChrome()) {
-        if (chrome === undefined || chrome.runtime === undefined || chrome.runtime.sendMessage === undefined) {
+        if (chrome === undefined || chrome.runtime === undefined || chrome.runtime.sendMessage === undefined || typeof chrome.runtime.sendMessage !== "function") {
             return Promise.resolve(false);
         }
         return new Promise<boolean>((resolve => {
