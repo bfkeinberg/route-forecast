@@ -1,23 +1,23 @@
-import axios from "axios";
+import axios, { AxiosError, AxiosRequestConfig } from "axios";
 const { DateTime } = require("luxon");
 import * as Sentry from "@sentry/node"
 const axiosInstance = axios.create()
-const axiosRetry = require('axios-retry').default
+import axiosRetry from 'axios-retry'
 const airNowKey = process.env.AIRNOW_KEY;
 const forecastDay = DateTime.now().toFormat("y-MM-dd");
 
 axiosRetry(axiosInstance, {
-    retries: 5,
-    retryDelay: axiosRetry.exponentialDelay,
-    retryCondition: (error: { response: { status: any; }; }) => {
-        switch (error.response.status) {
+    retries: 3,
+    retryDelay: (...arg) => axiosRetry.exponentialDelay(...arg, 1000),
+    retryCondition: (error) => {
+        switch (error.response ? error.response.status : error) {
         case 504:
             return true;
         default:
             return false;
         }
     },
-    onRetry: (retryCount: number, error: any, requestConfig: { url: string; }) => {
+    onRetry: (retryCount: number, error: AxiosError, requestConfig: AxiosRequestConfig) => {
         console.log(`AirNow axios retry count ${retryCount} for ${requestConfig.url}`);
     },
     onMaxRetryTimesExceeded: (err: any) => {

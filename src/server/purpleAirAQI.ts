@@ -159,8 +159,8 @@ const processPurpleResults = (lat : number, lon : number, results: PurpleAirData
 };
 
 axiosRetry(axiosInstance, {
-    retries: 5,
-    retryDelay: axiosRetry.exponentialDelay,
+    retries: 3,
+    retryDelay: (...arg) => axiosRetry.exponentialDelay(...arg, 1000),
     retryCondition: (error) => {
         // in the weird case that we don't get a response field in the error then report to Sentry and fail the request
         if (!error.response) {
