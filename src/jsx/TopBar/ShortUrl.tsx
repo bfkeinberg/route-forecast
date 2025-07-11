@@ -14,6 +14,7 @@ const ShortUrl = ({shortUrl} : {shortUrl:string}) => {
             </div>
             <InputGroup leftIcon={IconNames.SHARE} id={'shortUrl'} size="small" readOnly fill={false} type="text" value={shortUrl}
                    onClick={async event => {
+                    if (navigator.clipboard) {
                        try {
                             await navigator.clipboard.writeText((event.target as HTMLInputElement).value);
                             (await AppToaster).show({ message: "Short URL copied", timeout:3000, isCloseButtonShown: false });
@@ -21,6 +22,10 @@ const ShortUrl = ({shortUrl} : {shortUrl:string}) => {
                            Sentry.captureException(err);
                            (event.target as HTMLInputElement).select();document.execCommand('copy');
                        }
+                    }
+                    else {
+                        (event.target as HTMLInputElement).select();document.execCommand('copy');
+                    }
                     ReactGA.event('share', {item_id:(event.target as HTMLInputElement).value})}}/>
         </FormGroup>
     );
