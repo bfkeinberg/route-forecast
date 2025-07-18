@@ -1,6 +1,6 @@
 {
   "name": "route_weather",
-  "version": "4.19.5",
+  "version": "4.19.6",
   "description": "Forecast weather along a route from RideWithGps or Strava. Support for others may be added if there is demand",
   "main": "jsx/server/index.js",
   "engines": {
@@ -67,7 +67,7 @@
     "react-i18next": "^15.0.0",
     "react-redux": "^9.1.1",
     "react-responsive": "^10.0.0",
-    "react-router-dom": "^7.0.1",
+    "react-router-dom": "^7.6.3",
     "react-select": "^5.8.0",
     "recharts": "^3.0.2",
     "redux": "^5.0.1",
