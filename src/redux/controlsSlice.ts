@@ -1,4 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
+import { number } from 'prop-types'
+import { act } from 'react'
 
 export interface UserControl {
     distance: number,
@@ -7,8 +9,16 @@ export interface UserControl {
     id?: number,
     actual?: string,
     arrival?: string,
-    banked?: number
+    banked?: number,
+    lat?: number,
+    lon?: number,
+    business?: string
     [index:string]:any
+}
+
+export type BusinessOpenType = {
+    isOpen: boolean
+    distance: number
 }
 
 export interface ControlsState {
@@ -16,6 +26,7 @@ export interface ControlsState {
     celsius: boolean,
     displayBanked: boolean,
     userControlPoints: UserControl[],
+    controlOpenStatus : Array<BusinessOpenType>,
     displayControlTableUI: boolean
 }
 
@@ -24,6 +35,7 @@ const controlsInitialState : ControlsState = {
     celsius: false,
     displayBanked: false,
     userControlPoints: [],
+    controlOpenStatus: [],
     displayControlTableUI: false
 }
 
@@ -54,6 +66,9 @@ const controlsSlice = createSlice({
         userControlsUpdated(state, action : PayloadAction<UserControl[]>) {
             state.userControlPoints = action.payload
         },
+        openBusinesses(state, action : PayloadAction<Array<BusinessOpenType>>) {
+            state.controlOpenStatus = action.payload
+        },
         displayControlTableUiSet(state, action : PayloadAction<boolean>) {
             state.displayControlTableUI = action.payload
         }
@@ -68,5 +83,5 @@ const controlsSlice = createSlice({
 })
 
 export const { metricSet, metricToggled, celsiusToggled, bankedDisplayToggled, controlRemoved,
-    userControlsUpdated, displayControlTableUiSet, controlAdded} = controlsSlice.actions
+    userControlsUpdated, displayControlTableUiSet, controlAdded, openBusinesses} = controlsSlice.actions
 export const controlsReducer = controlsSlice.reducer

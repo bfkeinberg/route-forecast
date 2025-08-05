@@ -21,7 +21,8 @@ const mergeControls = (oldCtrls : Array<UserControl>, newCtrls : Array<UserContr
     const merged = newCtrls.map(ctrl => {
         const matchingOldCtrl = oldCtrlsCopy.find(item => item.distance === ctrl.distance)
         if (matchingOldCtrl) {
-            const result =  {name:ctrl.name, distance:ctrl.distance, duration:matchingOldCtrl.duration}
+            const result =  {name:ctrl.name, distance:ctrl.distance, 
+                business:ctrl.business, lat:ctrl.lat, lon:ctrl.lon, duration:matchingOldCtrl.duration}
             oldCtrlsCopy = oldCtrlsCopy.filter( item => item.distance !== ctrl.distance)
             return result
         } else {

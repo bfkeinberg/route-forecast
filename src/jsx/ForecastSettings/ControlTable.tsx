@@ -18,6 +18,7 @@ export const ControlTable = () => {
     const compare = stravaActivityData !== null
     const metric = useAppSelector(state => state.controls.metric)
     const controls = useAppSelector(state => state.controls.userControlPoints)
+    const businessesAreOpen = useAppSelector(state => state.controls.controlOpenStatus)
 
     const { calculatedControlPointValues: calculatedValues } = useForecastDependentValues()
 
@@ -44,6 +45,9 @@ export const ControlTable = () => {
         }
         if (actualArrivalTimes !== null && actualArrivalTimes[index] !== undefined) {
             controlObject.actual = actualArrivalTimes[index].time
+        }
+        if (businessesAreOpen !== null && businessesAreOpen[index] !== undefined) {
+            controlObject.isOpen = businessesAreOpen[index].isOpen
         }
         return controlObject
     })
