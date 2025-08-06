@@ -17,8 +17,7 @@ import { Forecast, mapViewedSet } from '../../redux/forecastSlice';
 import { CalculatedValue } from 'utils/gpxParser';
 import { useAppSelector, useAppDispatch } from '../../utils/hooks';
 import SafeAdvancedMarker from './SafeMarker';
-import { openBusinesses } from '../../redux/controlsSlice';
-import type { BusinessOpenType } from '../../redux/controlsSlice';
+import { addOpenBusiness, clearOpenBusinesses } from '../../redux/controlsSlice';
 
 const curvedArrowPath = "m-68.4149 61.4815c-.5904 2.8312 1.5113 7.0934 7.6748 12.4358 19.1536 16.6019 60.8005 28.3549 91.4489-7.6894 30.0099-35.2935 21.5071-80.7594 21.1555-98.2548l14.7087-.0371-32.3276-55.688-32.0602 55.8545 16.4983-.0557c2.8274 19.3736 6.2889 57.8645-6.5882 79.4056-17.0631 28.5432-39.6439 26.2329-52.4747 19.0262-13.994-7.8596-26.7357-11.2308-28.0345-5.0021z"
 const findMarkerInfo = (forecast : Array<Forecast>, subrange : [number,number] | []) => {
@@ -105,6 +104,40 @@ const RouteForecastMap = ({maps_api_key} : {maps_api_key: string}) => {
         const placesLib = useMapsLibrary('places')
         const apiIsLoaded = useApiIsLoaded()
         const map = useMap()
+
+        const checkBusinessHours =  (controls : CalculatedValue[]) => {
+            dispatch(clearOpenBusinesses())
+            const businessPlaces = new Array<google.maps.places.Place>()
+            userControlPoints.forEach(async (control, index: number) => {
+                if (control.business && control.lat && control.lon) {
+                    const location = { center: { lat: control.lat, lng: control.lon }, radius: 500 }
+                    const request = {
+                        textQuery: control.business,
+                        fields: ['businessStatus', 'displayName', 'formattedAddress'],
+                        locationBias: location,
+                        maxResultCount: 1
+                    }
+                    const places = await google.maps.places.Place.searchByText(request).catch(error => console.log(error))
+                    if (places && places.places && places.places.length > 0) {
+                        businessPlaces.push(places.places[0])
+                        for (const place of places.places) {
+                            if (controls[index] && controls[index].distance === control.distance) {
+                                if (place.businessStatus === google.maps.places.BusinessStatus.OPERATIONAL) {
+                                    const lDate = DateTime.fromFormat(controls[index].arrival, finishTimeFormat).toJSDate()
+                                    const isOpen = await place.isOpen(lDate)
+                                    dispatch(addOpenBusiness({ isOpen: isOpen || false, distance: control.distance }))
+                                    console.log(`${place.displayName} at ${place.formattedAddress} is ${isOpen ? 'open' : 'closed'}`)                                    
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            )
+            setPlaces(businessPlaces)
+            placesCalledRef.current = true
+        }
+
         useEffect(() => {
             if (!apiIsLoaded) return;
             try {
@@ -142,42 +175,11 @@ const RouteForecastMap = ({maps_api_key} : {maps_api_key: string}) => {
             if (!map || !placesLib) return
             if (userControlPoints.length === 0 || placesCalledRef.current) return
             if (businessesOpen.length > 0 || places.length > 0) return
-            const businessPlaces = new Array<google.maps.places.Place>()
-            const controlsAreOpen = new Array<BusinessOpenType>()
-            userControlPoints.forEach((control, index : number) => {
-                if (control.business && control.lat && control.lon) {
-                    const location = { center: { lat:control.lat, lng: control.lon }, radius: 500 }
-                    const request = {
-                        textQuery: control.business,
-                        fields: ['businessStatus', 'displayName', 'formattedAddress'],
-                        locationBias: location,
-                        maxResultCount: 1
-                    }
-                    google.maps.places.Place.searchByText(request).then((places) => {
-                        if (places.places && places.places.length > 0) {
-                            businessPlaces.push(places.places[0])
-                            for (const place of places.places) {
-                                if (controls[index] && controls[index].distance === control.distance) {
-                                    if (place.businessStatus === google.maps.places.BusinessStatus.OPERATIONAL) {
-                                        const lDate = DateTime.fromFormat(controls[index].arrival, finishTimeFormat).toJSDate()
-                                        place.isOpen(lDate).then(isOpen => {
-                                            controlsAreOpen.push({ isOpen: isOpen || false, distance: control.distance });
-                                            console.log(`${place.displayName} at ${place.formattedAddress} is ${isOpen ? 'open' : 'closed'}`)
-                                        })
-                                    }
-                                }
-                            }
-                        }
-                    }).catch(error => console.log(error))
-                }
-            })
-            setPlaces(businessPlaces)
-            dispatch(openBusinesses(controlsAreOpen))
-            placesCalledRef.current = true
+            checkBusinessHours(controls)
         }, [map, placesLib])
         return <div/>
     }
-    
+
     const controlNames = userControlPoints.map(control => control.name)
 
     let markedInfo = findMarkerInfo(forecast, subrange);

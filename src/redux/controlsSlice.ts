@@ -16,8 +16,8 @@ export interface UserControl {
     [index:string]:any
 }
 
-export type BusinessOpenType = {
-    isOpen: boolean
+export interface BusinessOpenType {
+    isOpen: boolean,
     distance: number
 }
 
@@ -66,8 +66,11 @@ const controlsSlice = createSlice({
         userControlsUpdated(state, action : PayloadAction<UserControl[]>) {
             state.userControlPoints = action.payload
         },
-        openBusinesses(state, action : PayloadAction<Array<BusinessOpenType>>) {
-            state.controlOpenStatus = action.payload
+        clearOpenBusinesses(state) {
+            state.controlOpenStatus = controlsInitialState.controlOpenStatus
+        },
+        addOpenBusiness(state, action : PayloadAction<BusinessOpenType>) {
+            state.controlOpenStatus.push(action.payload)
         },
         displayControlTableUiSet(state, action : PayloadAction<boolean>) {
             state.displayControlTableUI = action.payload
@@ -83,5 +86,5 @@ const controlsSlice = createSlice({
 })
 
 export const { metricSet, metricToggled, celsiusToggled, bankedDisplayToggled, controlRemoved,
-    userControlsUpdated, displayControlTableUiSet, controlAdded, openBusinesses} = controlsSlice.actions
+    userControlsUpdated, displayControlTableUiSet, controlAdded, clearOpenBusinesses, addOpenBusiness} = controlsSlice.actions
 export const controlsReducer = controlsSlice.reducer
