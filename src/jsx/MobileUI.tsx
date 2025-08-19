@@ -15,6 +15,7 @@ import DisplayErrorList from "./app/DisplayErrorList";
 import { useAppDispatch, useAppSelector } from "../utils/hooks";
 import { Dispatch, SetStateAction } from "react";
 import * as Sentry from "@sentry/react"
+import FaqButton from "./TopBar/FaqButton";
 export interface MobileUIPropTypes {
     mapsApiKey:string, 
     orientationChanged:boolean
@@ -118,6 +119,7 @@ const MobileUITabs = (props : MobileUIPropTypes) => {
                             </Link>
                         }
                     </NavbarGroup>
+                <FaqButton/>
                 </Navbar>
                 <Divider/>
                 <Routes>

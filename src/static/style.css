@@ -194,3 +194,12 @@ table.bp4-html-table.bp4-html-table-bordered.bp4-html-table-striped.bp4-interact
 .MuiSlider-valueLabelCircle {
     background-color: 'white';
 }
+
+@keyframes blink {
+    0%, 100% { opacity: 1; stroke: red} /* Fully visible at the start and end */
+    50% { opacity: 0; stroke: "0066ff"}    /* Invisible in the middle of the cycle */
+}
+
+.flashing-red-text {
+    animation: blink 1s infinite alternate; /* Apply the animation */
+}
