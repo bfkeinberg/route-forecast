@@ -41,13 +41,16 @@ interface RwgpsCoursePointWithDescription {
 }
 
 export type RwgpsCoursePoint = RwgpsCoursePointWithN|RwgpsCoursePointWithDescription
-export type RwgpsPoi  = {lat: number, lng: number, n:string, t: number, d?:string}
+export type RwgpsPoi  = {lat: number, lng: number, n:string, t: number, d?:string, description:never}
 export type RwgpsPoint = {x:number, y:number, d:number, e:number}
 export type GpxPoint = {lat: number, lon: number, ele: number}
 export interface ExtractedControl {
     distance: number,
     duration: number,
-    name: string
+    name: string,
+    lat?: number,
+    lon?: number,
+    business?: string
 }
 export type Segment = [number, number]
 export type ForecastRequest = {
@@ -169,8 +172,17 @@ class AnalyzeRoute {
         return coursePoint.d !== undefined && coursePoint.t === 'Control' || (coursePoint.n && coursePoint.n.match(controlRegexp) && !coursePoint.n.match(exclusionRegexp))
     }
 
+    businessFromText = (coursePoint : RwgpsCoursePoint|RwgpsPoi) => {
+        const matched = coursePoint.description ? coursePoint.description.match(/_(?<resto>.*)_/) : coursePoint.n.match(/_(?<resto>.*)_/) 
+        return (matched && matched.groups) ? matched.groups.resto : undefined
+    }
+
     controlFromCoursePoint = (coursePoint : RwgpsCoursePoint) : ExtractedControl =>
-        ({name:coursePoint.n?coursePoint.n.replace(':','_'):coursePoint.description.replace(':','_'), duration:1, distance:Math.round((coursePoint.d*kmToMiles)/1000)})
+        ({business: this.businessFromText(coursePoint), name:coursePoint.n?coursePoint.n.replace(':','_'):
+            coursePoint.description.replace(':','_'), 
+            duration:1,
+            lat: coursePoint.y, lon: coursePoint.x,
+            distance:Math.round((coursePoint.d*kmToMiles)/1000)})
 
     extractControlPoints = (routeData : RwgpsRoute|RwgpsTrip) =>
         this.parseCoursePoints(routeData).filter((point : RwgpsCoursePoint) => this.isControl(point)).map((point : RwgpsCoursePoint) => this.controlFromCoursePoint(point))
@@ -184,7 +196,7 @@ class AnalyzeRoute {
     poiText = (poi : RwgpsPoi) => poi.n + (poi.d?'\n' + poi.d:'')
 
     controlFromPoi = (poi : RwgpsPoi, routeData : RwgpsRoute|RwgpsTrip) : ExtractedControl => (
-        {name: this.poiText(poi), duration:1, distance:this.findPoiDistance(poi, routeData)}
+        {name: this.poiText(poi), duration:1, lat:poi.lat, lon:poi.lng, business: this.businessFromText(poi), distance:this.findPoiDistance(poi, routeData)}
     )
 
     extractControlsFromPois = (routeData : RwgpsRoute|RwgpsTrip) =>

@@ -1,11 +1,12 @@
-import {APIProvider, Map, InfoWindow, useMap, useApiIsLoaded, CollisionBehavior} from '@vis.gl/react-google-maps';
+import {APIProvider, Map, InfoWindow, useMap, useApiIsLoaded, CollisionBehavior, useMapsLibrary} from '@vis.gl/react-google-maps';
 import * as Sentry from "@sentry/react"
 import sandwich from 'Images/sandwich.png'
 import rainCloud from "Images/lightning-and-blue-rain-cloud-16533.svg"
 import PropTypes from 'prop-types';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import 'Images/style.css';
 import { DateTime } from 'luxon';
+import { finishTimeFormat } from '../../jsx/ForecastSettings/TimeFields';
 import { routeLoadingModes } from '../../data/enums';
 import { MapPoint, MapPointList, useForecastDependentValues, usePointsAndBounds } from '../../utils/hooks';
 import { Bounds, milesToMeters } from '../../utils/util';
@@ -16,6 +17,7 @@ import { Forecast, mapViewedSet } from '../../redux/forecastSlice';
 import { CalculatedValue } from 'utils/gpxParser';
 import { useAppSelector, useAppDispatch } from '../../utils/hooks';
 import SafeAdvancedMarker from './SafeMarker';
+import { addOpenBusiness, clearOpenBusinesses } from '../../redux/controlsSlice';
 
 const curvedArrowPath = "m-68.4149 61.4815c-.5904 2.8312 1.5113 7.0934 7.6748 12.4358 19.1536 16.6019 60.8005 28.3549 91.4489-7.6894 30.0099-35.2935 21.5071-80.7594 21.1555-98.2548l14.7087-.0371-32.3276-55.688-32.0602 55.8545 16.4983-.0557c2.8274 19.3736 6.2889 57.8645-6.5882 79.4056-17.0631 28.5432-39.6439 26.2329-52.4747 19.0262-13.994-7.8596-26.7357-11.2308-28.0345-5.0021z"
 const findMarkerInfo = (forecast : Array<Forecast>, subrange : [number,number] | []) => {
@@ -39,7 +41,7 @@ const getMapBounds = (points : MapPointList, bounds : Bounds, zoomToRange : bool
     const preferDefault = userSubrange[0] === userSubrange[1]
     if (preferDefault && subrange.length !== 2) {
         return defaultBounds
-    }
+    }   
     let userBounds = new google.maps.LatLngBounds();
     points.filter(point => matchesSegment(point,userSubrange))
         .forEach(point => userBounds.extend(point));
@@ -66,6 +68,8 @@ const findMapBounds = (points : MapPointList, bounds : Bounds, zoomToRange : boo
 }
 
 const RouteForecastMap = ({maps_api_key} : {maps_api_key: string}) => {
+    const placesCalledRef = useRef(false)
+    const [places, setPlaces] = useState<Array<{place:google.maps.places.Place,distance:number}>>([])
     const userControlPoints = useAppSelector(state => state.controls.userControlPoints)
     const forecast = useAppSelector(state => state.forecast.forecast)
     const doingAnalysis = useAppSelector(state=>state.strava.activityData) !== null
@@ -80,7 +84,6 @@ const RouteForecastMap = ({maps_api_key} : {maps_api_key: string}) => {
     const { t } = useTranslation()
     const userSegment = useAppSelector(state => state.uiInfo.routeParams.segment)
     const [isMapApiReady, setIsMapApiReady] = useState(false)
-
     const { calculatedControlPointValues: controls } = useForecastDependentValues()
 
     const dispatch = useAppDispatch()
@@ -94,11 +97,76 @@ const RouteForecastMap = ({maps_api_key} : {maps_api_key: string}) => {
         Sentry.captureException(error, {tags: {where:'Google Maps API Load Error'}})
         setIsMapApiReady(false)
     }
-        
+    
+    const cumulateArrivalTimes = (controls : CalculatedValue[]) => {
+        let result = ""
+        for (let control of controls) {
+            result += control.arrival
+        }
+        return result
+    }
+
+    const arrivals = cumulateArrivalTimes(controls)
+
     const BoundSetter = ({points} : {points: MapPointList}) => {
         const [mapBounds, setMapBounds] = useState<google.maps.LatLngBounds|google.maps.LatLngBoundsLiteral|null>(null)
+        const businessesOpen = useAppSelector(state => state.controls.controlOpenStatus)
+        const placesLib = useMapsLibrary('places')
         const apiIsLoaded = useApiIsLoaded()
         const map = useMap()
+        const lastControls = useRef<Array<CalculatedValue>>([])
+
+        const lookupBusinesses = () => {
+            dispatch(clearOpenBusinesses())
+            const businessPlaces = new Array<{place:google.maps.places.Place,distance:number}>()
+            userControlPoints.forEach(async (control) => {
+                if (control.business && control.lat && control.lon) {
+                    const location = { center: { lat: control.lat, lng: control.lon }, radius: 500 }
+                    const request = {
+                        textQuery: control.business,
+                        fields: ['businessStatus', 'displayName', 'formattedAddress'],
+                        locationBias: location,
+                        maxResultCount: 1
+                    }
+                    console.log(`Looking up Places`)
+                    const places = await google.maps.places.Place.searchByText(request).catch(error => console.log(error))
+                    console.log(`Place lookup call returned`)
+                    if (places && places.places && places.places.length > 0) {
+                        businessPlaces.push({place:places.places[0],distance:control.distance})
+                        setPlaces(businessPlaces)
+                    }
+                }
+            }
+            )
+            placesCalledRef.current = true
+        }
+
+        const checkBusinessHours = async () => {
+            for (const placeInfo of places) {
+                const matchingControl = controls.find(value => value.distance === placeInfo.distance)
+                if (matchingControl) {
+                    const lastMatchingControl = lastControls.current && lastControls.current.find(value => value.distance)
+                    // only if the arrival time has changed
+                    if(!(lastMatchingControl && lastMatchingControl.arrival === matchingControl.arrival)) {
+                        const status = placeInfo.place.businessStatus
+                        if (status === google.maps.places.BusinessStatus.OPERATIONAL) {
+                            const lDate = DateTime.fromFormat(matchingControl.arrival, finishTimeFormat).toJSDate()
+                            const isOpen = await placeInfo.place.isOpen(lDate)
+                            dispatch(addOpenBusiness({ isOpen: isOpen || false, distance: matchingControl.distance, id:placeInfo.place.id }))
+                            console.log(`${placeInfo.place.displayName} at ${placeInfo.place.formattedAddress} is ${isOpen ? 'open' : 'closed'}`)                                    
+                        }
+                    }
+                }
+            }
+            if (places.length) {
+                lastControls.current = controls
+            }
+        }
+
+        useEffect(() => {
+            checkBusinessHours()
+        }, [controls, places, arrivals])
+
         useEffect(() => {
             if (!apiIsLoaded) return;
             try {
@@ -111,6 +179,7 @@ const RouteForecastMap = ({maps_api_key} : {maps_api_key: string}) => {
             // when the maps library is loaded, apiIsLoaded will be true and the API can be
             // accessed using the global `google.maps` namespace.
         }, [apiIsLoaded, zoomToRange, subrange, userSegment[0], userSegment[1]])
+
         useEffect(() => {
             if (!map || !mapBounds) {
                 return;
@@ -128,12 +197,19 @@ const RouteForecastMap = ({maps_api_key} : {maps_api_key: string}) => {
                 const zoom = map.getZoom()
                 if (typeof zoom === 'number' && zoom > 0) {
                     map.setZoom(zoom - 1);
-                }                
+                }
             }
         }, [map, mapBounds])
+
+        useEffect(() => {
+            if (!map || !placesLib) return
+            if (userControlPoints.length === 0 || placesCalledRef.current) return
+            if (places.length > 0) return
+            lookupBusinesses()
+        }, [map, placesLib])
         return <div/>
     }
-    
+
     const controlNames = userControlPoints.map(control => control.name)
 
     let markedInfo = findMarkerInfo(forecast, subrange);
@@ -176,7 +252,7 @@ const RouteForecastMap = ({maps_api_key} : {maps_api_key: string}) => {
             <Sentry.ErrorBoundary fallback=<h2>Cannot render map</h2>>
                 <div id="map" style={{ width:'auto', height: "calc(100vh - 115px)", position: "relative" }}>
                     {(Array.isArray(forecast) && forecast.length > 0 || routeLoadingMode === routeLoadingModes.STRAVA) && bounds !== null ?
-                        <APIProvider apiKey={maps_api_key} onLoad={handleApiLoad} onError={handleApiError}>
+                        <APIProvider version={"beta"} apiKey={maps_api_key} onLoad={handleApiLoad} onError={handleApiError}>
                             {(isMapApiReady) ? (
                                 <>
                                     <BoundSetter points={points} />

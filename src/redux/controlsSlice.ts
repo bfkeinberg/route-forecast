@@ -1,4 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
+import { number } from 'prop-types'
+import { act } from 'react'
 
 export interface UserControl {
     distance: number,
@@ -7,8 +9,17 @@ export interface UserControl {
     id?: number,
     actual?: string,
     arrival?: string,
-    banked?: number
+    banked?: number,
+    lat?: number,
+    lon?: number,
+    business?: string
     [index:string]:any
+}
+
+export interface BusinessOpenType {
+    isOpen: boolean,
+    distance: number,
+    id: string
 }
 
 export interface ControlsState {
@@ -16,6 +27,7 @@ export interface ControlsState {
     celsius: boolean,
     displayBanked: boolean,
     userControlPoints: UserControl[],
+    controlOpenStatus : Array<BusinessOpenType>,
     displayControlTableUI: boolean
 }
 
@@ -24,6 +36,7 @@ const controlsInitialState : ControlsState = {
     celsius: false,
     displayBanked: false,
     userControlPoints: [],
+    controlOpenStatus: [],
     displayControlTableUI: false
 }
 
@@ -54,6 +67,18 @@ const controlsSlice = createSlice({
         userControlsUpdated(state, action : PayloadAction<UserControl[]>) {
             state.userControlPoints = action.payload
         },
+        clearOpenBusinesses(state) {
+            state.controlOpenStatus = controlsInitialState.controlOpenStatus
+        },
+        addOpenBusiness(state, action : PayloadAction<BusinessOpenType>) {
+            const existingOpenBusiness = state.controlOpenStatus.find(openBusiness => openBusiness.distance === action.payload.distance)
+            if (existingOpenBusiness) {
+                existingOpenBusiness.distance = action.payload.distance
+                existingOpenBusiness.isOpen = action.payload.isOpen
+            } else {
+                state.controlOpenStatus.push(action.payload)
+            }
+        },
         displayControlTableUiSet(state, action : PayloadAction<boolean>) {
             state.displayControlTableUI = action.payload
         }
@@ -68,5 +93,5 @@ const controlsSlice = createSlice({
 })
 
 export const { metricSet, metricToggled, celsiusToggled, bankedDisplayToggled, controlRemoved,
-    userControlsUpdated, displayControlTableUiSet, controlAdded} = controlsSlice.actions
+    userControlsUpdated, displayControlTableUiSet, controlAdded, clearOpenBusinesses, addOpenBusiness} = controlsSlice.actions
 export const controlsReducer = controlsSlice.reducer

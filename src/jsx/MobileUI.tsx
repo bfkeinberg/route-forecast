@@ -41,12 +41,14 @@ const MobileUITabs = (props : MobileUIPropTypes) => {
         const routeData = useAppSelector(state => state.routeInfo[type === "rwgps" ? "rwgpsRouteData" : "gpxRouteData"])
         const stravaActivityData = useAppSelector(state => state.strava.activityData)
         const forecastData = useAppSelector(state => state.forecast.forecast)
+        const viewingControls = useAppSelector(state => state.uiInfo.dialogParams.viewControls)
+
         // if we've been reset while displaying another tab
         if (pathname !== '/' && routeData === null) {
             navigate('/')
         }
         useWhenChanged(routeData, () => navigate("/controlPoints", { replace: true }), routeData !== null)
-        useWhenChanged(forecastData, () => navigate("/forecastTable", { replace: true }), forecastData.length > 0)
+        useWhenChanged(forecastData, () => navigate("/forecastTable", { replace: true }), forecastData.length > 0 && !viewingControls)
         useWhenChanged(stravaActivityData, () => navigate("/paceTable", { replace: true }))
 
         React.useEffect(() => {
