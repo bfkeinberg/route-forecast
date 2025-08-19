@@ -3,6 +3,7 @@ import { pinnedRoutesSet } from './rideWithGpsSlice'
 import { rwgpsRouteLoaded, gpxRouteLoaded } from './routeInfoSlice'
 import { stravaFetched, stravaFetchFailed } from './stravaSlice'
 import {rwgpsRouteSetAsNumber, rwgpsRouteSet} from './routeParamsSlice'
+import { act } from 'react'
 
 interface ErrorMessage {
     message:string
@@ -41,7 +42,8 @@ interface DialogParams {
     shortUrl: string
     loadingSource: string | null
     fetchingForecast: boolean
-    fetchingRoute: boolean
+    fetchingRoute: boolean,
+    viewControls: boolean
 }
 
 const dialogParamsInitialState : DialogParams = {
@@ -51,7 +53,8 @@ const dialogParamsInitialState : DialogParams = {
     shortUrl: ' ',
     loadingSource: null, 
     fetchingForecast: false, 
-    fetchingRoute: false
+    fetchingRoute: false,
+    viewControls: false
 }
 
 export type ErrorPayload = Error|ErrorDetails|string|null
@@ -63,6 +66,9 @@ const dialogParamsSlice = createSlice({
         routeLoadingBegun(state, action : PayloadAction<string>) {
             state.loadingSource = action.payload
             state.fetchingRoute = true
+        },
+        viewingControls(state, action: PayloadAction<boolean>) {
+            state.viewControls = action.payload
         },
         forecastFetchBegun(state) {
             state.fetchingForecast = true
@@ -157,4 +163,5 @@ export const dialogParamsReducer = dialogParamsSlice.reducer
 export const {routeLoadingBegun,forecastFetchBegun,
     forecastFetchFailed,forecastFetchCanceled,rwgpsRouteLoadingFailed,
     gpxRouteLoadingFailed,errorDetailsSet,errorMessageListSet,shortUrlSet,
-    lastErrorCleared,stravaErrorSet, errorMessageListAppend} = dialogParamsSlice.actions
+    lastErrorCleared,stravaErrorSet, errorMessageListAppend,
+    viewingControls} = dialogParamsSlice.actions

@@ -18,7 +18,8 @@ export interface UserControl {
 
 export interface BusinessOpenType {
     isOpen: boolean,
-    distance: number
+    distance: number,
+    id: string
 }
 
 export interface ControlsState {
@@ -70,7 +71,13 @@ const controlsSlice = createSlice({
             state.controlOpenStatus = controlsInitialState.controlOpenStatus
         },
         addOpenBusiness(state, action : PayloadAction<BusinessOpenType>) {
-            state.controlOpenStatus.push(action.payload)
+            const existingOpenBusiness = state.controlOpenStatus.find(openBusiness => openBusiness.distance === action.payload.distance)
+            if (existingOpenBusiness) {
+                existingOpenBusiness.distance = action.payload.distance
+                existingOpenBusiness.isOpen = action.payload.isOpen
+            } else {
+                state.controlOpenStatus.push(action.payload)
+            }
         },
         displayControlTableUiSet(state, action : PayloadAction<boolean>) {
             state.displayControlTableUI = action.payload

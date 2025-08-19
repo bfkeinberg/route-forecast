@@ -69,6 +69,7 @@ const findMapBounds = (points : MapPointList, bounds : Bounds, zoomToRange : boo
 
 const RouteForecastMap = ({maps_api_key} : {maps_api_key: string}) => {
     const placesCalledRef = useRef(false)
+    const [places, setPlaces] = useState<Array<{place:google.maps.places.Place,distance:number}>>([])
     const userControlPoints = useAppSelector(state => state.controls.userControlPoints)
     const forecast = useAppSelector(state => state.forecast.forecast)
     const doingAnalysis = useAppSelector(state=>state.strava.activityData) !== null
@@ -96,19 +97,29 @@ const RouteForecastMap = ({maps_api_key} : {maps_api_key: string}) => {
         Sentry.captureException(error, {tags: {where:'Google Maps API Load Error'}})
         setIsMapApiReady(false)
     }
-        
+    
+    const cumulateArrivalTimes = (controls : CalculatedValue[]) => {
+        let result = ""
+        for (let control of controls) {
+            result += control.arrival
+        }
+        return result
+    }
+
+    const arrivals = cumulateArrivalTimes(controls)
+
     const BoundSetter = ({points} : {points: MapPointList}) => {
         const [mapBounds, setMapBounds] = useState<google.maps.LatLngBounds|google.maps.LatLngBoundsLiteral|null>(null)
-        const [places, setPlaces] = useState<Array<google.maps.places.Place>>([])
         const businessesOpen = useAppSelector(state => state.controls.controlOpenStatus)
         const placesLib = useMapsLibrary('places')
         const apiIsLoaded = useApiIsLoaded()
         const map = useMap()
+        const lastControls = useRef<Array<CalculatedValue>>([])
 
-        const checkBusinessHours =  (controls : CalculatedValue[]) => {
+        const lookupBusinesses = () => {
             dispatch(clearOpenBusinesses())
-            const businessPlaces = new Array<google.maps.places.Place>()
-            userControlPoints.forEach(async (control, index: number) => {
+            const businessPlaces = new Array<{place:google.maps.places.Place,distance:number}>()
+            userControlPoints.forEach(async (control) => {
                 if (control.business && control.lat && control.lon) {
                     const location = { center: { lat: control.lat, lng: control.lon }, radius: 500 }
                     const request = {
@@ -117,26 +128,44 @@ const RouteForecastMap = ({maps_api_key} : {maps_api_key: string}) => {
                         locationBias: location,
                         maxResultCount: 1
                     }
+                    console.log(`Looking up Places`)
                     const places = await google.maps.places.Place.searchByText(request).catch(error => console.log(error))
+                    console.log(`Place lookup call returned`)
                     if (places && places.places && places.places.length > 0) {
-                        businessPlaces.push(places.places[0])
-                        for (const place of places.places) {
-                            if (controls[index] && controls[index].distance === control.distance) {
-                                if (place.businessStatus === google.maps.places.BusinessStatus.OPERATIONAL) {
-                                    const lDate = DateTime.fromFormat(controls[index].arrival, finishTimeFormat).toJSDate()
-                                    const isOpen = await place.isOpen(lDate)
-                                    dispatch(addOpenBusiness({ isOpen: isOpen || false, distance: control.distance }))
-                                    console.log(`${place.displayName} at ${place.formattedAddress} is ${isOpen ? 'open' : 'closed'}`)                                    
-                                }
-                            }
-                        }
+                        businessPlaces.push({place:places.places[0],distance:control.distance})
+                        setPlaces(businessPlaces)
                     }
                 }
             }
             )
-            setPlaces(businessPlaces)
             placesCalledRef.current = true
         }
+
+        const checkBusinessHours = async () => {
+            for (const placeInfo of places) {
+                const matchingControl = controls.find(value => value.distance === placeInfo.distance)
+                if (matchingControl) {
+                    const lastMatchingControl = lastControls.current && lastControls.current.find(value => value.distance)
+                    // only if the arrival time has changed
+                    if(!(lastMatchingControl && lastMatchingControl.arrival === matchingControl.arrival)) {
+                        const status = placeInfo.place.businessStatus
+                        if (status === google.maps.places.BusinessStatus.OPERATIONAL) {
+                            const lDate = DateTime.fromFormat(matchingControl.arrival, finishTimeFormat).toJSDate()
+                            const isOpen = await placeInfo.place.isOpen(lDate)
+                            dispatch(addOpenBusiness({ isOpen: isOpen || false, distance: matchingControl.distance, id:placeInfo.place.id }))
+                            console.log(`${placeInfo.place.displayName} at ${placeInfo.place.formattedAddress} is ${isOpen ? 'open' : 'closed'}`)                                    
+                        }
+                    }
+                }
+            }
+            if (places.length) {
+                lastControls.current = controls
+            }
+        }
+
+        useEffect(() => {
+            checkBusinessHours()
+        }, [controls, places, arrivals])
 
         useEffect(() => {
             if (!apiIsLoaded) return;
@@ -150,6 +179,7 @@ const RouteForecastMap = ({maps_api_key} : {maps_api_key: string}) => {
             // when the maps library is loaded, apiIsLoaded will be true and the API can be
             // accessed using the global `google.maps` namespace.
         }, [apiIsLoaded, zoomToRange, subrange, userSegment[0], userSegment[1]])
+
         useEffect(() => {
             if (!map || !mapBounds) {
                 return;
@@ -170,12 +200,12 @@ const RouteForecastMap = ({maps_api_key} : {maps_api_key: string}) => {
                 }
             }
         }, [map, mapBounds])
+
         useEffect(() => {
-            // convert call to Places API to live in async function for manageable state handling
             if (!map || !placesLib) return
             if (userControlPoints.length === 0 || placesCalledRef.current) return
-            if (businessesOpen.length > 0 || places.length > 0) return
-            checkBusinessHours(controls)
+            if (places.length > 0) return
+            lookupBusinesses()
         }, [map, placesLib])
         return <div/>
     }

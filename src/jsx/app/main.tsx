@@ -14,7 +14,7 @@ import { useAppDispatch, useAppSelector } from "../../utils/hooks";
 import type { AppDispatch } from "../../redux/store";
 import  {useMediaQuery} from 'react-responsive';
 import {useTranslation} from 'react-i18next'
-import { stravaErrorSet } from "../../redux/dialogParamsSlice";
+import { stravaErrorSet, viewingControls } from "../../redux/dialogParamsSlice";
 import { usePinnedRoutesSet, rwgpsTokenSet } from "../../redux/rideWithGpsSlice";
 import { stravaActivitySet, stravaRefreshTokenSet, stravaRouteSet, stravaTokenSet } from "../../redux/stravaSlice";
 import { apiKeysSet, querySet, actionUrlAdded } from "../../redux/paramsSlice";
@@ -158,7 +158,8 @@ type QueryParams = {
     strava_analysis: boolean
     rusa_route_id: string
     rwgpsToken: string
-    stopAfterLoad: boolean
+    stopAfterLoad: boolean,
+    viewControls: boolean
 }
 const setupBrowserForwardBack = (dispatch : AppDispatch, origin : string, forecastFunc : MutationWrapper, aqiFunc : MutationWrapper, lang: string) => {
     if (typeof window !== 'undefined') {
@@ -260,6 +261,7 @@ const updateFromQueryParams = (dispatch : AppDispatch, queryParams : QueryParams
         dispatch(usePinnedRoutesSet(true))
         saveRwgpsCredentials(queryParams.rwgpsToken);
     }
+    dispatch(viewingControls(queryParams.viewControls))
     dispatch(stopAfterLoadSet(queryParams.stopAfterLoad))
 }
 
@@ -278,7 +280,7 @@ const RouteWeatherUI = ({search, href, action, maps_api_key, timezone_api_key, b
     const [getAqi] = useGetAqiMutation()
     const { i18n } = useTranslation()
 
-    let queryParams = queryString.parse(search, {parseBooleans: true, parseNumbers:false});
+    let queryParams = queryString.parse(search, {parseBooleans: true, parseNumbers:false, types:{viewControls:'boolean'}});
     const queryParamsAsObj = queryParams as unknown as QueryParams
     dispatch(querySet({url:href,search:search}))
     Sentry.setContext("query", {queryString:search})

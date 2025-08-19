@@ -89,7 +89,9 @@ export const ControlTable = () => {
 
     const tableData : TableData= {
         rows: controlsData.map(({name, distance, duration, arrival, banked, actual, isOpen}, index) =>
-            ({name, distance, duration, arrival, banked, actual, isOpen, delete: <Icon icon="delete" style={{cursor: "pointer"}} onClick={() => removeControl(index)}/>})),
+            ({name, distance, duration, arrival, banked, actual, 
+                style:!isOpen?{backgroundColor:"rgba(212, 16, 16, 0.315)", borderColor:"rgba(240, 10, 129, 0.86)"}:null, 
+                delete: <Icon icon="delete" style={{cursor: "pointer"}} onClick={() => removeControl(index)}/>})),
         columns: [
             {name: "name", render: t('controls.name'), width: 40, editable: true},
             {name: "distance", editTransformFunction: transformDistance, editCompleteFunction: reverseTransformDistance,  valueTransformFunction: transformDistance, render: <div style={{color: '#0000EE', cursor:'pointer'}} onClick={sortOurStuffByDistance}>{metric ? t('controls.distanceKilometers') :t('controls.distanceMiles')}</div>, width: 40, editable: true, editValidateFunction: stringIsOnlyDecimal},

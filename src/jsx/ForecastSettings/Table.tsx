@@ -64,7 +64,7 @@ export const Table = ({data, onCellValueChanged} : TableProps) => {
       {rows.map((row: RowType, rowIndex : number) =>
         <React.Fragment key={rowIndex}>
           {columns.map((column:Column, columnIndex:number) =>
-            <div key={column.name} style={{...baseStyle, ...column.cellStyle, gridColumn: columnIndex + 1, gridRow: rowIndex + 2}}>
+            <div key={column.name} style={{...baseStyle, ...column.cellStyle, ...row["style"], gridColumn: columnIndex + 1, gridRow: rowIndex + 2}}>
               <Cell
                 value={row[column.name]}
                 transformFunction={column.valueTransformFunction!}
