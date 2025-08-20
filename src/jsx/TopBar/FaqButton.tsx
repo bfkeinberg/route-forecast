@@ -1,10 +1,10 @@
-import {Classes} from "@blueprintjs/core"
+import {Classes, DrawerSize} from "@blueprintjs/core"
 import faq from "../../static/faq.htm"
 import React, {useState} from "react"
 import { Drawer } from "@blueprintjs/core"
 import Typography from "@mui/material/Typography"
 import cookie from 'react-cookies';
-
+import  {useMediaQuery} from 'react-responsive'
 
 const FaqImage = ({flash} : {flash:boolean}) => {
     const textClass = flash ? "flashing-red-text" : ""
@@ -27,13 +27,15 @@ const FaqButton = () => {
         setFaqVisible(false)
     }
     const faqWasClicked = cookie.load('clickedFaq')
+    const isMobile = useMediaQuery({query:'(max-width: 600px)'})
+    const drawerSize = isMobile? DrawerSize.LARGE : DrawerSize.STANDARD
 
     return (
         <>
             <button style={{border:'none', backgroundColor: 'transparent', width:"90px", height:"60px"}} onClick={showFaq}>
                 <FaqImage flash={!faqWasClicked}/>
             </button>
-            <Drawer style={{overflowY: 'scroll'}} className={Classes.OVERLAY_SCROLL_CONTAINER} onClose={hideFaq} title={"Randoplan FAQ"} isOpen={faqVisible}>
+            <Drawer size={drawerSize} style={{overflowY: 'scroll'}} className={Classes.OVERLAY_SCROLL_CONTAINER} onClose={hideFaq} title={"Randoplan FAQ"} isOpen={faqVisible}>
                 <Typography dangerouslySetInnerHTML={{__html:faq}}/>
             </Drawer>
         </>
