@@ -166,10 +166,11 @@ export type PointsAndBounds = {
 }
 const usePointsAndBounds = () : PointsAndBounds => {
   const rwgpsRouteData = useAppSelector(state => state.routeInfo.rwgpsRouteData)
+  const rwgpsRoute = useAppSelector(state => state.uiInfo.routeParams.rwgpsRoute)
   const gpxRouteData = useAppSelector(state => state.routeInfo.gpxRouteData)
 
   const routeLoadingMode = useAppSelector(state => state.uiInfo.routeParams.routeLoadingMode)
-  const stravaRouteUsed = useAppSelector(state => state.strava.route) !== ''
+  const stravaRoute = useAppSelector(state => state.strava.route)
   const stravaActivityStream = useAppSelector(state => state.strava.activityStream)
   const stravaMode = routeLoadingMode === routeLoadingModes.STRAVA
 
@@ -178,7 +179,7 @@ const usePointsAndBounds = () : PointsAndBounds => {
   if (stravaMode) {
     if (stravaActivityStream !== null) {
       pointsAndBounds = useMemo(() => stravaRouteParser.computePointsAndBounds(stravaActivityStream), [stravaActivityStream])
-    } else if (stravaRouteUsed && gpxRouteData) {
+    } else if ((stravaRoute !== '') && gpxRouteData) {
       // we import strava routes as gpx - so we expect the second half of the above condition to 
       // always be true
       pointsAndBounds = useMemo(() => gpxParser.computePointsAndBounds(
@@ -195,7 +196,7 @@ const usePointsAndBounds = () : PointsAndBounds => {
   }
   if (pointsAndBounds.pointList.length === 0) {
     Sentry.captureMessage(
-      `Empty points and bounds :Strava activity empty=${stravaActivityStream === null} Strava route empty: ${stravaRouteUsed} RWGPS empty:${rwgpsRouteData === null} GPX empty:${gpxRouteData === null}`)
+      `Empty points and bounds :Strava activity empty=${stravaActivityStream === null} Strava route: ${stravaRoute} RWGPS:${rwgpsRoute} RWGPS empty:${rwgpsRouteData === null} GPX empty:${gpxRouteData === null}`)
   }
   if (pointsAndBounds.pointList.length > 0) {
     pointsAndBounds.points = useMemo(() => pointsAndBounds.pointList
