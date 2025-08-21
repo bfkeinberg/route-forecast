@@ -12,7 +12,8 @@ export interface UserControl {
     banked?: number,
     lat?: number,
     lon?: number,
-    business?: string
+    business?: string,
+    isOpen?: boolean
     [index:string]:any
 }
 

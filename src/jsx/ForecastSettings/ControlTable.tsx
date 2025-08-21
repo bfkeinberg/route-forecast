@@ -90,7 +90,7 @@ export const ControlTable = () => {
     const tableData : TableData= {
         rows: controlsData.map(({name, distance, duration, arrival, banked, actual, isOpen}, index) =>
             ({name, distance, duration, arrival, banked, actual, 
-                style:!isOpen?{backgroundColor:"rgba(212, 16, 16, 0.315)", borderColor:"rgba(240, 10, 129, 0.86)"}:null, 
+                style:(isOpen===false)?{backgroundColor:"rgba(212, 16, 16, 0.315)", borderColor:"rgba(240, 10, 129, 0.86)"}:null, 
                 delete: <Icon icon="delete" style={{cursor: "pointer"}} onClick={() => removeControl(index)}/>})),
         columns: [
             {name: "name", render: t('controls.name'), width: 40, editable: true},
