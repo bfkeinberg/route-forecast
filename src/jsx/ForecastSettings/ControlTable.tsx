@@ -39,15 +39,18 @@ export const ControlTable = () => {
     }
 
     const controlsData = controls.map((control, index) => {
-        const controlObject = {...control}
+        const controlObject = { ...control }
         if (calculatedValues !== null && calculatedValues[index] && controlObject.distance === calculatedValues[index].distance) {
             Object.assign(controlObject, calculatedValues[index])
         }
         if (actualArrivalTimes !== null && actualArrivalTimes[index] !== undefined) {
             controlObject.actual = actualArrivalTimes[index].time
         }
-        if (businessesAreOpen !== null && businessesAreOpen[index] !== undefined) {
-            controlObject.isOpen = businessesAreOpen[index].isOpen
+        if (businessesAreOpen !== null && businessesAreOpen.length) {
+            const found = businessesAreOpen.find(business => business.distance === controlObject.distance)
+            if (found) {
+                controlObject.isOpen = found.isOpen
+            }
         }
         return controlObject
     })

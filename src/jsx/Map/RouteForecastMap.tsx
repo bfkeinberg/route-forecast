@@ -18,6 +18,7 @@ import { CalculatedValue } from 'utils/gpxParser';
 import { useAppSelector, useAppDispatch } from '../../utils/hooks';
 import SafeAdvancedMarker from './SafeMarker';
 import { addOpenBusiness, clearOpenBusinesses } from '../../redux/controlsSlice';
+import { openSync } from 'fs';
 
 const curvedArrowPath = "m-68.4149 61.4815c-.5904 2.8312 1.5113 7.0934 7.6748 12.4358 19.1536 16.6019 60.8005 28.3549 91.4489-7.6894 30.0099-35.2935 21.5071-80.7594 21.1555-98.2548l14.7087-.0371-32.3276-55.688-32.0602 55.8545 16.4983-.0557c2.8274 19.3736 6.2889 57.8645-6.5882 79.4056-17.0631 28.5432-39.6439 26.2329-52.4747 19.0262-13.994-7.8596-26.7357-11.2308-28.0345-5.0021z"
 const findMarkerInfo = (forecast : Array<Forecast>, subrange : [number,number] | []) => {
@@ -124,13 +125,13 @@ const RouteForecastMap = ({maps_api_key} : {maps_api_key: string}) => {
                     const location = { center: { lat: control.lat, lng: control.lon }, radius: 500 }
                     const request = {
                         textQuery: control.business,
-                        fields: ['businessStatus', 'displayName', 'formattedAddress'],
+                        fields: ['businessStatus', 'displayName', 'formattedAddress', 'regularOpeningHours', 'utcOffsetMinutes'],
                         locationBias: location,
                         maxResultCount: 1
                     }
                     console.log(`Looking up Places`)
                     const places = await google.maps.places.Place.searchByText(request).catch(error => console.log(error))
-                    console.log(`Place lookup call returned`)
+                    console.log(`Place lookup call for ${control.business} returned`)
                     if (places && places.places && places.places.length > 0) {
                         businessPlaces.push({place:places.places[0],distance:control.distance})
                         setPlaces(businessPlaces)
@@ -138,27 +139,61 @@ const RouteForecastMap = ({maps_api_key} : {maps_api_key: string}) => {
                 }
             }
             )
+            console.log("Places API has been called")
             placesCalledRef.current = true
+        }
+
+        const businessIsOpen = (when : DateTime, where : google.maps.places.Place) => {
+            if (!when.isValid) {
+                return false
+            }
+            if (!where) {
+                return false
+            }
+            if (!where.regularOpeningHours) {
+                return false
+            }
+            if (!where.regularOpeningHours.periods[when.weekday]) {
+                // might be closed or might be 24 hours
+                if (where.regularOpeningHours.periods[0]) {
+                    if (where.regularOpeningHours.periods[0].open.hour === 0 && 
+                        where.regularOpeningHours.periods[0].open.minute === 0 && 
+                        !where.regularOpeningHours.periods[0].close) {
+                        return true
+                    }
+                }
+                return false
+            }
+            const closePeriod = where.regularOpeningHours.periods[when.weekday].close
+            if (closePeriod) {
+                return (
+                    when.hour >= where.regularOpeningHours.periods[when.weekday].open.hour &&
+                    (when.hour <= closePeriod.hour))
+            } else {
+                return (
+                    when.hour >= where.regularOpeningHours.periods[when.weekday].open.hour)
+            }
         }
 
         const checkBusinessHours = async () => {
             for (const placeInfo of places) {
                 const matchingControl = controls.find(value => value.distance === placeInfo.distance)
                 if (matchingControl) {
-                    const lastMatchingControl = lastControls.current && lastControls.current.find(value => value.distance)
+                    const lastMatchingControl = lastControls.current && lastControls.current.find(value => value.distance === placeInfo.distance)
                     // only if the arrival time has changed
                     if(!(lastMatchingControl && lastMatchingControl.arrival === matchingControl.arrival)) {
                         const status = placeInfo.place.businessStatus
                         if (status === google.maps.places.BusinessStatus.OPERATIONAL) {
-                            const lDate = DateTime.fromFormat(matchingControl.arrival, finishTimeFormat).toJSDate()
-                            const isOpen = await placeInfo.place.isOpen(lDate)
+                            const arrDateObj = DateTime.fromFormat("Sat, Aug 30 2025 12:22PM", finishTimeFormat)
+                            const isOpen = businessIsOpen(arrDateObj, placeInfo.place)
                             dispatch(addOpenBusiness({ isOpen: isOpen || false, distance: matchingControl.distance, id:placeInfo.place.id }))
-                            console.log(`${placeInfo.place.displayName} at ${placeInfo.place.formattedAddress} is ${isOpen ? 'open' : 'closed'}`)                                    
+                            console.log(`${placeInfo.place.displayName} at ${placeInfo.place.formattedAddress} is ${isOpen ? 'open' : 'closed'} @ ${matchingControl.arrival}`)                                    
                         }
                     }
                 }
             }
             if (places.length) {
+                console.log("LastControls ref has been set")
                 lastControls.current = controls
             }
         }
