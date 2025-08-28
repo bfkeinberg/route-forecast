@@ -17,7 +17,7 @@ import { Forecast, mapViewedSet } from '../../redux/forecastSlice';
 import { CalculatedValue } from 'utils/gpxParser';
 import { useAppSelector, useAppDispatch } from '../../utils/hooks';
 import SafeAdvancedMarker from './SafeMarker';
-import { addOpenBusiness, clearOpenBusinesses } from '../../redux/controlsSlice';
+import { addOpenBusinesses, BusinessOpenType, clearOpenBusinesses, UserControl } from '../../redux/controlsSlice';
 import { openSync } from 'fs';
 
 const curvedArrowPath = "m-68.4149 61.4815c-.5904 2.8312 1.5113 7.0934 7.6748 12.4358 19.1536 16.6019 60.8005 28.3549 91.4489-7.6894 30.0099-35.2935 21.5071-80.7594 21.1555-98.2548l14.7087-.0371-32.3276-55.688-32.0602 55.8545 16.4983-.0557c2.8274 19.3736 6.2889 57.8645-6.5882 79.4056-17.0631 28.5432-39.6439 26.2329-52.4747 19.0262-13.994-7.8596-26.7357-11.2308-28.0345-5.0021z"
@@ -86,6 +86,7 @@ const RouteForecastMap = ({maps_api_key} : {maps_api_key: string}) => {
     const userSegment = useAppSelector(state => state.uiInfo.routeParams.segment)
     const [isMapApiReady, setIsMapApiReady] = useState(false)
     const { calculatedControlPointValues: controls } = useForecastDependentValues()
+    const lastControls = useRef<Array<CalculatedValue>>([])
 
     const dispatch = useAppDispatch()
     useEffect(() => { dispatch(mapViewedSet()) }, [])
@@ -111,36 +112,37 @@ const RouteForecastMap = ({maps_api_key} : {maps_api_key: string}) => {
 
     const BoundSetter = ({points} : {points: MapPointList}) => {
         const [mapBounds, setMapBounds] = useState<google.maps.LatLngBounds|google.maps.LatLngBoundsLiteral|null>(null)
-        const businessesOpen = useAppSelector(state => state.controls.controlOpenStatus)
         const placesLib = useMapsLibrary('places')
         const apiIsLoaded = useApiIsLoaded()
         const map = useMap()
-        const lastControls = useRef<Array<CalculatedValue>>([])
 
-        const lookupBusinesses = () => {
-            dispatch(clearOpenBusinesses())
-            const businessPlaces = new Array<{place:google.maps.places.Place,distance:number}>()
-            userControlPoints.forEach(async (control) => {
-                if (control.business && control.lat && control.lon) {
-                    const location = { center: { lat: control.lat, lng: control.lon }, radius: 500 }
-                    const request = {
-                        textQuery: control.business,
-                        fields: ['businessStatus', 'displayName', 'formattedAddress', 'regularOpeningHours', 'utcOffsetMinutes'],
-                        locationBias: location,
-                        maxResultCount: 1
-                    }
-                    console.log(`Looking up Places`)
-                    const places = await google.maps.places.Place.searchByText(request).catch(error => console.log(error))
-                    console.log(`Place lookup call for ${control.business} returned`)
-                    if (places && places.places && places.places.length > 0) {
-                        businessPlaces.push({place:places.places[0],distance:control.distance})
-                        setPlaces(businessPlaces)
-                    }
+        const addNewBusiness = async (control: UserControl,
+            businessPlaces: { place: google.maps.places.Place; distance: number; }[]
+        ) => {
+            if (control.business && control.lat && control.lon) {
+                const location = { center: { lat: control.lat, lng: control.lon }, radius: 500 };
+                const request = {
+                    textQuery: control.business,
+                    fields: ['businessStatus', 'displayName', 'formattedAddress', 'regularOpeningHours', 'utcOffsetMinutes'],
+                    locationBias: location,
+                    maxResultCount: 1
+                };
+                const places = await google.maps.places.Place.searchByText(request).catch(error => console.log(error));
+                console.log(`Place lookup call for ${control.business} returned`);
+                if (places && places.places && places.places.length > 0) {
+                    businessPlaces.push({ place: places.places[0], distance: control.distance });
                 }
             }
-            )
-            console.log("Places API has been called")
+        }
+
+        const lookupBusinesses = async () => {
+            dispatch(clearOpenBusinesses())
             placesCalledRef.current = true
+            const businessPlaces = new Array<{place:google.maps.places.Place,distance:number}>()
+            for (const control of userControlPoints) {
+                await addNewBusiness(control, businessPlaces)
+            }
+            setPlaces(businessPlaces)
         }
 
         const businessIsOpen = (when : DateTime, where : google.maps.places.Place) => {
@@ -164,18 +166,26 @@ const RouteForecastMap = ({maps_api_key} : {maps_api_key: string}) => {
                 }
                 return false
             }
-            const closePeriod = where.regularOpeningHours.periods[when.weekday].close
-            if (closePeriod) {
-                return (
-                    when.hour >= where.regularOpeningHours.periods[when.weekday].open.hour &&
-                    (when.hour <= closePeriod.hour))
-            } else {
-                return (
-                    when.hour >= where.regularOpeningHours.periods[when.weekday].open.hour)
+            for (let day = 0; day <= 6; ++day) {
+                const openPeriod = where.regularOpeningHours.periods[day].open
+                const closePeriod = where.regularOpeningHours.periods[day].close
+                if (openPeriod.day === when.weekday) {
+                    if (when.hour < openPeriod.hour &&
+                        !(when.hour === openPeriod.hour && when.minute < openPeriod.minute)
+                    ) return false
+                }
+                if (closePeriod) {
+                    if (closePeriod.day === when.day) {
+                        return when.hour < closePeriod.hour
+                    }
+                }
             }
+            console.log('Returning open is true after completing loop through periods')
+            return true
         }
 
-        const checkBusinessHours = async () => {
+        const checkBusinessHours = () => {
+            const controlOpenStatus = new Array<BusinessOpenType>()
             for (const placeInfo of places) {
                 const matchingControl = controls.find(value => value.distance === placeInfo.distance)
                 if (matchingControl) {
@@ -184,16 +194,16 @@ const RouteForecastMap = ({maps_api_key} : {maps_api_key: string}) => {
                     if(!(lastMatchingControl && lastMatchingControl.arrival === matchingControl.arrival)) {
                         const status = placeInfo.place.businessStatus
                         if (status === google.maps.places.BusinessStatus.OPERATIONAL) {
-                            const arrDateObj = DateTime.fromFormat("Sat, Aug 30 2025 12:22PM", finishTimeFormat)
+                            const arrDateObj = DateTime.fromFormat(matchingControl.arrival, finishTimeFormat)
                             const isOpen = businessIsOpen(arrDateObj, placeInfo.place)
-                            dispatch(addOpenBusiness({ isOpen: isOpen || false, distance: matchingControl.distance, id:placeInfo.place.id }))
+                            controlOpenStatus.push({ isOpen: isOpen || false, distance: matchingControl.distance, id:placeInfo.place.id } )                            
                             console.log(`${placeInfo.place.displayName} at ${placeInfo.place.formattedAddress} is ${isOpen ? 'open' : 'closed'} @ ${matchingControl.arrival}`)                                    
                         }
                     }
                 }
             }
-            if (places.length) {
-                console.log("LastControls ref has been set")
+            if (controlOpenStatus.length > 0) {
+                dispatch(addOpenBusinesses(controlOpenStatus))
                 lastControls.current = controls
             }
         }
@@ -287,7 +297,7 @@ const RouteForecastMap = ({maps_api_key} : {maps_api_key: string}) => {
             <Sentry.ErrorBoundary fallback=<h2>Cannot render map</h2>>
                 <div id="map" style={{ width:'auto', height: "calc(100vh - 115px)", position: "relative" }}>
                     {(Array.isArray(forecast) && forecast.length > 0 || routeLoadingMode === routeLoadingModes.STRAVA) && bounds !== null ?
-                        <APIProvider version={"beta"} apiKey={maps_api_key} onLoad={handleApiLoad} onError={handleApiError}>
+                        <APIProvider apiKey={maps_api_key} onLoad={handleApiLoad} onError={handleApiError}>
                             {(isMapApiReady) ? (
                                 <>
                                     <BoundSetter points={points} />

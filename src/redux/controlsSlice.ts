@@ -1,6 +1,4 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
-import { number } from 'prop-types'
-import { act } from 'react'
 
 export interface UserControl {
     distance: number,
@@ -71,14 +69,8 @@ const controlsSlice = createSlice({
         clearOpenBusinesses(state) {
             state.controlOpenStatus = controlsInitialState.controlOpenStatus
         },
-        addOpenBusiness(state, action : PayloadAction<BusinessOpenType>) {
-            const existingOpenBusiness = state.controlOpenStatus.find(openBusiness => openBusiness.distance === action.payload.distance)
-            if (existingOpenBusiness) {
-                existingOpenBusiness.distance = action.payload.distance
-                existingOpenBusiness.isOpen = action.payload.isOpen
-            } else {
-                state.controlOpenStatus.push(action.payload)
-            }
+        addOpenBusinesses(state, action : PayloadAction<BusinessOpenType[]>) {
+            state.controlOpenStatus = action.payload
         },
         displayControlTableUiSet(state, action : PayloadAction<boolean>) {
             state.displayControlTableUI = action.payload
@@ -94,5 +86,5 @@ const controlsSlice = createSlice({
 })
 
 export const { metricSet, metricToggled, celsiusToggled, bankedDisplayToggled, controlRemoved,
-    userControlsUpdated, displayControlTableUiSet, controlAdded, clearOpenBusinesses, addOpenBusiness} = controlsSlice.actions
+    userControlsUpdated, displayControlTableUiSet, controlAdded, clearOpenBusinesses, addOpenBusinesses} = controlsSlice.actions
 export const controlsReducer = controlsSlice.reducer
