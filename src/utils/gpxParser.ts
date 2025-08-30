@@ -185,26 +185,34 @@ class AnalyzeRoute {
         return (matched && matched.groups) ? matched.groups.resto : undefined
     }
 
-    controlFromCoursePoint = (coursePoint : RwgpsCoursePoint) : ExtractedControl =>
+    controlFromCoursePoint = (coursePoint : RwgpsCoursePoint, distanceInMiles : number) : ExtractedControl => 
         ({business: this.businessFromText(coursePoint), name:coursePoint.n?coursePoint.n.replace(':','_'):
             (coursePoint.description?coursePoint.description.replace(':','_'):' '), 
             duration:1,
             lat: coursePoint.y, lon: coursePoint.x,
-            distance:Math.round((coursePoint.d*kmToMiles)/1000)})
+            distance:Math.min(Math.round((coursePoint.d*kmToMiles)/1000),Math.trunc(distanceInMiles))})
 
-    extractControlPoints = (routeData : RwgpsRoute|RwgpsTrip) =>
-        this.parseCoursePoints(routeData).filter((point : RwgpsCoursePoint) => this.isControl(point)).map((point : RwgpsCoursePoint) => this.controlFromCoursePoint(point))
+    extractControlPoints = (routeData : RwgpsRoute|RwgpsTrip) => {
+        const distanceInMiles = ((routeData.route ? routeData.route.distance : routeData.trip.distance) * kmToMiles) / 1000
+        return this.parseCoursePoints(routeData).filter((point : RwgpsCoursePoint) => this.isControl(point)).
+            map((point : RwgpsCoursePoint) => this.controlFromCoursePoint(point, distanceInMiles))
+    }
 
     findPoiDistance = (poi : RwgpsPoi, routeData : RwgpsRoute|RwgpsTrip, routeDataAsLineString: LineString | Feature<LineString, GeoJsonProperties>) => {
+        const distanceInMiles = ((routeData.route ? routeData.route.distance : routeData.trip.distance) * kmToMiles) / 1000
         const found = routeData[routeData.type]?.track_points.find((value) => math.equal(value.x, poi.lng) && math.equal(value.y, poi.lat))
-        if (found) return Math.round((found.d*kmToMiles)/1000)
+        if (found) {
+            return Math.min(Math.round((found.d*kmToMiles)/1000),distanceInMiles)
+        }
         const point = turf.point([poi.lng, poi.lat])
         const nearestPoint = turf.nearestPointOnLine(routeDataAsLineString, point, { units: "miles" })
         // console.log(`POI ${poi.n} is ${nearestPoint.properties.dist} miles from the route`)
         const foundNearest = routeData[routeData.type]?.track_points.find((value) => 
             math.equal(value.x, nearestPoint.geometry.coordinates[0]) && math.equal(value.y, nearestPoint.geometry.coordinates[1]))
-        if (foundNearest) return Math.round((foundNearest.d*kmToMiles)/1000)
-
+        if (foundNearest) {
+            const nearestDistance = Math.round((foundNearest.d*kmToMiles)/1000)
+            return Math.min(nearestDistance,Math.trunc(distanceInMiles))
+        }
         return 0
     }
 
@@ -269,11 +277,9 @@ class AnalyzeRoute {
                 return 0
             }
             let delayInMinutes = controls[nextControl].duration;
-            if (isNaN(delayInMinutes)) {
-                Sentry.captureMessage(`Invalid duration for control ${nextControl} - ${controls[nextControl].duration}`)
-            }
             let arrivalTime = startTime.plus({hours:elapsedTimeInHours});
             let banked = Math.round(AnalyzeRoute.rusa_time(distanceInKm, elapsedTimeInHours));
+            // id is populated only when/if the controls are sorted by distance after a user click
             let ctrlId = controls[nextControl].id
             calculatedValues.push({arrival:arrivalTime.toFormat(finishTimeFormat),
                 banked: banked,

@@ -17,9 +17,9 @@ export type Bounds = {
 
 const formatOneControl = (controlPoint : string | UserControl) => {
   if (typeof controlPoint === 'string') {
-    return controlPoint;
+    return controlPoint.replaceAll(":", "$");
   }
-  return controlPoint.name + "," + controlPoint.distance + "," + controlPoint.duration;
+  return controlPoint.name?controlPoint.name.replaceAll(":", "$"):controlPoint.name + "," + controlPoint.distance + "," + controlPoint.duration;
 };
 
 export const maxWidthForMobile = '501px'
@@ -117,7 +117,8 @@ export const parseControls = function (controlPointString : string, deleteFirstE
         .filter(point => { const values = point.split(",");return !Number.isNaN(Number.parseInt(values[1])) && !isNaN(Number.parseInt(values[2])) })
         .map((point, index) => {
           let controlPointValues = point.split(",");
-          return ({ name: controlPointValues[0], distance: Number(controlPointValues[1]), duration: Number(controlPointValues[2]), id: index });
+          return ({ name: controlPointValues[0]?controlPointValues[0].replaceAll("$", ":"):controlPointValues[0], 
+            distance: Number(controlPointValues[1]), duration: Number(controlPointValues[2]), id: index });
         });
     // delete dummy first element
     // controlPoints.splice(0, 1);
@@ -127,7 +128,8 @@ export const parseControls = function (controlPointString : string, deleteFirstE
     const controlPoints = controlPointList.filter(item => item.length > 0).filter(point => { const values = point.split(",");return !Number.isNaN(Number.parseInt(values[1])) && !Number.isNaN(Number.parseInt(values[2])) })
       .map((point, index) => {
         let controlPointValues = point.split(",");
-        return ({ name: controlPointValues[0], distance: Number(controlPointValues[1]), duration: Number(controlPointValues[2]), id: index });
+        return ({ name: controlPointValues[0]?controlPointValues[0].replaceAll("$", ":"):controlPointValues[0], 
+          distance: Number(controlPointValues[1]), duration: Number(controlPointValues[2]), id: index });
       });
     // delete dummy first element
     // controlPoints.splice(0, 1);
@@ -145,31 +147,35 @@ export const controlsMeaningfullyDifferent = (controls1 : Array<UserControl>, co
                           control.duration !== controls2[index].duration
     )
 }
+
 export const removeDuplicateControl = (controls: Array<ExtractedControl>) => {
-  // let deduplicatedResults = []
-  let resultsToRemove = []
-  for (let i = 0; i < controls.length - 1; ++i) {
-    if (controls[i].distance === 0) {     // no one will add stop time at the ride start
-      resultsToRemove.push(controls[i])
-    }
-    else if (controls[i].distance === controls[i + 1].distance) {
-      if (controls[i].name && controls[i + 1].name) {
-        if (controls[i].name.length > controls[i + 1].name.length) {
-          resultsToRemove.push(controls[i + 1])
-        } else {
-          resultsToRemove.push(controls[i])
-        }
-      }
-    }
+  const seenDistances = new Set(); for (let i = 0; i < controls.length - 1; ++i) {
+    return controls.filter(ctrl => {
+      if (ctrl.distance === 0 || seenDistances.has(ctrl.distance)) return false
+      seenDistances.add(ctrl.distance)
+      return true
+    })
   }
-  return controls.filter(control => !resultsToRemove.includes(control))
 }
 
-export const extractControlsFromRoute = (routeData : RwgpsRoute|RwgpsTrip) => {
+const longerName = (a : ExtractedControl,b : ExtractedControl) => {
+  if (!a.name) return -1
+  if (!b.name) return 1
+  return (b.name.length - a.name.length)
+}
+
+const compareControls = (a: ExtractedControl, b: ExtractedControl) => {
+  if (a.distance === b.distance) return longerName(a,b)
+    return a.distance - b.distance
+}
+
+export const extractControlsFromRoute = (routeData: RwgpsRoute | RwgpsTrip) => {
   const controlsPointControls = gpxParser.extractControlPoints(routeData)
   const poiControls = gpxParser.extractControlsFromPois(routeData)
   if (poiControls) {
-    return removeDuplicateControl(controlsPointControls.concat(poiControls).sort((a,b) => a.distance - b.distance))
+    const deduplicatedControls = removeDuplicateControl(controlsPointControls.
+      concat(poiControls).sort(compareControls))
+    return deduplicatedControls ? deduplicatedControls : []
   } else {
     return controlsPointControls
   }
