@@ -172,13 +172,16 @@ const RouteForecastMap = ({maps_api_key} : {maps_api_key: string}) => {
                 if (openPeriod.day === when.weekday) {
                     if (when.hour < openPeriod.hour &&
                         !(when.hour === openPeriod.hour && when.minute < openPeriod.minute)
-                    ) return false
+                    ) {
+                        return false
+                    }
                 }
                 if (closePeriod) {
-                    if (closePeriod.day === when.day) {
+                    if (closePeriod.day === when.weekday) {
                         return when.hour < closePeriod.hour
                     }
                 }
+                if (openPeriod.day > when.weekday) return true
             }
             console.log('Returning open is true after completing loop through periods')
             return true

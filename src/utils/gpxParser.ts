@@ -7,7 +7,10 @@ import {getPowerOrVelocity} from "./windUtils"
 import * as Sentry from "@sentry/browser"
 import { UserControl} from '../redux/controlsSlice';
 import type { GpxRouteData, RwgpsRoute, RwgpsTrip } from '../redux/routeInfoSlice';
+import * as turf from "@turf/turf";
+
 import { create, all } from 'mathjs'
+import { Feature, LineString, GeoJsonProperties } from 'geojson';
 const config = {
   relTol: 1e-5,
   absTol: 1e-8,
@@ -41,7 +44,7 @@ interface RwgpsCoursePointWithDescription {
 }
 
 export type RwgpsCoursePoint = RwgpsCoursePointWithN|RwgpsCoursePointWithDescription
-export type RwgpsPoi  = {lat: number, lng: number, n:string, t: number, d?:string, description:never}
+export type RwgpsPoi  = {lat: number, lng: number, n:string, t: number, d:string}
 export type RwgpsPoint = {x:number, y:number, d:number, e:number}
 export type GpxPoint = {lat: number, lon: number, ele: number}
 export interface ExtractedControl {
@@ -172,8 +175,13 @@ class AnalyzeRoute {
         return coursePoint.d !== undefined && coursePoint.t === 'Control' || (coursePoint.n && coursePoint.n.match(controlRegexp) && !coursePoint.n.match(exclusionRegexp))
     }
 
-    businessFromText = (coursePoint : RwgpsCoursePoint|RwgpsPoi) => {
+    businessFromText = (coursePoint : RwgpsCoursePoint) => {
         const matched = coursePoint.description ? coursePoint.description.match(/_(?<resto>.*)_/) : coursePoint.n.match(/_(?<resto>.*)_/) 
+        return (matched && matched.groups) ? matched.groups.resto : undefined
+    }
+
+    businessFromPoiText = (coursePoint : RwgpsPoi) => {
+        const matched = this.poiText(coursePoint).match(/_(?<resto>.*)_/) 
         return (matched && matched.groups) ? matched.groups.resto : undefined
     }
 
@@ -187,20 +195,35 @@ class AnalyzeRoute {
     extractControlPoints = (routeData : RwgpsRoute|RwgpsTrip) =>
         this.parseCoursePoints(routeData).filter((point : RwgpsCoursePoint) => this.isControl(point)).map((point : RwgpsCoursePoint) => this.controlFromCoursePoint(point))
 
-    findPoiDistance = (poi : RwgpsPoi, routeData : RwgpsRoute|RwgpsTrip) => {
+    findPoiDistance = (poi : RwgpsPoi, routeData : RwgpsRoute|RwgpsTrip, routeDataAsLineString: LineString | Feature<LineString, GeoJsonProperties>) => {
         const found = routeData[routeData.type]?.track_points.find((value) => math.equal(value.x, poi.lng) && math.equal(value.y, poi.lat))
         if (found) return Math.round((found.d*kmToMiles)/1000)
+        const point = turf.point([poi.lng, poi.lat])
+        const nearestPoint = turf.nearestPointOnLine(routeDataAsLineString, point, { units: "miles" })
+        // console.log(`POI ${poi.n} is ${nearestPoint.properties.dist} miles from the route`)
+        const foundNearest = routeData[routeData.type]?.track_points.find((value) => 
+            math.equal(value.x, nearestPoint.geometry.coordinates[0]) && math.equal(value.y, nearestPoint.geometry.coordinates[1]))
+        if (foundNearest) return Math.round((foundNearest.d*kmToMiles)/1000)
+
         return 0
     }
 
     poiText = (poi : RwgpsPoi) => poi.n + (poi.d?'\n' + poi.d:'')
 
-    controlFromPoi = (poi : RwgpsPoi, routeData : RwgpsRoute|RwgpsTrip) : ExtractedControl => (
-        {name: this.poiText(poi), duration:1, lat:poi.lat, lon:poi.lng, business: this.businessFromText(poi), distance:this.findPoiDistance(poi, routeData)}
+    controlFromPoi = (poi : RwgpsPoi, routeData : RwgpsRoute|RwgpsTrip, 
+        routeAsLineString: Feature<LineString, GeoJsonProperties>) : ExtractedControl => (
+        {name: this.poiText(poi), duration:1, lat:poi.lat, lon:poi.lng, business: this.businessFromPoiText(poi), 
+            distance:this.findPoiDistance(poi, routeData, routeAsLineString)}
     )
 
-    extractControlsFromPois = (routeData : RwgpsRoute|RwgpsTrip) =>
-        routeData[routeData.type]?.points_of_interest.filter((poi: RwgpsPoi) => poi.t===31).map((poi: RwgpsPoi) => this.controlFromPoi(poi, routeData))
+    extractControlsFromPois = (routeData : RwgpsRoute|RwgpsTrip) => {
+        // create GeoJson LineString for later POI analysis
+        const coordinates = this.parseRwgpsRouteStream(routeData).map( point => [point.lon, point.lat])
+        const routeAsLineString = turf.lineString(coordinates)
+        const cleanedLine = turf.cleanCoords(routeAsLineString)
+        return routeData[routeData.type]?.points_of_interest.filter((poi: RwgpsPoi) =>
+             (poi.t===31||poi.t===13)).map((poi: RwgpsPoi) => this.controlFromPoi(poi, routeData, cleanedLine))
+    }
 
     parseGpxRouteStream ( routeData : GpxRouteData) : Array<Point> {
         return routeData.tracks.reduce((accum : Array<GpxPoint>, current: {points: Array<GpxPoint>}) => accum.concat(current.points, []), []).

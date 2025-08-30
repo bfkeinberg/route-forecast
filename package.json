@@ -1,6 +1,6 @@
 {
   "name": "route_weather",
-  "version": "4.20.3",
+  "version": "4.20.4",
   "description": "Forecast weather along a route from RideWithGps or Strava. Support for others may be added if there is demand",
   "main": "jsx/server/index.js",
   "engines": {
@@ -24,6 +24,7 @@
     "@sentry/profiling-node": "^9.0.1",
     "@sentry/react": "^9.0.1",
     "@sentry/tracing": "^7.114.0",
+    "@turf/turf": "^7.2.0",
     "@types/luxon": "^3.4.2",
     "@types/webappsec-credential-management": "^0.6.8",
     "@vis.gl/react-google-maps": "^1.0.0",
