@@ -101,7 +101,7 @@ const doForecastByParts = (forecastFunc : MutationWrapper, aqiFunc : MutationWra
          getState().uiInfo.routeParams.startTimestamp,
         getState().uiInfo.routeParams.zone, getState().uiInfo.routeParams.pace,
         getState().uiInfo.routeParams.interval, getState().controls.userControlPoints,
-        getState().uiInfo.routeParams.segment
+        getState().uiInfo.routeParams.segment, getState().routeInfo.routeUUID
     )
     return forecastByParts(forecastFunc, aqiFunc, forecastRequest, getState().uiInfo.routeParams.zone,
         getState().forecast.weatherProvider, getState().routeInfo.name, routeNumber, dispatch,

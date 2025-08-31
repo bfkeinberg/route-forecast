@@ -3,7 +3,7 @@ import cookie from 'react-cookies';
 
 import gpxParser from "./gpxParser";
 import type {ControlsState, UserControl} from '../redux/controlsSlice'
-import type {Point} from './gpxParser'
+import type {ForecastRequest, Point} from './gpxParser'
 import type { GpxRouteData, RouteInfoState, RwgpsRoute, RwgpsTrip, } from '../redux/routeInfoSlice';
 import type { RouteParamsState } from '../redux/routeParamsSlice';
 import type { Segment, ExtractedControl } from './gpxParser';
@@ -78,32 +78,40 @@ export const getRouteInfo = (state: StateForRouteInfo, timeZoneId: string, segme
   );
 }
 
+let cachedRouteUUID: string | null = null
+
 export const getForecastRequest = (routeData : GpxRouteData | RwgpsRoute | RwgpsTrip, 
   startTimestamp : number, timeZoneId : string, pace : string, interval : number,
-  userControlPoints : Array<UserControl>, segment : Segment) =>
+  userControlPoints : Array<UserControl>, segment : Segment, routeUUID : string | null) =>
 {
-  if (routeData.type === "route" || routeData.type === "trip") {
-    return gpxParser.walkRwgpsRoute(
-      routeData as RwgpsRoute|RwgpsTrip,
-      DateTime.fromMillis(startTimestamp, {zone:timeZoneId}),
+  if (routeUUID === cachedRouteUUID) {
+    const storedData = sessionStorage.getItem("forecastRequest")
+    return storedData ? JSON.parse(storedData) : []
+  } else if (cachedRouteUUID) {
+    sessionStorage.clear()
+  }
+  const data = routeData.type === "route" || routeData.type === "trip" ?
+    gpxParser.walkRwgpsRoute(
+      routeData as RwgpsRoute | RwgpsTrip,
+      DateTime.fromMillis(startTimestamp, { zone: timeZoneId }),
+      pace,
+      interval,
+      userControlPoints,
+      timeZoneId,
+      segment
+    ).forecastRequest :
+    gpxParser.walkGpxRoute(
+      routeData as GpxRouteData,
+      DateTime.fromMillis(startTimestamp, { zone: timeZoneId }),
       pace,
       interval,
       userControlPoints,
       timeZoneId,
       segment
     ).forecastRequest
-    } else {
-      return gpxParser.walkGpxRoute(
-        routeData as GpxRouteData,
-        DateTime.fromMillis(startTimestamp, {zone:timeZoneId}),
-        pace,
-        interval,
-        userControlPoints,
-        timeZoneId,
-        segment
-      ).forecastRequest
-    
-  }
+  sessionStorage.setItem("forecastRequest", JSON.stringify(data))
+  cachedRouteUUID = routeUUID
+  return data
 }
 
 export const parseControls = function (controlPointString : string, deleteFirstElement : boolean) {

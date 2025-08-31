@@ -1,6 +1,7 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { getRwgpsRouteName, getGpxRouteName } from '../utils/util';
 import type { GpxPoint, RwgpsCoursePoint, RwgpsPoint, RwgpsPoi } from '../utils/gpxParser';
+import { v4 as uuidv4 } from 'uuid';
 
 const routeInfoInitialState : RouteInfoState = {
     name: '',
@@ -10,6 +11,7 @@ const routeInfoInitialState : RouteInfoState = {
     distanceInKm: 0,
     canDoUserSegment:false,
     type: "none",
+    routeUUID: null
 }
 
 export interface RwgpsRoute {
@@ -59,6 +61,7 @@ export interface BaseRouteInfoState  {
     distanceInKm: number,
     canDoUserSegment: boolean,
     type: "rwgps" | "gpx" | "none"
+    routeUUID: string | null
     [index:string]:any
 }
 
@@ -88,6 +91,7 @@ const routeInfoSlice = createSlice({
     initialState: routeInfoInitialState,
     reducers:{
         rwgpsRouteLoaded(state, action: PayloadAction<RwGpsData>) {
+            state.routeUUID = uuidv4()
             state.rwgpsRouteData = action.payload
             state.type = "rwgps"
             state.gpxRouteData = routeInfoInitialState.gpxRouteData
@@ -101,6 +105,7 @@ const routeInfoSlice = createSlice({
             }
         },
         gpxRouteLoaded(state, action : PayloadAction<GpxRouteData>) {
+            state.routeUUID = uuidv4()
             state.type = "gpx"
             state.gpxRouteData = action.payload
             state.gpxRouteData.type = "gpx"
@@ -109,11 +114,9 @@ const routeInfoSlice = createSlice({
             state.distanceInKm = action.payload.tracks[0].distance.total/1000
         },
         routeDataCleared(state) {
-            state.rwgpsRouteData = routeInfoInitialState.rwgpsRouteData
-            state.gpxRouteData = routeInfoInitialState.gpxRouteData
-            state.name = routeInfoInitialState.name
-            state.type = routeInfoInitialState.type
-            state.distanceInKm = routeInfoInitialState.distanceInKm
+            const {rwgpsRouteData, gpxRouteData, name, type, distanceInKm, routeUUID} = routeInfoInitialState
+            const resetState = {rwgpsRouteData, gpxRouteData, name, type, distanceInKm, routeUUID}
+            Object.assign(state, resetState)
         },
         loadingFromUrlSet(state, action : PayloadAction<boolean>) {
             state.loadingFromURL = action.payload

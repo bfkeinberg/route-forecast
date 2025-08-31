@@ -296,19 +296,41 @@ const useWhenChanged = <Type>(value : Type, callback : () => void, changedCondit
   }, [value])
 }
 
-const useForecastRequestData = () => {
+export const useGetForecastRequestDependencies = () => {
   const rwgpsRouteData = useAppSelector(state => state.routeInfo.rwgpsRouteData)
-  const gpxRouteData = useAppSelector(state => state.routeInfo.gpxRouteData)
-  const type = rwgpsRouteData ? "rwgps" : (gpxRouteData ? "gpx" : null)
+  const routeUUID = useAppSelector(state => state.routeInfo.routeUUID)
   const timeZoneId = useAppSelector(state => state.uiInfo.routeParams.zone)
-  const routeData = useAppSelector(state => state.routeInfo[type === "rwgps" ? "rwgpsRouteData" : "gpxRouteData"])
+  const routeData = useAppSelector(state => state.routeInfo[rwgpsRouteData ? "rwgpsRouteData" : "gpxRouteData"])
   const startTimestamp = useAppSelector(state => state.uiInfo.routeParams.startTimestamp)
   const pace = useAppSelector(state => state.uiInfo.routeParams.pace)
   const interval = useAppSelector(state => state.uiInfo.routeParams.interval)
   const controlPoints = useAppSelector(state => state.controls.userControlPoints)
   const segment = useAppSelector(state => state.uiInfo.routeParams.segment)
+  return {
+    routeData,
+    startTimestamp,
+    timeZoneId,
+    pace,
+    interval,
+    controlPoints,
+    segment,
+    routeUUID
+  }
+}
+
+const useForecastRequestData = () => {
+  const {
+    routeData,
+    startTimestamp,
+    timeZoneId,
+    pace,
+    interval,
+    controlPoints,
+    segment,
+    routeUUID
+  } = useGetForecastRequestDependencies()
   const getForecastRequestData = () => {
-    if (!type || !routeData) {
+    if (!routeData) {
       // removed Sentry message here because this can happen when the language selection buttons are used
       // after a route has already been loaded
       return { length: 0, daysInFuture:0, last:DateTime.now().toString() }
@@ -318,7 +340,7 @@ const useForecastRequestData = () => {
       startTimestamp,
       timeZoneId, pace,
       interval, controlPoints,
-      segment)
+      segment, routeUUID)
     return { length: forecastRequest.length, last: forecastRequest[forecastRequest.length - 1].time }
   }
   const forecastData = useMemo(getForecastRequestData, [routeData, interval, startTimestamp])

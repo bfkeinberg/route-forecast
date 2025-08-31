@@ -16,7 +16,7 @@ import { getForecastRequest } from '../../utils/util';
 import { DesktopTooltip } from '../shared/DesktopTooltip';
 import {useTranslation} from 'react-i18next'
 import { providerValues } from '../../redux/providerValues';
-import { useForecastRequestData } from '../../utils/hooks';
+import { useForecastRequestData, useGetForecastRequestDependencies } from '../../utils/hooks';
 import type { RootState } from "../../redux/store";
 import { useAppSelector, useAppDispatch } from '../../utils/hooks';
 import type {ForecastRequest} from '../../utils/gpxParser'
@@ -40,22 +40,30 @@ type ForecastButtonProps = PropsFromRedux & {
 const ForecastButton = ({fetchingForecast,submitDisabled, routeNumber, startTimestamp, pace, interval,
      metric, controls, strava_activity, strava_route, provider, href, 
      urlIsShortened, querySet, zone, computeStdDev, downloadAll} : ForecastButtonProps) => {
-        const [forecast, forecastFetchResult] = useForecastMutation()
-        const [getAQI, aqiFetchResult] = useGetAqiMutation()
-        const dispatch = useAppDispatch()
-        const rwgpsRouteData = useAppSelector(state => state.routeInfo.rwgpsRouteData)
-        const gpxRouteData = useAppSelector(state => state.routeInfo.gpxRouteData)
-        const routeName = useAppSelector(state => state.routeInfo.name)
-        const userControlPoints = useAppSelector(state => state.controls.userControlPoints)
-        const distanceInKm = useAppSelector(state => state.routeInfo.distanceInKm)
-        const fetchAqi = useAppSelector(state => state.forecast.fetchAqi)
-        const rusaRouteId = useAppSelector(state => state.uiInfo.routeParams.rusaPermRouteId)
-        const segmentRange = useAppSelector(state => state.uiInfo.routeParams.segment)
-        const { t } = useTranslation()
-        const forecastRequestData = useRef(useForecastRequestData())
-        const [optionPressed, setOptionPressed] = useState(false)
-        const [shiftPressed, setShiftPressed] = useState(false)
-        const { i18n } = useTranslation()
+    const [forecast, forecastFetchResult] = useForecastMutation()
+    const [getAQI, aqiFetchResult] = useGetAqiMutation()
+    const dispatch = useAppDispatch()
+    const {
+        routeData,
+        timeZoneId,
+        controlPoints,
+        segment,
+        routeUUID,
+        type
+    } = useGetForecastRequestDependencies()    
+    const rwgpsRouteData = useAppSelector(state => state.routeInfo.rwgpsRouteData)
+    const gpxRouteData = useAppSelector(state => state.routeInfo.gpxRouteData)
+    const routeName = useAppSelector(state => state.routeInfo.name)
+    const userControlPoints = useAppSelector(state => state.controls.userControlPoints)
+    const distanceInKm = useAppSelector(state => state.routeInfo.distanceInKm)
+    const fetchAqi = useAppSelector(state => state.forecast.fetchAqi)
+    const rusaRouteId = useAppSelector(state => state.uiInfo.routeParams.rusaPermRouteId)
+    const segmentRange = useAppSelector(state => state.uiInfo.routeParams.segment)
+    const { t } = useTranslation()
+    const forecastRequestData = useRef(useForecastRequestData())
+    const [optionPressed, setOptionPressed] = useState(false)
+    const [shiftPressed, setShiftPressed] = useState(false)
+    const { i18n } = useTranslation()
 
     const keyIsDown = (event : KeyboardEvent) => {
         if (event.code === "AltLeft" || event.code === "AltRight") {
@@ -111,7 +119,7 @@ const ForecastButton = ({fetchingForecast,submitDisabled, routeNumber, startTime
 
     const doForecastByParts = (provider : string, routeData :RwgpsRoute|RwgpsTrip|GpxRouteData) => {
         const forecastRequest = getForecastRequest(routeData, startTimestamp, zone, 
-            pace, interval, userControlPoints, segmentRange)
+            pace, interval, userControlPoints, segmentRange, routeUUID)
         return forecastByParts(forecastRequest, zone, provider, routeName, routeNumber)
     }
     
