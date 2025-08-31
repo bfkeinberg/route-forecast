@@ -49,7 +49,6 @@ const ForecastButton = ({fetchingForecast,submitDisabled, routeNumber, startTime
         controlPoints,
         segment,
         routeUUID,
-        type
     } = useGetForecastRequestDependencies()    
     const rwgpsRouteData = useAppSelector(state => state.routeInfo.rwgpsRouteData)
     const gpxRouteData = useAppSelector(state => state.routeInfo.gpxRouteData)
