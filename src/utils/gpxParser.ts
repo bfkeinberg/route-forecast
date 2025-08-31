@@ -262,7 +262,8 @@ class AnalyzeRoute {
     };
 
     analyzeRoute(stream : Array<Point>, userStartTime : DateTime, pace : string, 
-        intervalInHours : number, controls : Array<UserControl>, timeZoneId : string, segment : Segment) {
+        intervalInHours : number, controls : Array<UserControl>, timeZoneId : string, 
+        segment : Segment, totalDistMeters : number) {
 
         let nextControl = 0;
 
@@ -346,23 +347,18 @@ class AnalyzeRoute {
                     previousAccumulatedTime
                 );
             }
-            // can't repro issue with NaN passed into this method so just check for it preventively
-            if (!isNaN(accumulatedTime) && !isNaN(idlingTime)) {
-                idlingTime += checkAndUpdateControls(accumulatedDistanceKm, startTime, (accumulatedTime + idlingTime),
-                    controls, calculatedValues, point, shouldSkip);
-                // see if it's time for forecast
-                if (!shouldSkip && ((accumulatedTime + idlingTime) - lastTime) >= intervalInHours) {
-                    forecastRequests.push(AnalyzeRoute.addToForecast(point, startTime, (accumulatedTime + idlingTime),
-                        accumulatedDistanceKm * kmToMiles, false));
-                    lastTime = accumulatedTime + idlingTime;
-                    previousAccumulatedTime = accumulatedTime;
-                    if (forecastPoint) {
-                        bearings.push(AnalyzeRoute.getRelativeBearing(forecastPoint,point));
-                    }
-                    forecastPoint = point;
+            idlingTime += checkAndUpdateControls(accumulatedDistanceKm, startTime, (accumulatedTime + idlingTime),
+                controls, calculatedValues, point, shouldSkip);
+            // see if it's time for forecast
+            if (!shouldSkip && ((accumulatedTime + idlingTime) - lastTime) >= intervalInHours) {
+                forecastRequests.push(AnalyzeRoute.addToForecast(point, startTime, (accumulatedTime + idlingTime),
+                    accumulatedDistanceKm * kmToMiles, false));
+                lastTime = accumulatedTime + idlingTime;
+                previousAccumulatedTime = accumulatedTime;
+                if (forecastPoint) {
+                    bearings.push(AnalyzeRoute.getRelativeBearing(forecastPoint,point));
                 }
-            } else {
-                Sentry.captureMessage(`Invalid accumulated or idling times ${accumulatedTime} ${idlingTime}`)
+                forecastPoint = point;
             }
             previousPoint = point;
         });
@@ -374,16 +370,21 @@ class AnalyzeRoute {
                 bearings.push(lastBearing);    
             }
         }
+        if (accumulatedDistanceKm < totalDistMeters) {
+            console.log(`Route added up to ${(accumulatedDistanceKm*1000).toFixed(2)}km rather than stated ${totalDistMeters} meters`)
+        }
         let finishTime = AnalyzeRoute.formatFinishTime(startTime,accumulatedTime,idlingTime);
         // console.info(`setting finish time ${finishTime} from start ${startTime} accumulated ${accumulatedTime} and idling ${idlingTime}`);
-        AnalyzeRoute.fillLastControlPoint(finishTime, controls, nextControl, accumulatedTime + idlingTime,
+        AnalyzeRoute.fillLastControlPoints(finishTime, controls, nextControl, accumulatedTime + idlingTime,
             accumulatedDistanceKm, calculatedValues);
         calculatedValues.sort((a,b) => a.val-b.val);
         let requestsWithBearings : Array<ForecastRequest> = forecastRequests.map( 
             ( request, index) => {return (index === 0) ? {...request, bearing:0} : {...request, bearing:bearings.shift()}})
         return {forecastRequest:requestsWithBearings,
             points:stream,values:calculatedValues,
-            finishTime: finishTime, timeInHours:accumulatedTime + idlingTime};
+            finishTime: finishTime, timeInHours:accumulatedTime + idlingTime,
+            totalDistMeters
+        };
     }
 
     static getRelativeBearing(point1 : Point, point2 : Point) {
@@ -401,7 +402,7 @@ class AnalyzeRoute {
         return relative_bearing;
     }
 
-    static fillLastControlPoint(finishTime: string, controls: Array<UserControl>, nextControl: number,
+    static fillLastControlPoints(finishTime: string, controls: Array<UserControl>, nextControl: number,
         totalTime : number, totalDistanceInKm : number, calculatedValues : Array<CalculatedValue>) {
         while (nextControl < controls.length) {
             // update banked time also, supplying final distance in km and total time taken
@@ -422,7 +423,8 @@ class AnalyzeRoute {
         let modifiedControls = controls.slice();
         modifiedControls.sort((a,b) => a['distance']-b['distance']);
         const stream = this.parseRwgpsRouteStream(routeData)
-        return this.analyzeRoute(stream, startTime, pace, interval, modifiedControls, timeZoneId, segment);
+        const totalDistKm = routeData.route ? routeData.route?.distance : routeData.trip?.distance
+        return this.analyzeRoute(stream, startTime, pace, interval, modifiedControls, timeZoneId, segment, totalDistKm);
     }
 
     walkGpxRoute(routeData : GpxRouteData, startTime : DateTime, pace : string, interval: number,
@@ -430,7 +432,8 @@ class AnalyzeRoute {
         let modifiedControls = controls.slice();
         modifiedControls.sort((a,b) => a['distance']-b['distance']);
         const stream = this.parseGpxRouteStream(routeData)
-        return this.analyzeRoute(stream, startTime, pace, interval, modifiedControls, timeZoneId, segment);
+        const totalDistMeters = routeData.tracks[0].distance.total
+        return this.analyzeRoute(stream, startTime, pace, interval, modifiedControls, timeZoneId, segment, totalDistMeters);
     }
 
     static rusa_time(accumulatedDistanceInKm : number, elapsedTimeInHours : number) {
@@ -514,7 +517,7 @@ class AnalyzeRoute {
 
     adjustForWind = (forecastInfo : ForecastInfo, stream : Array<Point>, pace : string, controls : Array<UserControl>, 
         previouslyCalculatedValues : Array<CalculatedValue>, start : DateTime, 
-        finishTime : string, timeZoneId : string) : WindAdjustResults => {
+        finishTime : string, timeZoneId : string, totalDistMeters : number) : WindAdjustResults => {
         if (forecastInfo.length===0) {
             return {weatherCorrectionMinutes:0,calculatedControlPointValues:[],maxGustSpeed:0, adjustedTimes:[], finishTime:finishTime, chartData:[]};
         }
@@ -611,6 +614,8 @@ class AnalyzeRoute {
             if (currentForecast) {
                 const initialForecastTime = DateTime.fromISO(currentForecast.time);
                 adjustedTimes.push({time:initialForecastTime.plus({minutes:totalMinutesLost}),index:forecastIndex})    
+                currentControl = AnalyzeRoute.calculateValuesForWind(controls, previouslyCalculatedValues,
+                    calculatedValues, currentControl, (totalDistMeters*kmToMiles)/1000, totalMinutesLost, start, totalDistanceInKm*kmToMiles, timeZoneId);
             }
         }
         if (!finishTime) {

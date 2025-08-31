@@ -243,8 +243,8 @@ const calculateWindResult = (inputs : WindResultInputs) : WindAdjustResults => {
   const stateStuff = {routeInfo, uiInfo: {routeParams}, controls}
 
   let result
-  if (forecast.length > 0 && (routeInfo?.rwgpsRouteData || routeInfo?.gpxRouteData)) {
-    const { points, values, finishTime} = getRouteInfo(stateStuff, timeZoneId, segment)
+  if (/*forecast.length > 0 && */(routeInfo?.rwgpsRouteData || routeInfo?.gpxRouteData)) {
+    const { points, values, finishTime, totalDistMeters} = getRouteInfo(stateStuff, timeZoneId, segment)
 
     let sortedControls = controls.userControlPoints.slice();
     sortedControls?.sort((a,b) => a['distance']-b['distance']);
@@ -260,7 +260,8 @@ const calculateWindResult = (inputs : WindResultInputs) : WindAdjustResults => {
         sortedValues,
         DateTime.fromMillis(routeParams.startTimestamp, {zone:routeParams.zone}),
         finishTime,
-        timeZoneId
+        timeZoneId,
+        totalDistMeters
     )
     result = { weatherCorrectionMinutes: weatherCorrectionMinutes, 
       calculatedControlPointValues: calculatedControlPointValues, maxGustSpeed: maxGustSpeed,
