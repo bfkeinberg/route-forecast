@@ -19,7 +19,8 @@ const formatOneControl = (controlPoint : string | UserControl) => {
   if (typeof controlPoint === 'string') {
     return controlPoint.replaceAll(":", "$");
   }
-  return controlPoint.name?controlPoint.name.replaceAll(":", "$"):controlPoint.name + "," + controlPoint.distance + "," + controlPoint.duration;
+  console.log(controlPoint.name.replaceAll(":", "$").replaceAll(",","~") + "," + controlPoint.distance + "," + controlPoint.duration)
+  return controlPoint.name.replaceAll(":", "$").replaceAll(",","~") + "," + controlPoint.distance + "," + controlPoint.duration
 };
 
 export const maxWidthForMobile = '501px'
@@ -28,7 +29,8 @@ export const maxWidthForMobile = '501px'
 // ask wtf is up with this & parseControls()
 export const formatControlsForUrl = (controlPoints : Array<UserControl>, filter: boolean) => {
   const filteredControlPoints = filter ? controlPoints.filter(point => point.name !== '').filter(point => {return !isNaN(point.distance) && !isNaN(point.duration)}) : controlPoints
-  return filteredControlPoints.reduce((queryParam,point) => {return queryParam + ':' + formatOneControl(point)},'');
+  console.log(filteredControlPoints.reduce((queryParam,point) => {return queryParam + ':' + formatOneControl(point)},''))
+  return filteredControlPoints.reduce((queryParam,point) => {return queryParam + ':' + formatOneControl(point)},'')
 };
 
 export const setMinMaxCoords = (trackPoint : Point,bounds : Bounds) => {
@@ -125,7 +127,7 @@ export const parseControls = function (controlPointString : string, deleteFirstE
         .filter(point => { const values = point.split(",");return !Number.isNaN(Number.parseInt(values[1])) && !isNaN(Number.parseInt(values[2])) })
         .map((point, index) => {
           let controlPointValues = point.split(",");
-          return ({ name: controlPointValues[0]?controlPointValues[0].replaceAll("$", ":"):controlPointValues[0], 
+          return ({ name: controlPointValues[0]?controlPointValues[0].replaceAll("$", ":").replaceAll("~",","):controlPointValues[0], 
             distance: Number(controlPointValues[1]), duration: Number(controlPointValues[2]), id: index });
         });
     // delete dummy first element
@@ -136,7 +138,7 @@ export const parseControls = function (controlPointString : string, deleteFirstE
     const controlPoints = controlPointList.filter(item => item.length > 0).filter(point => { const values = point.split(",");return !Number.isNaN(Number.parseInt(values[1])) && !Number.isNaN(Number.parseInt(values[2])) })
       .map((point, index) => {
         let controlPointValues = point.split(",");
-        return ({ name: controlPointValues[0]?controlPointValues[0].replaceAll("$", ":"):controlPointValues[0], 
+        return ({ name: controlPointValues[0]?controlPointValues[0].replaceAll("$", ":").replaceAll("~",","):controlPointValues[0], 
           distance: Number(controlPointValues[1]), duration: Number(controlPointValues[2]), id: index });
       });
     // delete dummy first element

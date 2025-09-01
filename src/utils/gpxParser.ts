@@ -186,8 +186,8 @@ class AnalyzeRoute {
     }
 
     controlFromCoursePoint = (coursePoint : RwgpsCoursePoint, distanceInMiles : number) : ExtractedControl => 
-        ({business: this.businessFromText(coursePoint), name:coursePoint.n?coursePoint.n.replace(':','_'):
-            (coursePoint.description?coursePoint.description.replace(':','_'):' '), 
+        ({business: this.businessFromText(coursePoint), name:coursePoint.n?coursePoint.n:
+            (coursePoint.description?coursePoint.description:' '), 
             duration:1,
             lat: coursePoint.y, lon: coursePoint.x,
             distance:Math.min(Math.round((coursePoint.d*kmToMiles)/1000),Math.trunc(distanceInMiles))})
