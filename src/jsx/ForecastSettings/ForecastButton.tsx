@@ -93,7 +93,7 @@ const ForecastButton = ({fetchingForecast,submitDisabled, routeNumber, startTime
  */    }, [optionPressed, shiftPressed])
 
     const forecastByParts = (forecastRequest : Array<ForecastRequest>, zone : string, service : string, routeName : string, routeNumber : string) => {
-        let requestCopy = Object.assign(forecastRequest)
+        let requestCopy = [...forecastRequest]
         let forecastResults = []
         let aqiResults = []
         let locations = requestCopy.shift();

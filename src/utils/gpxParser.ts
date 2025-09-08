@@ -82,6 +82,15 @@ export type WindAdjustResults = {
     chartData:ChartDataType
 }
 
+export interface RouteAnalysisResults {
+    forecastRequest: ForecastRequest[],
+    points: Point[],
+    values: CalculatedValue[],
+    finishTime: string,
+    timeInHours: number,
+    totalDistMeters: number,
+}
+
 const desiredSeparationInMeters = 25;       // meters of distance desired between two points for grade calculation
 class AnalyzeRoute {
     constructor() {
@@ -263,7 +272,7 @@ class AnalyzeRoute {
 
     analyzeRoute(stream : Array<Point>, userStartTime : DateTime, pace : string, 
         intervalInHours : number, controls : Array<UserControl>, timeZoneId : string, 
-        segment : Segment, totalDistMeters : number) {
+        segment : Segment, totalDistMeters : number) : RouteAnalysisResults {
 
         let nextControl = 0;
 

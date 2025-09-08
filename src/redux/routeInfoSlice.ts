@@ -11,7 +11,8 @@ const routeInfoInitialState : RouteInfoState = {
     distanceInKm: 0,
     canDoUserSegment:false,
     type: "none",
-    routeUUID: null
+    routeUUID: null,
+    zoneCopy: Intl.DateTimeFormat().resolvedOptions().timeZone
 }
 
 export interface RwgpsRoute {
@@ -62,6 +63,7 @@ export interface BaseRouteInfoState  {
     canDoUserSegment: boolean,
     type: "rwgps" | "gpx" | "none"
     routeUUID: string | null
+    zoneCopy: string
     [index:string]:any
 }
 
@@ -138,6 +140,41 @@ const routeInfoSlice = createSlice({
                 state.type = routeInfoInitialState.type
             })
             .addCase("routeParams/reset", () => routeInfoInitialState)
+            .addCase("routeParams/startTimeSet", (state) => {
+                state.routeUUID = uuidv4()
+            })
+            .addCase("routeParams/initialStartTimeSet", (state) => {
+                state.routeUUID = uuidv4()
+            })
+            .addCase("routeParams/startTimestampSet", (state) => {
+                state.routeUUID = uuidv4()
+            })
+            .addCase("routeParams/timeZoneSet", (state, action) => {
+                //@ts-ignore
+                if (state.zoneCopy !== action.payload) {
+                    state.routeUUID = uuidv4()
+                    //@ts-ignore
+                    state.zoneCopy = action.payload
+                }
+            })
+            .addCase("routeParams/paceSet", (state) => {
+                state.routeUUID = uuidv4()
+            })
+            .addCase("routeParams/intervalSet", (state) => {
+                state.routeUUID = uuidv4()
+            })
+            .addCase("routeParams/segmentSet", (state) => {
+                state.routeUUID = uuidv4()
+            })
+            .addCase("controls/controlAdded", (state) => {
+                state.routeUUID = uuidv4()
+            })
+            .addCase("controls/controlRemoved", (state) => {
+                state.routeUUID = uuidv4()
+            })
+            .addCase("controls/userControlsUpdated", (state) => {
+                state.routeUUID = uuidv4()
+            })
     }
 })
 

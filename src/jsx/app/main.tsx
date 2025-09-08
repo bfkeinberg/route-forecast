@@ -319,7 +319,7 @@ const useLoadRouteFromURL = (queryParams : QueryParams, forecastFunc : MutationW
     lang: string, rwgpsRoute: string, stravaRoute: string) => {
     const dispatch = useAppDispatch()
     useEffect(() => {
-        if (queryParams.rwgpsRoute || queryParams.strava_route) {
+        if (rwgpsRoute || stravaRoute) {
             dispatch(loadRouteFromURL(forecastFunc, aqiFunc, lang))
         }
     }, [queryParams, rwgpsRoute, stravaRoute, forecastFunc, aqiFunc, lang])

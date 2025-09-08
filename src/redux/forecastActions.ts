@@ -57,7 +57,7 @@ const forecastByParts = (forecastFunc : MutationWrapper, aqiFunc : MutationWrapp
     forecastRequest : Array<ForecastRequest>, zone : string, service : string, 
     routeName : string, routeNumber : string, dispatch : AppDispatch, fetchAqi : boolean,
     lang: string) => {
-    let requestCopy = Object.assign(forecastRequest)
+    let requestCopy = [...forecastRequest]
     let forecastResults = []
     let aqiResults = []
     let locations = requestCopy.shift();

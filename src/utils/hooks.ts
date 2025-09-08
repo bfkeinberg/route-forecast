@@ -239,18 +239,24 @@ const calculateWindResult = (inputs : WindResultInputs) : WindAdjustResults => {
   if (dependencies.every(dependency => inputs[dependency] === lastWindResult.dependencyValues[dependency]) ) {
     return lastWindResult.result
   }
-  const {routeInfo, routeParams, controls, timeZoneId, forecast, segment} = inputs
-  const stateStuff = {routeInfo, uiInfo: {routeParams}, controls}
-
+  const {routeInfo: routeInfoState, routeParams, controls, timeZoneId, forecast, segment} = inputs
+  const routeInfo = routeInfoState.rwgpsRouteData ? routeInfoState.rwgpsRouteData : routeInfoState.gpxRouteData
   let result
-  if (/*forecast.length > 0 && */(routeInfo?.rwgpsRouteData || routeInfo?.gpxRouteData)) {
-    const { points, values, finishTime, totalDistMeters} = getRouteInfo(stateStuff, timeZoneId, segment)
+  if (routeInfo) {
+    const { points, values, finishTime, totalDistMeters} = getRouteInfo(
+      routeInfo,
+      routeParams.startTimestamp,
+      routeParams.timeZoneId,
+      routeParams.pace,
+      routeParams.interval,
+      controls.userControlPoints,
+      segment, routeInfoState.routeUUID)
 
     let sortedControls = controls.userControlPoints.slice();
     sortedControls?.sort((a,b) => a['distance']-b['distance']);
 
     let sortedValues = values.slice();
-    sortedValues.sort((a,b) => a['distance']-b['distance']);
+    sortedValues.sort((a: { [x: string]: number; },b: { [x: string]: number; }) => a['distance']-b['distance']);
 
     const { weatherCorrectionMinutes, calculatedControlPointValues, maxGustSpeed, finishTime: adjustedFinishTime, adjustedTimes, chartData } = gpxParser.adjustForWind(
         forecast,
