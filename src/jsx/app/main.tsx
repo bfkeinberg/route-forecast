@@ -318,8 +318,20 @@ export default React.memo(RouteWeatherUI)
 const useLoadRouteFromURL = (queryParams : QueryParams, forecastFunc : MutationWrapper, aqiFunc : MutationWrapper, 
     lang: string, rwgpsRoute: string, stravaRoute: string) => {
     const dispatch = useAppDispatch()
+    // the odd logic below deserves some explanation
+    // there are two possible edge cases that we are guarding against:
+    // case one: randoplan has no route in the url parameters, and the user enters one, checking the
+    // query params for a route ensures that we don't trigger the code to load and run a forecast,
+    // since this method is meant for when randoplan is invoked with a full url, but there will be
+    // none in the query params in this case
+    // case two: randoplan was invokved with a url containing a route, but after the forecast was run
+    // the user clears the route - this method is invoked because the route _changed_, and it is
+    // still set in the query params - but not in the value from current state
+    // so only when the value in the query params and the value in the current redux state
+    // are set do we load route and run forecast
+    // Q: what if they're different? A problem? Something to ponder
     useEffect(() => {
-        if (rwgpsRoute || stravaRoute) {
+        if ((rwgpsRoute && queryParams.rwgpsRoute) || (stravaRoute && queryParams.strava_route)) {
             dispatch(loadRouteFromURL(forecastFunc, aqiFunc, lang))
         }
     }, [queryParams, rwgpsRoute, stravaRoute, forecastFunc, aqiFunc, lang])
