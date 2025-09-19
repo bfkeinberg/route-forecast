@@ -5,6 +5,7 @@ import VersionContext from "../versionContext";
 import LocationContext from '../locationContext';
 import TopLevel from './topLevel';
 import "./i18n";
+import { MantineProvider } from '@mantine/core';
 
 if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('/worker.js').then((registration) => {
@@ -114,7 +115,9 @@ else {
         root.render(
             <VersionContext.Provider value={version}>
                 <LocationContext.Provider value={{ href: location.href, search: location.search, origin: location.origin }}>
-                    <Component action={action} maps_api_key={maps_api_key} timezone_api_key={timezone_api_key} bitly_token={bitly_token} />
+                    <MantineProvider>
+                            <Component action={action} maps_api_key={maps_api_key} timezone_api_key={timezone_api_key} bitly_token={bitly_token} />
+                    </MantineProvider>
                 </LocationContext.Provider>
             </VersionContext.Provider>
         )

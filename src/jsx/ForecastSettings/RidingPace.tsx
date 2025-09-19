@@ -1,7 +1,6 @@
 import "./RidingPace.css"
 
-import { Button, FormGroup, MenuItem } from "@blueprintjs/core";
-import { Select, ItemRenderer } from "@blueprintjs/select";
+import { FormGroup } from "@blueprintjs/core";
 import {connect, ConnectedProps} from 'react-redux';
 
 import { saveCookie } from "../../utils/util";
@@ -12,6 +11,7 @@ import { DesktopTooltip } from '../shared/DesktopTooltip';
 import {useTranslation} from 'react-i18next'
 import { milesToMeters } from '../../utils/util'
 import type { RootState } from "../../redux/store";
+import { Combobox, useCombobox, InputBase } from '@mantine/core'
 
 type PropsFromRedux = ConnectedProps<typeof connector>
 
@@ -98,45 +98,13 @@ const correctPaceValue = (paceAlpha : string, setPace : (pace:string) => void) :
     }
 }
 
-interface Pace {
-    name: string
-    number: number
-}
-
-const renderPaceImperial : ItemRenderer<Pace> = (pace, { handleClick, modifiers }) => {
-    if (!modifiers.matchesPredicate) {
-        return null;
-    }
-    return (
-        <MenuItem
-            active={modifiers.active}
-            key={pace.number}
-            onClick={handleClick}
-            text={`${pace.number} mph`}
-        />
-    );
-};
-
-const renderPaceMetric : ItemRenderer<Pace> = (pace, { handleClick, modifiers }) => {
-    if (!modifiers.matchesPredicate) {
-        return null;
-    }
-    return (
-        <MenuItem
-            active={modifiers.active}
-            key={pace.number}
-            onClick={handleClick}
-            text={`${pace.number} kph`}
-        />
-    );
-};
-
-const RidingPace = ({ pace, setPace, metric } : PropsFromRedux) => {
+const RidingPace = ({ pace, setPace, metric }: PropsFromRedux) => {
+    const combobox = useCombobox()
     const { t } = useTranslation()
     const actualPace = useActualPace()
-    
+
     // convert mph to kph if we are using metric
-    const cvtMilesToKm = (distance : number) => {
+    const cvtMilesToKm = (distance: number) => {
         return metric ? ((distance * milesToMeters) / 1000) : distance;
     };
 
@@ -150,25 +118,50 @@ const RidingPace = ({ pace, setPace, metric } : PropsFromRedux) => {
         pace_text = t('tooltips.ridingPace')
     } else {
 
-        pace_tooltip_class = getPaceTooltipId(cvtMilesToKm(actualPace),selectedSpeed);
+        pace_tooltip_class = getPaceTooltipId(cvtMilesToKm(actualPace), selectedSpeed);
         pace_text = `${t('tooltips.actualPace')} ${getAlphaPace(Math.round(actualPace))} (${formatSpeed(actualPace)})`;
     }
 
     const dropdownValues = metric ? paceValues.metric : paceValues.imperialLikeAPenguin
+
+    const options = dropdownValues.values.map((item) => (
+        <Combobox.Option value={item.name} key={item.number}>
+            {item.number} {dropdownValues.label}
+        </Combobox.Option>
+    ))
+
     return (
         <DesktopTooltip content={pace_text} className={pace_tooltip_class}>
             <FormGroup style={{ flex: 3, fontSize: "90%" }} label={<span><b>{t('labels.ridingPace')}</b></span>} labelFor={'paceInput'}>
-                <Select
-                    items={dropdownValues.values}
-                    itemsEqual={"number"}
-                    itemRenderer={metric ? renderPaceMetric : renderPaceImperial}
-                    filterable={false}
-                    fill={true}
-                    activeItem={{ name: pace, number: selectedSpeed }}
-                    onItemSelect={(selected) => { saveCookie("pace", selected.name); setPace(selected.name) }}
+                <Combobox
+                    store={combobox}
+                    onOptionSubmit={(selected: string) => {
+                        saveCookie("pace", selected)
+                        setPace(selected)
+                        combobox.closeDropdown();
+                    }}
                 >
-                    <Button id={'paceInput'} text={selectedSpeed + " " + dropdownValues.label} rightIcon="symbol-triangle-down" />
-                </Select>
+                    <Combobox.Target>
+                        <InputBase
+                            component="button"
+                            type="button"
+                            pointer
+                            onClick={() => combobox.toggleDropdown()}
+                            rightSection={<Combobox.Chevron />}
+                            rightSectionPointerEvents="none"
+                            id={'paceInput'}
+                        >
+                            {selectedSpeed}
+                        </InputBase>
+                    </Combobox.Target>
+
+                    <Combobox.Dropdown className="dropdown">
+                        <Combobox.Options>
+                            {options}
+                        </Combobox.Options>
+                    </Combobox.Dropdown>
+                </Combobox>
+
             </FormGroup>
         </DesktopTooltip>
     );

@@ -1,9 +1,7 @@
-import "@blueprintjs/datetime/lib/css/blueprint-datetime.css";
-
 import {Icon} from '@blueprintjs/core';
-import { DateInput, TimePrecision } from "@blueprintjs/datetime";
 import { DateTime } from 'luxon';
 import {connect, ConnectedProps} from 'react-redux';
+import { DateTimePicker } from '@mantine/dates';
 
 import {setStart} from "../../redux/actions";
 import { setTimeFromIso } from "../../redux/actions";
@@ -24,16 +22,16 @@ export const setDateOnly = (start : DateTime, setInitialStart : ActionCreatorWit
     setInitialStart({start: newStart.toISO()!, zone:newStart.zone.name});
 };
 
-//"EEE MMM dd yyyy HH:mm:ss 'GMT'ZZZ"
 const DateSelect = ({ start, zone, setStart, initialStartTimeSet, maxDaysInFuture, canForecastPast, setTimeFromIso } : PropsFromRedux) => {
     const { t, i18n } = useTranslation()
     const setDateWithZone = (zone : string) => {
         setTimeFromIso(start.toISO({includeOffset:false})!, zone)
     }
 
-    const setDateFromPicker = (dateIsoString : string|null) => {
-        if (dateIsoString) {
-            setStart(DateTime.fromISO(dateIsoString).toMillis());
+    const setDateFromPicker = (dateTimeString : string|null) => {
+        if (dateTimeString) {
+            console.log(dateTimeString)
+            setStart(DateTime.fromFormat(dateTimeString, "yyyy-MM-dd HH:mm:ss", {zone:zone}).toMillis());
         }
     }
 
@@ -52,6 +50,10 @@ const DateSelect = ({ start, zone, setStart, initialStartTimeSet, maxDaysInFutur
     if (!canForecastPast) {
         otherAttributes.minDate = now
     }
+    let startIso
+    startIso = start.toISO()
+    if (startIso===null)
+        startIso=undefined
     return (
         <div style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
             <span id={"startingTime"} style={{ fontSize: ".875rem", fontWeight: "bolder", padding: "0px 5px", flex: 1 }}>
@@ -60,21 +62,24 @@ const DateSelect = ({ start, zone, setStart, initialStartTimeSet, maxDaysInFutur
             </span>
             <div style={{ flex: 2.5 } }>
                 {/* <Tooltip disabled={hideTooltip} targetTagName={'div'} content={t('tooltips.startingTime')} placement={'top'}> */}
-                    <DateInput
-                        onChange={setDateFromPicker}
-                        closeOnSelection={false}
-                        onTimezoneChange={setDateWithZone}
-                        {...otherAttributes}
-                        placeholder="M/D/YYYY"
-                        value={start.toISO()}
-                        showTimezoneSelect
-                        maxDate={later}
-                        timePrecision={TimePrecision.MINUTE}
-                        timePickerProps={{useAmPm:true, showArrowButtons:true, selectAllOnFocus:true, onKeyDown:keyDownHandler}}
-                        dateFnsFormat='MMMM d, yyyy h:mmaaa'
-                        timezone={zone}
-                        locale={i18n.language}
-                    />
+                <DateTimePicker
+                    placeholder="M/D/YYYY" 
+                    rightSection={<span style={{paddingRight:5}}>{zone}</span>} 
+                    rightSectionWidth={"max-content"}
+                    rightSectionPointerEvents="auto"
+                    required                 
+                    firstDayOfWeek={1}
+                    {...otherAttributes}
+                    inputSize="20"
+                    maxDate={later}
+                    level={"month"}
+                    locale={i18n.language}
+                    value={start.toISO()}
+                    onChange={setDateFromPicker}
+                    highlightToday={false}
+                    valueFormat='MMMM d, YYYY h:mma'
+                    timePickerProps={{minutesStep:5,format:"12h"}}
+                />
                     {/* </Tooltip> */}
             </div>
         </div>

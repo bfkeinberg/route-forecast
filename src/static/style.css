@@ -203,3 +203,10 @@ table.bp4-html-table.bp4-html-table-bordered.bp4-html-table-striped.bp4-interact
 .flashing-red-text {
     animation: blink 1s infinite alternate; /* Apply the animation */
 }
+
+/* for mantine combobox dropdown */
+.dropdown {
+  border: 2px solid var(--mantine-color-blue-5);
+  border-radius: var(--mantine-radius-md);
+  box-shadow: var(--mantine-shadow-md);
+}
