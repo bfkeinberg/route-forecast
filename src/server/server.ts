@@ -17,7 +17,6 @@ const upload = multer({
 }); // for parsing multipart/form-data
 import callWeatherService from './weatherForecastDispatcher'
 import url from 'url'
-import strava from 'strava-v3'
 import getPurpleAirAQI from'./purpleAirAQI'
 import getAirNowAQI from './airNowAQI'
 import querystring from 'querystring';
@@ -449,16 +448,16 @@ app.post('/bitly', async (req : Request, res: Response) => {
     res.json({ error, url })
 });
 
-const getStravaAuthUrl = async (baseUrl : string, state: string) => {
+const getStravaAuthUrl = (baseUrl : string, state: string) => {
     if (baseUrl === 'http://localhost:8080') {
         process.env.STRAVA_REDIRECT_URI = baseUrl + '/stravaAuthReply';
     }
     else {
         process.env.STRAVA_REDIRECT_URI = 'https://www.randoplan.com/stravaAuthReply';
     }
-    process.env.STRAVA_CLIENT_SECRET = process.env.STRAVA_API_KEY;
     info("Getting Strava auth URL", {baseUrl: baseUrl, clientSecret: process.env.STRAVA_API_KEY});
-    return await strava.oauth.getRequestAccessURL({ scope: 'activity:read_all,read_all', state: encodeURIComponent(state) });
+    const authorizationUrl = `https://www.strava.com/oauth/authorize?client_id=${process.env.STRAVA_CLIENT_ID}&response_type=code&redirect_uri=${process.env.STRAVA_REDIRECT_URI}&approval_prompt=auto&scope=${'activity:read_all,read_all'}&state=${encodeURIComponent(state)}`;
+    return authorizationUrl;
 };
 
 interface StravaToken {
@@ -473,11 +472,25 @@ interface StravaToken {
     statusMessage: string
 }
 
-const getStravaToken = (code : string) => {
+const getStravaToken = async (code : string) => {
     // process.env.STRAVA_ACCESS_TOKEN = 'fake';
     info('Getting Strava OAuth token', {code : code});
     logger.info(`Getting Strava OAuth token from code ${code}`);
-    return strava.oauth.getToken(code, (err: { msg: any; } | null, payload: StravaToken) => {console.log(`token was ${JSON.stringify(payload.body)}`)})
+    try {
+        const tokenResponse = await axios.post('https://www.strava.com/api/v3/oauth/token', null, {
+                params: {
+                    client_id: process.env.STRAVA_CLIENT_ID,
+                    client_secret: process.env.STRAVA_API_KEY,
+                    code: code,
+                    grant_type: 'authorization_code'
+                }
+        });
+        console.log(`token was ${JSON.stringify(tokenResponse.data)}`)
+        return tokenResponse.data;
+    } catch (error : any) {
+        console.error('Error exchanging authorization code:', error.response ? error.response.data : error.message);
+        throw error;
+    }
 };
 
 /* const insertFeatureRecord = (record, featureName, user : string) => {
@@ -556,7 +569,7 @@ app.get('/rwgpsAuthReply', async (req: Request, res : Response) => {
     }
 });
 
-app.get('/stravaAuthReq', async (req : Request, res : Response) => {
+app.get('/stravaAuthReq', (req : Request, res : Response) => {
     const state = req.query.state;
     if (!state || typeof state !== 'string') {
         res.status(400).json({ 'status': 'Missing OAuth state from Strava' });
@@ -580,7 +593,7 @@ app.get('/stravaAuthReq', async (req : Request, res : Response) => {
     Sentry.addBreadcrumb({category:'strava', level:'info', message: state})
     info('Getting Strava auth', {baseUrl: baseUrl, state: state});
     logger.info(`Getting Strava authorization ${baseUrl} ${JSON.stringify(state)}`);
-    res.redirect(await getStravaAuthUrl(baseUrl, state));
+    res.redirect(getStravaAuthUrl(baseUrl, state));
 
 });
 
@@ -635,8 +648,18 @@ app.get('/refreshStravaToken', async (req: Request, res : Response) => {
         return;
     }
     process.env.STRAVA_CLIENT_SECRET = process.env.STRAVA_API_KEY;
+
     try {
-        let refreshResult = await strava.oauth.refreshToken(refreshToken);
+        const refreshResponse = await axios.post('https://www.strava.com/api/v3/oauth/token', null, {
+            params: {
+                client_id: process.env.STRAVA_CLIENT_ID,
+                client_secret: process.env.STRAVA_API_KEY,
+                grant_type: 'refresh_token',
+                refresh_token: refreshToken
+            }
+        });
+
+        const refreshResult = refreshResponse.data;
         res.status(200).json(refreshResult);    
     } catch (err : any) {
         res.status(err.statusCode).json(err.error)
