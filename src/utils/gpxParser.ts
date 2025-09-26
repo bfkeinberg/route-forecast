@@ -621,7 +621,7 @@ class AnalyzeRoute {
             currentForecast = forecast.pop();
             // calculate adjusted forecast time for table display purposes
             if (currentForecast) {
-                const initialForecastTime = DateTime.fromISO(currentForecast.time);
+                const initialForecastTime = DateTime.fromISO(currentForecast.time, {zone:timeZoneId});
                 adjustedTimes.push({time:initialForecastTime.plus({minutes:totalMinutesLost}),index:forecastIndex})    
                 currentControl = AnalyzeRoute.calculateValuesForWind(controls, previouslyCalculatedValues,
                     calculatedValues, currentControl, (totalDistMeters*kmToMiles)/1000, totalMinutesLost, start, totalDistanceInKm*kmToMiles, timeZoneId);
