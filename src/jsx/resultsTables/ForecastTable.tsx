@@ -319,7 +319,7 @@ const ForecastTable = (adjustedTimes : AdjustedTimes) => {
                         end={index!==forecast.length-1?forecast[index+1].distance*milesToMeters:maxDistanceInKm*1000}
                         className={selectedRow===point.distance*milesToMeters?'highlighted':undefined}
                         onClick={toggleRange} onMouseEnter={updateWeatherRange}>
-                        <td><span style={styleForControl(point)} className='timeCell'><Time time={index === forecast.length-1 ? undefined : getAdjustedTime(point,index,adjustedTimes, i18n)} zone={point.zone} i18n={i18n}/></span></td>
+                        <td><span style={styleForControl(point)} className='timeCell'><Time time={getAdjustedTime(point,index,adjustedTimes, i18n)} zone={point.zone} i18n={i18n}/></span></td>
                         <td style={styleForControl(point)}>{metric ? ((point.distance*milesToMeters)/1000).toFixed(0) : point.distance}</td>
                         <td>{point.summary}</td>
                         <td>{showApparentTemp?
