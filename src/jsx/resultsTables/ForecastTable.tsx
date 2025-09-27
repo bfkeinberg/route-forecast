@@ -66,7 +66,7 @@ type AdjustedTimes = {adjustedTimes:Array<{time:DateTime, index:number}>}
 const getAdjustedTime = (point : Forecast, index : number, adjustedTimes : AdjustedTimes, i18n : i18n) => {
     const timeFormat = getTimeFormat(i18n)
     if (adjustedTimes && adjustedTimes.adjustedTimes && adjustedTimes.adjustedTimes.length > 0 &&
-        adjustedTimes.adjustedTimes.findIndex(element => element.index === index) !== -1) {
+        adjustedTimes.adjustedTimes.findIndex(element => element.index === index-1) !== -1) {
         const adjustedTimeFound = adjustedTimes.adjustedTimes.find(element => element.index === index);
         return adjustedTimeFound ? adjustedTimeFound.time.setLocale(i18n.language).toFormat(timeFormat) : formatReturnedTime(point, i18n, timeFormat)
     } else {
@@ -255,7 +255,7 @@ const ForecastTable = (adjustedTimes : AdjustedTimes) => {
 
     const timeIsAdjusted = (adjustedTimes: AdjustedTimes, index: number) => {
         if (adjustedTimes && adjustedTimes.adjustedTimes && adjustedTimes.adjustedTimes.length > 0) {
-            return (adjustedTimes.adjustedTimes.findIndex(element => element.index === index) !== -1)
+            return (adjustedTimes.adjustedTimes.findIndex(element => element.index === index-1) !== -1)
         }
         return false
     }
