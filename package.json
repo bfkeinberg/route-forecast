@@ -108,7 +108,7 @@
     "@babel/preset-react": "^7.10.4",
     "@sentry/webpack-plugin": "^3.1.1",
     "@tsconfig/node22": "^22.0.0",
-    "@types/chrome": "^0.0.326",
+    "@types/chrome": "^0.1.22",
     "@types/google.maps": "^3.58.1",
     "@types/jest": "^29.5.14",
     "@types/node": "^24.0.4",
