@@ -1,14 +1,13 @@
-import {Button} from '@blueprintjs/core';
 import LadyBug from 'Images/gustavorezende_lady_bug-555px.png';
 import {useRef, useEffect} from 'react';
 import {useTranslation} from 'react-i18next'
 import { useMediaQuery } from "react-responsive";
 import * as Sentry from "@sentry/react";
-
+import { Button } from '@mantine/core';
 const BugReportButton = () => {
         const buttonRef = useRef<HTMLButtonElement>(null)
-        const buttonDimensions = useMediaQuery({ query: '(min-width: 1300px)' }) ? { height: "45", width: "32" } : { height: "34", width: "25" }
-        const buttonHeight = useMediaQuery({ query: '(min-width: 1300px)' }) ? '47px' : '36px'
+        const buttonDimensions = useMediaQuery({ query: '(min-width: 1300px)' }) ? { height: "39px", width: "28px" } : { height: "34px", width: "25px" }
+        const buttonHeight = useMediaQuery({ query: '(min-width: 1300px)' }) ? '40px' : '30px'
         const { t } = useTranslation()
         useEffect(() => {
                 const feedback = Sentry.feedbackIntegration({autoInject:false, isEmailRequired:false})
@@ -17,13 +16,14 @@ const BugReportButton = () => {
                 }
         })
         return (
-                <Button className="pt-intent-warning"
+                <Button
                         style={{ height: buttonHeight }}
-                        text={t('buttons.bugReport')}
-                        size="small"
+                        size="sm"
                         ref={buttonRef}
+                        rightSection={<img style={buttonDimensions} id='bugImage' src={LadyBug} />}
+                        variant='default'
                 >
-                        <img style={buttonDimensions} id='bugImage' src={LadyBug} />
+                        {t('buttons.bugReport')}                        
                 </Button>
         );
 };

@@ -33,7 +33,6 @@ module.exports = (env, argv) => {
                     use: [{ loader: "source-map-loader" }],
                     "exclude": [
                         path.join(process.cwd(), 'node_modules/react-responsive'),
-                        path.join(process.cwd(), 'node_modules/@blueprintjs')
                     ],
                 },
                 {
@@ -45,15 +44,41 @@ module.exports = (env, argv) => {
                     test: /\.scss$/,
                     use: [
                         devMode ? "style-loader" : MiniCssExtractPlugin.loader, // creates style nodes from JS strings
-                        "css-loader", // translates CSS into CommonJS
+                        {
+                            loader:"css-loader", // translates CSS into CommonJS
+                            options:{
+                                modules: true, // Enable CSS Modules
+                                importLoaders: 1, // Number of loaders applied before css-loader                                
+                            }
+                        },                        
                         "sass-loader" // compiles Sass to CSS, using Node Sass by default
                     ]
                 },
                 {
-                    test: /\.css$/,
+                    test: /\.module\.css$/,
                     use: [
-                        MiniCssExtractPlugin.loader,
-                        "css-loader"
+                        devMode ? "style-loader" : MiniCssExtractPlugin.loader, // creates style nodes from JS strings
+                        {
+                            loader:"css-loader", // translates CSS into CommonJS
+                            options:{
+                                modules: true, // Enable CSS Modules
+                                importLoaders: 2, // Number of loaders applied before css-loader                                
+                            }
+                        },                        
+                    ]
+                },
+                {
+                    test: /\.css$/,
+                    exclude: /\.module\.css$/,
+                    use: [
+                        devMode ? "style-loader" : MiniCssExtractPlugin.loader, // creates style nodes from JS strings
+                        {
+                            loader:"css-loader", // translates CSS into CommonJS
+                            options:{
+                                modules: false, // Enable CSS Modules
+                                importLoaders: 3, // Number of loaders applied before css-loader                                
+                            }
+                        },                        
                     ]
                 },
                 {

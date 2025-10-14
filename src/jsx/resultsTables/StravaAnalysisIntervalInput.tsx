@@ -1,9 +1,8 @@
-import {FormGroup, Tooltip} from "@blueprintjs/core";
 import { connect, ConnectedProps } from 'react-redux';
-import {useTranslation} from 'react-i18next'
+import { useTranslation } from 'react-i18next'
 import { analysisIntervalSet } from "../../redux/stravaSlice";
 import type { RootState } from "../../redux/store";
-import { Combobox, useCombobox, InputBase } from '@mantine/core'
+import { Combobox, useCombobox, InputBase, Tooltip, Flex } from '@mantine/core'
 
 type PropsFromRedux = ConnectedProps<typeof connector>
 const StravaAnalysisIntervalInput = ({ interval, setInterval }: PropsFromRedux) => {
@@ -27,50 +26,52 @@ const StravaAnalysisIntervalInput = ({ interval, setInterval }: PropsFromRedux) 
 
     const interval_tooltip_text = t('tooltips.analysisInterval');
     return (
-        <FormGroup style={{ flex: '1' }}>
+        <Flex direction={"column"} justify={"center"} style={{ flex: '1' }}>
             <div style={{ fontSize: "14px", fontWeight: "bold" }}>Analysis Interval</div>
-            <Tooltip placement="bottom" content={interval_tooltip_text}>
-                <Combobox
-                    store={combobox}
-                    onOptionSubmit={(selected: string) => {
-                        setInterval(selected)
-                        combobox.closeDropdown();
-                    }
-                    }
-                >
-                    <Combobox.Target>
-                        <InputBase
-                            component="button"
-                            type="button"
-                            pointer
-                            onClick={() => combobox.toggleDropdown()}
-                            rightSection={<Combobox.Chevron />}
-                            rightSectionPointerEvents="none"
-                        >
-                            {interval}
-                        </InputBase>
-                    </Combobox.Target>
+            <Combobox
+                store={combobox}
+                onOptionSubmit={(selected: string) => {
+                    setInterval(selected)
+                    combobox.closeDropdown();
+                }
+                }
+            >
+                <Tooltip label={interval_tooltip_text}>
+                    <div>
+                        <Combobox.Target>
+                            <InputBase
+                                component="button"
+                                type="button"
+                                pointer
+                                onClick={() => combobox.toggleDropdown()}
+                                rightSection={<Combobox.Chevron />}
+                                rightSectionPointerEvents="none"
+                            >
+                                {interval} {t('analysis.interval')}
+                            </InputBase>
+                        </Combobox.Target>
+                    </div>
+                </Tooltip>
 
-                    <Combobox.Dropdown className="dropdown">
-                        <Combobox.Options>
-                            {options}
-                        </Combobox.Options>
-                    </Combobox.Dropdown>
-                </Combobox>
+                <Combobox.Dropdown className="dropdown">
+                    <Combobox.Options>
+                        {options}
+                    </Combobox.Options>
+                </Combobox.Dropdown>
+            </Combobox>
 
-            </Tooltip>
-        </FormGroup>
+        </Flex >
     );
 };
 
-const mapStateToProps = (state : RootState) =>
-    ({
-        interval: state.strava.analysisInterval
-    });
+const mapStateToProps = (state: RootState) =>
+({
+    interval: state.strava.analysisInterval
+});
 
 const mapDispatchToProps = {
-    setInterval:analysisIntervalSet
+    setInterval: analysisIntervalSet
 };
 
-const connector = connect(mapStateToProps,mapDispatchToProps)
+const connector = connect(mapStateToProps, mapDispatchToProps)
 export default connector(StravaAnalysisIntervalInput);

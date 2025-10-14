@@ -1,4 +1,3 @@
-import { HotkeysProvider, OverlaysProvider } from "@blueprintjs/core";
 import { Provider } from 'react-redux';
 import { useContext } from "react";
 import LocationContext from '../locationContext';
@@ -13,12 +12,8 @@ const TopLevel = ({ action, maps_api_key, timezone_api_key, bitly_token, preload
     return (
         <Sentry.ErrorBoundary  fallback={<h2>Something went wrong.</h2>}>
             <Provider store={store}>
-                <OverlaysProvider>
-                    <HotkeysProvider>
-                        {<RouteWeatherUI search={search} href={href} action={action} maps_api_key={maps_api_key}
-                            timezone_api_key={timezone_api_key} bitly_token={bitly_token} origin={origin} />}
-                    </HotkeysProvider>
-                </OverlaysProvider>
+                {<RouteWeatherUI search={search} href={href} action={action} maps_api_key={maps_api_key}
+                    timezone_api_key={timezone_api_key} bitly_token={bitly_token} origin={origin} />}
             </Provider>
         </Sentry.ErrorBoundary>
     )

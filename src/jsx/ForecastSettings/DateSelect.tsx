@@ -1,4 +1,3 @@
-import {Icon} from '@blueprintjs/core';
 import { DateTime } from 'luxon';
 import {connect, ConnectedProps} from 'react-redux';
 import { DateTimePicker } from '@mantine/dates';
@@ -6,12 +5,12 @@ import { DateTimePicker } from '@mantine/dates';
 import {setStart} from "../../redux/actions";
 import { setTimeFromIso } from "../../redux/actions";
 import { initialStartTimeSet } from "../../redux/routeParamsSlice";
-import {useMediaQuery} from 'react-responsive'
-// import { Tooltip } from "@blueprintjs/core";
 import {useTranslation} from 'react-i18next'
 import type { RootState } from "../../redux/store";
 import { ActionCreatorWithPayload } from "@reduxjs/toolkit";
 type PropsFromRedux = ConnectedProps<typeof connector>
+import { Calendar } from 'tabler-icons-react';
+import { DesktopTooltip } from '../shared/DesktopTooltip';
 
 export const setDateOnly = (start : DateTime, setInitialStart : ActionCreatorWithPayload<{
     start: string;
@@ -24,10 +23,6 @@ export const setDateOnly = (start : DateTime, setInitialStart : ActionCreatorWit
 
 const DateSelect = ({ start, zone, setStart, initialStartTimeSet, maxDaysInFuture, canForecastPast, setTimeFromIso } : PropsFromRedux) => {
     const { t, i18n } = useTranslation()
-    const setDateWithZone = (zone : string) => {
-        setTimeFromIso(start.toISO({includeOffset:false})!, zone)
-    }
-
     const setDateFromPicker = (dateTimeString : string|null) => {
         if (dateTimeString) {
             console.log(dateTimeString)
@@ -35,14 +30,11 @@ const DateSelect = ({ start, zone, setStart, initialStartTimeSet, maxDaysInFutur
         }
     }
 
-    const keyDownHandler = (ev: any, unit: any) => console.log(ev, unit)
-    
     // allow us to continue to show the start time if the route was forecast for a time before the present
     const now = new Date();
     let later = new Date();
     const daysToAdd = maxDaysInFuture;
     later.setDate(now.getDate() + daysToAdd);
-    const hideTooltip = useMediaQuery({query:'(maxWidth={500}'})
     interface OtherAttributes {
         minDate? : Date
     }
@@ -54,36 +46,39 @@ const DateSelect = ({ start, zone, setStart, initialStartTimeSet, maxDaysInFutur
     startIso = start.toISO()
     if (startIso===null)
         startIso=undefined
+
+    const shortTimeZoneName = start.toFormat("ZZZZ")
+
     return (
         <div style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
             <span id={"startingTime"} style={{ fontSize: ".875rem", fontWeight: "bolder", padding: "0px 5px", flex: 1 }}>
-                <Icon icon="calendar" onClick={() => setDateOnly(start, initialStartTimeSet)} style={{ cursor: "pointer", marginRight: "3px" }} />
+                <Calendar onClick={() => setDateOnly(start, initialStartTimeSet)} style={{ cursor: "pointer", marginRight: "3px" }} />
                 {t('labels.startingTime')}
             </span>
-            <div style={{ flex: 2.5 } }>
-                {/* <Tooltip disabled={hideTooltip} targetTagName={'div'} content={t('tooltips.startingTime')} placement={'top'}> */}
-                <DateTimePicker
-                    placeholder="M/D/YYYY" 
-                    rightSection={<span style={{paddingRight:5}}>{zone}</span>} 
-                    rightSectionWidth={"max-content"}
-                    rightSectionPointerEvents="auto"
-                    required                 
-                    firstDayOfWeek={1}
-                    {...otherAttributes}
-                    inputSize="20"
-                    maxDate={later}
-                    level={"month"}
-                    locale={i18n.language}
-                    value={start.toISO()}
-                    onChange={setDateFromPicker}
-                    highlightToday={false}
-                    valueFormat='MMMM d, YYYY h:mma'
-                    timePickerProps={{minutesStep:5,format:"12h"}}
-                />
-                    {/* </Tooltip> */}
+            <div style={{ flex: 2.5 }}>
+                <DesktopTooltip label={t('tooltips.startingTime')} >
+                    <DateTimePicker
+                        placeholder="M/D/YYYY"
+                        rightSection={<span style={{ paddingRight: 4 }}>{shortTimeZoneName}</span>}
+                        rightSectionWidth={"max-content"}
+                        rightSectionPointerEvents="auto"
+                        required
+                        firstDayOfWeek={1}
+                        {...otherAttributes}
+                        inputSize="20"
+                        maxDate={later}
+                        level={"month"}
+                        locale={i18n.language}
+                        value={start.toISO()}
+                        onChange={setDateFromPicker}
+                        highlightToday={false}
+                        valueFormat='MMMM d, YYYY h:mma'
+                        timePickerProps={{ minutesStep: 5, format: "12h" }}
+                    />
+                </DesktopTooltip>
             </div>
         </div>
-    );
+    )
 };
 
 const mapStateToProps = (state : RootState) =>

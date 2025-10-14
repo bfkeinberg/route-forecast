@@ -1,23 +1,25 @@
-import { FormGroup,InputGroup } from '@blueprintjs/core';
-import { IconNames } from '@blueprintjs/icons';
 import ReactGA from "react-ga4";
 import {connect} from 'react-redux';
 import * as Sentry from "@sentry/react";
-import { AppToaster } from '../shared/toast';
 import type { RootState } from "../../redux/store";
+import {ArrowUpSquare} from "tabler-icons-react"
+import { TextInput } from '@mantine/core';
+import {useTranslation} from 'react-i18next'
+import { notifications } from '@mantine/notifications';
 
 const ShortUrl = ({shortUrl} : {shortUrl:string}) => {
+    const { t } = useTranslation()
     return (
-        <FormGroup inline={true} style={{ display: shortUrl === ' ' ? 'none' : 'inline-flex', margin: "0px 10px"}}>
+        <div style={{ display: shortUrl === ' ' ? 'none' : 'inline-flex', margin: "0px 10px", flexDirection:"column", justifyContent:"flex-start"}}>
             <div style={{width: "150px", display: "flex", alignItems: "center"}}>
-                <div>Shareable link:</div>
+                <div>{t('labels.share')}</div>
             </div>
-            <InputGroup leftIcon={IconNames.SHARE} id={'shortUrl'} size="small" readOnly fill={false} type="text" value={shortUrl}
+            <TextInput leftSection={<ArrowUpSquare/>} id={'shortUrl'} size="xs" readOnly type="text" value={shortUrl}
                    onClick={async event => {
                     if (navigator.clipboard) {
                        try {
                             await navigator.clipboard.writeText((event.target as HTMLInputElement).value);
-                            (await AppToaster).show({ message: "Short URL copied", timeout:3000, isCloseButtonShown: false });
+                            notifications.show({ message: "Short URL copied", autoClose:3000, withCloseButton: false });
                        } catch (err) {
                            Sentry.captureException(err);
                            (event.target as HTMLInputElement).select();document.execCommand('copy');
@@ -27,7 +29,7 @@ const ShortUrl = ({shortUrl} : {shortUrl:string}) => {
                         (event.target as HTMLInputElement).select();document.execCommand('copy');
                     }
                     ReactGA.event('share', {item_id:(event.target as HTMLInputElement).value})}}/>
-        </FormGroup>
+        </div>
     );
 };
 

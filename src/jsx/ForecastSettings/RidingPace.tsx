@@ -1,17 +1,15 @@
 import "./RidingPace.css"
 
-import { FormGroup } from "@blueprintjs/core";
 import {connect, ConnectedProps} from 'react-redux';
-
-import { saveCookie } from "../../utils/util";
 import { setPace } from "../../redux/actions";
 import { useActualPace, useFormatSpeed } from '../../utils/hooks';
-import { inputPaceToSpeed, metricPaceToSpeed, paceToSpeed } from '../../utils/util';
+import { inputPaceToSpeed, metricPaceToSpeed, paceToSpeed, saveCookie, milesToMeters } from '../../utils/util';
 import { DesktopTooltip } from '../shared/DesktopTooltip';
 import {useTranslation} from 'react-i18next'
-import { milesToMeters } from '../../utils/util'
 import type { RootState } from "../../redux/store";
-import { Combobox, useCombobox, InputBase } from '@mantine/core'
+import { Combobox, useCombobox, Flex, Button } from '@mantine/core'
+import { maxWidthForMobile } from '../../utils/util';
+import  {useMediaQuery} from 'react-responsive';
 
 type PropsFromRedux = ConnectedProps<typeof connector>
 
@@ -102,6 +100,7 @@ const RidingPace = ({ pace, setPace, metric }: PropsFromRedux) => {
     const combobox = useCombobox()
     const { t } = useTranslation()
     const actualPace = useActualPace()
+    const onDesktop = useMediaQuery({query:`(min-width: ${maxWidthForMobile})`})
 
     // convert mph to kph if we are using metric
     const cvtMilesToKm = (distance: number) => {
@@ -131,39 +130,40 @@ const RidingPace = ({ pace, setPace, metric }: PropsFromRedux) => {
     ))
 
     return (
-        <DesktopTooltip content={pace_text} className={pace_tooltip_class}>
-            <FormGroup style={{ flex: 3, fontSize: "90%" }} label={<span><b>{t('labels.ridingPace')}</b></span>} labelFor={'paceInput'}>
-                <Combobox
-                    store={combobox}
-                    onOptionSubmit={(selected: string) => {
-                        saveCookie("pace", selected)
-                        setPace(selected)
-                        combobox.closeDropdown();
-                    }}
-                >
-                    <Combobox.Target>
-                        <InputBase
-                            component="button"
-                            type="button"
-                            pointer
-                            onClick={() => combobox.toggleDropdown()}
-                            rightSection={<Combobox.Chevron />}
-                            rightSectionPointerEvents="none"
-                            id={'paceInput'}
-                        >
-                            {selectedSpeed}
-                        </InputBase>
-                    </Combobox.Target>
-
-                    <Combobox.Dropdown className="dropdown">
-                        <Combobox.Options>
-                            {options}
-                        </Combobox.Options>
-                    </Combobox.Dropdown>
-                </Combobox>
-
-            </FormGroup>
-        </DesktopTooltip>
+        <Flex direction={"column"} justify={"center"} style={{ flex: onDesktop ? 1: 0, fontSize: "80%" }}>
+            <label htmlFor="paceInput"><span><b>{t('labels.ridingPace')}</b></span></label>
+            {<Combobox
+                store={combobox}
+                onOptionSubmit={(selected: string) => {
+                    saveCookie("pace", selected)
+                    setPace(selected)
+                    combobox.closeDropdown();
+                }}
+            >
+                <DesktopTooltip label={pace_text} className={pace_tooltip_class}>
+                    <div>
+                        <Combobox.Target>
+                            <Button
+                                component="button"
+                                type="button"
+                                size={"sm"}
+                                onClick={() => combobox.toggleDropdown()}
+                                rightSection={<Combobox.Chevron />}
+                                variant="default"
+                                id={'paceInput'}
+                            >
+                                {`${selectedSpeed} ${metric ? paceValues.metric.label : paceValues.imperialLikeAPenguin.label}`}
+                            </Button>
+                        </Combobox.Target>
+                    </div>
+                </DesktopTooltip>
+                <Combobox.Dropdown className="dropdown">
+                    <Combobox.Options>
+                        {options}
+                    </Combobox.Options>
+                </Combobox.Dropdown>
+            </Combobox>}
+        </Flex>
     );
 };
 

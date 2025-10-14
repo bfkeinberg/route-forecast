@@ -1,4 +1,3 @@
-import { Button } from '@blueprintjs/core';
 import Slider from "@mui/material/Slider"
 import Typography from '@mui/material/Typography'
 
@@ -8,6 +7,7 @@ import { segmentSet } from '../../redux/routeParamsSlice'
 import { milesToMeters } from '../../utils/util';
 import {useTranslation} from 'react-i18next'
 import Tooltip from '@mui/material/Tooltip'
+import Button from "@mui/material/Button"
 
 const Segment = () => {
     const dispatch = useAppDispatch()
@@ -60,11 +60,11 @@ const Segment = () => {
         <>
             <div style={{ display: "flex", justifyContent: "space-between" }}>
                 <Typography gutterBottom>{t('labels.customSegment')}</Typography>
-                <Button disabled={!canDoUserSegment} onClick={resetSegment}>Reset</Button>
+                <Button disabled={!canDoUserSegment} variant='outlined' onClick={resetSegment}>Reset</Button>
             </div>
             <Tooltip describeChild arrow title={t('tooltips.customSegment')}>
                 <Slider marks value={getSliderValue(segment)} valueLabelFormat={sliderLabelRenderer} valueLabelDisplay='auto'
-                    getAriaLabel={() => 'Route segment'}
+                    getAriaLabel={() => 'Route segment'} style={{width:'96%', marginLeft:'5px'}}
                     min={0} max={maxDistance} onChange={segmentUpdate} disabled={!canDoUserSegment} />
             </Tooltip>
         </>)

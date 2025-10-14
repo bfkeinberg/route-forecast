@@ -1,7 +1,6 @@
-import { Button, Spinner } from '@blueprintjs/core';
 import * as Sentry from "@sentry/react";
 import axios from 'axios';
-import {Suspense, useEffect, lazy, SetStateAction, Dispatch, useState} from 'react';
+import React, {Suspense, useEffect, lazy, SetStateAction, Dispatch, useState} from 'react';
 import ReactGA from "react-ga4";
 import {connect, ConnectedProps} from 'react-redux';
 import {useTranslation} from 'react-i18next'
@@ -11,6 +10,8 @@ import type { ErrorPayload } from '../../redux/dialogParamsSlice';
 import type { RootState } from "../../redux/store";
 import { ActionCreatorWithPayload } from '@reduxjs/toolkit';
 import Snackbar, {SnackbarCloseReason} from '@mui/material/Snackbar';
+import { Button } from "@mantine/core";
+import {Star} from "tabler-icons-react"
 
 const addBreadcrumb = (msg : string) => {
     Sentry.addBreadcrumb({
@@ -22,7 +23,7 @@ const addBreadcrumb = (msg : string) => {
 
 type PropsFromRedux = ConnectedProps<typeof connector>
 type RouteListType = Promise<typeof import(/* webpackChunkName: "RouteList" */ './RWGPSRouteList')>
-type DynamicRouteListType = RouteListType | Promise<{default:() => JSX.Element}>
+type DynamicRouteListType = RouteListType | Promise<{default:() => React.JSX.Element}>
 const LoadableRouteList = lazy(() : DynamicRouteListType => {addBreadcrumb('loading route list'); return import(/* webpackChunkName: "RouteList" */ './RWGPSRouteList').catch((err) => {
     addBreadcrumb(`failed to load pinned routes : ${JSON.stringify(err)}`)
     return {default: () => <div>Failed to load pinned route list - {err.message}</div>}
@@ -116,19 +117,20 @@ const PinnedRouteLoader = ({rwgpsToken, rwgpsTokenSet, credentialsValid,
         setShowPinnedRoutes(false)
     }
 
+    const starFill = usingPinnedRoutes ? "#4C5897" : "white"
     return (
         <>
-            <Button intent="primary"
-                size='small'
-                variant={usingPinnedRoutes?'outlined':'solid'}
-                active={usingPinnedRoutes}
-                icon="star"
+            <Button
+                size='xs'
+                variant={usingPinnedRoutes?'outline':'filled'}
+                autoContrast
                 loading={loadingPinnedRoutes}
                 className={button_class}
-                text={usingPinnedRoutes ? t('buttons.dontUsePinned') : t('buttons.usePinned')}
-                style={{fontSize: "13px"}}
+                leftSection={<Star style={{fill:starFill, stroke:usingPinnedRoutes?"#3c4988":"white"}}/>}
+                style={{fontSize: "12px", color:usingPinnedRoutes?"#4C5897":"white", background:usingPinnedRoutes?"#bdc2de":"##2d72d2"}}
                 onClick={() => {setDisplayRoutesError(true); togglePinnedRoutes(usePinnedRoutesSet, setShowPinnedRoutes, usingPinnedRoutes)}}
-            />
+            >{usingPinnedRoutes ? t('buttons.dontUsePinned') : t('buttons.usePinned')}
+            </Button>
             {credentialsValid ?
             (
                 usingPinnedRoutes && hasRoutes && (

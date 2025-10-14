@@ -67,7 +67,7 @@ function makeBounds(locations : Location[]|AQILocation[]): google.maps.LatLngBou
     return bounds;
 }
 
-  const MarkerWithInfoWindow = ({location} : {location : Location}) : JSX.Element => {
+  const MarkerWithInfoWindow = ({location} : {location : Location}) : React.JSX.Element => {
     // `markerRef` and `marker` are needed to establish the connection between
     // the marker and infowindow (if you're using the Marker component, you
     // can use the `useMarkerRef` hook instead).

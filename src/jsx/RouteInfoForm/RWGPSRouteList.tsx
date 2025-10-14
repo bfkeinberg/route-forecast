@@ -1,4 +1,4 @@
-import { Map } from "@blueprintjs/icons";
+import { Map } from "tabler-icons-react";
 import {useRef} from 'react';
 
 import { loadFromRideWithGps } from "../../redux/loadRouteActions";

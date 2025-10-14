@@ -1,10 +1,9 @@
-import { FormGroup,InputGroup } from '@blueprintjs/core'
 import { connect, ConnectedProps } from 'react-redux';
 
 import { stravaActivitySet } from '../../redux/stravaSlice';
 import { ActionCreatorWithPayload } from '@reduxjs/toolkit';
 import type { RootState } from "../../redux/store";
-
+import { Flex, Input } from '@mantine/core';
 type StravaActivityIdProps = {
     canAnalyze: boolean
     strava_activity: string
@@ -13,8 +12,9 @@ type StravaActivityIdProps = {
 type PropsFromRedux = ConnectedProps<typeof connector>
 const StravaActivityIdInput = ({ stravaActivitySet, strava_activity, canAnalyze } : StravaActivityIdProps) => {
     return (
-        <FormGroup label={<span><b>Strava Activity Id</b></span>} labelFor={"stravaActivity"}>
-            <InputGroup style={{fontSize:"16px"}} autoFocus id='stravaActivity' tabIndex={0} type="text"
+        <Flex direction={"column"} justify={"center"}>
+            <label style={{fontSize:"90%"}} htmlFor={"stravaActivity"}>{<span><b>Strava Activity Id</b></span>}</label>
+            <Input style={{fontSize:"16px"}} autoFocus id='stravaActivity' tabIndex={0} type="text"
                 onDrop={event => {
                     let dt = event.dataTransfer;
                     if (dt.items) {
@@ -57,7 +57,7 @@ const StravaActivityIdInput = ({ stravaActivitySet, strava_activity, canAnalyze 
                     }
                 }}
                 onBlur={() => { if (strava_activity !== '') { /*updateExpectedTimes(strava_activity)*/ } }} />
-        </FormGroup>
+        </Flex>
     );
 };
 

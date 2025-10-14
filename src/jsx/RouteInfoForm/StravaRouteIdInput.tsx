@@ -1,14 +1,14 @@
-import { FormGroup,InputGroup } from '@blueprintjs/core'
 import {connect, ConnectedProps} from 'react-redux';
 import type { RootState } from "../../redux/store";
 import { stravaRouteSet } from '../../redux/stravaSlice';
-
+import { Flex, Input } from '@mantine/core';
 type PropsFromRedux = ConnectedProps<typeof connector>
 
 const StravaRouteIdInput = ({ stravaRouteSet, strava_route } : PropsFromRedux) => {
     return (
-        <FormGroup label={<span><b>Strava Route Id</b></span>} labelFor={"stravaRoute"}>
-            <InputGroup style={{fontSize:"16px"}} id='stravaRoute' tabIndex={1} type="text"
+        <Flex direction={"column"} justify={"center"} >
+            <label style={{fontSize:"90%"}} htmlFor={"stravaRoute"}>{<span><b>Strava Route Id</b></span>}</label>
+            <Input style={{fontSize:"16px"}} id='stravaRoute' tabIndex={1} type="text"
                 onDrop={event => {
                     let dt = event.dataTransfer;
                     if (dt.items) {
@@ -40,7 +40,7 @@ const StravaRouteIdInput = ({ stravaRouteSet, strava_route } : PropsFromRedux) =
                 value={strava_route}
                 onChange={event => { stravaRouteSet(event.target.value) }}
                 onBlur={() => { if (strava_route !== '') { /*updateExpectedTimes(strava_activity)*/ } }} />
-        </FormGroup>
+        </Flex>
     );
 };
 

@@ -1,11 +1,11 @@
-import {Button,FormGroup, InputGroup} from '@blueprintjs/core';
 import {connect, ConnectedProps} from 'react-redux';
 import {useTranslation} from 'react-i18next'
 import * as Sentry from "@sentry/react";
 import { routeDataCleared} from '../../redux/routeInfoSlice';
 import { rwgpsRouteSet } from '../../redux/routeParamsSlice';
 import type { RootState } from "../../redux/store";
-import { RefObject } from 'react';
+import { ChangeEvent, RefObject } from 'react';
+import { CloseButton, Flex, Input } from '@mantine/core';
 
 export const decideValidationStateFor = (type : string, methodUsed : string|null, loadingSuccess : boolean) => {
     if (type === methodUsed) {
@@ -21,35 +21,37 @@ export const decideValidationStateFor = (type : string, methodUsed : string|null
 
 type PropsFromRedux = ConnectedProps<typeof connector>
 interface RideWithGpsIdProps extends PropsFromRedux {
-    loadButtonRef:RefObject<HTMLButtonElement>
+    loadButtonRef:RefObject<HTMLButtonElement|null>
 }
 
 const RideWithGpsId = ({rwgpsRouteSet,loadingSource,loadingSuccess,rwgpsRoute,routeDataCleared,loadButtonRef} : RideWithGpsIdProps) => {
     const { t } = useTranslation()
     const isNumberKey = function(event:React.KeyboardEvent<HTMLInputElement>) {
         const charCode = (event.which) ? event.which : event.keyCode;
-        if (charCode === 13 && loadButtonRef.current) {
+        if (charCode === 13 && loadButtonRef && loadButtonRef.current) {
             loadButtonRef.current.click()
         }
     };
 
-    const settingRoute = (route : string) => {
-        rwgpsRouteSet(route);
+    const settingRoute = (value: ChangeEvent<HTMLInputElement>|string) => {
+        rwgpsRouteSet(typeof value === "string" ? value : value.target?.value);
         routeDataCleared();
     };
 
     const clearRoute = () => {
-        settingRoute('')
+        rwgpsRouteSet('')
+        routeDataCleared();
     }
 
+    // set font size of input to keep Mobile Safari from zooming
     return (
-        // set size to keep Mobile Safari from zooming
-        <FormGroup inline={false} label={<span style={{fontSize:"90%"}} ><b>{t('titles.rwgpsId')}</b></span>} labelFor={'rwgps_route'} >
-            <InputGroup id={'rwgps_route'} style={{fontSize:"16px"}} className={'glowing_input'} autoComplete='on'
-                   autoFocus tabIndex={0} type="text" rightElement={<Button variant='minimal' icon="delete" onClick={clearRoute}></Button>}
+        <Flex direction={"column"} justify={"center"} >
+            <label htmlFor='rwgps_route'><span style={{fontSize:"80%"}}><b>{t('titles.rwgpsId')}</b></span></label>
+            <Input id={'rwgps_route'} style={{fontSize:"16px"}} className={'glowing_input'} autoComplete='on'
+                   autoFocus tabIndex={0} type="text" rightSection={<CloseButton onClick={clearRoute}></CloseButton>}
                    {...decideValidationStateFor('rwgps',loadingSource,loadingSuccess)}
                  onKeyDown={isNumberKey}
-                 onValueChange={settingRoute}
+                 onChange={settingRoute}
                  onDrop={event => {
                      let dt = event.dataTransfer;
                      if (dt.items) {
@@ -80,7 +82,7 @@ const RideWithGpsId = ({rwgpsRouteSet,loadingSource,loadingSuccess,rwgpsRoute,ro
                  }}
                  pattern="[0-9]*"
                  value={rwgpsRoute}/>
-        </FormGroup>
+        </Flex>
     );
 };
 

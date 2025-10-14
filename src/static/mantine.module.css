@@ -1,0 +1,14 @@
+.root[data-variant='warning'] {
+    background-color: #fab461;
+    color: var(--mantine-color-black);
+}
+
+.root[data-variant='success'] {
+    background-color: #1f8550;
+    color: var(--mantine-color-white);
+}
+
+.root[data-variant='active'] {
+    background-color: #dce0e6;
+    color: var(--mantine-color-black);
+}

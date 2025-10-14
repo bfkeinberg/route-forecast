@@ -142,7 +142,7 @@ const useActualArrivalTimes = () => {
 }
 
 const usePrevious = <Type>(value : Type) => {
-  const ref = useRef<Type>();
+  const ref = useRef<Type>(null);
   useEffect(() => {
     ref.current = value;
   });

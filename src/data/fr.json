@@ -29,7 +29,8 @@
                 "source":"Source de prévisions météorologiques",
                 "customSegment":"Utiliser une longueur de segment personnalisée",
                 "degreesF":"Température en degrés F",
-                "degreesC":"Température en degrés C"
+                "degreesC":"Température en degrés C",
+                "share":"lien partageable"
             },
             "titles": {
                 "routeInfo": "Informations sur les parcours",
