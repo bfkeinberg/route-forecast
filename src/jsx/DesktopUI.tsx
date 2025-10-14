@@ -1,6 +1,5 @@
 import "./DesktopUI.css"
 
-import { Spinner } from "@blueprintjs/core";
 import React, { Suspense,useState,StrictMode, SetStateAction, Dispatch, lazy } from "react";
 import { useAppDispatch, useAppSelector } from "../utils/hooks";
 import { routeLoadingModes } from "../data/enums";
@@ -19,6 +18,7 @@ import {useTranslation} from 'react-i18next'
 import { lastErrorCleared } from '../redux/dialogParamsSlice'
 import DisplayErrorList from "./app/DisplayErrorList";
 import * as Sentry from "@sentry/react"
+import { Loader } from "@mantine/core";
 
 export type DesktopUIProps = {
     mapsApiKey: string
@@ -166,7 +166,7 @@ export const useLoadingFromURLStatus = () => {
 }
 
 type SidebarProps = {
-    sidePaneOptions: Array<{content:JSX.Element}>
+    sidePaneOptions: Array<{content:React.JSX.Element}>
     activeSidePane: number
     sidebarWidth: number
 }
@@ -212,7 +212,7 @@ const LoadingFromURLOverlay = () => {
         <>
             <RouteTitle style={{color: "white"}} className={routeData !== null ? "fade-in" : ""}/>
             <div style={{fontSize: "24px", color: "white", marginBottom: "10px"}}>Loading forecast...</div>
-            <Spinner style={{color: "white"}}/>
+            <Loader color="red"/>
         </>
     )
 }

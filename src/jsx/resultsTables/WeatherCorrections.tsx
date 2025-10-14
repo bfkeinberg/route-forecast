@@ -1,9 +1,10 @@
 import { useTranslation } from 'react-i18next'
 import { useForecastDependentValues, useAppSelector } from '../../utils/hooks';
 const gustySpeedThreshold = 25;
-import { Popover } from '@blueprintjs/core';
+import { Popover } from '@mantine/core';
 import { TimeChangeChart } from './TimeChangeChart';
 import {useState} from 'react'
+import { useDisclosure } from '@mantine/hooks';
 
 export const WeatherCorrections = () => {
   const [popoverIsOpen, setPopoverIsOpen] = useState(false)
@@ -15,15 +16,20 @@ export const WeatherCorrections = () => {
   const weatherId = (maxGustSpeed > gustySpeedThreshold) ? 'gustyWeather' : 'weatherCorrections';
 
   const lost = weatherCorrectionMinutes >= 0
-
+  const [opened, { close, open }] = useDisclosure(false);
   return (
-    <Popover onOpening={() => setPopoverIsOpen(true) } onClosing={() => setPopoverIsOpen(false)} interactionKind='hover' content={TimeChangeChart(chartData, isMetric, popoverIsOpen)}>
-      <span id={weatherId} style={{ fontSize: "14px" }}>
-        <span>
-          {Math.abs(Math.round(weatherCorrectionMinutes))} minutes <span style={{ color: lost ? "darkorange" : "deepskyblue" }}>
-            {lost ? `${t('data.wind.lost')} ` : `${t('data.wind.gained')} `}</span>{lost ? `${t('data.wind.to')}` : `${t('data.wind.from')}`}
+    <Popover onOpen={() => setPopoverIsOpen(true) } onClose={() => setPopoverIsOpen(false)} opened={opened} withArrow shadow='md' arrowPosition='side' position='right'>
+      <Popover.Target>
+        <span id={weatherId} style={{ fontSize: "14px" }} onMouseEnter={open} onMouseLeave={close}>
+          <span>
+            {Math.abs(Math.round(weatherCorrectionMinutes))} minutes <span style={{ color: lost ? "darkorange" : "deepskyblue" }}>
+              {lost ? `${t('data.wind.lost')} ` : `${t('data.wind.gained')} `}</span>{lost ? `${t('data.wind.to')}` : `${t('data.wind.from')}`}
+          </span>
         </span>
-      </span>
+      </Popover.Target>
+      <Popover.Dropdown>
+          <TimeChangeChart chartData={chartData} metric={isMetric} popoverIsOpen={popoverIsOpen}/>
+      </Popover.Dropdown>
     </Popover>
   )
 }

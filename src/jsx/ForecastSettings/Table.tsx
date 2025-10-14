@@ -1,15 +1,15 @@
-import React, { useState } from 'react';
+import React, { Ref, useState } from 'react';
 
 interface Column {
   name:string
   editable?: boolean
-  cellStyle?: JSX.Element | {}
+  cellStyle?: React.JSX.Element | {}
   valueTransformFunction?: (value: string) => string
   editValidateFunction?: (value: string) => boolean
   editTransformFunction?: (value: string) => string
   editCompleteFunction?: (value: string) => string
-  headerStyle?: JSX.Element | {}
-  render?: JSX.Element | string
+  headerStyle?: React.JSX.Element | {}
+  render?: React.JSX.Element | string
 }
 
 const pickTabIndex = (column: Column) => {
@@ -118,13 +118,12 @@ const Cell = ({ value, transformFunction, editTransformFunction, editCompleteFun
     }
   }
 
-
   return (
     editingValue !== null ?
       <div>
         <input autoFocus value={editingValue} style={{ width: "40px" }} onFocus={(event) => event.target.select()} onChange={(event) => valueEdited(event.target.value)} onBlur={endEditing} />
       </div> :
-      <div autoFocus={autoFocus} ref={field => field && autoFocus && field.focus()} style={{ cursor: editable ? "pointer" : "", width: "100%", height: "100%" }} tabIndex={tabIndex} onClick={beginEditing} onFocus={beginEditing}>
+      <div autoFocus={autoFocus} ref={field => {field && autoFocus && field.focus()}} style={{ cursor: editable ? "pointer" : "", width: "100%", height: "100%" }} tabIndex={tabIndex} onClick={beginEditing} onFocus={beginEditing}>
         {value !== undefined && transformFunction(value)}
       </div>
   )

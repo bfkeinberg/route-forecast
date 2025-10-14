@@ -185,7 +185,7 @@ class AnalyzeRoute {
     }
 
     businessFromText = (coursePoint : RwgpsCoursePoint) => {
-        const matched = coursePoint.description ? coursePoint.description.match(/_(?<resto>.*)_/) : coursePoint.n.match(/_(?<resto>.*)_/) 
+        const matched = coursePoint.description ? coursePoint.description.match(/_(?<resto>.*)_/) : (coursePoint.n ? coursePoint.n.match(/_(?<resto>.*)_/) : undefined)
         return (matched && matched.groups) ? matched.groups.resto : undefined
     }
 

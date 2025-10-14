@@ -29,7 +29,8 @@
                 "source":"Weather forecast source",
                 "customSegment":"Use custom segment length",
                 "degreesF":"Temperature in degrees F",
-                "degreesC":"Temperature in degrees C"
+                "degreesC":"Temperature in degrees C",
+                "share":"Shareable link"
             },
             "titles": {
                 "routeInfo": "Route info",

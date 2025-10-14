@@ -1,7 +1,6 @@
 
-import { Button, FormGroup, InputGroup,Intent } from '@blueprintjs/core';
 import * as Sentry from "@sentry/react";
-import React, { useRef } from 'react';
+import React, { ChangeEvent, useRef } from 'react';
 import ReactGA from "react-ga4"
 
 import { loadFromRideWithGps } from '../../redux/loadRouteActions';
@@ -9,6 +8,8 @@ import { errorDetailsSet } from '../../redux/dialogParamsSlice';
 import { rusaIdLookupApiSlice } from '../../redux/rusaLookupApiSlice';
 import { rusaPermRouteIdSet, rwgpsRouteSet } from '../../redux/routeParamsSlice';
 import { useAppDispatch, useAppSelector } from '../../utils/hooks';
+import {Button, CloseButton, Flex, Input} from "@mantine/core"
+
 export const RouteInfoInputRUSA = () => {
     const loadButtonRef = useRef(null)
     const dispatch = useAppDispatch()
@@ -44,20 +45,21 @@ export const RouteInfoInputRUSA = () => {
         dispatch(rusaPermRouteIdSet(''))
     }
 
-    const settingRoute = (route : string) => {
-        dispatch(rusaPermRouteIdSet(route))
+    const settingRoute = (event : ChangeEvent<HTMLInputElement>) => {
+        dispatch(rusaPermRouteIdSet(event.target?.value))
     }
 
     return (
         <>
-            <div style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
-                <FormGroup inline={false} style={{fontSize:"90%"}} label={<span><b>RUSA permanent route ID</b></span>} labelFor={'rusa_perm_route'} >
-                    <InputGroup id={'rusa_perm_route'} style={{fontSize:"16px"}} className={'glowing_input'}
-                        autoFocus tabIndex={0} type="number" rightElement={<Button minimal icon="delete" onClick={clearRoute}></Button>}
-                        onValueChange={settingRoute}
+            <div style={{ display: "flex", justifyContent: "center", alignItems: "center", padding:"10px" }}>
+                <Flex direction={"column"} justify={"center"} style={{fontSize:"90%"}}>
+                <label htmlFor={'rusa_perm_route'}>{<span><b>RUSA permanent route ID</b></span>} </label>
+                    <Input id={'rusa_perm_route'} style={{fontSize:"16px"}} className={'glowing_input'}
+                        autoFocus tabIndex={0} type="number" rightSection={<CloseButton onClick={clearRoute}/>}
+                        onChange={settingRoute}
                         onKeyDown={isReturnKey}
                         value={rusaPermRouteId}/>
-                </FormGroup>
+                </Flex>
             </div>
             <RUSALoadRouteButton loadButtonRef={loadButtonRef} lookupFunc={lookupRouteId}/>
         </>
@@ -73,7 +75,7 @@ const RUSALoadRouteButton = ({loadButtonRef, lookupFunc} : RUSALoadRouteButtonPr
   const isLoading = useAppSelector(state => state.uiInfo.dialogParams.fetchingRoute)
   const hasRusaPermId = useAppSelector(state => state.uiInfo.routeParams.rusaPermRouteId !== '')
   return (
-    <Button ref={loadButtonRef} intent={Intent.PRIMARY} fill disabled={isLoading || (!hasRusaPermId)}
+    <Button ref={loadButtonRef} variant='filled' fullWidth disabled={isLoading || (!hasRusaPermId)}
         onClick={lookupFunc} loading={isLoading}>
             Load Route
     </Button>

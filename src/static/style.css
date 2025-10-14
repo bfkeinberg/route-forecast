@@ -107,20 +107,6 @@ input#finishTime.finish-time {
     background-color: #e9ecef;
 }
 
-/*
-input#finishTime.finish-time {
-    display: inline-flex;
-    width: 15em;
-    margin-top: 3px;
-    margin-bottom: 0px;
-    height: 28px;
-    flex: 1;
-    padding-top: 5px;
-    !*margin-right: 5px;*!
-    font-size: .875rem;
-    background-color: #e9ecef;
-}
-*/
 input#interval.form-control {
     padding-top: 5px;
     display: inline-flex;
@@ -157,11 +143,6 @@ select#pace.form-control {
 
 #gustyWeather {
     color: #CC0000;
-}
-
-table.bp4-html-table.bp4-html-table-bordered.bp4-html-table-striped.bp4-interactive td,
-table.bp4-html-table.bp4-html-table-bordered.bp4-html-table-striped.bp4-interactive th {
-    padding: 0.25rem; 
 }
 
 .spacer {
@@ -202,4 +183,15 @@ table.bp4-html-table.bp4-html-table-bordered.bp4-html-table-striped.bp4-interact
 
 .flashing-red-text {
     animation: blink 1s infinite alternate; /* Apply the animation */
+}
+
+/* for mantine combobox dropdown */
+.dropdown {
+  border: 2px solid var(--mantine-color-blue-5);
+  border-radius: var(--mantine-radius-md);
+  box-shadow: var(--mantine-shadow-md);
+}
+
+body {
+  font-size: var(--mantine-font-size-sm); /* Uses the font size defined in your theme */
 }

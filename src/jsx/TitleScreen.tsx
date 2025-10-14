@@ -1,9 +1,9 @@
-import {Icon} from "@blueprintjs/core"
+import { Bike } from "tabler-icons-react"
 
 export const TitleScreen = () => {
   return (
     <div style={{height: "600px", position: "relative"}}>
-      <Icon icon={"cycle"} size={160} style={{ position: "absolute", top: "50%", left: "50%" }} />
+      <Bike size={160} style={{ position: "absolute", top: "50%", left: "50%" }} />
     </div>
   )
 }

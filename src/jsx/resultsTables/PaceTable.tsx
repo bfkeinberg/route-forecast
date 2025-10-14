@@ -1,6 +1,5 @@
 import 'animate.css/animate.min.css';
 
-import { HTMLTable, Tooltip } from '@blueprintjs/core';
 import { useState } from 'react';
 import cookie from 'react-cookies';
 import {connect, ConnectedProps} from 'react-redux';
@@ -13,6 +12,8 @@ import StravaAnalysisIntervalInput from './StravaAnalysisIntervalInput';
 import {useTranslation} from 'react-i18next'
 import { mapSubrangeSet, mapRangeToggled } from '../../redux/stravaSlice';
 import type { RootState } from "../../redux/store";
+import { Tooltip, Table } from '@mantine/core';
+import { TableBody } from '@mui/material';
 
 type PropsFromRedux = ConnectedProps<typeof connector>
 
@@ -78,20 +79,20 @@ const PaceTable = ({activityData, activityStream, analysisInterval, mapSubrangeS
     }
     const expandTable = (paces : Array<Pace>) => {
         return (
-            <tbody>
+            <TableBody>
             {paces.map((pace) =>
-                <tr key={pace.distance+Math.random().toString(10)} start={pace.start} end={pace.end}
+                <Table.Tr key={pace.distance+Math.random().toString(10)} start={pace.start} end={pace.end}
                     onClick={toggleRange} onMouseEnter={updateSubrange}>
-                    <td>{pace.time}</td>
-                    <td>{formatSpeed(pace.pace)}</td>
-                    <td>{pace.alphaPace}</td>
-                    <td>{pace.distance.toFixed(0)}</td>
-                    <td>{pace.climb.toFixed(0)}</td>
-                    <td>{((pace.climb*100)/(pace.distance*5280)).toFixed(1)}%</td>
-                    <td>{(pace.stoppedTimeSeconds/60).toFixed(1)}min</td>
-                </tr>
+                    <Table.Td>{pace.time}</Table.Td>
+                    <Table.Td>{formatSpeed(pace.pace)}</Table.Td>
+                    <Table.Td>{pace.alphaPace}</Table.Td>
+                    <Table.Td>{pace.distance.toFixed(0)}</Table.Td>
+                    <Table.Td>{pace.climb.toFixed(0)}</Table.Td>
+                    <Table.Td>{((pace.climb*100)/(pace.distance*5280)).toFixed(1)}%</Table.Td>
+                    <Table.Td>{(pace.stoppedTimeSeconds/60).toFixed(1)}min</Table.Td>
+                </Table.Tr>
             )}
-            </tbody>
+            </TableBody>
         );
     }
 
@@ -113,22 +114,22 @@ const PaceTable = ({activityData, activityStream, analysisInterval, mapSubrangeS
                     <div style={{padding: "16px", display: "flex", flexFlow: "column", alignItems: "end"}}>
                         <ToggleButton active={zoomToRange} onClick={toggleZoom}>{t('buttons.zoomToSegment')}</ToggleButton>
                     </div>
-                    <HTMLTable bordered interactive striped >
-                        <thead>
-                        <tr>
-                            <th style={{'fontSize':'80%'}}>Time</th>
-                            <th id={'pace'} style={{'fontSize':'80%'}}>
-                                <Tooltip content={t('tooltips.overallPace')} placement={"top"}>Pace</Tooltip>
-                            </th>
-                            <th style={{'fontSize':'80%'}}>WW Pace</th>
-                            <th style={{'fontSize':'80%'}}>Distance</th>
-                            <th style={{'fontSize':'80%'}}>Climb</th>
-                            <th style={{'fontSize':'80%'}}>Avg Grade</th>
-                            <th style={{'fontSize':'80%'}}>Time Stopped</th>
-                        </tr>
-                        </thead>
+                    <Table withTableBorder striped withRowBorders stickyHeader stickyHeaderOffset={16} withColumnBorders highlightOnHover>
+                        <Table.Thead>
+                        <Table.Tr>
+                            <Table.Th style={{'fontSize':'80%'}}>Time</Table.Th>
+                            <Table.Th id={'pace'} style={{'fontSize':'80%'}}>
+                                <Tooltip label={t('tooltips.overallPace')} position='top'>Pace</Tooltip>
+                            </Table.Th>
+                            <Table.Th style={{'fontSize':'80%'}}>WW Pace</Table.Th>
+                            <Table.Th style={{'fontSize':'80%'}}>Distance</Table.Th>
+                            <Table.Th style={{'fontSize':'80%'}}>Climb</Table.Th>
+                            <Table.Th style={{'fontSize':'80%'}}>Avg Grade</Table.Th>
+                            <Table.Th style={{'fontSize':'80%'}}>Time Stopped</Table.Th>
+                        </Table.Tr>
+                        </Table.Thead>
                         {expandTable(paceOverTime)}
-                    </HTMLTable>
+                    </Table>
                 </Sentry.ErrorBoundary>
             </div>
     );

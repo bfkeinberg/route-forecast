@@ -1,18 +1,20 @@
-import { FormGroup } from "@blueprintjs/core";
 import { Slider, Tooltip } from "@mui/material"
 import {connect, ConnectedProps} from 'react-redux';
 import type { RootState } from "../../redux/store"; 
 import {setInterval} from "../../redux/actions";
 import {useTranslation} from 'react-i18next'
+import { Flex } from "@mantine/core";
 
 type PropsFromRedux = ConnectedProps<typeof connector>
 
 const ForecastInterval = (props: PropsFromRedux) => {
     const { t } = useTranslation()
     return (
-        <FormGroup style={{flex: 1}} label={t('labels.interval')} >
+        <Flex direction={"column"} style={{flex: 1}}>
+            <label htmlFor="intervalRange">{t('labels.interval')}</label>
             <Tooltip arrow placement='bottom' title={t('tooltips.interval')}>
                 <Slider
+                    style={{width:'96%', marginLeft:'5px'}}
                     value={props.interval}
                     step={0.25}
                     min={props.min_interval}
@@ -32,7 +34,7 @@ const ForecastInterval = (props: PropsFromRedux) => {
                     // TODO: GA event for interval here
                     onChange={(event, selected) => {props.setInterval(selected as number)}} />
             </Tooltip>
-        </FormGroup>
+        </Flex>
     );
 };
 

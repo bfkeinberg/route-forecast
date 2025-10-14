@@ -1,9 +1,3 @@
-import "normalize.css/normalize.css";
-import '@blueprintjs/core/lib/css/blueprint.css';
-import "@blueprintjs/icons/lib/css/blueprint-icons.css";
-import "@blueprintjs/select/lib/css/blueprint-select.css";
-import 'Images/style.css';
-
 import ReactGA from "react-ga4";
 import * as Sentry from "@sentry/react";
 import {Info} from "luxon";
@@ -65,6 +59,7 @@ i18next.on('languageChanged', (lng) => {
     if (lng.startsWith('zh')) {ReactGA.event('chinese_detected')}
 })
 import i18n from "./i18n";
+import { useMantineTheme } from "@mantine/core";
 
 const checkCredentialsInterface = () => {
     return 'PasswordCredential' in window &&
@@ -279,6 +274,8 @@ const RouteWeatherUI = ({search, href, action, maps_api_key, timezone_api_key, b
     const [forecast] = useForecastMutation()
     const [getAqi] = useGetAqiMutation()
     const { i18n } = useTranslation()
+    const theme = useMantineTheme();
+
 
     let queryParams = queryString.parse(search, {parseBooleans: true, parseNumbers:false, types:{viewControls:'boolean'}});
     const queryParamsAsObj = queryParams as unknown as QueryParams

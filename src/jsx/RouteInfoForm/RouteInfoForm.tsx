@@ -1,8 +1,7 @@
-import {Toast2,Section,SectionCard, Elevation} from '@blueprintjs/core';
 import Slider from '@mui/material/Slider';
 import ReactGA from "react-ga4";
 import {connect, useDispatch, ConnectedProps} from 'react-redux';
-
+import { Card, Title } from '@mantine/core';
 import { routeLoadingModeProps,RouteLoadingModes,routeLoadingModes } from '../../data/enums';
 import { errorDetailsSet } from '../../redux/dialogParamsSlice';
 import { RouteInfoInputRUSA } from './RouteInfoInputRUSA';
@@ -14,6 +13,7 @@ import { routeLoadingModeSet } from '../../redux/routeParamsSlice';
 import type { RootState } from "../../redux/store";
 import { ReactNode } from 'react';
 type PropsFromRedux = ConnectedProps<typeof connector>
+import { Notification } from '@mantine/core';
 
 const getInputForMode = (mode : RouteLoadingModes ) => {
     switch (mode) {
@@ -37,18 +37,21 @@ const RouteInfoForm = ({ errorDetails, errorDetailsSet, routeLoadingMode, routeL
         routeLoadingModeSet(newValue);
         if (newValue === routeLoadingModes.STRAVA) {ReactGA.event('select_content', {content_type:'strava'})}
     }
-
     return (
         <div style={{ padding: "14px" }}>
             <RouteLoadingModeSelector mode={mode} modeSwitched={modeSwitched} />
             <div className='spacer' />
             {getInputForMode(mode)}
-            {errorDetails !== null && <div style={{ padding: '10px', marginTop: "10px" }}><Toast2 message={errorDetails} timeout={0} onDismiss={() => dispatch(errorDetailsSet(null))} intent="danger"></Toast2></div>}
-            <Section style={{marginTop:"1em"}} elevation={Elevation.ONE} title={t('titles.loading')}>
-                <SectionCard padded>
+            {errorDetails !== null && <div style={{ padding: '10px', marginTop: "10px" }}>
+                <Notification color='red' onClose={() => dispatch(errorDetailsSet(null))}>{errorDetails}</Notification></div>}
+            <Card radius={'md'} withBorder shadow='lg'>
+                <Card.Section withBorder pl="md" py={"lg"}>
+                    <Title order={6}>{t('titles.loading')}</Title> 
+                </Card.Section>
+                <Card.Section withBorder pl="md">
                     <strong>Randoplan</strong> {t('data.loading')}
-                </SectionCard>
-            </Section>            
+                </Card.Section>
+            </Card>
         </div>
     );
 }

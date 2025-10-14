@@ -1,4 +1,3 @@
-import { Button } from '@blueprintjs/core';
 import * as Sentry from "@sentry/react";
 import React, {useRef, useState} from 'react';
 import ReactGA from "react-ga4";
@@ -22,7 +21,7 @@ import { useAppSelector, useAppDispatch } from '../../utils/hooks';
 import type {ForecastRequest} from '../../utils/gpxParser'
 import { GpxRouteData, RwgpsRoute, RwgpsTrip } from 'redux/routeInfoSlice';
 import { writeObjToFile } from '../../utils/writeToFile';
-import { i18n } from 'i18next';
+import { Button } from "@mantine/core";
 declare module 'react' {
     interface HTMLAttributes<T> extends AriaAttributes, DOMAttributes<T> {
         // extends React's HTMLAttributes
@@ -250,18 +249,18 @@ const ForecastButton = ({fetchingForecast,submitDisabled, routeNumber, startTime
     const buttonText = (computeStdDev || (optionPressed && shiftPressed)) ? t("buttons.standardDeviation") : 
         ((optionPressed || downloadAll) ? t("buttons.downloadAll") : t("buttons.forecast"))
     return (
-        <DesktopTooltip content={tooltipContent}>
+        <DesktopTooltip label={tooltipContent}>
             <div id='forecast' style={{ 'display': 'flex', width: '100%', justifyContent: "center", margin: "10px 0px 0px 10px", flex: 1.6 }} cursor='not-allowed'>
                 <Button
                     tabIndex={0}
-                    intent="primary"
+                    variant="filled"
                     onClick={forecastClick}
                     onKeyDown={keyIsDown as unknown as (ev:React.KeyboardEvent)=>void}
                     onKeyUp={keyIsUp as unknown as (ev:React.KeyboardEvent)=>void}
                     style={{ ...buttonStyle, width: "100%", backgroundColor: "#137cbd", borderColor: "#137cbd", }}
                     disabled={submitDisabled || fetchingForecast}
-                    size={smallScreen?'small':'large'}
-                    fill={true}
+                    size={smallScreen?'sm':'lg'}
+                    fullWidth
                     loading={forecastFetchResult.isLoading || aqiFetchResult.isLoading || fetchingForecast}
                 >
                     {forecastFetchResult.isLoading ? t('buttons.forecastPending') : buttonText}

@@ -1,23 +1,28 @@
-import { Button,Icon, MaybeElement } from "@blueprintjs/core";
-import { BlueprintIcons_16Id } from "@blueprintjs/icons/lib/esm/generated/16px/blueprint-icons-16";
-
+import { Button } from "@mantine/core";
+import {Circle, CircleDot} from "tabler-icons-react"
+import { ForwardedRef, forwardRef } from "react";
 interface ToggleButtonProps {
   children: string
   active: boolean
   onClick: (event : React.MouseEvent) => void
-  icon?: BlueprintIcons_16Id | MaybeElement
+  icon?: React.JSX.Element | null
   style?: {}
 }
-export const ToggleButton = ({children, active, onClick, icon = null, style = {}} : ToggleButtonProps) => {
 
+export const ToggleButton = forwardRef((props : ToggleButtonProps, ref : ForwardedRef<HTMLButtonElement>) => {
+  const {children, active, onClick, icon, style} : ToggleButtonProps = props
+  const activeIcon = (<CircleDot style={{opacity: 1, transition: "opacity 0.15s"}}/>)
+  const inactiveIcon = (<Circle style={{opacity: 0.25, transition: "opacity 0.15s"}}/>)
   return (
-    <Button style={{height: '100%', border: "1px solid #6c757d80", display: "flex", alignItems: "center", justifyContent: "center", padding: '.25rem .5rem', ...style}} onClick={onClick} intent={active ? "success" : "none"} size='small'>
+    <Button ref={ref} leftSection={icon || (active?activeIcon:inactiveIcon)} 
+    style={{height: '100%', border: "1px solid #6c757d80", display: "flex", alignItems: "center", 
+      justifyContent: "center", padding: '.25rem .5rem', ...style}}
+     onClick={onClick} variant={active ? "success" : "default"} size='compact-sm'>
       <span style={{display: "flex", alignItems: "center", justifyContent: "center"}}>
-          <Icon icon={icon || (active ? "selection" : "circle")} style={{opacity: active ? 1 : 0.25, transition: "opacity 0.15s"}}/>
         <span style={{opacity: active ? 1 : 0.25, transition: "opacity 0.15s", textAlign: 'center'}}>
           {children}
         </span>
       </span>
     </Button>
   )
-}
+})

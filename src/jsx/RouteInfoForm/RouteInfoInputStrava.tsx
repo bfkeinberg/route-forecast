@@ -1,5 +1,4 @@
 
-import { Button } from '@blueprintjs/core';
 import stravaImage from 'Images/api_logo_pwrdBy_strava_stack_light.png';
 import ReactGA from "react-ga4";
 import * as Sentry from "@sentry/react"
@@ -8,6 +7,7 @@ import stravaRouteParser from '../../utils/stravaRouteParser';
 import StravaActivityIdInput from './StravaActivityIdInput';
 import StravaRouteIdInput from './StravaRouteIdInput';
 import { useAppSelector, useAppDispatch } from '../../utils/hooks';
+import { Button } from "@mantine/core"
 
 export const RouteInfoInputStrava = () => {
   const dispatch = useAppDispatch()
@@ -35,18 +35,18 @@ export const RouteInfoInputStrava = () => {
               <Button
                 id='analyze'
                 tabIndex={0}
-                intent="primary"
+                variant='filled'
                 onClick={fetchRoute}
                 disabled={fetchingFromStrava || !validActivityId}
                 loading={fetchingFromStrava}
-                fill
+                fullWidth
                 style={{backgroundColor: "rgb(234, 89, 41)", borderColor: "rgb(234, 89, 41)", color:"white", marginTop: "10px"}}
               >
                 Analyze Ride
               </Button>
               <StravaRouteIdInput/>
               <Button disabled={fetchingFromStrava || strava_route_id === ''}
-              style={{ backgroundColor: "#137cbd", borderColor: "#137cbd", marginTop: "10px", color:"white"}} loading={fetchingFromStrava} fill
+              style={{ backgroundColor: "#137cbd", borderColor: "#137cbd", marginTop: "10px", color:"white"}} loading={fetchingFromStrava} fullWidth
               onClick={() => dispatch(loadStravaRoute(strava_route_id))}>
                 {fetchingFromStrava ? "Loading..." : "Load Route"}
               </Button>

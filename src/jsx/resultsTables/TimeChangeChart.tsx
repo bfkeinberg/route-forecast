@@ -4,7 +4,7 @@ import { ResponsiveContainer, LineChart, XAxis, YAxis, Tooltip, Legend, Line, Ca
 import type { ChartDataType, ChartData } from 'utils/gpxParser';
 import ReactGA from "react-ga4";
 
-export const TimeChangeChart = (chartData: ChartDataType, metric: boolean, popoverIsOpen: boolean) => {
+export const TimeChangeChart = ({chartData, metric, popoverIsOpen} : {chartData: ChartDataType, metric: boolean, popoverIsOpen: boolean}) => {
     if (!popoverIsOpen || !chartData || chartData.length === 0) {
         return <div></div>
     }
