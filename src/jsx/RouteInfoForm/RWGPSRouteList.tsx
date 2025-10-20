@@ -5,7 +5,7 @@ import { loadFromRideWithGps } from "../../redux/loadRouteActions";
 import { routeIsTripSet, rwgpsRouteSetAsNumber } from "../../redux/routeParamsSlice";
 import { useAppSelector, useAppDispatch } from "../../utils/hooks";
 import { Favorite } from "../../redux/rideWithGpsSlice";
-import { Combobox, ComboboxOptionProps, useCombobox, InputBase, Group, Text } from '@mantine/core'
+import { Combobox, ComboboxOptionProps, useCombobox, InputBase, Group, Text, Button } from '@mantine/core'
 
 function SelectOption({ name, id, associated_object_id, associated_object_type }: Favorite) {
   return (
@@ -33,7 +33,7 @@ const RWGPSRouteList = ({ }) => {
 
     const options = pinnedRoutes.map((item) => (
         <Combobox.Option value={item.associated_object_id.toString()} itemType={item.associated_object_type} key={item.id}>
-            <SelectOption {...item} />
+            <SelectOption {...item} key={item.id}/>
         </Combobox.Option>
     ))
 
@@ -49,18 +49,20 @@ const RWGPSRouteList = ({ }) => {
                 dispatch(loadFromRideWithGps(selected, options.itemType == "trip"))
                 combobox.closeDropdown();
             }}
+            styles={{
+              dropdown: {minWidth: 'max-content', width:'600px'}
+            }}
         >
             <Combobox.Target>
-                <InputBase
-                    component="button"
-                    type="button"
-                    pointer
-                    onClick={() => combobox.openDropdown()}
-                    rightSection={<Combobox.Chevron />}
-                    leftSection={<Map />}
-                    className={'glowing_input'}>
-                    {selectedName.current === '' ? route_id : selectedName.current}
-                </InputBase>
+              <Button 
+                variant="default"
+                onClick={() => combobox.openDropdown()}
+                rightSection={<Combobox.Chevron />}
+                leftSection={<Map />}
+                className={'glowing_input'}
+              >             
+              {selectedName.current === '' ? route_id : selectedName.current}     
+              </Button>
             </Combobox.Target>
 
             <Combobox.Dropdown className="dropdown">

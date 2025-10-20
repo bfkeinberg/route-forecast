@@ -1,7 +1,7 @@
 import { DateTime } from 'luxon';
 import {connect, ConnectedProps} from 'react-redux';
 import { DateTimePicker } from '@mantine/dates';
-
+import  {useMediaQuery} from 'react-responsive'
 import {setStart} from "../../redux/actions";
 import { setTimeFromIso } from "../../redux/actions";
 import { initialStartTimeSet } from "../../redux/routeParamsSlice";
@@ -30,6 +30,7 @@ const DateSelect = ({ start, zone, setStart, initialStartTimeSet, maxDaysInFutur
         }
     }
 
+    const isMobile = useMediaQuery({query:'(max-width: 600px)'})
     // allow us to continue to show the start time if the route was forecast for a time before the present
     const now = new Date();
     let later = new Date();
@@ -48,17 +49,18 @@ const DateSelect = ({ start, zone, setStart, initialStartTimeSet, maxDaysInFutur
         startIso=undefined
 
     const shortTimeZoneName = start.toFormat("ZZZZ")
-
     return (
         <div style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
-            <span id={"startingTime"} style={{ fontSize: ".875rem", fontWeight: "bolder", padding: "0px 5px", flex: 1 }}>
+            <span id={"startingTime"} style={{ fontSize: isMobile ? ".7rem" : ".875rem", fontWeight: "bolder", padding: "0px 5px", flex: 1 }}>
                 <Calendar onClick={() => setDateOnly(start, initialStartTimeSet)} style={{ cursor: "pointer", marginRight: "3px" }} />
                 {t('labels.startingTime')}
             </span>
             <div style={{ flex: 2.5 }}>
                 <DesktopTooltip label={t('tooltips.startingTime')} >
                     <DateTimePicker
+                        dropdownType={isMobile ? "modal" : "popover"}
                         placeholder="M/D/YYYY"
+                        styles = {{ input : {fontSize: '16px'} }}
                         rightSection={<span style={{ paddingRight: 4 }}>{shortTimeZoneName}</span>}
                         rightSectionWidth={"max-content"}
                         rightSectionPointerEvents="auto"
@@ -69,11 +71,11 @@ const DateSelect = ({ start, zone, setStart, initialStartTimeSet, maxDaysInFutur
                         maxDate={later}
                         level={"month"}
                         locale={i18n.language}
-                        value={start.toISO()}
+                        value={startIso}
                         onChange={setDateFromPicker}
                         highlightToday={false}
-                        valueFormat='MMMM d, YYYY h:mma'
-                        timePickerProps={{ minutesStep: 5, format: "12h" }}
+                        valueFormat='MMMM DD, YYYY h:mma'
+                        timePickerProps={{ minutesStep: 5, format: "12h", styles: {input: {fontSize:'16px'}} }}
                     />
                 </DesktopTooltip>
             </div>

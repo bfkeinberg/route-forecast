@@ -5,7 +5,7 @@ import { routeDataCleared} from '../../redux/routeInfoSlice';
 import { rwgpsRouteSet } from '../../redux/routeParamsSlice';
 import type { RootState } from "../../redux/store";
 import { ChangeEvent, RefObject } from 'react';
-import { CloseButton, Flex, Input } from '@mantine/core';
+import { CloseButton, Flex, Input, TextInput } from '@mantine/core';
 
 export const decideValidationStateFor = (type : string, methodUsed : string|null, loadingSuccess : boolean) => {
     if (type === methodUsed) {
@@ -46,42 +46,48 @@ const RideWithGpsId = ({rwgpsRouteSet,loadingSource,loadingSuccess,rwgpsRoute,ro
     // set font size of input to keep Mobile Safari from zooming
     return (
         <Flex direction={"column"} justify={"center"} >
-            <label htmlFor='rwgps_route'><span style={{fontSize:"80%"}}><b>{t('titles.rwgpsId')}</b></span></label>
-            <Input id={'rwgps_route'} style={{fontSize:"16px"}} className={'glowing_input'} autoComplete='on'
-                   autoFocus tabIndex={0} type="text" rightSection={<CloseButton onClick={clearRoute}></CloseButton>}
-                   {...decideValidationStateFor('rwgps',loadingSource,loadingSuccess)}
-                 onKeyDown={isNumberKey}
-                 onChange={settingRoute}
-                 onDrop={event => {
-                     let dt = event.dataTransfer;
-                     if (dt.items) {
-                         for (let i=0;i < dt.items.length;i++) {
-                             if (dt.items[i].kind === 'string') {
-                                 event.preventDefault();
-                                 dt.items[i].getAsString(value => {
-                                     settingRoute(value);
-                                 });
-                             } else {
-                                 return false;
-                             }
-                         }
-                     }
-                 }}
-                 onDragEnd={event => {
-                     let dt = event.dataTransfer;
-                     if (dt.items) {
-                         // Use DataTransferItemList interface to remove the drag data
-                         try {
+            <TextInput id={'rwgps_route'} styles={{
+                input: { fontSize: "16px" }, label: {
+                    textAlign: 'center',
+                    width: '100%'
+                }
+            }} className={'glowing_input'} autoComplete='on'
+                autoFocus tabIndex={0} type="text" rightSection={<CloseButton onClick={clearRoute}></CloseButton>}
+                inputSize='md' w='10rem'
+                label={<span style={{ fontSize: "75%" }}><b>{t('titles.rwgpsId')}</b></span>}
+                {...decideValidationStateFor('rwgps', loadingSource, loadingSuccess)}
+                onKeyDown={isNumberKey}
+                onChange={settingRoute}
+                onDrop={event => {
+                    let dt = event.dataTransfer;
+                    if (dt.items) {
+                        for (let i = 0; i < dt.items.length; i++) {
+                            if (dt.items[i].kind === 'string') {
+                                event.preventDefault();
+                                dt.items[i].getAsString(value => {
+                                    settingRoute(value);
+                                });
+                            } else {
+                                return false;
+                            }
+                        }
+                    }
+                }}
+                onDragEnd={event => {
+                    let dt = event.dataTransfer;
+                    if (dt.items) {
+                        // Use DataTransferItemList interface to remove the drag data
+                        try {
                             for (let i = dt.items.length - 1; i >= 0; i--) {
                                 dt.items.remove(i);
-                            }   
-                         } catch (err) {
+                            }
+                        } catch (err) {
                             Sentry.captureException(err)
-                         }
-                     }
-                 }}
-                 pattern="[0-9]*"
-                 value={rwgpsRoute}/>
+                        }
+                    }
+                }}
+                pattern="[0-9]*"
+                value={rwgpsRoute} />
         </Flex>
     );
 };

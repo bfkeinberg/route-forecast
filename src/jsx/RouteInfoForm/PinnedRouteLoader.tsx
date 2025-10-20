@@ -59,7 +59,7 @@ const setRoutes = async (rwgpsToken : string|null|undefined, setRwgpsToken : Act
     setError : ActionCreatorWithPayload<ErrorPayload, "dialogParams/errorDetailsSet">,
     setPinnedRoutes : ActionCreatorWithPayload<Array<Favorite>, "rideWithGpsInfo/pinnedRoutesSet">, 
     setLoadingPinned : ActionCreatorWithPayload<boolean, "rideWithGpsInfo/loadingPinnedSet">, usingPinnedRoutes : boolean, hasRoutes : boolean) => {
-    if (rwgpsToken === '' || !rwgpsToken || rwgpsToken===undefined || !usingPinnedRoutes || hasRoutes) {
+    if (rwgpsToken === '' || !rwgpsToken || rwgpsToken===undefined || !usingPinnedRoutes/* || hasRoutes*/) {
         return null;
     }
     setLoadingPinned(true);
