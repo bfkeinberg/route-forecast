@@ -146,7 +146,7 @@ module.exports = (env, argv) => {
             path: STATIC_DIR,
             // pathinfo:'verbose',
             filename: "[name].bundle.[contenthash].js",
-            chunkFilename: '[name].bundle.js'
+            chunkFilename: '[name].bundle.[contenthash].js'
             // sourceMapFilename: "[name].bundle.js.map",
             // publicPath: "static/"
         },
