@@ -42,7 +42,7 @@
     "ejs": "^3.1.6",
     "export-to-csv": "^1.4.0",
     "express": "^5.1.0",
-    "express-rate-limit": "^7.4.1",
+    "express-rate-limit": "^8.1.0",
     "express-static-gzip": "^3.0.0",
     "express-winston": "^4.0.5",
     "form-data": "^4.0.4",
