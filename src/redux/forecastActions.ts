@@ -31,7 +31,7 @@ const getRouteId = (routeData : RwgpsRoute|RwgpsTrip) => {
 };
 
 export const msgFromError = (error : {reason:{data:{details:string}} | {reason:string, data: never}}) => {
-    if (error.reason.data !== undefined) {
+    if (error.reason.data) {
         return error.reason.data.details
     } else {
         return JSON.stringify(error.reason)
