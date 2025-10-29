@@ -528,7 +528,7 @@ class AnalyzeRoute {
         previouslyCalculatedValues : Array<CalculatedValue>, start : DateTime, 
         finishTime : string, timeZoneId : string, totalDistMeters : number) : WindAdjustResults => {
         if (forecastInfo.length===0) {
-            return {weatherCorrectionMinutes:0,calculatedControlPointValues:[],maxGustSpeed:0, adjustedTimes:[], finishTime:finishTime, chartData:[]};
+            return {weatherCorrectionMinutes:0,calculatedControlPointValues:previouslyCalculatedValues,maxGustSpeed:0, adjustedTimes:[], finishTime:finishTime, chartData:[]};
         }
 
         const gustThreshold = 50;   // above this incorporate some of the gust into the effect on the rider
