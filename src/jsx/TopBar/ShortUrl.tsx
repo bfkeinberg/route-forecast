@@ -3,17 +3,23 @@ import {connect} from 'react-redux';
 import * as Sentry from "@sentry/react";
 import type { RootState } from "../../redux/store";
 import {ArrowUpSquare} from "tabler-icons-react"
-import { TextInput } from '@mantine/core';
+import { TextInput, Notification } from '@mantine/core';
 import {useTranslation} from 'react-i18next'
 import { notifications } from '@mantine/notifications';
+import { useAppSelector, useAppDispatch } from "../../utils/hooks";
+import { errorDetailsSet } from "../../redux/dialogParamsSlice";
 
 const ShortUrl = ({shortUrl} : {shortUrl:string}) => {
     const { t } = useTranslation()
+    const errorDetails = useAppSelector(state => state.uiInfo.dialogParams.errorDetails)
+    const dispatch = useAppDispatch()
+
     return (
-        <div style={{ display: shortUrl === ' ' ? 'none' : 'inline-flex', margin: "0px 10px", flexDirection:"column", justifyContent:"flex-start"}}>
+        <div style={{ display: (shortUrl === ' ' && !errorDetails) ? 'none' : 'inline-flex', margin: "0px 10px", flexDirection:"column", justifyContent:"flex-start"}}>
             <div style={{width: "150px", display: "flex", alignItems: "center"}}>
                 <div>{t('labels.share')}</div>
             </div>
+            {errorDetails && <Notification color='red' onClose={() => dispatch(errorDetailsSet(null))}>{errorDetails}</Notification>}
             <TextInput leftSection={<ArrowUpSquare/>} id={'shortUrl'} size="xs" readOnly type="text" value={shortUrl}
                    onClick={async event => {
                     if (navigator.clipboard) {

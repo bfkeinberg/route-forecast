@@ -182,7 +182,7 @@ self.addEventListener('fetch', (event) => {
         return;
     }
     // we don't need to cache the pinned routes, the intent of caching is to preserve completed forecasts
-    if (url.includes('/pinned_routes') || url.includes('/bitly')) {
+    if (url.includes('/pinned_routes') || url.includes('/bitly') || url.includes('short_io')) {
         // console.log('Not handling pinned routes')
         return;
     }

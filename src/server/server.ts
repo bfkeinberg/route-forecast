@@ -1,7 +1,6 @@
 /* eslint-disable max-lines */
 require('./instrument');
-import express from 'express'
-import { Request, Response } from 'express'
+import express, { Request, Response } from 'express'
 const app = express();
 app.set('trust proxy', 1 /* number of proxies between user and server */)
 
@@ -22,7 +21,7 @@ import getAirNowAQI from './airNowAQI'
 import querystring from 'querystring';
 import * as Sentry from "@sentry/node"
 const { trace, debug, info, warn, error, fatal, fmt } = Sentry.logger;
-import axios, { AxiosError, isAxiosError } from 'axios';
+import axios, { AxiosError, isAxiosError, AxiosResponse } from 'axios';
 const axiosRetry = require('axios-retry').default
 const axiosInstance = axios.create()
 
@@ -31,6 +30,7 @@ const {std} = require('mathjs');
 import {Client} from "pg";
 
 import RateLimit from 'express-rate-limit'
+import { access } from 'fs';
 var limiter = RateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: 100, // max 100 requests per windowMs
@@ -44,6 +44,12 @@ app.use(compression());
 const bitly_token = process.env.BITLY_TOKEN
 if (!bitly_token) {
     console.error('No Bitly token')
+    process.exit(1)
+}
+
+const short_io_key = process.env.SHORT_IO_KEY
+if (!short_io_key) {
+    console.error('No Short.io access key')
     process.exit(1)
 }
 
@@ -445,6 +451,27 @@ const getBitlyShortenedUrl = (accessToken : string, longUrl : string) => {
 app.post('/bitly', async (req : Request, res: Response) => {
     const longUrl = req.body.longUrl;
     const { error, url } = await getBitlyShortenedUrl(bitly_token, longUrl);
+    res.json({ error, url })
+});
+
+const getShortIoUrl = async (accessToken: string, longUrl: string) => {
+    const short_io_domain = 'randoplan.short.gy';
+    try {
+        const url : AxiosResponse<string> = await axios.get(`https://api.short.io/links/tweetbot?domain=${short_io_domain}&originalURL=${longUrl}&urlOnly=true&apiKey=${accessToken}`).
+        catch((err : any) => {
+            console.log(`Short.io returned error ${err}`)
+            error(`Short.io returned error ${err}`);
+            throw err
+        })
+        return {error: null, url: url.data}
+    } catch (err : any) {
+        return {error: err.message, url: null}
+    }
+}
+
+app.post('/short_io', async (req : Request, res: Response) => {
+    const longUrl = req.body.longUrl;
+    const { error, url } = await getShortIoUrl(short_io_key, longUrl);
     res.json({ error, url })
 });
 
