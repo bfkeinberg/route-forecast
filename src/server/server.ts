@@ -461,7 +461,7 @@ interface Short_IO_Response {
 }
 
 const getShortIoUrl = async (accessToken: string, longUrl: string) => {
-    const short_io_domain = 'randoplan.short.gy';
+    const short_io_domain = 'go.randoplan.com';
     const options = {
         method: 'POST',
         url: 'https://api.short.io/links',
