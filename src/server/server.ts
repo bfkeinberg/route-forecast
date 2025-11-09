@@ -454,16 +454,39 @@ app.post('/bitly', async (req : Request, res: Response) => {
     res.json({ error, url })
 });
 
+interface Short_IO_Response {
+    originalURL: string
+    path: string
+    shortURL: string
+}
+
 const getShortIoUrl = async (accessToken: string, longUrl: string) => {
     const short_io_domain = 'randoplan.short.gy';
+    const options = {
+        method: 'POST',
+        url: 'https://api.short.io/links',
+        headers: {
+            accept: 'application/json',
+            'content-type': 'application/json',
+            Authorization: accessToken
+        },
+        data: {
+            skipQS: false,
+            archived: false,
+            allowDuplicates: false,
+            originalURL: longUrl,
+            cloaking: false,
+            domain: short_io_domain
+        }
+    };
     try {
-        const url : AxiosResponse<string> = await axios.get(`https://api.short.io/links/tweetbot?domain=${short_io_domain}&originalURL=${longUrl}&urlOnly=true&apiKey=${accessToken}`).
+        const short_io_reply : AxiosResponse<Short_IO_Response> = await axios.request(options).
         catch((err : any) => {
             console.log(`Short.io returned error ${err}`)
             error(`Short.io returned error ${err}`);
             throw err
         })
-        return {error: null, url: url.data}
+        return {error: null, url: short_io_reply.data.shortURL}
     } catch (err : any) {
         return {error: err.message, url: null}
     }
