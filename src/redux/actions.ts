@@ -61,7 +61,7 @@ export const setWeatherProvider = (weatherProvider : string) => {
 export const shortenUrl = function (url : string) {
     return function (dispatch : AppDispatch) {
         return Sentry.startSpan({ name: "shortenUrl" }, () => {
-            return fetch("/short_io",
+            return fetch("/bitly",
                 {
                     headers: {
                         Accept: 'application/json',
