@@ -114,7 +114,7 @@ const DesktopUI = ({mapsApiKey, orientationChanged, setOrientationChanged} : Des
         <StrictMode>
             <div style={{ display: 'flex', flexDirection: 'column', maxHeight: '97vh' }}>
                 {!mapDataExists ? <InstallExtensionButton /> : null}
-                <div /* style={{ display:'flex',  flexShrink: 0 }} */>
+                <div style={{ display:'flex'/*,  flexShrink: 0 */}} >
                     <TopBar
                         sidePaneOptions={sidePaneOptions.map(({ title }) => title)}
                         activeSidePane={activeSidePane}

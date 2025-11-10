@@ -160,7 +160,7 @@ select#pace.form-control {
 .truncated_title {
     text-overflow: ellipsis;
     overflow: hidden;
-    white-space: nowrap;
+    /* white-space: nowrap; */
 }
 
 .truncated_title:hover {

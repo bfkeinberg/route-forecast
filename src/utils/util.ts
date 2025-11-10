@@ -2,10 +2,9 @@ import { DateTime } from 'luxon';
 import cookie from 'react-cookies';
 
 import gpxParser from "./gpxParser";
-import type {ControlsState, UserControl} from '../redux/controlsSlice'
-import type {ForecastRequest, Point, RouteAnalysisResults} from './gpxParser'
-import type { GpxRouteData, RouteInfoState, RwgpsRoute, RwgpsTrip, } from '../redux/routeInfoSlice';
-import type { RouteParamsState } from '../redux/routeParamsSlice';
+import type {UserControl} from '../redux/controlsSlice'
+import type {Point, RouteAnalysisResults} from './gpxParser'
+import type { GpxRouteData, RwgpsRoute, RwgpsTrip, } from '../redux/routeInfoSlice';
 import type { Segment, ExtractedControl } from './gpxParser';
 
 export type Bounds = {
@@ -19,7 +18,6 @@ const formatOneControl = (controlPoint : string | UserControl) => {
   if (typeof controlPoint === 'string') {
     return controlPoint.replaceAll(":", "$");
   }
-  console.log(controlPoint.name.replaceAll(":", "$").replaceAll(",","~") + "," + controlPoint.distance + "," + controlPoint.duration)
   return controlPoint.name.replaceAll(":", "$").replaceAll(",","~") + "," + controlPoint.distance + "," + controlPoint.duration
 };
 
@@ -29,7 +27,6 @@ export const maxWidthForMobile = '501px'
 // ask wtf is up with this & parseControls()
 export const formatControlsForUrl = (controlPoints : Array<UserControl>, filter: boolean) => {
   const filteredControlPoints = filter ? controlPoints.filter(point => point.name !== '').filter(point => {return !isNaN(point.distance) && !isNaN(point.duration)}) : controlPoints
-  console.log(filteredControlPoints.reduce((queryParam,point) => {return queryParam + ':' + formatOneControl(point)},''))
   return filteredControlPoints.reduce((queryParam,point) => {return queryParam + ':' + formatOneControl(point)},'')
 };
 

@@ -16,7 +16,7 @@ import VersionContext from "../versionContext";
 const TitleAndFinishTime = ({finishTime, fontSize, alignment} : {finishTime : string, fontSize: string, alignment: "left" | "right"}) => {
   return (
     <div style={{display:'flex', flexDirection:'column'}}>
-      <RouteTitle style={{width:'21rem'}} className={'truncated_title'}/>
+      <RouteTitle /*style={{width:'21rem'}}*/ className={'truncated_title'}/>
       <div style={{fontStyle: "oblique", color: "rgba(64, 111, 140, 0.87)", fontSize: fontSize, height: "60px", textAlign: alignment}}>
         {finishTime}
       </div>
@@ -32,17 +32,18 @@ interface TopBarProps {
   panesVisible: Set<string>
 }
 export const TopBar = ({sidePaneOptions, activeSidePane, setActiveSidePane, sidebarWidth, panesVisible} : TopBarProps) => {
-  const roomForTitle = useMediaQuery({ query: '(min-width: 1610px)' });
+  const widthToShrinkAt = '1650px';
+  const roomForTitle = useMediaQuery({ query: `(min-width: ${widthToShrinkAt})` });
   const roomForFinishTime = useMediaQuery({ query: '(min-width: 1000px)' });
   const titleAdjacent = roomForFinishTime && roomForTitle
   const titleMustBeStacked = roomForFinishTime && !roomForTitle
   const { finishTime: predictedFinishTime } = useForecastDependentValues();
   const predictedFinishTimeExists = predictedFinishTime !== null;
-  const finishTimeFontSize = useMediaQuery({ query: '(min-width: 1300px)' }) ? "20px" : "15px"
+  const finishTimeFontSize = useMediaQuery({ query: `(min-width: ${widthToShrinkAt})` }) ? "20px" : "15px"
   const alignment = useMediaQuery({ query: '(min-width: 1500px)' }) ? "right" : "left"
-
+  const direction = useMediaQuery({ query: '(min-width: 1300px)' }) ? "row" : "column"
   return (
-    <div style={{display: "flex"}}>
+    <div style={{display: "flex", width:'100%'}}>
       <Tabs
         sidePaneOptions={sidePaneOptions}
         activeSidePane={activeSidePane}
@@ -54,12 +55,12 @@ export const TopBar = ({sidePaneOptions, activeSidePane, setActiveSidePane, side
         {roomForTitle && <RouteTitle style={{width:'21rem'}} className={'truncated_title'}/>}
         {titleMustBeStacked && predictedFinishTimeExists && <TitleAndFinishTime finishTime={predictedFinishTime} fontSize={finishTimeFontSize} alignment={alignment}/>}
         {titleAdjacent && predictedFinishTimeExists && <div style={{fontStyle: "oblique", color: "rgba(64, 111, 140, 0.87)", fontSize: finishTimeFontSize, height: "60px", textAlign: alignment}}>{predictedFinishTime}</div>}
-        <div style={{display: "flex", justifyContent: "flex-end", alignItems: "center"}}>
+        <div style={{display: "flex", justifyContent: "flex-end", alignItems: "center", "flexDirection":direction}}>
           <MediaQuery minWidth={1780}>
             <ShortUrl/>
           </MediaQuery>
           <DonationRequest wacky/>
-          <div style={{margin: "0px 10px", flexShrink: 0}}><BugReportButton/></div>
+          <div style={{margin: "0px 10px"}}><BugReportButton/></div>
         </div>
       </div>
     </div>
@@ -84,7 +85,8 @@ const Tabs = ({ sidePaneOptions, activeSidePane, setActiveSidePane, sidebarWidth
   // console.info(`loadingFromUrlFinished=${loadingFromURLFinished}`)
   return (
     <div style={{
-      width: `${sidebarWidth}px`
+      width: `${sidebarWidth}px`,
+      flexShrink: 0
     }}>
       <div style={{
         display: "flex",

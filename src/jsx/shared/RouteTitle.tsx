@@ -11,6 +11,6 @@ export const RouteTitle = ({style, className}: RouteTitleProps) => {
   const routeName = useAppSelector(state => state.routeInfo.name || (state.strava.activityData && state.strava.activityData.name))
 
   return (
-    <div className={className} style={{fontStyle: "oblique", color: "rgba(64, 111, 140, 0.87)", fontSize: titleFont, height: "60px", textAlign: "center", ...style}}>{routeName}</div>
+    <div className={className} style={{fontStyle: "oblique", color: "rgba(64, 111, 140, 0.87)", fontSize: titleFont, height: "60px", textAlign: "left", ...style}}>{routeName}</div>
   )
 }
