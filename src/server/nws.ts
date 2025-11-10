@@ -3,7 +3,8 @@ import { WeatherFunc } from "./weatherForecastDispatcher";
 import { DateTime, Interval } from "luxon"
 const axios = require('axios');
 const axiosInstance = axios.create()
-const Sentry = require("@sentry/node")
+import * as Sentry from "@sentry/node"
+const { trace, debug, info, warn, error, fatal, fmt } = Sentry.logger;
 const milesToMeters = 1609.34;
 const axiosRetry = require('axios-retry').default
 
@@ -12,7 +13,6 @@ axiosRetry(axiosInstance, {
     retryDelay: (...arg: any) => axiosRetry.exponentialDelay(...arg, 400),
     retryCondition: (error: { response: { status: any; }; message: any; }) => {
         // in the weird case that we don't get a response field in the error then report to Sentry and fail the request
-        console.log(`Retrying NWS error ${error.message}`)
         if (!error.response) {
             Sentry.addBreadcrumb({category:'nws',level:'error',message:`NWS error ${error.message}`})
             return false
@@ -69,7 +69,7 @@ interface ForecastGridType {
     }
 }
 const findNearestTime = <T>(data : {values: Array<{validTime: string, value: T}>}, time : DateTime) : T => {
-    let newerThan = data.values.find(value => {return Interval.fromISO(value.validTime).contains(time)});
+    let newerThan = data.values.find(value => {return Interval.fromISO(value.validTime, {setZone:true}).contains(time)});
     if (!newerThan) {
         throw Error(`No matching weather data for ${time.toString()}`);
     }
@@ -92,7 +92,13 @@ const extractForecast = (forecastGridData : ForecastGridType, currentTime : Date
     const windSpeed = findNearestTime(forecastGridData.data.properties.windSpeed, currentTime);
     const gust = findNearestTime(forecastGridData.data.properties.windGust, currentTime);
     const precip = findNearestTime(forecastGridData.data.properties.probabilityOfPrecipitation, currentTime);
-    const {attributes, visibility, ...summary} = findNearestTime<Array<any>>(forecastGridData.data.properties.weather, currentTime)[0];
+    let weatherSummary = null
+    try {
+        const {attributes, visibility, ...summary} = findNearestTime<Array<any>>(forecastGridData.data.properties.weather, currentTime)[0];
+        weatherSummary = summary
+    } catch (err : any) {
+        error(`Failed to get weather summary for ${currentTime}`)
+    }
     const humidity = findNearestTime(forecastGridData.data.properties.relativeHumidity, currentTime);
 
     return {
@@ -103,7 +109,7 @@ const extractForecast = (forecastGridData : ForecastGridType, currentTime : Date
         windSpeedInKph:windSpeed,
         gustInKph:gust,
         precip:precip,
-        summary:summary,
+        summary:weatherSummary,
         humidity:humidity
     }
 };
@@ -114,7 +120,6 @@ const getForecastFromNws = async (forecastUrl : string) => {
             Sentry.addBreadcrumb({
                 category:'nws',level:'error',message:`Failed to get NWS forecast from ${forecastUrl}`
             })
-            console.log(`NWS forecast failure with ${forecastUrl}`)
             throw Error(`Failed to get NWS forecast from ${forecastUrl}`)
         }
     );
@@ -136,7 +141,6 @@ const getForecastFromNws = async (forecastUrl : string) => {
  * vectorBearing: *, gust: string} | never>} a promise to evaluate to get the forecast results
  */
 const callNWS = async function (lat, lon, currentTime, distance, zone, bearing, getBearingDifference, isControl) {
-    console.log('calling NWS forecast')
     const forecastUrl = await getForecastUrl(lat, lon);
     Sentry.setContext('forecastUrl', {'forecastUrl': forecastUrl})
     if (!forecastUrl) {
@@ -152,12 +156,12 @@ const callNWS = async function (lat, lon, currentTime, distance, zone, bearing, 
     const apparentTemperatureInF = forecastValues.apparentTemperatureInC * 9/5 + 32;
     const windSpeedInMph = forecastValues.windSpeedInKph * 1000/milesToMeters;
     const windGustInMph = forecastValues.gustInKph * 1000/milesToMeters;
-
+    const formattedSummary = forecastValues.summary ? formatSummary(forecastValues.summary) : ''
     return new Promise((resolve) => {resolve({
         'time':currentTime,
         'zone':zone,
         'distance':distance,
-        'summary':formatSummary(forecastValues.summary),
+        'summary':formattedSummary,
         'precip':`${forecastValues.precip.toFixed(1)}%`,
         'humidity':forecastValues.humidity,
         'cloudCover':`${forecastValues.cloudCover.toFixed(1)}%`,
