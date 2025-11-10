@@ -344,7 +344,7 @@ app.post('/forecast_one', cache.middleware(), upload.none(), async (req : Reques
         res.status(200).json({ 'forecast': result });
     } catch (error) {
         if (!process.env.NO_LOGGING) {
-            logger.info(`Error with request from ${req.ip}`);
+            logger.info(`Error with request from ${req.ip} ${error}`);
         }
         res.status(500).json({ 'details': `Error calling weather service : ${error}` });
     }

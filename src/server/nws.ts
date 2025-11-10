@@ -12,6 +12,7 @@ axiosRetry(axiosInstance, {
     retryDelay: (...arg: any) => axiosRetry.exponentialDelay(...arg, 400),
     retryCondition: (error: { response: { status: any; }; message: any; }) => {
         // in the weird case that we don't get a response field in the error then report to Sentry and fail the request
+        console.log(`Retrying NWS error ${error.message}`)
         if (!error.response) {
             Sentry.addBreadcrumb({category:'nws',level:'error',message:`NWS error ${error.message}`})
             return false
@@ -113,6 +114,7 @@ const getForecastFromNws = async (forecastUrl : string) => {
             Sentry.addBreadcrumb({
                 category:'nws',level:'error',message:`Failed to get NWS forecast from ${forecastUrl}`
             })
+            console.log(`NWS forecast failure with ${forecastUrl}`)
             throw Error(`Failed to get NWS forecast from ${forecastUrl}`)
         }
     );
@@ -134,6 +136,7 @@ const getForecastFromNws = async (forecastUrl : string) => {
  * vectorBearing: *, gust: string} | never>} a promise to evaluate to get the forecast results
  */
 const callNWS = async function (lat, lon, currentTime, distance, zone, bearing, getBearingDifference, isControl) {
+    console.log('calling NWS forecast')
     const forecastUrl = await getForecastUrl(lat, lon);
     Sentry.setContext('forecastUrl', {'forecastUrl': forecastUrl})
     if (!forecastUrl) {
