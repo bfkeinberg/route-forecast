@@ -56,11 +56,11 @@ else {
                 dsn: 'https://ea4c472ff9054dab8c18d594b95d8da2@sentry.io/298059',
                 _experiments: { enableLogs: true },
                 environment: 'production',
-/*                 ignoreErrors: [
+                ignoreErrors: [
                     "Non-Error exception captured",
                     "Non-Error promise rejection captured"
                 ],
- */                // This enables automatic instrumentation (highly recommended), but is not
+                // This enables automatic instrumentation (highly recommended), but is not
                 // necessary for purely manual usage
                 integrations: [
                     Sentry.thirdPartyErrorFilterIntegration({
