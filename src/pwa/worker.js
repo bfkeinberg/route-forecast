@@ -137,7 +137,7 @@ const getAndCachePOST = async (request) => {
     const formData = await requestClone.json();
     const cacheKey = `${formData.locations.lat}:${formData.locations.lon}_${formData.locations.time}_${formData.service}`
 
-    const response = await fetch(request.clone()).catch(() => console.warn("Could not POST, will try cache"));
+    const response = await fetch(request.clone()).catch((err) => console.warn(`Could not POST (${err}), will try cache`));
     if (response !== undefined && response.ok) {
         // If it works, put the response into IndexedDB
         // console.info(`inserting item into POST cache with key ${cacheKey}`, response);
@@ -164,7 +164,12 @@ const getAndCachePOST = async (request) => {
         let cachedResponse = await postCache.getItem(cacheKey);
         if (!cachedResponse) {
             // console.warn('Returning 503 for POST');
-            return Response.json({details:'No cached POST response'}, {status:503, statusText: 'Service Unavailable'})
+            let details = 'No cached POST response';
+            if (response) {
+                const json = await response.json();
+                details += `(${json.details})`;
+            }
+            return Promise.resolve(Response.json({details:details}, {status:503, statusText: 'Service Unavailable'}));
         }
         // console.info('Returning cached copy', cachedResponse)
         return deserializeResponse(cachedResponse);
