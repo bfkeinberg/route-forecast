@@ -9,6 +9,7 @@ import { MutationWrapper } from "./loadRouteActions";
 import { getForecastRequest } from "../utils/util";
 import { ForecastRequest } from "../utils/gpxParser";
 import { Action, Dispatch } from "@reduxjs/toolkit";
+import * as Sentry from "@sentry/react";
 
 const getRouteDistanceInKm = (routeData : RwgpsRoute|RwgpsTrip) => {
     if (routeData.route !== undefined) {
@@ -32,8 +33,14 @@ const getRouteId = (routeData : RwgpsRoute|RwgpsTrip) => {
 
 export const msgFromError = (error : {reason:{data:{details:string}} | {reason:string, data: never}}) => {
     if (error.reason.data) {
+        if (/^\s*$/.test(error.reason.data.details)) {
+            Sentry.captureMessage("Error string from data.details was all whitespace")
+        }
         return error.reason.data.details
     } else {
+        if (/^\s*$/.test(JSON.stringify(error.reason))) {
+            Sentry.captureMessage("Error string from reason was all whitespace")
+        }
         return JSON.stringify(error.reason)
     }
 }
