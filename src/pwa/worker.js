@@ -124,7 +124,7 @@ const getAndCacheGET = async (request) => {
             }
             if (cachedResponse == undefined) {
                 console.warn(`No matching cache entry for GET for ${url}`);
-                return new Response({details:'No cached GET response'}, {status: 503, statusText: 'Service Unavailable'});
+                return Promise.resolve(new Response({details:'No cached GET response'}, {status: 503, statusText: 'Service Unavailable'}));
             }
         }
         return cachedResponse;
