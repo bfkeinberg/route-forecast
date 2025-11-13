@@ -12,14 +12,17 @@ import { errorDetailsSet } from "../../redux/dialogParamsSlice";
 const ShortUrl = ({shortUrl} : {shortUrl:string}) => {
     const { t } = useTranslation()
     const errorDetails = useAppSelector(state => state.uiInfo.dialogParams.errorDetails)
+    const searchString = useAppSelector(state => state.params.searchString);
+    const distance = useAppSelector(state => state.routeInfo.distanceInKm)
     const dispatch = useAppDispatch()
+    const showErrorNotUrl = errorDetails && searchString && distance;
 
     return (
-        <div style={{ display: (shortUrl === ' ' && !errorDetails) ? 'none' : 'inline-flex', margin: "0px 10px", flexDirection:"column", justifyContent:"flex-start"}}>
+        <div style={{ display: (shortUrl === ' ' && !showErrorNotUrl) ? 'none' : 'inline-flex', margin: "0px 10px", flexDirection:"column", justifyContent:"flex-start"}}>
             <div style={{width: "150px", display: "flex", alignItems: "center"}}>
                 <div>{t('labels.share')}</div>
             </div>
-            {errorDetails && <Notification color='red' onClose={() => dispatch(errorDetailsSet(null))}>{errorDetails}</Notification>}
+            {showErrorNotUrl && <Notification color='red' onClose={() => dispatch(errorDetailsSet(null))}>{errorDetails}</Notification>}
             <TextInput leftSection={<ArrowUpSquare/>} id={'shortUrl'} size="xs" readOnly type="text" value={shortUrl}
                    onClick={async event => {
                     if (navigator.clipboard) {
