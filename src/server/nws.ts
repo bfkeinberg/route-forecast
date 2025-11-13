@@ -78,7 +78,11 @@ const findNearestTime = <T>(data : {values: Array<{validTime: string, value: T}>
 
 const formatSummary = (summary : Summary) => {
     if (summary.coverage && summary.intensity && summary.weather) {
-        return `${summary.coverage} of ${summary.intensity} ${summary.weather}`
+        if (/chance/.test(summary.coverage)) {
+            return `${summary.coverage} of ${summary.intensity} ${summary.weather}`
+        } else {
+            return `${summary.coverage} ${summary.intensity} ${summary.weather}`
+        }
     } else {
         return ""
     }
