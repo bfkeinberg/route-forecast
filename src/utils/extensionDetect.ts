@@ -8,8 +8,8 @@ declare namespace browser.runtime {
     export function sendMessage<M = any, R = any>(
         extensionId: string | undefined | null,
         message: M,
-        responseCallback: (response: R) => void,
-    ): void;
+        responseCallback?: (response: R) => void,
+    ): Promise<{version:number}>;
 }
 
 export const browserIsChrome = () => {
@@ -66,7 +66,32 @@ export const extensionIsInstalled = () => {
         return new Promise<boolean>(( resolve => {
             try {
                 // eslint-disable-next-line no-undef
-                browser.runtime.sendMessage("com.randoplan.extension.Extension (2B6A6N9QBQ)", {message: "version"}, function(response: { version: number; }) {
+                browser.runtime.sendMessage(
+                    "com.randoplan.extension.Extension (2B6A6N9QBQ)",
+                    { message: "version" }).then(response => {
+                        if (response && response.version) {
+                            return resolve(response.version >= requiredVersion)
+                        } else {
+                            return resolve(false);
+                        }
+                    }).catch( error => {
+                        console.error(error)
+                        return resolve(false)
+                    })
+            } catch( error ) {
+                console.error(error)
+                return resolve(false)
+            }
+        }))
+    }
+    else {
+        // for no known browser
+        return Promise.resolve(false)
+    }
+}
+
+/* 
+function(response: { version: number; }) {
                     if (response && response.version) {
                         return resolve(response.version >= requiredVersion)
                     } else {
@@ -77,10 +102,6 @@ export const extensionIsInstalled = () => {
                     console.error(error)
                     return resolve(false)
                 }
-        }))
-    }
-    else {
-        // for no known browser
-        return Promise.resolve(false)
-    }
-}
+        })
+
+        */
