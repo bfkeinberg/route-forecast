@@ -19,16 +19,19 @@ axiosRetry(axiosInstance, {
         }
         switch (error.response.status) {
         case 500:
+        case 404:
             return true;
         default:
             return false;
         }
     },
     onRetry: (retryCount: any, error: any, requestConfig: { url: any; }) => {
-        console.log(`nws axios retry count: ${retryCount} for ${requestConfig.url}`)
+        console.log(`nws axios retry count: ${retryCount} for ${requestConfig.url} with ${error}`)
+        warn(`nws axios retry count: ${retryCount} for ${requestConfig.url} with ${error}`)
     },
     onMaxRetryTimesExceeded: (err: any) => {
         console.log(`last nws axios error after retrying was ${err}`)
+        error(`last nws axios error after retrying was ${err}`)
     }
 })
 
