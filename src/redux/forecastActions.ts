@@ -10,6 +10,7 @@ import { getForecastRequest } from "../utils/util";
 import { ForecastRequest } from "../utils/gpxParser";
 import { Action, Dispatch } from "@reduxjs/toolkit";
 import * as Sentry from "@sentry/react";
+const { trace, debug, info, warn, error, fatal, fmt } = Sentry.logger;
 
 const getRouteDistanceInKm = (routeData : RwgpsRoute|RwgpsTrip) => {
     if (routeData.route !== undefined) {
@@ -33,11 +34,13 @@ const getRouteId = (routeData : RwgpsRoute|RwgpsTrip) => {
 
 export const msgFromError = (error : {reason:{data:{details:string}} | {reason:string, data: never}}) => {
     if (error.reason.data) {
+        warn(error.reason.data.details);
         if (/^\s*$/.test(error.reason.data.details)) {
             Sentry.captureMessage("Error string from data.details was all whitespace")
         }
         return error.reason.data.details
     } else {
+        warn(JSON.stringify(error.reason));
         if (/^\s*$/.test(JSON.stringify(error.reason))) {
             Sentry.captureMessage("Error string from reason was all whitespace")
         }

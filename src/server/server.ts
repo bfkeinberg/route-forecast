@@ -363,8 +363,9 @@ app.post('/aqi_one', upload.none(), async (req, res) => {
         let result = {};
         await getAQI(result, forecastPoint);
         res.status(200).json({ 'aqi': result });
-    } catch (error) {
-        res.status(500).json({ 'details': `Error retrieving AQI : ${JSON.stringify(error)}` });
+    } catch (err) {
+        error(`Error retrieving AQI : ${JSON.stringify(err)}`);
+        res.status(500).json({ 'details': `Error retrieving AQI : ${JSON.stringify(err)}`});
     }
 });
 
