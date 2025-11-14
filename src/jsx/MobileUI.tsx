@@ -1,6 +1,6 @@
 import { Cloud, Globe, BuildingStore, Bike, Map as MapIcon } from "tabler-icons-react";
-import * as React from "react";
-import { Link, NavLink, MemoryRouter, Route, Routes, To, useLocation, useNavigate } from "react-router-dom";
+import React, { useContext } from "react";
+import { NavLink, MemoryRouter, Route, Routes, useLocation, useNavigate } from "react-router-dom";
 import { errorDetailsSet, lastErrorCleared } from "../redux/dialogParamsSlice";
 import { useForecastDependentValues,useWhenChanged } from "../utils/hooks";
 import { ForecastSettings } from "./ForecastSettings/ForecastSettings";
@@ -15,6 +15,8 @@ import { Dispatch, SetStateAction } from "react";
 import * as Sentry from "@sentry/react"
 import {Button, Group, Divider} from "@mantine/core";
 import FaqButton, { ShowFaq } from "./TopBar/FaqButton";
+import VersionContext from "./versionContext";
+
 export interface MobileUIPropTypes {
     mapsApiKey:string, 
     orientationChanged:boolean
@@ -74,7 +76,16 @@ const MobileUITabs = (props : MobileUIPropTypes) => {
                 props.setOrientationChanged(() => false)
             }
         }, [props.orientationChanged])
-    
+
+        const [showVersion, setShowVersion] = React.useState(false);
+        const fontSize = showVersion ? "16px" : "18px";
+        const version = useContext(VersionContext)
+        const title = showVersion ? 'Randoplan v' + version : 'Randoplan';
+        
+        const toggleShowVersion = () => {
+            setShowVersion(!showVersion)
+        }
+
         const { adjustedTimes } = useForecastDependentValues()
         const errorMessageList = useAppSelector(state => state.uiInfo.dialogParams.errorMessageList)
 
@@ -90,8 +101,8 @@ const MobileUITabs = (props : MobileUIPropTypes) => {
             <>
                 <DisplayErrorList errorList={errorMessageList} onClose={closeErrorList}/>
                 <Sentry.ErrorBoundary fallback={<h2>Something went wrong.</h2>}>
-                <Group title="Randoplan" wrap={'nowrap'}>
-                    <span style={{fontSize:'18px'}}>Randoplan</span>
+                <Group title="Randoplan" wrap={'nowrap'} onClick={toggleShowVersion} >
+                    <span style={{fontSize:fontSize}}>{title}</span>
                     <NavLink to={"/"}>
                         <Button size='compact-xs' leftSection={<MapIcon />} title={"home"} variant={pathname==='/'?'filled':'default'}></Button>
                     </NavLink>
