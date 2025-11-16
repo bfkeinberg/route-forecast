@@ -117,8 +117,8 @@ module.exports = (env, argv) => {
                 minify: { minifyURLs: true, removeComments: true },
                 chunksSortMode: 'none',
                 sentryRelease: env.sentryRelease,
-                mode: mode
-                // favicon:'src/static/favicon.ico'
+                mode: mode,
+                favicon:'src/static/favicon.ico'
             }),
             new HtmlWebpackPlugin({
                 title: 'Visualize randoplan usage on a world map',

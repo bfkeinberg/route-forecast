@@ -84,6 +84,18 @@ app.get('/robots.txt', (req : Request, res : Response) => {
 app.set('views', path.resolve(__dirname, 'views'));
 app.set('view engine', 'ejs');
 
+app.get('/favicon.ico', (req : Request, res : Response) => { 
+    res.sendFile(path.resolve(__dirname, '../static/favicon.ico'))
+})
+
+app.get('/apple-touch-icon.png', (req : Request, res : Response) => { 
+    res.sendFile(path.resolve(__dirname, '../static/apple-touch-icon.png'))
+})
+
+app.get('/apple-touch-icon-precomposed.png', (req : Request, res : Response) => { 
+    res.sendFile(path.resolve(__dirname, '../static/apple-touch-icon-precomposed.png'))
+})
+
 const setupPostgres = async () => {
 
     const client = new Client({
