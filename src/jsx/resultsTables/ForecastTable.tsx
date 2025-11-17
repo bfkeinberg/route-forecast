@@ -22,7 +22,7 @@ import { UserControl } from 'redux/controlsSlice';
 import { i18n } from 'i18next';
 import ReactGA from "react-ga4";
 import { Button, Tooltip, Table, Card, Title, Text } from '@mantine/core'
-import { Clipboard, Temperature } from 'tabler-icons-react';
+import { Clipboard, Temperature, Percentage } from 'tabler-icons-react';
 import { notifications } from '@mantine/notifications';
 
 type TimeFormats = {
@@ -140,12 +140,12 @@ const ForecastTable = (adjustedTimes : AdjustedTimes) => {
     const distHeader = <DesktopTooltip label={t('tooltips.distHeader')} position='top'>{distHeaderText}</DesktopTooltip>
 
     const toggleGustDisplay = () => {ReactGA.event('select_content', {content_type : 'gusts'}); return setShowGusts(!showGusts)}
-    const windHeaderText = <Button variant='default' size='compact-xs' onClick={toggleGustDisplay} >{showGusts ? t('data.wind.gust') : t('data.wind.speed')}</Button>;
+    const windHeaderText = <Button className={'clickableHeaderCell'} variant='default' size='compact-xs' onClick={toggleGustDisplay} >{showGusts ? t('data.wind.gust') : t('data.wind.speed')}</Button>;
     const windHeader = <DesktopTooltip label={t('tooltips.windHeader')} position='top'>{windHeaderText}</DesktopTooltip>
 
     const toggleApparentDisplay = () => {ReactGA.event('select_content', {content_type : 'feelsLike'}); return setShowApparentTemp(!showApparentTemp)}
 
-    const temperatureHeaderText = <Button variant='default' size='compact-xs' onClick={toggleApparentDisplay}>{showApparentTemp ? t('tableHeaders.temperature') : <Temperature/>}</Button>
+    const temperatureHeaderText = <Button className={'clickableHeaderCell'} variant='default' size='compact-xs' onClick={toggleApparentDisplay}>{showApparentTemp ? t('tableHeaders.temperature') : <Temperature/>}</Button>
     const temperatureHeader = <DesktopTooltip label={t('tooltips.temperatureHeader')} position='top'>{temperatureHeaderText}</DesktopTooltip>
 
     const copyTable = async (event: React.MouseEvent) => {
@@ -302,7 +302,11 @@ const ForecastTable = (adjustedTimes : AdjustedTimes) => {
             : DateTime.fromISO(point.time, { locale: i18n.language, zone: point.zone }).toFormat('cccc')
     }
 
-    const expandTable = (forecast : Forecast[], metric : boolean, adjustedTimes : AdjustedTimes, finishTime : string|null) => {
+    const forecastHasSummary = (forecasts : Forecast[]) => {
+        return !!forecasts.find( (forecast : Forecast) => forecast.summary !== '');
+    }
+
+    const expandTable = (forecast : Forecast[], metric : boolean, adjustedTimes : AdjustedTimes, finishTime : string|null, hasSummary: boolean) => {
         const { i18n } = useTranslation()
         if (forecast.length > 0) {
             return (
@@ -321,7 +325,7 @@ const ForecastTable = (adjustedTimes : AdjustedTimes) => {
                         <Table.Td><span style={styleForControl(point)} className='timeCell'>
                             <Time time={getAdjustedTime(point,index,adjustedTimes, i18n)} zone={point.zone} i18n={i18n}/></span></Table.Td>
                         <Table.Td style={styleForControl(point)}>{metric ? ((point.distance*milesToMeters)/1000).toFixed(0) : point.distance}</Table.Td>
-                        <Table.Td>{point.summary}</Table.Td>
+                        {hasSummary && <Table.Td>{point.summary}</Table.Td>}                        
                         <Table.Td>{showApparentTemp?
                             // eslint-disable-next-line multiline-ternary
                             <i>{formatTemperature(point.feel.toString(), celsius)}</i>:formatTemperature(point.temp, celsius)}</Table.Td>
@@ -336,7 +340,7 @@ const ForecastTable = (adjustedTimes : AdjustedTimes) => {
                             <WindSpeed gust={point.gust} windSpeed={point.windSpeed} showGusts={showGusts}/>
                         </Table.Td>
                         <MediaQuery minWidth={maxWidthForMobile}>
-                            <Table.Td>{showRelativeBearing ? point.relBearing.toFixed() : point.windBearing}</Table.Td>
+                            <Table.Td>{showRelativeBearing ? point.relBearing.toFixed() : point.windBearing}&#176;</Table.Td>
                         </MediaQuery>
                     </Table.Tr>
                     </React.Fragment>
@@ -364,6 +368,7 @@ const ForecastTable = (adjustedTimes : AdjustedTimes) => {
     const isLandscape = useMediaQuery({query:'(orientation:landscape)'})
     const isLargeEnough = useMediaQuery({query:'(min-width: 950px)'})
     const hasStdDev = forecast[0] && forecast[0].stdDev
+    const hasSummary = forecastHasSummary(forecast);
 
     return (
 
@@ -425,15 +430,15 @@ const ForecastTable = (adjustedTimes : AdjustedTimes) => {
                             <Table.Tr key={'777'}>
                                 <Table.Th><span className={'timeHeaderCell'}>{t('tableHeaders.time')}</span></Table.Th>
                                 <Table.Th><span className={'headerCell'}>{distHeader}</span></Table.Th>
-                                <Table.Th><span style={{display:"inline-block", width:"60px"}}className={'headerCell'}>{t('tableHeaders.summary')}</span></Table.Th>
-                                <Table.Th id={'temp'} className={'clickableHeaderCell'}>{temperatureHeader}</Table.Th>
+                                {hasSummary && <Table.Th><span style={{display:"inline-block", width:"60px"}}className={'headerCell'}>{t('tableHeaders.summary')}</span></Table.Th>}                                
+                                <Table.Th id={'temp'}>{temperatureHeader}</Table.Th>
                                 {hasStdDev?<Table.Th>
                                     <span className={'symbolHeaderCell'}>&#x3c3;<Temperature/></span>
                                 </Table.Th>:<></>}
                                 <Table.Th>
-                                    <span className={'headerCell'}>
+                                    <span>
                                         <DesktopTooltip label={t('tooltips.scrollToRain')} position='top'>
-                                            <Button variant='default' size='compact-xs' onClick={scrollToChanceOfRain}>{t('tableHeaders.precipitation')}</Button>
+                                            <Button  className={'clickableHeaderCell'} style={{width:"30px"}} variant='default' size='compact-xs' onClick={scrollToChanceOfRain}><Percentage/></Button>
                                         </DesktopTooltip>
                                     </span>
                                 </Table.Th>
@@ -442,18 +447,18 @@ const ForecastTable = (adjustedTimes : AdjustedTimes) => {
                                     <Table.Th><span className={'headerCell'}>{t('tableHeaders.cloudCover')}</span></Table.Th>
                                     <Table.Th className={'clickableHeaderCell'} id={'aqi'}>
                                         <DesktopTooltip label={t('tooltips.aqiHeader')} position='top'>
-                                            <Button size='sm' variant={fetchAqi?"active":"default"} onClick={toggleAqi}><span className={fetchAqi ? 'largerClickableHeaderCell' : 'largerStruckClickableHeaderCell'}>AQI</span></Button></DesktopTooltip>
+                                            <Button style={{padding:'0px'}} size='sm' variant={fetchAqi?"active":"default"} onClick={toggleAqi}><span className={fetchAqi ? 'largerClickableHeaderCell' : 'struckClickableHeaderCell'}>AQI</span></Button></DesktopTooltip>
                                     </Table.Th>
                                 </MediaQuery>
                                 <Table.Th id={'wind'}>{windHeader}</Table.Th>
                                 <MediaQuery minWidth={501}>
-                                    <Table.Th><span className={'headerCell'}>
+                                    <Table.Th><span>
                                         <Tooltip label={t('tooltips.bearingHeader')}>
-                                            <Button variant='default' size='compact-xs' onClick={toggleRelBearing} >{showRelativeBearing ? t('tableHeaders.relBearing') : t('tableHeaders.windBearing')}</Button></Tooltip></span></Table.Th>
+                                            <Button className={'clickableHeaderCell'} variant='default' size='compact-xs' onClick={toggleRelBearing} >{showRelativeBearing ? t('tableHeaders.relBearing') : t('tableHeaders.windBearing')}</Button></Tooltip></span></Table.Th>
                                 </MediaQuery>
                             </Table.Tr>
                         </Table.Thead>
-                        {expandTable(forecast, metric, adjustedTimes, finishTime)}
+                        {expandTable(forecast, metric, adjustedTimes, finishTime, hasSummary)}
                     </Table>
                 </div>
             </Sentry.ErrorBoundary>

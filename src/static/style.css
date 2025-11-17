@@ -51,6 +51,13 @@ img#bugImage {
     color: #0000EE
 }
 
+.struckClickableHeaderCell {
+    font-size: 80%;
+    /* width: 60%; */
+    color: #0000EE;
+    text-decoration: line-through;
+}
+
 .largerClickableHeaderCell {
     font-size: 100%;
     width: 90%;
