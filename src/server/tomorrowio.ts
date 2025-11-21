@@ -1,5 +1,6 @@
 import { AxiosError } from "axios";
 import { WeatherFunc } from "./weatherForecastDispatcher";
+import { Temperature } from "tabler-icons-react";
 
 const { DateTime } = require("luxon");
 const axios = require('axios');
@@ -109,6 +110,8 @@ const callTomorrowIo = async function callTomorrowIo (lat, lon, currentTime, dis
     const windBearing = values.windDirection;
     const relativeBearing = hasWind && windBearing !== undefined ? getBearingDifference(bearing, windBearing) : null;
     const rainy = current.precipitationType === 1;
+    let temperature = values.temperature==undefined ? '<undefined>':`${Math.round(values.temperature)}`;
+    
     return {
         'time':current.startTime,
         zone:zone,
@@ -120,13 +123,13 @@ const callTomorrowIo = async function callTomorrowIo (lat, lon, currentTime, dis
         'windSpeed':!hasWind?'<unavailable>':`${Math.round(values.windSpeed)}`,
         'lat':lat,
         'lon':lon,
-        'temp':`${Math.round(values.temperature)}`,
+        'temp': temperature,
         'relBearing':relativeBearing,
         'rainy':rainy,
-        'windBearing':Math.round(windBearing),
+        'windBearing':windBearing==undefined?'<undefined>':Math.round(windBearing),
         'vectorBearing':bearing,
-        'gust':values.windGust===undefined?'<unavailable>':`${Math.round(values.windGust)}`,
-        'feel':values.temperatureApparent===undefined?Math.round(values.temperature):Math.round(values.temperatureApparent),
+        'gust':values.windGust==undefined?'<unavailable>':`${Math.round(values.windGust)}`,
+        'feel':values.temperatureApparent==undefined? temperature : Math.round(values.temperatureApparent),
         'aqi':values.epaIndex,
         isControl:isControl
     }
