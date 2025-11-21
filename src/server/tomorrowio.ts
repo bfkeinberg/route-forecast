@@ -106,11 +106,11 @@ const callTomorrowIo = async function callTomorrowIo (lat, lon, currentTime, dis
 
     const current = forecast.data.timelines[0];
     const values = current.intervals[0].values;
-    const hasWind = values.windSpeed !== undefined;
+    const hasWind = values.windSpeed != undefined;
     const windBearing = values.windDirection;
     const relativeBearing = hasWind && windBearing !== undefined ? getBearingDifference(bearing, windBearing) : null;
     const rainy = current.precipitationType === 1;
-    let temperature = values.temperature==undefined ? '<undefined>':`${Math.round(values.temperature)}`;
+    let temperature = values.temperature==undefined ? '<unavailable>':`${Math.round(values.temperature)}`;
     
     return {
         'time':current.startTime,
@@ -126,7 +126,7 @@ const callTomorrowIo = async function callTomorrowIo (lat, lon, currentTime, dis
         'temp': temperature,
         'relBearing':relativeBearing,
         'rainy':rainy,
-        'windBearing':windBearing==undefined?'<undefined>':Math.round(windBearing),
+        'windBearing':windBearing==undefined?'<unavailable>':Math.round(windBearing),
         'vectorBearing':bearing,
         'gust':values.windGust==undefined?'<unavailable>':`${Math.round(values.windGust)}`,
         'feel':values.temperatureApparent==undefined? temperature : Math.round(values.temperatureApparent),
