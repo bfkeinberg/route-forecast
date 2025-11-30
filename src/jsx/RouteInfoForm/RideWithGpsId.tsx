@@ -73,19 +73,6 @@ const RideWithGpsId = ({rwgpsRouteSet,loadingSource,loadingSuccess,rwgpsRoute,ro
                         }
                     }
                 }}
-                onDragEnd={event => {
-                    let dt = event.dataTransfer;
-                    if (dt.items) {
-                        // Use DataTransferItemList interface to remove the drag data
-                        try {
-                            for (let i = dt.items.length - 1; i >= 0; i--) {
-                                dt.items.remove(i);
-                            }
-                        } catch (err) {
-                            Sentry.captureException(err)
-                        }
-                    }
-                }}
                 pattern="[0-9]*"
                 value={rwgpsRoute} />
         </Flex>
