@@ -8,9 +8,14 @@ import { Favorite } from "../../redux/rideWithGpsSlice";
 import { Combobox, ComboboxOptionProps, useCombobox, InputBase, Group, Text, Button } from '@mantine/core'
 
 function SelectOption({ name, id, associated_object_id, associated_object_type }: Favorite) {
+  let idString = associated_object_id.toString()
+  const queryFound = idString.indexOf('?');
+  if (queryFound !== -1) {
+    idString = idString.slice(0, queryFound);
+  }
   return (
     <Group>
-      <Text fz={20}>{associated_object_id}</Text>
+      <Text fz={20}>{idString}</Text>
       <div>
         <Text fz="sm" fw={500}>
           {name}
