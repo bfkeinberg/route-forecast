@@ -21,7 +21,7 @@ import getAirNowAQI from './airNowAQI'
 import querystring from 'querystring';
 import * as Sentry from "@sentry/node"
 const { trace, debug, info, warn, error, fatal, fmt } = Sentry.logger;
-import axios, { AxiosError, isAxiosError, AxiosResponse } from 'axios';
+import axios, { AxiosError, isAxiosError, AxiosResponse, AxiosRequestConfig } from 'axios';
 const axiosRetry = require('axios-retry').default
 const axiosInstance = axios.create()
 
@@ -805,7 +805,7 @@ axiosRetry(axiosInstance, {
 app.get('/pinned_routes', async (req : Request, res : Response) => {
     const rwgpsApiKey = process.env.RWGPS_API_KEY;
     const token = req.query.token;
-    if (token === undefined || token === 'undefined') {
+    if (token === undefined || token === 'undefined' || typeof token !== 'string') {
         res.status(400).json("{'status': 'Missing authentication token'}");
         return;
     }
@@ -813,9 +813,68 @@ app.get('/pinned_routes', async (req : Request, res : Response) => {
         res.status(500).json({ 'details': 'Missing rwgps API key' });
         return;
     }
-    let url = `https://ridewithgps.com/users/current.json`;
-    let options = {headers:{'Authorization':`Bearer ${token}`}};
+
+    const customHeaders: AxiosRequestConfig['headers'] = {
+    'Authorization':`Bearer ${token}`,
+    'x-rwgps-api-key':rwgpsApiKey,
+    'x-rwgps-auth-token':token
+    };
+
+    const userInfoHeaders: AxiosRequestConfig['headers'] = {
+    'Authorization':`Bearer ${token}`
+    };
+
+    interface RwgpsSyncType {
+        action : string,
+        datetime: string,
+        item_id : number,
+        item_type : 'route'|'trip',
+        item_url : string,
+        item_user_id : number
+    }
+    interface RwgpsSyncMeta {
+        rwgps_datetime: string,
+        next_sync_url: string
+    }
+    type RwgpsSync = {
+        items: RwgpsSyncType[],
+        meta: RwgpsSyncMeta
+    }
+    interface ErrorResponse {
+        error: string
+    }
+    interface FavoriteMapValue {
+        id: number,
+        associated_object_id: string,
+        associated_object_type: string
+    }
+    let options = {headers: customHeaders};
+    let syncUrl = `https://ridewithgps.com/api/v1/sync.json?since=1970-01-01&assets=routes,trips`;
+    const syncResponse = await axiosInstance.get<RwgpsSync>(syncUrl, options).catch(((error : AxiosError) => {
+        if (error.response && isAxiosError(error) && error.response.data) {
+            Sentry.captureMessage(`Error fetching pinned routes for ${req.query.token} ${(error.response.data as ErrorResponse).error}`);
+            res.status(error.response.status).json((error.response.data as ErrorResponse).error);    
+        } else {
+            Sentry.captureMessage(`Error fetching pinned routes for ${req.query.token} ${error.response}`);
+            res.status(500).json(error.response)
+        }
+    }));
+    if (!syncResponse) {
+            Sentry.captureMessage("No favorites returned from Ride with GPS sync call")
+            res.status(401).json("No favorites returned from Ride with GPS sync call")
+            return
+    }
+    const filteredResponse = syncResponse.data.items.filter((item : RwgpsSyncType) => item.action === 'added');
+    const favoritesMap = new Map<string,FavoriteMapValue>(filteredResponse.map((fav : RwgpsSyncType) => {
+        return [fav.item_id.toString(), {id:fav.item_id,
+            associated_object_id:fav.item_url.replace('https://ridewithgps.com/api/v1/routes/', '').replace('.json',''), 
+            associated_object_type:fav.item_type, key:fav.item_id}]
+        }));
+
+    // keep this older code to get the names without having to fetch all the data from every route
+    let userInfoOptions = {headers: userInfoHeaders};
     try {
+        let url = `https://ridewithgps.com/users/current.json`;
         interface RwgpsUserInfo {
             user: {
                 id: string
@@ -826,10 +885,8 @@ app.get('/pinned_routes', async (req : Request, res : Response) => {
             };
             status: number;
         }
-        interface ErrorResponse {
-            error: string
-        }
-        const response = await axiosInstance.get<RwgpsUserInfo>(url, options).catch((error: AxiosError) => {
+        //@ts-ignore
+        const response = await axiosInstance.get<RwgpsUserInfo>(url, userInfoOptions).catch((error: AxiosError) => {
             if (error.response && isAxiosError(error) && error.response.data) {
                 Sentry.captureMessage(`Error fetching pinned routes for ${req.query.token} ${(error.response.data as ErrorResponse).error}`);
                 res.status(error.response.status).json((error.response.data as ErrorResponse).error);    
@@ -842,7 +899,7 @@ app.get('/pinned_routes', async (req : Request, res : Response) => {
             return;
         }
         // insertFeatureRecord(makeFeatureRecord(response), "pinned", response.data.user.email);
-        const favoritesReply = await axiosInstance.get<FavoritesReply>(`https://ridewithgps.com/users/${response.data.user.id}/favorites.json?version=2&apikey=${rwgpsApiKey}`, options).
+        const favoritesReply = await axiosInstance.get<FavoritesReply>(`https://ridewithgps.com/users/${response.data.user.id}/favorites.json?version=2&apikey=${rwgpsApiKey}`, userInfoOptions).
         catch((error : AxiosError) => {
             Sentry.captureMessage(`Favorites error ${error}`)
             if (error.response) {
@@ -856,8 +913,15 @@ app.get('/pinned_routes', async (req : Request, res : Response) => {
             res.status(401).json("No favorites returned from Ride with GPS")
             return
         }
-        const favorites = favoritesReply.data.results.map(fav => {return {id:fav.favid, name:fav[fav.type].name,
-            associated_object_id:fav[fav.type].id, associated_object_type:fav.type, key:fav.favid}});
+
+        const favorites = favoritesReply.data.results.map(fav => {
+            const matchingFav = favoritesMap.get(fav[fav.type].id.toString());
+            if (matchingFav) {
+                return {
+                    ...matchingFav, name:fav[fav.type].name,
+                }
+            }
+        });
         res.status(200).json(favorites);
     } catch (err : any) {
         if (err !== undefined) {
