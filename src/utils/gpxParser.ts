@@ -239,7 +239,7 @@ class AnalyzeRoute {
         const routeAsLineString = turf.lineString(coordinates)
         const cleanedLine = turf.cleanCoords(routeAsLineString)
         return routeData[routeData.type]?.points_of_interest.filter((poi: RwgpsPoi) =>
-             (poi.t===31||poi.t===13)).map((poi: RwgpsPoi) => this.controlFromPoi(poi, routeData, cleanedLine))
+             (poi.t===31||poi.t===13||poi.t===27)).map((poi: RwgpsPoi) => this.controlFromPoi(poi, routeData, cleanedLine))
     }
 
     parseGpxRouteStream ( routeData : GpxRouteData) : Array<Point> {
