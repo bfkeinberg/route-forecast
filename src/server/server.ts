@@ -31,6 +31,7 @@ import {Client} from "pg";
 
 import RateLimit from 'express-rate-limit'
 import { access } from 'fs';
+import { DateTime } from 'luxon';
 var limiter = RateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: 100, // max 100 requests per windowMs
@@ -489,7 +490,8 @@ const getShortIoUrl = async (accessToken: string, longUrl: string) => {
             allowDuplicates: false,
             originalURL: longUrl,
             cloaking: false,
-            domain: short_io_domain
+            domain: short_io_domain,
+            ttl: DateTime.now().plus({days: 10}).toISO()
         }
     };
     try {
