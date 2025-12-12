@@ -17,13 +17,13 @@ import WeatherProviderSelector from "./WeatherProviderSelector"
 import Segment from './Segment'
 import i18n from '../app/i18n';
 import { Button, Notification, Checkbox, Collapse, Stack, CheckboxGroup, Paper } from '@mantine/core';
-import { Settings} from "tabler-icons-react"
+import { IconSettings} from "@tabler/icons-react"
 import { useAppSelector, useAppDispatch } from '../../utils/hooks';
 import { ChangeEvent, useState } from 'react';
-import { ChevronDown } from 'tabler-icons-react';
+import { IconChevronDown } from '@tabler/icons-react';
 import { useDisclosure } from '@mantine/hooks';
 
-export const ForecastSettings = () => {
+const ForecastSettings = () => {
     // const [showSettings, setShowSettings] = useState(false)
     const [settingsOpened, { toggle }] = useDisclosure(false);
     const [computeStdDev, setComputeStdDEv] = useState(false)
@@ -96,7 +96,7 @@ export const ForecastSettings = () => {
                 <div style={{ display: "flex", justifyContent: 'space-between' }}>
                     <WeatherProviderSelector />
 {                    <MediaQuery maxDeviceWidth={1050}>
-                        <Button size='small' variant='subtle' onClick={toggle} leftSection={<Settings/>}></Button>
+                        <Button size='small' variant='subtle' onClick={toggle} leftSection={<IconSettings/>}></Button>
                     </MediaQuery>
 }                </div>
                 <div style={{ display: "flex", margin: "30px 0px" }}>
@@ -105,8 +105,10 @@ export const ForecastSettings = () => {
                     </LocationContext.Consumer>
                 </div>
             </div>
-            <ToggleButtonOpaque icon={<ChevronDown/>} active={showControlPoints} onClick={() => {setShowControlPoints()}}>{t('buttons.stops')}</ToggleButtonOpaque>
+            <ToggleButtonOpaque icon={<IconChevronDown/>} active={showControlPoints} onClick={() => {setShowControlPoints()}}>{t('buttons.stops')}</ToggleButtonOpaque>
             {showControlPoints && <ControlTableContainer />}
         </div>
     )
 }
+
+export default ForecastSettings;

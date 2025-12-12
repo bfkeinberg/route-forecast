@@ -4,14 +4,14 @@ import {connect, useDispatch, ConnectedProps} from 'react-redux';
 import { Card, Title } from '@mantine/core';
 import { routeLoadingModeProps,RouteLoadingModes,routeLoadingModes } from '../../data/enums';
 import { errorDetailsSet } from '../../redux/dialogParamsSlice';
-import { RouteInfoInputRUSA } from './RouteInfoInputRUSA';
+import React, { ReactNode, Suspense } from 'react';
+const RouteInfoInputRUSA = React.lazy(() => import('./RouteInfoInputRUSA'));
 import { RouteInfoInputRWGPS } from './RouteInfoInputRWGPS';
-import { RouteInfoInputStrava } from './RouteInfoInputStrava'
+const RouteInfoInputStrava = React.lazy(() => import('./RouteInfoInputStrava'));
 import {useTranslation} from 'react-i18next'
 import bicycle from 'Images/bicycle.svg'
 import { routeLoadingModeSet } from '../../redux/routeParamsSlice';
 import type { RootState } from "../../redux/store";
-import { ReactNode } from 'react';
 type PropsFromRedux = ConnectedProps<typeof connector>
 import { Notification } from '@mantine/core';
 
@@ -20,9 +20,9 @@ const getInputForMode = (mode : RouteLoadingModes ) => {
         case routeLoadingModes.RWGPS:
             return <RouteInfoInputRWGPS/>
         case routeLoadingModes.STRAVA:
-            return <RouteInfoInputStrava/>
+            return <Suspense fallback={<div>Loading Strava route input...</div>}><RouteInfoInputStrava/></Suspense>
         case routeLoadingModes.RUSA_PERM:
-            return <RouteInfoInputRUSA/>
+            return <Suspense fallback={<div>Loading RUSA route input...</div>}><RouteInfoInputRUSA/></Suspense>
         default:
             return <RouteInfoInputRWGPS/>
     }

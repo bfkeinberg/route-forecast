@@ -1,4 +1,4 @@
-import { Map } from "tabler-icons-react";
+import { IconMap } from "@tabler/icons-react";
 import {useRef} from 'react';
 
 import { loadFromRideWithGps } from "../../redux/loadRouteActions";
@@ -63,7 +63,7 @@ const RWGPSRouteList = ({ }) => {
                 variant="default"
                 onClick={() => combobox.openDropdown()}
                 rightSection={<Combobox.Chevron />}
-                leftSection={<Map />}
+                leftSection={<IconMap />}
                 className={'glowing_input'}
               >             
               {selectedName.current === '' ? route_id : selectedName.current}     

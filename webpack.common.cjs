@@ -118,6 +118,7 @@ module.exports = (env, argv) => {
                 chunksSortMode: 'none',
                 sentryRelease: env.sentryRelease,
                 mode: mode,
+                hash: true,
                 favicon:'src/static/favicon.ico'
             }),
             new HtmlWebpackPlugin({
@@ -125,8 +126,9 @@ module.exports = (env, argv) => {
                 filename: path.resolve(VIEWS_DIR, 'vis_index.ejs'),
                 template: path.resolve(TEMPLATE_DIR, 'visualize.html'),
                 inject: false,
+                hash: true,
                 minify: { minifyURLs: true, removeComments: true },
-                chunksSortMode: 'none',
+                chunksSortMode: 'auto',
                 mode: mode
             }),
             new CopyWebpackPlugin({
@@ -172,22 +174,27 @@ module.exports = (env, argv) => {
         },
         // webpack.common.js
         optimization: {
-            moduleIds: 'deterministic',
-            chunkIds: 'named',            
+            runtimeChunk: 'single',
+            // moduleIds: 'named', //'deterministic',
+            // chunkIds: 'named',
             splitChunks: {
-                cacheGroups: {
-                    mapModules: {
-                        test: /[\\/]Map[\\/]/,
-                        name: 'map-components',
-                        priority: 10
+                chunks: 'all',
+                // maxInitialRequests: Infinity,
+                minSize: 1000,
+/*                 cacheGroups: {
+                    vendor: {
+                        test: /[\\/]node_modules[\\/]/,
+                        name(module) {
+                            // get the name. E.g. node_modules/packageName/not/this/part.js
+                            // or node_modules/packageName
+                            const packageName = module.context.match(/[\\/]node_modules[\\/](.*?)([\\/]|$)/)[1];
+
+                            // npm package names are URL-safe, but some servers don't like @ symbols
+                            return `npm.${packageName.replace('@', '')}`;
+                        },
                     },
-                    forecastModules: {
-                        test: /(Forecast|forecast|Weather)/,
-                        name: 'forecast-components',
-                        priority: 5
-                    }
                 }
-            }
+ */            }
         }
     }
 };

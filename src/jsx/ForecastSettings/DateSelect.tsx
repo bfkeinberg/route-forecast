@@ -9,7 +9,7 @@ import {useTranslation} from 'react-i18next'
 import type { RootState } from "../../redux/store";
 import { ActionCreatorWithPayload } from "@reduxjs/toolkit";
 type PropsFromRedux = ConnectedProps<typeof connector>
-import { Calendar } from 'tabler-icons-react';
+import { IconCalendar } from '@tabler/icons-react';
 import { DesktopTooltip } from '../shared/DesktopTooltip';
 
 export const setDateOnly = (start : DateTime, setInitialStart : ActionCreatorWithPayload<{
@@ -52,7 +52,7 @@ const DateSelect = ({ start, zone, setStart, initialStartTimeSet, maxDaysInFutur
     return (
         <div style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
             <span id={"startingTime"} style={{ fontSize: isMobile ? ".7rem" : ".875rem", fontWeight: "bolder", padding: "0px 5px", flex: 1 }}>
-                <Calendar onClick={() => setDateOnly(start, initialStartTimeSet)} style={{ cursor: "pointer", marginRight: "3px" }} />
+                <IconCalendar onClick={() => setDateOnly(start, initialStartTimeSet)} style={{ cursor: "pointer", marginRight: "3px" }} />
                 {t('labels.startingTime')}
             </span>
             <div style={{ flex: 2.5 }}>

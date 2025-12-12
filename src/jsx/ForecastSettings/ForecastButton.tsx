@@ -11,7 +11,7 @@ import { forecastFetched, forecastAppended, Forecast } from '../../redux/forecas
 import { querySet } from '../../redux/paramsSlice';
 import { errorMessageListSet, errorMessageListAppend, forecastFetchBegun, forecastFetchFailed } from '../../redux/dialogParamsSlice';
 import { generateUrl } from '../../utils/queryStringUtils';
-import { getForecastRequest } from '../../utils/util';
+import { getForecastRequest } from '../../utils/routeUtils';
 import { DesktopTooltip } from '../shared/DesktopTooltip';
 import {useTranslation} from 'react-i18next'
 import { providerValues } from '../../redux/providerValues';

@@ -217,6 +217,8 @@ const render = () => {
     if (!container) {
         return (<div>Missing root container for application</div>)
     }
+    const maps_key = script.getAttribute('maps_key');
+
     if (!maps_key) {
         return (<div>Missing required configuration variables</div>)
     }

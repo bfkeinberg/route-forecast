@@ -11,7 +11,7 @@ import type { RootState } from "../../redux/store";
 import { ActionCreatorWithPayload } from '@reduxjs/toolkit';
 import Snackbar, {SnackbarCloseReason} from '@mui/material/Snackbar';
 import { Button } from "@mantine/core";
-import {Star} from "tabler-icons-react"
+import {IconStar} from "@tabler/icons-react"
 
 const addBreadcrumb = (msg : string) => {
     Sentry.addBreadcrumb({
@@ -126,7 +126,7 @@ const PinnedRouteLoader = ({rwgpsToken, rwgpsTokenSet, credentialsValid,
                 autoContrast
                 loading={loadingPinnedRoutes}
                 className={button_class}
-                leftSection={<Star style={{fill:starFill, stroke:usingPinnedRoutes?"#3c4988":"white"}}/>}
+                leftSection={<IconStar style={{fill:starFill, stroke:usingPinnedRoutes?"#3c4988":"white"}}/>}
                 style={{fontSize: "12px", color:usingPinnedRoutes?"#4C5897":"white", background:usingPinnedRoutes?"#bdc2de":"##2d72d2"}}
                 onClick={() => {setDisplayRoutesError(true); togglePinnedRoutes(usePinnedRoutesSet, setShowPinnedRoutes, usingPinnedRoutes)}}
             >{usingPinnedRoutes ? t('buttons.dontUsePinned') : t('buttons.usePinned')}

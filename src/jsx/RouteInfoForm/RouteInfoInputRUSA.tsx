@@ -10,7 +10,7 @@ import { rusaPermRouteIdSet, rwgpsRouteSet } from '../../redux/routeParamsSlice'
 import { useAppDispatch, useAppSelector } from '../../utils/hooks';
 import {Button, CloseButton, Flex, Input} from "@mantine/core"
 
-export const RouteInfoInputRUSA = () => {
+const RouteInfoInputRUSA = () => {
     const loadButtonRef = useRef(null)
     const dispatch = useAppDispatch()
     const rusaPermRouteId = useAppSelector(state => state.uiInfo.routeParams.rusaPermRouteId)
@@ -81,3 +81,5 @@ const RUSALoadRouteButton = ({loadButtonRef, lookupFunc} : RUSALoadRouteButtonPr
     </Button>
   )
 }
+
+export default RouteInfoInputRUSA;

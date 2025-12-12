@@ -9,7 +9,7 @@ import StravaRouteIdInput from './StravaRouteIdInput';
 import { useAppSelector, useAppDispatch } from '../../utils/hooks';
 import { Button } from "@mantine/core"
 
-export const RouteInfoInputStrava = () => {
+const RouteInfoInputStrava = () => {
   const dispatch = useAppDispatch()
 
   const strava_activity_id = useAppSelector(state => state.strava.activity);
@@ -69,3 +69,5 @@ const StravaLoginButton = () => {
     </Button>
   )
 }
+
+export default RouteInfoInputStrava;

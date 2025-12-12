@@ -3,11 +3,11 @@ import "./DesktopUI.css"
 import React, { Suspense,useState,StrictMode, SetStateAction, Dispatch, lazy } from "react";
 import { useAppDispatch, useAppSelector } from "../utils/hooks";
 import { routeLoadingModes } from "../data/enums";
-import { useDelay, useForecastDependentValues,usePrevious, useValueHasChanged, useWhenChanged } from "../utils/hooks";
-import { ForecastSettings } from "./ForecastSettings/ForecastSettings";
+import { useDelay, usePrevious, useValueHasChanged, useWhenChanged } from "../utils/hooks";
+const ForecastSettings = React.lazy(() => import("./ForecastSettings/ForecastSettings"));
 import { InstallExtensionButton } from "./InstallExtensionButton";
 import MapLoader, {addBreadcrumb} from "./Map/MapLoader";
-import PaceTable from "./resultsTables/PaceTable";
+const PaceTable = React.lazy(() => import("./resultsTables/PaceTable"));
 import RouteInfoForm from "./RouteInfoForm/RouteInfoForm";
 import { RouteTitle } from "./shared/RouteTitle";
 import { TransitionWrapper } from "./shared/TransitionWrapper";
@@ -36,16 +36,15 @@ const DesktopUI = ({mapsApiKey, orientationChanged, setOrientationChanged} : Des
     const { t } = useTranslation()
     const dispatch = useAppDispatch()
 
-    const {adjustedTimes } = useForecastDependentValues()
     const titleRouteInfo = t("titles.routeInfo")
     const titleForecastSettings = t("titles.forecastSettings")
     const titleForecast = t("titles.forecast")
     const titlePaceAnalyis = t("titles.paceAnalysis")
     const sidePaneOptions = [
         {title: titleRouteInfo, content: <Sentry.ErrorBoundary fallback={<h2>Something went wrong loading the route selector.</h2>}><RouteInfoForm /></Sentry.ErrorBoundary>},
-        {title: titleForecastSettings, content: <Sentry.ErrorBoundary fallback={<h2>Something went wrong loading the forecast settings.</h2>}><ForecastSettings/></Sentry.ErrorBoundary>},
-        {title: titleForecast, content: <Sentry.ErrorBoundary fallback={<h2>Something went wrong loading the forecast.</h2>}><Suspense fallback={<div>Loading ForecastTable...</div>}>{<LoadableForecastTable adjustedTimes={adjustedTimes}/>}</Suspense></Sentry.ErrorBoundary>},
-        {title: titlePaceAnalyis, content: <Sentry.ErrorBoundary fallback={<h2>Something went wrong loading the table of paces.</h2>}>{<PaceTable/>}</Sentry.ErrorBoundary>}
+        {title: titleForecastSettings, content: <Sentry.ErrorBoundary fallback={<h2>Something went wrong loading the forecast settings.</h2>}><Suspense fallback={<div>Loading forecast settings</div>}><ForecastSettings/></Suspense></Sentry.ErrorBoundary>},
+        {title: titleForecast, content: <Sentry.ErrorBoundary fallback={<h2>Something went wrong loading the forecast.</h2>}><Suspense fallback={<div>Loading ForecastTable...</div>}>{<LoadableForecastTable/>}</Suspense></Sentry.ErrorBoundary>},
+        {title: titlePaceAnalyis, content: <Sentry.ErrorBoundary fallback={<h2>Something went wrong loading the table of paces.</h2>}>{<Suspense fallback={<div>Loading pace table...</div>}><PaceTable/></Suspense>}</Sentry.ErrorBoundary>}
     ]
     const [
         activeSidePane,

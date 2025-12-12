@@ -1,5 +1,5 @@
 import { Button } from "@mantine/core";
-import {Circle, CircleDot} from "tabler-icons-react"
+import {IconCircle, IconCircleDot} from "@tabler/icons-react"
 import { ForwardedRef, forwardRef } from "react";
 interface ToggleButtonProps {
   children: string
@@ -11,8 +11,8 @@ interface ToggleButtonProps {
 
 export const ToggleButton = forwardRef((props : ToggleButtonProps, ref : ForwardedRef<HTMLButtonElement>) => {
   const {children, active, onClick, icon, style} : ToggleButtonProps = props
-  const activeIcon = (<CircleDot style={{opacity: 1, transition: "opacity 0.15s"}}/>)
-  const inactiveIcon = (<Circle style={{opacity: 0.25, transition: "opacity 0.15s"}}/>)
+  const activeIcon = (<IconCircleDot style={{opacity: 1, transition: "opacity 0.15s"}}/>)
+  const inactiveIcon = (<IconCircle style={{opacity: 0.25, transition: "opacity 0.15s"}}/>)
   return (
     <Button ref={ref} leftSection={icon || (active?activeIcon:inactiveIcon)} 
     style={{height: '100%', border: "1px solid #6c757d80", display: "flex", alignItems: "center", 

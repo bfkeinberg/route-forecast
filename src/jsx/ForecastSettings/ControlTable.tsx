@@ -7,7 +7,7 @@ import {useTranslation} from 'react-i18next'
 import { useAppSelector, useAppDispatch } from '../../utils/hooks';
 const minSuffixFunction = (value : string) => `${value} min`
 import type { UserControl } from '../../redux/controlsSlice';
-import { CircleX } from 'tabler-icons-react';
+import {IconCircleX } from '@tabler/icons-react';
 import { CloseButton } from '@mantine/core';
 
 export const ControlTable = () => {
@@ -94,7 +94,7 @@ export const ControlTable = () => {
         rows: controlsData.map(({name, distance, duration, arrival, banked, actual, isOpen}, index) =>
             ({name, distance, duration, arrival, banked, actual, 
                 style:(isOpen===false)?{backgroundColor:"rgba(212, 16, 16, 0.315)", borderColor:"rgba(240, 10, 129, 0.86)"}:null, 
-                delete: <CloseButton icon={<CircleX/>} style={{cursor: "pointer"}} onClick={() => removeControl(index)}/>})),
+                delete: <CloseButton icon={<IconCircleX/>} style={{cursor: "pointer"}} onClick={() => removeControl(index)}/>})),
         columns: [
             {name: "name", render: t('controls.name'), width: 40, editable: true},
             {name: "distance", editTransformFunction: transformDistance, editCompleteFunction: reverseTransformDistance,  valueTransformFunction: transformDistance, render: <div style={{color: '#0000EE', cursor:'pointer'}} onClick={sortOurStuffByDistance}>{metric ? t('controls.distanceKilometers') :t('controls.distanceMiles')}</div>, width: 40, editable: true, editValidateFunction: stringIsOnlyDecimal},

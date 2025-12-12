@@ -7,7 +7,7 @@ import { ControlTable } from './ControlTable';
 import { DesktopTooltip } from "../shared/DesktopTooltip";
 import {useTranslation} from 'react-i18next'
 import { Button, Paper } from "@mantine/core"; 
-import { Plus } from "tabler-icons-react"
+import { IconPlus } from "@tabler/icons-react"
 
 export const ControlTableContainer = () => {
   const displayBanked = useAppSelector(state => state.controls.displayBanked)
@@ -42,7 +42,7 @@ const AddRowButton = () => {
   const { t } = useTranslation()
   return (
     <div style={{border: "1px solid black", width: "100%"}} onClick={() => dispatch(controlAdded())}>
-      <Button id={'addButton'} style={{width: "100%"}} variant='default' tabIndex={0} leftSection={<Plus/>}>{t("buttons.addControl")}</Button>
+      <Button id={'addButton'} style={{width: "100%"}} variant='default' tabIndex={0} leftSection={<IconPlus/>}>{t("buttons.addControl")}</Button>
     </div>
   )
 }

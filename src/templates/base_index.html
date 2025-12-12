@@ -48,6 +48,10 @@
                 }
             }
         </script>
+        <% for (var i = 0; i < htmlWebpackPlugin.files.js.length; i++) {  %>
+            <% if (htmlWebpackPlugin.files.js[i].includes('main.bundle')) { break; } %>
+            <script type="text/javascript" src="<%= htmlWebpackPlugin.files.js[i] %>"></script>
+        <% } %>        
         <script>
             function addScriptTag() {
                 if (supportsArrowFunctions()) {
@@ -59,7 +63,7 @@
                     element.setAttribute('sentry_app_id', '<?= sentry_app_id ?>');
                     element.setAttribute('action', '/forecast');
                     element.setAttribute('mode', '<%= htmlWebpackPlugin.options.mode %>');
-                    element.setAttribute('src', '<%= htmlWebpackPlugin.files.js[0] %>');
+                    element.setAttribute('src', "<%= htmlWebpackPlugin.files.js.find(name => name.includes('main.bundle')) %>");
                     element.setAttribute('sentry_trace_sample_rate', '<?= sentry_trace_sample_rate ?>')
                     element.setAttribute('version', '<?= version ?>')
                     document.body.appendChild(element);

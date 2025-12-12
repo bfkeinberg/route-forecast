@@ -1,11 +1,22 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <title>Randoplan usage</title>
-    <link href="<%= htmlWebpackPlugin.files.css[1] %>" rel="stylesheet" type="text/css" >
-  </head>
-  <body>
-    <div id="usage_map" style="height:100%;"></div>
-    <script id='usage_map' src="<%= htmlWebpackPlugin.files.js[1] %>" maps_key="<?= maps_key ?>"></script>
-  </body>
+
+<head>
+  <title>Randoplan usage</title>
+  <% for (var i=0; i < htmlWebpackPlugin.files.css.length; i++) { %>
+    <link href="<%= htmlWebpackPlugin.files.css[i] %>" rel="stylesheet" type="text/css">
+    <% } %>
+  <% for (var i=0; i < htmlWebpackPlugin.files.js.length; i++) { %>
+    <% if (!htmlWebpackPlugin.files.js[i].includes('main.bundle')) {  %>
+    <script defer="true" type="text/javascript" src="<%= htmlWebpackPlugin.files.js[i] %>" maps_key="<?= maps_key ?>"></script>
+    <% } } %>
+
+</head>
+
+<body>
+
+      <div id="usage_map" style="height:100%;"></div>
+
+</body>
+
 </html>

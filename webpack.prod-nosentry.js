@@ -14,6 +14,9 @@ module.exports = (env, argv) => merge(common(env, argv), {
             parallel: true,
             terserOptions: {
                 ecma: 6,
+                compress: {
+                    ecma: 2021
+                }
             },
         }),
         new webpack.IgnorePlugin({
@@ -36,7 +39,7 @@ module.exports = (env, argv) => merge(common(env, argv), {
                 /\.html/
             ]
         }),
-        new BundleAnalyzerPlugin()
+        new BundleAnalyzerPlugin({ analyzerMode: "server" })
     ],
     optimization: {
         minimizer: [

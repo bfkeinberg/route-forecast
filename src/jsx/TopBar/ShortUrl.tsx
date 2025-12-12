@@ -2,7 +2,7 @@ import ReactGA from "react-ga4";
 import {connect} from 'react-redux';
 import * as Sentry from "@sentry/react";
 import type { RootState } from "../../redux/store";
-import {ArrowUpSquare} from "tabler-icons-react"
+import {IconArrowUpSquare} from "@tabler/icons-react"
 import { TextInput, Notification } from '@mantine/core';
 import {useTranslation} from 'react-i18next'
 import { notifications } from '@mantine/notifications';
@@ -23,7 +23,7 @@ const ShortUrl = ({shortUrl} : {shortUrl:string}) => {
                 <div>{t('labels.share')}</div>
             </div>
             {showErrorNotUrl && <Notification color='red' onClose={() => dispatch(errorDetailsSet(null))}>{errorDetails}</Notification>}
-            <TextInput leftSection={<ArrowUpSquare/>} id={'shortUrl'} size="xs" readOnly type="text" value={shortUrl}
+            <TextInput leftSection={<IconArrowUpSquare/>} id={'shortUrl'} size="xs" readOnly type="text" value={shortUrl}
                    onClick={async event => {
                     if (navigator.clipboard) {
                        try {

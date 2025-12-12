@@ -1,9 +1,7 @@
-import faq from "../../static/faq.htm"
-import React, {useState} from "react"
-import Typography from "@mui/material/Typography"
+import React, {Suspense, useState} from "react"
 import cookie from 'react-cookies';
 import  {useMediaQuery} from 'react-responsive'
-import { Drawer } from "@mantine/core";
+const FaqDrawer = React.lazy(() => import("./FaqImpl").then(module => ({ default: module.FaqDrawer })));
 
 const FaqImage = ({flash} : {flash:boolean}) => {
     const textClass = flash ? "flashing-red-text" : ""
@@ -17,8 +15,6 @@ const FaqImage = ({flash} : {flash:boolean}) => {
         </svg>
     )
 }
-
-export const ShowFaq = () => (<Typography style={{ overflowY: 'scroll' }} dangerouslySetInnerHTML={{ __html: faq }} />)
 
 const FaqButton = () => {
     const [faqVisible, setFaqVisible] = useState(false)
@@ -39,9 +35,7 @@ const FaqButton = () => {
             <button style={{border:'none', backgroundColor: 'transparent', width:"90px", height:"60px"}} onClick={showFaq}>
                 <FaqImage flash={!faqWasClicked}/>
             </button>
-            <Drawer style={{overflowY: 'scroll'}} size={drawerSize} onClose={hideFaq} position={"right"} title={"Randoplan FAQ"} opened={faqVisible}>
-                <Typography dangerouslySetInnerHTML={{__html:faq}}/>
-            </Drawer>
+            <Suspense fallback={<div>Loading FAQ drawer...</div>}><FaqDrawer drawerSize={drawerSize} hideFaq={hideFaq} faqVisible={faqVisible}/></Suspense>
         </>
     )
 }

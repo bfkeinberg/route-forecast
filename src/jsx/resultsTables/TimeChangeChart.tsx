@@ -23,7 +23,7 @@ export const TimeChangeChart = ({chartData, metric, popoverIsOpen} : {chartData:
     const formatTooltipValue = (value: number, name: string, isMetric: boolean) => 
         (name === 'totalMinutesLost') ? value.toFixed(0) : isMetric ? [(value / kmToMiles).toFixed(0), "windSpeedKph"] : [value.toFixed(0), "windSpeedMph"]
     ReactGA.event('time_lost_chart')
-    return <ResponsiveContainer width="100%" height={"100%"} minWidth={550} minHeight={250} /* maxHeight={400} */>
+    return <ResponsiveContainer width="100%" height={"100%"} minWidth={550} minHeight={250} aspect={2.2}/* maxHeight={400} */>
         <LineChart
             width={550} height={250} data={sampledData}
             margin={{

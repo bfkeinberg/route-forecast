@@ -7,7 +7,6 @@ import * as Sentry from "@sentry/react";
 import { routeLoadingBegun, rwgpsRouteLoadingFailed } from "./dialogParamsSlice";
 import { loadRwgpsRoute } from '../utils/rwgpsUtilities';
 import { rwgpsRouteLoaded } from "./routeInfoSlice";
-import { extractControlsFromRoute } from "../utils/util";
 import { displayControlTableUiSet, UserControl } from "./controlsSlice";
 import { timeZoneSet } from "./routeParamsSlice";
 import { updateUserControls, shortenUrl } from "./actions";
@@ -53,17 +52,20 @@ export const loadFromRideWithGps = function (routeNumber? : string, isTrip? : bo
                     message: `Route ${routeNumber} has been loaded`
                 })                
                 dispatch(rwgpsRouteLoaded(routeData));
-                const extractedControls = extractControlsFromRoute(routeData);
-                if (extractedControls.length !== 0) {
-                    const oldControls = getState().controls.userControlPoints
-                    if (oldControls.length === 0) {
-                        dispatch(updateUserControls(extractedControls))
-                    } else {
-                        const merged = mergeControls(oldControls, extractedControls)
-                        dispatch(updateUserControls(merged))
+                import ("../utils/routeUtils").then(({extractControlsFromRoute}) => {
+                    const extractedControls = extractControlsFromRoute(routeData);
+                    if (extractedControls.length !== 0) {
+                        const oldControls = getState().controls.userControlPoints
+                        if (oldControls.length === 0) {
+                            dispatch(updateUserControls(extractedControls))
+                        } else {
+                            const merged = mergeControls(oldControls, extractedControls)
+                            dispatch(updateUserControls(merged))
+                        }
+                        dispatch(displayControlTableUiSet(true))
                     }
-                    dispatch(displayControlTableUiSet(true))
-                }
+                })
+
                 const routeInfo = getState().routeInfo
                 if (routeInfo.type === null) {
                     return

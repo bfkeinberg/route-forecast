@@ -6,7 +6,6 @@ import { forecastFetched, forecastAppended, Forecast, forecastInvalidated } from
 import {getRwgpsRouteName, getRouteNumberFromValue} from "../utils/util"
 import { RwgpsRoute, RwgpsTrip } from "./routeInfoSlice";
 import { MutationWrapper } from "./loadRouteActions";
-import { getForecastRequest } from "../utils/util";
 import { ForecastRequest } from "../utils/gpxParser";
 import { Action, Dispatch } from "@reduxjs/toolkit";
 import * as Sentry from "@sentry/react";
@@ -93,7 +92,7 @@ const forecastByParts = (forecastFunc : MutationWrapper, aqiFunc : MutationWrapp
     return [Promise.allSettled(forecastResults),fetchAqi?Promise.allSettled(aqiResults):[]]
 }
 
-const doForecastByParts = (forecastFunc : MutationWrapper, aqiFunc : MutationWrapper,
+const doForecastByParts = async (forecastFunc : MutationWrapper, aqiFunc : MutationWrapper,
      dispatch : AppDispatch, getState : () => RootState, lang : string) => {
     const type = ((getState().routeInfo.rwgpsRouteData !== null) ? "rwgps" : "gpx")
     const routeNumber = (type === "rwgps") ? getState().uiInfo.routeParams.rwgpsRoute : getState().strava.route
@@ -107,8 +106,9 @@ const doForecastByParts = (forecastFunc : MutationWrapper, aqiFunc : MutationWra
 
         ]),[]]
     }
-    const forecastRequest = getForecastRequest(routeData,
-         getState().uiInfo.routeParams.startTimestamp,
+    const module = await import ("../utils/routeUtils");    
+    const forecastRequest = module.getForecastRequest(routeData,
+        getState().uiInfo.routeParams.startTimestamp,
         getState().uiInfo.routeParams.zone, getState().uiInfo.routeParams.pace,
         getState().uiInfo.routeParams.interval, getState().controls.userControlPoints,
         getState().uiInfo.routeParams.segment, getState().routeInfo.routeUUID
@@ -165,7 +165,7 @@ export const forecastWithHook = async (forecastFunc: MutationWrapper, aqiFunc: M
     fetchAbortMethod = abortMethod;
 
     dispatch(forecastFetchBegun())
-    const forecastAndAqiResults = doForecastByParts(forecastFunc, aqiFunc, dispatch, getState, lang)
+    const forecastAndAqiResults = await doForecastByParts(forecastFunc, aqiFunc, dispatch, getState, lang)
     const forecastResults = await forecastAndAqiResults[0]
     const aqiResults = await forecastAndAqiResults[1]
     let filteredResults = forecastResults.filter(result => result.status === "fulfilled").map(result => (result as PromiseFulfilledResult<{forecast:Forecast}>).value)

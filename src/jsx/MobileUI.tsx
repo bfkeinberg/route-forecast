@@ -1,12 +1,12 @@
-import { Cloud, Globe, BuildingStore, Bike, Map as MapIcon } from "tabler-icons-react";
-import React, { useContext } from "react";
+import { IconCloud, IconGlobe, IconBuildingStore, IconBike, IconMap } from "@tabler/icons-react";
+import React, { Suspense, useContext } from "react";
 import { NavLink, MemoryRouter, Route, Routes, useLocation, useNavigate } from "react-router-dom";
 import { errorDetailsSet, lastErrorCleared } from "../redux/dialogParamsSlice";
-import { useForecastDependentValues,useWhenChanged } from "../utils/hooks";
-import { ForecastSettings } from "./ForecastSettings/ForecastSettings";
+import { useWhenChanged } from "../utils/hooks";
+const ForecastSettings = React.lazy(() => import("./ForecastSettings/ForecastSettings"));
 import MapLoader from "./Map/MapLoader";
-import ForecastTable from "./resultsTables/ForecastTable";
-import PaceTable from "./resultsTables/PaceTable";
+const ForecastTable = React.lazy(() => import("./resultsTables/ForecastTable"));
+const PaceTable = React.lazy(() => import("./resultsTables/PaceTable"));
 import RouteInfoForm from "./RouteInfoForm/RouteInfoForm";
 import DonationRequest from "./TopBar/DonationRequest";
 import DisplayErrorList from "./app/DisplayErrorList";
@@ -14,7 +14,8 @@ import { useAppDispatch, useAppSelector } from "../utils/hooks";
 import { Dispatch, SetStateAction } from "react";
 import * as Sentry from "@sentry/react"
 import {Button, Group, Divider} from "@mantine/core";
-import FaqButton, { ShowFaq } from "./TopBar/FaqButton";
+import FaqButton from "./TopBar/FaqButton";
+const ShowFaq = React.lazy(() => import("./TopBar/FaqImpl").then(module => ({ default: module.ShowFaq })));
 import VersionContext from "./versionContext";
 
 export interface MobileUIPropTypes {
@@ -86,7 +87,6 @@ const MobileUITabs = (props : MobileUIPropTypes) => {
             setShowVersion(!showVersion)
         }
 
-        const { adjustedTimes } = useForecastDependentValues()
         const errorMessageList = useAppSelector(state => state.uiInfo.dialogParams.errorMessageList)
 
         const closeErrorList = () => {
@@ -104,21 +104,21 @@ const MobileUITabs = (props : MobileUIPropTypes) => {
                 <Group title="Randoplan" wrap={'nowrap'} onClick={toggleShowVersion} >
                     <span style={{fontSize:fontSize}}>{title}</span>
                     <NavLink to={"/"}>
-                        <Button size='compact-xs' leftSection={<MapIcon />} title={"home"} variant={pathname==='/'?'filled':'default'}></Button>
+                        <Button size='compact-xs' leftSection={<IconMap />} title={"home"} variant={pathname==='/'?'filled':'default'}></Button>
                     </NavLink>
                     <NavLink to={"/controlPoints/"}>
-                        <Button size='compact-xs' leftSection={<BuildingStore />} right={3} disabled={!routeData} title={"controls"} variant={pathname==='/'?'filled':'default'}></Button>
+                        <Button size='compact-xs' leftSection={<IconBuildingStore />} right={3} disabled={!routeData} title={"controls"} variant={pathname==='/'?'filled':'default'}></Button>
                     </NavLink>
                     <NavLink to={"/forecastTable/"}>
-                        <Button size='compact-xs' leftSection={<Cloud />} disabled={!hasForecast} title={"forecast"} variant={needToViewTable ? 'warning' : (pathname==='/'?'filled':'default')}></Button>
+                        <Button size='compact-xs' leftSection={<IconCloud />} disabled={!hasForecast} title={"forecast"} variant={needToViewTable ? 'warning' : (pathname==='/'?'filled':'default')}></Button>
                     </NavLink>
                     <NavLink to={"/map/"}>
-                        <Button size='compact-xs' leftSection={<Globe />} disabled={!hasForecast} title={"forecast"} variant={needToViewMap ? 'warning' : (pathname==='/'?'filled':'default')}></Button>
+                        <Button size='compact-xs' leftSection={<IconGlobe />} disabled={!hasForecast} title={"forecast"} variant={needToViewMap ? 'warning' : (pathname==='/'?'filled':'default')}></Button>
                     </NavLink>
                     {
                         stravaActivityData &&
                         <NavLink to={"/paceTable/"} className={'nav-link'}>
-                            <Button size='compact-xs' leftSection={<Bike />} color="orange" disabled={!stravaActivityData} title={"strava"} variant={needToViewTable ? 'warning' : (pathname==='/'?'filled':'default')} />
+                            <Button size='compact-xs' leftSection={<IconBike />} color="orange" disabled={!stravaActivityData} title={"strava"} variant={needToViewTable ? 'warning' : (pathname==='/'?'filled':'default')} />
                         </NavLink>
                     }
                     <FaqButton/>
@@ -127,11 +127,11 @@ const MobileUITabs = (props : MobileUIPropTypes) => {
                 <Divider/>
                 <Routes>
                     <Route path="/" element={<RouteInfoForm />} />
-                    <Route path="/controlPoints/" element={<ForecastSettings />} />
+                    <Route path="/controlPoints/" element={<Suspense fallback={<div>Loading forecast settings...</div>}><ForecastSettings/></Suspense>} />
                     <Route path="/map/" element={<MapLoader maps_api_key={props.mapsApiKey} />} />
-                    <Route path="/forecastTable/" element={<ForecastTable adjustedTimes={adjustedTimes} />} />
-                    <Route path="/paceTable/" element={<PaceTable />} />
-                    <Route path="/faq" element={<ShowFaq/>} />
+                    <Route path="/forecastTable/" element={<Suspense fallback={<div>Loading forecast table...</div>}><ForecastTable/></Suspense>} />
+                    <Route path="/paceTable/" element={<Suspense fallback={<div>Loading pace table...</div>}><PaceTable/></Suspense>} />
+                    <Route path="/faq" element={<Suspense fallback={<div>Loading pace table...</div>}><ShowFaq/></Suspense>} />
                 </Routes>
                 <DonationRequest wacky={false}/>
             </>

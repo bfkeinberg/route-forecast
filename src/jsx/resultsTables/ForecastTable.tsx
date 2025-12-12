@@ -22,7 +22,7 @@ import { UserControl } from 'redux/controlsSlice';
 import { i18n } from 'i18next';
 import ReactGA from "react-ga4";
 import { Button, Tooltip, Table, Card, Title, Text } from '@mantine/core'
-import { Clipboard, Temperature, Percentage } from 'tabler-icons-react';
+import { IconClipboard, IconTemperature, IconPercentage } from '@tabler/icons-react';
 import { notifications } from '@mantine/notifications';
 
 type TimeFormats = {
@@ -113,7 +113,7 @@ const windStyle = (point: Forecast) => {
     }
 }
 
-const ForecastTable = (adjustedTimes : AdjustedTimes) => {
+const ForecastTable = () => {
     const forecast = useAppSelector(state => state.forecast.forecast)
     const provider = useAppSelector(state => state.forecast.weatherProvider)
     const metric = useAppSelector(state => state.controls.metric)
@@ -131,7 +131,7 @@ const ForecastTable = (adjustedTimes : AdjustedTimes) => {
     const startTimestamp = useAppSelector(state => state.uiInfo.routeParams.startTimestamp)
     const zone = useAppSelector(state => state.uiInfo.routeParams.zone)
     const startTime = DateTime.fromMillis(startTimestamp, {zone:zone})
-    const { finishTime } = useForecastDependentValues()
+    const ForecastValues = useForecastDependentValues()
     const dispatch = useAppDispatch()
     useEffect(() => { dispatch(tableViewedSet()) }, [])
     const { t } = useTranslation()
@@ -145,7 +145,7 @@ const ForecastTable = (adjustedTimes : AdjustedTimes) => {
 
     const toggleApparentDisplay = () => {ReactGA.event('select_content', {content_type : 'feelsLike'}); return setShowApparentTemp(!showApparentTemp)}
 
-    const temperatureHeaderText = <Button className={'clickableHeaderCell'} variant='default' size='compact-xs' onClick={toggleApparentDisplay}>{showApparentTemp ? t('tableHeaders.temperature') : <Temperature/>}</Button>
+    const temperatureHeaderText = <Button className={'clickableHeaderCell'} variant='default' size='compact-xs' onClick={toggleApparentDisplay}>{showApparentTemp ? t('tableHeaders.temperature') : <IconTemperature/>}</Button>
     const temperatureHeader = <DesktopTooltip label={t('tooltips.temperatureHeader')} position='top'>{temperatureHeaderText}</DesktopTooltip>
 
     const copyTable = async (event: React.MouseEvent) => {
@@ -291,7 +291,7 @@ const ForecastTable = (adjustedTimes : AdjustedTimes) => {
 
     // before showing the day, adjust for wind and localize the language, also set the time zone appropriately
     const forecastPointDayMarker = (point: Forecast, i18n: i18n, adjustedTimes: AdjustedTimes, 
-        index: number, forecastLength: number) => {
+        index: number, forecastLength: number, finishTime: string|null) => {
         // this will be true even if several forecast entries are missing due to errors 
         // from the provider
         if (finishTime && (index === forecastLength-1)) {
@@ -315,7 +315,7 @@ const ForecastTable = (adjustedTimes : AdjustedTimes) => {
                 <React.Fragment key={index}>
                     {(index > 0 && compareDays(forecast[index-1].time, point.time, point.zone, index, forecast.length, finishTime, adjustedTimes) )?
                         <Table.Tr style={{outline:'thin solid'}}>
-                            <Table.Td>{forecastPointDayMarker(point, i18n, adjustedTimes, index, forecast.length)}</Table.Td>
+                            <Table.Td>{forecastPointDayMarker(point, i18n, adjustedTimes, index, forecast.length, finishTime)}</Table.Td>
                         </Table.Tr>:null}
                     <Table.Tr id={`forecast_row_${index}`}
                         start={point.distance*milesToMeters}
@@ -402,11 +402,11 @@ const ForecastTable = (adjustedTimes : AdjustedTimes) => {
                                 <div style={{ flex: 1 }}>
                                     <WeatherCorrections />
                                 </div>
-                                {finishTime && finishTimeFormat && <MakeSummaryLine startTime={startTime} finishTime={finishTime} finishTimeFormat={finishTimeFormat} userControls={userControls} />}
+                                {ForecastValues.finishTime && finishTimeFormat && <MakeSummaryLine startTime={startTime} finishTime={ForecastValues.finishTime} finishTimeFormat={finishTimeFormat} userControls={userControls} />}
                             </div>
                             <div style={{padding:'20px'}}>
                                 <Tooltip label={t('tooltips.copyTable')}>
-                                    <Button size='compact-sm' variant='default' leftSection={<Clipboard size={16}/>} onClick={copyTable}/>
+                                    <Button size='compact-sm' variant='default' leftSection={<IconClipboard size={16}/>} onClick={copyTable}/>
                                 </Tooltip>
                             </div>
                             <div style={{ flexShrink: 0, width: "fit-content" }}>
@@ -433,12 +433,12 @@ const ForecastTable = (adjustedTimes : AdjustedTimes) => {
                                 {hasSummary && <Table.Th><span style={{display:"inline-block", width:"60px"}}className={'headerCell'}>{t('tableHeaders.summary')}</span></Table.Th>}                                
                                 <Table.Th id={'temp'}>{temperatureHeader}</Table.Th>
                                 {hasStdDev?<Table.Th>
-                                    <span className={'symbolHeaderCell'}>&#x3c3;<Temperature/></span>
+                                    <span className={'symbolHeaderCell'}>&#x3c3;<IconTemperature/></span>
                                 </Table.Th>:<></>}
                                 <Table.Th>
                                     <span>
                                         <DesktopTooltip label={t('tooltips.scrollToRain')} position='top'>
-                                            <Button  className={'clickableHeaderCell'} style={{width:"30px"}} variant='default' size='compact-xs' onClick={scrollToChanceOfRain}><Percentage/></Button>
+                                            <Button  className={'clickableHeaderCell'} style={{width:"30px"}} variant='default' size='compact-xs' onClick={scrollToChanceOfRain}><IconPercentage/></Button>
                                         </DesktopTooltip>
                                     </span>
                                 </Table.Th>
@@ -458,7 +458,7 @@ const ForecastTable = (adjustedTimes : AdjustedTimes) => {
                                 </MediaQuery>
                             </Table.Tr>
                         </Table.Thead>
-                        {expandTable(forecast, metric, adjustedTimes, finishTime, hasSummary)}
+                        {expandTable(forecast, metric, ForecastValues, ForecastValues.finishTime, hasSummary)}
                     </Table>
                 </div>
             </Sentry.ErrorBoundary>

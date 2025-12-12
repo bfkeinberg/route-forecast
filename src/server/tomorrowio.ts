@@ -1,6 +1,5 @@
 import { AxiosError } from "axios";
 import { WeatherFunc } from "./weatherForecastDispatcher";
-import { Temperature } from "tabler-icons-react";
 
 const { DateTime } = require("luxon");
 const axios = require('axios');

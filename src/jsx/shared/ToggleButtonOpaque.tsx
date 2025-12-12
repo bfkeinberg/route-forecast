@@ -1,6 +1,6 @@
 import { ReactNode } from "react";
 import { Button } from "@mantine/core";
-import {Circle, CircleDot} from "tabler-icons-react"
+import {IconCircle, IconCircleDot} from "@tabler/icons-react"
 
 interface ToggleButtonOpaqueProps {
   children: ReactNode
@@ -11,8 +11,8 @@ interface ToggleButtonOpaqueProps {
 }
 
 export const ToggleButtonOpaque = ({children, active, onClick, icon = null, style = {}} : ToggleButtonOpaqueProps) => {
-  const activeIcon = (<CircleDot style={{opacity: 1, transition: "opacity 0.15s"}}/>)
-  const inactiveIcon = (<Circle style={{opacity: 0.75, transition: "opacity 0.15s"}}/>)
+  const activeIcon = (<IconCircleDot style={{opacity: 1, transition: "opacity 0.15s"}}/>)
+  const inactiveIcon = (<IconCircle style={{opacity: 0.75, transition: "opacity 0.15s"}}/>)
 
   return (
     <Button leftSection={icon || (active?activeIcon:inactiveIcon)} style={{border: "1px solid #6c757d80", display: "flex", alignItems: "center", justifyContent: "center", ...style}} onClick={onClick} variant={active ? "default" : "filled"} size='sm'>
