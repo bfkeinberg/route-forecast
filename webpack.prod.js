@@ -25,6 +25,7 @@ module.exports = (env, argv) => merge(common(env, argv), {
             contextRegExp: /moment$/,
         }),
         sentryWebpackPlugin({
+            applicationKey: process.env.SENTRY_APP_ID,
             include: '.',
             ignoreFile: '.sentrycliignore',
             ignore: [
@@ -44,7 +45,15 @@ module.exports = (env, argv) => merge(common(env, argv), {
             authToken: process.env.SENTRY_AUTH_TOKEN,
             org: 'brian-feinberg',
             project: 'randoplan',
-            deploy: { env: 'production', name: 'latest' }
+            deploy: { env: 'production', name: 'latest' },
+            bundleSizeOptimizations: {
+                excludeDebugStatements: true,
+                // Only relevant if you added `browserTracingIntegration`
+                // excludePerformanceMonitoring: true,
+                // Only relevant if you added `replayIntegration`
+                // excludeReplayIframe: true,
+                excludeReplayShadowDom: true,
+            }
         }),
         new CompressionPlugin({
             minRatio: 0.85,

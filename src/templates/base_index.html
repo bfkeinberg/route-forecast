@@ -37,50 +37,27 @@
             // http://redux.js.org/recipes/ServerRendering.html#security-considerations
             window.__PRELOADED_STATE__ = '<?= preloaded_state ?>'
         </script>
-        <script>
-            function supportsArrowFunctions() {
-                try {
-                    new Function("(a) => a");
-                    return true;
-                }
-                catch (err) {
-                    return false;
-                }
-            }
-        </script>
-        <% for (var i = 0; i < htmlWebpackPlugin.files.js.length; i++) {  %>
-            <% if (htmlWebpackPlugin.files.js[i].includes('main.bundle')) { break; } %>
-            <script type="text/javascript" src="<%= htmlWebpackPlugin.files.js[i] %>"></script>
-        <% } %>        
-        <script>
-            function addScriptTag() {
-                if (supportsArrowFunctions()) {
-                    var element = document.createElement('script');
-                    element.setAttribute('id', 'routeui');
-                    element.setAttribute('timezone_api_key', '<?= timezone_api_key ?>');
-                    element.setAttribute('maps_api_key', '<?= maps_key ?>');
-                    element.setAttribute('bitly_token', '<?= bitly_token ?>');
-                    element.setAttribute('sentry_app_id', '<?= sentry_app_id ?>');
-                    element.setAttribute('action', '/forecast');
-                    element.setAttribute('mode', '<%= htmlWebpackPlugin.options.mode %>');
-                    element.setAttribute('src', "<%= htmlWebpackPlugin.files.js.find(name => name.includes('main.bundle')) %>");
-                    element.setAttribute('sentry_trace_sample_rate', '<?= sentry_trace_sample_rate ?>')
-                    element.setAttribute('version', '<?= version ?>')
-                    document.body.appendChild(element);
-                } else {
-                    document.write("Sorry, this browser is not supported. Please try a newer one such as Chrome or Firefox");
-                }
-            }
-        </script>
+
         <% for (var css in htmlWebpackPlugin.files.css) { %>
         <link href="<%= htmlWebpackPlugin.files.css[css] %>" rel="stylesheet" type="text/css" >
         <% } %>
         <link rel="canonical" href="https://www.randoplan.com"/>
     </head>
-    <body onload="addScriptTag();measureCRP()">
+    <body onload="measureCRP()">
         <div id="container">
             <div id="content"><?- reactDom ?></div>
         </div>
         <noscript>This application requires JavaScript. Please enable JavaScript to use the application.</noscript>
+        <% for (var i = 0; i < htmlWebpackPlugin.files.js.length; i++) {  %>
+            <% if (i === htmlWebpackPlugin.files.js.length-2) { %>
+                <script type="text/javascript" src="<%= htmlWebpackPlugin.files.js[i] %>" 
+                    id="routeui" timezone_api_key='<?= timezone_api_key ?>' 
+                    maps_api_key='<?= maps_key ?>' bitly_token='<?= bitly_token ?>' 
+                    sentry_app_id='<?= sentry_app_id ?>' action='/forecast' 
+                    mode='<%= htmlWebpackPlugin.options.mode %>' 
+                    sentry_trace_sample_rate='<?= sentry_trace_sample_rate ?>' version='<?= version ?>'></script>
+            <% } else { %>
+                <script type="text/javascript" src="<%= htmlWebpackPlugin.files.js[i] %>" ></script>
+        <% } } %>
     </body>
 </html>

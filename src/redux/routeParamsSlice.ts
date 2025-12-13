@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { providerValues, defaultProvider } from './providerValues'
-import { RouteLoadingModes, routeLoadingModes } from '../data/enums';
+import { routeLoadingModes } from '../data/enums';
 import type { Segment } from '../utils/gpxParser';
 import { DateTime } from 'luxon';
 import { stravaRouteSet } from './stravaSlice';

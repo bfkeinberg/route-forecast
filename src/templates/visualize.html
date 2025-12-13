@@ -7,9 +7,8 @@
     <link href="<%= htmlWebpackPlugin.files.css[i] %>" rel="stylesheet" type="text/css">
     <% } %>
   <% for (var i=0; i < htmlWebpackPlugin.files.js.length; i++) { %>
-    <% if (!htmlWebpackPlugin.files.js[i].includes('main.bundle')) {  %>
     <script defer="true" type="text/javascript" src="<%= htmlWebpackPlugin.files.js[i] %>" maps_key="<?= maps_key ?>"></script>
-    <% } } %>
+    <% } %>
 
 </head>
 

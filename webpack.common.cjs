@@ -5,11 +5,9 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 
-const SRC_DIR = path.resolve(__dirname, "src")
 const APP_DIR = path.resolve(__dirname, 'src/jsx');
 const TEMPLATE_DIR = path.resolve(__dirname, 'src/templates');
 const SRC_STATIC_DIR = path.resolve(__dirname, 'src/static');
-const SRC_SERVER_DIR = path.resolve(SRC_DIR, 'server');
 const BUILD_DIR = path.resolve(__dirname, 'dist');
 const STATIC_DIR = path.resolve(BUILD_DIR, 'static');
 const SERVER_DIR = path.resolve(BUILD_DIR, 'server');
@@ -76,7 +74,7 @@ module.exports = (env, argv) => {
                             loader:"css-loader", // translates CSS into CommonJS
                             options:{
                                 modules: false, // Enable CSS Modules
-                                importLoaders: 3, // Number of loaders applied before css-loader                                
+                                importLoaders: 2, // Number of loaders applied before css-loader                                
                             }
                         },                        
                     ]
@@ -115,7 +113,7 @@ module.exports = (env, argv) => {
                 template: path.resolve(TEMPLATE_DIR, 'base_index.html'),
                 inject: false,
                 minify: { minifyURLs: true, removeComments: true },
-                chunksSortMode: 'none',
+                chunks: ['main'],
                 sentryRelease: env.sentryRelease,
                 mode: mode,
                 hash: true,
@@ -128,7 +126,7 @@ module.exports = (env, argv) => {
                 inject: false,
                 hash: true,
                 minify: { minifyURLs: true, removeComments: true },
-                chunksSortMode: 'auto',
+                chunks: ['visualize'],
                 mode: mode
             }),
             new CopyWebpackPlugin({
@@ -179,8 +177,9 @@ module.exports = (env, argv) => {
             // chunkIds: 'named',
             splitChunks: {
                 chunks: 'all',
-                // maxInitialRequests: Infinity,
-                minSize: 1000,
+                maxInitialRequests: 40,
+                minSize: 5000,
+                maxSize: 200000,
 /*                 cacheGroups: {
                     vendor: {
                         test: /[\\/]node_modules[\\/]/,

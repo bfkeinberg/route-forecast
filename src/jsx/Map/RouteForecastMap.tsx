@@ -15,11 +15,10 @@ import { formatTemperature } from "../resultsTables/ForecastTable";
 import { Polyline } from './polyline';
 import {useTranslation} from 'react-i18next'
 import { Forecast, mapViewedSet } from '../../redux/forecastSlice';
-import { CalculatedValue } from 'utils/gpxParser';
+import { type CalculatedValue } from 'utils/gpxParser';
 import { useAppSelector, useAppDispatch } from '../../utils/hooks';
 import SafeAdvancedMarker from './SafeMarker';
 import { addOpenBusinesses, BusinessOpenType, clearOpenBusinesses, UserControl } from '../../redux/controlsSlice';
-import { openSync } from 'fs';
 
 const curvedArrowPath = "m-68.4149 61.4815c-.5904 2.8312 1.5113 7.0934 7.6748 12.4358 19.1536 16.6019 60.8005 28.3549 91.4489-7.6894 30.0099-35.2935 21.5071-80.7594 21.1555-98.2548l14.7087-.0371-32.3276-55.688-32.0602 55.8545 16.4983-.0557c2.8274 19.3736 6.2889 57.8645-6.5882 79.4056-17.0631 28.5432-39.6439 26.2329-52.4747 19.0262-13.994-7.8596-26.7357-11.2308-28.0345-5.0021z"
 const findMarkerInfo = (forecast : Array<Forecast>, subrange : [number,number] | []) => {

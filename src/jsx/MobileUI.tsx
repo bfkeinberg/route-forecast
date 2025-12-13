@@ -101,28 +101,28 @@ const MobileUITabs = (props : MobileUIPropTypes) => {
             <>
                 <DisplayErrorList errorList={errorMessageList} onClose={closeErrorList}/>
                 <Sentry.ErrorBoundary fallback={<h2>Something went wrong.</h2>}>
-                <Group title="Randoplan" wrap={'nowrap'} onClick={toggleShowVersion} >
-                    <span style={{fontSize:fontSize}}>{title}</span>
-                    <NavLink to={"/"}>
-                        <Button size='compact-xs' leftSection={<IconMap />} title={"home"} variant={pathname==='/'?'filled':'default'}></Button>
-                    </NavLink>
-                    <NavLink to={"/controlPoints/"}>
-                        <Button size='compact-xs' leftSection={<IconBuildingStore />} right={3} disabled={!routeData} title={"controls"} variant={pathname==='/'?'filled':'default'}></Button>
-                    </NavLink>
-                    <NavLink to={"/forecastTable/"}>
-                        <Button size='compact-xs' leftSection={<IconCloud />} disabled={!hasForecast} title={"forecast"} variant={needToViewTable ? 'warning' : (pathname==='/'?'filled':'default')}></Button>
-                    </NavLink>
-                    <NavLink to={"/map/"}>
-                        <Button size='compact-xs' leftSection={<IconGlobe />} disabled={!hasForecast} title={"forecast"} variant={needToViewMap ? 'warning' : (pathname==='/'?'filled':'default')}></Button>
-                    </NavLink>
-                    {
-                        stravaActivityData &&
-                        <NavLink to={"/paceTable/"} className={'nav-link'}>
-                            <Button size='compact-xs' leftSection={<IconBike />} color="orange" disabled={!stravaActivityData} title={"strava"} variant={needToViewTable ? 'warning' : (pathname==='/'?'filled':'default')} />
+                    <Group title="Randoplan" wrap={'nowrap'} onClick={toggleShowVersion} >
+                        <span style={{fontSize:fontSize}}>{title}</span>
+                        <NavLink to={"/"}>
+                            <Button size='compact-xs' leftSection={<IconMap />} title={"home"} variant={pathname==='/'?'filled':'default'}></Button>
                         </NavLink>
-                    }
-                    <FaqButton/>
-                </Group>
+                        <NavLink to={"/controlPoints/"}>
+                            <Button size='compact-xs' leftSection={<IconBuildingStore />} right={3} disabled={!routeData} title={"controls"} variant={pathname==='/'?'filled':'default'}></Button>
+                        </NavLink>
+                        <NavLink to={"/forecastTable/"}>
+                            <Button size='compact-xs' leftSection={<IconCloud />} disabled={!hasForecast} title={"forecast"} variant={needToViewTable ? 'warning' : (pathname==='/'?'filled':'default')}></Button>
+                        </NavLink>
+                        <NavLink to={"/map/"}>
+                            <Button size='compact-xs' leftSection={<IconGlobe />} disabled={!hasForecast} title={"forecast"} variant={needToViewMap ? 'warning' : (pathname==='/'?'filled':'default')}></Button>
+                        </NavLink>
+                        {
+                            stravaActivityData &&
+                            <NavLink to={"/paceTable/"} className={'nav-link'}>
+                                <Button size='compact-xs' leftSection={<IconBike />} color="orange" disabled={!stravaActivityData} title={"strava"} variant={needToViewTable ? 'warning' : (pathname==='/'?'filled':'default')} />
+                            </NavLink>
+                        }
+                        <FaqButton/>
+                    </Group>
                 </Sentry.ErrorBoundary>
                 <Divider/>
                 <Routes>

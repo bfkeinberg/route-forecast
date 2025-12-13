@@ -9,7 +9,7 @@ import { UserControl} from '../redux/controlsSlice';
 import type { GpxRouteData, RwgpsRoute, RwgpsTrip } from '../redux/routeInfoSlice';
 import * as turf from "@turf/turf";
 
-import { create, all } from 'mathjs'
+import { create, all } from 'mathjs/number'
 import { Feature, LineString, GeoJsonProperties } from 'geojson';
 const config = {
   relTol: 1e-5,

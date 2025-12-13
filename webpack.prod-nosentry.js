@@ -39,7 +39,7 @@ module.exports = (env, argv) => merge(common(env, argv), {
                 /\.html/
             ]
         }),
-        new BundleAnalyzerPlugin({ analyzerMode: "server" })
+        // new BundleAnalyzerPlugin({ an    alyzerMode: "server" })
     ],
     optimization: {
         minimizer: [

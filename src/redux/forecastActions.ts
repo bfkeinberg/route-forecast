@@ -6,7 +6,7 @@ import { forecastFetched, forecastAppended, Forecast, forecastInvalidated } from
 import {getRwgpsRouteName, getRouteNumberFromValue} from "../utils/util"
 import { RwgpsRoute, RwgpsTrip } from "./routeInfoSlice";
 import { MutationWrapper } from "./loadRouteActions";
-import { ForecastRequest } from "../utils/gpxParser";
+import { type ForecastRequest } from "../utils/gpxParser";
 import { Action, Dispatch } from "@reduxjs/toolkit";
 import * as Sentry from "@sentry/react";
 const { trace, debug, info, warn, error, fatal, fmt } = Sentry.logger;
