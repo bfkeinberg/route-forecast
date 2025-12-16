@@ -20,8 +20,8 @@ export const TimeChangeChart = ({chartData, metric, popoverIsOpen} : {chartData:
     const formatDistance = (value: number, isMetric: boolean) => isMetric ? value.toFixed(0): (value * kmToMiles).toFixed(0);
     const formatTipDistance = (value: number, isMetric: boolean) => isMetric ? value.toFixed(0) + " km": (value * kmToMiles).toFixed(0) + " miles";
     const formatWindSpeed = (speed: number, isMetric: boolean) => isMetric ? (speed/kmToMiles).toFixed(0) : speed.toFixed(0)
-    const formatTooltipValue = (value: number, name: string, isMetric: boolean) => 
-        (name === 'totalMinutesLost') ? value.toFixed(0) : isMetric ? [(value / kmToMiles).toFixed(0), "windSpeedKph"] : [value.toFixed(0), "windSpeedMph"]
+    const formatTooltipValue = (value: number|undefined, name: string|undefined, isMetric: boolean) => 
+        (name === 'totalMinutesLost') ? value?.toFixed(0) : isMetric ? [(value! / kmToMiles).toFixed(0), "windSpeedKph"] : [value!.toFixed(0), "windSpeedMph"]
     ReactGA.event('time_lost_chart')
     return <ResponsiveContainer width="100%" height={"100%"} minWidth={550} minHeight={250} aspect={2.2}/* maxHeight={400} */>
         <LineChart
@@ -37,7 +37,7 @@ export const TimeChangeChart = ({chartData, metric, popoverIsOpen} : {chartData:
             <YAxis dataKey="totalMinutesLost" unit=" mins" />
             <YAxis dataKey="windSpeedMph" type="number" unit={metric?" kph":" mph"} yAxisId="right" orientation="right" 
                 domain={['dataMin', 'dataMax']} tickFormatter={(value:number) => `${value > 0 ? '+':''}${formatWindSpeed(value, metric)}`}/>
-            <Tooltip labelFormatter={(value: number) => formatTipDistance(value, metric)} formatter={(value: number, name: string) => formatTooltipValue(value, name, metric)} />
+            <Tooltip labelFormatter={(value: number) => formatTipDistance(value, metric)} formatter={(value: number|undefined, name: string|undefined) => formatTooltipValue(value, name, metric)} />
             <Legend />
             <Line type="monotone" dataKey="totalMinutesLost" dot={false} />
             <Line type="monotone" yAxisId={'right'} dataKey="windSpeedMph" stroke={"#32a852"} dot={false} name={metric?"windSpeedKph":"windSpeedMph"}/>
