@@ -50,6 +50,8 @@ const RWGPSRouteList = ({ }) => {
                 if (options.children && Array.isArray(options.children)) {
                     dispatch(rwgpsRouteSetAsNumber(options.children[0]))
                     selectedName.current = options.children[2]
+                } else {
+                  dispatch(rwgpsRouteSetAsNumber(Number(options.value)));
                 }
                 dispatch(loadFromRideWithGps(selected, options.itemType == "trip"))
                 combobox.closeDropdown();
