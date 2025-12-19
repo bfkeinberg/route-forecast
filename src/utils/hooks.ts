@@ -156,7 +156,7 @@ const useForecastDependentValues = () => {
   const routeInfo = useAppSelector(state => state.routeInfo)
   const routeParams = useAppSelector(state => state.uiInfo.routeParams)
   const controls = useAppSelector(state => state.controls)
-  const timeZoneId = useAppSelector(state => state.forecast.timeZoneId)
+  const timeZoneId = routeParams.zone;
   const forecast = useAppSelector(state => state.forecast.forecast)
   const segment = useAppSelector(state => state.uiInfo.routeParams.segment)
 
