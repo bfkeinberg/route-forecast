@@ -31,15 +31,15 @@ const getRouteId = (routeData : RwgpsRoute|RwgpsTrip) => {
     }
 };
 
-export const msgFromError = (error : {reason:{data:{details:string}} | {reason:string, data: never}}) => {
+export const msgFromError = (error : {reason:{data:{details:string}} | {reason:string, data: never}}, provider : string ) => {
     if (error.reason.data) {
-        warn(error.reason.data.details);
+        warn(error.reason.data.details, {provider:provider});
         if (/^\s*$/.test(error.reason.data.details)) {
             Sentry.captureMessage("Error string from data.details was all whitespace")
         }
         return error.reason.data.details
     } else {
-        warn(JSON.stringify(error.reason));
+        warn(JSON.stringify(error.reason), {provider:provider}  );
         if (/^\s*$/.test(JSON.stringify(error.reason))) {
             Sentry.captureMessage("Error string from reason was all whitespace")
         }
@@ -106,13 +106,27 @@ const doForecastByParts = async (forecastFunc : MutationWrapper, aqiFunc : Mutat
 
         ]),[]]
     }
-    const module = await import ("../utils/routeUtils");    
+    const module = await import ("../utils/routeUtils").catch((err) => {
+        dispatch(forecastFetchFailed(err))
+        error("Failed to load routeUtils module for forecastByParts");
+        return null
+    });
+    if (module === null) {
+        return [Promise.allSettled([new Promise<{result: "error"}>((resolve, reject) => {
+            reject({data:{details:"Failed to load routeUtils module"}})
+        })
+
+        ]),[]]
+    }
     const forecastRequest = module.getForecastRequest(routeData,
         getState().uiInfo.routeParams.startTimestamp,
         getState().uiInfo.routeParams.zone, getState().uiInfo.routeParams.pace,
         getState().uiInfo.routeParams.interval, getState().controls.userControlPoints,
         getState().uiInfo.routeParams.segment, getState().routeInfo.routeUUID
     )
+    Sentry.getGlobalScope().setAttributes({
+        provider: getState().forecast.weatherProvider
+    });    
     return forecastByParts(forecastFunc, aqiFunc, forecastRequest, getState().uiInfo.routeParams.zone,
         getState().forecast.weatherProvider, getState().routeInfo.name, routeNumber, dispatch,
         getState().forecast.fetchAqi, lang)
@@ -190,6 +204,6 @@ export const forecastWithHook = async (forecastFunc: MutationWrapper, aqiFunc: M
     fetchAbortMethod = null;
 
     // handle any errors
-    dispatch(errorMessageListSet(extractRejectedResults(forecastResults).map(result => msgFromError(result))))
-    dispatch(errorMessageListAppend(extractRejectedResults(aqiResults).map(result => msgFromError(result))))
+    dispatch(errorMessageListSet(extractRejectedResults(forecastResults).map(result => msgFromError(result, ""))))
+    dispatch(errorMessageListAppend(extractRejectedResults(aqiResults).map(result => msgFromError(result, ""))))
 }
