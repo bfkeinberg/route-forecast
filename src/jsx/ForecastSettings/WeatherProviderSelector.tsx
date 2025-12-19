@@ -1,9 +1,9 @@
 import { connect, ConnectedProps } from 'react-redux';
 import { setWeatherProvider } from "../../redux/actions";
-import { providerValues } from "../../redux/providerValues";
+import { providerValues, defaultProvider } from "../../redux/providerValues";
 import { DesktopTooltip } from '../shared/DesktopTooltip';
 import { useTranslation } from 'react-i18next'
-import { useForecastRequestData } from "../../utils/hooks"
+import { useForecastRequestData, useAppSelector } from "../../utils/hooks"
 import type { RootState } from "../../redux/store";
 import ReactGA from "react-ga4";
 import { Combobox, useCombobox, Button, Flex } from '@mantine/core'
@@ -14,18 +14,24 @@ const WeatherProviderSelector = ({ weatherProvider, setWeatherProvider }: PropsF
     const combobox = useCombobox()
     const { t } = useTranslation()
     const forecastData = useForecastRequestData()
-
+    const country = useAppSelector((state: RootState) => state.routeInfo.country);
+    
     const items = Object.entries(providerValues).
         filter((entry) => entry[1].maxCallsPerHour === undefined ||
             entry[1].maxCallsPerHour > forecastData.length).
         filter((entry) => entry[1].max_days >= forecastData.daysInFuture).
+        filter((entry) => !entry[1].usOnly || country === 'US').
         map((element) => (
             <Combobox.Option value={element[0]} key={element[0]} disabled={!element[1].enabled}>
                 {element[1].name}
             </Combobox.Option>
         )
         )
-
+    
+    const filteredWeatherProvider = items.map(item => item.key).includes(weatherProvider) ? weatherProvider : items[0]?.key || defaultProvider;
+    if (filteredWeatherProvider !== weatherProvider) {
+        setWeatherProvider(filteredWeatherProvider);
+    }   
     return (
         <Flex direction={'column'} justify={'center'}>
             <label htmlFor={'provider'}>{<span><b>{t('labels.source')}</b></span>} </label>
@@ -49,7 +55,7 @@ const WeatherProviderSelector = ({ weatherProvider, setWeatherProvider }: PropsF
                                 id={'provider'}
                                 variant="default"
                             >
-                                {providerValues[weatherProvider].name}
+                                {providerValues[filteredWeatherProvider].name}
                             </Button>
                         </Combobox.Target>
                     </div>
