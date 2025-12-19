@@ -12,12 +12,14 @@ const routeInfoInitialState : RouteInfoState = {
     canDoUserSegment:false,
     type: "none",
     routeUUID: null,
-    zoneCopy: Intl.DateTimeFormat().resolvedOptions().timeZone
+    zoneCopy: Intl.DateTimeFormat().resolvedOptions().timeZone,
+    country: 'US'
 }
 
 export interface RwgpsRoute {
     type: "route",
     route: {
+        country_code: string;
         distance: number,
         name: string,
         track_points: RwgpsPoint[]
@@ -31,6 +33,7 @@ export interface RwgpsRoute {
 
 export interface RwgpsTrip {
     trip: {
+        country_code: string;
         distance: number,
         name: string,
         track_points: RwgpsPoint[]
@@ -101,9 +104,11 @@ const routeInfoSlice = createSlice({
             if (action.payload.route) {
                 state.distanceInKm = action.payload.route.distance/1000
                 state.canDoUserSegment = action.payload.route.track_points[0] && action.payload.route.track_points[0].d !== undefined
+                state.country = action.payload.route.country_code
             } else {
                 state.distanceInKm = action.payload.trip.distance/1000
                 state.canDoUserSegment = action.payload.trip.track_points[0] && action.payload.trip.track_points[0].d !== undefined
+                state.country = action.payload.trip.country_code
             }
         },
         gpxRouteLoaded(state, action : PayloadAction<GpxRouteData>) {
@@ -114,6 +119,7 @@ const routeInfoSlice = createSlice({
             state.rwgpsRouteData = routeInfoInitialState.rwgpsRouteData
             state.name = getGpxRouteName(action.payload)
             state.distanceInKm = action.payload.tracks[0].distance.total/1000
+            state.country = "US"
         },
         routeDataCleared(state) {
             const {rwgpsRouteData, gpxRouteData, name, type, distanceInKm, routeUUID} = routeInfoInitialState

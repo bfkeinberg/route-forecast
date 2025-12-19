@@ -7,6 +7,7 @@ import { stravaRouteSet } from './stravaSlice';
 import { weatherProviderSet } from './forecastSlice';
 import { getRouteNumberFromValue } from '../utils/util';
 import { rwgpsRouteLoaded, gpxRouteLoaded } from './routeInfoSlice';
+import { usePinnedRoutesSet } from './rideWithGpsSlice';
 
 const defaultIntervalInHours = 1;
 const defaultPace = 'D';
@@ -81,7 +82,8 @@ const routeParamsSlice = createSlice({
                 let route = getRouteNumberFromValue(action.payload);
                 state.rwgpsRoute = route
             } else {
-                state.rwgpsRoute = ''
+                state.rwgpsRoute = routeParamsInitialState.rwgpsRoute;
+                state.rwgpsRouteIsTrip = routeParamsInitialState.rwgpsRouteIsTrip;
             }
             state.succeeded = null
             state.segment = routeParamsInitialState.segment
@@ -89,6 +91,7 @@ const routeParamsSlice = createSlice({
         rusaPermRouteIdSet(state,action : PayloadAction<string>) {
             state.rusaPermRouteId = action.payload
             state.routeLoadingMode = routeLoadingModes.RUSA_PERM
+            state.rwgpsRouteIsTrip = routeParamsInitialState.rwgpsRouteIsTrip;
         },
         startTimeSet(state,action : PayloadAction<number>) {
             if (action.payload) {
@@ -179,6 +182,10 @@ const routeParamsSlice = createSlice({
             }).addCase(stravaRouteSet, (state, action) => {
                 if (action.payload && action.payload !== '') {
                     state.rwgpsRoute = routeParamsInitialState.rwgpsRoute
+                }
+            }).addCase(usePinnedRoutesSet, (state, action) => {
+                if (!action.payload) {
+                    state.rwgpsRouteIsTrip = routeParamsInitialState.rwgpsRouteIsTrip;
                 }
             })
     }
