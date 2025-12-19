@@ -163,7 +163,7 @@ export const loadStravaRoute = (routeId : string) => {
             }
             api.setDefaultHeader('Authorization', `Bearer ${access_token}`)
             try {
-                const routeInfo = await api.get(`/routes/${routeId}/export_gpx`)
+                const routeInfo = await api.get(`routes/${routeId}/export_gpx`)
                 if (!routeInfo || typeof routeInfo !== 'string' || routeInfo.trim().length === 0) {
                     dispatch(errorDetailsSet('Error fetching Strava route: Received empty or invalid data from Strava.'));
                 } else if (routeInfo.charAt(0) === '{') {
