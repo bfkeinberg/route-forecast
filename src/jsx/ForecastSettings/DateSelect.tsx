@@ -44,7 +44,7 @@ const DateSelect = ({ start, zone, setStart, initialStartTimeSet, maxDaysInFutur
         otherAttributes.minDate = now
     }
     let startIso
-    startIso = start.toISO()
+    startIso = start.toISO({includeOffset:false, precision:'minutes'});
     if (startIso===null)
         startIso=undefined
 
