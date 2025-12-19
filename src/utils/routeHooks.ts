@@ -104,7 +104,7 @@ export const calculateWindResult = (inputs: WindResultInputs): WindAdjustResults
     const { points, values, finishTime, totalDistMeters } = getRouteInfo(
       routeInfo,
       routeParams.startTimestamp,
-      routeParams.timeZoneId,
+      routeParams.zone,
       routeParams.pace,
       routeParams.interval,
       controls.userControlPoints,
