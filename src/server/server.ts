@@ -520,7 +520,6 @@ const getStravaAuthUrl = (baseUrl : string, state: string) => {
     else {
         process.env.STRAVA_REDIRECT_URI = 'https://www.randoplan.com/stravaAuthReply';
     }
-    info("Getting Strava auth URL", {baseUrl: baseUrl, clientSecret: process.env.STRAVA_API_KEY});
     const authorizationUrl = `https://www.strava.com/oauth/authorize?client_id=${process.env.STRAVA_CLIENT_ID}&response_type=code&redirect_uri=${process.env.STRAVA_REDIRECT_URI}&approval_prompt=auto&scope=${'activity:read_all,read_all'}&state=${encodeURIComponent(state)}`;
     return authorizationUrl;
 };
@@ -539,7 +538,6 @@ interface StravaToken {
 
 const getStravaToken = async (code : string) => {
     // process.env.STRAVA_ACCESS_TOKEN = 'fake';
-    info('Getting Strava OAuth token', {code : code});
     logger.info(`Getting Strava OAuth token from code ${code}`);
     try {
         const tokenResponse = await axios.post('https://www.strava.com/api/v3/oauth/token', null, {
@@ -656,7 +654,6 @@ app.get('/stravaAuthReq', (req : Request, res : Response) => {
         host: req.get('host')
     });
     Sentry.addBreadcrumb({category:'strava', level:'info', message: state})
-    info('Getting Strava auth', {baseUrl: baseUrl, state: state});
     logger.info(`Getting Strava authorization ${baseUrl} ${JSON.stringify(state)}`);
     res.redirect(getStravaAuthUrl(baseUrl, state));
 
@@ -869,7 +866,7 @@ app.get('/pinned_routes', async (req : Request, res : Response) => {
     const filteredResponse = syncResponse.data.items.filter((item : RwgpsSyncType) => item.action === 'added');
     const favoritesMap = new Map<string,FavoriteMapValue>(filteredResponse.map((fav : RwgpsSyncType) => {
         return [fav.item_id.toString(), {id:fav.item_id,
-            associated_object_id:fav.item_url.replace('https://ridewithgps.com/api/v1/routes/', '').replace('.json',''), 
+            associated_object_id:fav.item_url.replace('https://ridewithgps.com/api/v1/routes/', '').replace('https://ridewithgps.com/api/v1/trips/', '').replace('.json',''), 
             associated_object_type:fav.item_type, key:fav.item_id}]
         }));
 
