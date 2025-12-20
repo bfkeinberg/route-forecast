@@ -21,3 +21,4 @@ export const providerValues : ProviderValues = {
     // meteomatics:{min_interval:1, max_days:10,canForecastPast:true, daysInPast:1, name:"Meteomatics"}
     }
 export const defaultProvider = 'nws'
+export const alternateProvider = "oneCall"
