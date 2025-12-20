@@ -107,18 +107,18 @@ const MobileUITabs = (props : MobileUIPropTypes) => {
                             <Button size='compact-xs' leftSection={<IconMap />} title={"home"} variant={pathname==='/'?'filled':'default'}></Button>
                         </NavLink>
                         <NavLink to={"/controlPoints/"}>
-                            <Button size='compact-xs' leftSection={<IconBuildingStore />} right={3} disabled={!routeData} title={"controls"} variant={pathname==='/'?'filled':'default'}></Button>
+                            <Button size='compact-xs' leftSection={<IconBuildingStore />} right={3} disabled={!routeData} title={"controls"} variant={pathname==='/controlPoints/'?'filled':'default'}></Button>
                         </NavLink>
                         <NavLink to={"/forecastTable/"}>
-                            <Button size='compact-xs' leftSection={<IconCloud />} disabled={!hasForecast} title={"forecast"} variant={needToViewTable ? 'warning' : (pathname==='/'?'filled':'default')}></Button>
+                            <Button size='compact-xs' leftSection={<IconCloud />} disabled={!hasForecast} title={"forecast"} variant={needToViewTable ? 'warning' : (pathname==='/forecastTable/'?'filled':'default')}></Button>
                         </NavLink>
                         <NavLink to={"/map/"}>
-                            <Button size='compact-xs' leftSection={<IconGlobe />} disabled={!hasForecast} title={"forecast"} variant={needToViewMap ? 'warning' : (pathname==='/'?'filled':'default')}></Button>
+                            <Button size='compact-xs' leftSection={<IconGlobe />} disabled={!hasForecast} title={"forecast"} variant={needToViewMap ? 'warning' : (pathname==='/map/'?'filled':'default')}></Button>
                         </NavLink>
                         {
                             stravaActivityData &&
                             <NavLink to={"/paceTable/"} className={'nav-link'}>
-                                <Button size='compact-xs' leftSection={<IconBike />} color="orange" disabled={!stravaActivityData} title={"strava"} variant={needToViewTable ? 'warning' : (pathname==='/'?'filled':'default')} />
+                                <Button size='compact-xs' leftSection={<IconBike />} color="orange" disabled={!stravaActivityData} title={"strava"} variant={needToViewTable ? 'warning' : (pathname==='/paceTable/ '?'filled':'default')} />
                             </NavLink>
                         }
                         <FaqButton/>
