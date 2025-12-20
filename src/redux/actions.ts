@@ -75,9 +75,9 @@ export const shortenUrl = function (url : string) {
                 .catch(err => { error(`Error fetching short URL: ${err}`); return errorDetailsSet(err) })
                 .then(responseJson => {
                     if (responseJson.error === null) {
-                        error(`Error fetching short URL: ${responseJson.error}`); 
                         return dispatch(shortUrlSet(responseJson.url));
                     } else {
+                        error(`Error fetching short URL: ${responseJson.error}`); 
                         return dispatch(errorDetailsSet(responseJson.error));
                     }
                 })
