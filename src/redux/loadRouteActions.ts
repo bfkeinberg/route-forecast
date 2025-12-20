@@ -9,11 +9,13 @@ import { loadRwgpsRoute } from '../utils/rwgpsUtilities';
 import { rwgpsRouteLoaded } from "./routeInfoSlice";
 import { displayControlTableUiSet, UserControl } from "./controlsSlice";
 import { timeZoneSet } from "./routeParamsSlice";
-import { updateUserControls, shortenUrl } from "./actions";
+import { updateUserControls, shortenUrl, setWeatherProvider } from "./actions";
 import { requestTimeZoneForRoute } from "../utils/forecastUtilities";
 import { loadStravaRoute, loadStravaActivity } from "./loadFromStravaActions";
 import { cancelForecast, forecastWithHook } from "./forecastActions";
 import { DateTime } from "luxon";
+import { providerValues, alternateProvider } from "./providerValues";
+const { trace, debug, info, warn, error, fatal, fmt } = Sentry.logger;
 
 const mergeControls = (oldCtrls : Array<UserControl>, newCtrls : Array<UserControl>) => {
     let oldCtrlsCopy = oldCtrls.slice()
@@ -85,6 +87,15 @@ export const loadFromRideWithGps = function (routeNumber? : string, isTrip? : bo
     };
 };
 
+const filterProvider = (provider : string, country : string, providerValues : any, alternateProvider: string) => {
+    const providerInfo = providerValues[provider];
+    if (providerInfo && providerInfo.usOnly && country !== "US") {
+        warn("Provider not valid in the country of the route, using alternateProvider");    
+        return alternateProvider;
+    }
+    return provider;
+}
+
 export type MutationWrapper = (request:{}) => {unwrap: () => Promise<any>}
 
 export const loadRouteFromURL = (forecastFunc : MutationWrapper, aqiFunc : MutationWrapper, lang: string) => {
@@ -103,6 +114,12 @@ export const loadRouteFromURL = (forecastFunc : MutationWrapper, aqiFunc : Mutat
         if (getState().uiInfo.routeParams.stopAfterLoad) {
             ReactGA.event('search', {search_term:getState().uiInfo.routeParams.rwgpsRoute})
         }
+        // disallow provider not valid in the country of the route
+        const country = getState().routeInfo.country;
+        const requestedProvider = getState().forecast.weatherProvider;
+        const provider = filterProvider(requestedProvider, country, providerValues, alternateProvider);
+        dispatch(setWeatherProvider(provider));
+
         if (error === null && !getState().uiInfo.routeParams.stopAfterLoad) {
             await forecastWithHook(forecastFunc, aqiFunc, dispatch, getState, lang)
             const queryString = getState().params.queryString
