@@ -8,6 +8,7 @@ import {controlsMeaningfullyDifferent} from "../utils/util"
 import type { RootState } from "../redux/store";
 import type { AppDispatch } from "../redux/store";
 import * as Sentry from "@sentry/react";
+const { trace, debug, info, warn, error, fatal, fmt } = Sentry.logger;
 import { cancelForecast } from "./forecastActions";
 
 export const setPace = function (pace : string) {
@@ -71,9 +72,10 @@ export const shortenUrl = function (url : string) {
                     body: JSON.stringify({ longUrl: url })
                 })
                 .then(response => response.json())
-                .catch(error => { return errorDetailsSet(error) })
+                .catch(err => { error(`Error fetching short URL: ${err}`); return errorDetailsSet(err) })
                 .then(responseJson => {
                     if (responseJson.error === null) {
+                        error(`Error fetching short URL: ${responseJson.error}`); 
                         return dispatch(shortUrlSet(responseJson.url));
                     } else {
                         return dispatch(errorDetailsSet(responseJson.error));
