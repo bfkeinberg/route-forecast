@@ -4,7 +4,7 @@ import ReactGA from "react-ga4";
 import {connect, ConnectedProps} from 'react-redux';
 import { useMediaQuery } from 'react-responsive';
 
-import { msgFromError, removeDuplicateForecasts, extractRejectedResults } from '../../redux/forecastActions';
+import { msgFromError, removeDuplicateForecasts, extractRejectedResults, getDaysInFuture } from '../../redux/forecastActions';
 import { shortenUrl } from '../../redux/actions';
 import { useForecastMutation, useGetAqiMutation } from '../../redux/forecastApiSlice';
 import { forecastFetched, forecastAppended, Forecast } from '../../redux/forecastSlice';
@@ -195,7 +195,7 @@ const ForecastButton = ({fetchingForecast,submitDisabled, routeNumber, startTime
             dispatch(forecastFetchBegun())
             const reactEventParams = {
                 value: distanceInKm, currency:routeNumber, coupon:routeName,
-                items: [{ item_id: '', item_name: '' }]
+                items: [{ item_id: '', item_name: '' }], daysInFuture: getDaysInFuture(startTimestamp)
             }
             ReactGA.event('add_payment_info', reactEventParams);
             const routeData = rwgpsRouteData && rwgpsRouteData || gpxRouteData
@@ -230,8 +230,8 @@ const ForecastButton = ({fetchingForecast,submitDisabled, routeNumber, startTime
             }
             
             // handle any errors
-            dispatch(errorMessageListSet(extractRejectedResults(forecastResults).map(result => msgFromError(result, provider))))
-            dispatch(errorMessageListAppend(extractRejectedResults(aqiResults).map(result => msgFromError(result, provider))))
+            dispatch(errorMessageListSet(extractRejectedResults(forecastResults).map(result => msgFromError(result, forecastProvider))))
+            dispatch(errorMessageListAppend(extractRejectedResults(aqiResults).map(result => msgFromError(result, forecastProvider))))
         // })
         const url = generateUrl(startTimestamp, routeNumber, pace, interval, metric, controls,
             strava_activity, strava_route, provider, origin, true, zone, rusaRouteId)

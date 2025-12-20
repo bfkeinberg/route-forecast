@@ -9,6 +9,7 @@ import { MutationWrapper } from "./loadRouteActions";
 import { type ForecastRequest } from "../utils/gpxParser";
 import { Action, Dispatch } from "@reduxjs/toolkit";
 import * as Sentry from "@sentry/react";
+import { DateTime } from "luxon";
 const { trace, debug, info, warn, error, fatal, fmt } = Sentry.logger;
 
 const getRouteDistanceInKm = (routeData : RwgpsRoute|RwgpsTrip) => {
@@ -124,9 +125,6 @@ const doForecastByParts = async (forecastFunc : MutationWrapper, aqiFunc : Mutat
         getState().uiInfo.routeParams.interval, getState().controls.userControlPoints,
         getState().uiInfo.routeParams.segment, getState().routeInfo.routeUUID
     )
-    Sentry.getGlobalScope().setAttributes({
-        provider: getState().forecast.weatherProvider
-    });    
     return forecastByParts(forecastFunc, aqiFunc, forecastRequest, getState().uiInfo.routeParams.zone,
         getState().forecast.weatherProvider, getState().routeInfo.name, routeNumber, dispatch,
         getState().forecast.fetchAqi, lang)
@@ -156,21 +154,29 @@ export function extractRejectedResults<T>(results: PromiseSettledResult<T>[]): P
     return results.filter((result): result is PromiseRejectedResult => result.status === 'rejected');
 }    
 
+export const getDaysInFuture = (forecastedTime : number) => {
+    const now = DateTime.now();
+    const forecastDate = DateTime.fromMillis(forecastedTime);
+    const days = forecastDate.diff(now, 'days').days;
+    return days;
+}
+
 export const forecastWithHook = async (forecastFunc: MutationWrapper, aqiFunc: MutationWrapper,
      dispatch: AppDispatch, getState: () => RootState, lang: string) => {
-    const routeInfo = getState().routeInfo
-
+    const routeInfo = getState().routeInfo;
+    const daysInFuture = getDaysInFuture(getState().uiInfo.routeParams.startTimestamp)
+    
     if (routeInfo.rwgpsRouteData) {
         ReactGA.event('add_payment_info', {
             value: getRouteDistanceInKm(routeInfo.rwgpsRouteData), coupon: getRwgpsRouteName(routeInfo.rwgpsRouteData),
             currency: getRouteId(routeInfo.rwgpsRouteData),
-            items: [{ item_id: '', item_name: '' }]
+            items: [{ item_id: '', item_name: '' }], daysInFuture: daysInFuture
         });
     } else if (routeInfo.gpxRouteData) {
         ReactGA.event('add_payment_info', {
             value: routeInfo.gpxRouteData.tracks[0].distance.total/1000, coupon: routeInfo.gpxRouteData.name,
             currency: getRouteNumberFromValue(routeInfo.gpxRouteData.tracks[0].link?routeInfo.gpxRouteData.tracks[0].link.href:''),
-            items: [{ item_id: '', item_name: '' }]
+            items: [{ item_id: '', item_name: '' }], daysInFuture: daysInFuture
         });
     }
 
@@ -204,6 +210,6 @@ export const forecastWithHook = async (forecastFunc: MutationWrapper, aqiFunc: M
     fetchAbortMethod = null;
 
     // handle any errors
-    dispatch(errorMessageListSet(extractRejectedResults(forecastResults).map(result => msgFromError(result, ""))))
-    dispatch(errorMessageListAppend(extractRejectedResults(aqiResults).map(result => msgFromError(result, ""))))
+    dispatch(errorMessageListSet(extractRejectedResults(forecastResults).map(result => msgFromError(result, getState().forecast.weatherProvider))))
+    dispatch(errorMessageListAppend(extractRejectedResults(aqiResults).map(result => msgFromError(result, getState().forecast.weatherProvider))))
 }
