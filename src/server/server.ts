@@ -661,7 +661,6 @@ app.get('/stravaAuthReq', (req : Request, res : Response) => {
 
 app.get('/stravaAuthReply', async (req : Request, res : Response) => {
     console.log(JSON.stringify(req.query))
-    info("Strava auth callback", {query: req.query});
     const code = req.query.code;
     let error = req.query.error;
     const scope = req.query.scope
