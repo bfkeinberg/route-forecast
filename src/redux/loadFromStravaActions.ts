@@ -147,7 +147,7 @@ const loadGpxRoute = function(gpxFileData : GpxRouteData) {
 export const loadStravaRoute = (routeId : string) => {
     return async function (dispatch : AppDispatch, getState: () => RootState) {
         routeId = routeId || getState().strava.route
-        ReactGA.event('login', {method:routeId});
+        // ReactGA.event('login', {method:routeId});
         ReactGA.event('sign_up', {method:routeId});
         dispatch(routeLoadingBegun('gpx'));
         await Sentry.startSpan({ name: "loadingStravaRoute" }, async () => {
