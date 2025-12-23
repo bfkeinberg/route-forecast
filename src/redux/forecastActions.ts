@@ -32,15 +32,15 @@ const getRouteId = (routeData : RwgpsRoute|RwgpsTrip) => {
     }
 };
 
-export const msgFromError = (error : {reason:{data:{details:string}} | {reason:string, data: never}}, provider : string ) => {
+export const msgFromError = (error : {reason:{data:{details:string}} | {reason:string, data: never}}, provider : string, context?: string ) => {
     if (error.reason.data) {
-        warn(error.reason.data.details, {provider:provider});
+        warn(error.reason.data.details, {provider:provider, context:context} );
         if (/^\s*$/.test(error.reason.data.details)) {
             Sentry.captureMessage("Error string from data.details was all whitespace")
         }
         return error.reason.data.details
     } else {
-        warn(JSON.stringify(error.reason), {provider:provider}  );
+        warn(JSON.stringify(error.reason), {provider:provider, context:context}  );
         if (/^\s*$/.test(JSON.stringify(error.reason))) {
             Sentry.captureMessage("Error string from reason was all whitespace")
         }
@@ -210,6 +210,6 @@ export const forecastWithHook = async (forecastFunc: MutationWrapper, aqiFunc: M
     fetchAbortMethod = null;
 
     // handle any errors
-    dispatch(errorMessageListSet(extractRejectedResults(forecastResults).map(result => msgFromError(result, getState().forecast.weatherProvider))))
-    dispatch(errorMessageListAppend(extractRejectedResults(aqiResults).map(result => msgFromError(result, getState().forecast.weatherProvider))))
+    dispatch(errorMessageListSet(extractRejectedResults(forecastResults).map(result => msgFromError(result, getState().forecast.weatherProvider, "forecast"))))
+    dispatch(errorMessageListAppend(extractRejectedResults(aqiResults).map(result => msgFromError(result, getState().forecast.weatherProvider, "aqi"))))
 }
