@@ -1,7 +1,6 @@
 {
     "name": "RandoPlan",
     "short_name": "RandoPlan",
-    "start_url": ".",
     "display": "standalone",
     "description": "Route forecast for cycle or hiking route",
     "start_url": "/",
