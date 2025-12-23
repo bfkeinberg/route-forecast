@@ -72,12 +72,12 @@ export const shortenUrl = function (url : string) {
                     body: JSON.stringify({ longUrl: url })
                 })
                 .then(response => response.json())
-                .catch(err => { error(`Error fetching short URL: ${err}`); return errorDetailsSet(err) })
+                .catch(err => { dispatch(errorDetailsSet(err)); error(`Error fetching short URL for ${url}: ${err}`); return err; })
                 .then(responseJson => {
                     if (responseJson.error === null) {
                         return dispatch(shortUrlSet(responseJson.url));
                     } else {
-                        error(`Error fetching short URL: ${responseJson.error}`); 
+                        error(`Error fetching the shortened version of ${url}: ${responseJson.error}`); 
                         return dispatch(errorDetailsSet(responseJson.error));
                     }
                 })

@@ -30,7 +30,6 @@ const {std} = require('mathjs');
 import {Client} from "pg";
 
 import RateLimit from 'express-rate-limit'
-import { access } from 'fs';
 import { DateTime } from 'luxon';
 var limiter = RateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
@@ -510,11 +509,12 @@ const getShortIoUrl = async (accessToken: string, longUrl: string) => {
         const short_io_reply : AxiosResponse<Short_IO_Response> = await axios.request(options).
         catch((err : any) => {
             console.log(`Short.io returned error ${err}`)
-            error(`Short.io returned error ${err}`);
+            error(`Short.io for ${longUrl} returned error ${err}`);
             throw err
         })
         return {error: null, url: short_io_reply.data.shortURL}
     } catch (err : any) {
+        error(`Short.io returned error ${err}`);
         return {error: err.message, url: null}
     }
 }
