@@ -54,7 +54,19 @@ if (!short_io_key) {
     process.exit(1)
 }
 
-const publicPath = express.static(path.resolve(__dirname, '../static'), { maxAge: 86400000 });
+const publicPath = express.static(path.resolve(__dirname, '../static'), {
+    setHeaders: (res, path) => {
+        // Long-term caching for hashed static assets (js, css, images, etc.)
+        if (path.match(/\\.(js|br|css|png|jpg|jpeg|gif|ico|json|svg)$/)) {
+            // Cache for one year, marked as public and immutable
+            res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+        } else {
+            // No caching for index.html (ensures the latest version is always fetched)
+            res.setHeader('Cache-Control', 'public, no-cache, must-revalidate');
+        }
+    }
+});
+
 app.use('/static', expressStaticGzip(path.resolve(__dirname, '../'), {
     enableBrotli: true,
     orderPreference: [
