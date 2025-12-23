@@ -57,7 +57,7 @@ if (!short_io_key) {
 const publicPath = express.static(path.resolve(__dirname, '../static'), {
     setHeaders: (res, path) => {
         // Long-term caching for hashed static assets (js, css, images, etc.)
-        if (path.match(/\\.(js|br|css|png|jpg|jpeg|gif|ico|json|svg)$/)) {
+        if (path.match(/\.(js|br|css|png|jpg|jpeg|gif|ico|json|svg)$/)) {
             // Cache for one year, marked as public and immutable
             res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
         } else {
