@@ -74,8 +74,14 @@ export const shortenUrl = function (url : string) {
                 .then(response => response.json())
                 .catch(err => { dispatch(errorDetailsSet(err)); error(`Error fetching short URL for ${url}: ${err}`); return err; })
                 .then(responseJson => {
-                    if (responseJson.error === null) {
-                        return dispatch(shortUrlSet(responseJson.url));
+                    if (!responseJson.error) {
+                        if (responseJson.url) {
+                            return dispatch(shortUrlSet(responseJson.url));
+                        } else {
+                            error(`Unexpected response from short.io: ${JSON.stringify(responseJson)}`); 
+                            return dispatch(errorDetailsSet(`Unexpected response from short.io: ${JSON.stringify(responseJson)}`)); 
+                        }
+                        
                     } else {
                         error(`Error fetching the shortened version of ${url}: ${responseJson.error}`); 
                         return dispatch(errorDetailsSet(responseJson.error));
