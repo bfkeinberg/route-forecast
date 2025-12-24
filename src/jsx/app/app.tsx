@@ -26,11 +26,11 @@ if ('serviceWorker' in navigator) {
         // a new SW was registered.
         registration.installing?.addEventListener('statechange', (event : Event) => {
         if (event.target && (event.target as ServiceWorker).state === 'redundant') {
-            warn(`Service worker did not install correctly`)
+            warn(`Service worker did not install correctly, was redundant`)
         }
         });        
     }).catch((error) => {
-        warn('Error registering service worker:', error);
+        warn(`Error registering service worker: ${error}`);
     });
 }
 
