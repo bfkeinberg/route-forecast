@@ -488,6 +488,8 @@ interface Short_IO_Response {
 }
 
 const getShortIoUrl = async (accessToken: string, longUrl: string) => {
+    // TODO: temporary for troubleshooting
+    info(`Short.io shortening ${longUrl}`);
     const short_io_domain = 'go.randoplan.com';
     const options = {
         method: 'POST',
@@ -514,6 +516,8 @@ const getShortIoUrl = async (accessToken: string, longUrl: string) => {
             error(`Short.io for ${longUrl} returned error ${err}`);
             throw err
         })
+        // TODO: temporary for troubleshooting
+        info(`Short.io returned ${short_io_reply.data.shortURL} for ${longUrl}`);
         return {error: null, url: short_io_reply.data.shortURL}
     } catch (err : any) {
         error(`Short.io returned error ${err}`);
