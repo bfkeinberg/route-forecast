@@ -1,4 +1,6 @@
 import * as Sentry from "@sentry/react";
+const { trace, debug, info, warn, error, fatal, fmt } = Sentry.logger;
+
 import { createRoot } from 'react-dom/client';
 import ReactGA from "react-ga4";
 import VersionContext from "../versionContext";
@@ -24,11 +26,11 @@ if ('serviceWorker' in navigator) {
         // a new SW was registered.
         registration.installing?.addEventListener('statechange', (event : Event) => {
         if (event.target && (event.target as ServiceWorker).state === 'redundant') {
-            console.log(`Service worker did not install correctly`)
+            warn(`Service worker did not install correctly`)
         }
         });        
     }).catch((error) => {
-        console.warn('Error registering service worker:', error);
+        warn('Error registering service worker:', error);
     });
 }
 
