@@ -7,6 +7,20 @@ const indexed_db_app_name = 'RandoplanPOST_DB';
 const indexed_db_table_name = 'RandoplanPOST_Cache';
 let postCache;
 
+const sendLogMessage = (message, type) => {
+  // Get all active windows/tabs controlled by this service worker
+  self.clients.matchAll({ includeUncontrolled: true, type: 'window' })
+    .then((clientList) => {
+      for (const client of clientList) {
+        // Send the message to the main application
+        client.postMessage({
+          type: type,
+          data: message
+        });
+      }
+    });
+};
+
 self.addEventListener('install', (event) => {
     console.log('[Service Worker] Install');
 
@@ -108,14 +122,14 @@ const serialize = (request) => {
 const getAndCacheGET = async (request) => {
     const cache = await caches.open(cacheName);
     const url = request.url;
-    let response = await fetch(request).catch(() => console.warn(`Could not GET, will try cache for ${url}`));
+    let response = await fetch(request).catch(() => sendLogMessage(`Could not GET, will try cache for ${url}`, 'warning'));
     if (response !== undefined) {
         console.info(`inserting item into cache with key ${url}`, response);
         cache.put(url, response.clone());
         return response;
     } else {
         // If the network is unavailable, get
-        console.info(`Searching GET cache for ${url}`);
+        sendLogMessage(`Searching GET cache for ${url}`, 'info');
         let cachedResponse = await cache.match(url);
         if (cachedResponse === undefined) {
             // try while ignoring query parameters if /
@@ -123,7 +137,7 @@ const getAndCacheGET = async (request) => {
                 cachedResponse = await cache.match(url, {ignoreSearch:true});
             }
             if (cachedResponse == undefined) {
-                console.warn(`No matching cache entry for GET for ${url}`);
+                sendLogMessage(`No matching cache entry for GET for ${url}`, 'warning');
                 return new Response('No cached GET response', {status: 503, statusText: 'Service Unavailable'})
             }
         }
@@ -140,9 +154,9 @@ const getAndCachePOST = async (request) => {
             `${formData.locations.lat}:${formData.locations.lon}_${formData.locations.time}_${formData.service}` :
             (formData.longUrl ? formData.longUrl : 'unknown'); 
         if (cacheKey === 'unknown') {
-            warn(`Contents of unknown POST request:`, formData);
+            sendLogMessage(`Contents of unknown POST request to ${request.url}: ${JSON.stringify(formData)}`, 'warning');
         }
-        const response = await fetch(request.clone()).catch((err) => console.warn(`Could not POST (${err}), will try cache`));
+        const response = await fetch(request.clone()).catch((err) => console.warn(`Could not POST to ${request.url} (${err}), will try cache`));
         if (response !== undefined && response.ok) {
             // If it works, put the response into IndexedDB
             // console.info(`inserting item into POST cache with key ${cacheKey}`, response);
@@ -168,7 +182,7 @@ const getAndCachePOST = async (request) => {
             }
             let cachedResponse = await postCache.getItem(cacheKey);
             if (!cachedResponse) {
-                console.warn('Returning 503 for POST');
+                sendLogMessage(`Returning 503 for POST to ${request.url}`, 'warning');
                 let details = 'No cached POST response';
                 if (response) {     // but presumably it's not ok
                     try {
@@ -180,17 +194,17 @@ const getAndCachePOST = async (request) => {
                 }
                 return Response.json(details, {status:503, statusText: 'Service Unavailable'});
             }
-            console.info('Returning cached copy', cachedResponse);
+            sendLogMessage(`Returning cached copy for ${request.url}`, 'info');
             return deserializeResponse(cachedResponse);
         }
     } catch (err) {
         // don't even try to cache when we don't know what format of data we're getting
-        console.error('Could not parse JSON from POST request');
+        sendLogMessage('Could not parse JSON from POST request to ${request.url}', 'error');
         try {
             const rawText = await request.clone().text();
             console.info('Raw request body:', rawText)
         } catch (e) {
-            console.error('Failed to read raw body:', e);
+            sendLogMessage(`Failed to read raw body for POST to ${request.url}: ${e}`, 'error');
         }        
         return fetch(request.clone());
     }
@@ -203,12 +217,12 @@ self.addEventListener('fetch', (event) => {
         !url.startsWith("https://fonts.gstatic.com") && !url.startsWith("https://maps.googleapis.com/maps/api/timezone") &&
         !url.includes('/rwgps_route') && !url.includes('/forecast_one') && !url.startsWith('https://www.weather.gov/images')
     ) {
-        console.log(`returning and not handling url ${url}`)
+        console.info(`returning and not handling url ${url}`);
         return;
     }
     // we don't need to cache the pinned routes, the intent of caching is to preserve completed forecasts
-    if (url.includes('/pinned_routes') || url.includes('/bitly') || url.includes('short_io')) {
-        console.log('Not handling pinned routes')
+    if (url.includes('/pinned_routes') || url.includes('/bitly') || url.includes('/short_io')) {
+        console.info('Not handling pinned routes or shortened urls');
         return;
     }
     // console.log(`responding to event for ${url} with method ${event.request.method}`);
