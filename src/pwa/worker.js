@@ -115,7 +115,7 @@ const getAndCacheGET = async (request) => {
         return response;
     } else {
         // If the network is unavailable, get
-        // console.info(`Searching GET cache for ${url}`)
+        console.info(`Searching GET cache for ${url}`);
         let cachedResponse = await cache.match(url);
         if (cachedResponse === undefined) {
             // try while ignoring query parameters if /
@@ -134,45 +134,65 @@ const getAndCacheGET = async (request) => {
 const getAndCachePOST = async (request) => {
     // First try to fetch the request from the server
     const requestClone = request.clone()
-    const formData = await requestClone.json();
-    const cacheKey = `${formData.locations.lat}:${formData.locations.lon}_${formData.locations.time}_${formData.service}`
-
-    const response = await fetch(request.clone()).catch((err) => console.warn(`Could not POST (${err}), will try cache`));
-    if (response !== undefined && response.ok) {
-        // If it works, put the response into IndexedDB
-        // console.info(`inserting item into POST cache with key ${cacheKey}`, response);
-        if (postCache !== undefined) {
-            postCache.setItem(cacheKey, serializeResponse(response.clone()));
-        } else {
-            postCache = localforage.createInstance({
-                name: indexed_db_app_name,
-                storeName: indexed_db_table_name
-            });
-            postCache.setItem(cacheKey, serializeResponse(response.clone()));
+    try {
+        const formData = await requestClone.json();
+        const cacheKey = formData.locations ? 
+            `${formData.locations.lat}:${formData.locations.lon}_${formData.locations.time}_${formData.service}` :
+            (formData.longUrl ? formData.longUrl : 'unknown'); 
+        if (cacheKey === 'unknown') {
+            warn(`Contents of unknown POST request:`, formData);
         }
-        return response;
-    } else {
-        // If it does not work, return the cached response. If the cache does not
-        // contain a response for our request, it will give us a 503-response
-        // don't know how this could happen, but evidently it can
-        if (postCache === undefined) {
-            postCache = localforage.createInstance({
-                name: indexed_db_app_name,
-                storeName: indexed_db_table_name
-            });
-        }
-        let cachedResponse = await postCache.getItem(cacheKey);
-        if (!cachedResponse) {
-            // console.warn('Returning 503 for POST');
-            let details = 'No cached POST response';
-            if (response) {
-                const json = await response.json();
-                details += `(${json.details})`;
+        const response = await fetch(request.clone()).catch((err) => console.warn(`Could not POST (${err}), will try cache`));
+        if (response !== undefined && response.ok) {
+            // If it works, put the response into IndexedDB
+            // console.info(`inserting item into POST cache with key ${cacheKey}`, response);
+            if (postCache !== undefined) {
+                postCache.setItem(cacheKey, serializeResponse(response.clone()));
+            } else {
+                postCache = localforage.createInstance({
+                    name: indexed_db_app_name,
+                    storeName: indexed_db_table_name
+                });
+                postCache.setItem(cacheKey, serializeResponse(response.clone()));
             }
-            return Response.json(details, {status:503, statusText: 'Service Unavailable'});
+            return response;
+        } else {
+            // If it does not work, return the cached response. If the cache does not
+            // contain a response for our request, it will give us a 503-response
+            // don't know how this could happen, but evidently it can
+            if (postCache === undefined) {
+                postCache = localforage.createInstance({
+                    name: indexed_db_app_name,
+                    storeName: indexed_db_table_name
+                });
+            }
+            let cachedResponse = await postCache.getItem(cacheKey);
+            if (!cachedResponse) {
+                console.warn('Returning 503 for POST');
+                let details = 'No cached POST response';
+                if (response) {     // but presumably it's not ok
+                    try {
+                        const json = await response.json();
+                        details += `(${json.details})`;
+                    } catch (e) {
+                        details += `(${response.statusText})`;
+                    }
+                }
+                return Response.json(details, {status:503, statusText: 'Service Unavailable'});
+            }
+            console.info('Returning cached copy', cachedResponse);
+            return deserializeResponse(cachedResponse);
         }
-        // console.info('Returning cached copy', cachedResponse)
-        return deserializeResponse(cachedResponse);
+    } catch (err) {
+        // don't even try to cache when we don't know what format of data we're getting
+        console.error('Could not parse JSON from POST request');
+        try {
+            const rawText = await request.clone().text();
+            console.info('Raw request body:', rawText)
+        } catch (e) {
+            console.error('Failed to read raw body:', e);
+        }        
+        return fetch(request.clone());
     }
 }
 
@@ -183,12 +203,12 @@ self.addEventListener('fetch', (event) => {
         !url.startsWith("https://fonts.gstatic.com") && !url.startsWith("https://maps.googleapis.com/maps/api/timezone") &&
         !url.includes('/rwgps_route') && !url.includes('/forecast_one') && !url.startsWith('https://www.weather.gov/images')
     ) {
-        // console.log(`returning and not handling url ${url}`)
+        console.log(`returning and not handling url ${url}`)
         return;
     }
     // we don't need to cache the pinned routes, the intent of caching is to preserve completed forecasts
     if (url.includes('/pinned_routes') || url.includes('/bitly') || url.includes('short_io')) {
-        // console.log('Not handling pinned routes')
+        console.log('Not handling pinned routes')
         return;
     }
     // console.log(`responding to event for ${url} with method ${event.request.method}`);
