@@ -230,8 +230,8 @@ const ForecastButton = ({fetchingForecast,submitDisabled, routeNumber, startTime
             }
             
             // handle any errors
-            dispatch(errorMessageListSet(extractRejectedResults(forecastResults).map(result => msgFromError(result, forecastProvider))))
-            dispatch(errorMessageListAppend(extractRejectedResults(aqiResults).map(result => msgFromError(result, forecastProvider))))
+            dispatch(errorMessageListSet(extractRejectedResults(forecastResults).map(result => msgFromError(result, forecastProvider, 'forecast'))))
+            dispatch(errorMessageListAppend(extractRejectedResults(aqiResults).map(result => msgFromError(result, forecastProvider, 'aqi'))))
         // })
         const url = generateUrl(startTimestamp, routeNumber, pace, interval, metric, controls,
             strava_activity, strava_route, provider, origin, true, zone, rusaRouteId)
