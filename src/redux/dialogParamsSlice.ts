@@ -3,7 +3,7 @@ import { pinnedRoutesSet } from './rideWithGpsSlice'
 import { rwgpsRouteLoaded, gpxRouteLoaded } from './routeInfoSlice'
 import { stravaFetched, stravaFetchFailed } from './stravaSlice'
 import {rwgpsRouteSetAsNumber, rwgpsRouteSet} from './routeParamsSlice'
-import { act } from 'react'
+import { forecastInvalidated } from './forecastSlice'
 
 interface ErrorMessage {
     message:string
@@ -50,7 +50,7 @@ const dialogParamsInitialState : DialogParams = {
     errorDetails: null,
     errorMessageList: [],
     succeeded: true, 
-    shortUrl: ' ',
+    shortUrl: 'click here to get a short URL',
     loadingSource: null, 
     fetchingForecast: false, 
     fetchingRoute: false,
@@ -155,6 +155,8 @@ const dialogParamsSlice = createSlice({
                 state.loadingSource = null
             }).addCase(rwgpsRouteSet, (state) => {
                 state.loadingSource = null
+            }).addCase(forecastInvalidated, (state) => {
+                state.shortUrl = dialogParamsInitialState.shortUrl;
             })
     }
 })

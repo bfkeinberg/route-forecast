@@ -128,10 +128,11 @@ export const loadRouteFromURL = (forecastFunc : MutationWrapper, aqiFunc : Mutat
                 updateHistory(queryString, searchString, true);
             }
             const url = getState().params.queryString
-            if (url && !url.includes("localhost")) {
+            // TODO: temporarily disabled automatic url shortening, must click to generate one
+/*             if (url && !url.includes("localhost")) {
                 await dispatch(shortenUrl(url))
             }
-            if (getState().strava.activity && getState().strava.activity !== '') {
+ */            if (getState().strava.activity && getState().strava.activity !== '') {
                 dispatch(loadStravaActivity())
             }
         }

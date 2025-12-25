@@ -5,7 +5,7 @@ import {connect, ConnectedProps} from 'react-redux';
 import { useMediaQuery } from 'react-responsive';
 
 import { msgFromError, removeDuplicateForecasts, extractRejectedResults, getDaysInFuture } from '../../redux/forecastActions';
-import { shortenUrl } from '../../redux/actions';
+// import { shortenUrl } from '../../redux/actions';
 import { useForecastMutation, useGetAqiMutation } from '../../redux/forecastApiSlice';
 import { forecastFetched, forecastAppended, Forecast } from '../../redux/forecastSlice';
 import { querySet } from '../../redux/paramsSlice';
@@ -237,11 +237,12 @@ const ForecastButton = ({fetchingForecast,submitDisabled, routeNumber, startTime
             strava_activity, strava_route, provider, origin, true, zone, rusaRouteId)
         querySet({url:url.url,search:url.search})
         Sentry.setContext("query", {queryString:url.search})
-        // don't shorten localhost with bitly
-        if (origin !== 'http://localhost:8080' && (url.url !== href || !urlIsShortened)) {
+        // TODO: temporarily disabled automatic url shortening, must click to generate one
+        // don't shorten localhost
+/*         if (origin !== 'http://localhost:8080' && (url.url !== href || !urlIsShortened)) {
             dispatch(shortenUrl(url.url))
         }
-    };
+ */    };
 
     const smallScreen = useMediaQuery({query: "(max-width: 800px)"})
     forecastRequestData.current = useForecastRequestData()
