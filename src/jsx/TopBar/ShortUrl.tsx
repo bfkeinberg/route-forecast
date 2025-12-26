@@ -82,7 +82,7 @@ const ShortUrl = ({shortUrl} : {shortUrl:string}) => {
     const needsItalic = !shortUrl.startsWith('https');
     const textStyle = needsItalic ? { fontStyle: "italic" } : {};
     return (
-        <div style={{ display: (shortUrl === ' ' && !showErrorNotUrl) ? 'none' : 'inline-flex', margin: "0px 10px", flexDirection: "column", justifyContent: "flex-start" }}>
+        <div style={{ display: (false/* shortUrl === ' ' && !showErrorNotUrl*/) ? 'none' : 'inline-flex', margin: "0px 10px", flexDirection: "column", justifyContent: "flex-start" }}>
             <div style={{ width: "150px", display: "flex", alignItems: "center" }}>
                 <div>{t('labels.share')}</div>
             </div>
