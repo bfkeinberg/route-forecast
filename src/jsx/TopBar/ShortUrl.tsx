@@ -87,7 +87,11 @@ const ShortUrl = ({shortUrl} : {shortUrl:string}) => {
                 <div>{t('labels.share')}</div>
             </div>
             {showErrorNotUrl && <Notification color='red' onClose={() => dispatch(errorDetailsSet(null))}>{errorDetails}</Notification>}
-            {copyFailed && <ActionIcon onClick={() => {setCopyFailed(false); copyShortUrl(shortUrl)}}>
+            {copyFailed && <ActionIcon onClick={() => {
+setCopyFailed(false); 
+copyShortUrl(shortUrl);
+notifications.show({ message: "Short URL copied", autoClose:3000, withCloseButton: false });
+}}>
                 <IconCopy size={12} />
             </ActionIcon>}
             <TextInput style={textStyle} leftSection={<IconArrowUpSquare />} id={'shortUrl'} size="xs" readOnly type="text" value={shortUrl}
