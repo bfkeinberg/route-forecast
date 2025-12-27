@@ -156,7 +156,7 @@ const getAndCachePOST = async (request) => {
         if (cacheKey === 'unknown') {
             sendLogMessage(`Contents of unknown POST request to ${request.url}: ${JSON.stringify(formData)}`, 'warning');
         }
-        const response = await fetch(request.clone()).catch((err) => console.warn(`Could not POST to ${request.url} (${err}), will try cache`));
+        const response = await fetch(request.clone()).catch((err) => sendLogMessage(`Could not POST to ${request.url} ${cacheKey} (${err}), will try cache`, 'warning'));
         if (response !== undefined && response.ok) {
             // If it works, put the response into IndexedDB
             // console.info(`inserting item into POST cache with key ${cacheKey}`, response);
