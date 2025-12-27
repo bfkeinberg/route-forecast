@@ -1,4 +1,4 @@
-import { IconCloud, IconGlobe, IconBuildingStore, IconBike, IconMap } from "@tabler/icons-react";
+import { IconCloudRain, IconWorld, IconSettings, IconBike, IconMap } from "@tabler/icons-react";
 import React, { Suspense, useContext } from "react";
 import { NavLink, MemoryRouter, Route, Routes, useLocation, useNavigate } from "react-router-dom";
 import { errorDetailsSet, lastErrorCleared } from "../redux/dialogParamsSlice";
@@ -107,13 +107,13 @@ const MobileUITabs = (props : MobileUIPropTypes) => {
                             <Button size='compact-xs' leftSection={<IconMap />} title={"home"} variant={pathname==='/'?'filled':'default'}></Button>
                         </NavLink>
                         <NavLink to={"/controlPoints/"}>
-                            <Button size='compact-xs' leftSection={<IconBuildingStore />} right={3} disabled={!routeData} title={"controls"} variant={pathname==='/controlPoints/'?'filled':'default'}></Button>
+                            <Button size='compact-xs' leftSection={<IconSettings />} right={3} disabled={!routeData} title={"controls"} variant={pathname==='/controlPoints/'?'filled':'default'}></Button>
                         </NavLink>
                         <NavLink to={"/forecastTable/"}>
-                            <Button size='compact-xs' leftSection={<IconCloud />} disabled={!hasForecast} title={"forecast"} variant={needToViewTable ? 'warning' : (pathname==='/forecastTable/'?'filled':'default')}></Button>
+                            <Button size='compact-xs' leftSection={<IconCloudRain />} disabled={!hasForecast} title={"forecast"} variant={needToViewTable ? 'warning' : (pathname==='/forecastTable/'?'filled':'default')}></Button>
                         </NavLink>
                         <NavLink to={"/map/"}>
-                            <Button size='compact-xs' leftSection={<IconGlobe />} disabled={!hasForecast} title={"forecast"} variant={needToViewMap ? 'warning' : (pathname==='/map/'?'filled':'default')}></Button>
+                            <Button size='compact-xs' leftSection={<IconWorld />} disabled={!hasForecast} title={"forecast"} variant={needToViewMap ? 'warning' : (pathname==='/map/'?'filled':'default')}></Button>
                         </NavLink>
                         {
                             stravaActivityData &&
