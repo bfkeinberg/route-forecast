@@ -217,12 +217,12 @@ self.addEventListener('fetch', (event) => {
         !url.startsWith("https://fonts.gstatic.com") && !url.startsWith("https://maps.googleapis.com/maps/api/timezone") &&
         !url.includes('/rwgps_route') && !url.includes('/forecast_one') && !url.startsWith('https://www.weather.gov/images')
     ) {
-        console.info(`returning and not handling url ${url}`);
+        // console.info(`returning and not handling url ${url}`);
         return;
     }
     // we don't need to cache the pinned routes, the intent of caching is to preserve completed forecasts
     if (url.includes('/pinned_routes') || url.includes('/bitly') || url.includes('/short_io')) {
-        console.info('Not handling pinned routes or shortened urls');
+        // console.info('Not handling pinned routes or shortened urls');
         return;
     }
     // console.log(`responding to event for ${url} with method ${event.request.method}`);
