@@ -5,6 +5,7 @@ import * as Sentry from '@sentry/react'
 const weatherKitImage = "https://weatherkit.apple.com/assets/branding/square-mark.png";
 import visualcrossing from 'Images/vclogo.svg';
 import oneCallLogo from 'Images/OpenWeather-Master-Logo RGB.png'
+import openMeteoLogo from 'Images/OpenMeteo.svg'
 import { DateTime, Interval } from 'luxon';
 import cookie from 'react-cookies';
 import MediaQuery, {useMediaQuery} from 'react-responsive';
@@ -46,6 +47,8 @@ const displayBacklink = (provider : string) => {
             return <a href="https://developer.apple.com/weatherkit/data-source-attribution/" target="_blank" rel="noopener noreferrer"><img src={weatherKitImage} /></a>
         case 'oneCall':
             return <a href="https://openweathermap.org/" target="_blank" rel="noopener noreferrer"><img src={oneCallLogo} width={150} height={85}/></a>
+        case 'openMeteo':
+            return <a href="https://open-meteo.com/" style={{fontFamily:'ui-sans-serif', fontSize:'18px'}} target="_blank" rel="noopener noreferrer"><img src={openMeteoLogo} width={28} height={28}/>Open Meteo</a>
         default: return <div/>;
     }
 }

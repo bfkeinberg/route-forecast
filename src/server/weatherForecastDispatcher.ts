@@ -4,6 +4,7 @@ import callVisualCrossing from './visualCrossing'
 import callNWS from './nws'
 const callMeteomatics = require('./meteomatics');
 const callWeatherKit = require('./weatherKit');
+import callOpenMeteo from './openmeteo';
 import callOneCall from './oneCall'
 const Sentry = require('@sentry/node')
 
@@ -75,8 +76,8 @@ const callWeatherService = function (service : string, lat : number, lon : numbe
         return Sentry.startSpan({ name: "nws" }, () => {
             return callNWS(lat, lon, currentTime, distance, zone, bearing, getBearingDifference, isControl, lang)
         })
-    case 'meteomatics':
-        return callMeteomatics(lat, lon, currentTime, distance, zone, bearing, getBearingDifference, isControl, lang);
+    // case 'meteomatics':
+    //     return callMeteomatics(lat, lon, currentTime, distance, zone, bearing, getBearingDifference, isControl, lang);
     case 'weatherKit':
         return Sentry.startSpan({ name: "weatherkit" }, () => {
             return callWeatherKit(lat, lon, currentTime, distance, zone, bearing, getBearingDifference, isControl, lang)
@@ -84,6 +85,10 @@ const callWeatherService = function (service : string, lat : number, lon : numbe
     case 'oneCall':
         return Sentry.startSpan({ name: "oneCall" }, () => {
             return callOneCall(lat, lon, currentTime, distance, zone, bearing, getBearingDifference, isControl, lang)
+        })
+    case 'openMeteo':
+        return Sentry.startSpan({ name: "openMeteo" }, () => {
+            return callOpenMeteo(lat, lon, currentTime, distance, zone, bearing, getBearingDifference, isControl, lang)
         })
     default:
         return null;
