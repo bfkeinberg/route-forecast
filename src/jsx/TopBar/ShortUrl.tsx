@@ -2,7 +2,7 @@ import ReactGA from "react-ga4";
 import {connect} from 'react-redux';
 import * as Sentry from "@sentry/react";
 import type { RootState } from "../../redux/store";
-import {IconArrowUpSquare, IconCopy} from "@tabler/icons-react"
+import {IconShare2, IconCopy} from "@tabler/icons-react"
 import { TextInput, Notification, ActionIcon, Flex } from '@mantine/core';
 import {useTranslation} from 'react-i18next'
 import { notifications } from '@mantine/notifications';
@@ -61,7 +61,7 @@ const ShortUrl = ({ shortUrl }: { shortUrl: string }) => {
         if (navigator.clipboard) {
             try {
                 await navigator.clipboard.writeText((shortUrl));
-                notifications.show({ message: "Short URL copied", autoClose: 3000, withCloseButton: false });
+                notifications.show({ message: "Short URL copied", autoClose: 3000, position: "top-center", withCloseButton: false });
             } catch (err) {
                 Sentry.captureException(err);
                 fallbackCopyToClipboard(shortUrl);
@@ -76,6 +76,7 @@ const ShortUrl = ({ shortUrl }: { shortUrl: string }) => {
 
     React.useEffect(() => {
         setShowCopyButton(shortUrl !== 'click here to get a short URL');
+        notifications.show({ message: "Click clipboard to copy short URL", autoClose: 4000, position: "top-right", withCloseButton: false });
     }, [shortUrl]);
     
     const showErrorNotUrl = errorDetails && searchString && distance;
@@ -88,15 +89,16 @@ const ShortUrl = ({ shortUrl }: { shortUrl: string }) => {
             </div>
             {showErrorNotUrl && <Notification color='red' onClose={() => dispatch(errorDetailsSet(null))}>{errorDetails}</Notification>}
             <Flex>
-            {showCopyButton && <ActionIcon onClick={() => {setCopyFailed(false); copyShortUrl(shortUrl); ReactGA.event('share', {item_id: shortUrl})}}>
-                <IconCopy size={12} />
-            </ActionIcon>}
-            <TextInput style={textStyle} leftSection={<IconArrowUpSquare />} id={'shortUrl'} size="xs" readOnly type="text" value={shortUrl}
-                onClick={async event => {
-                    setNeedToGetShortUrl(true);
-                }} 
+                {showCopyButton && <ActionIcon onClick={() => { setCopyFailed(false); copyShortUrl(shortUrl); ReactGA.event('share', { item_id: shortUrl }) }}>
+                    <IconCopy size={12} />
+                </ActionIcon>}
+                <TextInput style={textStyle} leftSection={<IconShare2 />} leftSectionPointerEvents="none"
+                    id={'shortUrl'} size="xs" readOnly type="text" value={shortUrl}
+                    onClick={async event => {
+                        setNeedToGetShortUrl(true);
+                    }}
                 />
-                </Flex>
+            </Flex>
         </div>
     );
 };
