@@ -220,7 +220,12 @@ const updateFromQueryParams = (dispatch : AppDispatch, queryParams : QueryParams
     if (hasProvider(queryParams.provider)) {
         dispatch(setWeatherProvider(queryParams.provider))
     } else {
-        dispatch(setWeatherProvider(defaultProvider))
+        const provider = loadCookie('provider');
+        if (hasProvider(provider)) {
+            dispatch(setWeatherProvider(provider!))
+        } else {
+            dispatch(setWeatherProvider(defaultProvider))
+        }
     }
     dispatch(rwgpsRouteSet(queryParams.rwgpsRoute))
     getStravaToken(queryParams, dispatch);

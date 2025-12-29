@@ -6,7 +6,8 @@ import { useTranslation } from 'react-i18next'
 import { useForecastRequestData, useAppSelector } from "../../utils/hooks"
 import type { RootState } from "../../redux/store";
 import ReactGA from "react-ga4";
-import { Combobox, useCombobox, Button, Flex } from '@mantine/core'
+import { Combobox, useCombobox, Button, Flex } from '@mantine/core';
+import cookie from 'react-cookies';
 
 type PropsFromRedux = ConnectedProps<typeof connector>
 
@@ -40,6 +41,7 @@ const WeatherProviderSelector = ({ weatherProvider, setWeatherProvider }: PropsF
                 onOptionSubmit={(selected: string) => {
                     ReactGA.event('unlock_achievement', { achievement_id: selected });
                     setWeatherProvider(selected);
+                    cookie.save('provider', selected, { path: '/' });
                     combobox.closeDropdown();
                 }
                 }
