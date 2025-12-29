@@ -125,6 +125,8 @@ const doForecastByParts = async (forecastFunc : MutationWrapper, aqiFunc : Mutat
         getState().uiInfo.routeParams.interval, getState().controls.userControlPoints,
         getState().uiInfo.routeParams.segment, getState().routeInfo.routeUUID
     )
+
+    ReactGA.event('weather_provider', { provider: getState().forecast.weatherProvider });    
     return forecastByParts(forecastFunc, aqiFunc, forecastRequest, getState().uiInfo.routeParams.zone,
         getState().forecast.weatherProvider, getState().routeInfo.name, routeNumber, dispatch,
         getState().forecast.fetchAqi, lang)
