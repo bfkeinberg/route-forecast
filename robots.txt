@@ -1,1 +1,5 @@
+User-agent: short.io-link-checker
+Allow: /
+
+Use User-agent: *
 Disallow: /*? 
