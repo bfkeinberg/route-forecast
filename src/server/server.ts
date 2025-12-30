@@ -487,7 +487,7 @@ interface Short_IO_Response {
     shortURL: string
 }
 
-const getShortIoUrl = async (accessToken: string, longUrl: string) => {
+const getShortIoUrl = async (accessToken: string, longUrl: string, title?: string) => {
     // TODO: temporary for troubleshooting
     // info(`Short.io shortening ${longUrl}`);
     const short_io_domain = 'go.randoplan.com';
@@ -506,7 +506,8 @@ const getShortIoUrl = async (accessToken: string, longUrl: string) => {
             originalURL: longUrl,
             cloaking: false,
             domain: short_io_domain,
-            ttl: DateTime.now().plus({days: 10}).toISO()
+            ttl: DateTime.now().plus({days: 10}).toISO(),
+            title: title
         }
     };
     try {
@@ -527,7 +528,8 @@ const getShortIoUrl = async (accessToken: string, longUrl: string) => {
 
 app.post('/short_io', async (req : Request, res: Response) => {
     const longUrl = req.body.longUrl;
-    const { error, url } = await getShortIoUrl(short_io_key, longUrl);
+    const title = req.body.title;
+    const { error, url } = await getShortIoUrl(short_io_key, longUrl, title);
     res.json({ error, url })
 });
 
@@ -746,6 +748,13 @@ app.get('/refreshStravaToken', async (req: Request, res : Response) => {
 });
 
 app.get('/', (req : Request, res : Response) => {
+    let title = 'RandoPlan - Weather and AQI for Randonnées and Brevets';
+    if (Object.keys(req.query).length > 0) {
+        console.log(`request query ${JSON.stringify(req.query)}`);
+        if (Object.keys(req.query).includes('name') && typeof req.query.name === 'string') {
+            title = `Forecast for ${req.query.name}`;
+        }
+    }
     const ejsVariables = {
         'maps_key': process.env.MAPS_KEY,
         'timezone_api_key': process.env.TIMEZONE_API_KEY,
@@ -755,11 +764,9 @@ app.get('/', (req : Request, res : Response) => {
         'version': process.env.npm_package_version,
         'preloaded_state': '',
         'reactDom': '',
-        delimiter: '?'
+        delimiter: '?',
+        title: title
     };
-    if (Object.keys(req.query).length > 0) {
-        console.log(`request query ${JSON.stringify(req.query)}`);
-    }
     try {
         res.render('index', ejsVariables)
     } catch (err) {

@@ -22,10 +22,11 @@ const ShortUrl = ({ shortUrl }: { shortUrl: string }) => {
     const [copyFailed, setCopyFailed] = React.useState(false);
     const [showCopyButton, setShowCopyButton] = React.useState(false);
     const publicUrl = useAppSelector(state => state.params.queryString);
+    const routeName = useAppSelector(state => state.routeInfo.name)
 
     React.useEffect(() => {
         if (needToGetShortUrl && publicUrl) {
-            dispatch(shortenUrl(publicUrl));
+            dispatch(shortenUrl(publicUrl, routeName));
             setNeedToGetShortUrl(false);
         }
     }, [needToGetShortUrl, publicUrl]);
@@ -76,7 +77,7 @@ const ShortUrl = ({ shortUrl }: { shortUrl: string }) => {
 
     React.useEffect(() => {
         setShowCopyButton(shortUrl !== 'click here to get a short URL');
-        notifications.show({ message: "Click clipboard to copy short URL", autoClose: 4000, position: "top-right", withCloseButton: false });
+        notifications.show({ message: "Click clipboard icon to copy short URL", autoClose: 4000, position: "top-right", withCloseButton: false });
     }, [shortUrl]);
     
     const showErrorNotUrl = errorDetails && searchString && distance;

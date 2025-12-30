@@ -59,7 +59,7 @@ export const setWeatherProvider = (weatherProvider : string) => {
  * @param {String} url the URL to shortern
  * @returns {function(*=, *): Promise<T | never>} return value
  */
-export const shortenUrl = function (url : string) {
+export const shortenUrl = function (url : string, name? : string) {
     return function (dispatch : AppDispatch) {
         return Sentry.startSpan({ name: "shortenUrl" }, () => {
             return fetch("/short_io",
@@ -69,10 +69,13 @@ export const shortenUrl = function (url : string) {
                         'Content-Type': 'application/json'
                     },
                     method: 'POST',
-                    body: JSON.stringify({ longUrl: url })
+                    body: JSON.stringify({ longUrl: url, title: name})
                 })
                 .then(response => response.json())
-                .catch(err => { dispatch(errorDetailsSet(err)); error(`Error fetching short URL for ${url}: ${err}`); return err; })
+                .catch(err => { dispatch(errorDetailsSet(err)); 
+                    error(`Error fetching short URL for ${url}: ${err}`); 
+                    Sentry.metrics.count("shorten_url_failure", 1, {attributes: {url: url, name: name}});
+                    return err; })
                 .then(responseJson => {
                     if (!responseJson.error) {
                         if (responseJson.url) {
@@ -83,7 +86,8 @@ export const shortenUrl = function (url : string) {
                         }
                         
                     } else {
-                        error(`Error fetching the shortened version of ${url}: ${responseJson.error}`); 
+                        error(`Error fetching the shortened version of ${url}: ${responseJson.error}`);
+                        Sentry.metrics.count("shorten_url_failure", 1, {attributes: {url: url, name: name}});
                         return dispatch(errorDetailsSet(responseJson.error));
                     }
                 })

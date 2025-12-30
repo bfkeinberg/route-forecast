@@ -237,7 +237,9 @@ const ForecastButton = ({fetchingForecast,submitDisabled, routeNumber, startTime
             dispatch(errorMessageListAppend(extractRejectedResults(aqiResults).map(result => msgFromError(result, forecastProvider, 'aqi'))))
         // })
         const url = generateUrl(startTimestamp, routeNumber, pace, interval, metric, controls,
-            strava_activity, strava_route, provider, origin, true, zone, rusaRouteId)
+            strava_activity, strava_route, provider, origin, true, zone, rusaRouteId,
+            routeName
+        );
         querySet({url:url.url,search:url.search})
         Sentry.setContext("query", {queryString:url.search})
         // TODO: temporarily disabled automatic url shortening, must click to generate one
