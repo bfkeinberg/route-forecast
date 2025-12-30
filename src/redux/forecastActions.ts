@@ -38,12 +38,14 @@ export const msgFromError = (error : {reason:{data:{details:string}} | {reason:s
         if (/^\s*$/.test(error.reason.data.details)) {
             Sentry.captureMessage("Error string from data.details was all whitespace")
         }
+        Sentry.metrics.count("forecast_errors", 1, {attributes:{provider:provider, details:error.reason.data.details, context:context}});
         return error.reason.data.details
     } else {
         warn(JSON.stringify(error.reason), {provider:provider, context:context}  );
         if (/^\s*$/.test(JSON.stringify(error.reason))) {
             Sentry.captureMessage("Error string from reason was all whitespace")
         }
+        Sentry.metrics.count("forecast_errors", 1, {attributes:{provider:provider, details:error.reason, context:context}});
         return JSON.stringify(error.reason)
     }
 }
@@ -127,6 +129,7 @@ const doForecastByParts = async (forecastFunc : MutationWrapper, aqiFunc : Mutat
     )
 
     ReactGA.event('weather_provider', { provider: getState().forecast.weatherProvider });    
+    Sentry.metrics.count("forecast_requests", 1, {attributes:{provider:getState().forecast.weatherProvider}});
     return forecastByParts(forecastFunc, aqiFunc, forecastRequest, getState().uiInfo.routeParams.zone,
         getState().forecast.weatherProvider, getState().routeInfo.name, routeNumber, dispatch,
         getState().forecast.fetchAqi, lang)

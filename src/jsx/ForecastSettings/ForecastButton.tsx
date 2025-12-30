@@ -195,9 +195,12 @@ const ForecastButton = ({fetchingForecast,submitDisabled, routeNumber, startTime
             dispatch(forecastFetchBegun())
             const reactEventParams = {
                 value: distanceInKm, currency:routeNumber, coupon:routeName,
-                items: [{ item_id: '', item_name: '' }], daysInFuture: getDaysInFuture(startTimestamp)
+                items: [{ item_id: '', item_name: '' }], daysInFuture: getDaysInFuture(startTimestamp),
+                provider: forecastProvider
             }
             ReactGA.event('add_payment_info', reactEventParams);
+            Sentry.metrics.count("forecast_requests", 1, {attributes:{provider:forecastProvider}});
+
             const routeData = rwgpsRouteData && rwgpsRouteData || gpxRouteData
             // below makes Typescript happy but should not be neccessary given that the button ought to be
             // disabled via submitDisabled in this case

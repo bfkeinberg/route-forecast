@@ -4,6 +4,7 @@ import { rwgpsRouteLoaded, gpxRouteLoaded } from './routeInfoSlice'
 import { stravaFetched, stravaFetchFailed } from './stravaSlice'
 import {rwgpsRouteSetAsNumber, rwgpsRouteSet} from './routeParamsSlice'
 import { forecastInvalidated } from './forecastSlice'
+import * as Sentry from "@sentry/react";
 
 interface ErrorMessage {
     message:string
@@ -92,14 +93,18 @@ const dialogParamsSlice = createSlice({
         },
         errorDetailsSet(state, action:PayloadAction<ErrorPayload>) {
             if (action.payload instanceof Error) {
+                Sentry.metrics.count("errors", 1, {attributes:{message:action.payload.toString()}});
                 state.errorDetails = action.payload.toString()
             } else if (!action.payload) {
                 state.errorDetails = action.payload
             } else if (typeof action.payload === "string") {
+                Sentry.metrics.count("errors", 1, {attributes:{message:action.payload}});
                 state.errorDetails = action.payload
             } else if (action.payload.data) {
+                Sentry.metrics.count("errors", 1, {attributes:{message:action.payload.data.details}});
                 state.errorDetails = action.payload.data.details
             } else {
+                Sentry.metrics.count("errors", 1, {attributes:{message:JSON.stringify(action.payload)}});
                 state.errorDetails = JSON.stringify(action.payload)
             }
         },
