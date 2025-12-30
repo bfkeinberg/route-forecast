@@ -21,6 +21,8 @@ const sendLogMessage = (message, type) => {
     });
 };
 
+sendLogMessage('Service Worker loading', 'info');
+
 self.addEventListener('install', (event) => {
     console.log('[Service Worker] Install');
 
