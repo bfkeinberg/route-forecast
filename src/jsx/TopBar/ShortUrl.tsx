@@ -77,7 +77,9 @@ const ShortUrl = ({ shortUrl }: { shortUrl: string }) => {
 
     React.useEffect(() => {
         setShowCopyButton(shortUrl !== 'click here to get a short URL');
-        notifications.show({ message: "Click clipboard icon to copy short URL", autoClose: 4000, position: "top-right", withCloseButton: false });
+        if (shortUrl !== 'click here to get a short URL') {
+            notifications.show({ message: "Click clipboard icon to copy short URL", autoClose: 4000, position: "top-right", withCloseButton: false });
+        }
     }, [shortUrl]);
     
     const showErrorNotUrl = errorDetails && searchString && distance;
