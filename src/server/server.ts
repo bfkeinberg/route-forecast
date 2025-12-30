@@ -293,7 +293,7 @@ const stdDevPrecip = (forecastPoint: { lat: number; lon: number; time: string; d
         if (!process.env.NO_LOGGING) {
             logger.info(`Error with request from ${ip}`);
         }
-        res.status(500).json({ 'details': `Error calling weather service : ${error}` });
+        res.status(500).json({ 'details': `Error calling weather service @ ${forecastPoint.lat},${forecastPoint.lon}: ${error}` });
         return
     }
 }
