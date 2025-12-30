@@ -194,10 +194,16 @@ class AnalyzeRoute {
         return (matched && matched.groups) ? matched.groups.resto : undefined
     }
 
+    nameHasDuration = (name : string) => {
+        const durationRegex = /(\d{2})m/;        
+        const matchResult = name.match(durationRegex);
+        return matchResult ? parseInt(matchResult[1], 10) : 1;
+    }
+
     controlFromCoursePoint = (coursePoint : RwgpsCoursePoint, distanceInMiles : number) : ExtractedControl => 
         ({business: this.businessFromText(coursePoint), name:coursePoint.n?coursePoint.n:
             (coursePoint.description?coursePoint.description:' '), 
-            duration:1,
+            duration: this.nameHasDuration(coursePoint.n?coursePoint.n:(coursePoint.description?coursePoint.description:' ')),
             lat: coursePoint.y, lon: coursePoint.x,
             distance:Math.min(Math.round((coursePoint.d*kmToMiles)/1000),Math.trunc(distanceInMiles))})
 
