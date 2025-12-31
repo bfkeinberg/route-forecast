@@ -21,9 +21,12 @@ if ('serviceWorker' in navigator) {
         if (event.type === 'info') {
             console.info(`Message from service worker: ${event.data}`);
             info(`Message from service worker: ${event.data}`);
+        } else if (event.type === 'warning') {
+            console.warn(`Message from service worker: ${event.data}`);
+            warn(`Message from service worker: ${event.data}`);
         } else {
-            console.warn('Message from service worker:', event.data);
-            warn('Message from service worker:', event.data);
+            console.log('Message from service worker:', event.data);
+            error('Message from service worker:', event.data);
         }
         return;
     });
