@@ -4,6 +4,8 @@ import queryString from 'query-string';
 import { updateHistory } from "../jsx/app/updateHistory"
 import { formatControlsForUrl } from './util';
 import { UserControl } from '../redux/controlsSlice';
+import * as Sentry from "@sentry/node"
+const { warn } = Sentry.logger;
 
 const maxUrlLength = 2048;
 const maxControlNameLength = 10;
@@ -63,8 +65,10 @@ const buildUrl = (routeNumber : string, pace : string, interval : number, metric
     if (!isNaN(shortDate)) {
         query.startTimestamp = shortDate;
         query.zone = zone ? zone : start.zoneName;
+    } else {
+        warn(`Invalid start date ${shortDate} for route ${routeName}`);
     }
-    const search = queryString.stringify(query)
+    const search = queryString.stringify(query, {skipNull: true, skipEmptyString: true, sort: false});
     const url = `${origin}/?${search}`
     if (setPageUrl) {
         updateHistory(url, search)
