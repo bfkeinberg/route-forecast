@@ -372,7 +372,7 @@ app.post('/forecast_one', cache.middleware(), upload.none(), async (req : Reques
         if (!process.env.NO_LOGGING) {
             logger.info(`Error with request from ${req.ip} ${error}`);
         }
-        res.status(500).json({ 'details': `Error calling weather service : ${error}` });
+        res.status(502).json({ 'details': `Error calling weather service @ ${forecastPoints.lat},${forecastPoints.lon} : ${error}` });
     }
 });
 
