@@ -72,6 +72,15 @@
     <ul>Different providers offer different numbers of days in the future to give (at least) hourly forecasts.
         Some offer daily forecasts further out but that is not useful for our purposes.
     </ul>
-    <li><strong>why is the wind speed boldfaced with a red background?</strong></li>
+    <li><strong>Why is the wind speed boldfaced with a red background?</strong></li>
     <ul>This is to indicate a crosswind more than 10mph</ul>
+    <li><strong>How can one create a control in the route file with a predefined stopping time</strong></li>
+    <ul>By entering a two digit number in the control description, followed by 'm', that delay
+        will be used as the stopping time at that control, rather than the default of 1. For example, entering '15m' will
+        make the forecast assume a 15 minute stop there.
+    </ul>
+    <li><strong>Why does the forecast sometimes show "No data"</strong></li>
+    <ul>This can happen for a few reasons. One is that the weather provider does not have data for that location
+        (e.g. out at sea). Another is that the forecast time is too far in the future for that provider to give
+        a forecast for. Another is that the provider is temporarily unavailable (e.g. rate limited or down for maintenance).    
 </UL>
