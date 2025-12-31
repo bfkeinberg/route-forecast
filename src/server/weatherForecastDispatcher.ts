@@ -7,6 +7,7 @@ const callWeatherKit = require('./weatherKit');
 import callOpenMeteo from './openmeteo';
 import callOneCall from './oneCall'
 const Sentry = require('@sentry/node')
+const { error } = Sentry.logger;
 
 const getBearingDifference = function (bearing : number,windBearing : number) {
     return Math.min(bearing - windBearing < 0 ? bearing - windBearing + 360 : bearing - windBearing,
@@ -91,6 +92,7 @@ const callWeatherService = function (service : string, lat : number, lon : numbe
             return callOpenMeteo(lat, lon, currentTime, distance, zone, bearing, getBearingDifference, isControl, lang)
         })
     default:
+        error(`Unknown weather service requested: ${service}`);
         return null;
     }
 }

@@ -330,7 +330,7 @@ app.post('/forecast_one', cache.middleware(), upload.none(), async (req : Reques
         return
     }
     if (!process.env.NO_LOGGING) {
-        logger.info(`Request from ${req.ip} for single point from ${service} at ${forecastPoints.time}`);
+        logger.info(`Request from ${req.ip} for ${forecastPoints.lat},${forecastPoints.lon} from ${service} at ${forecastPoints.time}`);
     }
     if (req.body.routeName !== undefined && req.body.routeName !== '' && req.body.which===0) {
         if (!postgresClient) {
@@ -361,18 +361,21 @@ app.post('/forecast_one', cache.middleware(), upload.none(), async (req : Reques
     }
     try {
         const point = forecastPoints
-        const result = await callWeatherService(service, point.lat, point.lon, point.time, point.distance, zone, point.bearing, point.isControl, lang).catch((error: Error) => {
-            throw error;
+        const result = await callWeatherService(service, point.lat, point.lon, point.time, point.distance, zone, point.bearing, point.isControl, lang).catch((err: Error) => {
+            console.error(`callWeatherService @ ${point.lat},${point.lon} ${point.time} failed with ${err}`);
+            error(`callWeatherService @ ${point.lat},${point.lon} ${point.time} failed with ${err}`);
+            throw err;
         })
         if (!process.env.NO_LOGGING) {
             logger.info(`Done with request from ${req.ip}`);
         }
         res.status(200).json({ 'forecast': result });
-    } catch (error) {
+    } catch (err) {
         if (!process.env.NO_LOGGING) {
-            logger.info(`Error with request from ${req.ip} ${error}`);
+            logger.info(`Error with request @ ${forecastPoints.lat},${forecastPoints.lon} from ${req.ip} ${err}`);
         }
-        res.status(502).json({ 'details': `Error calling weather service @ ${forecastPoints.lat},${forecastPoints.lon} : ${error}` });
+        res.status(502).json(
+            { 'details': `Error calling weather service @ ${forecastPoints.lat},${forecastPoints.lon} ${forecastPoints.time}: ${err}` });
     }
 });
 

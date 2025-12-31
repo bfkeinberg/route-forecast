@@ -4,7 +4,7 @@ import queryString from 'query-string';
 import { updateHistory } from "../jsx/app/updateHistory"
 import { formatControlsForUrl } from './util';
 import { UserControl } from '../redux/controlsSlice';
-import * as Sentry from "@sentry/node"
+import * as Sentry from "@sentry/react"
 const { warn } = Sentry.logger;
 
 const maxUrlLength = 2048;
