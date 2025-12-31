@@ -1,5 +1,6 @@
 import ReactGA from "react-ga4";
 import * as Sentry from "@sentry/react";
+const { info } = Sentry.logger;
 import {Info} from "luxon";
 import queryString from 'query-string';
 import React, {lazy,  ReactElement, Suspense,useEffect} from 'react';
@@ -49,14 +50,15 @@ import { setPace, updateUserControls, setInterval, setWeatherProvider } from "..
 import { useForecastMutation, useGetAqiMutation } from '../../redux/forecastApiSlice';
 import { inputPaceToSpeed,parseControls } from '../../utils/util';
 import i18next from "i18next";
+
 i18next.on('languageChanged', (lng) => {
     if (lng.startsWith('zh')) {ReactGA.event('chinese_detected')}
 })
 
 const checkCredentialsInterface = () => {
-    return 'PasswordCredential' in window &&
-        "credentials" in navigator && "store" in navigator.credentials && "get" in navigator.credentials &&
-        "password" in PasswordCredential && "name" in PasswordCredential
+    return ('PasswordCredential' in window &&
+        "credentials" in navigator && "store" in navigator.credentials && "get" in navigator.credentials/* &&
+        "password" in PasswordCredential && "name" in PasswordCredential*/)
 }
 
 export const saveRwgpsCredentials = (token : string) => {
@@ -273,6 +275,10 @@ const RouteWeatherUI = ({search, href, action, maps_api_key, timezone_api_key, b
     const { i18n } = useTranslation()
 
     let queryParams = queryString.parse(search, {parseBooleans: true, parseNumbers:false, types:{viewControls:'boolean'}});
+    // temporarily log query params as received by DuckDuckGo
+    if (window.navigator.userAgent.indexOf('Ddg') !== -1) {
+        info(`Query params received by DuckDuckGo: ${search}`, queryParams);
+    }
     const queryParamsAsObj = queryParams as unknown as QueryParams
     dispatch(querySet({url:href,search:search}))
     Sentry.setContext("query", {queryString:search})
