@@ -17,13 +17,7 @@ import { stopAfterLoadSet, rusaPermRouteIdSet, routeLoadingModeSet, startTimesta
 import { metricSet, displayControlTableUiSet } from "../../redux/controlsSlice";
 import { defaultProvider, providerValues } from "../../redux/providerValues";
 import { DesktopUIProps } from "../DesktopUI";
-const addBreadcrumb = (msg : string) => {
-    Sentry.addBreadcrumb({
-        category: 'loading',
-        level: "info",
-        message: msg
-    })
-}
+
 const reloadPage = () => {
     Sentry.addBreadcrumb({category:"No stack", level:"info", message:"reloadPage"})
     if (window && window["location"] && window.location["reload"]) {
@@ -33,14 +27,14 @@ const reloadPage = () => {
   
 type DesktopUIType = Promise<typeof import(/* webpackChunkName: "DesktopUI" */ '../DesktopUI')>
 type DynamicDesktopUIType = DesktopUIType | Promise<{default:({ mapsApiKey, orientationChanged, setOrientationChanged }: DesktopUIProps) => ReactElement; }>
-const LoadableDesktop = lazy(() : DynamicDesktopUIType => {addBreadcrumb('loading desktop UI'); 
+const LoadableDesktop = lazy(() : DynamicDesktopUIType => {
     return import( /* webpackChunkName: "DesktopUI" */'../DesktopUI')
     .then(module => ({ default: module.default }))
     .catch((error) => {
     setTimeout(() => reloadPage(), 5000);
     return { default: () => <div>{`Error ${error} loading the component. Window will reload in five seconds`}</div> };
 })})
-const LoadableMobile = lazy(() => {addBreadcrumb('loading mobile UI'); return import( /* webpackChunkName: "MobileUI" */'../MobileUI').catch((error) => {
+const LoadableMobile = lazy(() => {return import( /* webpackChunkName: "MobileUI" */'../MobileUI').catch((error) => {
     setTimeout(() => reloadPage(), 5000);
     return { default: () => <div>{`Error ${error} loading the component. Window will reload in five seconds`}</div> };
 })})
@@ -58,8 +52,6 @@ import i18next from "i18next";
 i18next.on('languageChanged', (lng) => {
     if (lng.startsWith('zh')) {ReactGA.event('chinese_detected')}
 })
-import i18n from "./i18n";
-import { useMantineTheme } from "@mantine/core";
 
 const checkCredentialsInterface = () => {
     return 'PasswordCredential' in window &&
@@ -279,8 +271,6 @@ const RouteWeatherUI = ({search, href, action, maps_api_key, timezone_api_key, b
     const [forecast] = useForecastMutation()
     const [getAqi] = useGetAqiMutation()
     const { i18n } = useTranslation()
-    const theme = useMantineTheme();
-
 
     let queryParams = queryString.parse(search, {parseBooleans: true, parseNumbers:false, types:{viewControls:'boolean'}});
     const queryParamsAsObj = queryParams as unknown as QueryParams
