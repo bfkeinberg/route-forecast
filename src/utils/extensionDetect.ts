@@ -61,7 +61,7 @@ export const extensionIsInstalled = () => {
         } else {
             return Promise.resolve(false);
         }
-    } else if (browserIsSafari())
+    } else if (browserIsSafari() && typeof browser !== "undefined" && browser.runtime !== undefined && typeof browser.runtime.sendMessage === "function")
     {
         return new Promise<boolean>(( resolve => {
             try {
