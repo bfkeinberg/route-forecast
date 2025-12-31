@@ -24,13 +24,13 @@ const sendLogMessage = (message, type) => {
 sendLogMessage('Service Worker loading', 'info');
 
 self.addEventListener('install', (event) => {
-    console.log('[Service Worker] Install');
+    sendLogMessage('[Service Worker] Install', 'info');
 
     postCache = localforage.createInstance({
         name: indexed_db_app_name,
         storeName: indexed_db_table_name
     });
-    console.info('creating Cache');
+    sendLogMessage('creating Cache', 'info');
 /*     event.waitUntil(caches.open(cacheName).then((cache) => {
         // `Cache` instance for later use.
         return cache.addAll([
@@ -44,13 +44,17 @@ self.addEventListener('install', (event) => {
 });
 
 self.addEventListener('activate', (e) => {
-    console.info('deleting old caches');
-    e.waitUntil(caches.keys().then((keyList) => {
-      return Promise.all(keyList.map((key) => {
-        if (key === cacheName) { return null; }
-        return caches.delete(key);
-      }))
-    }));
+    sendLogMessage('deleting old caches', 'info');
+    try {
+        e.waitUntil(caches.keys().then((keyList) => {
+        return Promise.all(keyList.map((key) => {
+            if (key === cacheName) { return null; }
+            return caches.delete(key);
+        }))
+        }));
+    } catch (err) {
+        sendLogMessage(`Error deleting old caches: ${err}`, 'error');
+    }
   });
 
 const serializeHeaders = (headers) => {

@@ -18,8 +18,14 @@ import * as classes from "../../static/mantine.module.css";
 
 if ('serviceWorker' in navigator) {
     navigator.serviceWorker.addEventListener('message', (event: MessageEvent) => {
-        console.warn('Message from service worker:', event.data);
-        warn('Message from service worker:', event.data);
+        if (event.type === 'info') {
+            console.info('Message from service worker:', event.data);
+            info(`Message from service worker: ${event.data}`);
+        } else {
+            console.warn('Message from service worker:', event.data);
+            warn('Message from service worker:', event.data);
+        }
+        return;
     });
 
     navigator.serviceWorker.register('/worker.js').then((registration) => {
