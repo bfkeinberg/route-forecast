@@ -40,10 +40,8 @@ const getForecastUrl = async (lat : number, lon : number) => {
     const gridResult = await axiosInstance.get(url).catch(
         (        error: { response: { data: { detail: any; }; }; }) => {throw error.response.data.detail});
     if (!gridResult.data.properties.forecastGridData) {
-        Sentry.addBreadcrumb({category:'nws', 
-            level:'error',
-            message:`NWS API call returned ${JSON.stringify(gridResult.data.properties)} but no forecast URL`
-        })
+        warn(`NWS API call returned ${JSON.stringify(gridResult.data.properties)} but no forecast URL`);
+        throw Error(`NWS API call for ${lat},${lon} returned no forecast URL`);
     }
     return gridResult.data.properties.forecastGridData;
 }
@@ -123,11 +121,9 @@ const extractForecast = (forecastGridData : ForecastGridType, currentTime : Date
 
 const getForecastFromNws = async (forecastUrl : string) => {
     const forecastGridData = await axiosInstance.get(forecastUrl, { headers: { "User-Agent": '(randoplan.com, randoplan.ltd@gmail.com)' } }).catch(
-        (        error: any) => {
-            Sentry.addBreadcrumb({
-                category:'nws',level:'error',message:`Failed to get NWS forecast from ${forecastUrl}`
-            })
-            throw Error(`Failed to get NWS forecast from ${forecastUrl}`)
+        (        err: any) => {
+            error(`Failed to get NWS forecast from ${forecastUrl} : ${err}`);
+            throw Error(`Failed to get NWS forecast from ${forecastUrl} : ${err}`);
         }
     );
     return forecastGridData;
