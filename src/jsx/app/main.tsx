@@ -329,7 +329,7 @@ const useLoadRouteFromURL = (queryParams : QueryParams, forecastFunc : MutationW
     // are set do we load route and run forecast
     // Q: what if they're different? A problem? Something to ponder
     useEffect(() => {
-        if ((rwgpsRoute && queryParams.rwgpsRoute) || (stravaRoute && queryParams.strava_route)) {
+        if ((rwgpsRoute && queryParams.rwgpsRoute && queryParams.rwgpsRoute === rwgpsRoute) || (stravaRoute && queryParams.strava_route)) {
             dispatch(loadRouteFromURL(forecastFunc, aqiFunc, lang))
         }
     }, [queryParams, rwgpsRoute, stravaRoute, forecastFunc, aqiFunc, lang])
