@@ -20,10 +20,12 @@ import getPurpleAirAQI from'./purpleAirAQI'
 import getAirNowAQI from './airNowAQI'
 import querystring from 'querystring';
 import * as Sentry from "@sentry/node"
+import type { NextFunction, RequestHandler } from 'express';
 const { trace, debug, info, warn, error, fatal, fmt } = Sentry.logger;
 import axios, { AxiosError, isAxiosError, AxiosResponse, AxiosRequestConfig } from 'axios';
 const axiosRetry = require('axios-retry').default
 const axiosInstance = axios.create()
+const timeout = require('connect-timeout');
 
 // import {std} from "mathjs";
 const {std} = require('mathjs');
@@ -311,7 +313,19 @@ const stdDevPrecip = (forecastPoint: { lat: number; lon: number; time: string; d
 }
  */
 
-app.post('/forecast_one', cache.middleware(), upload.none(), async (req : Request, res : Response) => {
+interface RequestWithTimeout extends Request {
+    timedout?: boolean
+}
+
+const haltOnTimedout = (req: RequestWithTimeout, res: any, next: () => void) => {
+  if (!req.timedout) {
+    next()
+  } else {
+    res.status(503).json({ 'details': 'Request timed out' });
+  }
+}
+
+app.post('/forecast_one', cache.middleware(), upload.none(), timeout('27s'), haltOnTimedout, async (req : RequestWithTimeout, res : Response) => {
     if (req.body.locations === undefined) {
         res.status(400).json({ 'status': 'Missing location key' });
         return;
@@ -369,6 +383,10 @@ app.post('/forecast_one', cache.middleware(), upload.none(), async (req : Reques
         if (!process.env.NO_LOGGING) {
             logger.info(`Done with request from ${req.ip}`);
         }
+        if (req.timedout) {
+            console.warn(`Processing finished, but request already timed out. Not sending response.`);
+            return;
+        }        
         res.status(200).json({ 'forecast': result });
     } catch (err) {
         if (!process.env.NO_LOGGING) {
@@ -377,6 +395,17 @@ app.post('/forecast_one', cache.middleware(), upload.none(), async (req : Reques
         res.status(502).json(
             { 'details': `Error calling weather service @ ${forecastPoints.lat},${forecastPoints.lon} ${forecastPoints.time}: ${err}` });
     }
+});
+
+// A general error handler to catch timeout errors
+app.use((err : Error, req : RequestWithTimeout, res : Response, next : NextFunction) => {
+    if (req.timedout) {
+        // Send a specific response for timeout errors
+        console.log('Request timed out!');
+        return res.status(503).send({ details: `Service unavailable: Request exceeded timeout` });
+    }
+    // Handle other types of errors
+    next(err);
 });
 
 app.post('/aqi_one', upload.none(), async (req, res) => {

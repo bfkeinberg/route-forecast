@@ -1,6 +1,6 @@
 {
   "name": "route_weather",
-  "version": "5.5.6",
+  "version": "5.5.7",
   "description": "Forecast weather along a route from RideWithGps or Strava. Support for others may be added if there is demand",
   "main": "jsx/server/index.js",
   "engines": {
@@ -36,6 +36,7 @@
     "body-parser": "^2.2.0",
     "buffer": "^6.0.3",
     "compression": "^1.7.3",
+    "connect-timeout": "^1.9.1",
     "core-js": "^3.33.1",
     "d3fc": "^15.2.13",
     "d3fc-sample": "^3.0.5",
