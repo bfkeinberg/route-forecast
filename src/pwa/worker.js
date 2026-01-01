@@ -188,16 +188,16 @@ const getAndCachePOST = async (request) => {
             let cachedResponse = await postCache.getItem(cacheKey);
             if (!cachedResponse) {
                 sendLogMessage(`Returning 502 for POST to ${request.url} with ${cacheKey}`, 'warning');
-                let details = 'No cached POST response';
                 if (response) {     // but presumably it's not ok
                     try {
                         const json = await response.json();
-                        details += `(${json.details})`;
+                        return Response.json(json, {status:502, statusText: 'Service Unavailable'});
                     } catch (e) {
-                        details += `(${response.statusText})`;
+                        return Response.json({details: response.statusText}, {status:502, statusText: 'Service Unavailable'});
                     }
+                } else {
+                    return Response.json({details: 'No cached POST response available'}, {status:502, statusText: 'Service Unavailable'});
                 }
-                return Response.json(details, {status:502, statusText: 'Service Unavailable'});
             }
             // sendLogMessage(`Returning cached copy for ${request.url}`, 'info');
             return deserializeResponse(cachedResponse);
