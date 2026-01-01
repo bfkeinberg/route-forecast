@@ -1,11 +1,12 @@
 import {connect, ConnectedProps} from 'react-redux';
 import {useTranslation} from 'react-i18next'
-import * as Sentry from "@sentry/react";
 import { routeDataCleared} from '../../redux/routeInfoSlice';
 import { rwgpsRouteSet } from '../../redux/routeParamsSlice';
+import { querySet } from '../../redux/paramsSlice';
 import type { RootState } from "../../redux/store";
 import { ChangeEvent, RefObject } from 'react';
-import { CloseButton, Flex, Input, TextInput } from '@mantine/core';
+import { CloseButton, Flex, TextInput } from '@mantine/core';
+import { updateHistory } from '../../jsx/app/updateHistory';
 
 export const decideValidationStateFor = (type : string, methodUsed : string|null, loadingSuccess : boolean) => {
     if (type === methodUsed) {
@@ -25,7 +26,8 @@ interface RideWithGpsIdProps extends PropsFromRedux {
 }
 
 const RideWithGpsId = ({rwgpsRouteSet,loadingSource,loadingSuccess,rwgpsRoute,routeDataCleared,loadButtonRef} : RideWithGpsIdProps) => {
-    const { t } = useTranslation()
+    const { t } = useTranslation();
+    
     const isNumberKey = function(event:React.KeyboardEvent<HTMLInputElement>) {
         const charCode = (event.which) ? event.which : event.keyCode;
         if (charCode === 13 && loadButtonRef && loadButtonRef.current) {
@@ -41,6 +43,8 @@ const RideWithGpsId = ({rwgpsRouteSet,loadingSource,loadingSuccess,rwgpsRoute,ro
     const clearRoute = () => {
         rwgpsRouteSet('')
         routeDataCleared();
+        querySet({url:window.location.origin, search:''});
+        updateHistory(window.location.origin, '');
     }
 
     // set font size of input to keep Mobile Safari from zooming
