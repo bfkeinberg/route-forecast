@@ -40,7 +40,7 @@ const getForecastUrl = async (lat : number, lon : number) => {
     const url = `https://api.weather.gov/points/${lat},${lon}`;
     const gridResult = await axiosInstance.get(url).catch(
         (        error: { response: { data: { detail: any; }; }; }) => {throw error.response.data.detail});
-    if (!gridResult.data.properties.forecastGridData) {
+    if (!gridResult.data || !gridResult.data.properties || !gridResult.data.properties.forecastGridData) {
         warn(`NWS API call returned ${JSON.stringify(gridResult.data.properties)} but no forecast URL`);
         throw Error(`NWS API call for ${lat},${lon} returned no forecast URL`);
     }
@@ -121,8 +121,9 @@ const extractForecast = (forecastGridData : ForecastGridType, currentTime : Date
 };
 
 const getForecastFromNws = async (forecastUrl : string) => {
-    const forecastGridData = await axiosInstance.get(forecastUrl, { headers: { "User-Agent": '(randoplan.com, randoplan.ltd@gmail.com)' } }).catch(
-        (        err: any) => {
+    const forecastGridData = await axiosInstance.get(forecastUrl, 
+        { headers: { "User-Agent": '(randoplan.com, randoplan.ltd@gmail.com)' } }).catch(
+        (        err: AxiosError) => {
             error(`Failed to get NWS forecast from ${forecastUrl} : ${err}`);
             throw Error(`Failed to get NWS forecast from ${forecastUrl} : ${err}`);
         }
