@@ -21,5 +21,5 @@ export const providerValues : ProviderValues = {
     climacell:{min_interval:0.25, max_days:4, canForecastPast:false, daysInPast:1, name:"Tomorrow.io", maxCallsPerHour:25, enabled:true, usOnly: false},
     // meteomatics:{min_interval:1, max_days:10,canForecastPast:true, daysInPast:1, name:"Meteomatics"}
     }
-export const defaultProvider = 'nws'
+export const defaultProvider = 'openMeteo'
 export const alternateProvider = "oneCall"
