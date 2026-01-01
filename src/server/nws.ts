@@ -6,15 +6,16 @@ const axiosInstance = axios.create()
 import * as Sentry from "@sentry/node"
 const { trace, debug, info, warn, error, fatal, fmt } = Sentry.logger;
 const milesToMeters = 1609.34;
-const axiosRetry = require('axios-retry').default
+import axiosRetry from "axios-retry";
+import { AxiosError, AxiosRequestConfig } from "axios";
 
 axiosRetry(axiosInstance, {
-    retries: 5,
-    retryDelay: (...arg: any) => axiosRetry.exponentialDelay(...arg, 400),
-    retryCondition: (error: { response: { status: any; }; message: any; }) => {
+    retries: 3,
+    retryDelay: (...arg: any) => axiosRetry.exponentialDelay(...arg),
+    retryCondition: (error: AxiosError) => {
+        warn(`NWS axios retry condition called due to error: ${error.message} ${error.code}`);
         // in the weird case that we don't get a response field in the error then report to Sentry and fail the request
         if (!error.response) {
-            Sentry.addBreadcrumb({category:'nws',level:'error',message:`NWS error ${error.message}`})
             return false
         }
         switch (error.response.status) {
@@ -25,7 +26,7 @@ axiosRetry(axiosInstance, {
             return false;
         }
     },
-    onRetry: (retryCount: any, error: any, requestConfig: { url: any; }) => {
+    onRetry: (retryCount: number, error: AxiosError, requestConfig: AxiosRequestConfig) => {
         console.log(`nws axios retry count: ${retryCount} for ${requestConfig.url} with ${error}`)
         warn(`nws axios retry count: ${retryCount} for ${requestConfig.url} with ${error}`)
     },
