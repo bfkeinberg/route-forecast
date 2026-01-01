@@ -57,8 +57,8 @@ i18next.on('languageChanged', (lng) => {
 
 const checkCredentialsInterface = () => {
     return ('PasswordCredential' in window &&
-        "credentials" in navigator && "store" in navigator.credentials && "get" in navigator.credentials/* &&
-        "password" in PasswordCredential && "name" in PasswordCredential*/)
+        "credentials" in navigator && "store" in navigator.credentials && "get" in navigator.credentials &&
+        "password" in PasswordCredential && "name" in PasswordCredential)
 }
 
 export const saveRwgpsCredentials = (token : string) => {
