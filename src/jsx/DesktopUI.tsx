@@ -1,6 +1,7 @@
 import "./DesktopUI.css"
 
-import React, { Suspense,useState,StrictMode, SetStateAction, Dispatch, lazy } from "react";
+import React, { Suspense,useState, lazy } from "react";
+import type { SetStateAction, Dispatch } from "react";
 import { useAppDispatch, useAppSelector } from "../utils/hooks";
 import { routeLoadingModes } from "../data/enums";
 import { useDelay, usePrevious, useValueHasChanged, useWhenChanged } from "../utils/hooks";
@@ -110,42 +111,40 @@ const DesktopUI = ({mapsApiKey, orientationChanged, setOrientationChanged} : Des
      (forecastData.length > 0) : stravaActivityData !== null
 
     return (
-        <StrictMode>
-            <div style={{ display: 'flex', flexDirection: 'column', maxHeight: '97vh' }}>
-                {!mapDataExists ? <InstallExtensionButton /> : null}
-                <div style={{ display:'flex'/*,  flexShrink: 0 */}} >
-                    <TopBar
-                        sidePaneOptions={sidePaneOptions.map(({ title }) => title)}
-                        activeSidePane={activeSidePane}
-                        setActiveSidePane={setActiveSidePane}
-                        sidebarWidth={sidebarWidth}
-                        panesVisible={panesVisible}
-                    />
+        <div style={{ display: 'flex', flexDirection: 'column', maxHeight: '97vh' }}>
+            {!mapDataExists ? <InstallExtensionButton /> : null}
+            <div style={{ display: 'flex'/*,  flexShrink: 0 */ }} >
+                <TopBar
+                    sidePaneOptions={sidePaneOptions.map(({ title }) => title)}
+                    activeSidePane={activeSidePane}
+                    setActiveSidePane={setActiveSidePane}
+                    sidebarWidth={sidebarWidth}
+                    panesVisible={panesVisible}
+                />
+            </div>
+            <div style={{ display: "flex", flex: 1, flexGrow: 8, minHeight: '0px' }}>
+                <div style={{ maxHeight: '100%', overflowY: 'scroll', width: `${sidebarWidth}px` }}>
+                    <Sidebar sidePaneOptions={sidePaneOptions} activeSidePane={activeSidePane} sidebarWidth={sidebarWidth} />
                 </div>
-                <div style={{ display: "flex", flex: 1, flexGrow: 8, minHeight: '0px' }}>
-                    <div style={{ maxHeight: '100%', overflowY: 'scroll', width: `${sidebarWidth}px` }}>
-                        <Sidebar sidePaneOptions={sidePaneOptions} activeSidePane={activeSidePane} sidebarWidth={sidebarWidth} />
-                    </div>
-                    <DisplayErrorList errorList={errorMessageList} onClose={closeErrorList}/>
-                    <div style={{
-                        flexGrow: 1,
-                        maxHeight: "100%",
-                        borderLeft: "1px solid transparent",
-                        borderImage: "linear-gradient(to bottom, grey , transparent)",
-                        borderImageSlice: 1
-                    }}>
-                        {
-                            (mapDataExists) ?
-                                <MapLoader maps_api_key={mapsApiKey} /> :
-                                <TitleScreen />
-                        }
-                    </div>
-                </div>
-                <div style={{ flexShrink: 0 }}>
-                    <LangSwitcher />
+                <DisplayErrorList errorList={errorMessageList} onClose={closeErrorList} />
+                <div style={{
+                    flexGrow: 1,
+                    maxHeight: "100%",
+                    borderLeft: "1px solid transparent",
+                    borderImage: "linear-gradient(to bottom, grey , transparent)",
+                    borderImageSlice: 1
+                }}>
+                    {
+                        (mapDataExists) ?
+                            <MapLoader maps_api_key={mapsApiKey} /> :
+                            <TitleScreen />
+                    }
                 </div>
             </div>
-        </StrictMode>
+            <div style={{ flexShrink: 0 }}>
+                <LangSwitcher />
+            </div>
+        </div>
     );
 };
 

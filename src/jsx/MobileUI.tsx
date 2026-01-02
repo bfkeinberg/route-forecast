@@ -11,7 +11,7 @@ import RouteInfoForm from "./RouteInfoForm/RouteInfoForm";
 import DonationRequest from "./TopBar/DonationRequest";
 import DisplayErrorList from "./app/DisplayErrorList";
 import { useAppDispatch, useAppSelector } from "../utils/hooks";
-import { Dispatch, SetStateAction } from "react";
+import type { Dispatch, SetStateAction } from "react";
 import * as Sentry from "@sentry/react"
 import {Button, Group, Divider} from "@mantine/core";
 import FaqButton from "./TopBar/FaqButton";

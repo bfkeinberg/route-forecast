@@ -1,5 +1,5 @@
 import { Provider } from 'react-redux';
-import { useContext } from "react";
+import { useContext, StrictMode } from "react";
 import LocationContext from '../locationContext';
 import * as Sentry from "@sentry/react"
 import RouteWeatherUI from './main';
@@ -14,8 +14,10 @@ const TopLevel = ({ action, maps_api_key, timezone_api_key, bitly_token, preload
         <Sentry.ErrorBoundary fallback={<h2>Something went wrong.</h2>}>
             <ChunkErrorBoundary>
                 <Provider store={store}>
-                    {<RouteWeatherUI search={search} href={href} action={action} maps_api_key={maps_api_key}
-                        timezone_api_key={timezone_api_key} bitly_token={bitly_token} origin={origin} />}
+                    <StrictMode>
+                        <RouteWeatherUI search={search} href={href} action={action} maps_api_key={maps_api_key}
+                            timezone_api_key={timezone_api_key} bitly_token={bitly_token} origin={origin} />
+                    </StrictMode>
                 </Provider>
             </ChunkErrorBoundary>
         </Sentry.ErrorBoundary>
