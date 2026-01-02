@@ -78,7 +78,7 @@ const forecastByParts = (forecastFunc : MutationWrapper, aqiFunc : MutationWrapp
         try {
             const request = {locations:locations, timezone:zone, service:service, routeName:routeName, routeNumber:routeNumber, lang:lang, which}
             const result = forecastFunc(request).unwrap()
-            result.catch(() => { /* Handled by Promise.allSettled */ });
+            result.catch((err) => { warn(`Forecast fetch failed for part ${which} ${request.locations.lat} using ${service} with error ${err}`) });
             forecastResults.push(result)
             if (fetchAqi) {
                 const aqiRequest = {locations:locations}

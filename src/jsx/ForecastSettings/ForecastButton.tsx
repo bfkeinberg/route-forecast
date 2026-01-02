@@ -22,6 +22,7 @@ import type {ForecastRequest} from '../../utils/gpxParser'
 import { GpxRouteData, RwgpsRoute, RwgpsTrip } from 'redux/routeInfoSlice';
 import { writeObjToFile } from '../../utils/writeToFile';
 import { Button } from "@mantine/core";
+import { warn } from "console";
 declare module 'react' {
     interface HTMLAttributes<T> extends AriaAttributes, DOMAttributes<T> {
         // extends React's HTMLAttributes
@@ -101,7 +102,7 @@ const ForecastButton = ({fetchingForecast,submitDisabled, routeNumber, startTime
             const request = {locations:locations, timezone:zone, service:service, routeName:routeName,
                  routeNumber:routeNumber, lang: i18n.language, which}
             const result = forecast(request).unwrap()
-            result.catch(() => { /* Handled by Promise.allSettled */ });
+            result.catch((err) => { warn(`Forecast fetch failed for part ${which} ${request.locations.lat} using ${service} with error ${err}`) });
             forecastResults.push(result)
             if (fetchAqi) {
                 const aqiRequest = {locations:locations}
