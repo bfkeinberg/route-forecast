@@ -1,4 +1,5 @@
 import * as Sentry from "@sentry/react";
+const { trace, debug, info, warn, error, fatal, fmt } = Sentry.logger;
 import React, {useRef, useState} from 'react';
 import ReactGA from "react-ga4";
 import {connect, ConnectedProps} from 'react-redux';
@@ -22,7 +23,7 @@ import type {ForecastRequest} from '../../utils/gpxParser'
 import { GpxRouteData, RwgpsRoute, RwgpsTrip } from 'redux/routeInfoSlice';
 import { writeObjToFile } from '../../utils/writeToFile';
 import { Button } from "@mantine/core";
-import { warn } from "console";
+
 declare module 'react' {
     interface HTMLAttributes<T> extends AriaAttributes, DOMAttributes<T> {
         // extends React's HTMLAttributes
