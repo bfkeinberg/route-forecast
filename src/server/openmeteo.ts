@@ -97,7 +97,7 @@ const callOpenMeteo = async function (lat : number, lon : number, currentTime : 
         end_date: startTime.plus({days:1}).toISODate(),
     };
     const url = "https://api.open-meteo.com/v1/forecast";
-    const responses = await fetchWeatherApi(url, params);    
+    const responses = await fetchWeatherApi(url, params, 3);    
     const response = responses[0];      // first and only location
 
     // const latitude = response.latitude();
