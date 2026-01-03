@@ -108,7 +108,7 @@ const ForecastButton = ({fetchingForecast,submitDisabled, routeNumber, startTime
             if (fetchAqi) {
                 const aqiRequest = {locations:locations}
                 const aqiResult = getAQI(aqiRequest).unwrap()
-                aqiResult.catch(() => { /* Handled by Promise.allSettled */ });
+                aqiResult.catch((err) => { warn(`AQI fetch failed for part ${which} ${aqiRequest.locations.lat} with error ${err.details}`) });
                 aqiResults.push(aqiResult)
             }
             locations = requestCopy.shift();
