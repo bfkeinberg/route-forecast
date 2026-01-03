@@ -103,7 +103,7 @@ const ForecastButton = ({fetchingForecast,submitDisabled, routeNumber, startTime
             const request = {locations:locations, timezone:zone, service:service, routeName:routeName,
                  routeNumber:routeNumber, lang: i18n.language, which}
             const result = forecast(request).unwrap()
-            result.catch((err) => { warn(`Forecast fetch failed for part ${which} ${request.locations.lat} using ${service} with error ${err}`) });
+            result.catch((err) => { warn(`Forecast fetch failed for part ${which} ${request.locations.lat} using ${service} with error ${err.details}`) });
             forecastResults.push(result)
             if (fetchAqi) {
                 const aqiRequest = {locations:locations}
