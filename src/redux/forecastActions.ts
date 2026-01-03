@@ -10,6 +10,7 @@ import { type ForecastRequest } from "../utils/gpxParser";
 import { Action, Dispatch } from "@reduxjs/toolkit";
 import * as Sentry from "@sentry/react";
 import { DateTime } from "luxon";
+import { alternateProvider } from "./providerValues";
 const { trace, debug, info, warn, error, fatal, fmt } = Sentry.logger;
 
 const getRouteDistanceInKm = (routeData : RwgpsRoute|RwgpsTrip) => {
@@ -72,13 +73,17 @@ const forecastByParts = (forecastFunc : MutationWrapper, aqiFunc : MutationWrapp
     let requestCopy = [...forecastRequest]
     let forecastResults = []
     let aqiResults = []
+    let failedRequests: { locations: ForecastRequest; timezone: string; service: string; routeName: string; routeNumber: string; lang: string; which: number; }[] = []
     let locations = requestCopy.shift();
     let which = 0
     while (requestCopy.length >= 0 && locations) {
         try {
             const request = {locations:locations, timezone:zone, service:service, routeName:routeName, routeNumber:routeNumber, lang:lang, which}
             const result = forecastFunc(request).unwrap()
-            result.catch((err) => { warn(`Forecast fetch failed for part ${which} ${request.locations.lat} using ${service} with error ${err}`) });
+            result.catch((err) => {
+                 warn(`Forecast fetch failed for part ${which} ${request.locations.lat} using ${service} with error ${err.details}`);
+                 failedRequests.push(request);
+                 });
             forecastResults.push(result)
             if (fetchAqi) {
                 const aqiRequest = {locations:locations}
@@ -90,6 +95,19 @@ const forecastByParts = (forecastFunc : MutationWrapper, aqiFunc : MutationWrapp
             ++which
         } catch (err :any) {
             dispatch(forecastFetchFailed(err))
+        }
+    }
+    // retry with alternate provider if any failed
+    if (failedRequests.length > 0) {
+        for (let i = 0; i < failedRequests.length; ++i) {
+            const request = failedRequests.pop();
+            if (!request) { continue; }
+            request.service = alternateProvider;
+            const result = forecastFunc(request).unwrap();
+            result.catch((err) => {
+                warn(`Retry forecast fetch failed for part ${i} ${request.locations.lat} using ${alternateProvider} with error ${err.details}`);
+                });
+            forecastResults.push(result)
         }
     }
     return [Promise.allSettled(forecastResults),fetchAqi?Promise.allSettled(aqiResults):[]]
