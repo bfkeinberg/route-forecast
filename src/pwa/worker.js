@@ -50,8 +50,8 @@ self.addEventListener('activate', (e) => {
         return Promise.all(keyList.map((key) => {
             if (key === cacheName) { return null; }
             return caches.delete(key);
-        }))
-        }));
+        })).catch((err) => sendLogMessage(`Error during cache deletion: ${err}`, 'error'));
+        })).catch((err) => sendLogMessage(`Error during cache keys retrieval: ${err}`, 'error'));
     } catch (err) {
         sendLogMessage(`Error deleting old caches: ${err}`, 'error');
     }
