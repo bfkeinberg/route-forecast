@@ -377,7 +377,7 @@ app.post('/forecast_one', cache.middleware(), upload.none(), timeout('27s'), hal
         const point = forecastPoints
         const result = await callWeatherService(service, point.lat, point.lon, point.time, point.distance, zone, point.bearing, point.isControl, lang).catch((err: Error) => {
             console.error(`callWeatherService @ ${point.lat},${point.lon} ${point.time} failed with ${err}`);
-            error(`callWeatherService @ ${point.lat},${point.lon} ${point.time} failed with ${err}`);
+            error(`callWeatherService @ ${point.lat},${point.lon} ${point.time} using ${service} failed with ${err}`);
             throw err;
         })
         if (!process.env.NO_LOGGING) {
@@ -403,7 +403,7 @@ app.use((err : Error, req : RequestWithTimeout, res : Response, next : NextFunct
         // Send a specific response for timeout errors
         console.log('Request timed out!');
         if (req.body.locations) {
-            error(`Request timed out for location ${req.body.locations.lat},${req.body.locations.lon}`);
+            error(`Request to ${req.body.service} timed out for location ${req.body.locations.lat},${req.body.locations.lon}`);
         } else {
             error(`Request timed out for unknown location`);
         }
