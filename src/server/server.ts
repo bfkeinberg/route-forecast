@@ -325,7 +325,7 @@ const haltOnTimedout = (req: RequestWithTimeout, res: any, next: () => void) => 
   }
 }
 
-app.post('/forecast_one', cache.middleware(), upload.none(), timeout('27s'), haltOnTimedout, async (req : RequestWithTimeout, res : Response) => {
+app.post('/forecast_one', cache.middleware(), upload.none(), timeout('28s'), haltOnTimedout, async (req : RequestWithTimeout, res : Response) => {
     if (req.body.locations === undefined) {
         res.status(400).json({ 'status': 'Missing location key' });
         return;
@@ -384,7 +384,7 @@ app.post('/forecast_one', cache.middleware(), upload.none(), timeout('27s'), hal
             logger.info(`Done with request from ${req.ip}`);
         }
         if (req.timedout) {
-            console.warn(`Processing finished, but request already timed out. Not sending response.`);
+            console.warn(`Forecast processing finished, but request already timed out. Not sending response.`);
             return;
         }        
         res.status(200).json({ 'forecast': result });
@@ -413,7 +413,7 @@ app.use((err : Error, req : RequestWithTimeout, res : Response, next : NextFunct
     next(err);
 });
 
-app.post('/aqi_one', upload.none(), async (req, res) => {
+app.post('/aqi_one', upload.none(), timeout('27s'), haltOnTimedout, async (req : RequestWithTimeout, res: Response) => {
     if (req.body.locations === undefined) {
         res.status(400).json({ 'status': 'Missing location key' });
         return;
@@ -422,6 +422,10 @@ app.post('/aqi_one', upload.none(), async (req, res) => {
     if (!process.env.NO_LOGGING) {
         logger.info(`AQI request from ${req.ip} for AQI at ${forecastPoint.lat},${forecastPoint.lon}`)
     }
+    if (req.timedout) {
+        console.warn(`AQI processing finished, but request already timed out. Not sending response.`);
+        return;
+    }        
     try {
         let result = {};
         await getAQI(result, forecastPoint);
@@ -432,7 +436,7 @@ app.post('/aqi_one', upload.none(), async (req, res) => {
     }
 });
 
-app.post('/aqi', upload.none(), async (req, res) => {
+/* app.post('/aqi', upload.none(), async (req, res) => {
     if (req.body.locations === undefined) {
         res.status(400).json({ 'status': 'Missing location key' });
         return;
@@ -457,7 +461,7 @@ app.post('/aqi', upload.none(), async (req, res) => {
         res.status(500).json({ 'details': `Error retrieving AQI : ${JSON.stringify(error)}` });
     }
 });
-
+ */
 interface BitlyResponse {
     message : string
     groups: Array<{
