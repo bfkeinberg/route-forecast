@@ -84,14 +84,14 @@ const forecastByParts = (forecastFunc : MutationWrapper, aqiFunc : MutationWrapp
             const request = {locations:locations, timezone:zone, service:service, routeName:routeName, routeNumber:routeNumber, lang:lang, which}
             const result = limit(() => forecastFunc(request).unwrap())
             result.catch((err) => {
-                 warn(`Forecast fetch failed for part ${which} ${request.locations.lat} using ${service} with error ${err.details}`);
+                 warn(`Forecast fetch failed for part ${which} ${request.locations.lat} using ${service} with error ${err.data.details}`);
                  failedRequests.push(request);
                  });
             forecastResults.push(result)
             if (fetchAqi) {
                 const aqiRequest = {locations:locations}
                 const aqiResult = aqiFunc(aqiRequest).unwrap()
-                aqiResult.catch((err) => { warn(`AQI fetch failed for part ${which} ${aqiRequest.locations.lat} with error ${err.details}`) });
+                aqiResult.catch((err) => { warn(`AQI fetch failed for part ${which} ${aqiRequest.locations.lat} with error ${err.data.details}`) });
                 aqiResults.push(aqiResult)
             }
         locations = requestCopy.shift();

@@ -15,7 +15,7 @@ import { generateUrl } from '../../utils/queryStringUtils';
 import { getForecastRequest } from '../../utils/routeUtils';
 import { DesktopTooltip } from '../shared/DesktopTooltip';
 import {useTranslation} from 'react-i18next'
-import { providerValues } from '../../redux/providerValues';
+import { alternateProvider, providerValues } from '../../redux/providerValues';
 import { useForecastRequestData, useGetForecastRequestDependencies } from '../../utils/hooks';
 import type { RootState } from "../../redux/store";
 import { useAppSelector, useAppDispatch } from '../../utils/hooks';
@@ -101,23 +101,41 @@ const ForecastButton = ({fetchingForecast,submitDisabled, routeNumber, startTime
         let locations = requestCopy.shift();
         let which = 0
         let maxSimultaneousRequests = providerValues[service].maxRequests;
+        let failedRequests: { locations: ForecastRequest; timezone: string; service: string; routeName: string; routeNumber: string; lang: string; which: number; }[] = []
 
         const limit = pLimit(maxSimultaneousRequests);
         while (requestCopy.length >= 0 && locations) {
             const request = {locations:locations, timezone:zone, service:service, routeName:routeName,
                  routeNumber:routeNumber, lang: i18n.language, which}
             const result = limit(() => forecast(request).unwrap());
-            result.catch((err) => { warn(`Forecast fetch failed for part ${which} ${request.locations.lat} using ${service} with error ${err.details}`) });
+            result.catch((err) => { 
+                warn(`Forecast fetch failed for part ${which} ${request.locations.lat} using ${service} with error ${err.data.details}`);
+                failedRequests.push(request)
+            });
             forecastResults.push(result)
             if (fetchAqi) {
                 const aqiRequest = {locations:locations}
                 const aqiResult = getAQI(aqiRequest).unwrap()
-                aqiResult.catch((err) => { warn(`AQI fetch failed for part ${which} ${aqiRequest.locations.lat} with error ${err.details}`) });
+                aqiResult.catch((err) => { warn(`AQI fetch failed for part ${which} ${aqiRequest.locations.lat} with error ${err.data.details}`) });
                 aqiResults.push(aqiResult)
             }
             locations = requestCopy.shift();
             ++which
         }
+        // retry with alternate provider if any failed
+        if (failedRequests.length > 0) {
+            for (let i = 0; i < failedRequests.length; ++i) {
+                const request = failedRequests.pop();
+                if (!request) { continue; }
+                request.service = alternateProvider;
+                const result = forecast(request).unwrap();
+                result.catch((err) => {
+                    warn(`Retry forecast fetch failed for part ${i} ${request.locations.lat} using ${alternateProvider} with error ${err.details}`);
+                });
+                forecastResults.push(result)
+            }
+        }
+
         return [Promise.allSettled(forecastResults),fetchAqi?Promise.allSettled(aqiResults):[]]    
     }
 
