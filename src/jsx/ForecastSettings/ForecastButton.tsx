@@ -109,7 +109,7 @@ const ForecastButton = ({fetchingForecast,submitDisabled, routeNumber, startTime
                  routeNumber:routeNumber, lang: i18n.language, which}
             const result = limit(() => forecast(request).unwrap());
             result.catch((err) => { 
-                warn(`Forecast fetch failed for part ${which} ${request.locations.lat} using ${service} with error ${err.data.details}`);
+                warn(`Forecast fetch failed for part ${which} ${request.locations.lat} with error ${err.data.details}`, {provider:service});
                 failedRequests.push(request)
             });
             forecastResults.push(result)
@@ -124,6 +124,7 @@ const ForecastButton = ({fetchingForecast,submitDisabled, routeNumber, startTime
         }
         // retry with alternate provider if any failed
         if (failedRequests.length > 0) {
+            info(`Retrying ${failedRequests.length} failed forecast requests with alternate provider ${alternateProvider}`);
             for (let i = 0; i < failedRequests.length; ++i) {
                 const request = failedRequests.pop();
                 if (!request) { continue; }

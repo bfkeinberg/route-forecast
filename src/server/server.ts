@@ -325,7 +325,7 @@ const haltOnTimedout = (req: RequestWithTimeout, res: any, next: () => void) => 
   }
 }
 
-app.post('/forecast_one', cache.middleware(), upload.none(), timeout('28s'), haltOnTimedout, async (req : RequestWithTimeout, res : Response) => {
+app.post('/forecast_one', cache.middleware(), upload.none(), timeout('27s'), haltOnTimedout, async (req : RequestWithTimeout, res : Response) => {
     if (req.body.locations === undefined) {
         res.status(400).json({ 'status': 'Missing location key' });
         return;
@@ -407,7 +407,7 @@ app.use((err : Error, req : RequestWithTimeout, res : Response, next : NextFunct
         } else {
             error(`Request timed out for unknown location`);
         }
-        return res.status(503).send({ details: `Service unavailable: Request exceeded timeout` });
+        return res.status(503).send({ details: `Service unavailable: Request to ${req.body.service} exceeded timeout` });
     }
     // Handle other types of errors
     next(err);
@@ -821,9 +821,9 @@ app.get('/visualize', (req : Request, res : Response) => {
         'version': process.env.npm_package_version,
         delimiter: '?'
     };
-    if (Object.keys(req.query).length > 0) {
-        console.log(`request query ${JSON.stringify(req.query)}`);
-    }
+    // if (Object.keys(req.query).length > 0) {
+    //     console.log(`request query ${JSON.stringify(req.query)}`);
+    // }
     try {
         res.render('vis_index', ejsVariables)
     } catch (err) {
@@ -859,10 +859,10 @@ axiosRetry(axiosInstance, {
         return isNetworkError;    
     },
     onRetry: (retryCount: number, error: any, requestConfig: { url: string; }) => {
-        console.log(`pinned route axios retry count ${retryCount} for ${requestConfig.url}`);
+        warn(`pinned route axios retry count ${retryCount} for ${requestConfig.url}`);
     },
     onMaxRetryTimesExceeded: (err: any) => {
-        console.log(`last pinned route axios error after retrying was ${err}`)
+        warn(`last pinned route axios error after retrying was ${err}`)
     }
 });
 

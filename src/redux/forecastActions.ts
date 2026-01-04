@@ -84,7 +84,7 @@ const forecastByParts = (forecastFunc : MutationWrapper, aqiFunc : MutationWrapp
             const request = {locations:locations, timezone:zone, service:service, routeName:routeName, routeNumber:routeNumber, lang:lang, which}
             const result = limit(() => forecastFunc(request).unwrap())
             result.catch((err) => {
-                 warn(`Forecast fetch failed for part ${which} ${request.locations.lat} using ${service} with error ${err.data.details}`);
+                 warn(`Forecast fetch failed for part ${which} ${request.locations.lat} with error ${err.data.details}`, {provider:service});
                  failedRequests.push(request);
                  });
             forecastResults.push(result)
@@ -102,6 +102,7 @@ const forecastByParts = (forecastFunc : MutationWrapper, aqiFunc : MutationWrapp
     }
     // retry with alternate provider if any failed
     if (failedRequests.length > 0) {
+        info(`Retrying ${failedRequests.length} failed forecast requests with alternate provider ${alternateProvider}`);
         for (let i = 0; i < failedRequests.length; ++i) {
             const request = failedRequests.pop();
             if (!request) { continue; }

@@ -195,7 +195,7 @@ const getAndCachePOST = async (request) => {
             }
             let cachedResponse = await postCache.getItem(cacheKey);
             if (!cachedResponse) {
-                sendLogMessage(`Returning 502 for POST to ${request.url} with ${cacheKey}`, 'warning');
+                // sendLogMessage(`Returning 502 for POST to ${request.url} with ${cacheKey}`, 'warning');
                 if (response) {     // but presumably it's not ok
                     try {
                         const json = await response.json();
