@@ -1,6 +1,6 @@
 {
   "name": "route_weather",
-  "version": "5.5.10",
+  "version": "5.5.11",
   "description": "Forecast weather along a route from RideWithGps or Strava. Support for others may be added if there is demand",
   "main": "jsx/server/index.js",
   "engines": {
@@ -62,6 +62,7 @@
     "node-cache-32": "^1.6.3",
     "node-fetch": "^3.3.2",
     "openmeteo": "^1.2.3",
+    "p-limit": "^7.2.0",
     "package-lock.json": "^1.0.0",
     "pg": "^8.14.1",
     "prop-types": "^15.6.1",

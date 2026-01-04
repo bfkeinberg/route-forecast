@@ -1,7 +1,7 @@
 import type { RootState } from "../redux/store";
 import type { AppDispatch } from "../redux/store";
 import ReactGA from "react-ga4";
-import { forecastFetchBegun, errorMessageListSet, forecastFetchFailed, forecastFetchCanceled, errorMessageListAppend } from "./dialogParamsSlice";
+import { forecastFetchBegun, errorMessageListSet, forecastFetchFailed, errorMessageListAppend } from "./dialogParamsSlice";
 import { forecastFetched, forecastAppended, Forecast, forecastInvalidated } from "./forecastSlice";
 import {getRwgpsRouteName, getRouteNumberFromValue} from "../utils/util"
 import { RwgpsRoute, RwgpsTrip } from "./routeInfoSlice";
@@ -10,8 +10,9 @@ import { type ForecastRequest } from "../utils/gpxParser";
 import { Action, Dispatch } from "@reduxjs/toolkit";
 import * as Sentry from "@sentry/react";
 import { DateTime } from "luxon";
-import { alternateProvider } from "./providerValues";
+import { alternateProvider, providerValues } from "./providerValues";
 const { trace, debug, info, warn, error, fatal, fmt } = Sentry.logger;
+import pLimit from 'p-limit';
 
 const getRouteDistanceInKm = (routeData : RwgpsRoute|RwgpsTrip) => {
     if (routeData.route !== undefined) {
@@ -75,11 +76,13 @@ const forecastByParts = (forecastFunc : MutationWrapper, aqiFunc : MutationWrapp
     let aqiResults = []
     let failedRequests: { locations: ForecastRequest; timezone: string; service: string; routeName: string; routeNumber: string; lang: string; which: number; }[] = []
     let locations = requestCopy.shift();
-    let which = 0
+    let which = 0;
+    const limit = pLimit(providerValues[service].maxRequests);
+    
     while (requestCopy.length >= 0 && locations) {
         try {
             const request = {locations:locations, timezone:zone, service:service, routeName:routeName, routeNumber:routeNumber, lang:lang, which}
-            const result = forecastFunc(request).unwrap()
+            const result = limit(() => forecastFunc(request).unwrap())
             result.catch((err) => {
                  warn(`Forecast fetch failed for part ${which} ${request.locations.lat} using ${service} with error ${err.details}`);
                  failedRequests.push(request);

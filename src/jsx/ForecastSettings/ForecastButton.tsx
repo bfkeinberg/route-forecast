@@ -23,6 +23,7 @@ import type {ForecastRequest} from '../../utils/gpxParser'
 import { GpxRouteData, RwgpsRoute, RwgpsTrip } from 'redux/routeInfoSlice';
 import { writeObjToFile } from '../../utils/writeToFile';
 import { Button } from "@mantine/core";
+import pLimit from 'p-limit';
 
 declare module 'react' {
     interface HTMLAttributes<T> extends AriaAttributes, DOMAttributes<T> {
@@ -99,10 +100,13 @@ const ForecastButton = ({fetchingForecast,submitDisabled, routeNumber, startTime
         let aqiResults = []
         let locations = requestCopy.shift();
         let which = 0
+        let maxSimultaneousRequests = providerValues[service].maxRequests;
+
+        const limit = pLimit(maxSimultaneousRequests);
         while (requestCopy.length >= 0 && locations) {
             const request = {locations:locations, timezone:zone, service:service, routeName:routeName,
                  routeNumber:routeNumber, lang: i18n.language, which}
-            const result = forecast(request).unwrap()
+            const result = limit(() => forecast(request).unwrap());
             result.catch((err) => { warn(`Forecast fetch failed for part ${which} ${request.locations.lat} using ${service} with error ${err.details}`) });
             forecastResults.push(result)
             if (fetchAqi) {
