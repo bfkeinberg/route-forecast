@@ -43,19 +43,27 @@ self.addEventListener('install', (event) => {
     self.skipWaiting()
 });
 
+// 
 self.addEventListener('activate', (e) => {
     //sendLogMessage('deleting old caches', 'info');
     try {
         e.waitUntil(caches.keys().then((keyList) => {
-        return Promise.all(keyList.map((key) => {
-            if (key === cacheName) { return null; }
-            return caches.delete(key);
-        })).catch((err) => sendLogMessage(`Error during cache deletion: ${err}`, 'error'));
-        })).catch((err) => sendLogMessage(`Error during cache keys retrieval: ${err}`, 'error'));
+            return Promise.all(keyList.map((key) => {
+                if (key === cacheName) { return null; }
+                return caches.delete(key).catch((err) => {
+                    sendLogMessage(`Error deleting cache ${key}: ${err}`, 'error');
+                });
+            }
+            )
+            ).catch((err) => sendLogMessage(`Error during cache deletion: ${err}`, 'error'));
+        }
+        ).catch((err) => sendLogMessage(`Error during cache keys retrieval: ${err}`, 'error'))
+        )
     } catch (err) {
         sendLogMessage(`Error deleting old caches: ${err}`, 'error');
     }
-  });
+}
+);
 
 const serializeHeaders = (headers) => {
     var serialized = {};
