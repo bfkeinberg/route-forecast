@@ -357,9 +357,9 @@ app.post('/forecast_one', cache.middleware(), upload.none(), timeout('27s'), hal
                         "INSERT into randoplan VALUES($1,$2,$3,$4) ON CONFLICT (routeName) DO UPDATE SET timestamp=EXCLUDED.timestamp, location=EXCLUDED.location, routeNumber=EXCLUDED.routeNumber",
                         [req.body.routeName, req.body.routeNumber,
                         new Date(), `(${forecastPoints.lat},${forecastPoints.lon})`]);
-                console.info(insertResult);
+                // console.info(insertResult);
             } catch (err) {
-                console.error(`DB call from /forecast_one failed with ${err}`)
+                warn(`DB call from /forecast_one failed with ${err}`)
             }
         }
     }
@@ -612,7 +612,7 @@ const getStravaToken = async (code : string) => {
         console.log(`token was ${JSON.stringify(tokenResponse.data)}`)
         return tokenResponse.data;
     } catch (error : any) {
-        console.error('Error exchanging authorization code:', error.response ? error.response.data : error.message);
+        warn('Error exchanging authorization code:', error.response ? error.response.data : error.message);
         throw error;
     }
 };
@@ -821,9 +821,9 @@ app.get('/visualize', (req : Request, res : Response) => {
         'version': process.env.npm_package_version,
         delimiter: '?'
     };
-    // if (Object.keys(req.query).length > 0) {
-    //     console.log(`request query ${JSON.stringify(req.query)}`);
-    // }
+    if (Object.keys(req.query).length > 0) {
+        console.log(`request query ${JSON.stringify(req.query)}`);
+    }
     try {
         res.render('vis_index', ejsVariables)
     } catch (err) {
