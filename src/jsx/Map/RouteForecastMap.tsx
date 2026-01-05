@@ -377,15 +377,17 @@ const MapMarkers = ({ forecast, controls, controlNames, subrange, metric} : MapM
 
     // marker title now contains both temperature and mileage
     return (validForecastPoints.map((point) =>
-                <TempMarker latitude={point.lat}
-                    longitude={point.lon}
-                    value={cvtDistance(point.distance.toString(), metric)}
-                    title={`${DateTime.fromISO(point.time, {zone:point.zone, locale:i18n.language}).toFormat('EEE MMM d h:mma yyyy')}\n${formatTemperature(point.temp, celsius)}`}
-                    bearing={point.windBearing}
-                    relBearing={point.relBearing}
-                    windSpeed={point.windSpeed}
-                    key={`${point.lat}${point.lon}_${cvtDistance(point.distance.toString(), metric)}_temp_${Math.random().toString(10)}`}
-                />
+        <Sentry.ErrorBoundary fallback=<h2>Cannot render temperature marker</h2> >
+            <TempMarker latitude={point.lat}
+                longitude={point.lon}
+                value={cvtDistance(point.distance.toString(), metric)}
+                title={`${DateTime.fromISO(point.time, { zone: point.zone, locale: i18n.language }).toFormat('EEE MMM d h:mma yyyy')}\n${formatTemperature(point.temp, celsius)}`}
+                bearing={point.windBearing}
+                relBearing={point.relBearing}
+                windSpeed={point.windSpeed}
+                key={`${point.lat}${point.lon}_${cvtDistance(point.distance.toString(), metric)}_temp_${Math.random().toString(10)}`}
+            />
+        </Sentry.ErrorBoundary>
             )
         ).concat(
             validControls
@@ -411,15 +413,19 @@ const MapMarkers = ({ forecast, controls, controlNames, subrange, metric} : MapM
         )
 }
 
-const RainIcon = ({ latitude, longitude, value, title, isRainy } : {latitude: number, longitude: number, value: number, title: string, isRainy: boolean}) => {
+const RainIcon = ({ latitude, longitude, value, title, isRainy }: { latitude: number, longitude: number, value: number, title: string, isRainy: boolean }) => {
     const apiIsLoaded = useApiIsLoaded();
     if (!apiIsLoaded) {
-      return <div>API not yet loaded, no rain icon</div>
+        return <div>API not yet loaded, no rain icon</div>
     }
     if (isRainy) {
-        return <SafeAdvancedMarker position={{ lat: latitude, lng: longitude }} /* label={value.toFixed(0)} */ title={title}>
-            <img style={{position:'relative',margin:'2px'}} src={rainCloud} width={45} height={50} />
-        </SafeAdvancedMarker>
+        return (
+            <Sentry.ErrorBoundary fallback=<h2>Cannot render rain marker</h2> >
+                <SafeAdvancedMarker position={{ lat: latitude, lng: longitude }} /* label={value.toFixed(0)} */ title={title}>
+                    <img style={{ position: 'relative', margin: '2px' }} src={rainCloud} width={45} height={50} />
+                </SafeAdvancedMarker>
+            </Sentry.ErrorBoundary>
+        )
     }
     return null;
 }
@@ -572,24 +578,28 @@ interface ControlMarkerProps {
     longitude: number
     value: string
 }
-const ControlMarker = ({ latitude, longitude, value = '' } : ControlMarkerProps) => {
+const ControlMarker = ({ latitude, longitude, value = '' }: ControlMarkerProps) => {
     const apiIsLoaded = useApiIsLoaded();
     if (!apiIsLoaded) {
-      return <div/>
+        return <div />
     }
     const [showTheText, setShowTheText] = React.useState<boolean>(false)
     if (!latitude || !longitude) {
-        return <div/>
+        return <div />
     }
-    return <SafeAdvancedMarker position={{ lat: latitude, lng: longitude }} 
-        zIndex={5} collisionBehavior={CollisionBehavior.REQUIRED_AND_HIDES_OPTIONAL}
-        onMouseEnter={(event : google.maps.MapMouseEvent['domEvent']) => {setShowTheText(true)}}
-        onMouseLeave={(event  : google.maps.MapMouseEvent['domEvent']) => {setShowTheText(false)}}
-        onClick={(event : google.maps.MapMouseEvent )=> setShowTheText(false)}
-        >
-        <img src={sandwich} style={{backgroundColor: 'transparent'}}/>
-        {showTheText && ShowControlName(latitude, longitude, value, setShowTheText)}
-    </SafeAdvancedMarker>;
+    return (
+        <Sentry.ErrorBoundary fallback=<h2>Cannot render control marker</h2> >
+            <SafeAdvancedMarker position={{ lat: latitude, lng: longitude }}
+                zIndex={5} collisionBehavior={CollisionBehavior.REQUIRED_AND_HIDES_OPTIONAL}
+                onMouseEnter={(event: google.maps.MapMouseEvent['domEvent']) => { setShowTheText(true) }}
+                onMouseLeave={(event: google.maps.MapMouseEvent['domEvent']) => { setShowTheText(false) }}
+                onClick={(event: google.maps.MapMouseEvent) => setShowTheText(false)}
+            >
+                <img src={sandwich} style={{ backgroundColor: 'transparent' }} />
+                {showTheText && ShowControlName(latitude, longitude, value, setShowTheText)}
+            </SafeAdvancedMarker>
+        </Sentry.ErrorBoundary>
+    );
 }
 
 const MapHighlight = ({ points, subrange } : { points: MapPointList, subrange: [number,number]|[]}) => {
