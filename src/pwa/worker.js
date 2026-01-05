@@ -24,13 +24,13 @@ const sendLogMessage = (message, type) => {
 // sendLogMessage('Service Worker loading', 'info');
 
 self.addEventListener('install', (event) => {
-    // sendLogMessage('[Service Worker] Install', 'info');
+    sendLogMessage('[Service Worker] Install', 'trace');
 
     postCache = localforage.createInstance({
         name: indexed_db_app_name,
         storeName: indexed_db_table_name
     });
-    //sendLogMessage('creating Cache', 'info');
+    sendLogMessage('creating Cache', 'trace');
 /*     event.waitUntil(caches.open(cacheName).then((cache) => {
         // `Cache` instance for later use.
         return cache.addAll([
@@ -45,7 +45,7 @@ self.addEventListener('install', (event) => {
 
 // 
 self.addEventListener('activate', (e) => {
-    //sendLogMessage('deleting old caches', 'info');
+    sendLogMessage('deleting old caches', 'trace');
     try {
         e.waitUntil(caches.keys().then((keyList) => {
             return Promise.all(keyList.map((key) => {
@@ -195,7 +195,7 @@ const getAndCachePOST = async (request) => {
             }
             let cachedResponse = await postCache.getItem(cacheKey);
             if (!cachedResponse) {
-                // sendLogMessage(`Returning 502 for POST to ${request.url} with ${cacheKey}`, 'warning');
+                sendLogMessage(`Returning 502 for POST to ${request.url} with ${cacheKey}`, 'warning');
                 if (response) {     // but presumably it's not ok
                     try {
                         const json = await response.json();

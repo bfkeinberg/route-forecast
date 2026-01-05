@@ -21,11 +21,14 @@ if ('serviceWorker' in navigator) {
         if (event.type === 'info') {
             console.info(`Message from service worker: ${event.data}`);
             info(`Message from service worker: ${event.data}`);
+        } else if (event.type === 'trace') {
+            console.info(`Message from service worker: ${event.data}`);
+            trace(`Message from service worker: ${event.data}`);
         } else if (event.type === 'warning') {
             console.warn(`Message from service worker: ${event.data}`);
             warn(`Message from service worker: ${event.data}`);
         } else {
-            console.log('Message from service worker:', event.data);
+            console.error('Message from service worker:', event.data);
             error('Message from service worker:', event.data);
         }
         return;
