@@ -9,9 +9,8 @@ if (process.env.NODE_ENV !== 'development') {
             nodeProfilingIntegration()
         ],
         tracesSampleRate: 0.15,
-        // Set sampling rate for profiling
-        // This is relative to tracesSampleRate
-        profilesSampleRate: 0.2
+        profileSessionSampleRate: 0.5,
+        profileLifecycle: "trace"
     });
 } else {
 }

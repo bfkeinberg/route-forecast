@@ -809,6 +809,7 @@ app.get('/', (req : Request, res : Response) => {
         title: title
     };
     try {
+        res.set("Document-Policy", "js-profiling");
         res.render('index', ejsVariables)
     } catch (err) {
         Sentry.captureException(err, {tags: {where:'Top level rendering'}})

@@ -88,6 +88,7 @@ else {
                     }),
                     Sentry.browserSessionIntegration(),
                     Sentry.browserTracingIntegration(),
+                    Sentry.browserProfilingIntegration(),
                     Sentry.replayIntegration({
                         maskAllText: false,
                         blockAllMedia: false,
@@ -101,13 +102,15 @@ else {
                 // denyUrls: ["https://maps.googleapis"],
                 // To set a uniform sample rate
                 tracesSampleRate: Number.parseFloat(trace_sample_rate?trace_sample_rate:'0.1'),
+                profileSessionSampleRate: 0.3,
+                profileLifecycle: "trace",
                 tracePropagationTargets: ["localhost", /^https:\/\/www\.randoplan\.com/],
                 // This sets the sample rate to be 10%. You may want this to be 100% while
                 // in development and sample at a lower rate in production
-                replaysSessionSampleRate: 0.01,
+                replaysSessionSampleRate: 0.02,
                 // If the entire session is not sampled, use the below sample rate to sample
                 // sessions when an error occurs.
-                replaysOnErrorSampleRate: 0.7,
+                replaysOnErrorSampleRate: 0.8,
                 normalizeDepth: 5
             });
         }
