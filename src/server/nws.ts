@@ -103,7 +103,7 @@ const extractForecast = (forecastGridData : ForecastGridType, currentTime : Date
         const {attributes, visibility, ...summary} = findNearestTime<Array<any>>(forecastGridData.data.properties.weather, currentTime)[0];
         weatherSummary = summary
     } catch (err : any) {
-        error(`Failed to get weather summary for ${currentTime}`)
+        error(`Failed to get weather summary for ${currentTime} - ${JSON.stringify(forecastGridData.data.properties.weather)}`)
     }
     const humidity = findNearestTime(forecastGridData.data.properties.relativeHumidity, currentTime);
 
