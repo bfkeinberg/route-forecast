@@ -18,18 +18,18 @@ import * as classes from "../../static/mantine.module.css";
 
 if ('serviceWorker' in navigator) {
     navigator.serviceWorker.addEventListener('message', (event: MessageEvent) => {
-        if (event.type === 'info') {
-            console.info(`Message from service worker: ${event.data}`);
-            info(`Message from service worker: ${event.data}`);
-        } else if (event.type === 'trace') {
-            console.info(`Message from service worker: ${event.data}`);
-            trace(`Message from service worker: ${event.data}`);
-        } else if (event.type === 'warning') {
-            console.warn(`Message from service worker: ${event.data}`);
-            warn(`Message from service worker: ${event.data}`);
+        if (event.data.type === 'info') {
+            console.info(`Message from service worker: ${event.data.data}`);
+            info(`Message from service worker: ${event.data.data}`);
+        } else if (event.data.type === 'trace') {
+            console.debug(`Message from service worker: ${event.data.data}`);
+            trace(`Message from service worker: ${event.data.data}`);
+        } else if (event.data.type === 'warning') {
+            console.warn(`Message from service worker: ${event.data.data}`);
+            warn(`Message from service worker: ${event.data.data}`);
         } else {
-            console.error('Message from service worker:', event.data);
-            error('Message from service worker:', event.data);
+            console.error('Message from service worker:', event.data.data);
+            error('Message from service worker:', event.data.data);
         }
         return;
     });
