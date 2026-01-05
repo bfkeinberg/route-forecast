@@ -29,6 +29,8 @@ self.addEventListener('install', (event) => {
     postCache = localforage.createInstance({
         name: indexed_db_app_name,
         storeName: indexed_db_table_name
+    }).catch((err) => {
+        sendLogMessage(`Error creating IndexedDB instance: ${err}`, 'error');
     });
     sendLogMessage('creating Cache', 'trace');
 /*     event.waitUntil(caches.open(cacheName).then((cache) => {
@@ -40,7 +42,11 @@ self.addEventListener('install', (event) => {
             'static/manifest.json'
         ]));
     })); */
-    self.skipWaiting()
+    self.skipWaiting().then(() => {
+        sendLogMessage('Service Worker skipWaiting complete', 'trace');
+    }).catch((err) => {
+        sendLogMessage(`Service Worker skipWaiting error: ${err}`, 'error');
+    });
 });
 
 // 
@@ -49,8 +55,9 @@ self.addEventListener('activate', (e) => {
     try {
         e.waitUntil(caches.keys().then((keyList) => {
             return Promise.all(keyList.map((key) => {
-                if (key === cacheName) { return null; }
-                return caches.delete(key).catch((err) => {
+                if (key === cacheName) { sendLogMessage(`Skipping cache ${key}`, 'trace'); return null; }
+                sendLogMessage(`Deleting cache ${key}`, 'trace');
+                return caches.delete(key).then(sendLogMessage(`Deleted cache ${key}`, 'trace')).catch((err) => {
                     sendLogMessage(`Error deleting cache ${key}: ${err}`, 'error');
                 });
             }
@@ -223,6 +230,7 @@ const getAndCachePOST = async (request) => {
     }
 }
 
+sendLogMessage('About to define fetch listener in Service Worker loaded', 'trace');
 self.addEventListener('fetch', (event) => {
     const url = event.request.url;
     if (!url.startsWith(self.location.origin) &&
