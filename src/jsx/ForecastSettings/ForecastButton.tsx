@@ -125,7 +125,7 @@ const ForecastButton = ({fetchingForecast,submitDisabled, routeNumber, startTime
         // retry with alternate provider if any failed
         if (failedRequests.length > 0) {
             info(`Retrying ${failedRequests.length} failed forecast requests with alternate provider ${alternateProvider}`);
-            for (let i = 0; i < failedRequests.length; ++i) {
+/*             for (let i = 0; i < failedRequests.length; ++i) {
                 const request = failedRequests.pop();
                 if (!request) { continue; }
                 request.service = alternateProvider;
@@ -134,7 +134,7 @@ const ForecastButton = ({fetchingForecast,submitDisabled, routeNumber, startTime
                     warn(`Retry forecast fetch failed for part ${i} ${request.locations.lat} using ${alternateProvider} with error ${err.details}`);
                 });
                 forecastResults.push(result)
-            }
+            } */
         }
 
         return [Promise.allSettled(forecastResults),fetchAqi?Promise.allSettled(aqiResults):[]]    
