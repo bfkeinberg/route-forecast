@@ -28,8 +28,8 @@ if ('serviceWorker' in navigator) {
             console.warn(`Message from service worker: ${event.data.data}`);
             warn(`Message from service worker: ${event.data.data}`);
         } else {
-            console.error('Message from service worker:', event.data.data);
-            error('Message from service worker:', event.data.data);
+            console.error(`Message from service worker: ${event.data.data}`);
+            error(`Message from service worker: ${event.data.data}`);
         }
         return;
     });
