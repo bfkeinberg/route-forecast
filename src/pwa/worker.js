@@ -1,12 +1,5 @@
 /* globals importScripts, localforage */
 
-importScripts('lib/localforage.js');
-
-const cacheName = 'RandoplanCache_v1';
-const indexed_db_app_name = 'RandoplanPOST_DB';
-const indexed_db_table_name = 'RandoplanPOST_Cache';
-let postCache;
-
 const sendLogMessage = (message, type) => {
   // Get all active windows/tabs controlled by this service worker
   self.clients.matchAll({ includeUncontrolled: true, type: 'window' })
@@ -21,10 +14,19 @@ const sendLogMessage = (message, type) => {
     });
 };
 
+sendLogMessage('About to import localforage', 'trace');
+
+importScripts('lib/localforage.js');
+
+const cacheName = 'RandoplanCache_v1';
+const indexed_db_app_name = 'RandoplanPOST_DB';
+const indexed_db_table_name = 'RandoplanPOST_Cache';
+let postCache;
+
 // sendLogMessage('Service Worker loading', 'info');
 
 self.addEventListener('install', (event) => {
-    sendLogMessage('creating Cache in install event', 'trace');
+    // sendLogMessage('creating Cache in install event', 'trace');
 
     try {
         postCache = localforage.createInstance({
@@ -51,7 +53,7 @@ self.addEventListener('install', (event) => {
 
 // 
 self.addEventListener('activate', (e) => {
-    sendLogMessage('deleting old caches', 'trace');
+    // sendLogMessage('deleting old caches', 'trace');
     try {
         e.waitUntil(caches.keys().then((keyList) => {
             return Promise.all(keyList.map((key) => {
@@ -230,7 +232,7 @@ const getAndCachePOST = async (request) => {
     }
 }
 
-sendLogMessage('About to define fetch listener in Service Worker loaded', 'trace');
+// sendLogMessage('About to define fetch listener in Service Worker loaded', 'trace');
 self.addEventListener('fetch', (event) => {
     const url = event.request.url;
     if (!url.startsWith(self.location.origin) &&
