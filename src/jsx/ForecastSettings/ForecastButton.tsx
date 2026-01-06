@@ -5,7 +5,7 @@ import ReactGA from "react-ga4";
 import {connect, ConnectedProps} from 'react-redux';
 import { useMediaQuery } from 'react-responsive';
 
-import { msgFromError, removeDuplicateForecasts, extractRejectedResults, getDaysInFuture } from '../../redux/forecastActions';
+import { msgFromError, removeDuplicateForecasts, extractRejectedResults, getDaysInFuture, errorDetails } from '../../redux/forecastActions';
 // import { shortenUrl } from '../../redux/actions';
 import { useForecastMutation, useGetAqiMutation } from '../../redux/forecastApiSlice';
 import { forecastFetched, forecastAppended, Forecast } from '../../redux/forecastSlice';
@@ -109,14 +109,14 @@ const ForecastButton = ({fetchingForecast,submitDisabled, routeNumber, startTime
                  routeNumber:routeNumber, lang: i18n.language, which}
             const result = limit(() => forecast(request).unwrap());
             result.catch((err) => { 
-                warn(`Forecast fetch failed for part ${which} ${request.locations.lat} with error ${err.data.details}`, {provider:service});
+                warn(`Forecast fetch failed for part ${which} ${request.locations.lat} with error ${errorDetails(err)}`, {provider:service});
                 failedRequests.push(request)
             });
             forecastResults.push(result)
             if (fetchAqi) {
                 const aqiRequest = {locations:locations}
                 const aqiResult = getAQI(aqiRequest).unwrap()
-                aqiResult.catch((err) => { warn(`AQI fetch failed for part ${which} ${aqiRequest.locations.lat} with error ${err.data.details}`) });
+                aqiResult.catch((err) => { warn(`AQI fetch failed for part ${which} ${aqiRequest.locations.lat} with error ${errorDetails(err)}`) });
                 aqiResults.push(aqiResult)
             }
             locations = requestCopy.shift();
