@@ -14,7 +14,7 @@
     "@fast-csv/format": "^5.0.2",
     "@loadable/component": "^5.13.2",
     "@mantine/core": "^8.3.1",
-    "@mantine/dates": "^8.3.1",
+    "@mantine/dates": "^8.3.11",
     "@mantine/hooks": "^8.3.1",
     "@mantine/notifications": "^8.3.2",
     "@mui/material": "^7.0.0",
