@@ -14,7 +14,7 @@ const sendLogMessage = (message, type) => {
     });
 };
 
-sendLogMessage('About to import localforage', 'trace');
+// sendLogMessage('About to import localforage', 'trace');
 
 importScripts('lib/localforage.js');
 
@@ -44,11 +44,11 @@ self.addEventListener('install', (event) => {
             'static/manifest.json'
         ]));
     })); */
-    self.skipWaiting().then(() => {
-        sendLogMessage('Service Worker skipWaiting complete', 'trace');
-    }).catch((err) => {
-        sendLogMessage(`Service Worker skipWaiting error: ${err}`, 'error');
-    });
+    // self.skipWaiting().then(() => {
+        // sendLogMessage('Service Worker skipWaiting complete', 'trace');
+    // }).catch((err) => {
+        // sendLogMessage(`Service Worker skipWaiting error: ${err}`, 'error');
+    // });
 });
 
 // 
@@ -57,7 +57,7 @@ self.addEventListener('activate', (e) => {
     try {
         e.waitUntil(caches.keys().then((keyList) => {
             return Promise.all(keyList.map((key) => {
-                if (key === cacheName) { sendLogMessage(`Skipping cache ${key}`, 'trace'); return null; }
+                if (key === cacheName) { /*sendLogMessage(`Skipping cache ${key}`, 'trace'); */ return null; }
                 sendLogMessage(`Deleting cache ${key}`, 'trace');
                 return caches.delete(key).then(sendLogMessage(`Deleted cache ${key}`, 'trace')).catch((err) => {
                     sendLogMessage(`Error deleting cache ${key}: ${err}`, 'error');
@@ -204,7 +204,7 @@ const getAndCachePOST = async (request) => {
             }
             let cachedResponse = await postCache.getItem(cacheKey);
             if (!cachedResponse) {
-                sendLogMessage(`Returning 502 for POST to ${request.url} with ${cacheKey}`, 'warning');
+                // sendLogMessage(`Returning 502 for POST to ${request.url} with ${cacheKey}`, 'warning');
                 if (response) {     // but presumably it's not ok
                     try {
                         const json = await response.json();
