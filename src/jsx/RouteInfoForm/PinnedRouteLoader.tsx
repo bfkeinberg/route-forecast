@@ -33,7 +33,7 @@ const LoadableRouteList = lazy(() : DynamicRouteListType => {addBreadcrumb('load
 
 const getPinnedRoutes = async (rwgpsToken : string, 
     setErrorDetails : ActionCreatorWithPayload<ErrorPayload, "dialogParams/errorDetailsSet">, 
-    rwgpsTokenSet : ActionCreatorWithPayload<string|null, "rideWithGpsInfo/rwgpsTokenSet">,) => {
+    rwgpsTokenSet : ActionCreatorWithPayload<string|null, "rideWithGpsInfo/rwgpsTokenSet">,) : Promise<Favorite[]|null> => {
     if (!rwgpsToken || rwgpsToken === 'undefined') {
         return null
     }
@@ -44,7 +44,7 @@ const getPinnedRoutes = async (rwgpsToken : string,
         return null
     }
     try {
-        const response = await axios.get(url);
+        const response = await axios.get<Favorite[]>(url);
         return response.data;
     } catch (e : any) {
         Sentry.captureException(e)
@@ -65,6 +65,7 @@ const setRoutes = async (rwgpsToken : string|null|undefined, setRwgpsToken : Act
     setLoadingPinned(true);
     const user_favorites = await getPinnedRoutes(rwgpsToken, setError, setRwgpsToken);
     if (user_favorites != null) {
+        user_favorites.sort((fava, favb) => fava.name.localeCompare(favb.name));
         setPinnedRoutes(user_favorites);
     }
     setLoadingPinned(false);
