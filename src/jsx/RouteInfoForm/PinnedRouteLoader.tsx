@@ -11,7 +11,7 @@ import type { RootState } from "../../redux/store";
 import { ActionCreatorWithPayload } from '@reduxjs/toolkit';
 import Snackbar, {SnackbarCloseReason} from '@mui/material/Snackbar';
 import { Button } from "@mantine/core";
-import {IconStar} from "@tabler/icons-react"
+import RideWithGpsLogo from 'Images/rideWithGps.svg';
 
 const addBreadcrumb = (msg : string) => {
     Sentry.addBreadcrumb({
@@ -117,32 +117,32 @@ const PinnedRouteLoader = ({rwgpsToken, rwgpsTokenSet, credentialsValid,
         setShowPinnedRoutes(false)
     }
 
-    const starFill = usingPinnedRoutes ? "#4C5897" : "white"
     return (
         <>
             <Button
                 size='xs'
-                variant={usingPinnedRoutes?'outline':'filled'}
+                variant='default' ///{usingPinnedRoutes ? 'outline' : 'filled'}
                 autoContrast
                 loading={loadingPinnedRoutes}
                 className={button_class}
-                leftSection={<IconStar style={{fill:starFill, stroke:usingPinnedRoutes?"#3c4988":"white"}}/>}
-                style={{fontSize: "12px", color:usingPinnedRoutes?"#4C5897":"white", background:usingPinnedRoutes?"#bdc2de":"##2d72d2"}}
-                onClick={() => {setDisplayRoutesError(true); togglePinnedRoutes(usePinnedRoutesSet, setShowPinnedRoutes, usingPinnedRoutes)}}
-            >{usingPinnedRoutes ? t('buttons.dontUsePinned') : t('buttons.usePinned')}
+                style={{ fontSize: "12px" }}
+                onClick={() => { setDisplayRoutesError(true); togglePinnedRoutes(usePinnedRoutesSet, setShowPinnedRoutes, usingPinnedRoutes) }}
+            >
+                <RideWithGpsLogo style={{ width: 64, height: 32, marginRight: 4 }} />
+                {usingPinnedRoutes ? t('buttons.dontUsePinned') : t('buttons.usePinned')}
             </Button>
             {credentialsValid ?
-            (
-                usingPinnedRoutes && hasRoutes && (
-                    <Suspense fallback={<p>Loading pinned routes</p>}>
-                        <LoadableRouteList/>
-                    </Suspense>
-                )
-            ) :
-             (
-                <div/>
-            )}
-            <Snackbar message={"No pinned routes to display"} onClose={handleClose} 
+                (
+                    usingPinnedRoutes && hasRoutes && (
+                        <Suspense fallback={<p>Loading pinned routes</p>}>
+                            <LoadableRouteList />
+                        </Suspense>
+                    )
+                ) :
+                (
+                    <div />
+                )}
+            <Snackbar message={"No pinned routes to display"} onClose={handleClose}
                 open={usingPinnedRoutes && !loadingPinnedRoutes && !hasRoutes && displayRoutesError} autoHideDuration={5000} />
         </>
     )
