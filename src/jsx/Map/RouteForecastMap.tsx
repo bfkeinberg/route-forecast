@@ -1,7 +1,7 @@
 import {APIProvider, Map, InfoWindow, useMap, useApiIsLoaded, CollisionBehavior, useMapsLibrary} from '@vis.gl/react-google-maps';
 import * as Sentry from "@sentry/react"
 import sandwich from 'Images/sandwich.png'
-import rainCloud from "Images/lightning-and-blue-rain-cloud-16533.svg"
+import RainCloud from "Images/lightning-and-blue-rain-cloud-16533.svg"
 import PropTypes from 'prop-types';
 import React, { useEffect, useState, useRef } from 'react';
 import 'Images/style.css';
@@ -422,7 +422,7 @@ const RainIcon = ({ latitude, longitude, value, title, isRainy }: { latitude: nu
         return (
             <Sentry.ErrorBoundary fallback=<h2>Cannot render rain marker</h2> >
                 <SafeAdvancedMarker position={{ lat: latitude, lng: longitude }} /* label={value.toFixed(0)} */ title={title}>
-                    <img style={{ position: 'relative', margin: '2px' }} src={rainCloud} width={45} height={50} />
+                    <RainCloud style={{ position: 'relative', margin: '2px' }} width={45} height={50} />
                 </SafeAdvancedMarker>
             </Sentry.ErrorBoundary>
         )
