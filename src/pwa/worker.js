@@ -24,15 +24,15 @@ const sendLogMessage = (message, type) => {
 // sendLogMessage('Service Worker loading', 'info');
 
 self.addEventListener('install', (event) => {
-    sendLogMessage('[Service Worker] Install', 'trace');
+    sendLogMessage('creating Cache in install event', 'trace');
 
-    postCache = localforage.createInstance({
-        name: indexed_db_app_name,
-        storeName: indexed_db_table_name
-    }).catch((err) => {
+    try {
+        postCache = localforage.createInstance({
+            name: indexed_db_app_name,
+            storeName: indexed_db_table_name})
+    } catch (err) {
         sendLogMessage(`Error creating IndexedDB instance: ${err}`, 'error');
-    });
-    sendLogMessage('creating Cache', 'trace');
+    }
 /*     event.waitUntil(caches.open(cacheName).then((cache) => {
         // `Cache` instance for later use.
         return cache.addAll([
