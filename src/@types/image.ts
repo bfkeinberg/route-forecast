@@ -2,10 +2,13 @@ declare module "*.png" {
     const value: string;
     export default value;
 }
+
 declare module "*.svg" {
-    const value: string;
-    export default value;
+  import React = require("react");
+  const ReactComponent: React.FC<React.SVGProps<SVGSVGElement>>;
+  export default ReactComponent;
 }
+
 declare module "*.htm" {
     const value: string;
     export default value;

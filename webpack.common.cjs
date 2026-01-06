@@ -13,6 +13,7 @@ const STATIC_DIR = path.resolve(BUILD_DIR, 'static');
 const SERVER_DIR = path.resolve(BUILD_DIR, 'server');
 const VIEWS_DIR = path.resolve(SERVER_DIR, 'views');
 var webpack = require('webpack');
+const { options } = require('axios');
 
 module.exports = (env, argv) => {
     const mode = argv === undefined ? 'development' : argv.mode;
@@ -80,6 +81,20 @@ module.exports = (env, argv) => {
                     ]
                 },
                 {
+                    test: /\.svg$/,
+                    use: [
+                        {
+                            loader: '@svgr/webpack',
+                            options: {
+                            // Set dimensions to false to remove width/height attributes
+                            // dimensions: false,
+                            // or use the 'icon' option
+                            icon: true, 
+                            }
+                    }
+                    ],
+                },                
+                {
                     test: /\.(png|woff2?|ttf|eot)$/,
                     type: "asset",
                     parser: {
@@ -88,7 +103,7 @@ module.exports = (env, argv) => {
                         }
                     }
                 },
-                { test: /\.(jpg|ico|svg|gif)$/, type: "asset/resource" },
+                { test: /\.(jpg|ico|gif)$/, type: "asset/resource" },
                 { test: /\.htm$/, type: "asset/source" }
             ]
         },
