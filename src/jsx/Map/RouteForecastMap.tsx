@@ -1,7 +1,7 @@
 import {APIProvider, Map, InfoWindow, useMap, useApiIsLoaded, CollisionBehavior, useMapsLibrary} from '@vis.gl/react-google-maps';
 import * as Sentry from "@sentry/react"
 import sandwich from 'Images/sandwich.png'
-import RainCloud from "Images/lightning-and-blue-rain-cloud-16533.svg"
+import RainCloud from "Images/lightning-and-blue-rain-cloud-16533.svg?react"
 import PropTypes from 'prop-types';
 import React, { useEffect, useState, useRef } from 'react';
 import 'Images/style.css';

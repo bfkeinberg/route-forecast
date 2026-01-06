@@ -13,7 +13,6 @@ const STATIC_DIR = path.resolve(BUILD_DIR, 'static');
 const SERVER_DIR = path.resolve(BUILD_DIR, 'server');
 const VIEWS_DIR = path.resolve(SERVER_DIR, 'views');
 var webpack = require('webpack');
-const { options } = require('axios');
 
 module.exports = (env, argv) => {
     const mode = argv === undefined ? 'development' : argv.mode;
@@ -82,18 +81,25 @@ module.exports = (env, argv) => {
                 },
                 {
                     test: /\.svg$/,
-                    use: [
-                        {
-                            loader: '@svgr/webpack',
-                            options: {
-                            // Set dimensions to false to remove width/height attributes
-                            // dimensions: false,
-                            // or use the 'icon' option
-                            icon: true, 
-                            }
-                    }
-                    ],
-                },                
+                            oneOf: [{
+                                issuer: /\.[jt]sx?$/,
+                                resourceQuery: /react/, // *.svg?react
+                                use: [{
+                                loader: '@svgr/webpack',
+                                options: {
+                                    icon: true
+                                }
+                                }]
+                            },
+                            {
+                                type: 'asset',
+                                parser: {
+                                dataUrlCondition: {
+                                    maxSize: 200
+                                }
+                                }
+                            },
+        ],                },                
                 {
                     test: /\.(png|woff2?|ttf|eot)$/,
                     type: "asset",
@@ -171,7 +177,8 @@ module.exports = (env, argv) => {
                 '.ts',
                 '.tsx',
                 '.js',
-                '.jsx'
+                '.jsx',
+                '.d.ts'
             ],
             extensionAlias: {
                 ".js": [".js", ".ts"],
@@ -192,7 +199,7 @@ module.exports = (env, argv) => {
             // chunkIds: 'named',
             splitChunks: {
                 chunks: 'all',
-                maxInitialRequests: 40,
+                maxInitialRequests: 35,
                 minSize: 5000,
                 maxSize: 200000,
 /*                 cacheGroups: {

@@ -11,7 +11,7 @@ import type { RootState } from "../../redux/store";
 import { ActionCreatorWithPayload } from '@reduxjs/toolkit';
 import Snackbar, {SnackbarCloseReason} from '@mui/material/Snackbar';
 import { Button } from "@mantine/core";
-import RideWithGpsLogo from 'Images/rideWithGps.svg';
+import RideWithGpsLogo from 'Images/rideWithGps.svg?react';
 
 const addBreadcrumb = (msg : string) => {
     Sentry.addBreadcrumb({
