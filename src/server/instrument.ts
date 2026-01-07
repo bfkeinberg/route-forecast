@@ -9,8 +9,8 @@ if (process.env.NODE_ENV !== 'development') {
             nodeProfilingIntegration()
         ],
         tracesSampleRate: 0.15,
-        profileSessionSampleRate: 0.5,
-        profileLifecycle: "trace"
+        // profileSessionSampleRate: 0.5,
+        // profileLifecycle: "trace"
     });
 } else {
 }
