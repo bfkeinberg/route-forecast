@@ -8,7 +8,7 @@ import 'Images/style.css';
 import { DateTime } from 'luxon';
 import { finishTimeFormat } from '../../jsx/ForecastSettings/TimeFields';
 import { routeLoadingModes } from '../../data/enums';
-import { useForecastDependentValues } from '../../utils/hooks';
+import { useForecastDependentValues } from "../../utils/forecastValuesHook";
 import { MapPoint, MapPointList, usePointsAndBounds } from "../../utils/routeHooks";
 import { Bounds, milesToMeters } from '../../utils/util';
 import { formatTemperature } from "../resultsTables/ForecastTable";

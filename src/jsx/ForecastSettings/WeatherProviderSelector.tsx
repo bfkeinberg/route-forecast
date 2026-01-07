@@ -3,7 +3,8 @@ import { setWeatherProvider } from "../../redux/actions";
 import { providerValues, defaultProvider } from "../../redux/providerValues";
 import { DesktopTooltip } from '../shared/DesktopTooltip';
 import { useTranslation } from 'react-i18next'
-import { useForecastRequestData, useAppSelector } from "../../utils/hooks"
+import { useAppSelector } from "../../utils/hooks"
+import { useForecastRequestData } from "../../utils/useForecastRequestData";
 import type { RootState } from "../../redux/store";
 import ReactGA from "react-ga4";
 import { Combobox, useCombobox, Button, Flex } from '@mantine/core';

@@ -50,14 +50,14 @@
         <noscript>This application requires JavaScript. Please enable JavaScript to use the application.</noscript>
         <% for (var i = 0; i < htmlWebpackPlugin.files.js.length; i++) {  %>
             <% if (i === htmlWebpackPlugin.files.js.length-2) { %>
-                <script type="text/javascript" src="<%= htmlWebpackPlugin.files.js[i] %>" 
+                <script defer src="<%= htmlWebpackPlugin.files.js[i] %>" 
                     id="routeui" timezone_api_key='<?= timezone_api_key ?>' 
                     maps_api_key='<?= maps_key ?>' bitly_token='<?= bitly_token ?>' 
                     sentry_app_id='<?= sentry_app_id ?>' action='/forecast' 
                     mode='<%= htmlWebpackPlugin.options.mode %>' 
                     sentry_trace_sample_rate='<?= sentry_trace_sample_rate ?>' version='<?= version ?>'></script>
             <% } else { %>
-                <script type="text/javascript" src="<%= htmlWebpackPlugin.files.js[i] %>" ></script>
+                <script defer src="<%= htmlWebpackPlugin.files.js[i] %>" ></script>
         <% } } %>
     </body>
 </html>

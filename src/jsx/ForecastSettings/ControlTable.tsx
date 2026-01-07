@@ -1,6 +1,7 @@
 import { controlRemoved } from '../../redux/controlsSlice';
 import { updateUserControls } from '../../redux/actions';
-import { useActualArrivalTimes, useForecastDependentValues } from '../../utils/hooks';
+import { useActualArrivalTimes } from '../../utils/hooks';
+import { useForecastDependentValues } from "../../utils/forecastValuesHook";
 import { milesToMeters,stringIsOnlyDecimal, stringIsOnlyNumeric } from '../../utils/util';
 import { Table } from "./Table"
 import {useTranslation} from 'react-i18next'

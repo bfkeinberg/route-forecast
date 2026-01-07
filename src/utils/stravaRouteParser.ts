@@ -4,8 +4,7 @@ import cookie from 'react-cookies';
 import { Api } from 'rest-api-handler';
 
 import { paceToSpeed, setMinMaxCoords } from './util';
-import { UserControl } from '../redux/controlsSlice';
-import type { Point } from './gpxParser';
+import type { UserControl } from '../redux/controlsSlice';
 
 const metersToMiles = 0.00062137;
 const metersToFeet = 3.2808;

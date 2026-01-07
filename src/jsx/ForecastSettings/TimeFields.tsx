@@ -2,7 +2,8 @@ import { DateTime } from "luxon";
 
 export const finishTimeFormat = 'EEE, MMM dd yyyy h:mma';
 
-import { useActualFinishTime, useForecastDependentValues } from '../../utils/hooks';
+import { useActualFinishTime } from '../../utils/hooks';
+import { useForecastDependentValues } from "../../utils/forecastValuesHook";
 import DateSelect from "./DateSelect";
 import { useTranslation } from 'react-i18next'
 // const LoadableDatePicker = lazy(() => componentLoader(import(/* webpackChunkName: "DateSelect" */ /* webpackPrefetch: true */ './DateSelect'), 5));

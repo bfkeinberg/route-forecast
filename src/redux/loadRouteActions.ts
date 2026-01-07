@@ -9,7 +9,7 @@ import { loadRwgpsRoute } from '../utils/rwgpsUtilities';
 import { rwgpsRouteLoaded } from "./routeInfoSlice";
 import { displayControlTableUiSet, UserControl } from "./controlsSlice";
 import { timeZoneSet } from "./routeParamsSlice";
-import { updateUserControls, shortenUrl, setWeatherProvider } from "./actions";
+import { updateUserControls, setWeatherProvider } from "./actions";
 import { requestTimeZoneForRoute } from "../utils/forecastUtilities";
 import { loadStravaRoute, loadStravaActivity } from "./loadFromStravaActions";
 import { cancelForecast, forecastWithHook } from "./forecastActions";

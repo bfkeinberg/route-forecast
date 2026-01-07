@@ -6,7 +6,6 @@ import {connect, ConnectedProps} from 'react-redux';
 import { useMediaQuery } from 'react-responsive';
 
 import { msgFromError, removeDuplicateForecasts, extractRejectedResults, getDaysInFuture, errorDetails } from '../../redux/forecastActions';
-// import { shortenUrl } from '../../redux/actions';
 import { useForecastMutation, useGetAqiMutation } from '../../redux/forecastApiSlice';
 import { forecastFetched, forecastAppended, Forecast } from '../../redux/forecastSlice';
 import { querySet } from '../../redux/paramsSlice';
@@ -16,7 +15,8 @@ import { getForecastRequest } from '../../utils/routeUtils';
 import { DesktopTooltip } from '../shared/DesktopTooltip';
 import {useTranslation} from 'react-i18next'
 import { alternateProvider, providerValues } from '../../redux/providerValues';
-import { useForecastRequestData, useGetForecastRequestDependencies } from '../../utils/hooks';
+import { useGetForecastRequestDependencies } from '../../utils/hooks';
+import { useForecastRequestData } from "../../utils/useForecastRequestData";
 import type { RootState } from "../../redux/store";
 import { useAppSelector, useAppDispatch } from '../../utils/hooks';
 import type {ForecastRequest} from '../../utils/gpxParser'

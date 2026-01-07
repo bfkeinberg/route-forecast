@@ -2,7 +2,8 @@ import "./TopBar.css"
 
 import MediaQuery, { useMediaQuery } from "react-responsive";
 
-import { useForecastDependentValues,usePreviousPersistent, useReusableDelay, useValueHasChanged } from "../../utils/hooks";
+import { usePreviousPersistent, useReusableDelay, useValueHasChanged } from "../../utils/hooks";
+import { useForecastDependentValues } from "../../utils/forecastValuesHook";
 import { useLoadingFromURLStatus } from "../DesktopUI";
 import { RouteTitle } from "../shared/RouteTitle";
 import BugReportButton from "./BugReportButton";
@@ -12,6 +13,7 @@ import {useTranslation} from 'react-i18next'
 import FaqButton from "./FaqButton";
 import React, { ReactElement, useContext } from "react";
 import VersionContext from "../versionContext";
+import { DateTime } from "luxon";
 
 const TitleAndFinishTime = ({finishTime, fontSize, alignment} : {finishTime : string, fontSize: string, alignment: "left" | "right"}) => {
   return (

@@ -1,6 +1,5 @@
 import * as Sentry from "@sentry/react";
-import { DateTime, Interval } from 'luxon';
-import { useEffect, useMemo, useRef, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import type { AppDispatch, RootState } from '../redux/store'
 
@@ -9,8 +8,6 @@ export const useAppSelector = useSelector.withTypes<RootState>()
 
 import stravaRouteParser from "./stravaRouteParser"
 import { milesToMeters } from "./util"
-import { getForecastRequest } from './routeUtils';
-import { calculateWindResult } from "././routeHooks";
 
 const useDelay = (delay: number, startCondition = true) => {
   const [
@@ -152,18 +149,6 @@ const useFormatSpeed = () => {
     `${speed.toFixed(1)} mph`);
 }
 
-const useForecastDependentValues = () => {
-  const routeInfo = useAppSelector(state => state.routeInfo)
-  const routeParams = useAppSelector(state => state.uiInfo.routeParams)
-  const controls = useAppSelector(state => state.controls)
-  const timeZoneId = routeParams.zone;
-  const forecast = useAppSelector(state => state.forecast.forecast)
-  const segment = useAppSelector(state => state.uiInfo.routeParams.segment)
-
-  const windAdjustmentResult = calculateWindResult({routeInfo, routeParams, controls, timeZoneId, forecast, segment})
-  return windAdjustmentResult
-}
-
 const useWhenChanged = <Type>(value : Type, callback : () => void, changedCondition = true) => {
   const previousValue = usePrevious(value)
   const valueChanged = previousValue !== undefined && previousValue !== value && value !== null && changedCondition
@@ -196,37 +181,6 @@ export const useGetForecastRequestDependencies = () => {
   }
 }
 
-const useForecastRequestData = () => {
-  const {
-    routeData,
-    startTimestamp,
-    timeZoneId,
-    pace,
-    interval,
-    controlPoints,
-    segment,
-    routeUUID
-  } = useGetForecastRequestDependencies()
-  const getForecastRequestData = () => {
-    if (!routeData) {
-      // removed Sentry message here because this can happen when the language selection buttons are used
-      // after a route has already been loaded
-      return { length: 0, daysInFuture:0, last:DateTime.now().toString() }
-    }
-    const forecastRequest = getForecastRequest(
-      routeData,
-      startTimestamp,
-      timeZoneId, pace,
-      interval, controlPoints,
-      segment, routeUUID)
-    return { length: forecastRequest.length, last: forecastRequest[forecastRequest.length - 1].time }
-  }
-  const forecastData = useMemo(getForecastRequestData, [routeData, interval, startTimestamp])
-  const daysInFuture = Interval.fromDateTimes(DateTime.now(), DateTime.fromISO(forecastData.last)).length('days')
-
-  return {length: forecastData.length, daysInFuture:daysInFuture}
-}
-
 export { useValueHasChanged, useActualPace, useActualFinishTime, useActualArrivalTimes, 
   usePrevious, useFormatSpeed, useDelay, useReusableDelay, 
-  usePreviousPersistent, useForecastDependentValues, useWhenChanged, useForecastRequestData }
+  usePreviousPersistent, useWhenChanged }
