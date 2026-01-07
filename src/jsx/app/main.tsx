@@ -17,7 +17,9 @@ import { fetchAqiSet, zoomToRangeSet } from "../../redux/forecastSlice";
 import { stopAfterLoadSet, rusaPermRouteIdSet, routeLoadingModeSet, startTimestampSet, rwgpsRouteSet, reset } from "../../redux/routeParamsSlice";
 import { metricSet, displayControlTableUiSet } from "../../redux/controlsSlice";
 import { defaultProvider, providerValues } from "../../redux/providerValues";
-import { DesktopUIProps } from "../DesktopUI";
+import type { DesktopUIProps } from "../DesktopUI";
+import { Notifications } from '@mantine/notifications';
+
 
 const reloadPage = () => {
     Sentry.addBreadcrumb({category:"No stack", level:"info", message:"reloadPage"})
@@ -392,6 +394,7 @@ const FunAppWrapperThingForHooksUsability = ({maps_api_key, queryParams, lang} :
     const isLargeEnough = useMediaQuery({query:'(min-width: 950px)'})
     return (
         <div>
+            <Notifications autoClose={2000}/>
             {isLandscape && isLargeEnough && <Suspense fallback={<div>Loading Desktop UI...</div>}><LoadableDesktop mapsApiKey={maps_api_key} orientationChanged={orientationChanged} setOrientationChanged={setOrientationChanged}/></Suspense>}
             {(!isLargeEnough || !isLandscape) && <Suspense fallback={<div>Loading Mobile UI...</div>}><LoadableMobile mapsApiKey={maps_api_key} orientationChanged={mobileOrientationChanged} setOrientationChanged={setMobileOrientationChanged}/></Suspense>}
         </div>

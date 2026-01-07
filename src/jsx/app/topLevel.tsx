@@ -1,8 +1,8 @@
 import { Provider } from 'react-redux';
-import { useContext, StrictMode } from "react";
+import { useContext, StrictMode, lazy, Suspense } from "react";
 import LocationContext from '../locationContext';
 import * as Sentry from "@sentry/react"
-import RouteWeatherUI from './main';
+const RouteWeatherUI = lazy(() => import("./main"));
 import { store } from '../../redux/store';
 import ChunkErrorBoundary from './ChunkErrorBoundary';
 
@@ -15,8 +15,10 @@ const TopLevel = ({ action, maps_api_key, timezone_api_key, bitly_token, preload
             <ChunkErrorBoundary>
                 <Provider store={store}>
                     <StrictMode>
-                        <RouteWeatherUI search={search} href={href} action={action} maps_api_key={maps_api_key}
-                            timezone_api_key={timezone_api_key} bitly_token={bitly_token} origin={origin} />
+                        <Suspense fallback={<div>Loading main UI</div>}>
+                            <RouteWeatherUI search={search} href={href} action={action} maps_api_key={maps_api_key}
+                                timezone_api_key={timezone_api_key} bitly_token={bitly_token} origin={origin} />
+                        </Suspense>
                     </StrictMode>
                 </Provider>
             </ChunkErrorBoundary>

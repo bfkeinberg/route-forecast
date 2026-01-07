@@ -13,7 +13,6 @@ import '@mantine/dates/styles.css';
 import '@mantine/notifications/styles.css';
 import 'Images/style.css';
 import { MantineProvider, createTheme, Button } from '@mantine/core';
-import { Notifications } from '@mantine/notifications';
 import * as classes from "../../static/mantine.module.css";
 
 if ('serviceWorker' in navigator) {
@@ -151,8 +150,7 @@ else {
             <VersionContext.Provider value={version}>
                 <LocationContext.Provider value={{ href: location.href, search: location.search, origin: location.origin }}>
                     <MantineProvider theme={theme}>
-                        <Notifications autoClose={2000}/>
-                            <Component action={action} maps_api_key={maps_api_key} timezone_api_key={timezone_api_key} bitly_token={bitly_token} />
+                        <Component action={action} maps_api_key={maps_api_key} timezone_api_key={timezone_api_key} bitly_token={bitly_token} />
                     </MantineProvider>
                 </LocationContext.Provider>
             </VersionContext.Provider>
