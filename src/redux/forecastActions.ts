@@ -36,14 +36,14 @@ const getRouteId = (routeData : RwgpsRoute|RwgpsTrip) => {
 
 export const msgFromError = (error : {reason:{data:{details:string}} | {reason:string, data: never}}, provider : string, context?: string ) => {
     if (error.reason.data) {
-        warn(error.reason.data.details, {provider:provider, context:context} );
+        // warn(error.reason.data.details, {provider:provider, context:context} );
         if (/^\s*$/.test(error.reason.data.details)) {
             Sentry.captureMessage("Error string from data.details was all whitespace")
         }
         Sentry.metrics.count("forecast_errors", 1, {attributes:{provider:provider, details:error.reason.data.details, context:context}});
         return error.reason.data.details
     } else {
-        warn(JSON.stringify(error.reason), {provider:provider, context:context}  );
+        // warn(JSON.stringify(error.reason), {provider:provider, context:context}  );
         if (/^\s*$/.test(JSON.stringify(error.reason))) {
             Sentry.captureMessage("Error string from reason was all whitespace")
         }
@@ -89,8 +89,9 @@ const forecastByParts = (forecastFunc : MutationWrapper, aqiFunc : MutationWrapp
             const request = {locations:locations, timezone:zone, service:service, routeName:routeName, routeNumber:routeNumber, lang:lang, which}
             const result = limit(() => forecastFunc(request).unwrap())
             result.catch((err) => {
-                 warn(`Forecast fetch failed for part ${which} ${request.locations.lat} with error ${errorDetails(err)}`, {provider:service});
+                 warn(`Forecast fetch failed for part ${which} ${request.locations.lat},${request.locations.lon} with error ${errorDetails(err)}`, {provider:service});
                  failedRequests.push(request);
+                 info(`There are now ${failedRequests.length} failed requests queued up`);
                  });
             forecastResults.push(result)
             if (fetchAqi) {

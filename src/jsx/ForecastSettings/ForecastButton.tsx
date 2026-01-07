@@ -110,7 +110,8 @@ const ForecastButton = ({fetchingForecast,submitDisabled, routeNumber, startTime
             const result = limit(() => forecast(request).unwrap());
             result.catch((err) => { 
                 warn(`Forecast fetch failed for part ${which} ${request.locations.lat} with error ${errorDetails(err)}`, {provider:service});
-                failedRequests.push(request)
+                failedRequests.push(request);
+                info(`[FB] There are now ${failedRequests.length} failed requests queued up`);
             });
             forecastResults.push(result)
             if (fetchAqi) {
@@ -267,12 +268,7 @@ const ForecastButton = ({fetchingForecast,submitDisabled, routeNumber, startTime
         );
         querySet({url:url.url,search:url.search})
         Sentry.setContext("query", {queryString:url.search})
-        // TODO: temporarily disabled automatic url shortening, must click to generate one
-        // don't shorten localhost
-/*         if (origin !== 'http://localhost:8080' && (url.url !== href || !urlIsShortened)) {
-            dispatch(shortenUrl(url.url))
-        }
- */    };
+    };
 
     const smallScreen = useMediaQuery({query: "(max-width: 800px)"})
     forecastRequestData.current = useForecastRequestData()

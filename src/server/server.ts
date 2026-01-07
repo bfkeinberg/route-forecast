@@ -403,9 +403,9 @@ app.use((err : Error, req : RequestWithTimeout, res : Response, next : NextFunct
         // Send a specific response for timeout errors
         console.log('Request timed out!');
         if (req.body.locations) {
-            error(`Request to ${req.body.service} timed out for location ${req.body.locations.lat},${req.body.locations.lon}`);
+            // error(`Request to ${req.body.service} timed out for location ${req.body.locations.lat},${req.body.locations.lon}`);
         } else {
-            error(`Request timed out for unknown location`);
+            // error(`Request timed out for unknown location`);
         }
         return res.status(503).send({ details: `Service unavailable: Request to ${req.body.service} exceeded timeout` });
     }

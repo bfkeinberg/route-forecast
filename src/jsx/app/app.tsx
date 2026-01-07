@@ -45,7 +45,7 @@ if ('serviceWorker' in navigator) {
         }
         });        
     }).catch((error) => {
-        warn(`Error registering service worker: ${JSON.stringify(error)}`);
+        warn(`Error registering service worker: ${JSON.stringify(error)} ${error}`);
     });
 }
 
