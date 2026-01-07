@@ -20,6 +20,7 @@ import { lastErrorCleared } from '../redux/dialogParamsSlice'
 import DisplayErrorList from "./app/DisplayErrorList";
 import * as Sentry from "@sentry/react"
 import { Loader } from "@mantine/core";
+import '@mantine/core/styles/Loader.css';
 
 export type DesktopUIProps = {
     mapsApiKey: string

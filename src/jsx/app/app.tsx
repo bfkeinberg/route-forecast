@@ -1,17 +1,16 @@
-import * as Sentry from "@sentry/react";
-const { trace, debug, info, warn, error, fatal, fmt } = Sentry.logger;
+//import * as Sentry from "@sentry/react";
+import { init, feedbackIntegration, browserSessionIntegration, browserTracingIntegration,
+     browserProfilingIntegration, replayIntegration, replayCanvasIntegration, 
+     thirdPartyErrorFilterIntegration, setTag, logger } from '@sentry/react';
+const { trace, debug, info, warn, error, fatal, fmt } = logger;
 
 import { createRoot } from 'react-dom/client';
 import ReactGA from "react-ga4";
 import VersionContext from "../versionContext";
 import LocationContext from '../locationContext';
 import TopLevel from './topLevel';
-import "./i18n";
-import '@mantine/core/styles.css';
-// ‼️ import dates styles after core package styles
-import '@mantine/dates/styles.css';
-import '@mantine/notifications/styles.css';
-import 'Images/style.css';
+// import "./i18n";
+// import '@mantine/core/styles.css';
 import { MantineProvider, createTheme, Button } from '@mantine/core';
 import * as classes from "../../static/mantine.module.css";
 
@@ -70,7 +69,7 @@ else {
     if (!allowedHosts.includes(url.hostname)) {
         ReactGA.initialize("G-0R3J1W9ECC");
         if (sentry_app_id && sentry_app_id !== null) {
-            Sentry.init({
+            init({
                 dsn: 'https://ea4c472ff9054dab8c18d594b95d8da2@sentry.io/298059',
                 _experiments: { enableLogs: true },
                 environment: 'production',
@@ -81,20 +80,20 @@ else {
                 // This enables automatic instrumentation (highly recommended), but is not
                 // necessary for purely manual usage
                 integrations: [
-                    Sentry.thirdPartyErrorFilterIntegration({
+                    thirdPartyErrorFilterIntegration({
                         filterKeys: [sentry_app_id],
                         behaviour: "drop-error-if-exclusively-contains-third-party-frames"
                     }),
-                    Sentry.browserSessionIntegration(),
-                    Sentry.browserTracingIntegration(),
-                    Sentry.browserProfilingIntegration(),
-                    Sentry.replayIntegration({
+                    browserSessionIntegration(),
+                    browserTracingIntegration(),
+                    browserProfilingIntegration(),
+                    replayIntegration({
                         maskAllText: false,
                         blockAllMedia: false,
                         maskAllInputs: false
                     }),
-                    Sentry.replayCanvasIntegration(),
-                    Sentry.feedbackIntegration({
+                    replayCanvasIntegration(),
+                    feedbackIntegration({
                         autoInject: false
                     })
                 ],
@@ -121,7 +120,7 @@ else {
     const bitly_token = script.getAttribute('bitly_token');
     let version = script.getAttribute('version');
 
-    Sentry.setTag('version', version)
+    setTag('version', version)
     
     interface TopLevelProps {
         action: string, 

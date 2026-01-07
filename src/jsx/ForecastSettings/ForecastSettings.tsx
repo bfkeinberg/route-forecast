@@ -16,7 +16,12 @@ import { TimeFields } from "./TimeFields";
 import WeatherProviderSelector from "./WeatherProviderSelector"
 import Segment from './Segment'
 import i18n from '../app/i18n';
+import '@mantine/core/styles/Checkbox.css';
+import '@mantine/core/styles/Paper.css';
+import '@mantine/core/styles/Stack.css';
+import '@mantine/core/styles/Notification.css';
 import { Button, Notification, Checkbox, Collapse, Stack, CheckboxGroup, Paper } from '@mantine/core';
+
 import { IconSettings} from "@tabler/icons-react"
 import { useAppSelector, useAppDispatch } from '../../utils/hooks';
 import { ChangeEvent, useState } from 'react';

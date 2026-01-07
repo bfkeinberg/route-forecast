@@ -1,3 +1,15 @@
+import '@mantine/core/styles/baseline.css';
+import '@mantine/core/styles/UnstyledButton.css'; // Buttons often need this
+import '@mantine/core/styles/Button.css';
+import '@mantine/core/styles/global.css'; // Import globals separately if needed
+import '@mantine/core/styles/default-css-variables.css'; // Import globals separately if needed
+
+// ‼️ import dates styles after core package styles
+import '@mantine/dates/styles.css';
+import '@mantine/notifications/styles.css';
+import 'Images/style.css';
+
+import "./i18n";
 import ReactGA from "react-ga4";
 import * as Sentry from "@sentry/react";
 const { info } = Sentry.logger;

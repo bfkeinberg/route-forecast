@@ -199,8 +199,8 @@ module.exports = (env, argv) => {
             // chunkIds: 'named',
             splitChunks: {
                 chunks: 'all',
-                maxInitialRequests: 35,
-                minSize: 5000,
+                maxInitialRequests: 50,
+                minSize: 3000,
                 maxSize: 200000,
 /*                 cacheGroups: {
                     vendor: {

@@ -4,7 +4,6 @@ import type { RootState } from "../../redux/store";
 import {setInterval} from "../../redux/actions";
 import {useTranslation} from 'react-i18next'
 import { Flex } from "@mantine/core";
-
 type PropsFromRedux = ConnectedProps<typeof connector>
 
 const ForecastInterval = (props: PropsFromRedux) => {

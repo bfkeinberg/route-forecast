@@ -1,5 +1,7 @@
 import MediaQuery from 'react-responsive'
-import { Tooltip, TooltipProps } from "@mantine/core";
+import '@mantine/core/styles/Tooltip.css';
+import { Tooltip } from "@mantine/core";
+import type { TooltipProps } from '@mantine/core';
 
 export const DesktopTooltip = (props : TooltipProps) => {
     return (

@@ -7,7 +7,9 @@ import { inputPaceToSpeed, metricPaceToSpeed, paceToSpeed, saveCookie, milesToMe
 import { DesktopTooltip } from '../shared/DesktopTooltip';
 import {useTranslation} from 'react-i18next'
 import type { RootState } from "../../redux/store";
-import { Combobox, useCombobox, Flex, Button } from '@mantine/core'
+import '@mantine/core/styles/Combobox.css';
+import { Combobox, useCombobox, Flex, Button } from '@mantine/core';
+
 import { maxWidthForMobile } from '../../utils/util';
 import  {useMediaQuery} from 'react-responsive';
 

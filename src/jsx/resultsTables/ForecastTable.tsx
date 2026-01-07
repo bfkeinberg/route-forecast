@@ -22,7 +22,10 @@ import ShortUrl from '../TopBar/ShortUrl'
 import { UserControl } from 'redux/controlsSlice';
 import { i18n } from 'i18next';
 import ReactGA from "react-ga4";
-import { Button, Tooltip, Table, Card, Title, Text } from '@mantine/core'
+import '@mantine/core/styles/Table.css';
+import '@mantine/core/styles/Text.css';
+import { Button, Tooltip, Table, Card, Title, Text } from '@mantine/core';
+
 import { IconClipboard, IconTemperature, IconPercentage } from '@tabler/icons-react';
 import { notifications } from '@mantine/notifications';
 

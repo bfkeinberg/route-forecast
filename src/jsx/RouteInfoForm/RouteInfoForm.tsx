@@ -1,6 +1,8 @@
 import Slider from '@mui/material/Slider';
 import ReactGA from "react-ga4";
 import {connect, useDispatch, ConnectedProps} from 'react-redux';
+import '@mantine/core/styles/Card.css';
+import '@mantine/core/styles/Title.css';
 import { Card, Title } from '@mantine/core';
 import { routeLoadingModeProps,RouteLoadingModes,routeLoadingModes } from '../../data/enums';
 import { errorDetailsSet } from '../../redux/dialogParamsSlice';

@@ -6,7 +6,8 @@ import { ToggleButton } from '../shared/ToggleButton';
 import { ControlTable } from './ControlTable';
 import { DesktopTooltip } from "../shared/DesktopTooltip";
 import {useTranslation} from 'react-i18next'
-import { Button, Paper } from "@mantine/core"; 
+import { Button, Paper } from "@mantine/core";
+
 import { IconPlus } from "@tabler/icons-react"
 
 export const ControlTableContainer = () => {

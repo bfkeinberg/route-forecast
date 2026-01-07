@@ -1,6 +1,9 @@
 
+import '@mantine/core/styles/Switch.css';
 import "./AlwaysFilledSwitch.css"
-import { Switch, SwitchProps } from "@mantine/core"
+import { Switch } from "@mantine/core";
+import type { SwitchProps } from "@mantine/core";
+
 interface AlwaysFilledSwitchProps extends SwitchProps{
   checked: boolean  
 }

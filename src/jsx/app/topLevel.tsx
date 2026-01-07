@@ -1,7 +1,8 @@
 import { Provider } from 'react-redux';
 import { useContext, StrictMode, lazy, Suspense } from "react";
 import LocationContext from '../locationContext';
-import * as Sentry from "@sentry/react"
+// import * as Sentry from "@sentry/react"
+import { ErrorBoundary } from '@sentry/react';
 const RouteWeatherUI = lazy(() => import("./main"));
 import { store } from '../../redux/store';
 import ChunkErrorBoundary from './ChunkErrorBoundary';
@@ -11,7 +12,7 @@ const TopLevel = ({ action, maps_api_key, timezone_api_key, bitly_token, preload
         const locationContext = useContext(LocationContext);
         const {href, search, origin} = locationContext;        
     return (
-        <Sentry.ErrorBoundary fallback={<h2>Something went wrong.</h2>}>
+        <ErrorBoundary fallback={<h2>Something went wrong.</h2>}>
             <ChunkErrorBoundary>
                 <Provider store={store}>
                     <StrictMode>
@@ -22,7 +23,7 @@ const TopLevel = ({ action, maps_api_key, timezone_api_key, bitly_token, preload
                     </StrictMode>
                 </Provider>
             </ChunkErrorBoundary>
-        </Sentry.ErrorBoundary>
+        </ErrorBoundary>
     )
 };
 
