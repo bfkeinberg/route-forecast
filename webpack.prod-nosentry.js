@@ -2,7 +2,6 @@
 const { merge } = require('webpack-merge');
 const common = require('./webpack.common.cjs');
 const webpack = require('webpack');
-const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 const CompressionPlugin = require("compression-webpack-plugin");
 const TerserPlugin = require('terser-webpack-plugin');
 const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
@@ -38,8 +37,7 @@ module.exports = (env, argv) => merge(common(env, argv), {
                 /\.ico/,
                 /\.html/
             ]
-        }),
-        // new BundleAnalyzerPlugin({ analyzerMode: "server" })
+        })
     ],
     optimization: {
         minimizer: [
