@@ -2,7 +2,6 @@
 const { merge } = require('webpack-merge');
 const common = require('./webpack.common.cjs');
 const webpack = require('webpack');
-//const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 const CompressionPlugin = require("compression-webpack-plugin");
 const TerserPlugin = require('terser-webpack-plugin');
 const { sentryWebpackPlugin } = require('@sentry/webpack-plugin');
