@@ -10,7 +10,10 @@ import VersionContext from "../versionContext";
 import LocationContext from '../locationContext';
 import TopLevel from './topLevel';
 // import "./i18n";
-// import '@mantine/core/styles.css';
+import '@mantine/core/styles.css';
+// ‼️ import dates styles after core package styles
+import '@mantine/dates/styles.css';
+import '@mantine/notifications/styles.css';
 import { MantineProvider, createTheme, Button } from '@mantine/core';
 import * as classes from "../../static/mantine.module.css";
 
