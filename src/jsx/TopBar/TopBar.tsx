@@ -13,7 +13,6 @@ import {useTranslation} from 'react-i18next'
 import FaqButton from "./FaqButton";
 import React, { ReactElement, useContext } from "react";
 import VersionContext from "../versionContext";
-import { DateTime } from "luxon";
 
 const TitleAndFinishTime = ({finishTime, fontSize, alignment} : {finishTime : string, fontSize: string, alignment: "left" | "right"}) => {
   return (
