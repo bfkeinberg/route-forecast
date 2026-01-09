@@ -36,7 +36,8 @@
     "types": [
       "chrome",
        "@types/webappsec-credential-management",
-       "@types/google.maps"
+       "@types/google.maps",
+      "@testing-library/jest-dom", "node", "jest"       
     ],                                                   /* Specify type package names to be included without being referenced in a source file. */
     // "allowUmdGlobalAccess": true,                     /* Allow accessing UMD globals from modules. */
     // "moduleSuffixes": [],                             /* List of file name suffixes to search when resolving a module. */

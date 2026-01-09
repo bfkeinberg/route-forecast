@@ -26,6 +26,7 @@
     "@sentry/tracing": "^7.120.4",
     "@tabler/icons": "^3.35.0",
     "@tabler/icons-react": "^3.35.0",
+    "@testing-library/jest-dom": "^6.9.1",
     "@turf/turf": "^7.2.0",
     "@types/luxon": "^3.4.2",
     "@types/webappsec-credential-management": "^0.6.8",
@@ -112,6 +113,8 @@
     "@babel/preset-react": "^7.10.4",
     "@sentry/webpack-plugin": "^4.5.0",
     "@svgr/webpack": "^8.1.0",
+    "@testing-library/dom": "^10.4.1",
+    "@testing-library/react": "^16.3.1",
     "@tsconfig/node22": "^22.0.0",
     "@types/chrome": "^0.1.24",
     "@types/google.maps": "^3.58.1",
@@ -145,6 +148,7 @@
     "jsdom": "^27.4.0",
     "json-loader": "^0.5.4",
     "mini-css-extract-plugin": "^2.1.0",
+    "npm": "^11.7.0",
     "nyc": "^17.0.0",
     "react-test-renderer": "^19.2.0",
     "redux-actions-assertions": "^1.3.0",
@@ -154,7 +158,9 @@
     "style-loader": "^4.0.0",
     "supertest": "^7.0.0",
     "terser-webpack-plugin": "^5.3.14",
+    "ts-jest": "^29.4.6",
     "ts-loader": "^9.5.1",
+    "ts-node": "^10.9.2",
     "typescript": "^5.4.5",
     "webpack-cli": "^6.0.1",
     "webpack-merge": "^6.0.1",
@@ -194,28 +200,5 @@
     "minify": true,
     "rootDir": "."
   },
-  "homepage": "https://github.com/bfkeinberg/route-forecast#readme",
-  "jest": {
-    "collectCoverage": true,
-    "collectCoverageFrom": [
-      "<rootDir>/src/jsx/**/*.{js,jsx}"
-    ],
-    "moduleNameMapper": {
-      "\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga|htm)$": "<rootDir>/__mocks__/fileMock.js",
-      "@google-cloud/datastore": "<rootDir>/__mocks__/@google-cloud/datastore.js",
-      "\\.(css|less)$": "<rootDir>/__mocks__/styleMock.js"
-    },
-    "testEnvironmentOptions": {
-      "url": "http://localhost/"
-    },
-    "transform": {
-      "\\.[jt]sx?$": "babel-jest"
-    },
-    "transformIgnorePatterns": [
-      "node_modules/(?!luxon)"
-    ],
-    "testPathIgnorePatterns": [
-      "./__enzyme_tests__/"
-    ]
-  }
+  "homepage": "https://github.com/bfkeinberg/route-forecast#readme"
 }
