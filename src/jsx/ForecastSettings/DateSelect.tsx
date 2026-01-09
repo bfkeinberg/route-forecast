@@ -1,5 +1,8 @@
+import '@mantine/dates/styles.css';
+
 import { DateTime } from 'luxon';
 import {connect, ConnectedProps} from 'react-redux';
+
 import { DateTimePicker } from '@mantine/dates';
 import  {useMediaQuery} from 'react-responsive'
 import {setStart} from "../../redux/actions";

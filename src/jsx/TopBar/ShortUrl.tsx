@@ -4,7 +4,6 @@ import * as Sentry from "@sentry/react";
 import type { RootState } from "../../redux/store";
 import {IconShare2, IconCopy} from "@tabler/icons-react"
 import { TextInput, Notification, ActionIcon, Flex } from '@mantine/core';
-import '@mantine/core/styles/ActionIcon.css';
 import {useTranslation} from 'react-i18next'
 import { notifications } from '@mantine/notifications';
 import { useAppSelector, useAppDispatch } from "../../utils/hooks";

@@ -10,12 +10,9 @@ import VersionContext from "../versionContext";
 import LocationContext from '../locationContext';
 import TopLevel from './topLevel';
 // import "./i18n";
-import '@mantine/core/styles.css';
-// ‼️ import dates styles after core package styles
-import '@mantine/dates/styles.css';
-import '@mantine/notifications/styles.css';
-import { MantineProvider, createTheme, Button } from '@mantine/core';
-import * as classes from "../../static/mantine.module.css";
+// import '@mantine/core/styles.css';
+// // ‼️ import dates styles after core package styles
+// import '@mantine/dates/styles.css';
 
 if ('serviceWorker' in navigator) {
     navigator.serviceWorker.addEventListener('message', (event: MessageEvent) => {
@@ -51,13 +48,6 @@ if ('serviceWorker' in navigator) {
         warn(`Error registering service worker: ${JSON.stringify(error)} ${error}`);
     });
 }
-
-const theme = createTheme({
-  components: {
-    // @ts-ignore
-    Button: Button.extend({ classNames: classes }),
-  }
-});
 
 let script = document.scripts.namedItem('routeui')
 if (!script || script == null) {
@@ -151,9 +141,7 @@ else {
         root.render(
             <VersionContext.Provider value={version}>
                 <LocationContext.Provider value={{ href: location.href, search: location.search, origin: location.origin }}>
-                    <MantineProvider theme={theme}>
-                        <Component action={action} maps_api_key={maps_api_key} timezone_api_key={timezone_api_key} bitly_token={bitly_token} />
-                    </MantineProvider>
+                    <Component action={action} maps_api_key={maps_api_key} timezone_api_key={timezone_api_key} bitly_token={bitly_token} />
                 </LocationContext.Provider>
             </VersionContext.Provider>
         )

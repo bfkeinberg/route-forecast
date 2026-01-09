@@ -2,7 +2,6 @@ import { useTranslation } from 'react-i18next'
 import { useAppSelector } from '../../utils/hooks';
 import { useForecastDependentValues } from "../../utils/forecastValuesHook";
 const gustySpeedThreshold = 25;
-import '@mantine/core/styles/Popover.css';
 import { Popover } from '@mantine/core';
 import { TimeChangeChart } from './TimeChangeChart';
 import {useState} from 'react'

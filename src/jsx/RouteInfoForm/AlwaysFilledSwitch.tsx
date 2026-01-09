@@ -1,5 +1,4 @@
 
-import '@mantine/core/styles/Switch.css';
 import "./AlwaysFilledSwitch.css"
 import { Switch } from "@mantine/core";
 import type { SwitchProps } from "@mantine/core";

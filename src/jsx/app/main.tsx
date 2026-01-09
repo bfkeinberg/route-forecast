@@ -1,13 +1,47 @@
 import '@mantine/core/styles/baseline.css';
-import '@mantine/core/styles/UnstyledButton.css'; // Buttons often need this
-import '@mantine/core/styles/Button.css';
-import '@mantine/core/styles/global.css'; // Import globals separately if needed
 import '@mantine/core/styles/default-css-variables.css'; // Import globals separately if needed
+import '@mantine/core/styles/global.css'; // Import globals separately if needed
+
+import '@mantine/core/styles/ScrollArea.css';
+import '@mantine/core/styles/UnstyledButton.css'; 
+import '@mantine/core/styles/Paper.css';
+import '@mantine/core/styles/Popover.css';
+import '@mantine/core/styles/CloseButton.css';
+import '@mantine/core/styles/Group.css';
+import '@mantine/core/styles/Loader.css';
+import '@mantine/core/styles/Overlay.css';
+import '@mantine/core/styles/ModalBase.css';
+import '@mantine/core/styles/Input.css';
+import '@mantine/core/styles/InlineInput.css';
+import '@mantine/core/styles/Flex.css';
+import '@mantine/core/styles/ActionIcon.css';
+import '@mantine/core/styles/Typography.css';
+
+import '@mantine/core/styles/Modal.css';
+import '@mantine/core/styles/Button.css';
+import '@mantine/core/styles/Checkbox.css';
+import '@mantine/core/styles/Stack.css';
+import '@mantine/core/styles/Combobox.css';
+import '@mantine/core/styles/Group.css';
+import '@mantine/core/styles/Divider.css'
+import '@mantine/core/styles/Table.css';
+import '@mantine/core/styles/Text.css';
+import '@mantine/core/styles/Card.css';
+import '@mantine/core/styles/Title.css';
+import '@mantine/core/styles/Drawer.css';
+import '@mantine/core/styles/Switch.css';
+import '@mantine/core/styles/Tooltip.css';
+import '@mantine/core/styles/Notification.css';
+
+import '@mantine/notifications/styles.css';
 
 // ‼️ import dates styles after core package styles
-import '@mantine/dates/styles.css';
-import '@mantine/notifications/styles.css';
+// import '@mantine/dates/styles.css';
+
 import 'Images/style.css';
+
+import { MantineProvider, createTheme, Button } from '@mantine/core';
+import * as classes from "../../static/mantine.module.css";
 
 import "./i18n";
 import ReactGA from "react-ga4";
@@ -32,6 +66,12 @@ import { defaultProvider, providerValues } from "../../redux/providerValues";
 import type { DesktopUIProps } from "../DesktopUI";
 import { Notifications } from '@mantine/notifications';
 
+const theme = createTheme({
+  components: {
+    // @ts-ignore
+    Button: Button.extend({ classNames: classes }),
+  }
+});
 
 const reloadPage = () => {
     Sentry.addBreadcrumb({category:"No stack", level:"info", message:"reloadPage"})
@@ -320,7 +360,9 @@ const RouteWeatherUI = ({search, href, action, maps_api_key, timezone_api_key, b
         ReactGA.event('select_promotion', {creative_name:'it'})
     }
     return (
-        <FunAppWrapperThingForHooksUsability maps_api_key={maps_api_key} queryParams={queryParamsAsObj} lang={i18n.language}/>
+        <MantineProvider theme={theme}>
+            <FunAppWrapperThingForHooksUsability maps_api_key={maps_api_key} queryParams={queryParamsAsObj} lang={i18n.language}/>
+        </MantineProvider>
     )
 
 }

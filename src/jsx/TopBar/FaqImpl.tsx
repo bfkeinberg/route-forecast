@@ -1,6 +1,5 @@
 import faq from "../../static/faq.htm"
 import Typography from "@mui/material/Typography"
-import '@mantine/core/styles/Drawer.css';
 import { Drawer } from "@mantine/core";
 
 export const ShowFaq = () => (<Typography style={{ overflowY: 'scroll' }} dangerouslySetInnerHTML={{ __html: faq }} />)

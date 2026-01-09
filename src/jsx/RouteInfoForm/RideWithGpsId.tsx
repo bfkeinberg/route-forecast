@@ -5,9 +5,6 @@ import { rwgpsRouteSet } from '../../redux/routeParamsSlice';
 import { querySet } from '../../redux/paramsSlice';
 import type { RootState } from "../../redux/store";
 import { ChangeEvent, RefObject } from 'react';
-import '@mantine/core/styles/Flex.css';
-import '@mantine/core/styles/CloseButton.css';
-import '@mantine/core/styles/Input.css';
 import { CloseButton, Flex, TextInput } from '@mantine/core';
 import { updateHistory } from '../../jsx/app/updateHistory';
 

@@ -19,8 +19,8 @@ import {useTranslation} from 'react-i18next'
 import { lastErrorCleared } from '../redux/dialogParamsSlice'
 import DisplayErrorList from "./app/DisplayErrorList";
 import * as Sentry from "@sentry/react"
-import { Loader } from "@mantine/core";
 import '@mantine/core/styles/Loader.css';
+import { Loader } from "@mantine/core";
 
 export type DesktopUIProps = {
     mapsApiKey: string
