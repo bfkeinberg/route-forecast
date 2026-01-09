@@ -9,10 +9,6 @@ import ReactGA from "react-ga4";
 import VersionContext from "../versionContext";
 import LocationContext from '../locationContext';
 import TopLevel from './topLevel';
-// import "./i18n";
-// import '@mantine/core/styles.css';
-// // ‼️ import dates styles after core package styles
-// import '@mantine/dates/styles.css';
 
 if ('serviceWorker' in navigator) {
     navigator.serviceWorker.addEventListener('message', (event: MessageEvent) => {
