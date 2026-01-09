@@ -35,9 +35,6 @@ import '@mantine/core/styles/Notification.css';
 
 import '@mantine/notifications/styles.css';
 
-// ‼️ import dates styles after core package styles
-// import '@mantine/dates/styles.css';
-
 import 'Images/style.css';
 
 import { MantineProvider, createTheme, Button } from '@mantine/core';
