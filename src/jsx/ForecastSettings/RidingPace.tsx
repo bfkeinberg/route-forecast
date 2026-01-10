@@ -179,4 +179,5 @@ const mapDispatchToProps = {
 };
 
 const connector = connect(mapStateToProps,mapDispatchToProps)
+export { RidingPace };
 export default connector(RidingPace);

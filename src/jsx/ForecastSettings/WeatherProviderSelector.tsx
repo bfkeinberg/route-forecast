@@ -83,4 +83,5 @@ const mapDispatchToProps = {
 };
 
 const connector = connect(mapStateToProps, mapDispatchToProps)
+export { WeatherProviderSelector };
 export default connector(WeatherProviderSelector);

@@ -325,4 +325,5 @@ export     interface AllForecasts {
 }
 
 const connector = connect(mapStateToProps,mapDispatchToProps)
+export { ForecastButton };
 export default connector(ForecastButton);
