@@ -36,7 +36,12 @@ module.exports = (env, argv) => {
                 {
                     test: /\.(t|j)sx?$/,
                     use: { loader: 'ts-loader' },
-                    exclude: /node_modules/
+                    exclude: [
+                        /node_modules/,
+                        /\.test\.tsx$/,
+                        /test-utils\.tsx$/
+
+                    ]
                 },
                 {
                     test: /\.scss$/,

@@ -1,6 +1,6 @@
 // src/jsx/TopBar/DonationRequest.test.tsx
 import React from 'react';
-import { render, fireEvent, act } from '@testing-library/react';
+import { render, fireEvent, act } from 'test-utils';
 import { describe, beforeEach, jest, test, expect } from '@jest/globals';
 
 // Mocks
@@ -40,8 +40,9 @@ jest.mock('react-i18next', () => {
     DesktopTooltip: ({ children }: any) => <div data-testid="desktop-tooltip">{children}</div>
   };
 });
+
  // Render Mantine Button as an anchor-like wrapper preserving props and children
-jest.mock('@mantine/core', () => {
+/* jest.mock('@mantine/core', () => {
   return {
     __esModule: true,
     Button: (props: any) => {
@@ -50,7 +51,7 @@ jest.mock('@mantine/core', () => {
     }
   };
 });
-
+ */
 import cookie from 'react-cookies';
 import ReactGA from 'react-ga4';
 import { useMediaQuery } from 'react-responsive';
@@ -121,15 +122,15 @@ describe('DonationRequest', () => {
       jest.advanceTimersByTime(1500);
     });
     // after timer, transform and filter should be non-empty strings
-    expect(wrapper.style.transform).not.toBe('');
-    expect(wrapper.style.filter).not.toBe('');
+    expect(container.querySelector('div')!.style.transform).not.toBe('');
+    expect(container.querySelector('div')!.style.filter).not.toBe('');
     jest.useRealTimers();
   });
 
   test('when donateWasClicked is true, wacky does not animate', () => {
     jest.useFakeTimers();
     mockedCookie.load.mockReturnValue("true");
-    const { container } = render(<DonationRequest wacky={true} />);
+    const { container, getByRole } = render(<DonationRequest wacky={true} />);
     const wrapper = container.firstChild as HTMLElement;
     expect(wrapper.style.transform).toBe('');
     expect(wrapper.style.filter).toBe('');

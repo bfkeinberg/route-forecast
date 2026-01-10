@@ -1,5 +1,5 @@
 // src/jsx/TopBar/BugReportButton.test.tsx
-import { render, act } from '@testing-library/react';
+import { render } from 'test-utils';
 import { describe, beforeEach, jest, test, expect } from '@jest/globals';
 
 jest.mock('Images/gustavorezende_lady_bug-555px.png', () => 'lady-bug.png');
@@ -25,16 +25,19 @@ jest.mock('@sentry/react', () => {
   };
 });
 
+/*import * as Mantine from '@mantine/core';
 jest.mock('@mantine/core', () => {
   return {
     __esModule: true,
+    MantineProvider: jest.requireActual<typeof Mantine>('@mantine/core').MantineProvider,
+    createTheme: jest.requireActual<typeof Mantine>('@mantine/core').createTheme,
     Button: (props: any) => {
       const { children, ...rest } = props;
       return <button {...rest}>{children}</button>;
     }
   };
 });
-
+*/
 import { useTranslation } from 'react-i18next';
 import { useMediaQuery } from 'react-responsive';
 import * as Sentry from '@sentry/react';
@@ -90,7 +93,7 @@ describe('BugReportButton', () => {
     mockedUseMediaQuery.mockReturnValue(false);
     const { container } = render(<BugReportButton />);
     const button = container.querySelector('button');
-    expect(button!.getAttribute('size')).toBe('xsm');
+    expect(button!.getAttribute('style')!.includes('xsm')).toBe(true);
   });
 
   test('sets button variant to sm when media query 1250px is true', () => {
@@ -99,7 +102,7 @@ describe('BugReportButton', () => {
     );
     const { container } = render(<BugReportButton />);
     const button = container.querySelector('button');
-    expect(button!.getAttribute('size')).toBe('sm');
+    expect(button!.getAttribute('style')!.includes('var(--button-height-sm)')).toBe(true);
   });
 
   test('sets image dimensions to 34px height and 25px width when 1300px query is false', () => {
