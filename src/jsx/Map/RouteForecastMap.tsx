@@ -15,7 +15,7 @@ import { formatTemperature } from "../resultsTables/ForecastTable";
 import { Polyline } from './polyline';
 import {useTranslation} from 'react-i18next'
 import { Forecast, mapViewedSet } from '../../redux/forecastSlice';
-import { type CalculatedValue } from 'utils/gpxParser';
+import type { CalculatedValue } from '../../utils/gpxParser';
 import { useAppSelector, useAppDispatch } from '../../utils/hooks';
 import SafeAdvancedMarker from './SafeMarker';
 import { addOpenBusinesses, BusinessOpenType, clearOpenBusinesses, UserControl } from '../../redux/controlsSlice';

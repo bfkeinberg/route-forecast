@@ -23,7 +23,6 @@ import '@mantine/core/styles/Checkbox.css';
 import '@mantine/core/styles/Stack.css';
 import '@mantine/core/styles/Combobox.css';
 import '@mantine/core/styles/Group.css';
-import '@mantine/core/styles/Divider.css'
 import '@mantine/core/styles/Table.css';
 import '@mantine/core/styles/Text.css';
 import '@mantine/core/styles/Card.css';

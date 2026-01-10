@@ -1,6 +1,6 @@
 import { DateTime } from 'luxon';
-import type { UserControl } from 'redux/controlsSlice';
-import type { GpxRouteData, RwgpsRoute, RwgpsTrip, } from 'redux/routeInfoSlice';
+import type { UserControl } from '../redux/controlsSlice';
+import type { GpxRouteData, RwgpsRoute, RwgpsTrip, } from '../redux/routeInfoSlice';
 import gpxParser, { type RouteAnalysisResults, type Segment, type ExtractedControl } from './gpxParser';
 
 let cachedRouteUUID: string | null = null;

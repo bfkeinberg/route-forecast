@@ -20,7 +20,7 @@ import { useForecastRequestData } from "../../utils/useForecastRequestData";
 import type { RootState } from "../../redux/store";
 import { useAppSelector, useAppDispatch } from '../../utils/hooks';
 import type {ForecastRequest} from '../../utils/gpxParser'
-import { GpxRouteData, RwgpsRoute, RwgpsTrip } from 'redux/routeInfoSlice';
+import { GpxRouteData, RwgpsRoute, RwgpsTrip } from '../../redux/routeInfoSlice';
 import { writeObjToFile } from '../../utils/writeToFile';
 import { Button } from "@mantine/core";
 import pLimit from 'p-limit';

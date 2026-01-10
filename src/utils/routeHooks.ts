@@ -57,8 +57,8 @@ export const usePointsAndBounds = (): PointsAndBounds => {
 };
 
 import { DateTime } from "luxon";
-import type { ControlsState } from "redux/controlsSlice";
-import type { RouteInfoState } from "redux/routeInfoSlice";
+import type { ControlsState } from "../redux/controlsSlice";
+import type { RouteInfoState } from "../redux/routeInfoSlice";
 import { type WindAdjustResults } from "./gpxParser";
 import { getRouteInfo } from "./routeUtils";
 

@@ -1,7 +1,7 @@
 // @ts-ignore 
 import { largestTriangleThreeBucket } from 'd3fc-sample';
 import { ResponsiveContainer, LineChart, XAxis, YAxis, Tooltip, Legend, Line, CartesianGrid } from 'recharts';
-import type { ChartDataType, ChartData } from 'utils/gpxParser';
+import type { ChartDataType, ChartData } from '../../utils/gpxParser';
 import ReactGA from "react-ga4";
 
 export const TimeChangeChart = ({chartData, metric, popoverIsOpen} : {chartData: ChartDataType, metric: boolean, popoverIsOpen: boolean}) => {

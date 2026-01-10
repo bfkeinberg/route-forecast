@@ -13,6 +13,7 @@ import DisplayErrorList from "./app/DisplayErrorList";
 import { useAppDispatch, useAppSelector } from "../utils/hooks";
 import type { Dispatch, SetStateAction } from "react";
 import * as Sentry from "@sentry/react"
+import '@mantine/core/styles/Divider.css'
 import {Button, Group, Divider} from "@mantine/core";
 import FaqButton from "./TopBar/FaqButton";
 const ShowFaq = React.lazy(() => import("./TopBar/FaqImpl").then(module => ({ default: module.ShowFaq })));

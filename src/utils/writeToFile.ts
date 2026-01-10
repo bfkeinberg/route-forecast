@@ -1,6 +1,6 @@
 import { mkConfig, generateCsv, asBlob } from "export-to-csv";
-import type { AllForecasts } from "jsx/ForecastSettings/ForecastButton";
-import { Forecast } from "redux/forecastSlice";
+import type { AllForecasts } from "../jsx/ForecastSettings/ForecastButton";
+import { Forecast } from "../redux/forecastSlice";
 export const writeObjToFile = (dataToWrite: AllForecasts, writeCsvNotJson: boolean) => {
     const aElement = document.createElement('a');
     let href

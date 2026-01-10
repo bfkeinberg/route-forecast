@@ -26,7 +26,7 @@ const findTimezoneForPoint = (lat : number, lon : number, time : DateTime, timez
     .catch(error => {return Error(error.message + " time zone")});
 }
 
-import type { RouteInfoState } from 'redux/routeInfoSlice';
+import type { RouteInfoState } from '../redux/routeInfoSlice';
 interface TimeZoneIdSuccess {
     result: "success"
     value: {offset: number, zoneId: string}

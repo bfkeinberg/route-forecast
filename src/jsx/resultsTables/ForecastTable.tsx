@@ -20,7 +20,7 @@ import { WeatherCorrections } from './WeatherCorrections';
 import {useTranslation} from 'react-i18next'
 import { DesktopTooltip } from '../shared/DesktopTooltip';
 import ShortUrl from '../TopBar/ShortUrl'
-import { UserControl } from 'redux/controlsSlice';
+import { UserControl } from '../../redux/controlsSlice';
 import { i18n } from 'i18next';
 import ReactGA from "react-ga4";
 import { Button, Tooltip, Table, Card, Title, Text } from '@mantine/core';

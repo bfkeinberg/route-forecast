@@ -1,4 +1,4 @@
-import { RwgpsRoute, RwgpsTrip } from "redux/routeInfoSlice";
+import { RwgpsRoute, RwgpsTrip } from "../redux/routeInfoSlice";
 
 export const loadRwgpsRoute = (route : string, isTrip : boolean, token? : string|null) => {
   return new Promise<RwgpsRoute|RwgpsTrip >((resolve, reject) => {
