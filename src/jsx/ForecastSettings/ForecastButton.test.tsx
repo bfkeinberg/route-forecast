@@ -4,6 +4,19 @@ import { render, fireEvent, waitFor } from 'test-utils';
 import { describe, beforeEach, jest, test, expect } from '@jest/globals';
 
 // Mocks
+jest.mock('react-i18next', () => ({
+  // this mock makes sure any components using the translate hook can use it without a warning
+  useTranslation: () => {
+    return {
+      t: (str: any) => str, // Returns the key as the translation
+      i18n: {
+        changeLanguage: () => new Promise(() => {}),
+      },
+    };
+  },
+  I18nextProvider: ({ children }: { children: React.ReactNode }) => children, // Mock the provider as well
+}));
+
 jest.mock('@sentry/react', () => ({
   __esModule: true,
   logger: { trace: jest.fn(), debug: jest.fn(), info: jest.fn(), warn: jest.fn(), error: jest.fn(), fatal: jest.fn(), fmt: jest.fn() },
