@@ -310,11 +310,15 @@ const RouteForecastMap = ({maps_api_key} : {maps_api_key: string}) => {
                                         scaleControl={true}
                                         defaultBounds={initialBounds}
                                     >
+                                        <Sentry.ErrorBoundary fallback=<h3>Cannot render markers</h3>>
                                         {controls !== null && <MapMarkers forecast={forecast}
                                             controls={controls} controlNames={controlNames}
                                             subrange={subrange} metric={metric}
                                         />}
-                                        <Polyline path={points} strokeWeight={3} strokeColor={'#3244a8'} strokeOpacity={1.0} />
+                                        </Sentry.ErrorBoundary>
+                                        <Sentry.ErrorBoundary fallback=<h3>Cannot render route line</h3>>
+                                            <Polyline path={points} strokeWeight={3} strokeColor={'#3244a8'} strokeOpacity={1.0} />
+                                        </Sentry.ErrorBoundary>                                        
                                         {infoVisible && getInfoWindow(markedInfo)}
                                         <MapHighlight points={points} subrange={subrange} />
                                     </Map>
