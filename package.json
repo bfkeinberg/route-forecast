@@ -172,7 +172,7 @@
     "prod": "./node_modules/.bin/webpack --mode production --config webpack.prod.js --env sentryRelease && tsc -p tsconfig_server.json > tsc.log",
     "prod-local": "./node_modules/.bin/webpack --mode production --config webpack.prod-nosentry.js && tsc -p tsconfig_server.json > tsc.log",
     "dev": "./node_modules/.bin/webpack --mode development --progress --color --stats-error-details --config webpack.dev.cjs --env sentryRelease && tsc -p tsconfig_server.json>tsc.log",
-    "dev:watch": "./node_modules/.bin/webpack --mode development --progress --color --config webpack.dev.js --env sentryRelease --watch",
+    "dev:watch": "./node_modules/.bin/webpack --mode development --progress --color --config webpack.dev.cjs --env sentryRelease --watch",
     "deploy": "./buildRelease.sh",
     "lint": "eslint src --fix",
     "test": "jest",
