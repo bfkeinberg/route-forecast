@@ -44,11 +44,11 @@ self.addEventListener('install', (event) => {
             'static/manifest.json'
         ]));
     })); */
-    // self.skipWaiting().then(() => {
+    self.skipWaiting().then(() => {
         // sendLogMessage('Service Worker skipWaiting complete', 'trace');
-    // }).catch((err) => {
-        // sendLogMessage(`Service Worker skipWaiting error: ${err}`, 'error');
-    // });
+    }).catch((err) => {
+        sendLogMessage(`Service Worker skipWaiting error: ${err}`, 'error');
+    });
 });
 
 // 
