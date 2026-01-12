@@ -368,6 +368,59 @@ describe('ForecastButton', () => {
     expect(errorMessageListAppend).toHaveBeenCalled();
   });
 
+  test('partial forecast failures still dispatch successful forecasts and record errors', async () => {
+    const mockDispatch = jest.fn();
+    mockedUseAppDispatch.mockReturnValue(mockDispatch);
+
+    // first part resolves to distance 4, second part rejects
+    let call = 0;
+    const forecastFn = jest.fn(() => ({ unwrap: () => (call++ === 0 ? Promise.resolve({ forecast: { distance: 4 } }) : Promise.reject({ details: 'fetch error' })) }));
+    mockedUseForecast.mockReturnValue([forecastFn, { isLoading: false }]);
+
+    // no AQI for simplicity
+    mockedUseAqi.mockReturnValue([jest.fn(), { isLoading: false }]);
+
+    const routeUtils = require('../../utils/routeUtils');
+    routeUtils.getForecastRequest.mockReturnValue([{ lat: 1 }, { lat: 2 }]);
+
+    const { container } = render(<ForecastButton
+      fetchingForecast={false}
+      submitDisabled={false}
+      routeNumber={'1'}
+      startTimestamp={0}
+      pace={"A"}
+      interval={1}
+      metric={false}
+      controls={[]}
+      strava_activity={""}
+      strava_route={""}
+      provider={"weatherKit"}
+      href={""}
+      origin={""}
+      queryString={null}
+      urlIsShortened={false}
+      querySet={jest.fn() as any}
+      zone={""}
+      computeStdDev={false}
+      downloadAll={false}
+    />);
+
+    const btn = container.querySelector('button') as HTMLButtonElement;
+    await (async () => fireEvent.click(btn))();
+
+    // wait for dispatches
+    await waitFor(() => expect(mockDispatch).toHaveBeenCalled());
+
+    const { forecastFetched, forecastAppended } = require('../../redux/forecastSlice');
+    // forecastFetched should be called with the first successful forecast
+    expect(forecastFetched).toHaveBeenCalled();
+    // since there's only one successful forecast, forecastAppended may not be called; ensure not to throw if it wasn't
+
+    const { errorMessageListSet, errorMessageListAppend } = require('../../redux/dialogParamsSlice');
+    expect(errorMessageListSet).toHaveBeenCalled();
+    expect(errorMessageListAppend).toHaveBeenCalled();
+  });
+
   test('getForecastForProvider returns [] for all providers when no route data (downloadAll)', async () => {
     // no route data present
     mockedUseAppSelector.mockImplementation((fn: any) => fn({ routeInfo: { rwgpsRouteData: null, gpxRouteData: null, name: 'routename', distanceInKm: 13 }, controls: { userControlPoints: [] }, forecast: { fetchAqi: false }, uiInfo: { routeParams: { rusaPermRouteId: '', segment: 0 } }, routeInfoSlice: {} }));
