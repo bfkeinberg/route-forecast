@@ -10,6 +10,8 @@ import VersionContext from "../versionContext";
 import LocationContext from '../locationContext';
 import TopLevel from './topLevel';
 
+let serviceWorkerInstalled = false;
+
 if ('serviceWorker' in navigator) {
     navigator.serviceWorker.addEventListener('message', (event: MessageEvent) => {
         if (event.data.type === 'info') {
@@ -30,6 +32,7 @@ if ('serviceWorker' in navigator) {
 
     navigator.serviceWorker.register('/worker.js').then((registration) => {
         console.log(`Service worker registered! - ${registration.scope}`);
+        serviceWorkerInstalled = true;
         if (registration.active) {
             console.log(`Worker details:${registration.active.state} ${registration.active.scriptURL}`);
         }
@@ -41,9 +44,24 @@ if ('serviceWorker' in navigator) {
         }
         });        
     }).catch((error) => {
-        warn(`Error registering service worker: ${JSON.stringify(error)} ${error}`);
+        warn(`Error registering service worker, while browser was ${navigator.onLine?'online':'offline'}: ${JSON.stringify(error)} ${error}`);
     });
 }
+
+window.addEventListener('online', (event) => {
+    if (!serviceWorkerInstalled) {
+        // retry installing service worker when back online
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/worker.js').then((registration) => {
+                console.log(`Service worker registered on reconnect! - ${registration.scope}`);
+                serviceWorkerInstalled = true;
+            }).catch((error) => {
+                warn(`Error registering service worker on reconnect: ${JSON.stringify(error)} ${error}`);
+            });
+        }
+    }
+});
+
 
 let script = document.scripts.namedItem('routeui')
 if (!script || script == null) {
