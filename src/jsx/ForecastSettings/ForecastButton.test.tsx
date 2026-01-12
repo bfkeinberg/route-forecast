@@ -368,6 +368,302 @@ describe('ForecastButton', () => {
     expect(errorMessageListAppend).toHaveBeenCalled();
   });
 
+  test('getForecastForProvider returns [] for all providers when no route data (downloadAll)', async () => {
+    // no route data present
+    mockedUseAppSelector.mockImplementation((fn: any) => fn({ routeInfo: { rwgpsRouteData: null, gpxRouteData: null, name: 'routename', distanceInKm: 13 }, controls: { userControlPoints: [] }, forecast: { fetchAqi: false }, uiInfo: { routeParams: { rusaPermRouteId: '', segment: 0 } }, routeInfoSlice: {} }));
+    // ensure providers are considered by grabAllPossibleForecasts
+    mockedUseForecastData.mockReturnValue({ length: 1, daysInFuture: 1 });
+
+    const { container } = render(<ForecastButton
+      fetchingForecast={false}
+      submitDisabled={false}
+      routeNumber={'1'}
+      startTimestamp={0}
+      pace={"A"}
+      interval={1}
+      metric={false}
+      controls={[]}
+      strava_activity={""}
+      strava_route={""}
+      provider={"weatherKit"}
+      href={""}
+      origin={""}
+      queryString={null}
+      urlIsShortened={false}
+      querySet={jest.fn() as any}
+      zone={""}
+      computeStdDev={false}
+      downloadAll={true}
+    />);
+
+    const btn = container.querySelector('button') as HTMLButtonElement;
+    fireEvent.click(btn);
+
+    // grabAllPossibleForecasts calls writeObjToFile asynchronously
+    await waitFor(() => expect(mockedWrite).toHaveBeenCalled());
+    const arg = mockedWrite.mock.calls[0][0] as any;
+    // weatherKit should be present and its array should be empty since getForecastForProvider returns [] without route data
+    expect(arg.weatherKit).toEqual([]);
+  });
+
+  test('getForecastForProvider returns [] when all parts reject', async () => {
+    const mockDispatch = jest.fn();
+    mockedUseAppDispatch.mockReturnValue(mockDispatch);
+    // route data exists so the internal doForecastByParts will create parts
+    mockedGetDeps.mockReturnValue({ routeData: {}, timeZoneId: 'tz', controlPoints: [], segment: 0, routeUUID: 'uuid' });
+    // two parts
+    const routeUtils = require('../../utils/routeUtils');
+    routeUtils.getForecastRequest.mockReturnValue([{ lat: 1 }, { lat: 2 }]);
+
+    // forecast unwrap always rejects
+    const forecastFn = jest.fn(() => ({ unwrap: () => Promise.reject({ details: 'bad' }) }));
+    mockedUseForecast.mockReturnValue([forecastFn, { isLoading: false }]);
+
+    mockedUseForecastData.mockReturnValue({ length: 1, daysInFuture: 1 });
+
+    const { container } = render(<ForecastButton
+      fetchingForecast={false}
+      submitDisabled={false}
+      routeNumber={'1'}
+      startTimestamp={0}
+      pace={"A"}
+      interval={1}
+      metric={false}
+      controls={[]}
+      strava_activity={""}
+      strava_route={""}
+      provider={"weatherKit"}
+      href={""}
+      origin={""}
+      queryString={null}
+      urlIsShortened={false}
+      querySet={jest.fn() as any}
+      zone={""}
+      computeStdDev={false}
+      downloadAll={true}
+    />);
+
+    const btn = container.querySelector('button') as HTMLButtonElement;
+    fireEvent.click(btn);
+
+    await waitFor(() => expect(mockedWrite).toHaveBeenCalled());
+    const arg = mockedWrite.mock.calls[0][0] as any;
+
+    expect(arg.weatherKit).toEqual([]);
+  });
+
+  test('getForecastForProvider returns sorted forecasts when parts succeed', async () => {
+    const mockDispatch = jest.fn();
+    mockedUseAppDispatch.mockReturnValue(mockDispatch);
+    mockedGetDeps.mockReturnValue({ routeData: {}, timeZoneId: 'tz', controlPoints: [], segment: 0, routeUUID: 'uuid' });
+
+    const routeUtils = require('../../utils/routeUtils');
+    routeUtils.getForecastRequest.mockReturnValue([{ lat: 1 }, { lat: 2 }]);
+
+    // return distance based on part data so result ordering is deterministic
+    const forecastFn = jest.fn((req: any) => ({ unwrap: () => Promise.resolve({ forecast: { distance: req.locations.lat } }) }));
+    mockedUseForecast.mockReturnValue([forecastFn, { isLoading: false }]);
+
+    mockedUseForecastData.mockReturnValue({ length: 1, daysInFuture: 1 });
+
+    const { container } = render(<ForecastButton
+      fetchingForecast={false}
+      submitDisabled={false}
+      routeNumber={'1'}
+      startTimestamp={0}
+      pace={"A"}
+      interval={1}
+      metric={false}
+      controls={[]}
+      strava_activity={""}
+      strava_route={""}
+      provider={"weatherKit"}
+      href={""}
+      origin={""}
+      queryString={null}
+      urlIsShortened={false}
+      querySet={jest.fn() as any}
+      zone={""}
+      computeStdDev={false}
+      downloadAll={true}
+    />);
+
+    const btn = container.querySelector('button') as HTMLButtonElement;
+    fireEvent.click(btn);
+
+    await waitFor(() => expect(mockedWrite).toHaveBeenCalled());
+    const arg = mockedWrite.mock.calls[0][0] as any;
+    const arr = arg.weatherKit;
+    expect(arr).toBeDefined();
+    expect(arr.length).toBeGreaterThan(0);
+    const distances = arr.map((a:any)=>a.distance).sort((a:number,b:number)=>a-b);
+    expect(distances).toEqual([1,2]);
+  });
+
+  test('fetchAqi true includes AQI values in forecast payload', async () => {
+    const mockDispatch = jest.fn();
+    mockedUseAppDispatch.mockReturnValue(mockDispatch);
+
+    // route data exists and fetchAqi true
+    mockedUseAppSelector.mockImplementation((fn: any) => fn({ routeInfo: { rwgpsRouteData: {}, gpxRouteData: null, name: 'routename', distanceInKm: 13 }, controls: { userControlPoints: [] }, forecast: { fetchAqi: true }, uiInfo: { routeParams: { rusaPermRouteId: '', segment: 0 } }, routeInfoSlice: {} }));
+
+    mockedGetDeps.mockReturnValue({ routeData: {}, timeZoneId: 'tz', controlPoints: [], segment: 0, routeUUID: 'uuid' });
+
+    const routeUtils = require('../../utils/routeUtils');
+    routeUtils.getForecastRequest.mockReturnValue([{ lat: 1 }, { lat: 2 }]);
+
+    const forecastFn = jest.fn((req: any) => ({ unwrap: () => Promise.resolve({ forecast: { distance: req.locations.lat } }) }));
+    const aqiFn = jest.fn((req: any) => ({ unwrap: () => Promise.resolve({ aqi: { aqi: req.locations.lat * 10 } }) }));
+    mockedUseForecast.mockReturnValue([forecastFn, { isLoading: false }]);
+    mockedUseAqi.mockReturnValue([aqiFn, { isLoading: false }]);
+
+    mockedUseForecastData.mockReturnValue({ length: 1, daysInFuture: 1 });
+
+    const { container } = render(<ForecastButton
+      fetchingForecast={false}
+      submitDisabled={false}
+      routeNumber={'1'}
+      startTimestamp={0}
+      pace={"A"}
+      interval={1}
+      metric={false}
+      controls={[]}
+      strava_activity={""}
+      strava_route={""}
+      provider={"weatherKit"}
+      href={""}
+      origin={""}
+      queryString={null}
+      urlIsShortened={false}
+      querySet={jest.fn() as any}
+      zone={""}
+      computeStdDev={false}
+      downloadAll={false}
+    />);
+
+    const btn = container.querySelector('button') as HTMLButtonElement;
+    await (async () => fireEvent.click(btn))();
+
+    await waitFor(() => expect(require('../../redux/forecastSlice').forecastFetched).toHaveBeenCalled());
+
+    const { forecastFetched, forecastAppended } = require('../../redux/forecastSlice');
+    const fetchedArg = (forecastFetched as jest.Mock).mock.calls[0][0] as any;
+    expect(fetchedArg.forecastInfo.forecast[0].aqi).toBe(10);
+
+    const appendedArg = (forecastAppended as jest.Mock).mock.calls[0][0] as any;
+    expect(appendedArg.aqi).toBe(20);
+  });
+
+  test('partial AQI failures: one AQI rejects, one succeeds', async () => {
+    const mockDispatch = jest.fn();
+    mockedUseAppDispatch.mockReturnValue(mockDispatch);
+
+    // route data exists and fetchAqi true
+    mockedUseAppSelector.mockImplementation((fn: any) => fn({ routeInfo: { rwgpsRouteData: {}, gpxRouteData: null, name: 'routename', distanceInKm: 13 }, controls: { userControlPoints: [] }, forecast: { fetchAqi: true }, uiInfo: { routeParams: { rusaPermRouteId: '', segment: 0 } }, routeInfoSlice: {} }));
+
+    mockedGetDeps.mockReturnValue({ routeData: {}, timeZoneId: 'tz', controlPoints: [], segment: 0, routeUUID: 'uuid' });
+    const routeUtils = require('../../utils/routeUtils');
+    routeUtils.getForecastRequest.mockReturnValue([{ lat: 1 }, { lat: 2 }]);
+
+    const forecastFn = jest.fn((req: any) => ({ unwrap: () => Promise.resolve({ forecast: { distance: req.locations.lat } }) }));
+    const aqiFn = jest.fn((req: any) => ({ unwrap: () => (req.locations.lat === 1 ? Promise.resolve({ aqi: { aqi: 10 } }) : Promise.reject({ details: 'badAQI' })) }));
+    mockedUseForecast.mockReturnValue([forecastFn, { isLoading: false }]);
+    mockedUseAqi.mockReturnValue([aqiFn, { isLoading: false }]);
+
+    mockedUseForecastData.mockReturnValue({ length: 1, daysInFuture: 1 });
+
+    const { container } = render(<ForecastButton
+      fetchingForecast={false}
+      submitDisabled={false}
+      routeNumber={'1'}
+      startTimestamp={0}
+      pace={"A"}
+      interval={1}
+      metric={false}
+      controls={[]}
+      strava_activity={""}
+      strava_route={""}
+      provider={"weatherKit"}
+      href={""}
+      origin={""}
+      queryString={null}
+      urlIsShortened={false}
+      querySet={jest.fn() as any}
+      zone={""}
+      computeStdDev={false}
+      downloadAll={false}
+    />);
+
+    const btn = container.querySelector('button') as HTMLButtonElement;
+    await (async () => fireEvent.click(btn))();
+
+    await waitFor(() => expect(require('../../redux/forecastSlice').forecastFetched).toHaveBeenCalled());
+    const { forecastFetched, forecastAppended } = require('../../redux/forecastSlice');
+    const fetchedArg = (forecastFetched as jest.Mock).mock.calls[0][0] as any;
+    expect(fetchedArg.forecastInfo.forecast[0].aqi).toBe(10);
+
+    const appendedArg = (forecastAppended as jest.Mock).mock.calls[0][0] as any;
+    // second part had AQI fetch fail, so no aqi set on appended forecast
+    expect(appendedArg.aqi).toBeUndefined();
+
+    const { errorMessageListAppend } = require('../../redux/dialogParamsSlice');
+    expect(errorMessageListAppend).toHaveBeenCalled();
+  });
+
+  test('all AQI failures: forecasts succeed but no AQI fields set and errors appended', async () => {
+    const mockDispatch = jest.fn();
+    mockedUseAppDispatch.mockReturnValue(mockDispatch);
+
+    mockedUseAppSelector.mockImplementation((fn: any) => fn({ routeInfo: { rwgpsRouteData: {}, gpxRouteData: null, name: 'routename', distanceInKm: 13 }, controls: { userControlPoints: [] }, forecast: { fetchAqi: true }, uiInfo: { routeParams: { rusaPermRouteId: '', segment: 0 } }, routeInfoSlice: {} }));
+
+    mockedGetDeps.mockReturnValue({ routeData: {}, timeZoneId: 'tz', controlPoints: [], segment: 0, routeUUID: 'uuid' });
+    const routeUtils = require('../../utils/routeUtils');
+    routeUtils.getForecastRequest.mockReturnValue([{ lat: 1 }, { lat: 2 }]);
+
+    const forecastFn = jest.fn((req: any) => ({ unwrap: () => Promise.resolve({ forecast: { distance: req.locations.lat } }) }));
+    const aqiFn = jest.fn(() => ({ unwrap: () => Promise.reject({ details: 'badAQI' }) }));
+    mockedUseForecast.mockReturnValue([forecastFn, { isLoading: false }]);
+    mockedUseAqi.mockReturnValue([aqiFn, { isLoading: false }]);
+
+    mockedUseForecastData.mockReturnValue({ length: 1, daysInFuture: 1 });
+
+    const { container } = render(<ForecastButton
+      fetchingForecast={false}
+      submitDisabled={false}
+      routeNumber={'1'}
+      startTimestamp={0}
+      pace={"A"}
+      interval={1}
+      metric={false}
+      controls={[]}
+      strava_activity={""}
+      strava_route={""}
+      provider={"weatherKit"}
+      href={""}
+      origin={""}
+      queryString={null}
+      urlIsShortened={false}
+      querySet={jest.fn() as any}
+      zone={""}
+      computeStdDev={false}
+      downloadAll={false}
+    />);
+
+    const btn = container.querySelector('button') as HTMLButtonElement;
+    await (async () => fireEvent.click(btn))();
+
+    await waitFor(() => expect(require('../../redux/forecastSlice').forecastFetched).toHaveBeenCalled());
+    const { forecastFetched, forecastAppended } = require('../../redux/forecastSlice');
+    const fetchedArg = (forecastFetched as jest.Mock).mock.calls[0][0] as any;
+    expect(fetchedArg.forecastInfo.forecast[0].aqi).toBeUndefined();
+
+    const appendedArg = (forecastAppended as jest.Mock).mock.calls[0][0] as any;
+    expect(appendedArg.aqi).toBeUndefined();
+
+    const { errorMessageListAppend } = require('../../redux/dialogParamsSlice');
+    expect(errorMessageListAppend).toHaveBeenCalled();
+  });
+
   test('computeStdDev true causes add_payment_info to include provider list with provider first', async () => {
     const mockEvent = jest.fn();
     (ReactGA as any).event = mockEvent;
