@@ -297,7 +297,7 @@ const RouteForecastMap = ({maps_api_key} : {maps_api_key: string}) => {
     const initialBounds = {north:37.34544, south:37.30822, east:-121.98912, west:-122.06169}
     try {
         return (
-            <Sentry.ErrorBoundary fallback=<h2>Cannot render map</h2>>
+            <Sentry.ErrorBoundary fallback={<h2>Cannot render map</h2>}>
                 <div id="map" style={{ width:'auto', height: "calc(100vh - 115px)", position: "relative" }}>
                     {(Array.isArray(forecast) && forecast.length > 0 || routeLoadingMode === routeLoadingModes.STRAVA) && bounds !== null ?
                         <APIProvider apiKey={maps_api_key} onLoad={handleApiLoad} onError={handleApiError}>
@@ -310,13 +310,13 @@ const RouteForecastMap = ({maps_api_key} : {maps_api_key: string}) => {
                                         scaleControl={true}
                                         defaultBounds={initialBounds}
                                     >
-                                        <Sentry.ErrorBoundary fallback=<h3>Cannot render markers</h3>>
+                                        <Sentry.ErrorBoundary fallback={<h3>Cannot render markers</h3>}>
                                         {controls !== null && <MapMarkers forecast={forecast}
                                             controls={controls} controlNames={controlNames}
                                             subrange={subrange} metric={metric}
                                         />}
                                         </Sentry.ErrorBoundary>
-                                        <Sentry.ErrorBoundary fallback=<h3>Cannot render route line</h3>>
+                                        <Sentry.ErrorBoundary fallback={<h3>Cannot render route line</h3>}>
                                             <Polyline path={points} strokeWeight={3} strokeColor={'#3244a8'} strokeOpacity={1.0} />
                                         </Sentry.ErrorBoundary>                                        
                                         {infoVisible && getInfoWindow(markedInfo)}
@@ -381,7 +381,7 @@ const MapMarkers = ({ forecast, controls, controlNames, subrange, metric} : MapM
 
     // marker title now contains both temperature and mileage
     return (validForecastPoints.map((point) =>
-        <Sentry.ErrorBoundary fallback=<h2>Cannot render temperature marker</h2> >
+        <Sentry.ErrorBoundary fallback={<h2>Cannot render temperature marker</h2>} >
             <TempMarker latitude={point.lat}
                 longitude={point.lon}
                 value={cvtDistance(point.distance.toString(), metric)}
@@ -424,7 +424,7 @@ const RainIcon = ({ latitude, longitude, value, title, isRainy }: { latitude: nu
     }
     if (isRainy) {
         return (
-            <Sentry.ErrorBoundary fallback=<h2>Cannot render rain marker</h2> >
+            <Sentry.ErrorBoundary fallback={<h2>Cannot render rain marker</h2>} >
                 <SafeAdvancedMarker position={{ lat: latitude, lng: longitude }} /* label={value.toFixed(0)} */ title={title}>
                     <RainCloud style={{ position: 'relative', margin: '2px' }} width={45} height={50} />
                 </SafeAdvancedMarker>
@@ -592,7 +592,7 @@ const ControlMarker = ({ latitude, longitude, value = '' }: ControlMarkerProps) 
         return <div />
     }
     return (
-        <Sentry.ErrorBoundary fallback=<h2>Cannot render control marker</h2> >
+        <Sentry.ErrorBoundary fallback={<h2>Cannot render control marker</h2>} >
             <SafeAdvancedMarker position={{ lat: latitude, lng: longitude }}
                 zIndex={5} collisionBehavior={CollisionBehavior.REQUIRED_AND_HIDES_OPTIONAL}
                 onMouseEnter={(event: google.maps.MapMouseEvent['domEvent']) => { setShowTheText(true) }}
