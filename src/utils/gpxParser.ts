@@ -1,7 +1,6 @@
 let gpxParser = require('gpxparser')
 import { DateTime } from 'luxon';
 
-import { finishTimeFormat } from '../jsx/ForecastSettings/TimeFields';
 import { inputPaceToSpeed, setMinMaxCoords } from './util';
 import {getPowerOrVelocity} from "./windUtils"
 import * as Sentry from "@sentry/browser"
@@ -11,6 +10,9 @@ import * as turf from "@turf/turf";
 
 import { create, all } from 'mathjs/number'
 import { Feature, LineString, GeoJsonProperties } from 'geojson';
+
+// Format for finish times (moved from TimeFields to avoid circular dependency in tests)
+const finishTimeFormat = 'EEE, MMM dd yyyy h:mma';
 const config = {
   relTol: 1e-5,
   absTol: 1e-8,
@@ -673,4 +675,5 @@ class AnalyzeRoute {
     }
 }
 
+export { AnalyzeRoute };
 export default new AnalyzeRoute();

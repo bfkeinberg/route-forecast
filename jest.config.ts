@@ -9,13 +9,19 @@ const __dirname = dirname(__filename);
 
 const config: Config.InitialOptions = {
   // using explicit ts-jest transform below (avoid preset to prevent default hoisting transformer)
-  testEnvironment: 'jsdom', // Provides a browser-like environment (Jest 28+ requires separate install)
+  testEnvironment: 'node',
   setupFilesAfterEnv: ['<rootDir>/jest.setup.ts'], // Points to the setup file for jest-dom matchers
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'], // Ensures correct file resolution
   // Add other options as needed
   moduleNameMapper: {
     '^Images/(.*)$': '<rootDir>/src/static/$1',
+    '^gpxparser$': '<rootDir>/__mocks__/gpxparser.js',
+    '^./stravaRouteParser$': '<rootDir>/__mocks__/stravaRouteParser.js',
+    '\\.(css|scss|sass|less)$': '<rootDir>/__mocks__/styleMock.js',
   },
+  transformIgnorePatterns: [
+    'node_modules/(?!(@exodus|gpxparser|query-string))',
+  ],
   transform: {
     '^.+\\.(css|scss|sass|less)$': 'jest-transform-css',
     '^.+\\.tsx?$': ['ts-jest', {
