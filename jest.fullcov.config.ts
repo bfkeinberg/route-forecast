@@ -8,9 +8,11 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 const config: Config.InitialOptions = {
-    preset: 'ts-jest', // Enables TypeScript support with ts-jest,
+    // using explicit ts-jest transform below (avoid preset to prevent default hoisting transformer)
     collectCoverage: true,
     collectCoverageFrom: ["src/{jsx,redux,server,utils}/**/*.{js,jsx,ts,tsx}"],
+    coveragePathIgnorePatterns: [
+    ],
     testEnvironment: 'jsdom', // Provides a browser-like environment (Jest 28+ requires separate install)
     setupFilesAfterEnv: ['<rootDir>/jest.setup.ts'], // Points to the setup file for jest-dom matchers
     moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'], // Ensures correct file resolution
@@ -21,7 +23,13 @@ const config: Config.InitialOptions = {
     transform: {
         '^.+\\.(css|scss|sass|less)$': 'jest-transform-css',
         '^.+\\.tsx?$': ['ts-jest', {
-            tsconfig: 'tsconfig.test.json' // Specify the path to your test tsconfig
+            tsconfig: 'tsconfig.test.json',
+            babelConfig: true,
+            // disable ast transformers (hoisting) to avoid ts-jest hoist errors
+            astTransformers: {
+                before: [],
+                after: []
+            }
         }]
     },
     moduleDirectories: [
