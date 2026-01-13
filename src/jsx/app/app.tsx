@@ -1,7 +1,7 @@
 //import * as Sentry from "@sentry/react";
 import { init, feedbackIntegration, browserSessionIntegration, browserTracingIntegration,
      browserProfilingIntegration, replayIntegration, replayCanvasIntegration, 
-     thirdPartyErrorFilterIntegration, setTag, logger } from '@sentry/react';
+     thirdPartyErrorFilterIntegration, setTag, logger, metrics } from '@sentry/react';
 const { trace, debug, info, warn, error, fatal, fmt } = logger;
 
 import { createRoot } from 'react-dom/client';
@@ -33,18 +33,23 @@ if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('/worker.js').then((registration) => {
         console.log(`Service worker registered! - ${registration.scope}`);
         serviceWorkerInstalled = true;
+        metrics.count("install_successes", 1, {attributes:{registration:registration}});
         if (registration.active) {
             console.log(`Worker details:${registration.active.state} ${registration.active.scriptURL}`);
+        } else {
+            trace(`No active service worker after registration : ${JSON.stringify(registration)}`);
         }
     // reg.installing may or may not be set, depending on whether
         // a new SW was registered.
         registration.installing?.addEventListener('statechange', (event : Event) => {
         if (event.target && (event.target as ServiceWorker).state === 'redundant') {
-            warn(`Service worker did not install correctly, was redundant`)
-        }
-        });        
+            warn(`Service worker did not install correctly, was redundant`);
+        } else if (event.target) {
+            trace(`Service worker state changed to ${(event.target as ServiceWorker).state}`);
+        }});        
     }).catch((error) => {
-        warn(`Error registering service worker, while browser was ${navigator.onLine?'online':'offline'}: ${JSON.stringify(error)} ${error}`);
+        warn(`Error registering service worker, while browser was ${navigator.onLine?'online':'offline'}: ${error}`);
+        metrics.count("install_failures", 1, {attributes:{error:error}});
     });
 }
 
@@ -54,9 +59,11 @@ window.addEventListener('online', (event) => {
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('/worker.js').then((registration) => {
                 console.log(`Service worker registered on reconnect! - ${registration.scope}`);
+                metrics.count("install_successes", 1, {attributes:{registration:registration}});
                 serviceWorkerInstalled = true;
             }).catch((error) => {
-                warn(`Error registering service worker on reconnect: ${JSON.stringify(error)} ${error}`);
+                warn(`Error registering service worker on reconnect: ${error}`);
+                metrics.count("install_failures", 1, {attributes:{error:error}});
             });
         }
     }
