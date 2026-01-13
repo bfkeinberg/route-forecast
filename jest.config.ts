@@ -9,7 +9,7 @@ const __dirname = dirname(__filename);
 
 const config: Config.InitialOptions = {
   // using explicit ts-jest transform below (avoid preset to prevent default hoisting transformer)
-  testEnvironment: 'node',
+  testEnvironment: 'jsdom',
   setupFilesAfterEnv: ['<rootDir>/jest.setup.ts'], // Points to the setup file for jest-dom matchers
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'], // Ensures correct file resolution
   // Add other options as needed
