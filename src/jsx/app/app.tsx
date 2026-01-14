@@ -36,8 +36,6 @@ if ('serviceWorker' in navigator) {
         metrics.count("install_successes", 1, {attributes:{registration:registration}});
         if (registration.active) {
             console.log(`Worker details:${registration.active.state} ${registration.active.scriptURL}`);
-        } else {
-            trace(`No active service worker after registration : ${JSON.stringify(registration)}`);
         }
     // reg.installing may or may not be set, depending on whether
         // a new SW was registered.

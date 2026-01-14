@@ -16,7 +16,17 @@ const sendLogMessage = (message, type) => {
 
 // sendLogMessage('About to import localforage', 'trace');
 
-importScripts('lib/localforage.js');
+try {
+    importScripts('lib/localforage.min.js');
+} catch (err) {
+    sendLogMessage(`Error importing localforage.min.js: ${err}`, 'error');
+    // try the non-minified version
+    try {
+        importScripts('lib/localforage.js');
+    } catch (err) {
+        sendLogMessage(`Error importing localforage.js: ${err}`, 'error');
+    }
+}
 
 const cacheName = 'RandoplanCache_v1';
 const indexed_db_app_name = 'RandoplanPOST_DB';
