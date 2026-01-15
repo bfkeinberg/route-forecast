@@ -351,11 +351,14 @@ app.post('/forecast_one', cache.middleware(), upload.none(), timeout('27s'), hal
             postgresClient = await setupPostgres();
         }
         if (postgresClient && req.body.routeNumber && req.body.routeName) {
+            // tear off the privacy code if any
+            const queryPos = req.body.routeNumber.indexOf('?')
+            const routeNumber = (queryPos === -1) ? req.body.routeNumber : req.body.routeNumber.slice(0,queryPos);
             try {
                 const insertResult = await
                     postgresClient.query(
                         "INSERT into randoplan VALUES($1,$2,$3,$4) ON CONFLICT (routeName) DO UPDATE SET timestamp=EXCLUDED.timestamp, location=EXCLUDED.location, routeNumber=EXCLUDED.routeNumber",
-                        [req.body.routeName, req.body.routeNumber,
+                        [req.body.routeName, routeNumber,
                         new Date(), `(${forecastPoints.lat},${forecastPoints.lon})`]);
                 // console.info(insertResult);
             } catch (err) {
