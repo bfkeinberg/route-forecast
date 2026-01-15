@@ -375,23 +375,20 @@ app.post('/forecast_one', cache.middleware(), upload.none(), timeout('27s'), hal
     }
     try {
         const point = forecastPoints
-        const result = await callWeatherService(service, point.lat, point.lon, point.time, point.distance, zone, point.bearing, point.isControl, lang).catch((err: Error) => {
-            console.error(`callWeatherService @ ${point.lat},${point.lon} ${point.time} failed with ${err}`);
-            error(`callWeatherService @ ${point.lat},${point.lon} ${point.time} using ${service} failed with ${err}`);
-            throw err;
-        })
+        const result = await callWeatherService(service, point.lat, point.lon, point.time, point.distance, zone, point.bearing, point.isControl, lang);
         if (!process.env.NO_LOGGING) {
             logger.info(`Done with request from ${req.ip}`);
         }
         if (req.timedout) {
-            console.warn(`Forecast processing finished, but request already timed out. Not sending response.`);
+            warn(`Forecast processing finished, but request already timed out. Not sending response.`);
             return;
         }        
         res.status(200).json({ 'forecast': result });
     } catch (err) {
         if (!process.env.NO_LOGGING) {
-            logger.info(`Error with request @ ${forecastPoints.lat},${forecastPoints.lon} from ${req.ip} ${err}`);
+            logger.info(`Error with request @ ${forecastPoints.lat},${forecastPoints.lon} at ${forecastPoints.time} from ${req.ip} ${err}`);
         }
+        error(`callWeatherService @ ${forecastPoints.lat},${forecastPoints.lon} ${forecastPoints.time} using ${service} failed with ${err}`);
         res.status(502).json(
             { 'details': `Error calling weather service @ ${forecastPoints.lat},${forecastPoints.lon} ${forecastPoints.time}: ${err}` });
     }
