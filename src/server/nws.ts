@@ -19,20 +19,22 @@ axiosRetry(axiosInstance, {
             return false
         }
         switch (error.response.status) {
-        case 500:
-        case 404:
-            return true;
-        default:
-            return false;
+            case 500:
+            case 503:
+            case 504:
+            case 404:
+                return true;
+            default:
+                return false;
         }
     },
     onRetry: (retryCount: number, error: AxiosError, requestConfig: AxiosRequestConfig) => {
-        console.log(`nws axios retry count: ${retryCount} for ${requestConfig.url} with ${error}`)
-        warn(`nws axios retry count: ${retryCount} for ${requestConfig.url} with ${error}`)
+        console.log(`nws axios retry count: ${retryCount} for ${requestConfig.url} with ${error.message}`)
+        warn(`nws axios retry count: ${retryCount} for ${requestConfig.url} with ${error.message}`)
     },
-    onMaxRetryTimesExceeded: (err: any) => {
-        console.log(`last nws axios error after retrying was ${err}`)
-        error(`last nws axios error after retrying was ${err}`)
+    onMaxRetryTimesExceeded: (err: any, retryCount: number) => {
+        console.log(`last nws axios error after retrying ${retryCount} times was ${err}`)
+        error(`last nws axios error after retrying ${retryCount} times was ${err}`)
     }
 })
 
@@ -124,8 +126,8 @@ const getForecastFromNws = async (forecastUrl : string) => {
     const forecastGridData = await axiosInstance.get(forecastUrl, 
         { headers: { "User-Agent": '(randoplan.com, randoplan.ltd@gmail.com)' } }).catch(
         (        err: AxiosError) => {
-            error(`Failed to get NWS forecast from ${forecastUrl} : ${err}`);
-            throw Error(`Failed to get NWS forecast from ${forecastUrl} : ${err}`);
+            error(`Failed to get NWS forecast from ${forecastUrl} : ${err.message}`);
+            throw Error(`Failed to get NWS forecast from ${forecastUrl} : ${err.message}`);
         }
     );
     return forecastGridData;
