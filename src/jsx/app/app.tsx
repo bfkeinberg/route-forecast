@@ -42,7 +42,7 @@ if ('serviceWorker' in navigator) {
         registration.installing?.addEventListener('statechange', (event : Event) => {
         if (event.target && (event.target as ServiceWorker).state === 'redundant') {
             warn(`Service worker did not install correctly, was redundant`);
-        } else if (event.target) {
+        } else if (event.target && (event.target as ServiceWorker).state === 'activated') {
             trace(`Service worker state changed to ${(event.target as ServiceWorker).state}`);
         }});        
     }).catch((error) => {
