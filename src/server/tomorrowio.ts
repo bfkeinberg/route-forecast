@@ -6,6 +6,7 @@ const axios = require('axios');
 const axiosInstance = axios.create()
 const Sentry = require("@sentry/node")
 const axiosRetry = require('axios-retry').default
+const { trace, debug, info, warn, error, fatal, fmt } = Sentry.logger;
 
 const weatherCodes  : {[index: string]: any} = {
     "0": "Unknown",
@@ -39,20 +40,24 @@ const weatherCodes  : {[index: string]: any} = {
 
 axiosRetry(axiosInstance, {
     retries: 4,
-    retryDelay: axiosRetry.exponentialDelay,
-    retryCondition: (error: { response: { status: any; }; }) => {
+    retryDelay: (...arg: any) => axiosRetry.exponentialDelay(...arg),
+    retryCondition: (error: AxiosError) => {
+        if (!error.response) {
+            warn(`Tomorrow.io axios retry condition called due to error with no response: ${error.message} ${error.code}`);
+            return false
+        }
         switch (error.response.status) {
-        case 429:
-            return true;
-        default:
-            return false;
+            case 429:
+                return true;
+            default:
+                return false;
         }
     },
-    onRetry: (retryCount : number) => {
-        console.info(`tommorow.io axios retry count: ${retryCount}`);
+    onRetry: (retryCount: number) => {
+        info(`tommorow.io axios retry count: ${retryCount}`);
     },
     onMaxRetryTimesExceeded: (err: any) => {
-        console.log(`last tomorrow.io axios error after retrying was ${err}`)
+        warn(`last tomorrow.io axios error after retrying was ${err}`)
     }
 });
 
@@ -60,7 +65,7 @@ const getFromTomorrowIoWithBackoff = async (forecastUrl : string) => {
     const forecastResult = await axiosInstance.get(forecastUrl).catch((error : AxiosError) => {
         // Sentry.captureException(error)
         console.error('Axios error', error.response?.statusText)
-        throw Error(`Failed to get Tomorrow.io forecast from ${forecastUrl}:${error}`)
+        throw Error(`Failed to get Tomorrow.io forecast from ${forecastUrl}: ${error}`)
     })
     if (forecastResult !== undefined) {
         const forecast = forecastResult.data;
