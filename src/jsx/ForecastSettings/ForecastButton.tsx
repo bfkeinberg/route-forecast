@@ -100,7 +100,10 @@ const ForecastButton = ({fetchingForecast,submitDisabled, routeNumber, startTime
         let aqiResults = []
         let locations = requestCopy.shift();
         let which = 0
-        let maxSimultaneousRequests = providerValues[service].maxRequests;
+        let maxSimultaneousRequests = providerValues[service] ? providerValues[service].maxRequests : 1;
+        if (!providerValues[service]) {
+            warn(`Unknown provider ${service} requested`);
+        }
 
         const limit = pLimit(maxSimultaneousRequests);
         while (requestCopy.length >= 0 && locations) {
