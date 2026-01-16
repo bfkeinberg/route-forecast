@@ -94,28 +94,36 @@ const ForecastButton = ({fetchingForecast,submitDisabled, routeNumber, startTime
         }
  */    }, [optionPressed, shiftPressed])
 
-    const forecastByParts = (forecastRequest : Array<ForecastRequest>, zone : string, service : string, routeName : string, routeNumber : string) => {
+    const forecastByParts = (forecastRequest: Array<ForecastRequest>, zone: string, service: string, routeName: string, routeNumber: string) => {
         let requestCopy = [...forecastRequest]
         let forecastResults = []
         let aqiResults = []
         let locations = requestCopy.shift();
         let which = 0
         let maxSimultaneousRequests = providerValues[service].maxRequests;
-        let failedRequests: { locations: ForecastRequest; timezone: string; service: string; routeName: string; routeNumber: string; lang: string; which: number; }[] = []
 
         const limit = pLimit(maxSimultaneousRequests);
         while (requestCopy.length >= 0 && locations) {
-            const request = {locations:locations, timezone:zone, service:service, routeName:routeName,
-                 routeNumber:routeNumber, lang: i18n.language, which}
+            const request = {
+                locations: locations, timezone: zone, service: service, routeName: routeName,
+                routeNumber: routeNumber, lang: i18n.language, which
+            }
             const result = limit(() => forecast(request).unwrap());
-            result.catch((err) => { 
-                warn(`Forecast fetch failed for part ${which} ${request.locations.lat} with error ${errorDetails(err)}`, {provider:service});
-                failedRequests.push(request);
-                info(`[FB] There are now ${failedRequests.length} failed requests queued up`);
+            result.catch((err) => {
+                warn(`Forecast fetch failed for part ${which} ${request.locations.lat} with error ${errorDetails(err)}`, { provider: service });
+                // retry with alternate provider if any failed
+                if (alternateProvider === service) {
+                    return;
+                }
+                let retryRequest = { ...request, service: alternateProvider };
+                forecastResults.push(limit(() => forecast(retryRequest).unwrap()).catch((err) => {
+                    warn(`Retry forecast fetch failed for part ${which} ${request.locations.lat} using ${alternateProvider} with error ${errorDetails(err)}`, { provider: alternateProvider });
+                }
+                ))
             });
             forecastResults.push(result)
             if (fetchAqi) {
-                const aqiRequest = {locations:locations}
+                const aqiRequest = { locations: locations }
                 const aqiResult = getAQI(aqiRequest).unwrap()
                 aqiResult.catch((err) => { warn(`AQI fetch failed for part ${which} ${aqiRequest.locations.lat} with error ${errorDetails(err)}`) });
                 aqiResults.push(aqiResult)
@@ -123,22 +131,8 @@ const ForecastButton = ({fetchingForecast,submitDisabled, routeNumber, startTime
             locations = requestCopy.shift();
             ++which
         }
-        // retry with alternate provider if any failed
-        if (failedRequests.length > 0) {
-            info(`Retrying ${failedRequests.length} failed forecast requests with alternate provider ${alternateProvider}`);
-/*             for (let i = 0; i < failedRequests.length; ++i) {
-                const request = failedRequests.pop();
-                if (!request) { continue; }
-                request.service = alternateProvider;
-                const result = forecast(request).unwrap();
-                result.catch((err) => {
-                    warn(`Retry forecast fetch failed for part ${i} ${request.locations.lat} using ${alternateProvider} with error ${err.details}`);
-                });
-                forecastResults.push(result)
-            } */
-        }
 
-        return [Promise.allSettled(forecastResults),fetchAqi?Promise.allSettled(aqiResults):[]]    
+        return [Promise.allSettled(forecastResults), fetchAqi ? Promise.allSettled(aqiResults) : []]
     }
 
     const doForecastByParts = (provider : string, routeData :RwgpsRoute|RwgpsTrip|GpxRouteData) => {
