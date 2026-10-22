@@ -404,7 +404,7 @@ app.post('/forecast_one', cache.middleware(), upload.none(), timeout('27s'), hal
         } catch (err) {
             warn(`Postgres setup failed: ${err}`);
         }
-        if (postgresClient && req.body.routeNumber && req.body.routeName) {
+        if (postgresClient && typeof req.body.routeNumber === 'string' && req.body.routeName) {
             // tear off the privacy code if any
             const queryPos = req.body.routeNumber.indexOf('?')
             const routeNumber = req.body.routeNumber.replace(/[&?].*/, '');
