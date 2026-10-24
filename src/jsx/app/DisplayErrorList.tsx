@@ -2,12 +2,11 @@ import * as React from 'react';
 import Snackbar, {SnackbarCloseReason} from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
 
-type CloseHandler = (event?: React.SyntheticEvent | Event, reason?: SnackbarCloseReason) => void
+type CloseHandler = (event?: React.SyntheticEvent | Event | null, reason?: SnackbarCloseReason) => void
 
 const ErrorDisplayer = ({ errorDetails, onClose } : {errorDetails : string, onClose: CloseHandler}) => {
     const [open, setOpen] = React.useState(true)
-    const handleClose = (event?: React.SyntheticEvent | Event,
-        reason?: SnackbarCloseReason) => {
+    const handleClose: CloseHandler = (event, reason) => {
             console.log('closing error details', reason)
             setOpen(false)
             onClose()
